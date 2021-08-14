@@ -1,3 +1,25 @@
+extend type Query {
+    # DataSource Query
+    queryDataSource(loginUser: InputUser!, id: Int!): QueryDataSourceResultType
+    queryDataSourceList(loginUser: InputUser!, dbType: DbType): DataSourceListResultType
+    queryDataSourceListPaging(loginUser: InputUser!, searchVal: String,
+        pageNo: Int!, pageSize: Int!): QueryDataSourceListPagingResultType
+    connectDataSource(loginUser: InputUser!,
+        dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    connectionTest(loginUser: InputUser!, id: Int): NormalResultType
+    verifyDataSourceName(loginUser: InputUser!, name: String!): NormalResultType
+    unauthDatasource(loginUser: InputUser!, userId: Int!): DataSourceListResultType
+    authedDatasource(loginUser: InputUser!, userId: Int!): DataSourceListResultType
+    getKerberosStartupState(loginUser: InputUser!): NormalResultType
+}
+
+extend type Mutation {
+    # DataSource Mutation
+    createDataSource(loginUser: InputUser!, dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    updateDataSource(loginUser: InputUser!, dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    deleteDataSource(loginUser: InputUser!, id: Int): NormalResultType
+}
+
 input InputBaseDataSourceParamDTO {
     database: String
     host: String

@@ -1,3 +1,21 @@
+extend type Query {
+    # AlertPluginInstance Query
+    getAlertPluginInstance(loginUser: InputUser!, id: Int!): AlertPluginInstanceResultType
+    getAllAlertPluginInstance(loginUser: InputUser!): AlertPluginInstanceListResultType
+    verifyAlertInstanceName(loginUser: InputUser!, alertInstanceName: String!): NormalResultType
+    queryAlertPluginInstanceListPaging(loginUser: InputUser!, pageNo: Int!,
+        pageSize: Int!): AlertPluginInstanceListPagingResultType
+}
+
+extend type Mutation {
+    # AlertPluginInstance Mutation
+    createAlertPluginInstance(loginUser: InputUser!, pluginDefineId: Int!,
+        instanceName: String, pluginInstanceParams: String): NormalResultType
+    updateAlertPluginInstance(loginUser: InputUser!, pluginDefineId: Int!,
+        instanceName: String!, pluginInstanceParams: String!): NormalResultType
+    deleteAlertPluginInstance(loginUser: InputUser!, id: Int): NormalResultType
+}
+
 type AlertPluginInstanceResultType {
     code: Int
     msg: String

@@ -44,6 +44,12 @@ public class GraphQLProvider {
     @Value("classpath:schema/Monitor.graphql")
     Resource monitorResource;
 
+    @Value("classpath:schema/ProcessDefinition.graphql")
+    Resource processDefinitionResource;
+
+    @Value("classpath:schema/ProcessInstance.graphql")
+    Resource processInstanceResource;
+
     private GraphQL graphQL;
 
     @Autowired
@@ -68,6 +74,8 @@ public class GraphQLProvider {
         File executorFile = executorResource.getFile();
         File alertPluginInstanceFile = alertPluginInstanceResource.getFile();
         File monitorFile = monitorResource.getFile();
+        File processDefinitionFile = processDefinitionResource.getFile();
+        File processInstanceFile = processInstanceResource.getFile();
 
         // parse schema
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
@@ -80,6 +88,8 @@ public class GraphQLProvider {
         typeRegistry.merge(schemaParser.parse(executorFile));
         typeRegistry.merge(schemaParser.parse(alertPluginInstanceFile));
         typeRegistry.merge(schemaParser.parse(monitorFile));
+        typeRegistry.merge(schemaParser.parse(processDefinitionFile));
+        typeRegistry.merge(schemaParser.parse(processInstanceFile));
 
         RuntimeWiring wiring = graphQLWiring.buildWiring();
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);

@@ -1,3 +1,16 @@
+extend type Query {
+    # DataAnalysis Query
+    countTaskStateByProject(loginUser: InputUser!, startDate: String,
+        endDate: String, projectId: Int = 0): TaskCountDtoResultType
+    countProcessInstanceState(loginUser: InputUser!, startDate: String,
+        endDate: String, projectId: Int = 0): TaskCountDtoResultType
+    countDefinitionByUser(loginUser: InputUser!, projectId: Int = 0): DefineUserDtoResultType
+    countCommandState(loginUser: InputUser!, startDate: String, endDate:
+    String, projectId: Int = 0): CommandStateCountResultType
+    countQueueState(loginUser: InputUser!, projectId: Int = 0): CountQueueStateResultType
+
+}
+
 type TaskCountDtoResultType {
     code: Int
     msg: String

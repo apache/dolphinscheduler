@@ -1,0 +1,276 @@
+query queryTaskListByProcessId {
+    queryTaskListByProcessId(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        projectName: "mktb_test"
+        processInstanceId: 2
+    ) {
+        code
+        msg
+        data {
+            processInstanceState
+            taskList {
+                id
+            }
+        }
+        success
+        failed
+    }
+}
+
+query queryProcessInstanceList {
+    queryProcessInstanceList(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        projectName: "mktb_test"
+        pageNo: 1
+        pageSize: 3
+    ) {
+        code
+        msg
+        data {
+            totalList {
+                id
+                code
+                name
+                version
+                releaseState
+                projectId
+                processDefinitionJson
+                description
+                globalParams
+                globalParamList {
+                    prop
+                    direct
+                    type
+                    value
+                }
+                globalParamMap
+                createTime
+                updateTime
+                flag
+                userId
+                userName
+                projectName
+                locations
+                connects
+                scheduleReleaseState
+                timeout
+                tenantId
+                modifyBy
+                resourceIds
+                warningGroupId
+            }
+            total
+            totalPage
+            currentPage
+        }
+        success
+        failed
+    }
+}
+
+query queryTaskListByProcessId {
+    queryTaskListByProcessId(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        projectName: "mktb_test"
+        processInstanceId: 2
+    ) {
+        code
+        msg
+        data {
+            processInstanceState
+            taskList {
+                id
+                name
+                taskType
+                processInstanceId
+                taskCode
+                taskDefinitionVersion
+                processInstanceName
+                state
+                firstSubmitTime
+                submitTime
+                startTime
+                endTime
+                host
+                executePath
+                logPath
+                retryTimes
+                alertFlag
+                processInstance {
+                    id
+                    processDefinitionCode
+                    processDefinitionVersion
+                    state
+                    recovery
+                    startTime
+                    endTime
+                    runTimes
+                    name
+                    host
+                    processDefinition {
+                        id
+                        code
+                        name
+                        version
+                        releaseState
+                        projectId
+                        projectCode
+                        processDefinitionJson
+                        description
+                        globalParams
+                        globalParamList {
+                            prop
+                            direct
+                            type
+                            value
+                        }
+                        globalParamMap
+                        createTime
+                        updateTime
+                        flag
+                        userId
+                        projectName
+                        locations
+                        connects
+                        scheduleReleaseState
+                        timeout
+                        tenantId
+                        modifyBy
+                        resourceIds
+                        warningGroupId
+                    }
+                    commandType
+                    taskDependType
+                    maxTryTimes
+                    failureStrategy
+                    warningType
+                    scheduleTime
+                    commandStartTime
+                    globalParams
+                    processInstanceJson
+                    executorId
+                    tenantCode
+                    queue
+                    isSubProcess
+                    locations
+                    connects
+                    historyCmd
+                    dependenceScheduleTimes
+                    duration
+                    processInstancePriority
+                    workerGroup
+                    timeout
+                    tenantId
+                    varPool
+                }
+                processDefine {
+                    id
+                    code
+                    name
+                    version
+                    releaseState
+                    projectId
+                    projectCode
+                    processDefinitionJson
+                    description
+                    globalParams
+                    globalParamList {
+                        prop
+                        direct
+                        type
+                        value
+                    }
+                    globalParamMap
+                    createTime
+                    updateTime
+                    flag
+                    userId
+                    projectName
+                    locations
+                    connects
+                    scheduleReleaseState
+                    timeout
+                    tenantId
+                    modifyBy
+                    resourceIds
+                    warningGroupId
+                }
+                taskDefine {
+                    id
+                    code
+                    name
+                    version
+                    description
+                    projectCode
+                    userId
+                    taskType
+                    taskParams
+                    taskParamMap
+                    flag
+                    taskPriority
+                    userName
+                    projectName
+                    workerGroup
+                    failRetryTimes
+                    failRetryInterval
+                    timeoutFlag
+                    timeoutNotifyStrategy
+                    timeout
+                    delayTime
+                    resourceIds
+                    createTime
+                    updateTime
+                }
+                pid
+                appLink
+                flag
+                dependency {
+                    dependTaskList {
+                        dependItemList {
+                            definitionCode
+                            depTask
+                            cycle
+                            dataValue
+                            dependResult
+                            status
+                        }
+                        relation
+                    }
+                }
+                duration
+                maxRetryTimes
+                retryInterval
+                taskInstancePriority
+                processInstancePriority
+                dependentResult
+                workerGroup
+                executorId
+                varPool
+                executorName
+                resources
+                delayTime
+                taskParams
+            }
+        }
+        success
+        failed
+    }
+}
+
+mutation updateProcessInstance {
+    updateProcessInstance(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        processInstanceId: 1
+        projectName: "mktb_test"
+        syncDefine: true
+        flag: NO
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+

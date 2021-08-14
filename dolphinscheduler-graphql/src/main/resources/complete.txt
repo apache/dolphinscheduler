@@ -33,7 +33,37 @@ Monitor
     queryDatabaseState
     queryZookeeperState
     
-ProcessDefinition
+ProcessDefinition               ----Long改用String
     createProcessDefinition
     copyProcessDefinition
-
+    moveProcessDefinition
+    verifyProcessDefinitionName
+    updateProcessDefinition
+    queryProcessDefinitionVersions
+    switchProcessDefinitionVersion
+    deleteProcessDefinitionVersion
+    releaseProcessDefinition
+    queryProcessDefinitionById
+    queryProcessDefinitionByName
+    queryProcessDefinitionList
+    queryProcessDefinitionListPaging
+    viewTree
+    getNodeListByDefinitionCode
+    getNodeListByDefinitionCodeList     ----返回值Map待解决
+    deleteProcessDefinitionById
+    batchDeleteProcessDefinitionByIds
+    batchExportProcessDefinitionByIds   ----无返回值
+    queryProcessDefinitionAllByProjectId
+    
+ProcessInstance
+    queryProcessInstanceList
+    queryTaskListByProcessId            ----t_ds_task_instance表中无process_instance_id
+    updateProcessInstance
+    queryProcessInstanceById
+    queryTopNLongestRunningProcessInstance  --------测试
+    deleteProcessInstanceById
+    querySubProcessInstanceByTaskId
+    queryParentInstanceBySubId
+    viewVariables
+    viewTree
+    batchDeleteProcessInstanceByIds

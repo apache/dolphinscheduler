@@ -39,6 +39,9 @@ public class GraphQLWiring {
     @Autowired
     private ProcessDefinitionDataFetchers processDefinitionDataFetchers;
 
+    @Autowired
+    private ProcessInstanceDataFetchers processInstanceDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -135,6 +138,46 @@ public class GraphQLWiring {
         // ProcessDefinition Query
         typeWiring.dataFetcher("copyProcessDefinition",
                 processDefinitionDataFetchers.queryTypeCopyProcessDefinition());
+        typeWiring.dataFetcher("moveProcessDefinition",
+                processDefinitionDataFetchers.queryTypeMoveProcessDefinition());
+        typeWiring.dataFetcher("verifyProcessDefinitionName",
+                processDefinitionDataFetchers.queryTypeVerifyProcessDefinitionName());
+        typeWiring.dataFetcher("queryProcessDefinitionVersions",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionVersions());
+        typeWiring.dataFetcher("queryProcessDefinitionById",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionById());
+        typeWiring.dataFetcher("queryProcessDefinitionByName",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionByName());
+        typeWiring.dataFetcher("queryProcessDefinitionList",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionList());
+        typeWiring.dataFetcher("queryProcessDefinitionListPaging",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionListPaging());
+        typeWiring.dataFetcher("viewTree",
+                processDefinitionDataFetchers.queryTypeViewTree());
+        typeWiring.dataFetcher("getNodeListByDefinitionCode",
+                processDefinitionDataFetchers.queryTypeGetNodeListByDefinitionCode());
+        typeWiring.dataFetcher("getNodeListByDefinitionCodeList",
+                processDefinitionDataFetchers.queryTypeGetNodeListByDefinitionCodeList());
+        typeWiring.dataFetcher("queryProcessDefinitionAllByProjectId",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionAllByProjectId());
+
+        // ProcessInstance Query
+        typeWiring.dataFetcher("queryProcessInstanceList",
+                processInstanceDataFetchers.queryTypeQueryProcessInstanceList());
+        typeWiring.dataFetcher("queryTaskListByProcessId",
+                processInstanceDataFetchers.queryTypeQueryTaskListByProcessId());
+        typeWiring.dataFetcher("queryProcessInstanceById",
+                processInstanceDataFetchers.queryTypeQueryProcessInstanceById());
+        typeWiring.dataFetcher("queryTopNLongestRunningProcessInstance",
+                processInstanceDataFetchers.queryTypeQueryTopNLongestRunningProcessInstance());
+        typeWiring.dataFetcher("querySubProcessInstanceByTaskId",
+                processInstanceDataFetchers.queryTypeQuerySubProcessInstanceByTaskId());
+        typeWiring.dataFetcher("queryParentInstanceBySubId",
+                processInstanceDataFetchers.queryTypeQueryParentInstanceBySubId());
+        typeWiring.dataFetcher("viewVariables",
+                processInstanceDataFetchers.queryTypeViewVariables());
+        typeWiring.dataFetcher("viewTree",
+                processInstanceDataFetchers.queryTypeViewTree());
 
         return typeWiring;
     }
@@ -186,6 +229,26 @@ public class GraphQLWiring {
         // ProcessDefinition Mutation
         typeWiring.dataFetcher("createProcessDefinition",
                 processDefinitionDataFetchers.mutationTypeCreateProcessDefinition());
+        typeWiring.dataFetcher("updateProcessDefinition",
+                processDefinitionDataFetchers.mutationTypeUpdateProcessDefinition());
+        typeWiring.dataFetcher("switchProcessDefinitionVersion",
+                processDefinitionDataFetchers.mutationTypeSwitchProcessDefinitionVersion());
+        typeWiring.dataFetcher("deleteProcessDefinitionVersion",
+                processDefinitionDataFetchers.mutationTypeDeleteProcessDefinitionVersion());
+        typeWiring.dataFetcher("releaseProcessDefinition",
+                processDefinitionDataFetchers.mutationTypeReleaseProcessDefinition());
+        typeWiring.dataFetcher("deleteProcessDefinitionById",
+                processDefinitionDataFetchers.mutationTypeDeleteProcessDefinitionById());
+        typeWiring.dataFetcher("batchDeleteProcessDefinitionByIds",
+                processDefinitionDataFetchers.mutationTypeBatchDeleteProcessDefinitionByIds());
+
+        // ProcessInstance Mutation
+        typeWiring.dataFetcher("updateProcessInstance",
+                processInstanceDataFetchers.mutationTypeUpdateProcessInstance());
+        typeWiring.dataFetcher("deleteProcessInstanceById",
+                processInstanceDataFetchers.mutationTypeDeleteProcessInstanceById());
+        typeWiring.dataFetcher("batchDeleteProcessInstanceByIds",
+                processInstanceDataFetchers.mutationTypeBatchDeleteProcessInstanceByIds());
 
         return typeWiring;
     }

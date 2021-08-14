@@ -1,0 +1,284 @@
+extend type Query {
+    # ProcessInstance Query
+    queryProcessInstanceList(loginUser: InputUser!, projectName: String!, processDefinitionId: Int = 0,
+        searchVal: String, executorName: String, stateType: ExecutionStatus, host: String,
+        startTime: String, endTime: String, pageNo: Int!, pageSize: Int!): ProcessDefinitionPageInfoResultType
+
+    queryTaskListByProcessId(loginUser: InputUser!, projectName: String!,
+        processInstanceId: Int!): QueryTaskListByProcessIdResultType
+
+    queryProcessInstanceById(loginUser: InputUser!, projectName: String!,
+        processInstanceId: Int!): ProcessDefinitionResultType
+
+    queryTopNLongestRunningProcessInstance(loginUser: InputUser!, projectName: String!,
+        size: Int!, startTime: String!, endTime: String!): ProcessDefinitionListResultType
+
+    querySubProcessInstanceByTaskId(loginUser: InputUser!, projectName: String!,
+        taskId: Int!): QuerySubProcessInstanceByTaskIdResultType
+
+    queryParentInstanceBySubId(loginUser: InputUser!, projectName: String!,
+        subId: Int!): QueryParentInstanceBySubIdResultType
+
+    viewVariables(loginUser: InputUser!, processInstanceId: Int!): ViewVariablesResultType
+
+    viewTree(loginUser: InputUser!, projectName: String!,
+        processInstanceId: Int!): GanttDtoResultType
+}
+
+extend type Mutation {
+    # ProcessInstance Mutation
+    updateProcessInstance(loginUser: InputUser!, projectName: String!,
+        processInstanceJson: String, processInstanceId: Int!, scheduleTime: String
+        syncDefine: Boolean!, locations: String, connects: String, flag: Flag): NormalResultType
+
+    deleteProcessInstanceById(loginUser: InputUser!, projectName: String!,
+        processInstanceId: Int!): NormalResultType
+
+    batchDeleteProcessInstanceByIds(loginUser: InputUser!, projectName: String!,
+        processInstanceIds: String!): NormalResultType
+}
+
+type ProcessInstance {
+    id: Int
+    processDefinitionCode: String
+    processDefinitionVersion: Int
+    state: ExecutionStatus
+    recovery: Flag
+    startTime: String
+    endTime: String
+    runTimes: Int
+    name: String
+    host: String
+    processDefinition: ProcessDefinition
+    commandType: CommandType
+    commandParam: String
+    taskDependType: TaskDependType
+    maxTryTimes: Int
+    failureStrategy: FailureStrategy
+    warningType: WarningType
+    warningGroupId: Int
+    scheduleTime: String
+    commandStartTime: String
+    globalParams: String
+    processInstanceJson: String
+    executorId: Int
+    executorName: String
+    tenantCode: String
+    queue: String
+    isSubProcess: Flag
+    locations: String
+    connects: String
+    historyCmd: String
+    dependenceScheduleTimes: String
+    duration: String
+    processInstancePriority: Priority
+    workerGroup: String
+    timeout: Int
+    tenantId: Int
+    varPool: String
+}
+
+type ProcessInstanceResultType {
+    code: Int
+    msg: String
+    data: ProcessInstance
+    success: Boolean
+    failed: Boolean
+}
+
+type ProcessInstancePageInfo {
+    totalList: [ProcessInstance]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type ProcessInstancePageInfoResultType {
+    code: Int
+    msg: String
+    data: ProcessInstancePageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type QueryTaskListByProcessIdResultType {
+    code: Int
+    msg: String
+    data: ProcessInstanceStateAndTaskList
+    success: Boolean
+    failed: Boolean
+}
+
+type ProcessInstanceStateAndTaskList {
+    processInstanceState: String
+    taskList: [TaskInstance]
+}
+
+type TaskInstance {
+    id: Int
+    name: String
+    taskType: String
+    processInstanceId: Int
+    taskCode: String
+    taskDefinitionVersion: Int
+    processInstanceName: String
+    state: ExecutionStatus
+    firstSubmitTime: String
+    submitTime: String
+    startTime: String
+    endTime: String
+    host: String
+    executePath: String
+    logPath: String
+    retryTimes: Int
+    alertFlag: Flag
+    processInstance: ProcessInstance
+    processDefine: ProcessDefinition
+    taskDefine: TaskDefinition
+    pid: Int
+    appLink: String
+    flag: Flag
+    dependency: DependentParameters
+    duration: String
+    maxRetryTimes: Int
+    retryInterval: Int
+    taskInstancePriority: Priority
+    processInstancePriority: Priority
+    dependentResult: String
+    workerGroup: String
+    executorId: Int
+    varPool: String
+    executorName: String
+    resources: String
+    delayTime: Int
+    taskParams: String
+}
+
+type TaskDefinition {
+    id: Int
+    code: String
+    name: String
+    version: Int
+    description: String
+    projectCode: String
+    userId: Int
+    taskType: String
+    taskParams: String
+    taskParamList: [Property]
+    taskParamMap: String
+    flag: Flag
+    taskPriority: Priority
+    userName: String
+    projectName: String
+    workerGroup: String
+    failRetryTimes: Int
+    failRetryInterval: Int
+    timeoutFlag: TimeoutFlag
+    timeoutNotifyStrategy: TaskTimeoutStrategy
+    timeout: Int
+    delayTime: Int
+    resourceIds: String
+    createTime: String
+    updateTime: String
+}
+
+enum TimeoutFlag {
+    CLOSE
+    OPEN
+}
+
+enum TaskTimeoutStrategy {
+    WARN
+    FAILED
+    WARNFAILED
+}
+
+type DependentParameters {
+    dependTaskList: [DependentTaskModel]
+    relation: DependentRelation
+}
+
+type DependentTaskModel {
+    dependItemList: [DependentItem]
+    relation: DependentRelation
+}
+
+type DependentItem {
+    definitionCode: String
+    depTask: String
+    cycle: String
+    dataValue: String
+    dependResult: DependResult
+    status: ExecutionStatus
+}
+
+enum DependResult {
+    SUCCESS, WAITING, FAILED, NON_EXEC
+}
+
+enum DependentRelation {
+    AND,OR
+}
+
+type QuerySubProcessInstanceByTaskIdResultType {
+    code: Int
+    msg: String
+    data: SubProcessInstanceIdType
+    success: Boolean
+    failed: Boolean
+}
+
+type SubProcessInstanceIdType {
+    subProcessInstanceId: Int
+}
+
+type QueryParentInstanceBySubIdResultType {
+    code: Int
+    msg: String
+    data: ParentWorkflowInstanceType
+    success: Boolean
+    failed: Boolean
+}
+
+type ParentWorkflowInstanceType {
+    parentWorkflowInstance: Int
+}
+
+type ViewVariablesResultType {
+    code: Int
+    msg: String
+    data: GlobalParamsAndLocalParams
+    success: Boolean
+    failed: Boolean
+}
+
+type GlobalParamsAndLocalParams {
+    globalParams: [Property]
+    localParams: String
+}
+
+type GanttDto {
+    height: Int
+    tasks: [Task]
+    taskNames: [String]
+    taskStatus: String
+}
+
+type Task {
+    taskName: String
+    startDate: [String]
+    endDate: [String]
+    executionDate: String
+    isoStart: String
+    isoEnd: String
+    status: String
+    duration: String
+}
+
+type GanttDtoResultType {
+    code: Int
+    msg: String
+    data: GanttDto
+    success: Boolean
+    failed: Boolean
+}

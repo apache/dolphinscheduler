@@ -1,0 +1,237 @@
+extend type Query {
+    # ProcessDefinition Query
+    copyProcessDefinition(loginUser: InputUser!, projectName: String!, processDefinitionIds: String!
+        targetProjectId: Int!): NormalResultType
+    moveProcessDefinition(loginUser: InputUser!, projectName: String!, processDefinitionIds: String
+        targetProjectId: Int!): NormalResultType
+    verifyProcessDefinitionName(loginUser: InputUser!, projectName: String!, name: String!): NormalResultType
+    queryProcessDefinitionVersions(loginUser: InputUser!, projectName: String!, pageNo: Int!,
+        pageSize: Int!, processDefinitionCode: String!): ProcessDefinitionLogPageInfoResultType
+    queryProcessDefinitionById(loginUser: InputUser!, projectName: String!,
+        processId: Int!): ProcessDefinitionResultType
+    queryProcessDefinitionByName(loginUser: InputUser!, projectName: String!,
+        processDefinitionName: String!): ProcessDefinitionResultType
+    queryProcessDefinitionList(loginUser: InputUser!, projectName: String!): ProcessDefinitionListResultType
+    queryProcessDefinitionListPaging(loginUser: InputUser!, projectName: String!,
+        pageNo: Int!, searchVal: String, userId: Int = 0, pageSize: Int!): ProcessDefinitionPageInfoResultType
+    viewTree(loginUser: InputUser!, projectName: String!,
+        id: Int!, limit: Int!): TreeViewDtoResultType
+    getNodeListByDefinitionCode(loginUser: InputUser!, projectName: String!,
+        processDefinitionCode: String): TaskNodeListResultType
+    getNodeListByDefinitionCodeList(loginUser: InputUser!, projectName: String!,
+        processDefinitionCodeList: String): NormalResultType
+    queryProcessDefinitionAllByProjectId(loginUser: InputUser!,
+        projectId: Int!): ProcessDefinitionListResultType
+}
+
+extend type Mutation {
+    # ProcessDefinition Mutation
+    createProcessDefinition(loginUser: InputUser!, projectName: String!
+        name: String!, json: String!, locations: String!, connects: String!
+        description: String!): NormalResultType
+    updateProcessDefinition(loginUser: InputUser!, projectName: String!, name: String!,
+        id: Int!, processDefinitionJson: String!, locations: String, connects: String,
+        description: String, releaseState: ReleaseState = OFFLINE): NormalResultType
+    switchProcessDefinitionVersion(loginUser: InputUser!, projectName: String!,
+        processDefinitionId: Int!, version: String!): NormalResultType
+    deleteProcessDefinitionVersion(loginUser: InputUser!, projectName: String!,
+        processDefinitionId: Int!, version: String!): NormalResultType
+    releaseProcessDefinition(loginUser: InputUser!, projectName: String!,
+        processId: Int!, releaseState: ReleaseState!): NormalResultType
+    deleteProcessDefinitionById(loginUser: InputUser!, projectName: String!,
+        processDefinitionId: Int!): NormalResultType
+    batchDeleteProcessDefinitionByIds(loginUser: InputUser!, projectName: String!,
+        processDefinitionIds: String!): NormalResultType
+}
+
+enum ReleaseState {
+    OFFLINE
+    ONLINE
+}
+
+type ProcessDefinition {
+    id: Int
+    code: String
+    name: String
+    version: Int
+    releaseState: ReleaseState
+    projectId: Int
+    projectCode: String
+    processDefinitionJson: String
+    description: String
+    globalParams: String
+    globalParamList: [Property]
+    globalParamMap: String
+    createTime: String
+    updateTime: String
+    flag: Flag
+    userId: Int
+    userName: String
+    projectName: String
+    locations: String
+    connects: String
+    scheduleReleaseState: ReleaseState
+    timeout: Int
+    tenantId: Int
+    modifyBy: String
+    resourceIds: String
+    warningGroupId: Int
+}
+
+type ProcessDefinitionResultType {
+    code: Int
+    msg: String
+    data: ProcessDefinition
+    success: Boolean
+    failed: Boolean
+}
+
+type ProcessDefinitionListResultType {
+    code: Int
+    msg: String
+    data: [ProcessDefinition]
+    success: Boolean
+    failed: Boolean
+}
+
+type ProcessDefinitionPageInfo {
+    totalList: [ProcessDefinition]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type ProcessDefinitionPageInfoResultType {
+    code: Int
+    msg: String
+    data: ProcessDefinitionPageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type Property {
+    prop: String
+    direct: Direct
+    type: DataType
+    value: String
+}
+
+enum Direct {
+    IN
+    OUT
+}
+
+enum DataType {
+    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN,LIST
+}
+
+type ProcessDefinitionLog {
+    operator: Int
+    operateTime: String
+    id: Int
+    code: String
+    name: String
+    version: Int
+    releaseState: ReleaseState
+    projectId: Int
+    projectCode: String
+    processDefinitionJson: String
+    description: String
+    globalParams: String
+    globalParamList: [Property]
+    globalParamMap: String
+    createTime: String
+    updateTime: String
+    flag: Flag
+    userId: Int
+    userName: String
+    projectName: String
+    locations: String
+    connects: String
+    scheduleReleaseState: ReleaseState
+    timeout: Int
+    tenantId: Int
+    modifyBy: String
+    resourceIds: String
+    warningGroupId: Int
+}
+
+type ProcessDefinitionLogPageInfo {
+    totalList: [ProcessDefinitionLog]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type ProcessDefinitionLogPageInfoResultType {
+    code: Int
+    msg: String
+    data: ProcessDefinitionLogPageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type TreeViewDto {
+    name: String
+    type: String
+    instances: [Instance]
+    children: [TreeViewDto]
+}
+
+type Instance {
+    id: Int
+    name: String
+    type: String
+    state: String
+    startTime: String
+    endTime: String
+    host: String
+    duration: String
+    subflowId: Int
+}
+
+type TreeViewDtoResultType {
+    code: Int
+    msg: String
+    data: TreeViewDto
+    success: Boolean
+    failed: Boolean
+}
+
+type TaskNode {
+    id: String
+    code: String
+    version: Int
+    name: String
+    desc: String
+    type: String
+    runFlag: String
+    loc: String
+    maxRetryTimes: Int
+    retryInterval: Int
+    params: String
+    preTasks: String
+    preTaskNodeList: [PreviousTaskNode]
+    extras: String
+    depList: [String]
+    dependence: String
+    conditionResult: String
+    taskInstancePriority: Priority
+    workerGroup: String
+    timeout: String
+    delayTime: Int
+}
+
+type PreviousTaskNode {
+    code: String
+    name: String
+    version: Int
+}
+
+type TaskNodeListResultType {
+    code: Int
+    msg: String
+    data: [TaskNode]
+    success: Boolean
+    failed: Boolean
+}

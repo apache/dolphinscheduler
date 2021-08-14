@@ -1,3 +1,21 @@
+extend type Query {
+    # AlertGroup Query
+    queryAllGroupList(loginUser: InputUser!): AlertGroupListResultType
+    queryAlertGroupListPaging(loginUser: InputUser!, pageNo: Int!,
+        pageSize: Int!, searchVal: String): QueryAlertGroupListPagingResultType
+    verifyGroupName(loginUser: InputUser!, groupName: String!): NormalResultType
+}
+
+extend type Mutation {
+    # AlertGroup Mutation
+    createAlertGroup(loginUser: InputUser!, groupName: String!,
+        description: String, alertInstanceIds: String): NormalResultType
+    updateAlertGroup(loginUser: InputUser!, id: Int!, groupName: String!,
+        description: String, alertInstanceIds: String): NormalResultType
+    delAlertGroupById(loginUser: InputUser!, id: ID!): NormalResultType
+
+}
+
 type AlertGroup {
     id: ID!
     groupName: String

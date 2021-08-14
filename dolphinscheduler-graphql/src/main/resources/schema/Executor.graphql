@@ -1,3 +1,20 @@
+extend type Query {
+    # Executor Query
+    startCheckProcessDefinition(loginUser: InputUser!, processDefinitionId: Int): NormalResultType
+}
+
+extend type Mutation {
+    # Executor Mutation
+    startProcessInstance(loginUser: InputUser!, projectName: String!, processDefinitionId: Int!,
+        scheduleTime: String!, failureStrategy: FailureStrategy!, startNodeList: String,
+        taskDependType: TaskDependType, execType: CommandType, warningType: WarningType!,
+        warningGroupId: Int!, receivers: String, receiversCc: String, runMode: RunMode,
+        processInstancePriority: Priority, workerGroup: String = "default", timeout: Int,
+        startParams: String): NormalResultType
+    execute(loginUser: InputUser!, projectName: String!, processInstanceId: Int!,
+        executeType: ExecuteType!): NormalResultType
+}
+
 enum FailureStrategy {
     END
     CONTINUE
