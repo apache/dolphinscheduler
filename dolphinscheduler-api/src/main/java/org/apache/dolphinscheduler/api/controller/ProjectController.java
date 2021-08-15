@@ -149,7 +149,7 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/list-paging")

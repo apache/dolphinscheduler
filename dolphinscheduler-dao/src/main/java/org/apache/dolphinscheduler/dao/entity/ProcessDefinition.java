@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.ArrayList;
@@ -288,10 +289,9 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        if (globalParams == null) {
+        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
-        } else {
-            this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
     }
@@ -301,7 +301,6 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONUtils.toJsonString(globalParamList);
         this.globalParamList = globalParamList;
     }
 

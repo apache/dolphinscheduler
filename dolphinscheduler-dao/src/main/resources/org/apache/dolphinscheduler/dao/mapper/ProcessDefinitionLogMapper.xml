@@ -34,26 +34,26 @@
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
         WHERE p.code = #{projectCode}
-        and pd.name = #{processDefinitionName}
+        and pd.name = #{name}
     </select>
     <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
-        WHERE code = #{processDefinitionCode}
+        WHERE code = #{code}
     </select>
     <select id="queryByDefinitionCodeAndVersion"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
-        where code = #{processDefinitionCode}
+        where code = #{code}
         and version = #{version}
     </select>
     <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
         select max(version)
         from t_ds_process_definition_log
-        where code = #{processDefinitionCode}
+        where code = #{code}
     </select>
 
     <select id="queryMaxVersionDefinitionLog" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
@@ -61,7 +61,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
-        where code = #{processDefinitionCode} order by version desc limit 1
+        where code = #{code} order by version desc limit 1
     </select>
 
     <select id="queryProcessDefinitionVersionsPaging"
@@ -69,14 +69,14 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
-        where code = #{processDefinitionCode}
+        where code = #{code}
         order by version desc
     </select>
 
     <delete id="deleteByProcessDefinitionCodeAndVersion">
         delete
         from t_ds_process_definition_log
-        where code = #{processDefinitionCode}
+        where code = #{code}
           and version = #{version}
     </delete>
 </mapper>
