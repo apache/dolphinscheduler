@@ -48,6 +48,9 @@ public class GraphQLWiring {
     @Autowired
     private QueueDataFetchers queueDataFetchers;
 
+    @Autowired
+    private ResourcesDataFetchers resourcesDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -207,6 +210,38 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("verifyQueue",
                 queueDataFetchers.queryTypeVerifyQueue());
 
+        // Resource Query
+        typeWiring.dataFetcher("queryResourceList",
+                resourcesDataFetchers.queryTypeQueryResourceList());
+        typeWiring.dataFetcher("queryResourceListPaging",
+                resourcesDataFetchers.queryTypeQueryResourceListPaging());
+        typeWiring.dataFetcher("queryResource",
+                resourcesDataFetchers.queryTypeQueryResource());
+        typeWiring.dataFetcher("viewResource",
+                resourcesDataFetchers.queryTypeViewResource());
+        typeWiring.dataFetcher("verifyResourceName",
+                resourcesDataFetchers.queryTypeVerifyResourceName());
+        typeWiring.dataFetcher("queryResourceJarList",
+                resourcesDataFetchers.queryTypeQueryResourceJarList());
+        typeWiring.dataFetcher("downloadResource",
+                resourcesDataFetchers.queryTypeDownloadResource());
+        typeWiring.dataFetcher("viewUIUdfFunction",
+                resourcesDataFetchers.queryTypeViewUIUdfFunction());
+        typeWiring.dataFetcher("queryUdfFuncListPaging",
+                resourcesDataFetchers.queryTypeQueryUdfFuncListPaging());
+        typeWiring.dataFetcher("queryUdfFuncList",
+                resourcesDataFetchers.queryTypeQueryUdfFuncList());
+        typeWiring.dataFetcher("verifyUdfFuncName",
+                resourcesDataFetchers.queryTypeVerifyUdfFuncName());
+        typeWiring.dataFetcher("authorizedFile",
+                resourcesDataFetchers.queryTypeAuthorizedFile());
+        typeWiring.dataFetcher("authorizeResourceTree",
+                resourcesDataFetchers.queryTypeAuthorizeResourceTree());
+        typeWiring.dataFetcher("unauthUDFFunc",
+                resourcesDataFetchers.queryTypeUnauthUDFFunc());
+        typeWiring.dataFetcher("authorizedUDFFunction",
+                resourcesDataFetchers.queryTypeAuthorizedUDFFunction());
+
         return typeWiring;
     }
 
@@ -291,6 +326,22 @@ public class GraphQLWiring {
                 queueDataFetchers.mutationTypeCreateProject());
         typeWiring.dataFetcher("updateQueue",
                 queueDataFetchers.mutationTypeUpdateQueue());
+
+        // Resources Mutation
+        typeWiring.dataFetcher("createDirectory",
+                resourcesDataFetchers.mutationTypeCreateDirectory());
+        typeWiring.dataFetcher("deleteResource",
+                resourcesDataFetchers.mutationTypeDeleteResource());
+        typeWiring.dataFetcher("onlineCreateResource",
+                resourcesDataFetchers.mutationTypeOnlineCreateResource());
+        typeWiring.dataFetcher("updateResourceContent",
+                resourcesDataFetchers.mutationTypeUpdateResourceContent());
+        typeWiring.dataFetcher("createUdfFunc",
+                resourcesDataFetchers.mutationTypeCreateUdfFunc());
+        typeWiring.dataFetcher("updateUdfFunc",
+                resourcesDataFetchers.mutationTypeUpdateUdfFunc());
+        typeWiring.dataFetcher("deleteUdfFunc",
+                resourcesDataFetchers.mutationTypeDeleteUdfFunc());
 
         return typeWiring;
     }

@@ -58,7 +58,7 @@ ProcessDefinition               ----Long改用String
 ProcessInstance
     queryProcessInstanceList
     queryTaskListByProcessId            ----t_ds_task_instance表中无process_instance_id
-    updateProcessInstance
+    updateProcessInstanc
     queryProcessInstanceById
     queryTopNLongestRunningProcessInstance  --------测试
     deleteProcessInstanceById
@@ -86,3 +86,29 @@ Queue
     queryQueueListPaging
     updateQueue
     verifyQueue
+
+Resources                                   ----测试
+    createDirectory
+    createResource                          ----文件参数无法实现
+    updateResource                          ----文件参数无法实现
+    queryResourceList
+    queryResourceListPaging
+    deleteResource
+    verifyResourceName
+    queryResourceJarList
+    queryResource
+    viewResource
+    onlineCreateResource                    ----返回值map用string代替
+    updateResourceContent
+    downloadResource
+    createUdfFunc
+    viewUIUdfFunction
+    updateUdfFunc
+    queryUdfFuncListPaging
+    queryUdfFuncList
+    verifyUdfFuncName
+    deleteUdfFunc
+    authorizedFile
+    authorizeResourceTree
+    unauthUDFFunc
+    authorizedUDFFunction
