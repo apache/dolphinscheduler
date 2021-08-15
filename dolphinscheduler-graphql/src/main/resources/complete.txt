@@ -122,3 +122,7 @@ Schedule
     deleteScheduleById
     queryScheduleList
     previewSchedule
+    
+TaskInstance
+    queryTaskListPaging
+    forceTaskSuccess

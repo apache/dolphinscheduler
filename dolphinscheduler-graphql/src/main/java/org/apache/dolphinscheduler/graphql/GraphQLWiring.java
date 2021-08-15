@@ -54,6 +54,9 @@ public class GraphQLWiring {
     @Autowired
     private ScheduleDataFetchers scheduleDataFetchers;
 
+    @Autowired
+    private TaskInstanceDataFetchers taskInstanceDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -253,6 +256,10 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("previewSchedule",
                 scheduleDataFetchers.queryTypePreviewSchedule());
 
+        // TaskInstance Query
+        typeWiring.dataFetcher("queryTaskListPaging",
+                taskInstanceDataFetchers.queryTypeQueryTaskListPaging());
+
         return typeWiring;
     }
 
@@ -365,6 +372,10 @@ public class GraphQLWiring {
                 scheduleDataFetchers.mutationTypeOffline());
         typeWiring.dataFetcher("deleteScheduleById",
                 scheduleDataFetchers.mutationTypeDeleteScheduleById());
+
+        // TaskInstance Mutation
+        typeWiring.dataFetcher("forceTaskSuccess",
+                taskInstanceDataFetchers.mutationTypeForceTaskSuccess());
 
         return typeWiring;
     }
