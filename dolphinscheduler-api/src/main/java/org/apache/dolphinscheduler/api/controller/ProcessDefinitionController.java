@@ -278,10 +278,14 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
-        Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+        }
+        result = processDefinitionService.queryProcessDefinitionVersions(loginUser
                 , projectName, pageNo, pageSize, processDefinitionCode);
 
-        return returnDataList(result);
+        return result;
     }
 
     /**
@@ -366,7 +370,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by id
+     * query detail of process definition by id
      *
      * @param loginUser login user
      * @param projectName project name
@@ -390,7 +394,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by name
+     * query detail of process definition by name
      *
      * @param loginUser login user
      * @param projectName project name
@@ -460,17 +464,17 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
-        return returnDataListPaging(result);
+        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
+
     }
 
     /**
-     * encapsulation treeview structure
+     * encapsulation tree view structure
      *
      * @param loginUser login user
      * @param projectName project name

@@ -136,7 +136,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query datasouce by type
+     * query datasource by type
      *
      * @param loginUser login user
      * @param type      data source type
@@ -179,13 +179,12 @@ public class DataSourceController extends BaseController {
                                             @RequestParam(value = "searchVal", required = false) String searchVal,
                                             @RequestParam("pageNo") Integer pageNo,
                                             @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**

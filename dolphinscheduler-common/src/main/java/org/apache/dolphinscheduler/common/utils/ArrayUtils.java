@@ -14,26 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.fasterxml.jackson.databind.JsonNode;
+package org.apache.dolphinscheduler.common.utils;
 
-/**
- * ProcessAddTaskParam
- */
-public interface ProcessAddTaskParam {
+public class ArrayUtils {
 
-    /**
-     * add export task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addExportSpecialParam(JsonNode taskNode);
+    public static byte[] clone(byte[] array) {
+        return array == null ? null : (byte[])((byte[])array.clone());
+    }
 
-    /**
-     * add task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addImportSpecialParam(JsonNode taskNode);
+    public static byte[] addAll(byte[] array1, byte[] array2) {
+        if (array1 == null) {
+            return clone(array2);
+        } else if (array2 == null) {
+            return clone(array1);
+        } else {
+            byte[] joinedArray = new byte[array1.length + array2.length];
+            System.arraycopy(array1, 0, joinedArray, 0, array1.length);
+            System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
+            return joinedArray;
+        }
+    }
 }

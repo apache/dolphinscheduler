@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_LIS
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ACCESS_TOKEN_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -128,13 +127,13 @@ public class AccessTokenController extends BaseController {
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
 
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = accessTokenService.queryAccessTokenList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
