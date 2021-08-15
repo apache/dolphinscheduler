@@ -352,8 +352,8 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.connector.version}</version>
-                <scope>test</scope>
+                <version>8.0.17</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
