@@ -104,8 +104,8 @@ public class ProcessInstanceController extends BaseController {
         @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
         @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
         @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
     @GetMapping(value = "list-paging")
     @ResponseStatus(HttpStatus.OK)

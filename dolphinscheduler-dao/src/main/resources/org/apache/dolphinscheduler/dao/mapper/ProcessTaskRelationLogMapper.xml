@@ -35,10 +35,10 @@
         create_time, update_time)
         values
         <foreach collection="taskRelationList" item="relation" separator=",">
-            (#{relation.name},#{relation.process_definition_version},#{relation.project_code},#{relation.process_definition_code},
-            #{relation.pre_task_code},#{relation.pre_task_version},#{relation.post_task_code},#{relation.post_task_version},
-            #{relation.condition_type},#{relation.condition_params},#{relation.operator},#{relation.operate_time},
-            #{relation.create_time},#{relation.update_time})
+            (#{relation.name},#{relation.processDefinitionVersion},#{relation.projectCode},#{relation.processDefinitionCode},
+            #{relation.preTaskCode},#{relation.preTaskVersion},#{relation.postTaskCode},#{relation.postTaskVersion},
+            #{relation.conditionType},#{relation.conditionParams},#{relation.operator},#{relation.operateTime},
+            #{relation.createTime},#{relation.updateTime})
         </foreach>
     </insert>
 </mapper>

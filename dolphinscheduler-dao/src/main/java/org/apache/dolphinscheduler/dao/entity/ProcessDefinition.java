@@ -288,10 +288,9 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        if (globalParams == null) {
+        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
-        } else {
-            this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
     }
@@ -301,7 +300,6 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONUtils.toJsonString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
