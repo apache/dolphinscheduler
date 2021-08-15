@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
@@ -34,19 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * UiPluginServiceImpl
+ * ui plugin service impl
  */
 @Service
-public class UiPluginServiceImpl extends BaseService implements UiPluginService {
+public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginService {
 
     @Autowired
     PluginDefineMapper pluginDefineMapper;
-
-    private static final String LANGUAGE_REGEX = "\"([^\"]*)\"";
-
-    private static final String LANGUAGE_SYMBOL = "$t";
-
-    private static final String ESCAPE_SYMBOL = "\\";
 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {

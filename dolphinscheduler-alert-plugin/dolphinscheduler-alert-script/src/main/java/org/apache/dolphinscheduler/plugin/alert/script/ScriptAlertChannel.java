@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.Map;
 
@@ -33,8 +32,10 @@ public class ScriptAlertChannel implements AlertChannel {
     @Override
     public AlertResult process(AlertInfo alertinfo) {
         AlertData alertData = alertinfo.getAlertData();
-        String alertParams = alertinfo.getAlertParams();
-        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
-        return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle());
+        Map<String, String> paramsMap = alertinfo.getAlertParams();
+        if (null == paramsMap) {
+            return new AlertResult("false", "script params is null");
+        }
+        return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle(),alertData.getContent());
     }
 }

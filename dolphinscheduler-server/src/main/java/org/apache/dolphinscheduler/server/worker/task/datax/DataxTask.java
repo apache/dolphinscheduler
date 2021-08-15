@@ -18,18 +18,19 @@
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
@@ -44,12 +45,12 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -58,6 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -81,15 +84,16 @@ public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
-    public static final String JVM_EVN = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
     /**
      * python process(datax only supports version 2.7 by default)
      */
     private static final String DATAX_PYTHON = "python2.7";
+    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
     /**
-     * datax home path
+     * datax path
      */
-    private static final String DATAX_HOME_EVN = "${DATAX_HOME}";
+    private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
     /**
      * datax channel count
      */
@@ -149,12 +153,8 @@ public class DataxTask extends AbstractTask {
             String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
-            // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    dataXParameters.getLocalParametersMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
+            // replace placeholder,and combine local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
@@ -235,10 +235,12 @@ public class DataxTask extends AbstractTask {
 
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
-        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 dataxTaskExecutionContext.getSourceConnectionParams());
 
-        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
+        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
@@ -250,15 +252,13 @@ public class DataxTask extends AbstractTask {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        for (String url : new String[]{dataSourceCfg.getJdbcUrl()}) {
-            urlArr.add(url);
-        }
+        urlArr.add(DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
 
         readerConnArr.add(readerConn);
 
         ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
-        readerParam.put("password", dataSourceCfg.getPassword());
+        readerParam.put("password", CommonUtils.decodePassword(dataSourceCfg.getPassword()));
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
@@ -268,16 +268,14 @@ public class DataxTask extends AbstractTask {
         List<ObjectNode> writerConnArr = new ArrayList<>();
         ObjectNode writerConn = JSONUtils.createObjectNode();
         ArrayNode tableArr = writerConn.putArray("table");
-        for (String table : new String[]{dataXParameters.getTargetTable()}) {
-            tableArr.add(table);
-        }
+        tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
+        writerConn.put("jdbcUrl", DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
-        writerParam.put("password", dataTargetCfg.getPassword());
+        writerParam.put("password", CommonUtils.decodePassword(dataTargetCfg.getPassword()));
 
         String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 DbType.of(dataxTaskExecutionContext.getTargetType()),
@@ -310,8 +308,8 @@ public class DataxTask extends AbstractTask {
 
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
-        content.put("reader", reader.toString());
-        content.put("writer", writer.toString());
+        content.set("reader", reader);
+        content.set("writer", writer);
         contentList.add(content);
 
         return contentList;
@@ -341,8 +339,8 @@ public class DataxTask extends AbstractTask {
         errorLimit.put("percentage", 0);
 
         ObjectNode setting = JSONUtils.createObjectNode();
-        setting.put("speed", speed.toString());
-        setting.put("errorLimit", errorLimit.toString());
+        setting.set("speed", speed);
+        setting.set("errorLimit", errorLimit);
 
         return setting;
     }
@@ -394,9 +392,9 @@ public class DataxTask extends AbstractTask {
 
         // datax python command
         StringBuilder sbr = new StringBuilder();
-        sbr.append(DATAX_PYTHON);
+        sbr.append(getPythonCommand());
         sbr.append(" ");
-        sbr.append(DATAX_HOME_EVN);
+        sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
         sbr.append(jobConfigFilePath);
@@ -421,32 +419,49 @@ public class DataxTask extends AbstractTask {
         return fileName;
     }
 
+    public String getPythonCommand() {
+        String pythonHome = System.getenv("PYTHON_HOME");
+        return getPythonCommand(pythonHome);
+    }
+
+    public String getPythonCommand(String pythonHome) {
+        if (StringUtils.isEmpty(pythonHome)) {
+            return DATAX_PYTHON;
+        }
+        String pythonBinPath = "/bin/" + DATAX_PYTHON;
+        Matcher matcher = PYTHON_PATH_PATTERN.matcher(pythonHome);
+        if (matcher.find()) {
+            return matcher.replaceAll(pythonBinPath);
+        }
+        return Paths.get(pythonHome, pythonBinPath).toString();
+    }
+
     public String loadJvmEnv(DataxParameters dataXParameters) {
-        int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
-        int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
-        return String.format(JVM_EVN, xms, xmx);
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
+        return String.format(JVM_PARAM, xms, xmx);
     }
 
     /**
      * parsing synchronized column names in SQL statements
      *
-     * @param dsType the database type of the data source
-     * @param dtType the database type of the data target
+     * @param sourceType the database type of the data source
+     * @param targetType the database type of the data target
      * @param dataSourceCfg the database connection parameters of the data source
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource dataSourceCfg, String sql) {
-        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
             logger.info("try to execute sql analysis query column name");
-            columnNames = tryExecuteSqlResolveColumnNames(dataSourceCfg, sql);
+            columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
         }
 
         notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
 
-        return DataxUtils.convertKeywordsColumns(dtType, columnNames);
+        return DataxUtils.convertKeywordsColumns(targetType, columnNames);
     }
 
     /**
@@ -462,7 +477,10 @@ public class DataxTask extends AbstractTask {
 
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
-            notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
+            if (parser == null) {
+                logger.warn("database driver [{}] is not support grammatical analysis sql", dbType);
+                return new String[0];
+            }
 
             SQLStatement sqlStatement = parser.parseStatement();
             SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
@@ -511,7 +529,7 @@ public class DataxTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            return null;
+            return new String[0];
         }
 
         return columnNames;
@@ -524,14 +542,13 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(BaseDataSource baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
-                        baseDataSource.getPassword());
+                Connection connection = DatasourceUtil.getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

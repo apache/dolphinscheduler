@@ -142,4 +142,20 @@ public class CollectionUtilsTest {
         Assert.assertEquals(2, cardinalityMap.get(2).intValue());
         Assert.assertEquals(3, cardinalityMap.get(3).intValue());
     }
+
+    @Test
+    public void transformToList() {
+        List<String> stringList = new ArrayList<>();
+        stringList.add("1");
+        List<Integer> integers = CollectionUtils.transformToList(stringList, String::length);
+        Assert.assertFalse(integers.isEmpty());
+    }
+
+    @Test
+    public void collectionToMap() {
+        List<String> stringList = new ArrayList<>();
+        stringList.add("1");
+        Map<Integer, String> lengthStringMap = CollectionUtils.collectionToMap(stringList, String::length);
+        Assert.assertFalse(lengthStringMap.isEmpty());
+    }
 }

@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -34,7 +36,7 @@ public interface AccessTokenService {
      * @param pageSize page size
      * @return token list for page number and page size
      */
-    Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create token

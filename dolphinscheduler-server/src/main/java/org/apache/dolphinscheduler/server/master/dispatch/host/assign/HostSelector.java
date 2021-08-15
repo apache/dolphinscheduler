@@ -28,9 +28,9 @@ public enum HostSelector {
 
     LOWERWEIGHT;
 
-    public static HostSelector of(String selector){
-        for(HostSelector hs : values()){
-            if(hs.name().equalsIgnoreCase(selector)){
+    public static HostSelector of(String selector) {
+        for (HostSelector hs : values()) {
+            if (hs.name().equalsIgnoreCase(selector)) {
                 return hs;
             }
         }

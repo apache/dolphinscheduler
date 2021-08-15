@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper">
+    <sql id="baseSql">
+        id, name, process_definition_version, project_code, process_definition_code, pre_task_code, pre_task_version,
+        post_task_code, post_task_version, condition_type, condition_params, create_time, update_time
+    </sql>
+    <select id="queryByProcessCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and process_definition_code = #{processCode}
+    </select>
+    <select id="queryByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE pre_task_code = #{taskCode}
+        <if test="taskCode != 0">
+            or post_task_code = #{taskCode}
+        </if>
+    </select>
+    <select id="queryByTaskCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE 1 = 1
+        <if test="taskCodes != null and taskCodes.length != 0">
+            and pre_task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+            or post_task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <delete id="deleteByCode">
+        delete from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and process_definition_code = #{processCode}
+    </delete>
+</mapper>

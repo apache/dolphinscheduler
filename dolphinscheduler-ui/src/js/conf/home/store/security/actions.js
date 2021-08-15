@@ -446,7 +446,7 @@ export default {
    */
   updateAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/update', payload, res => {
+      io.post('alert-plugin-instance/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -600,6 +600,19 @@ export default {
       })
     })
   },
+  /**
+   * get alarm groups all
+   */
+  getAlarmGroupsAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('alert-group/list', payload, res => {
+        state.alarmGroupsListAll = res.data
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
   saveWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post('worker-group/save', payload, res => {
@@ -611,7 +624,16 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/delete-by-id', payload, res => {
+      io.post('worker-group/delete-by-id', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  getWorkerAddresses ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('worker-group/worker-address-list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

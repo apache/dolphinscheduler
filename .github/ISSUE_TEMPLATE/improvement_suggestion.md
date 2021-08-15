@@ -2,14 +2,13 @@
 name: Improvement suggestion
 about: Improvement suggestion for this project
 title: "[Improvement][Module Name] Improvement title"
-labels: improvement
 assignees: ''
 
 ---
 
 *For better global communication, please give priority to using English description, thx! *
 
-*Please review https://dolphinscheduler.apache.org/en-us/docs/development/issue.html when describe an issue.*
+*Please review https://dolphinscheduler.apache.org/en-us/community/development/issue.html when describe an issue.*
 
 **Describe the question**
 A clear and concise description of what the improvement is.

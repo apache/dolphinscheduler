@@ -18,6 +18,9 @@
 import _ from 'lodash'
 
 export default {
+  setProjectId (state, payload) {
+    state.projectId = payload
+  },
   setProjectName (state, payload) {
     state.projectName = payload
   },
@@ -162,5 +165,16 @@ export default {
     } else {
       state.cacheTasks[payload.id] = payload
     }
+  },
+  resetLocalParam (state, payload) {
+    const tasks = state.tasks
+    tasks.forEach((task, index) => {
+      payload.forEach(p => {
+        if (p.id === task.id) {
+          tasks[index].params.localParams = p.localParam
+        }
+      })
+    })
+    state.tasks = tasks
   }
 }

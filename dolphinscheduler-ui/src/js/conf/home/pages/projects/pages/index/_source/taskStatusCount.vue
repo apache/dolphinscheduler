@@ -139,9 +139,3 @@
     components: { mNoData }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .task-status-count-model {
-
-  }
-</style>

@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import com.google.common.collect.Sets;
-
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.utils.ExecutionContextTestUtils;
 
 import org.junit.Assert;
@@ -33,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.google.common.collect.Sets;
+
 
 /**
  * round robin host manager test
@@ -40,16 +40,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RoundRobinHostManagerTest {
 
-
     @Mock
-    private ZookeeperNodeManager zookeeperNodeManager;
+    private ServerNodeManager serverNodeManager;
 
     @InjectMocks
     RoundRobinHostManager roundRobinHostManager;
 
     @Test
     public void testSelectWithEmptyResult() {
-        Mockito.when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
+        Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host emptyHost = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isEmpty(emptyHost.getAddress()));
@@ -57,7 +56,7 @@ public class RoundRobinHostManagerTest {
 
     @Test
     public void testSelectWithResult() {
-        Mockito.when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22:100"));
+        Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22"));
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));

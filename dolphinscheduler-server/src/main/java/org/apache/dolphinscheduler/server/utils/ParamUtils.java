@@ -14,15 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,52 +43,71 @@ public class ParamUtils {
 
     /**
      * parameter conversion
-     * @param globalParams      global params
-     * @param globalParamsMap   global params map
-     * @param localParams       local params
-     * @param commandType       command type
-     * @param scheduleTime      schedule time
+     * Warning:
+     *  When you first invoke the function of convert, the variables of localParams and varPool in the ShellParameters will be modified.
+     *  But in the whole system the variables of localParams and varPool have been used in other functions. I'm not sure if this current
+     *  situation is wrong. So I cannot modify the original logic.
+     *
+     * @param taskExecutionContext the context of this task instance
+     * @param parameters the parameters
      * @return global params
+     *
      */
-    public static Map<String,Property> convert(Map<String,Property> globalParams,
-                                                           Map<String,String> globalParamsMap,
-                                                           Map<String,Property> localParams,
-                                                           CommandType commandType,
-                                                           Date scheduleTime){
-        if (globalParams == null
-                && localParams == null){
+    public static Map<String,Property> convert(TaskExecutionContext taskExecutionContext, AbstractParameters parameters) {
+        Preconditions.checkNotNull(taskExecutionContext);
+        Preconditions.checkNotNull(parameters);
+        Map<String,Property> globalParams = getUserDefParamsMap(taskExecutionContext.getDefinedParams());
+        Map<String,String> globalParamsMap = taskExecutionContext.getDefinedParams();
+        CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
+        Date scheduleTime = taskExecutionContext.getScheduleTime();
+
+        // combining local and global parameters
+        Map<String,Property> localParams = parameters.getLocalParametersMap();
+
+        Map<String,Property> varParams = parameters.getVarPoolMap();
+
+        if (globalParams == null && localParams == null) {
             return null;
         }
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        Map<String,String> timeParams = BusinessTimeUtils
+        Map<String,String> params = BusinessTimeUtils
                 .getBusinessTime(commandType,
                         scheduleTime);
 
-        if (globalParamsMap != null){
-            timeParams.putAll(globalParamsMap);
+        if (globalParamsMap != null) {
+            params.putAll(globalParamsMap);
         }
 
-        if (globalParams != null && localParams != null){
+        if (Strings.isNotBlank(taskExecutionContext.getExecutePath())) {
+            params.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
+        }
+        params.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));
+
+        if (globalParams != null && localParams != null) {
             globalParams.putAll(localParams);
-        }else if (globalParams == null && localParams != null){
+        } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
         }
+        if (varParams != null) {
+            varParams.putAll(globalParams);
+            globalParams = varParams;
+        }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
             if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().startsWith("$")){
+                    && property.getValue().startsWith("$")) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
                  *  and there are no variables in them.
                  */
                 String val = property.getValue();
-                val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
+                val  = ParameterUtils.convertParameterPlaceholders(val, params);
                 property.setValue(val);
             }
         }
@@ -94,20 +120,19 @@ public class ParamUtils {
      * @param paramsMap params map
      * @return Map of converted
      */
-    public static Map<String,String> convert(Map<String,Property> paramsMap){
-        if(paramsMap == null){
+    public static Map<String,String> convert(Map<String,Property> paramsMap) {
+        if (paramsMap == null) {
             return null;
         }
 
         Map<String,String> map = new HashMap<>();
         Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
             map.put(en.getKey(),en.getValue().getValue());
         }
         return map;
     }
-
 
     /**
      * get parameters map
@@ -118,9 +143,9 @@ public class ParamUtils {
         if (definedParams != null) {
             Map<String,Property> userDefParamsMaps = new HashMap<>();
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
-            while (iter.hasNext()){
+            while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();
-                Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR , en.getValue());
+                Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
                 userDefParamsMaps.put(property.getProp(),property);
             }
             return userDefParamsMaps;

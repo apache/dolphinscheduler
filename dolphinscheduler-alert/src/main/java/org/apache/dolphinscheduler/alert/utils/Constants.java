@@ -31,7 +31,7 @@ public class Constants {
     public static final String ALERT_PROPERTIES_PATH = "/alert.properties";
 
     /** default alert plugin dir **/
-    public static final String ALERT_PLUGIN_PATH = "./lib/plugin/alert";
+    public static final String ALERT_PLUGIN_PATH = "lib/plugin/alert";
 
     public static final int ALERT_SCAN_INTERVAL = 5000;
 

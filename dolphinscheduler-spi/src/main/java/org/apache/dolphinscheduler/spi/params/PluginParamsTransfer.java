@@ -17,12 +17,17 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
+
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * plugin params pojo and json transfer tool
@@ -44,8 +49,36 @@ public class PluginParamsTransfer {
         List<PluginParams> pluginParams = transferJsonToParamsList(paramsJsonStr);
         Map<String, String> paramsMap = new HashMap<>();
         for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), null != param.getValue() ? param.getValue().toString() : null);
+            paramsMap.put(param.getName(), param.getValue() == null ? null : param.getValue().toString());
         }
         return paramsMap;
+    }
+
+    /**
+     * generate Plugin Params
+     *
+     * @param paramsJsonStr paramsJsonStr value
+     * @param pluginParamsTemplate pluginParamsTemplate
+     * @return return plugin params value
+     */
+    public static List<Map<String, Object>> generatePluginParams(String paramsJsonStr, String pluginParamsTemplate) {
+        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr);
+        return generatePluginParams(paramsMap, pluginParamsTemplate);
+    }
+
+    /**
+     * generate Plugin Params
+     *
+     * @param paramsMap paramsMap
+     * @param pluginParamsTemplate pluginParamsTemplate
+     * @return return plugin params value
+     */
+    public static List<Map<String, Object>> generatePluginParams(Map<String, Object> paramsMap, String pluginParamsTemplate) {
+        if (paramsMap == null || paramsMap.isEmpty()) {
+            return null;
+        }
+        List<Map<String, Object>> pluginParamsList = JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {});
+        pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE, paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
+        return pluginParamsList;
     }
 }

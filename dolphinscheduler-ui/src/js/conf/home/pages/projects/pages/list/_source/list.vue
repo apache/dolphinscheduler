@@ -52,7 +52,7 @@
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -89,12 +89,13 @@
     },
     methods: {
       ...mapActions('projects', ['deleteProjects']),
-      ...mapMutations('dag', ['setProjectName']),
+      ...mapMutations('dag', ['setProjectId', 'setProjectName']),
       _switchProjects (item) {
+        this.setProjectId(item.id)
         this.setProjectName(item.name)
-        localStore.setItem('projectName', `${item.name}`)
-        localStore.setItem('projectId', `${item.id}`)
-        this.$router.push({ path: '/projects/index' })
+        localStore.setItem('projectId', item.id)
+        localStore.setItem('projectName', item.name)
+        this.$router.push({ path: `/projects/${item.id}/index` })
       },
       /**
        * Delete Project

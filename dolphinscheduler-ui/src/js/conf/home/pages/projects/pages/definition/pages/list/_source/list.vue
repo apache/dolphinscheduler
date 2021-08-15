@@ -19,14 +19,14 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50" :selectable="selectable"></el-table-column>
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links" :title="scope.row.name">
-                  {{scope.row.name}}
+                <router-link :to="{ path: `/projects/${projectId}/definition/list/${scope.row.id}` }" tag="a" class="links">
+                  <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
             </el-popover>
@@ -55,35 +55,35 @@
         <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
         <el-table-column :label="$t('Timing state')">
           <template slot-scope="scope">
-            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
-            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'" class="time_offline">{{$t('offline')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'" class="time_online">{{$t('online')}}</span>
             <span v-if="!scope.row.scheduleReleaseState">-</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="335" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Start')" placement="top" :enterable="false">
               <span><el-button type="success" size="mini" :disabled="scope.row.releaseState !== 'ONLINE'"  icon="el-icon-video-play" @click="_start(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Timing')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('online')" placement="top" :enterable="false">
               <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('offline')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button>
+              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Copy Workflow')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" :disabled="scope.row.releaseState === 'ONLINE'"  icon="el-icon-document-copy" @click="_copyProcess(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Cron Manage')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -96,19 +96,19 @@
               </el-popconfirm>
             </el-tooltip>
             <el-tooltip :content="$t('TreeView')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-s-data" @click="_treeView(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-s-data" @click="_treeView(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Export')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-info" @click="_version(scope.row)" circle></el-button></span>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top">
+    <el-tooltip :content="$t('Delete')" placement="top">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
@@ -129,6 +129,7 @@
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
       :visible.sync="startDialog"
       width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
@@ -152,7 +153,7 @@
   import mStart from './start'
   import mTiming from './timing'
   import mRelatedItems from './relatedItems'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
   import mVersions from './versions'
 
@@ -202,7 +203,7 @@
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
-        this.$router.push({ path: `/projects/definition/tree/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${item.id}` })
       },
       /**
        * Start
@@ -242,7 +243,7 @@
        * Timing manage
        */
       _timingManage (item) {
-        this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.id}` })
       },
       /**
        * delete
@@ -267,7 +268,7 @@
        * edit
        */
       _edit (item) {
-        this.$router.push({ path: `/projects/definition/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${item.id}` })
       },
       /**
        * Offline
@@ -342,7 +343,7 @@
           processDefinitionId: processDefinitionId
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -355,14 +356,14 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionCode, fromThis }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionId: processDefinitionId
+          processDefinitionCode: processDefinitionCode
         }).then(res => {
-          this.versionData.processDefinitionVersions = res.data.lists
-          this.versionData.total = res.data.totalCount
+          this.versionData.processDefinitionVersions = res.data.totalList
+          this.versionData.total = res.data.total
           this.versionData.pageSize = res.data.pageSize
           this.versionData.pageNo = res.data.currentPage
         }).catch(e => {
@@ -376,7 +377,7 @@
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
@@ -385,7 +386,7 @@
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
             pageSize: 10,
-            processDefinitionId: processDefinitionId,
+            processDefinitionCode: processDefinitionCode,
             fromThis: fromThis
           })
         }).catch(e => {
@@ -396,10 +397,10 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionId: item.id
+          processDefinitionCode: item.code
         }).then(res => {
-          let processDefinitionVersions = res.data.lists
-          let total = res.data.totalCount
+          let processDefinitionVersions = res.data.totalList
+          let total = res.data.total
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
 
@@ -518,6 +519,23 @@
     },
     mounted () {
     },
+    computed: {
+      ...mapState('dag', ['projectId'])
+    },
     components: { mVersions, mStart, mTiming, mRelatedItems }
   }
 </script>
+
+<style lang="scss" rel="stylesheet/scss">
+
+  .time_online {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 3px;
+  }
+  .time_offline {
+    background-color: #ffc107;
+    color: #fff;
+    padding: 3px;
+  }
+</style>

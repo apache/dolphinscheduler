@@ -20,7 +20,7 @@
       <slot name="button-group"></slot>
     </div>
     <div class="right">
-      <div class="from-box">
+      <div class="form-box">
         <slot name="search-group" v-if="isShow"></slot>
         <template v-if="!isShow">
           <div class="list">

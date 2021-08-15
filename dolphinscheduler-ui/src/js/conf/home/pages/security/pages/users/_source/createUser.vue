@@ -138,7 +138,8 @@
       }
     },
     props: {
-      item: Object
+      item: Object,
+      fromUserInfo: Boolean
     },
     methods: {
       _ok () {
@@ -239,7 +240,9 @@
               }
             })
             this.$nextTick(() => {
-              this.tenantId = this.tenantList[0].id
+              if (this.tenantList.length) {
+                this.tenantId = this.tenantList[0].id
+              }
             })
             resolve()
           })
@@ -290,10 +293,16 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
+            this.state = this.item.state
             this.userState = this.item.state + '' || '1'
-            this.tenantId = this.item.tenantId
+            if (this.fromUserInfo || this.item.tenantId) {
+              this.tenantId = this.item.tenantId
+            }
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id || ''
+              let queue = _.find(this.queueList, ['code', this.item.queue])
+              if (queue) {
+                this.queueName = queue.id || ''
+              }
             })
           }
         })
@@ -303,10 +312,16 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
+          this.state = this.item.state
           this.userState = this.state + '' || '1'
-          this.tenantId = this.item.tenantId
+          if (this.fromUserInfo || this.item.tenantId) {
+            this.tenantId = this.item.tenantId
+          }
           if (this.queueList.length > 0) {
-            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+            let queue = _.find(this.queueList, ['code', this.item.queue])
+            if (queue) {
+              this.queueName = queue.id || ''
+            }
           } else {
             this.queueName = ''
           }

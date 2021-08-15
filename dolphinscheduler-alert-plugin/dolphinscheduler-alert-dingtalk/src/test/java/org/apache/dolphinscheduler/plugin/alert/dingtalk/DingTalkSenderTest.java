@@ -50,7 +50,7 @@ public class DingTalkSenderTest {
         dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "true");
         dingTalkSender = new DingTalkSender(dingTalkConfig);
-        AlertResult alertResult = dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
+        AlertResult alertResult = dingTalkSender.sendDingTalkMsg("title", "content test");
         Assert.assertEquals("false",alertResult.getStatus());
     }
 

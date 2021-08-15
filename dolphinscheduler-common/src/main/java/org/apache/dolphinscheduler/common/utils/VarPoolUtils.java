@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class VarPoolUtils {
@@ -39,8 +38,7 @@ public class VarPoolUtils {
      */
     public static void setTaskNodeLocalParams(TaskNode taskNode, Map<String, Object> propToValue) {
         String taskParamsJson = taskNode.getParams();
-        Map<String,Object> taskParams = JSONUtils.parseObject(taskParamsJson, HashMap.class);
-
+        Map<String,Object> taskParams = JSONUtils.toMap(taskParamsJson, String.class, Object.class);
         Object localParamsObject = taskParams.get(LOCALPARAMS);
         if (null != localParamsObject && null != propToValue && propToValue.size() > 0) {
             ArrayList<Object> localParams = (ArrayList)localParamsObject;
@@ -72,7 +70,7 @@ public class VarPoolUtils {
             if (kvs.length == 2) {
                 propToValue.put(kvs[0], kvs[1]);
             } else {
-                throw new ParseException(kv, 2);
+                return;
             }
         }
     }

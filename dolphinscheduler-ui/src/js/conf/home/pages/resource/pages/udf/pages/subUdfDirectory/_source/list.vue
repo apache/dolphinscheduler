@@ -59,7 +59,7 @@
             <el-tooltip :content="$t('Download')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -127,11 +127,9 @@
         this.deleteResource({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },

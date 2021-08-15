@@ -44,6 +44,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
+
 @Component
 public class AlertDao extends AbstractBaseDao {
 
@@ -99,15 +101,23 @@ public class AlertDao extends AbstractBaseDao {
      * @param serverType serverType
      */
     public void sendServerStopedAlert(int alertGroupId, String host, String serverType) {
-        Alert alert = new Alert();
-        List<ServerAlertContent> serverAlertContents = new ArrayList<>(1);
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
-                type(serverType).host(host).event(AlertEvent.SERVER_DOWN).warningLevel(AlertWarnLevel.SERIOUS).
+                type(serverType)
+                .host(host)
+                .event(AlertEvent.SERVER_DOWN)
+                .warningLevel(AlertWarnLevel.SERIOUS).
                 build();
-        serverAlertContents.add(serverStopAlertContent);
-        String content = JSONUtils.toJsonString(serverAlertContents);
+        String content = JSONUtils.toJsonString(Lists.newArrayList(serverStopAlertContent));
+
+        Alert alert = new Alert();
         alert.setTitle("Fault tolerance warning");
-        saveTaskTimeoutAlert(alert, content, alertGroupId);
+        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert.setContent(content);
+        alert.setAlertGroupId(alertGroupId);
+        alert.setCreateTime(new Date());
+        alert.setUpdateTime(new Date());
+        // we use this method to avoid insert duplicate alert(issue #5525)
+        alertMapper.insertAlertWhenServerCrash(alert);
     }
 
     /**

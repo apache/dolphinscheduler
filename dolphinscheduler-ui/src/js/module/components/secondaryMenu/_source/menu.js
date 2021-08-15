@@ -115,7 +115,7 @@ const menu = {
       path: 'warning-instance-manage',
       isOpen: true,
       enabled: true,
-      icon: 'ri-spam-fill',
+      icon: 'el-icon-warning-outline',
       children: []
     },
     {
@@ -133,7 +133,7 @@ const menu = {
       path: 'queue-manage',
       isOpen: true,
       enabled: true,
-      icon: 'ri-group-line',
+      icon: 'el-icon-s-grid',
       children: []
     },
     {

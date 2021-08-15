@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class})
+@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class, PropertyUtils.class})
 public class ProcessUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
@@ -99,14 +100,27 @@ public class ProcessUtilsTest {
         try {
             when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, 1))).thenReturn("1111");
             when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, 1))).thenReturn("1111");
-            when(OSUtils.exeCmd("sudo kill -9")).thenReturn("1111");
+            when(OSUtils.exeCmd("sudo -u tenantCode kill -9")).thenReturn("1111");
         } catch (Exception e) {
             e.printStackTrace();
         }
         taskExecutionContext.setHost("127.0.0.1:8888");
         taskExecutionContext.setLogPath("/log/1.log");
+        taskExecutionContext.setTenantCode("tenantCode");
         ProcessUtils.kill(taskExecutionContext);
         Assert.assertEquals(1, taskExecutionContext.getProcessId());
+    }
+
+    @Test
+    public void testGetKerberosInitCommand() {
+        PowerMockito.mockStatic(PropertyUtils.class);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(true);
+        PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
+        PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
+        PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
+        Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(false);
+        Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
     }
 
     @Test

@@ -15,64 +15,77 @@
 # limitations under the License.
 #
 
-#============================================================================
-# System
-#============================================================================
-# system env path. self configuration, please make sure the directory and file exists and have read write execute permissions
-dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
+# user data local directory path, please make sure the directory exists and have read write permissions
+data.basedir.path=${DATA_BASEDIR_PATH}
 
-# user data directory path, self configuration, please make sure the directory exists and have read write permissions
-data.basedir.path=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH}
-
-# resource upload startup type : HDFS,S3,NONE
+# resource storage type: HDFS, S3, NONE
 resource.storage.type=${RESOURCE_STORAGE_TYPE}
 
-#============================================================================
-# HDFS
-#============================================================================
-# resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
+# resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.upload.path=${RESOURCE_UPLOAD_PATH}
 
-# whether kerberos starts
-#hadoop.security.authentication.startup.state=false
+# whether to startup kerberos
+hadoop.security.authentication.startup.state=${HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE}
 
 # java.security.krb5.conf path
-#java.security.krb5.conf.path=/opt/krb5.conf
+java.security.krb5.conf.path=${JAVA_SECURITY_KRB5_CONF_PATH}
 
-# loginUserFromKeytab user
-#login.user.keytab.username=hdfs-mycluster@ESZ.COM
+# login user from keytab username
+login.user.keytab.username=${LOGIN_USER_KEYTAB_USERNAME}
 
-# loginUserFromKeytab path
-#login.user.keytab.path=/opt/hdfs.headless.keytab
+# login user from keytab path
+login.user.keytab.path=${LOGIN_USER_KEYTAB_PATH}
 
-#resource.view.suffixs
-#resource.view.suffixs=txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties
+# kerberos expire time, the unit is hour
+kerberos.expire.time=${KERBEROS_EXPIRE_TIME}
 
-# if resource.storage.type=HDFS, the user need to have permission to create directories under the HDFS root path
-hdfs.root.user=hdfs
+# resource view suffixs
+#resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
-# kerberos expire time
-kerberos.expire.time=7
+# if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
+hdfs.root.user=${HDFS_ROOT_USER}
 
-#============================================================================
-# S3
-#============================================================================
-# if resource.storage.type=S3，the value like: s3a://dolphinscheduler ; if resource.storage.type=HDFS, When namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
+# if resource.storage.type=S3, the value like: s3a://dolphinscheduler; if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
 fs.defaultFS=${FS_DEFAULT_FS}
 
-# if resource.storage.type=S3，s3 endpoint
+# if resource.storage.type=S3, s3 endpoint
 fs.s3a.endpoint=${FS_S3A_ENDPOINT}
 
-# if resource.storage.type=S3，s3 access key
+# if resource.storage.type=S3, s3 access key
 fs.s3a.access.key=${FS_S3A_ACCESS_KEY}
 
-# if resource.storage.type=S3，s3 secret key
+# if resource.storage.type=S3, s3 secret key
 fs.s3a.secret.key=${FS_S3A_SECRET_KEY}
 
-# if not use hadoop resourcemanager, please keep default value; if resourcemanager HA enable, please type the HA ips ; if resourcemanager is single, make this value empty  TODO
-yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx
+# resourcemanager port, the default value is 8088 if not specified
+resource.manager.httpaddress.port=${RESOURCE_MANAGER_HTTPADDRESS_PORT}
 
-# If resourcemanager HA enable or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ark1 to actual resourcemanager hostname.
-yarn.application.status.address=http://ark1:8088/ws/v1/cluster/apps/%s
+# if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty
+yarn.resourcemanager.ha.rm.ids=${YARN_RESOURCEMANAGER_HA_RM_IDS}
 
+# if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname
+yarn.application.status.address=${YARN_APPLICATION_STATUS_ADDRESS}
 
+# job history status url when application number threshold is reached(default 10000, maybe it was set to 1000)
+yarn.job.history.status.address=${YARN_JOB_HISTORY_STATUS_ADDRESS}
+
+# datasource encryption enable
+datasource.encryption.enable=${DATASOURCE_ENCRYPTION_ENABLE}
+
+# datasource encryption salt
+datasource.encryption.salt=${DATASOURCE_ENCRYPTION_SALT}
+
+# use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions
+sudo.enable=${SUDO_ENABLE}
+
+# network interface preferred like eth0, default: empty
+#dolphin.scheduler.network.interface.preferred=
+
+# network IP gets priority, default: inner outer
+#dolphin.scheduler.network.priority.strategy=default
+
+# system env path
+#dolphinscheduler.env.path=env/dolphinscheduler_env.sh
+
+# development state
+development.state=false
