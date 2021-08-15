@@ -134,3 +134,7 @@ Tenant
     updateTenant
     deleteTenantById
     verifyTenantCode
+    
+UiPlugin
+    queryUiPluginsByType
+    queryUiPluginDetailById

@@ -68,6 +68,9 @@ public class GraphQLProvider {
     @Value("classpath:schema/Tenant.graphql")
     Resource tenantResource;
 
+    @Value("classpath:schema/UiPlugin.graphql")
+    Resource uiPluginResource;
+
     private GraphQL graphQL;
 
     @Autowired
@@ -100,6 +103,7 @@ public class GraphQLProvider {
         File scheduleFile = scheduleResource.getFile();
         File taskInstanceFile = taskInstanceResource.getFile();
         File tenantFile = tenantResource.getFile();
+        File uiPluginFile = uiPluginResource.getFile();
 
         // parse schema
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
@@ -120,6 +124,7 @@ public class GraphQLProvider {
         typeRegistry.merge(schemaParser.parse(scheduleFile));
         typeRegistry.merge(schemaParser.parse(taskInstanceFile));
         typeRegistry.merge(schemaParser.parse(tenantFile));
+        typeRegistry.merge(schemaParser.parse(uiPluginFile));
 
         RuntimeWiring wiring = graphQLWiring.buildWiring();
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);

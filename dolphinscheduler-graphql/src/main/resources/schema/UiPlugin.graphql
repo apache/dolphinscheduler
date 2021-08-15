@@ -1,0 +1,36 @@
+extend type Query {
+    # UiPlugin Query
+    queryUiPluginsByType(loginUser: InputUser!, pluginType: PluginType!): PluginDefineListResultType
+
+    queryUiPluginDetailById(loginUser: InputUser!, pluginId: Int!): PluginDefineResultType
+}
+
+enum PluginType {
+    ALERT
+    REGISTER
+}
+
+type PluginDefine {
+    id: Int
+    pluginName: String
+    pluginType: String
+    pluginParams: String
+    createTime: String
+    updateTime: String
+}
+
+type PluginDefineListResultType {
+    code: Int
+    msg: String
+    data: [PluginDefine]
+    success: Boolean
+    failed: Boolean
+}
+
+type PluginDefineResultType {
+    code: Int
+    msg: String
+    data: PluginDefine
+    success: Boolean
+    failed: Boolean
+}

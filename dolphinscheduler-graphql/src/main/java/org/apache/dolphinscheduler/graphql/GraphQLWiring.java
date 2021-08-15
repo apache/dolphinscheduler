@@ -60,6 +60,9 @@ public class GraphQLWiring {
     @Autowired
     private TenantDataFetchers tenantDataFetchers;
 
+    @Autowired
+    private UiPluginDataFetchers uiPluginDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -270,6 +273,12 @@ public class GraphQLWiring {
                 tenantDataFetchers.queryTypeQueryTenantlist());
         typeWiring.dataFetcher("verifyTenantCode",
                 tenantDataFetchers.queryTypeVerifyTenantCode());
+
+        // UiPlugin Query
+        typeWiring.dataFetcher("queryUiPluginsByType",
+                uiPluginDataFetchers.queryTypeQueryUiPluginsByType());
+        typeWiring.dataFetcher("queryUiPluginDetailById",
+                uiPluginDataFetchers.queryTypeQueryUiPluginDetailById());
 
         return typeWiring;
     }
