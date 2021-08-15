@@ -126,3 +126,11 @@ Schedule
 TaskInstance
     queryTaskListPaging
     forceTaskSuccess
+    
+Tenant
+    createTenant
+    queryTenantlistPaging
+    queryTenantlist
+    updateTenant
+    deleteTenantById
+    verifyTenantCode

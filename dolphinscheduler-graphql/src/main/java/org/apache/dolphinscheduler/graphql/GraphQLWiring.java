@@ -57,6 +57,9 @@ public class GraphQLWiring {
     @Autowired
     private TaskInstanceDataFetchers taskInstanceDataFetchers;
 
+    @Autowired
+    private TenantDataFetchers tenantDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -260,6 +263,14 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("queryTaskListPaging",
                 taskInstanceDataFetchers.queryTypeQueryTaskListPaging());
 
+        // Tenant Query
+        typeWiring.dataFetcher("queryTenantlistPaging",
+                tenantDataFetchers.queryTypeQueryTenantlistPaging());
+        typeWiring.dataFetcher("queryTenantlist",
+                tenantDataFetchers.queryTypeQueryTenantlist());
+        typeWiring.dataFetcher("verifyTenantCode",
+                tenantDataFetchers.queryTypeVerifyTenantCode());
+
         return typeWiring;
     }
 
@@ -376,6 +387,14 @@ public class GraphQLWiring {
         // TaskInstance Mutation
         typeWiring.dataFetcher("forceTaskSuccess",
                 taskInstanceDataFetchers.mutationTypeForceTaskSuccess());
+
+        // Tenant Mutation
+        typeWiring.dataFetcher("createTenant",
+                tenantDataFetchers.mutationTypeCreateTenant());
+        typeWiring.dataFetcher("updateTenant",
+                tenantDataFetchers.mutationTypeUpdateTenant());
+        typeWiring.dataFetcher("deleteTenantById",
+                tenantDataFetchers.mutationTypeDeleteTenantById());
 
         return typeWiring;
     }

@@ -65,6 +65,9 @@ public class GraphQLProvider {
     @Value("classpath:schema/TaskInstance.graphql")
     Resource taskInstanceResource;
 
+    @Value("classpath:schema/Tenant.graphql")
+    Resource tenantResource;
+
     private GraphQL graphQL;
 
     @Autowired
@@ -96,6 +99,7 @@ public class GraphQLProvider {
         File resourcesFile = resourcesResource.getFile();
         File scheduleFile = scheduleResource.getFile();
         File taskInstanceFile = taskInstanceResource.getFile();
+        File tenantFile = tenantResource.getFile();
 
         // parse schema
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
@@ -115,6 +119,7 @@ public class GraphQLProvider {
         typeRegistry.merge(schemaParser.parse(resourcesFile));
         typeRegistry.merge(schemaParser.parse(scheduleFile));
         typeRegistry.merge(schemaParser.parse(taskInstanceFile));
+        typeRegistry.merge(schemaParser.parse(tenantFile));
 
         RuntimeWiring wiring = graphQLWiring.buildWiring();
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
