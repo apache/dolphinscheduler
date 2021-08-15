@@ -429,7 +429,7 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
-        // batch delete task log files
+        // batch delete task log files 
         processInstanceService.removeTaskLogFiles(taskLogFiles);
         return returnDataList(result);
     }
