@@ -77,6 +77,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -254,7 +255,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
 
-            if (graphHasCycle(processService.transformTask(taskRelationList))) {
+            List<TaskNode> taskNodeList = processService.transformTask(taskRelationList);
+            if (taskNodeList.size() != taskRelationList.size()) {
+                Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode).collect(Collectors.toSet());
+                Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
+                Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
+                logger.error("the task code is not exit");
+                putMsg(result, Status.TASK_DEFINE_NOT_EXIST, StringUtils.join(codes, Constants.COMMA));
+                return result;
+            }
+            if (graphHasCycle(taskNodeList)) {
                 logger.error("process DAG has cycle");
                 putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
                 return result;

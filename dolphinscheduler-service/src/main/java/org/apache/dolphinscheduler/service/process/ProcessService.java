@@ -2319,7 +2319,7 @@ public class ProcessService {
                 taskNode.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
                 Map<String, Object> taskParamsMap = taskNode.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
                 taskNode.setConditionResult((String) taskParamsMap.get(Constants.CONDITION_RESULT));
-                taskNode.setDependence((String) taskParamsMap.get(Constants.DEPENDENCE));
+                taskNode.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
                 taskParamsMap.remove(Constants.CONDITION_RESULT);
                 taskParamsMap.remove(Constants.DEPENDENCE);
                 taskNode.setParams(JSONUtils.toJsonString(taskParamsMap));

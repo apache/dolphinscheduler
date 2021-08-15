@@ -101,19 +101,23 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        if (taskDefinitionLogs.isEmpty()) {
+            logger.error("taskDefinitionJson invalid: {}", taskDefinitionJson);
+            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
+            return result;
+        }
         int totalSuccessNumber = 0;
         List<Long> totalSuccessCode = new ArrayList<>();
-        List<TaskDefinitionLog> taskDefinitionLogsList = new ArrayList<>();
+        Date now = new Date();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             checkTaskDefinition(result, taskDefinitionLog);
             if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
-                    || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
+                || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
                 return result;
             }
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUserId(loginUser.getId());
             taskDefinitionLog.setVersion(1);
-            Date now = new Date();
             taskDefinitionLog.setCreateTime(now);
             taskDefinitionLog.setUpdateTime(now);
             long code = 0L;
@@ -127,19 +131,18 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             }
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
-            taskDefinitionLogsList.add(taskDefinitionLog);
             totalSuccessCode.add(code);
             totalSuccessNumber++;
         }
-        int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogsList);
-        int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogsList);
+        int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogs);
+        int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogs);
         if ((logInsert & insert) == 0) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             return result;
         }
         Map<String, Object> resData = new HashMap<>();
         resData.put("total", totalSuccessNumber);
-        resData.put("code",totalSuccessCode);
+        resData.put("code", totalSuccessCode);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resData);
         return result;
@@ -190,9 +193,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> processDefinitionCodes = processTaskRelationList
-                    .stream()
-                    .map(ProcessTaskRelation::getProcessDefinitionCode)
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(ProcessTaskRelation::getProcessDefinitionCode)
+                .collect(Collectors.toSet());
             putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, StringUtils.join(processDefinitionCodes, ","));
             return result;
         }
@@ -234,7 +237,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         TaskDefinitionLog taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJson, TaskDefinitionLog.class);
         checkTaskDefinition(result, taskDefinitionToUpdate);
         if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
-                || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
+            || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
             return result;
         }
         Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode);
@@ -337,6 +340,29 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                 Integer pageSize,
                                                 Integer userId) {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> genTaskCodeList(User loginUser, Integer genNum) {
+        Map<String, Object> result = new HashMap<>();
+        if (genNum == null || genNum < 1 || genNum > 100) {
+            logger.error("the genNum must be great than 1 and less than 100");
+            putMsg(result, Status.DATA_IS_NOT_VALID, genNum);
+            return result;
+        }
+        List<Long> taskCodes = new ArrayList<>();
+        try {
+            for (int i = 0; i < genNum; i++) {
+                taskCodes.add(SnowFlakeUtils.getInstance().nextId());
+            }
+        } catch (SnowFlakeException e) {
+            logger.error("Task code get error, ", e);
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
+        }
+        putMsg(result, Status.SUCCESS);
+        // return processDefinitionCode
+        result.put(Constants.DATA_LIST, taskCodes);
+        return result;
     }
 }
 
