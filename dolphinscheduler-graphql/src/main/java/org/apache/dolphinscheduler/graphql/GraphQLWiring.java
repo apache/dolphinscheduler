@@ -51,6 +51,9 @@ public class GraphQLWiring {
     @Autowired
     private ResourcesDataFetchers resourcesDataFetchers;
 
+    @Autowired
+    private ScheduleDataFetchers scheduleDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -242,6 +245,14 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("authorizedUDFFunction",
                 resourcesDataFetchers.queryTypeAuthorizedUDFFunction());
 
+        // Schedule Query
+        typeWiring.dataFetcher("queryScheduleListPaging",
+                scheduleDataFetchers.queryTypeQueryScheduleListPaging());
+        typeWiring.dataFetcher("queryScheduleList",
+                scheduleDataFetchers.queryTypeQueryScheduleList());
+        typeWiring.dataFetcher("previewSchedule",
+                scheduleDataFetchers.queryTypePreviewSchedule());
+
         return typeWiring;
     }
 
@@ -342,6 +353,18 @@ public class GraphQLWiring {
                 resourcesDataFetchers.mutationTypeUpdateUdfFunc());
         typeWiring.dataFetcher("deleteUdfFunc",
                 resourcesDataFetchers.mutationTypeDeleteUdfFunc());
+
+        // Schedule Mutation
+        typeWiring.dataFetcher("createSchedule",
+                scheduleDataFetchers.mutationTypeCreateSchedule());
+        typeWiring.dataFetcher("updateSchedule",
+                scheduleDataFetchers.mutationTypeUpdateSchedule());
+        typeWiring.dataFetcher("online",
+                scheduleDataFetchers.mutationTypeOnline());
+        typeWiring.dataFetcher("offline",
+                scheduleDataFetchers.mutationTypeOffline());
+        typeWiring.dataFetcher("deleteScheduleById",
+                scheduleDataFetchers.mutationTypeDeleteScheduleById());
 
         return typeWiring;
     }

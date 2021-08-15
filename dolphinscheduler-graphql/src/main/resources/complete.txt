@@ -112,3 +112,13 @@ Resources                                   ----测试
     authorizeResourceTree
     unauthUDFFunc
     authorizedUDFFunction
+    
+Schedule
+    createSchedule
+    updateSchedule
+    online
+    offline
+    queryScheduleListPaging
+    deleteScheduleById
+    queryScheduleList
+    previewSchedule
