@@ -18,6 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -27,25 +30,28 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
-import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.parquet.column.values.bitpacking.IntPacker;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
+import org.h2.pagestore.db.PageBtreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,10 +112,13 @@ public class MasterSchedulerService extends Thread {
      *
      */
     private StateEventCallbackService stateEventCallbackService;
+    private StateWheelExecuteThread stateWheelExecuteThread;
 
     private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps ;
     private ConcurrentHashMap<String, MasterExecThread> eventHandlerMap = new ConcurrentHashMap();
     ListeningExecutorService listeningExecutorService;
+    ConcurrentHashMap<Integer,ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
+    ConcurrentHashMap<Integer,TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
 
     /**
      * constructor of MasterSchedulerService
@@ -123,12 +132,17 @@ public class MasterSchedulerService extends Thread {
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
         ExecutorService eventService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
         listeningExecutorService = MoreExecutors.listeningDecorator(eventService);
+        stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
+                taskTimeoutCheckList,
+                processInstanceExecMaps,
+                masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
 
     @Override
     public synchronized void start() {
         super.setName("MasterSchedulerService");
         super.start();
+        stateWheelExecuteThread.start();
     }
 
     public void close() {
@@ -159,10 +173,6 @@ public class MasterSchedulerService extends Thread {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                // todo 串行执行 为何还需要判断状态？
-                /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
-                    scheduleProcess();
-                }*/
                 scheduleProcess();
                 eventHandler();
             } catch (Exception e) {
@@ -195,39 +205,46 @@ public class MasterSchedulerService extends Thread {
                     if(masterExecThread.getProcessInstance().getId() != processInstanceId){
                         processInstanceExecMaps.remove(processInstanceId);
                         processInstanceExecMaps.put(masterExecThread.getProcessInstance().getId(), masterExecThread);
+
                     }
                     eventHandlerMap.remove(masterExecThread.getKey());
                 }
 
                 private void notifyProcessChanged() {
-                    List<ProcessInstance> processInstances  = processService.notifyProcessList(processInstanceId, 0);
+                    Map<ProcessInstance, TaskInstance> fatherMaps = processService.notifyProcessList(processInstanceId, 0);
 
-                    for(ProcessInstance processInstance : processInstances){
-                        if(processInstance.getHost() == NetUtils.getHost()){
-                            notifyMyself(processInstance);
+                    for(ProcessInstance processInstance : fatherMaps.keySet()){
+                        if(processInstance.getHost().equalsIgnoreCase(getLocalAddress())){
+                            notifyMyself(processInstance, fatherMaps.get(processInstance));
                         } else{
-                            notifyProcess(processInstance);
+                            notifyProcess(processInstance, fatherMaps.get(processInstance));
                         }
                     }
                 }
 
-                private void notifyMyself(ProcessInstance processInstance){
+                private void notifyMyself(ProcessInstance processInstance,TaskInstance taskInstance){
+                    logger.info("notify process {} task {} state change", processInstance.getId(), taskInstance.getId());
+                    if(!processInstanceExecMaps.containsKey(processInstance.getId())){
+                        return;
+                    }
                     MasterExecThread masterExecThreadNotify = processInstanceExecMaps.get(processInstance.getId());
                     StateEvent stateEvent = new StateEvent();
-                    stateEvent.setType("process");
-                    stateEvent.setProcessInstanceId(processInstanceId);
-                    stateEvent.setExecutionStatus(processInstance.getState());
+                    stateEvent.setTaskInstanceId(taskInstance.getId());
+                    stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                    stateEvent.setProcessInstanceId(processInstance.getId());
+                    stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
                     masterExecThreadNotify.addStateEvent(stateEvent);
                 }
 
-                private void notifyProcess(ProcessInstance processInstance){
+                private void notifyProcess(ProcessInstance processInstance, TaskInstance taskInstance){
                     String host = processInstance.getHost();
+                    logger.info("notify process {} task {} state change, host:{}",
+                            processInstance.getId(), taskInstance.getId(), host);
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                            processInstanceId, 0, masterExecThread.getProcessInstance().getState(), processInstance.getId(), 0
+                            processInstanceId, 0, masterExecThread.getProcessInstance().getState(), processInstance.getId(), taskInstance.getId()
                     );
 
                     stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
-
                 }
 
                 @Override
@@ -238,6 +255,11 @@ public class MasterSchedulerService extends Thread {
         }
     }
 
+    /**
+     * 1. 根据槽数获取command
+     * 2. 当槽处于锁的情况下，空转或者停止
+     * @throws Exception
+     */
     private void scheduleProcess() throws Exception {
 
         try {
@@ -245,12 +267,10 @@ public class MasterSchedulerService extends Thread {
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
-            Command command = processService.findOneCommand();
+            Command command = findOneCommand();
             if (command != null) {
                 logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
-
                 try {
-
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
                             this.masterConfig.getMasterExecThreads() - activeCount, command);
@@ -260,9 +280,13 @@ public class MasterSchedulerService extends Thread {
                                 , processService
                                 , nettyRemotingClient
                                 , processAlertManager
-                                , masterConfig);
+                                , masterConfig
+                                , taskTimeoutCheckList);
 
                         this.processInstanceExecMaps.put(processInstance.getId(), masterExecThread);
+                        if(processInstance.getTimeout() > 0){
+                            this.processTimeoutCheckList.put(processInstance.getId(),processInstance);
+                        }
                         masterExecService.execute(masterExecThread);
                     }
                 } catch (Exception e) {
@@ -274,8 +298,34 @@ public class MasterSchedulerService extends Thread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } finally {
-//            masterRegistryClient.releaseLock();
         }
+    }
+
+    private Command findOneCommand(){
+        if(ServerNodeManager.SLOT_LIST.size() ==0){
+            return null;
+        }
+
+        int pageSize = ServerNodeManager.MASTER_SIZE;
+        int pageNumber = 0;
+
+        Command result = null;
+        List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
+        int slot = ServerNodeManager.SLOT_LIST.get(0);
+        if(slot == 0 || commandList.size() == 0){
+            return null;
+        }
+        while(commandList.size() > 0){
+            for(Command command : commandList){
+                if(command.getId() % slot == 0){
+                    result = command;
+                    break;
+                }
+            }
+            pageNumber += 1;
+            commandList = processService.findCommandPage(pageSize, pageNumber + 1);
+        }
+        return result;
     }
 
     private String getLocalAddress() {

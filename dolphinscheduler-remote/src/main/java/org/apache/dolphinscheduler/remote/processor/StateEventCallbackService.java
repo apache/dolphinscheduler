@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.remote.processor;
 
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.server.worker.processor.NettyRemoteChannel;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,20 +47,13 @@ public class StateEventCallbackService {
     private static final ConcurrentHashMap<String, NettyRemoteChannel> REMOTE_CHANNELS = new ConcurrentHashMap<>();
 
     /**
-     * zookeeper registry center
-     */
-    private RegistryClient registryClient;
-
-    /**
      * netty remoting client
      */
     private final NettyRemotingClient nettyRemotingClient;
 
     public StateEventCallbackService() {
-        this.registryClient = RegistryClient.getInstance();
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        this.nettyRemotingClient.registerProcessor(CommandType.STATE_EVENT_REQUEST, new StateEventProcessor());
     }
 
     /**
@@ -124,7 +114,7 @@ public class StateEventCallbackService {
     /**
      * send ack
      *
-     * @param command        command
+     * @param command        commandDS
      */
     public void sendAck(String host, Command command) {
         NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);

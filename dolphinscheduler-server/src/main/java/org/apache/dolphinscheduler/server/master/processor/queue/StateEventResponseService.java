@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
-import org.apache.dolphinscheduler.server.master.runner.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
 
 
 import java.util.ArrayList;
@@ -113,9 +113,6 @@ public class StateEventResponseService {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
                     persist(stateEvent);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
                 } catch (Exception e) {
                     logger.error("persist task error", e);
                 }

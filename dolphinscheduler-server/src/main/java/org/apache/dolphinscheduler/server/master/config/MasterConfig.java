@@ -21,9 +21,11 @@ import org.apache.dolphinscheduler.common.Constants;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("singleton")
 @PropertySource(value = "master.properties")
 public class MasterConfig {
 
@@ -44,6 +46,9 @@ public class MasterConfig {
 
     @Value("${master.heartbeat.interval:10}")
     private int masterHeartbeatInterval;
+
+    @Value("${master.state.wheel.interval:5}")
+    private int stateWheelInterval;
 
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
@@ -138,5 +143,12 @@ public class MasterConfig {
 
     public void setMasterDispatchTaskNumber(int masterDispatchTaskNumber) {
         this.masterDispatchTaskNumber = masterDispatchTaskNumber;
+    }
+
+    public int getStateWheelInterval(){
+        return this.stateWheelInterval;
+    }
+    public void setStateWheelInterval(int stateWheelInterval){
+        this.stateWheelInterval =  stateWheelInterval;
     }
 }

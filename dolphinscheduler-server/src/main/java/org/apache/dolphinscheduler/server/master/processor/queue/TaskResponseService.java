@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
-import org.apache.dolphinscheduler.server.master.runner.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -197,7 +198,7 @@ public class TaskResponseService {
             stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
             stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
             stateEvent.setExecutionStatus(taskResponseEvent.getState());
-            stateEvent.setType("task");
+            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
             masterExecThread.addStateEvent(stateEvent);
         }
     }

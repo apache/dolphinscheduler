@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
@@ -40,7 +42,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ConditionTaskProcessor extends BaseTaskProcessor{
 
@@ -65,6 +66,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
+    private TaskDefinition taskDefinition;
+
 
     @Override
     public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
@@ -73,6 +76,9 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
         if(!processService.submitTask(taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval)){
             return false;
         }
+        taskDefinition = processService.findTaskDefinition(
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+        );
 
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 processInstance.getProcessDefinitionCode(),
@@ -83,7 +89,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
         Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
         logger.info("dependent task start");
-        updateTaskState();
+        endTask();
         return true;
     }
 
@@ -97,7 +103,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
         if(conditionResult.equals(DependResult.WAITING)){
             setConditionResult();
         }else{
-            updateTaskState();
+            endTask();
         }
     }
 
@@ -106,6 +112,20 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
         this.taskInstance.setState(ExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
+        return true;
+    }
+
+    @Override
+    protected boolean taskTimeout(){
+        TaskTimeoutStrategy taskTimeoutStrategy =
+                taskDefinition.getTimeoutNotifyStrategy();
+        if(taskTimeoutStrategy == TaskTimeoutStrategy.WARN){
+            return true;
+        }
+        logger.info("condition task {} timeout, strategy {} ",
+                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        conditionResult = DependResult.FAILED;
+        endTask();
         return true;
     }
 
@@ -180,7 +200,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     /**
      *
      */
-    private void updateTaskState() {
+    private void endTask() {
         ExecutionStatus status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());

@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
@@ -29,6 +30,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected boolean killed = false;
 
     protected boolean paused = false;
+
+    protected boolean timeout = false;
 
     protected TaskInstance taskInstance = null;
 
@@ -58,9 +61,22 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return stop();
             case PAUSE:
                 return pause();
+            case TIMEOUT:
+                return timeout();
         }
         return false;
     }
+
+    protected boolean timeout(){
+        if(timeout){
+            return true;
+        }
+        timeout = taskTimeout();
+        return timeout;
+    }
+
+    protected abstract boolean taskTimeout();
+
 
     /**
      *
@@ -71,7 +87,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             return true;
         }
         paused = pauseTask();
-        return true;
+        return paused;
     }
 
     protected boolean stop() {
@@ -79,7 +95,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             return true;
         }
         killed = killTask();
-        return true;
+        return killed;
     }
 
 

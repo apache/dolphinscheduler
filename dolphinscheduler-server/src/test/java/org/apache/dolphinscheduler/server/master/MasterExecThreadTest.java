@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -105,7 +106,8 @@ public class MasterExecThreadTest {
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config));
+        ConcurrentHashMap<Integer,TaskInstance> taskTimeoutCheckList= new ConcurrentHashMap<>();
+        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config, taskTimeoutCheckList));
         // prepareProcess init dag
         Field dag = MasterExecThread.class.getDeclaredField("dag");
         dag.setAccessible(true);

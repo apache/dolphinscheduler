@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.common.enums;
 
 import io.netty.channel.Channel;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
 public class StateEvent {
 
@@ -27,7 +26,7 @@ public class StateEvent {
      */
     private String key;
 
-    private String type;
+    private StateEventType type;
 
     private ExecutionStatus executionStatus;
 
@@ -59,14 +58,6 @@ public class StateEvent {
         this.processInstanceId = processInstanceId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getContext() {
         return context;
     }
@@ -90,13 +81,13 @@ public class StateEvent {
     @Override
     public String toString() {
         return "State Event :" +
-                " type" + type +
-                " executeStatus:" + executionStatus +
-                " task instance id:" + taskInstanceId +
-                " process instance id:" + processInstanceId +
+                "key: " + key +
+                " type: " + type.toString() +
+                " executeStatus: " + executionStatus +
+                " task instance id: " + taskInstanceId +
+                " process instance id: " + processInstanceId +
                 " context: " + context
                 ;
-
     }
 
     public String getKey() {
@@ -105,5 +96,13 @@ public class StateEvent {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setType(StateEventType type) {
+        this.type = type;
+    }
+
+    public StateEventType getType() {
+        return this.type;
     }
 }

@@ -82,6 +82,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     public void run() {
     }
 
+    @Override
+    protected boolean taskTimeout() {
+        return true;
+    }
+
     /**
      * common task cannot be paused
      * @return

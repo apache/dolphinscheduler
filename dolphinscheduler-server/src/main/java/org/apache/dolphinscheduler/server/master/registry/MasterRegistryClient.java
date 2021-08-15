@@ -39,10 +39,12 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -89,6 +91,9 @@ public class MasterRegistryClient {
      * heartbeat executor
      */
     private ScheduledExecutorService heartBeatExecutor;
+
+    private MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
+
 
     /**
      * master start time
@@ -337,8 +342,6 @@ public class MasterRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
-        registryClient.persistEphemeral(localNodePath, "");
-        registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterMaxCpuloadAvg(),
@@ -347,6 +350,8 @@ public class MasterRegistryClient {
                 Constants.MASTER_TYPE,
                 registryClient);
 
+        registryClient.persistEphemeral(localNodePath, heartBeatTask.heartBeatInfo());
+        registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
 

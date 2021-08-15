@@ -17,11 +17,15 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.logging.log4j.core.tools.CustomLoggerGenerator;
 
 import java.util.Date;
 
@@ -36,12 +40,17 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     ProcessInstance processInstance;
 
     ProcessInstance subProcessInstance = null;
+    TaskDefinition taskDefinition;
+
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     @Override
     public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
         this.taskInstance = taskInstance;
+        taskDefinition = processService.findTaskDefinition(
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+        );
         if (!processService.submitTask(this.taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval)) {
             return false;
         }
@@ -55,16 +64,42 @@ public class SubTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public void run() {
-        setSubWorkFlow();
-        updateTaskState();
+
+        try{
+            if(setSubWorkFlow()){
+                updateTaskState();
+            }
+        }catch (Exception e){
+            logger.error("work flow {} sub task {} exceptions",
+                    this.processInstance.getId(),
+                    this.taskInstance.getId(),
+                    e);
+
+        }
+    }
+
+    @Override
+    protected boolean taskTimeout() {
+        TaskTimeoutStrategy taskTimeoutStrategy =
+                taskDefinition.getTimeoutNotifyStrategy();
+        if(TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
+                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy){
+            return true;
+        }
+        logger.info("sub process task {} timeout, strategy {} ",
+                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        killTask();
+        return true;
     }
 
     private void updateTaskState() {
-        if(null == subProcessInstance){
-            return ;
-        }
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if(subProcessInstance.getState().typeIsFinished()){
+        logger.info("work flow {} task {}, sub work flow: {} state: {}",
+                this.processInstance.getId(),
+                this.taskInstance.getId(),
+                subProcessInstance.getId(),
+                subProcessInstance.getState().getDescp());
+        if(subProcessInstance != null && subProcessInstance.getState().typeIsFinished()){
             taskInstance.setState(subProcessInstance.getState());
             taskInstance.setEndTime(new Date());
             processService.saveTaskInstance(taskInstance);
@@ -90,6 +125,9 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     }
 
     private boolean setSubWorkFlow() {
+        logger.info("set work flow {} task {} running",
+                this.processInstance.getId(),
+                this.taskInstance.getId());
         if(this.subProcessInstance != null){
             return true;
         }
@@ -97,11 +135,14 @@ public class SubTaskProcessor extends BaseTaskProcessor{
         if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
             return false;
         }
+
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
-        //TODO...
-        // send event to sub process master
+        logger.info("set sub work flow {} task {} state: {}",
+                processInstance.getId(),
+                taskInstance.getId(),
+                taskInstance.getState());
         return true;
 
     }

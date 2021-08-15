@@ -17,58 +17,140 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import org.apache.hadoop.util.ThreadUtil;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 1. 循环检测超时问题
- * 2.
+ * 2. 循环检测依赖问题
  */
 public class StateWheelExecuteThread extends Thread {
 
+    private static final Logger logger = LoggerFactory.getLogger(StateWheelExecuteThread.class);
 
-    ConcurrentLinkedQueue<ProcessInstance>  processInstances = new ConcurrentLinkedQueue<>();
-    ConcurrentLinkedQueue<TaskInstance> taskInstances = new ConcurrentLinkedQueue<>();
+    ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
+    ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
+    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps;
 
+    private int stateCheckIntervalSecs;
+
+    public StateWheelExecuteThread(ConcurrentHashMap<Integer, ProcessInstance> processInstances,
+                                   ConcurrentHashMap<Integer, TaskInstance> taskInstances,
+                                   ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps,
+                                   int stateCheckIntervalSecs) {
+        this.processInstanceCheckList = processInstances;
+        this.taskInstanceCheckList = taskInstances;
+        this.processInstanceExecMaps = processInstanceExecMaps;
+        this.stateCheckIntervalSecs = stateCheckIntervalSecs;
+    }
 
 
     @Override
-    public void run(){
+    public void run() {
 
-        while(Stopper.isRunning()){
-            Date now  = new Date();
-            timeoutCheck(now);
+        logger.info("state wheel thread start");
+        while (Stopper.isRunning()) {
+            try {
+                checkProcess();
+                checkTask();
+            }catch (Exception e){
+                logger.error("state wheel thread check error:", e);
+            }
+            ThreadUtil.sleepAtLeastIgnoreInterrupts(stateCheckIntervalSecs);
+        }
+    }
 
+    public boolean addProcess(ProcessInstance processInstance) {
+        this.processInstanceCheckList.put(processInstance.getId(), processInstance);
+        return true;
+    }
 
+    public boolean addTask(TaskInstance taskInstance) {
+        this.taskInstanceCheckList.put(taskInstance.getId(), taskInstance);
+        return true;
+    }
+
+    private void checkTask() {
+        if (taskInstanceCheckList.isEmpty()) {
+            return;
+        }
+
+        for (TaskInstance taskInstance : this.taskInstanceCheckList.values()) {
+            if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
+                long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
+                if (0 <= timeRemain && processTimeout(taskInstance)) {
+                    taskInstanceCheckList.remove(taskInstance);
+                    return;
+                }
+            }
+            if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
+                processDependCheck(taskInstance);
+            }
         }
 
     }
 
-    private void timeoutCheck(Date now) {
-
-        for(ProcessInstance processInstance : processInstances){
-
+    private void checkProcess() {
+        if (processInstanceCheckList.isEmpty()) {
+            return;
         }
+        for (ProcessInstance processInstance : this.processInstanceCheckList.values()) {
 
-        for(TaskInstance taskInstance : taskInstances){
-            
+            long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
+            if (0 <= timeRemain && processTimeout(processInstance)) {
+                processInstanceCheckList.remove(processInstance);
+            }
         }
     }
 
+    private void putEvent(StateEvent stateEvent) {
 
-    private void setTimeoutEvent(ProcessInstance processInstance){
-
+        if (!processInstanceExecMaps.containsKey(stateEvent.getProcessInstanceId())) {
+            return;
+        }
+        MasterExecThread masterExecThread = this.processInstanceExecMaps.get(stateEvent.getProcessInstanceId());
+        masterExecThread.addStateEvent(stateEvent);
     }
 
-    private void setTimeoutEvent(TaskInstance taskInstance){
-
+    private boolean processDependCheck(TaskInstance taskInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+        stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
+        stateEvent.setTaskInstanceId(taskInstance.getId());
+        stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        putEvent(stateEvent);
+        return true;
     }
 
-    private void setDependentTaskEvent(TaskInstance taskInstance){
-
+    private boolean processTimeout(TaskInstance taskInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.TASK_TIMEOUT);
+        stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
+        stateEvent.setTaskInstanceId(taskInstance.getId());
+        putEvent(stateEvent);
+        return true;
     }
+
+    private boolean processTimeout(ProcessInstance processInstance) {
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setType(StateEventType.PROCESS_TIMEOUT);
+        stateEvent.setProcessInstanceId(processInstance.getId());
+        putEvent(stateEvent);
+        return true;
+    }
+
 }

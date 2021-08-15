@@ -20,12 +20,15 @@ import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
@@ -38,8 +41,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -65,7 +66,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dependentDate;
 
+
+    DependResult result ;
+
     ProcessInstance processInstance;
+    TaskDefinition taskDefinition;
+
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
@@ -80,6 +86,9 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         if (!processService.submitTask(taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval)) {
             return false;
         }
+        taskDefinition = processService.findTaskDefinition(
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+        );
         taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
@@ -102,7 +111,25 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
         }
-        updateTaskState();
+        if(allDependentItemFinished){
+            getTaskDependResult();
+            endTask();
+        }
+    }
+
+    @Override
+    protected boolean taskTimeout() {
+        TaskTimeoutStrategy taskTimeoutStrategy =
+                taskDefinition.getTimeoutNotifyStrategy();
+        if(TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
+                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy){
+            return true;
+        }
+        logger.info("dependent task {} timeout, strategy {} ",
+                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+        result = DependResult.FAILED;
+        endTask();
+        return true;
     }
 
     /**
@@ -119,7 +146,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             this.dependentDate = new Date();
         }
     }
-
 
     @Override
     protected boolean pauseTask() {
@@ -172,7 +198,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             DependResult dependResult = dependentExecute.getModelDependResult(dependentDate);
             dependResultList.add(dependResult);
         }
-        DependResult result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
+        result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
         logger.info("dependent task completed, dependent result:{}", result);
         return result;
     }
@@ -180,9 +206,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     /**
      *
      */
-    private void updateTaskState() {
+    private void endTask() {
         ExecutionStatus status;
-        DependResult result = getTaskDependResult();
         status = (result == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());

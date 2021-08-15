@@ -14,10 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.runner.task;
 
-public enum  TaskAction {
-    PAUSE,
-    STOP,
-    TIMEOUT
+package org.apache.dolphinscheduler.server.master.registry;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class SlotManager {
+
+    private SlotManager(){}
+
+    private static volatile List<Integer> SLOT_LIST = new ArrayList<>();
+
+
 }
