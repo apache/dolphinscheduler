@@ -33,7 +33,7 @@
         </el-select>
       </div>
     </m-list-box>
-    <m-list-box v-if="programType !== 'PYTHON'">
+    <m-list-box v-if="programType === 'JAVA' || programType === 'SCALA'">
       <div slot="text">{{$t('Main Class')}}</div>
       <div slot="content">
         <el-input
@@ -45,7 +45,7 @@
         </el-input>
       </div>
     </m-list-box>
-    <m-list-box>
+    <m-list-box v-if="programType !== 'SQL'">
       <div slot="text">{{$t('Main Jar Package')}}</div>
       <div slot="content">
         <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
@@ -147,7 +147,7 @@
         </el-input>
       </div>
     </m-list-4-box>
-    <m-list-box>
+    <m-list-box v-if="programType !== 'SQL'">
       <div slot="text">{{$t('Main Arguments')}}</div>
       <div slot="content">
         <el-input
@@ -245,7 +245,7 @@
         // Program type
         programType: 'SCALA',
         // Program type(List)
-        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
+        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }, { code: 'SQL' }],
 
         flinkVersion: '<1.10',
         // Flink Versions(List)
@@ -319,12 +319,12 @@
        * verification
        */
       _verification () {
-        if (this.programType !== 'PYTHON' && !this.mainClass) {
+        if ((this.programType === 'JAVA' || this.programType === 'SCALA')  && !this.mainClass) {
           this.$message.warning(`${i18n.$t('Please enter main class')}`)
           return false
         }
 
-        if (!this.mainJar) {
+        if (this.programType !== 'SQL' && !this.mainJar) {
           this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
           return false
         }
@@ -450,7 +450,7 @@
     watch: {
       // Listening type
       programType (type) {
-        if (type === 'PYTHON') {
+        if (type === 'PYTHON' || type === 'SQL') {
           this.mainClass = ''
         }
       },
