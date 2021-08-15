@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.flink;
 
+import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -42,14 +43,20 @@ import org.slf4j.Logger;
 public class FlinkTask extends AbstractYarnTask {
 
     /**
-     *  flink command
-     *  usage: flink run [OPTIONS] <jar-file> <arguments>
+     * flink command
+     * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
     private static final String FLINK_COMMAND = "flink";
     private static final String FLINK_RUN = "run";
 
     /**
-     *  flink parameters
+     * flink sql command
+     * usage: sql-client.sh    -i,--init <initialization file>  -j,--jar <JAR file>   -l,--library <JAR directory>  -f,--file <script file>
+     */
+    private static final String FLINK_SQL_COMMAND = "sql-client.sh";
+
+    /**
+     * flink parameters
      */
     private FlinkParameters flinkParameters;
 
@@ -80,7 +87,7 @@ public class FlinkTask extends AbstractYarnTask {
             String args = flinkParameters.getMainArgs();
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
             logger.info("param Map : {}", paramsMap);
             if (paramsMap != null) {
@@ -93,6 +100,7 @@ public class FlinkTask extends AbstractYarnTask {
 
     /**
      * create command
+     *
      * @return command
      */
     @Override
@@ -100,8 +108,14 @@ public class FlinkTask extends AbstractYarnTask {
         // flink run [OPTIONS] <jar-file> <arguments>
         List<String> args = new ArrayList<>();
 
-        args.add(FLINK_COMMAND);
-        args.add(FLINK_RUN);
+        ProgramType programType = flinkParameters.getProgramType();
+
+        if (ProgramType.SQL != programType) {
+            args.add(FLINK_COMMAND);
+            args.add(FLINK_RUN);
+        } else {
+            args.add(FLINK_SQL_COMMAND);
+        }
         logger.info("flink task args : {}", args);
         // other parameters
         args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
@@ -118,7 +132,7 @@ public class FlinkTask extends AbstractYarnTask {
     protected void setMainJarName() {
         // main jar
         ResourceInfo mainJar = flinkParameters.getMainJar();
-        if (mainJar != null) {
+        if (mainJar != null && mainJar.isValid()) {
             int resourceId = mainJar.getId();
             String resourceName;
             if (resourceId == 0) {

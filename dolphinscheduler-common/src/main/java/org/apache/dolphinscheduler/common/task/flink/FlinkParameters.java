@@ -101,7 +101,7 @@ public class FlinkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     private ProgramType programType;
 
@@ -232,7 +232,7 @@ public class FlinkParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        if (mainJar != null && !resourceList.contains(mainJar)) {
+        if (mainJar != null && mainJar.isValid() && !resourceList.contains(mainJar)) {
             resourceList.add(mainJar);
         }
         return resourceList;

@@ -14,32 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.process;
+
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 /**
  * resource info
  */
 public class ResourceInfo {
-  /**
-   * res the name of the resource that was uploaded
-   */
-  private int id;
+    /**
+     * res the name of the resource that was uploaded
+     */
+    private int id;
 
-  public int getId() {
-    return id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  private String res;
+    private String res;
 
-  public String getRes() {
-    return res;
-  }
+    public String getRes() {
+        return res;
+    }
 
-  public void setRes(String res) {
-    this.res = res;
-  }
+    public void setRes(String res) {
+        this.res = res;
+    }
+
+    public boolean isValid() {
+        return id > 0 || id == 0 && StringUtils.isNotBlank(res);
+    }
 }

@@ -41,11 +41,18 @@ public class FlinkArgsUtils {
 
     /**
      * build args
+     *
      * @param param flink parameters
      * @return argument list
      */
     public static List<String> buildArgs(FlinkParameters param) {
         List<String> args = new ArrayList<>();
+
+        ProgramType programType = param.getProgramType();
+
+        if (ProgramType.SQL == programType) {
+            return buildSqlArgs(param);
+        }
 
         String deployMode = "cluster";
         String tmpDeployMode = param.getDeployMode();
@@ -115,7 +122,6 @@ public class FlinkArgsUtils {
             args.add(others);
         }
 
-        ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
 
         if (ProgramType.PYTHON == programType) {
@@ -133,6 +139,30 @@ public class FlinkArgsUtils {
             args.add(mainJar.getRes());
         }
 
+        String mainArgs = param.getMainArgs();
+        if (StringUtils.isNotEmpty(mainArgs)) {
+            args.add(mainArgs);
+        }
+
+        return args;
+    }
+
+    /**
+     * build args for flink sql
+     *
+     * @param param flink parameters
+     * @return argument list
+     */
+    public static List<String> buildSqlArgs(FlinkParameters param) {
+        List<String> args = new ArrayList<>();
+
+        // other args
+        String others = param.getOthers();
+        if (StringUtils.isNotEmpty(others)) {
+            args.add(others);
+        }
+
+        // mainArgs
         String mainArgs = param.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
             args.add(mainArgs);
