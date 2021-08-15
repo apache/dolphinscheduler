@@ -157,3 +157,10 @@ User
     registerUser
     activateUser
     batchActivateUser
+    
+WorkGroup
+    saveWorkerGroup
+    queryAllWorkerGroupsPaging
+    queryAllWorkerGroups
+    deleteWorkGroupById
+    queryWorkerAddressList

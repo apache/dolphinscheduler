@@ -1,0 +1,48 @@
+extend type Query {
+    # WorkGroup Query
+    queryAllWorkerGroupsPaging(loginUser: InputUser!, pageNo: Int!, pageSize: Int!,
+        searchVal: String): WorkerGroupPageInfoResultType
+
+    queryAllWorkerGroups(loginUser: InputUser!): StringListResultType
+
+    queryWorkerAddressList(loginUser: InputUser!): StringListResultType
+}
+
+extend type Mutation {
+    # WorkGroup Mutation
+    saveWorkerGroup(loginUser: InputUser!, id: Int=0, name: String!,
+        addrList: String!): NormalResultType
+
+    deleteWorkGroupById(loginUser: InputUser!, id: Int!): NormalResultType
+}
+
+type WorkerGroup {
+    id: Int
+    addrList: String
+    createTime: String
+    updateTime: String
+    systemDefault: Boolean
+}
+
+type WorkerGroupPageInfo {
+    totalList: [WorkerGroup]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type WorkerGroupPageInfoResultType {
+    code: Int
+    msg: String
+    data: WorkerGroupPageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type StringListResultType {
+    code: Int
+    msg: String
+    data: [String]
+    success: Boolean
+    failed: Boolean
+}

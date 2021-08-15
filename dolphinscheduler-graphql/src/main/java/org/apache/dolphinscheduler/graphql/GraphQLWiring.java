@@ -66,6 +66,9 @@ public class GraphQLWiring {
     @Autowired
     private UserDataFetchers userDataFetchers;
 
+    @Autowired
+    private WorkGroupDataFetchers workGroupDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -301,6 +304,14 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("batchActivateUser",
                 userDataFetchers.queryTypeBatchActivateUser());
 
+        // WorkGroup Query
+        typeWiring.dataFetcher("queryAllWorkerGroupsPaging",
+                workGroupDataFetchers.queryTypeQueryAllWorkerGroupsPaging());
+        typeWiring.dataFetcher("queryAllWorkerGroups",
+                workGroupDataFetchers.queryTypeQueryAllWorkerGroups());
+        typeWiring.dataFetcher("queryWorkerAddressList",
+                workGroupDataFetchers.queryTypeQueryWorkerAddressList());
+
         return typeWiring;
     }
 
@@ -445,6 +456,12 @@ public class GraphQLWiring {
                 userDataFetchers.mutationTypeRegisterUser());
         typeWiring.dataFetcher("activateUser",
                 userDataFetchers.mutationTypeActivateUser());
+
+        // WorkGroup Mutation
+        typeWiring.dataFetcher("saveWorkerGroup",
+                workGroupDataFetchers.mutationTypeSaveWorkerGroup());
+        typeWiring.dataFetcher("deleteWorkGroupById",
+                workGroupDataFetchers.mutationTypeDeleteWorkGroupById());
 
 
         return typeWiring;
