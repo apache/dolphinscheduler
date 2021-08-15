@@ -63,6 +63,9 @@ public class GraphQLWiring {
     @Autowired
     private UiPluginDataFetchers uiPluginDataFetchers;
 
+    @Autowired
+    private UserDataFetchers userDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -280,6 +283,24 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("queryUiPluginDetailById",
                 uiPluginDataFetchers.queryTypeQueryUiPluginDetailById());
 
+        // User Query
+        typeWiring.dataFetcher("queryUserList",
+                userDataFetchers.queryTypeQueryUserList());
+        typeWiring.dataFetcher("getUserInfo",
+                userDataFetchers.queryTypeGetUserInfo());
+        typeWiring.dataFetcher("listUser",
+                userDataFetchers.queryTypeListUser());
+        typeWiring.dataFetcher("listAll",
+                userDataFetchers.queryTypeListAll());
+        typeWiring.dataFetcher("verifyUserName",
+                userDataFetchers.queryTypeVerifyUserName());
+        typeWiring.dataFetcher("unauthorizedUser",
+                userDataFetchers.queryTypeUnauthorizedUser());
+        typeWiring.dataFetcher("authorizedUser",
+                userDataFetchers.queryTypeAuthorizedUser());
+        typeWiring.dataFetcher("batchActivateUser",
+                userDataFetchers.queryTypeBatchActivateUser());
+
         return typeWiring;
     }
 
@@ -404,6 +425,27 @@ public class GraphQLWiring {
                 tenantDataFetchers.mutationTypeUpdateTenant());
         typeWiring.dataFetcher("deleteTenantById",
                 tenantDataFetchers.mutationTypeDeleteTenantById());
+
+        // User Mutation
+        typeWiring.dataFetcher("createUser",
+                userDataFetchers.mutationTypeQueryCreateUser());
+        typeWiring.dataFetcher("updateUser",
+                userDataFetchers.mutationTypeUpdateUser());
+        typeWiring.dataFetcher("delUserById",
+                userDataFetchers.mutationTypeDelUserById());
+        typeWiring.dataFetcher("grantProject",
+                userDataFetchers.mutationTypeGrantProject());
+        typeWiring.dataFetcher("grantResource",
+                userDataFetchers.mutationTypeGrantResource());
+        typeWiring.dataFetcher("grantUDFFunc",
+                userDataFetchers.mutationTypeGrantUDFFunc());
+        typeWiring.dataFetcher("grantDataSource",
+                userDataFetchers.mutationTypeGrantDataSource());
+        typeWiring.dataFetcher("registerUser",
+                userDataFetchers.mutationTypeRegisterUser());
+        typeWiring.dataFetcher("activateUser",
+                userDataFetchers.mutationTypeActivateUser());
+
 
         return typeWiring;
     }

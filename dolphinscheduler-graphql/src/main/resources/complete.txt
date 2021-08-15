@@ -138,3 +138,22 @@ Tenant
 UiPlugin
     queryUiPluginsByType
     queryUiPluginDetailById
+    
+User
+    createUser
+    queryUserList
+    updateUser
+    delUserById
+    grantProject
+    grantResource
+    grantUDFFunc
+    grantDataSource
+    getUserInfo
+    listUser
+    listAll
+    verifyUserName
+    unauthorizedUser
+    authorizedUser
+    registerUser
+    activateUser
+    batchActivateUser
