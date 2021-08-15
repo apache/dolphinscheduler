@@ -15,48 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="shell-model">
-    <m-list-box>
-      <div slot="text">{{$t('Script')}}</div>
-      <div slot="content">
-        <div class="form-mirror">
-          <textarea
-            id="code-shell-mirror"
-            name="code-shell-mirror"
-            style="opacity: 0">
-          </textarea>
-          <a class="ans-modal-box-max">
-            <em class="el-icon-full-screen" @click="setEditorVal"></em>
-          </a>
-        </div>
-      </div>
-    </m-list-box>
-    <m-list-box>
-      <div slot="text">{{$t('Resources')}}</div>
-      <div slot="content">
-        <treeselect  v-model="resourceList" :multiple="true" maxHeight="200" :options="options" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }} <span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
-        </treeselect>
-      </div>
-    </m-list-box>
-    <m-list-box>
-      <div slot="text">{{$t('Custom Parameters')}}</div>
-      <div slot="content">
-        <m-local-params
-                ref="refLocalParams"
-                @on-local-params="_onLocalParams"
-                :udp-list="localParams"
-                :hide="true">
-        </m-local-params>
-      </div>
-    </m-list-box>
-    <el-dialog
-      :visible.sync="scriptBoxDialog"
-      append-to-body="true"
-      width="80%">
-      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
-    </el-dialog>
-  </div>
+  <form-create v-model="$f" :rule="rule" :option="option"></form-create>
 </template>
 <script>
   import _ from 'lodash'
@@ -70,9 +29,13 @@
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
   import Clipboard from 'clipboard'
   import { diGuiTree, searchTree } from './_source/resourceTree'
+  import formCreate from '@form-create/element-ui'
 
   let editor
-
+  formCreate.component('treeselect', Treeselect)
+  formCreate.component('mListBox', mListBox)
+  formCreate.component('mLocalParams', mLocalParams)
+  formCreate.component('mScriptBox', mScriptBox)
   export default {
     name: 'shell',
     data () {
@@ -86,8 +49,13 @@
         resourceList: [],
         // Cache ResourceList
         cacheResourceList: [],
+        // resource select options
+        resourceOptions: [],
         // define options
-        options: [],
+        option: {
+          submitBtn: false
+        },
+        rule: [],
         normalizer (node) {
           return {
             label: node.name
@@ -104,6 +72,166 @@
       backfillItem: Object
     },
     methods: {
+      _initRule () {
+        this.rule = [
+          {
+            type: 'div',
+            class: 'shell-model',
+            children: [
+              {
+                type: 'm-list-box',
+                props: {},
+                children: [
+                  {
+                    type: 'div',
+                    slot: 'text',
+                    children: [i18n.$t('Script')]
+                  },
+                  {
+                    type: 'div',
+                    slot: 'content',
+                    title: i18n.$t('Script'),
+                    children: [
+                      {
+                        type: 'div',
+                        class: 'form-mirror',
+                        children: [
+                          {
+                            type: 'input',
+                            name: 'code-shell-mirror',
+                            attrs: { id: 'code-shell-mirror' },
+                            value: '',
+                            props: {
+                              type: 'textarea'
+                            }
+                          },
+                          {
+                            type: 'a',
+                            class: 'ans-modal-box-max',
+                            children: [
+                              {
+                                type: 'em',
+                                class: 'el-icon-full-screen',
+                                on: {
+                                  click: this.setEditorVal
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'm-list-box',
+                children: [
+                  {
+                    type: 'div',
+                    slot: 'text',
+                    children: [i18n.$t('Resources')]
+                  },
+                  {
+                    type: 'div',
+                    slot: 'content',
+                    children: [
+                      {
+                        type: 'treeselect',
+                        field: 'resource',
+                        name: 'treeselect',
+                        value: this.resourceList,
+                        props: {
+                          placeholder: i18n.$t('Please select resources'),
+                          multiple: 'true',
+                          maxHeight: '200',
+                          options: this.resourceOptions,
+                          normalizer: this.normalizer,
+                          disabled: this.isDetails,
+                          valueConsistsOf: this.valueConsistsOf
+                        },
+                        children: [
+                          {
+                            type: 'div',
+                            slot: 'value-label',
+                            slotScope: 'node',
+                            children: [
+                              '{{ node.raw.fullName }}',
+                              {
+                                type: 'span',
+                                class: 'copy-path',
+                                children: [
+                                  {
+                                    type: 'em',
+                                    class: 'el-icon-copy-document',
+                                    title: i18n.$t('Copy path'),
+                                    props: {
+                                      dataContainer: 'body',
+                                      dataToggle: 'tooltip'
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'm-list-box',
+                children: [
+                  {
+                    type: 'div',
+                    slot: 'text',
+                    children: [i18n.$t('Custom Parameters')]
+                  },
+                  {
+                    type: 'div',
+                    slot: 'content',
+                    children: [
+                      {
+                        type: 'm-local-params',
+                        props: {
+                          ref: 'refLocalParams',
+                          udpList: this.localParams,
+                          hide: false
+                        },
+                        on: {
+                          onLocalParams: this._onLocalParams
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'ElDialog',
+                props: {
+                  visible: this.scriptBoxDialog,
+                  appendToBody: true,
+                  width: '80%'
+                },
+                sync: ['visible'],
+                children: [
+                  {
+                    type: 'mScriptBox',
+                    props: {
+                      item: this.item
+                    },
+                    on: {
+                      getSriptBoxValue: this.getSriptBoxValue,
+                      closeAble: this.closeAble
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
       _copyPath (e, node) {
         e.stopPropagation()
         let clipboard = new Clipboard('.copy-path', {
@@ -215,7 +343,7 @@
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
-            this.options.forEach(v1 => {
+            this.resourceOptions.forEach(v1 => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
               }
@@ -253,7 +381,7 @@
               item.isNew = true
             })
             noResources[0].children = optionsCmp
-            this.options = this.options.concat(noResources)
+            this.resourceOptions = this.resourceOptions.concat(noResources)
           }
         }
       }
@@ -282,7 +410,7 @@
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
-            this.options.forEach(v1 => {
+            this.resourceOptions.forEach(v1 => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
               }
@@ -304,7 +432,7 @@
     created () {
       let item = this.store.state.dag.resourcesListS
       diGuiTree(item)
-      this.options = item
+      this.resourceOptions = item
       let o = this.backfillItem
 
       // Non-null objects represent backfill
@@ -343,6 +471,7 @@
       }
     },
     mounted () {
+      this._initRule()
       setTimeout(() => {
         this._handlerEditor()
       }, 200)
@@ -353,6 +482,7 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
+    // eslint-disable-next-line vue/no-unused-components
     components: { mLocalParams, mListBox, mScriptBox, Treeselect }
   }
 </script>
