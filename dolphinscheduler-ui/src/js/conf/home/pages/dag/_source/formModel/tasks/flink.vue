@@ -319,7 +319,7 @@
        * verification
        */
       _verification () {
-        if ((this.programType === 'JAVA' || this.programType === 'SCALA')  && !this.mainClass) {
+        if ((this.programType === 'JAVA' || this.programType === 'SCALA') && !this.mainClass) {
           this.$message.warning(`${i18n.$t('Please enter main class')}`)
           return false
         }
