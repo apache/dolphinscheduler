@@ -69,6 +69,9 @@ public class GraphQLWiring {
     @Autowired
     private WorkGroupDataFetchers workGroupDataFetchers;
 
+    @Autowired
+    private WorkFlowLineageDataFetchers workFlowLineageDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -311,6 +314,12 @@ public class GraphQLWiring {
                 workGroupDataFetchers.queryTypeQueryAllWorkerGroups());
         typeWiring.dataFetcher("queryWorkerAddressList",
                 workGroupDataFetchers.queryTypeQueryWorkerAddressList());
+
+        // WorkFlowLineage Query
+        typeWiring.dataFetcher("queryWorkFlowLineageByName",
+                workFlowLineageDataFetchers.queryTypeQueryWorkFlowLineageByName());
+        typeWiring.dataFetcher("queryWorkFlowLineageByIds",
+                workFlowLineageDataFetchers.queryTypeQueryWorkFlowLineageByIds());
 
         return typeWiring;
     }

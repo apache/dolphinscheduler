@@ -77,6 +77,9 @@ public class GraphQLProvider {
     @Value("classpath:schema/WorkGroup.graphql")
     Resource workGroupResource;
 
+    @Value("classpath:schema/WorkFlowLineage.graphql")
+    Resource workFlowLineageResource;
+
     private GraphQL graphQL;
 
     @Autowired
@@ -112,6 +115,7 @@ public class GraphQLProvider {
         File uiPluginFile = uiPluginResource.getFile();
         File userFile = userResource.getFile();
         File workGroupFIle = workGroupResource.getFile();
+        File workFlowLineageFile = workFlowLineageResource.getFile();
 
         // parse schema
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
@@ -135,6 +139,7 @@ public class GraphQLProvider {
         typeRegistry.merge(schemaParser.parse(uiPluginFile));
         typeRegistry.merge(schemaParser.parse(userFile));
         typeRegistry.merge(schemaParser.parse(workGroupFIle));
+        typeRegistry.merge(schemaParser.parse(workFlowLineageFile));
 
         RuntimeWiring wiring = graphQLWiring.buildWiring();
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);

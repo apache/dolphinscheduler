@@ -164,3 +164,7 @@ WorkGroup
     queryAllWorkerGroups
     deleteWorkGroupById
     queryWorkerAddressList
+    
+WorkFlowLineage
+    queryWorkFlowLineageByName
+    queryWorkFlowLineageByIds
