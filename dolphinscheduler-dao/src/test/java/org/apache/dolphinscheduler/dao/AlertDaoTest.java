@@ -24,7 +24,9 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class AlertDaoTest {
 
     @Test
@@ -41,5 +43,20 @@ public class AlertDaoTest {
         List<Alert> alerts = alertDao.listWaitExecutionAlert();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
+    }
+
+    @Test
+    public void testSendServerStopedAlert() {
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        int alertGroupId = 1;
+        String host = "127.0.0.998165432";
+        String serverType = "Master";
+        alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
+        alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
+        long count = alertDao.listWaitExecutionAlert()
+                .stream()
+                .filter(alert -> alert.getContent().contains(host))
+                .count();
+        Assert.assertEquals(1L, count);
     }
 }

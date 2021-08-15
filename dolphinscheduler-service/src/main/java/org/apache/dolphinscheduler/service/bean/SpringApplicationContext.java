@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.bean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,9 +33,14 @@ public class SpringApplicationContext implements ApplicationContextAware {
         SpringApplicationContext.applicationContext = applicationContext;
     }
 
-    public static <T> T getBean(Class<T> requiredType){
-        return applicationContext.getBean(requiredType);
+    /**
+     * Close this application context, destroying all beans in its bean factory.
+     */
+    public void close() {
+        ((AbstractApplicationContext)applicationContext).close();
     }
 
-
+    public static <T> T getBean(Class<T> requiredType) {
+        return applicationContext.getBean(requiredType);
+    }
 }

@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -46,14 +48,15 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+/**
+ * scheduler service test
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuartzExecutors.class)
-
 public class SchedulerServiceTest {
 
-
     @InjectMocks
-    private SchedulerService schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
     @Mock
     private MonitorService monitorService;
@@ -89,13 +92,11 @@ public class SchedulerServiceTest {
     @Test
     public void testSetScheduleState() {
 
-
         String projectName = "test";
         User loginUser = new User();
         loginUser.setId(1);
         Map<String, Object> result = new HashMap<String, Object>();
         Project project = getProject(projectName);
-
 
         ProcessDefinition processDefinition = new ProcessDefinition();
 
@@ -143,7 +144,7 @@ public class SchedulerServiceTest {
         Assert.assertEquals(Status.MASTER_NOT_EXISTS, result.get(Constants.STATUS));
 
         //set master
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(masterServers);
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(masterServers);
 
         //SUCCESS
         result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);

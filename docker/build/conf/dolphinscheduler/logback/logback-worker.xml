@@ -18,24 +18,23 @@
 
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
 <configuration scan="true" scanPeriod="120 seconds"> <!--debug="true" -->
-
+    <conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.service.log.SensitiveDataConverter">
+    </conversionRule>
     <property name="log.base" value="logs"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %message%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
     <!-- worker server logback config start -->
-    <conversionRule conversionWord="messsage"
-                    converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-        </filter>
+        </filter> -->
         <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
             <key>taskAppId</key>
@@ -46,7 +45,7 @@
                 <file>${log.base}/${taskAppId}.log</file>
                 <encoder>
                     <pattern>
-                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %messsage%n
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %message%n
                     </pattern>
                     <charset>UTF-8</charset>
                 </encoder>
@@ -56,10 +55,9 @@
     </appender>
     <appender name="WORKERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-worker.log</file>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-        </filter>
-        <filter class="org.apache.dolphinscheduler.server.log.WorkerLogFilter"/>
+        </filter> -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.base}/dolphinscheduler-worker.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
@@ -67,7 +65,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %messsage%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %message%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>

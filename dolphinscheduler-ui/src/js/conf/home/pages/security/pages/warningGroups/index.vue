@@ -121,16 +121,13 @@
         this.item = item
         this.createWarningDialog = true
       },
-
       onUpdate () {
         this._debounceGET('false')
         this.createWarningDialog = false
       },
-
       close () {
         this.createWarningDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false

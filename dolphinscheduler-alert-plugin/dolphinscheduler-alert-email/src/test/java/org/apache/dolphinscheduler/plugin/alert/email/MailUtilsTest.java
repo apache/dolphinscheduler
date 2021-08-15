@@ -53,6 +53,7 @@ public class MailUtilsTest {
         emailConfig.put(MailParamsConstants.NAME_MAIL_SENDER, "xxx1.xxx.com");
         emailConfig.put(MailParamsConstants.NAME_MAIL_USER, "xxx2.xxx.com");
         emailConfig.put(MailParamsConstants.NAME_MAIL_PASSWD, "111111");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_AUTH, "true");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, "true");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE, "false");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST, "false");

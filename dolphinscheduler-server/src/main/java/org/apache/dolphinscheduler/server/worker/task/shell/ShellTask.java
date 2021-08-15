@@ -98,10 +98,12 @@ public class ShellTask extends AbstractTask {
     public void handle() throws Exception {
         try {
             // construct process
-            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+            String command = buildCommand();
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
+            shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
@@ -161,11 +163,8 @@ public class ShellTask extends AbstractTask {
 
     private String parseScript(String script) {
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
-            shellParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
         if (taskExecutionContext.getScheduleTime() != null) {
             if (paramsMap == null) {

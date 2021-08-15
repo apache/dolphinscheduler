@@ -20,7 +20,11 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Remarks')" width="200"></el-table-column>
+        <el-table-column prop="description" :label="$t('Remarks')" width="200">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Create Time')" width="140">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
@@ -31,12 +35,12 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="130">
+        <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"

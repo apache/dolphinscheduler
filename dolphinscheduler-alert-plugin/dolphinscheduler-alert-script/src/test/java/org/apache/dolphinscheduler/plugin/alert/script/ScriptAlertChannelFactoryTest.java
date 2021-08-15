@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;
 
@@ -35,7 +34,6 @@ public class ScriptAlertChannelFactoryTest {
     public void testGetParams() {
         ScriptAlertChannelFactory scriptAlertChannelFactory = new ScriptAlertChannelFactory();
         List<PluginParams> params = scriptAlertChannelFactory.getParams();
-        JSONUtils.toJsonString(params);
         Assert.assertEquals(3, params.size());
     }
 

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 
 import java.nio.file.Path;
@@ -38,10 +38,11 @@ public class LogUtilsTest {
 
     @Test
     public void testGetTaskLogPath() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setProcessDefinitionId(1);
-        taskInstance.setProcessInstanceId(100);
-        taskInstance.setId(1000);
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setProcessInstanceId(100);
+        taskExecutionContext.setTaskInstanceId(1000);
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
 
         Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
         Assert.assertNotNull(rootLogger);
@@ -59,8 +60,8 @@ public class LogUtilsTest {
 
         Path logPath = Paths.get(".").toAbsolutePath().getParent()
                 .resolve(logBase)
-                .resolve("1").resolve("100").resolve("1000.log");
-        Assert.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskInstance));
+                .resolve("1_1").resolve("100").resolve("1000.log");
+        Assert.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
     }
 
 }

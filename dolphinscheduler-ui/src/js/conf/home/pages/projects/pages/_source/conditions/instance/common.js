@@ -23,7 +23,7 @@ import i18n from '@/module/i18n'
 const stateType = [
   {
     code: '',
-    label: `${i18n.$t('none')}`
+    label: `${i18n.$t('AllStatus')}`
   }, {
     code: 'SUBMITTED_SUCCESS',
     label: `${i18n.$t('Submitted successfully')}`
@@ -44,21 +44,21 @@ const stateType = [
     label: `${i18n.$t('Stop')}`
   }, {
     code: 'FAILURE',
-    label: `${i18n.$t('failed')}`
+    label: `${i18n.$t('Failed')}`
   }, {
     code: 'SUCCESS',
-    label: `${i18n.$t('success')}`
+    label: `${i18n.$t('Success')}`
   }, {
     code: 'NEED_FAULT_TOLERANCE',
     label: `${i18n.$t('Need fault tolerance')}`
   }, {
     code: 'KILL',
-    label: `${i18n.$t('kill')}`
+    label: `${i18n.$t('Kill')}`
   }, {
-    code: 'WAITTING_THREAD',
+    code: 'WAITING_THREAD',
     label: `${i18n.$t('Waiting for thread')}`
   }, {
-    code: 'WAITTING_DEPEND',
+    code: 'WAITING_DEPEND',
     label: `${i18n.$t('Waiting for dependency to complete')}`
   }, {
     code: 'DELAY_EXECUTION',

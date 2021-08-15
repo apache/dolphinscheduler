@@ -63,7 +63,7 @@
                 <el-tooltip :content="$t('offline')" placement="top" v-if="scope.row.releaseState === 'ONLINE'">
                   <span><el-button type="danger" size="mini" icon="el-icon-download" @click="_offline(scope.row)" circle></el-button></span>
                 </el-tooltip>
-                <el-tooltip :content="$t('delete')" placement="top">
+                <el-tooltip :content="$t('Delete')" placement="top">
                   <el-popconfirm
                     :confirmButtonText="$t('Confirm')"
                     :cancelButtonText="$t('Cancel')"

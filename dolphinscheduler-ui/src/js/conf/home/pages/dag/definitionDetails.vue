@@ -42,7 +42,7 @@
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),
       ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getProcessDetails', 'getResourcesListJar']),
-      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll']),
+      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
       /**
        * init
        */
@@ -64,6 +64,8 @@
           this.getResourcesListJar(),
           // get worker group list
           this.getWorkerGroupsAll(),
+          // get alarm group list
+          this.getAlarmGroupsAll(),
           this.getTenantList()
         ]).then((data) => {
           let item = data[0]

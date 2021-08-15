@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="clearfix list">
-      <el-button type="info"  style="margin-left:20px" size="small" round :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</el-button>
+      <el-button type="primary"  style="margin-left:20px" size="small" round :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</el-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
@@ -59,6 +59,21 @@
             </div>
           </el-popover>
         </template>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
+        {{$t('Timezone')}}
+      </div>
+      <div class="cont">
+        <el-select v-model=timezoneId filterable placeholder="Timezone">
+          <el-option
+            v-for="item in availableTimezoneIDList"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div class="clearfix list">
@@ -115,15 +130,16 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Notification group')}}
+        {{$t('Alarm group')}}
       </div>
       <div class="cont">
         <el-select
           style="width: 200px;"
+          clearable
           size="small"
           :disabled="!notifyGroupList.length"
           v-model="warningGroupId">
-          <el-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
+          <el-input slot="trigger" readonly slot-scope="{ selectedModel }" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
           </el-input>
@@ -143,6 +159,7 @@
   </div>
 </template>
 <script>
+  import moment from 'moment-timezone'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
@@ -159,12 +176,14 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
+        availableTimezoneIDList: moment.tz.names(),
         warningType: 'NONE',
         notifyGroupList: [],
         warningGroupId: '',
         spinnerLoading: false,
         scheduleTime: '',
         crontab: '0 0 * * * ? *',
+        timezoneId: moment.tz.guess(),
         cronPopover: false,
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
@@ -203,7 +222,8 @@
             schedule: JSON.stringify({
               startTime: this.scheduleTime[0],
               endTime: this.scheduleTime[1],
-              crontab: this.crontab
+              crontab: this.crontab,
+              timezoneId: this.timezoneId
             }),
             failureStrategy: this.failureStrategy,
             warningType: this.warningType,
@@ -217,11 +237,11 @@
           if (this.timingData.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.timingData.item.id
-            msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
+            msg = `${i18n.$t('Edit')}${i18n.$t('Success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.timingData.item.id
-            msg = `${i18n.$t('Create')}${i18n.$t('success')}`
+            msg = `${i18n.$t('Create')}${i18n.$t('Success')}`
           }
 
           this.store.dispatch(api, searchParams).then(res => {
@@ -322,6 +342,7 @@
       if (this.timingData.item.crontab) {
         this.crontab = item.crontab
         this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
+        this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority

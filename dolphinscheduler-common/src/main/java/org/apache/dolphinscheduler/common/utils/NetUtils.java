@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE;
-
 import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -49,13 +47,46 @@ public class NetUtils {
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
-    private static final String ANY_HOST_VALUE = "0.0.0.0";
-    private static final String LOCAL_HOST_VALUE = "127.0.0.1";
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
 
     private NetUtils() {
         throw new UnsupportedOperationException("Construct NetUtils");
+    }
+
+    /**
+     * get addr like host:port
+     * @return addr
+     */
+    public static String getAddr(String host, int port) {
+        return String.format("%s:%d", host, port);
+    }
+
+    /**
+     * get addr like host:port
+     * @return addr
+     */
+    public static String getAddr(int port) {
+        return getAddr(getHost(), port);
+    }
+
+    /**
+     * get host
+     * @return host
+     */
+    public static String getHost(InetAddress inetAddress) {
+        if (inetAddress != null) {
+            if (Constants.KUBERNETES_MODE) {
+                String canonicalHost = inetAddress.getCanonicalHostName();
+                String[] items = canonicalHost.split("\\.");
+                if (items.length == 6 && "svc".equals(items[3])) {
+                    return String.format("%s.%s", items[0], items[1]);
+                }
+                return canonicalHost;
+            }
+            return inetAddress.getHostAddress();
+        }
+        return null;
     }
 
     public static String getHost() {
@@ -65,10 +96,10 @@ public class NetUtils {
 
         InetAddress address = getLocalAddress();
         if (address != null) {
-            HOST_ADDRESS = address.getHostAddress();
+            HOST_ADDRESS = getHost(address);
             return HOST_ADDRESS;
         }
-        return LOCAL_HOST_VALUE;
+        return Constants.KUBERNETES_MODE ? "localhost" : "127.0.0.1";
     }
 
     private static InetAddress getLocalAddress() {
@@ -97,7 +128,7 @@ public class NetUtils {
                     Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
                     if (addressOp.isPresent()) {
                         try {
-                            if (addressOp.get().isReachable(100)) {
+                            if (addressOp.get().isReachable(200)) {
                                 LOCAL_ADDRESS = addressOp.get();
                                 return LOCAL_ADDRESS;
                             }
@@ -153,8 +184,8 @@ public class NetUtils {
         String name = address.getHostAddress();
         return (name != null
                 && IP_PATTERN.matcher(name).matches()
-                && !ANY_HOST_VALUE.equals(name)
-                && !LOCAL_HOST_VALUE.equals(name));
+                && !address.isAnyLocalAddress()
+                && !address.isLoopbackAddress());
     }
 
     /**
@@ -227,7 +258,8 @@ public class NetUtils {
     }
 
     private static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
-        String preferredNetworkInterface = System.getProperty(DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE);
+        String preferredNetworkInterface = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED,
+                System.getProperty(Constants.DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED));
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
     }
 
@@ -235,7 +267,7 @@ public class NetUtils {
         if (validNetworkInterfaces.isEmpty()) {
             return null;
         }
-        String networkPriority = PropertyUtils.getString(Constants.NETWORK_PRIORITY_STRATEGY, NETWORK_PRIORITY_DEFAULT);
+        String networkPriority = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY, NETWORK_PRIORITY_DEFAULT);
         if (NETWORK_PRIORITY_DEFAULT.equalsIgnoreCase(networkPriority)) {
             return findAddressByDefaultPolicy(validNetworkInterfaces);
         } else if (NETWORK_PRIORITY_INNER.equalsIgnoreCase(networkPriority)) {

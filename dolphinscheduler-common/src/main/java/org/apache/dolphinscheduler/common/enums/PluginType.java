@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum PluginType {
 
     ALERT(1, "alert", true),
-    REGISTER(2, "register", false);
+    REGISTER(2, "registry", false);
 
     PluginType(int code, String desc, boolean hasUi) {
         this.code = code;

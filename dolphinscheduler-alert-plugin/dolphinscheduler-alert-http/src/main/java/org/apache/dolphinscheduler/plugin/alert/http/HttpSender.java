@@ -26,6 +26,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -110,17 +111,17 @@ public class HttpSender {
     }
 
     private void createHttpRequest(String msg) {
-
         if (REQUEST_TYPE_POST.equals(requestType)) {
             httpRequest = new HttpPost(url);
+            setHeader();
             //POST request add param in request body
             setMsgInRequestBody(msg);
         } else if (REQUEST_TYPE_GET.equals(requestType)) {
             //GET request add param in url
             setMsgInUrl(msg);
             httpRequest = new HttpGet(url);
+            setHeader();
         }
-        setHeader();
     }
 
     /**
@@ -156,11 +157,16 @@ public class HttpSender {
     /**
      * set body params
      */
-    private String setMsgInRequestBody(String msg) {
+    private void setMsgInRequestBody(String msg)  {
         ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
         //set msg content field
         objectNode.put(contentField, msg);
-        return objectNode.toString();
+        try {
+            StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
+            ((HttpPost)httpRequest).setEntity(entity);
+        } catch (Exception e) {
+            logger.error("send http alert msg  exception : {}", e.getMessage());
+        }
     }
 
 }

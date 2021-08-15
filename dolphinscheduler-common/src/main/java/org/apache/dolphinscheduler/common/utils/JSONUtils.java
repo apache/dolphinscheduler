@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -206,32 +207,35 @@ public class JSONUtils {
             return null;
         }
 
-        return node.toString();
+        return node.asText();
     }
 
     /**
      * json to map
-     * <p>
      * {@link #toMap(String, Class, Class)}
      *
      * @param json json
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
-            });
-        } catch (Exception e) {
-            logger.error("json to map exception!", e);
-        }
-
-        return null;
+        return parseObject(json, new TypeReference<Map<String, String>>() {});
     }
 
+    /**
+     * from the key-value generated json  to get the str value no matter the real type of value
+     * @param json the json str
+     * @param nodeName key
+     * @return the str value of key
+     */
+    public static String getNodeString(String json, String nodeName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+        } catch (JsonProcessingException e) {
+            return "";
+        }
+    }
+    
     /**
      * json to map
      *
@@ -243,13 +247,24 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
+        return parseObject(json, new TypeReference<Map<K, V>>() {});
+    }
+
+    /**
+     * json to object
+     *
+     * @param json json string
+     * @param type type reference
+     * @param <T>
+     * @return return parse object
+     */
+    public static <T> T parseObject(String json, TypeReference<T> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
-            });
+            return objectMapper.readValue(json, type);
         } catch (Exception e) {
             logger.error("json to map exception!", e);
         }

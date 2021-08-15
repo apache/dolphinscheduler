@@ -50,7 +50,7 @@
         <el-input v-model="searchParams.executorName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Executor')"></el-input>
       </div>
       <div class="list">
-        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 200px;" size="mini" :placeholder="$t('name')"></el-input>
+        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 200px;" size="mini" :placeholder="$t('Name')"></el-input>
       </div>
     </template>
   </m-conditions>

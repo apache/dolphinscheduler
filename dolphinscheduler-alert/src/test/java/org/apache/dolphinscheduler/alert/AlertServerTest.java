@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -34,12 +34,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AlertServer.class,DaoFactory.class})
+@PrepareForTest({AlertServer.class, DaoFactory.class})
 public class AlertServerTest {
 
     @Before
@@ -55,13 +56,15 @@ public class AlertServerTest {
 
         PluginDao pluginDao = PowerMockito.mock(PluginDao.class);
         PowerMockito.when(DaoFactory.getDaoInstance(PluginDao.class)).thenReturn(pluginDao);
+        PowerMockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
 
         AlertChannel alertChannelMock = PowerMockito.mock(AlertChannel.class);
 
         AlertPluginManager alertPluginManager = PowerMockito.mock(AlertPluginManager.class);
         PowerMockito.whenNew(AlertPluginManager.class).withNoArguments().thenReturn(alertPluginManager);
         ConcurrentHashMap alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put("pluginName",alertChannelMock);
+        alertChannelMap.put("pluginName", alertChannelMock);
+        PowerMockito.when(alertPluginManager.getPluginNameById(Mockito.anyInt())).thenReturn("pluginName");
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
 
         DolphinPluginManagerConfig alertPluginManagerConfig = PowerMockito.mock(DolphinPluginManagerConfig.class);
@@ -78,14 +81,11 @@ public class AlertServerTest {
         AlertServer alertServer = AlertServer.getInstance();
         Assert.assertNotNull(alertServer);
 
-        new Thread(() -> {
-            alertServer.start(); })
-                .start();
+        new Thread(() -> alertServer.start()).start();
 
         Thread.sleep(5 * Constants.ALERT_SCAN_INTERVAL);
 
         alertServer.stop();
-
     }
 
 }

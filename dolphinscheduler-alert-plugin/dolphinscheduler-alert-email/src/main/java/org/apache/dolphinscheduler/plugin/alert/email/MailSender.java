@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.activation.CommandMap;
+import javax.activation.MailcapCommandMap;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -171,6 +173,7 @@ public class MailSender {
         }
 
         receivers.removeIf(StringUtils::isEmpty);
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 
         if (showType.equals(ShowType.TABLE.getDescp()) || showType.equals(ShowType.TEXT.getDescp())) {
             // send email
@@ -202,7 +205,9 @@ public class MailSender {
         } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + EmailConstants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp())
+                        ? "Please see the attachment " + title + EmailConstants.EXCEL_SUFFIX_XLSX
+                        : htmlTable(content, false));
 
                 attachment(title, content, partContent);
 
@@ -284,6 +289,15 @@ public class MailSender {
      * @return the new Session
      */
     private Session getSession() {
+        // support multilple email format
+        MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
+        mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+        mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+        mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+        mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+        mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+        CommandMap.setDefaultCommandMap(mc);
+
         Properties props = new Properties();
         props.setProperty(MailParamsConstants.MAIL_SMTP_HOST, mailSmtpHost);
         props.setProperty(MailParamsConstants.MAIL_SMTP_PORT, mailSmtpPort);
@@ -327,7 +341,7 @@ public class MailSender {
         part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
+        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLSX);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -336,7 +350,7 @@ public class MailSender {
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLS, EmailConstants.UTF_8, "B"));
+        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
@@ -367,7 +381,6 @@ public class MailSender {
 
         // send
         email.setDebug(true);
-        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         email.send();
 
         alertResult.setStatus("true");
@@ -383,12 +396,12 @@ public class MailSender {
     public void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                logger.info("delete success: {}", file.getAbsolutePath() + file.getName());
+                logger.info("delete success: {}", file.getAbsolutePath());
             } else {
-                logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
+                logger.info("delete fail: {}", file.getAbsolutePath());
             }
         } else {
-            logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
+            logger.info("file not exists: {}", file.getAbsolutePath());
         }
     }
 

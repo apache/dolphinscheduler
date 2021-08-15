@@ -21,20 +21,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-worker
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
-  WORKER_EXEC_THREADS: {{ .Values.worker.configmap.WORKER_EXEC_THREADS | quote }}
-  WORKER_HEARTBEAT_INTERVAL: {{ .Values.worker.configmap.WORKER_HEARTBEAT_INTERVAL | quote }}
-  WORKER_FETCH_TASK_NUM: {{ .Values.worker.configmap.WORKER_FETCH_TASK_NUM | quote }}
-  WORKER_MAX_CPULOAD_AVG: {{ .Values.worker.configmap.WORKER_MAX_CPULOAD_AVG | quote }}
-  WORKER_RESERVED_MEMORY: {{ .Values.worker.configmap.WORKER_RESERVED_MEMORY | quote }}
-  WORKER_LISTEN_PORT: {{ .Values.worker.configmap.WORKER_LISTEN_PORT | quote }}
-  WORKER_GROUP: {{ .Values.worker.configmap.WORKER_GROUP | quote }}
-  WORKER_WEIGHT: {{ .Values.worker.configmap.WORKER_WEIGHT | quote }}
-  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
-  dolphinscheduler_env.sh: |-
-  {{- range .Values.worker.configmap.DOLPHINSCHEDULER_ENV }}
-    {{ . }}
+  {{- range $key, $value := .Values.worker.configmap }}
+  {{ $key }}: {{ $value | quote }}
   {{- end }}
 {{- end }}

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +75,8 @@ public class UserMapperTest {
         user.setCreateTime(new Date());
         user.setTenantId(1);
         user.setUpdateTime(new Date());
+        user.setQueueName("test_queue");
+        user.setQueue("queue");
         userMapper.insert(user);
         return user;
     }
@@ -311,5 +314,23 @@ public class UserMapperTest {
         User userToken = userMapper.queryUserByToken(accessToken.getToken());
         Assert.assertEquals(userToken, user);
 
+    }
+
+    @Test
+    public void selectByIds() {
+        //insertOne
+        User user = insertOne();
+        List<Integer> userIds = new ArrayList<>();
+        userIds.add(user.getId());
+        List<User> users = userMapper.selectByIds(userIds);
+        Assert.assertFalse(users.isEmpty());
+    }
+
+    @Test
+    public void testExistUser() {
+        String queueName = "queue";
+        Assert.assertNull(userMapper.existUser(queueName));
+        insertOne();
+        Assert.assertTrue(userMapper.existUser(queueName));
     }
 }

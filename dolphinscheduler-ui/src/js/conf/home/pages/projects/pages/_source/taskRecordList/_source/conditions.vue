@@ -73,26 +73,26 @@
       return {
         stateList: [
           {
-            label: `${this.$t('none')}`,
+            label: `${this.$t('None')}`,
             code: ''
           },
           {
-            label: `${this.$t('success')}`,
+            label: `${this.$t('Success')}`,
             code: '成功'
           },
           {
-            label: `${this.$t('waiting')}`,
+            label: `${this.$t('Waiting')}`,
             code: '等待'
           },
           {
-            label: `${this.$t('execution')}`,
+            label: `${this.$t('Execution')}`,
             code: '执行中'
           },
           {
-            label: `${this.$t('finish')}`,
+            label: `${this.$t('Finish')}`,
             code: '完成'
           }, {
-            label: `${this.$t('failed')}`,
+            label: `${this.$t('Failed')}`,
             code: '失败'
           }
         ],

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -39,7 +40,7 @@ public class AlertPluginInstance {
     /**
      * plugin_define_id
      */
-    @TableField("plugin_define_id")
+    @TableField(value = "plugin_define_id", updateStrategy = FieldStrategy.NEVER)
     private int pluginDefineId;
 
     /**
@@ -76,6 +77,13 @@ public class AlertPluginInstance {
         this.pluginInstanceParams = pluginInstanceParams;
         this.createTime = new Date();
         this.updateTime = new Date();
+        this.instanceName = instanceName;
+    }
+
+    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName, Date updateDate) {
+        this.id = id;
+        this.pluginInstanceParams = pluginInstanceParams;
+        this.updateTime = updateDate;
         this.instanceName = instanceName;
     }
 

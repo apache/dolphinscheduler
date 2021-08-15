@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINIT
 import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -35,11 +36,8 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.text.ParseException;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,14 +56,12 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * execute process controller
+ * executor controller
  */
-@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG", position = 1)
+@Api(tags = "EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/executors")
 public class ExecutorController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorController.class);
 
     @Autowired
     private ExecutorService execService;
@@ -107,6 +103,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                        @RequestParam(value = "processDefinitionId") int processDefinitionId,
@@ -121,13 +118,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
-                                       @RequestParam(value = "startParams", required = false) String startParams) throws ParseException {
-        logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {},  "
-                        + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                        + "notify group id: {}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, startParams: {} ",
-                loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
-                failureStrategy, startNodeList, taskDependType, warningType, workerGroup, runMode, processInstancePriority,
-                workerGroup, timeout, startParams);
+                                       @RequestParam(value = "startParams", required = false) String startParams) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -160,13 +151,12 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType
     ) {
-        logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                loginUser.getUserName(), projectName, processInstanceId, executeType);
         Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -185,9 +175,9 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-        logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionId);
         Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
         return returnDataList(result);
     }

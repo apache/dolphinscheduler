@@ -17,10 +17,15 @@
 
 import localStore from '@/module/util/localStorage'
 
-// Get the name of the item currently clicked
+// Get the project currently clicked
+const projectId = localStore.getItem('projectId')
 const projectName = localStore.getItem('projectName')
 
 export default {
+  // process definition code
+  code: '',
+  // process definition version
+  version: '',
   // name
   name: '',
   // description
@@ -43,7 +48,9 @@ export default {
   runFlag: '',
   // Whether to edit
   isEditDag: false,
-  // Current project
+  // Current project id
+  projectId: projectId,
+  // Current project name
   projectName: projectName || '',
   // Whether to go online the process definition
   releaseState: 'ONLINE',

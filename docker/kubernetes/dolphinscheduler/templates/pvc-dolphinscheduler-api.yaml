@@ -21,11 +21,10 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   accessModes:
-    {{- range .Values.api.persistentVolumeClaim.accessModes }}
+  {{- range .Values.api.persistentVolumeClaim.accessModes }}
     - {{ . | quote }}
   {{- end }}
   storageClassName: {{ .Values.api.persistentVolumeClaim.storageClassName | quote }}

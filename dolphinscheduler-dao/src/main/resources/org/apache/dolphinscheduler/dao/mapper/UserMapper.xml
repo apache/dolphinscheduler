@@ -61,7 +61,7 @@
         <include refid="baseSqlV2">
             <property name="alias" value="u"/>
         </include>
-        ,
+        ,t.tenant_code,
         case when u.queue <![CDATA[ <> ]]>  '' then u.queue else q.queue_name end as queue_name
         from t_ds_user u
         left join t_ds_tenant t on u.tenant_id=t.id
@@ -103,11 +103,24 @@
         select
         <include refid="baseSql"/>
         from t_ds_user
-        where queue = #{queueName}
+        where queue = #{queue}
+    </select>
+    <select id="existUser" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_user
+        where queue = #{queue} limit 1
     </select>
     <update id="updateUserQueue" parameterType="java.lang.String">
         update t_ds_user
         set queue = #{newQueue}
         where queue = #{oldQueue}
     </update>
+    <select id="selectByIds" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        select *
+        from t_ds_user
+        where id in
+        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

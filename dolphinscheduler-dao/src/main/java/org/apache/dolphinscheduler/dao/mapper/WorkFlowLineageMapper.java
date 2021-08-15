@@ -16,17 +16,53 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
-import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+
 import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Set;
 
 public interface WorkFlowLineageMapper {
 
-    List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectId") int projectId);
+    /**
+     * queryByName
+     *
+     * @param searchVal searchVal
+     * @param projectCode projectCode
+     * @return WorkFlowLineage list
+     */
+    List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectCode") Long projectCode);
 
-    List<WorkFlowLineage> queryByIds(@Param("ids") Set<Integer> ids, @Param("projectId") int projectId);
+    /**
+     * queryCodeRelation
+     *
+     * @param taskCode taskCode
+     * @param taskVersion taskVersion
+     * @param processDefinitionCode processDefinitionCode
+     * @return ProcessLineage
+     */
+    List<ProcessLineage> queryCodeRelation(
+            @Param("taskCode") Long taskCode, @Param("taskVersion") int taskVersion,
+            @Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
 
-    List<WorkFlowRelation> querySourceTarget(@Param("id") int id);
+    /**
+     * queryRelationByIds
+     *
+     * @param ids ids
+     * @param projectCode projectCode
+     * @return ProcessLineage
+     */
+    List<ProcessLineage> queryRelationByIds(@Param("ids") Set<Integer> ids, @Param("projectCode") Long projectCode);
+
+    /**
+     * queryWorkFlowLineageByCode
+     *
+     * @param processDefinitionCode processDefinitionCode
+     * @param projectCode projectCode
+     * @return WorkFlowLineage
+     */
+    WorkFlowLineage queryWorkFlowLineageByCode(@Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
+
 }

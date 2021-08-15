@@ -117,11 +117,9 @@
         this._debounceGET('false')
         this.createQueueDialog = false
       },
-
       close () {
         this.createQueueDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false

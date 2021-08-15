@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.COLON;
+
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * server address
@@ -40,45 +41,20 @@ public class Host implements Serializable {
      */
     private int port;
 
-    /**
-     * weight
-     */
-    private int weight;
-
-    /**
-     * startTime
-     */
-    private long startTime;
-
-    /**
-     * workGroup
-     */
-    private String workGroup;
-
     public Host() {
     }
 
     public Host(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
-    public Host(String ip, int port, int weight, long startTime) {
-        this.ip = ip;
-        this.port = port;
-        this.address = ip + ":" + port;
-        this.weight = getWarmUpWeight(weight, startTime);
-        this.startTime = startTime;
-    }
-
-    public Host(String ip, int port, int weight, long startTime, String workGroup) {
-        this.ip = ip;
-        this.port = port;
-        this.address = ip + ":" + port;
-        this.weight = getWarmUpWeight(weight, startTime);
-        this.workGroup = workGroup;
-        this.startTime = startTime;
+    public Host(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
+        this.address = address;
     }
 
     public String getAddress() {
@@ -86,6 +62,9 @@ public class Host implements Serializable {
     }
 
     public void setAddress(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
         this.address = address;
     }
 
@@ -95,23 +74,7 @@ public class Host implements Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
-        this.address = ip + ":" + port;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+        this.address = ip + COLON + port;
     }
 
     public int getPort() {
@@ -120,15 +83,7 @@ public class Host implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
-        this.address = ip + ":" + port;
-    }
-
-    public String getWorkGroup() {
-        return workGroup;
-    }
-
-    public void setWorkGroup(String workGroup) {
-        this.workGroup = workGroup;
+        this.address = ip + COLON + port;
     }
 
     /**
@@ -138,21 +93,25 @@ public class Host implements Serializable {
      * @return host
      */
     public static Host of(String address) {
+        String[] parts = splitAddress(address);
+        return new Host(parts[0], Integer.parseInt(parts[1]));
+    }
+
+    /**
+     * address convert host
+     *
+     * @param address address
+     * @return host
+     */
+    public static String[] splitAddress(String address) {
         if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
-        String[] parts = address.split(":");
-        if (parts.length < 2) {
+        String[] parts = address.split(COLON);
+        if (parts.length != 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
-        Host host = null;
-        if (parts.length == 2) {
-            host = new Host(parts[0], Integer.parseInt(parts[1]));
-        }
-        if (parts.length == 4) {
-            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Long.parseLong(parts[3]));
-        }
-        return host;
+        return parts;
     }
 
     /**
@@ -162,43 +121,17 @@ public class Host implements Serializable {
      * @return old version is true , otherwise is false
      */
     public static Boolean isOldVersion(String address) {
-        String[] parts = address.split(":");
-        return parts.length != 2 && parts.length != 3;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Host host = (Host) o;
-        return Objects.equals(getAddress(), host.getAddress());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getAddress());
+        String[] parts = address.split(COLON);
+        return parts.length != 2;
     }
 
     @Override
     public String toString() {
         return "Host{"
-            + "address='" + address + '\''
-            + '}';
+                + "address='" + address + '\''
+                + ", ip='" + ip + '\''
+                + ", port=" + port
+                + '}';
     }
 
-    /**
-     * warm up
-     */
-    private int getWarmUpWeight(int weight, long startTime) {
-        long uptime = System.currentTimeMillis() - startTime;
-        //If the warm-up is not over, reduce the weight
-        if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
-            return (int) (weight * ((float) uptime / Constants.WARM_UP_TIME));
-        }
-        return weight;
-    }
 }

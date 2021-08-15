@@ -30,20 +30,27 @@
       <div slot="text">{{$t('SQL Type')}}</div>
       <div slot="content">
         <div style="display: inline-block;">
-          <m-sql-type
-                  @on-sqlType="_onSqlType"
-                  :sql-type="sqlType">
-          </m-sql-type>
+          <m-sql-type @on-sqlType="_onSqlType" :sql-type="sqlType"></m-sql-type>
         </div>
-        <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <el-checkbox-group v-model="showType" size="small">
-            <el-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</el-checkbox>
-            <el-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</el-checkbox>
-          </el-checkbox-group>
+        <div style="display: inline-block;" v-if="sqlType === '0'">
+          <span class="text-b">{{$t('Send Email')}}</span>
+          <el-switch size="small" v-model="sendEmail"></el-switch>
+        </div>
+        <div style="display: inline-block;" v-if="sqlType === '0'">
+          <span class="text-b">{{$t('Log display')}}</span>
+          <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
+          <span>{{$t('rows of result')}}</span>
         </div>
       </div>
     </m-list-box>
-    <template v-if="sqlType==0">
+    <m-list-box v-show="sqlType === '0'">
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Max Numbers Return')}}</div>
+        <div slot="content">
+          <el-input type="input" :disabled="isDetails" size="medium" v-model="limit" :placeholder="$t('Max Numbers Return placeholder')">
+          </el-input>
+        </div>
+    </m-list-box>
+    <template v-if="sqlType === '0' && sendEmail">
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
@@ -51,8 +58,15 @@
             type="input"
             size="small"
             v-model="title"
+            :disabled="isDetails"
             :placeholder="$t('Please enter the title of email')">
           </el-input>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Alarm group')}}</div>
+        <div slot="content">
+          <m-warning-groups v-model="groupId"></m-warning-groups>
         </div>
       </m-list-box>
     </template>
@@ -71,7 +85,7 @@
     <m-list-box>
       <div slot="text">{{$t('SQL Statement')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea
                   id="code-sql-mirror"
                   name="code-sql-mirror"
@@ -142,6 +156,8 @@
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
+  import mWarningGroups from './_source/warningGroups'
+  import mSelectInput from '../_source/selectInput'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
@@ -165,10 +181,14 @@
         udfs: '',
         // Sql type
         sqlType: '0',
+        // Send email
+        sendEmail: false,
+        // Display rows
+        displayRows: 10,
+        // Max returned rows
+        limit: 10000,
         // Email title
         title: '',
-        // Form/attachment
-        showType: ['TABLE'],
         // Sql parameter
         connParams: '',
         // Pre statements
@@ -176,7 +196,8 @@
         // Post statements
         postStatements: [],
         item: '',
-        scriptBoxDialog: false
+        scriptBoxDialog: false,
+        groupId: null
       }
     },
     mixins: [disabledState],
@@ -185,6 +206,13 @@
       createNodeId: Number
     },
     methods: {
+      /**
+       * limit should't be empty;limit should be a non-negative number str;
+       * limit should be a number smaller or equal than Integer.MAX_VALUE in java.
+       */
+      isLimitInvalid () {
+        return !this.limit || !/^(0|[1-9]\d*)$/.test(this.limit) || parseInt(this.limit, 10) > 2147483647
+      },
       setEditorVal () {
         this.item = editor.getValue()
         this.scriptBoxDialog = true
@@ -197,9 +225,6 @@
        */
       _onSqlType (a) {
         this.sqlType = a
-        if (a === 0) {
-          this.showType = ['TABLE']
-        }
       },
       /**
        * return udfs
@@ -245,16 +270,16 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType === 0 && !this.showType.length) {
-          this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
-          return false
-        }
-        if (this.sqlType === 0 && !this.title) {
+        if (this.sqlType === '0' && this.sendEmail && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType === 0 && !this.receivers.length) {
-          this.$message.warning(`${i18n.$t('Recipient required')}`)
+        if (this.sqlType === '0' && this.isLimitInvalid()) {
+          this.$message.warning(`${i18n.$t('Max Numbers Return required')}`)
+          return false
+        }
+        if (this.sqlType === '0' && this.sendEmail && (this.groupId === '' || this.groupId === null)) {
+          this.$message.warning(`${i18n.$t('Alarm group required')}`)
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -286,19 +311,11 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
+          limit: this.limit,
           title: this.title,
-          showType: (() => {
-            /**
-             * Special processing return order TABLE,ATTACHMENT
-             * Handling checkout sequence
-             */
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -346,15 +363,11 @@
           sql: editor ? editor.getValue() : '',
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
+          limit: this.limit,
           title: this.title,
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -372,11 +385,9 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val === 0) {
-          this.showType = []
-        }
-        if (val !== 0) {
+        if (val !== '0') {
           this.title = ''
+          this.groupId = null
         }
       },
       // Listening data source
@@ -401,16 +412,15 @@
         this.sql = o.params.sql || ''
         this.udfs = o.params.udfs || ''
         this.sqlType = o.params.sqlType
+        this.sendEmail = o.params.sendEmail || false
+        this.displayRows = o.params.displayRows || 10
+        this.limit = o.params.limit || 10000
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        if (o.params.showType === '') {
-          this.showType = []
-        } else {
-          this.showType = o.params.showType.split(',') || []
-        }
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
+        this.groupId = o.params.groupId
       }
     },
     mounted () {
@@ -435,15 +445,11 @@
           datasource: this.rtDatasource,
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
+          limit: this.limit,
           title: this.title,
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -451,6 +457,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox, mWarningGroups, mSelectInput }
   }
 </script>
