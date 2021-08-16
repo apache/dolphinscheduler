@@ -90,7 +90,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+            putMsg(result, Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP);
             return result;
         }
 
@@ -196,7 +196,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+            putMsg(result, Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP);
             return result;
         }
 

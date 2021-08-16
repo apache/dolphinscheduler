@@ -87,7 +87,7 @@ public class UdfFuncServiceTest {
         //hdfs not start
         Result result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(),result.getMsg());
         //resource not exist
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
@@ -126,10 +126,10 @@ public class UdfFuncServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.UDF_FUNCTION_NOT_EXIST,result.get(Constants.STATUS));
 
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         result = udfFuncService.updateUdfFunc(1, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP,result.get(Constants.STATUS));
 
         //RESOURCE_NOT_EXIST
         PowerMockito.when(udfFuncMapper.selectUdfById(11)).thenReturn(getUdfFunc());

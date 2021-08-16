@@ -25,6 +25,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+
+/**
+ * todo
+ */
 @TableName("t_ds_resources")
 public class Resource {
   /**
@@ -72,6 +76,11 @@ public class Resource {
    * resource type
    */
   private ResourceType type;
+
+  /**
+   * resource storage name
+   */
+  private String resourceStorageName;
 
   /**
    * resource size
@@ -235,6 +244,14 @@ public class Resource {
 
   public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
+  }
+
+  public String getResourceStorageName() {
+    return resourceStorageName;
+  }
+
+  public void setResourceStorageName(String resourceStorageName) {
+    this.resourceStorageName = resourceStorageName;
   }
 
   @Override

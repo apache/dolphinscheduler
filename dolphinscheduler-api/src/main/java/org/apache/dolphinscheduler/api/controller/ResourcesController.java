@@ -121,7 +121,7 @@ public class ResourcesController extends BaseController {
                                   @RequestParam(value = "name") String alias,
                                   @RequestParam(value = "description", required = false) String description,
                                   @RequestParam(value = "pid") int pid,
-                                  @RequestParam(value = "currentDir") String currentDir) {
+                                  @RequestParam(value = "currentDir") String currentDir) { // todo :This parameter is not needed when the pid is known
         return resourceService.createDirectory(loginUser, alias, description, type, pid, currentDir);
     }
 
@@ -143,7 +143,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
             @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String") //todo:This parameter is not needed when the pid is known
     })
     @PostMapping(value = "/create")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -154,7 +154,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "description", required = false) String description,
                                  @RequestParam("file") MultipartFile file,
                                  @RequestParam(value = "pid") int pid,
-                                 @RequestParam(value = "currentDir") String currentDir) {
+                                 @RequestParam(value = "currentDir") String currentDir) { //todo:This parameter is not needed when the pid is known
         return resourceService.createResource(loginUser, alias, description, type, file, pid, currentDir);
     }
 

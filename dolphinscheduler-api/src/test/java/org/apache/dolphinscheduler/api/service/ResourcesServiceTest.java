@@ -118,10 +118,10 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         User user = new User();
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null, -1, "/");
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_FILE_IS_EMPTY
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
@@ -152,10 +152,10 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         User user = new User();
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, -1, "/");
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //PARENT_RESOURCE_NOT_EXIST
         user.setId(1);
@@ -181,10 +181,10 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         User user = new User();
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.updateResource(user, 1, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
@@ -299,10 +299,10 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
         try {
-            // HDFS_NOT_STARTUP
+            // RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
             Result result = resourcesService.delete(loginUser, 1);
             logger.info(result.toString());
-            Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+            Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
             //RESOURCE_NOT_EXIST
             PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
@@ -387,10 +387,10 @@ public class ResourcesServiceTest {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
@@ -450,10 +450,10 @@ public class ResourcesServiceTest {
         PowerMockito.when(HadoopUtils.getHdfsResDir("hdfsdDir")).thenReturn("hdfsDir");
         PowerMockito.when(HadoopUtils.getHdfsUdfDir("udfDir")).thenReturn("udfDir");
         User user = getUser();
-        //HDFS_NOT_STARTUP
+        //RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content", -1, "/");
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
@@ -488,10 +488,10 @@ public class ResourcesServiceTest {
         loginUser.setId(0);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
-        // HDFS_NOT_STARTUP
+        // RESOURCE_STORAGE_PLUGIN_NOT_STARTUP
         Result result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);

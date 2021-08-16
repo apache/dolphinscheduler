@@ -231,4 +231,8 @@ public interface ResourcesService {
      */
     Map<String, Object> authorizedFile(User loginUser, Integer userId);
 
+    boolean updateUserWhenUserChange(String newTenantCode,String oldTenantId,Integer userId);
+
+    boolean deleteUserResource(String tenantCode,Integer userId);
+
 }

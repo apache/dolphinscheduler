@@ -17,22 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.plugin.resource.ResourceStorageCenter;
+import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
@@ -113,6 +109,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    private ResourceStorageCenter resourceStorageCenter = ResourceStorageCenter.getInstance();
+
+    @Autowired
+    private ResourcesService resourcesService;
+
 
     /**
      * create user, only system admin have permission
@@ -157,18 +158,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
-
         Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))) {
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(), user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
-        }
-
         putMsg(result, Status.SUCCESS);
         return result;
 
@@ -337,8 +327,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     *
-     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -416,55 +404,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             //query tenant
             Tenant newTenant = tenantMapper.queryById(tenantId);
             if (newTenant != null) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-                    String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
-                    String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
-
-                    // if old tenant dir exists
-                    if (HadoopUtils.getInstance().exists(oldResourcePath)) {
-                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
-                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
-
-                        //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.FILE.ordinal());
-                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
-                        }
-
-                        //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.UDF.ordinal());
-                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
-                        }
-
-                        //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(), userId);
-                        HadoopUtils.getInstance().delete(oldUserPath, true);
-                    } else {
-                        // if old tenant dir not exists , create
-                        createTenantDirIfNotExists(oldTenant.getTenantCode());
-                    }
-
-                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))) {
-                        //create user in the new tenant directory
-                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(), user.getId());
-                        HadoopUtils.getInstance().mkdir(newUserPath);
-                    } else {
-                        // if new tenant dir not exists , create
-                        createTenantDirIfNotExists(newTenant.getTenantCode());
-                    }
-
-                }
+                user.setTenantId(tenantId);
+                resourcesService.updateUserWhenUserChange(newTenant.getTenantCode(),oldTenant.getTenantCode(),userId);
             }
-            user.setTenantId(tenantId);
         }
 
         // updateProcessInstance user
@@ -506,12 +448,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = userMapper.queryTenantCodeByUserId(id);
 
         if (user != null) {
-            if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(), id);
-                if (HadoopUtils.getInstance().exists(userPath)) {
-                    HadoopUtils.getInstance().delete(userPath, true);
-                }
-            }
+            resourcesService.deleteUserResource(user.getTenantCode(), id);
         }
 
         userMapper.deleteById(id);
@@ -950,42 +887,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return msg;
     }
 
-    /**
-     * copy resource files
-     *
-     * @param resourceComponent resource component
-     * @param srcBasePath src base path
-     * @param dstBasePath dst base path
-     * @throws IOException io exception
-     */
-    private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
-        List<ResourceComponent> components = resourceComponent.getChildren();
-
-        if (CollectionUtils.isNotEmpty(components)) {
-            for (ResourceComponent component : components) {
-                // verify whether exist
-                if (!HadoopUtils.getInstance().exists(String.format("%s/%s", srcBasePath, component.getFullName()))) {
-                    logger.error("resource file: {} not exist,copy error", component.getFullName());
-                    throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                }
-
-                if (!component.isDirctory()) {
-                    // copy it to dst
-                    HadoopUtils.getInstance().copy(String.format("%s/%s", srcBasePath, component.getFullName()), String.format("%s/%s", dstBasePath, component.getFullName()), false, true);
-                    continue;
-                }
-
-                if (CollectionUtils.isEmpty(component.getChildren())) {
-                    // if not exist,need create it
-                    if (!HadoopUtils.getInstance().exists(String.format("%s/%s", dstBasePath, component.getFullName()))) {
-                        HadoopUtils.getInstance().mkdir(String.format("%s/%s", dstBasePath, component.getFullName()));
-                    }
-                } else {
-                    copyResourceFiles(component, srcBasePath, dstBasePath);
-                }
-            }
-        }
-    }
 
     /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue

@@ -21,6 +21,7 @@ import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.register.RegistryFactory;
+import org.apache.dolphinscheduler.spi.resource.ResourceStorageFactory;
 
 /**
  * Dolphinscheduler plugin interface
@@ -46,6 +47,14 @@ public interface DolphinSchedulerPlugin {
      * @return registry factory
      */
     default Iterable<RegistryFactory> getRegisterFactorys() {
+        return emptyList();
+    }
+
+    /**
+     * get resource storage plugin factory
+     * @return resource storage factory
+     */
+    default Iterable<ResourceStorageFactory> getResourceStorageFactorys() {
         return emptyList();
     }
 }

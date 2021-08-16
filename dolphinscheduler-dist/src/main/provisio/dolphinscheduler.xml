@@ -39,6 +39,7 @@
     </artifactSet>
 
     <!-- Plugins -->
+    <!--Alert-->
     <artifactSet to="lib/plugin/alert/email">
         <artifact id="${project.groupId}:dolphinscheduler-alert-email:zip:${project.version}">
             <unpack/>
@@ -69,9 +70,24 @@
             <unpack/>
         </artifact>
     </artifactSet>
+
+    <!--registry-->
     <artifactSet to="lib/plugin/registry/zookeeper">
         <artifact id="${project.groupId}:dolphinscheduler-registry-zookeeper:zip:${project.version}">
             <unpack/>
         </artifact>
     </artifactSet>
+
+    <!--resource storage-->
+    <artifactSet to="lib/plugin/resource/hdfs">
+        <artifact id="${project.groupId}:dolphinscheduler-resource-hdfs:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/resource/s3">
+        <artifact id="${project.groupId}:dolphinscheduler-resource-s3:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+
 </runtime>

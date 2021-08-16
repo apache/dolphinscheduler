@@ -17,7 +17,41 @@
 
 package org.apache.dolphinscheduler.spi.resource;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ResourceStorage {
 
+    /**
+     *  init resource storage
+     * @param config config params
+     */
+    void init(Map<String, String> config);
 
+    /**
+     * cat file
+     * @param filePath file path
+     * @return
+     */
+    byte[] catFile(String filePath);
+
+    List<String> catFile(String filePath, int skipLineNums, int limit);
+
+    /**
+     * delete file
+     * @param filePath file path
+     * @param recursive recursive
+     * @return
+     */
+    boolean deleteFile(String filePath, Boolean recursive);
+
+    boolean exists(String filePath);
+
+    boolean rename(String oldPath, String newPath);
+
+    boolean uploadLocalFile(String localFileName, String resourceStorageName, boolean overwrite);
+
+    boolean downloadFileToLocal(String resourceFilePath,String localFilePath);
+
+    boolean copyFile(String filePath,String targetFilePath,boolean overwrite,boolean deleteSource);
 }
