@@ -28,7 +28,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -80,8 +79,8 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "createProject", notes = "CREATE_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -106,10 +105,10 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "updateProject", notes = "UPDATE_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -133,7 +132,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryProjectById", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/query-by-id")
     @ResponseStatus(HttpStatus.OK)
@@ -171,13 +170,13 @@ public class ProjectController extends BaseController {
                                          @RequestParam("pageNo") Integer pageNo
     ) {
 
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
@@ -189,7 +188,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "deleteProjectById", notes = "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -212,7 +211,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
@@ -234,7 +233,7 @@ public class ProjectController extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
@@ -271,9 +270,10 @@ public class ProjectController extends BaseController {
      * @return import result code
      */
 
-    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "importProcessDefinition", notes = "IMPORT_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/import-definition")
     @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
@@ -300,6 +300,4 @@ public class ProjectController extends BaseController {
         Map<String, Object> result = projectService.queryAllProjectList();
         return returnDataList(result);
     }
-
-
 }

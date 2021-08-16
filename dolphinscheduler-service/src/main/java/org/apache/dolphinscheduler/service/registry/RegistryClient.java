@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
@@ -42,18 +44,22 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
- * abstract registry client
+ * registry client singleton
  */
-@Service
 public class RegistryClient extends RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
-    private void loadRegistry() {
-        init();
+    private static RegistryClient registryClient = new RegistryClient();
+
+    private RegistryClient() {
+        super.init();
+    }
+
+    public static RegistryClient getInstance() {
+        return registryClient;
     }
 
     /**
@@ -344,7 +350,7 @@ public class RegistryClient extends RegistryCenter {
      * @return master nodes
      */
     public Set<String> getMasterNodesDirectly() {
-        List<String> masters = getChildrenKeys(MASTER_PATH);
+        List<String> masters = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_MASTERS);
         return new HashSet<>(masters);
     }
 
@@ -354,7 +360,7 @@ public class RegistryClient extends RegistryCenter {
      * @return master nodes
      */
     public Set<String> getWorkerNodesDirectly() {
-        List<String> workers = getChildrenKeys(WORKER_PATH);
+        List<String> workers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
         return new HashSet<>(workers);
     }
 
@@ -364,7 +370,7 @@ public class RegistryClient extends RegistryCenter {
      * @return worker group nodes
      */
     public Set<String> getWorkerGroupDirectly() {
-        List<String> workers = getChildrenKeys(getWorkerPath());
+        List<String> workers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
         return new HashSet<>(workers);
     }
 

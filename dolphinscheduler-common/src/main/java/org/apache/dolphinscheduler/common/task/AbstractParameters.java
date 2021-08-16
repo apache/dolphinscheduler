@@ -16,55 +16,163 @@
  */
 package org.apache.dolphinscheduler.common.task;
 
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * job params related class
  */
 public abstract class AbstractParameters implements IParameters {
 
-  @Override
-  public abstract boolean checkParameters();
+    @Override
+    public abstract boolean checkParameters();
 
-  @Override
-  public abstract List<ResourceInfo> getResourceFilesList();
+    @Override
+    public abstract List<ResourceInfo> getResourceFilesList();
 
-  /**
-   * local parameters
-   */
-  public List<Property> localParams;
+    /**
+     * local parameters
+     */
+    public List<Property> localParams;
 
-  /**
-   * get local parameters list
-   * @return Property list
-   */
-  public List<Property> getLocalParams() {
-    return localParams;
-  }
+    /**
+     * var pool
+     */
+    public List<Property> varPool;
 
-  public void setLocalParams(List<Property> localParams) {
-    this.localParams = localParams;
-  }
+    /**
+     * get local parameters list
+     *
+     * @return Property list
+     */
+    public List<Property> getLocalParams() {
+        return localParams;
+    }
 
-  /**
-   * get local parameters map
-   * @return parameters map
-   */
-  public Map<String,Property> getLocalParametersMap() {
-      if (localParams != null) {
-        Map<String,Property> localParametersMaps = new LinkedHashMap<>();
+    public void setLocalParams(List<Property> localParams) {
+        this.localParams = localParams;
+    }
 
-        for (Property property : localParams) {
-          localParametersMaps.put(property.getProp(),property);
+    /**
+     * get local parameters map
+     *
+     * @return parameters map
+     */
+    public Map<String, Property> getLocalParametersMap() {
+        if (localParams != null) {
+            Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+
+            for (Property property : localParams) {
+                localParametersMaps.put(property.getProp(), property);
+            }
+            return localParametersMaps;
         }
-        return localParametersMaps;
-      }
-      return null;
-  }
+        return null;
+    }
+
+    /**
+     * get varPool map
+     *
+     * @return parameters map
+     */
+    public Map<String, Property> getVarPoolMap() {
+        if (varPool != null) {
+            Map<String, Property> varPoolMap = new LinkedHashMap<>();
+            for (Property property : varPool) {
+                varPoolMap.put(property.getProp(), property);
+            }
+            return varPoolMap;
+        }
+        return null;
+    }
+
+    public List<Property> getVarPool() {
+        return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+        if (StringUtils.isEmpty(varPool)) {
+            this.varPool = new ArrayList<>();
+        } else {
+            this.varPool = JSONUtils.toList(varPool, Property.class);
+        }
+    }
+
+    public void dealOutParam(String result) {
+        if (CollectionUtils.isEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
+            return;
+        }
+        Map<String, String> taskResult = getMapByString(result);
+        if (taskResult == null || taskResult.size() == 0) {
+            return;
+        }
+        for (Property info : outProperty) {
+            info.setValue(taskResult.get(info.getProp()));
+            varPool.add(info);
+        }
+    }
+
+    public List<Property> getOutProperty(List<Property> params) {
+        if (CollectionUtils.isEmpty(params)) {
+            return new ArrayList<>();
+        }
+        List<Property> result = new ArrayList<>();
+        for (Property info : params) {
+            if (info.getDirect() == Direct.OUT) {
+                result.add(info);
+            }
+        }
+        return result;
+    }
+
+    public List<Map<String, String>> getListMapByString(String json) {
+        List<Map<String, String>> allParams = new ArrayList<>();
+        ArrayNode paramsByJson = JSONUtils.parseArray(json);
+        Iterator<JsonNode> listIterator = paramsByJson.iterator();
+        while (listIterator.hasNext()) {
+            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+            allParams.add(param);
+        }
+        return allParams;
+    }
+
+    /**
+     * shell's result format is key=value$VarPool$key=value$VarPool$
+     * @param result
+     * @return
+     */
+    public static Map<String, String> getMapByString(String result) {
+        String[] formatResult = result.split("\\$VarPool\\$");
+        Map<String, String> format = new HashMap<>();
+        for (String info : formatResult) {
+            if (StringUtils.isNotEmpty(info) && info.contains("=")) {
+                String[] keyValue = info.split("=");
+                format.put(keyValue[0], keyValue[1]);
+            }
+        }
+        return format;
+    }
 
 }

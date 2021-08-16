@@ -105,7 +105,7 @@ final class DolphinPluginDiscovery {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
                 if (file.getFileName().toString().endsWith(JAVA_CLASS_FILE_SUFFIX)) {
                     String name = file.subpath(base.getNameCount(), file.getNameCount()).toString();
-                    list.add(javaName(name.substring(0, name.length() - JAVA_CLASS_FILE_SUFFIX.length())));
+                    list.add(convertClassName(name.substring(0, name.length() - JAVA_CLASS_FILE_SUFFIX.length())));
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -142,5 +142,9 @@ final class DolphinPluginDiscovery {
 
     private static String javaName(String binaryName) {
         return binaryName.replace('/', '.');
+    }
+
+    private static String convertClassName(String pathName) {
+        return pathName.replace(File.separatorChar, '.');
     }
 }

@@ -101,7 +101,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param connects connects for nodes
      * @return create result code
      */
-    @ApiOperation(value = "save", notes = "CREATE_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "createProcessDefinition", notes = "CREATE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
             @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type = "String"),
@@ -278,10 +278,14 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
-        Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+        }
+        result = processDefinitionService.queryProcessDefinitionVersions(loginUser
                 , projectName, pageNo, pageSize, processDefinitionCode);
 
-        return returnDataList(result);
+        return result;
     }
 
     /**
@@ -366,7 +370,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by id
+     * query detail of process definition by id
      *
      * @param loginUser login user
      * @param projectName project name
@@ -390,7 +394,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by name
+     * query detail of process definition by name
      *
      * @param loginUser login user
      * @param projectName project name
@@ -460,17 +464,17 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
-        return returnDataListPaging(result);
+        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
+
     }
 
     /**
-     * encapsulation treeview structure
+     * encapsulation tree view structure
      *
      * @param loginUser login user
      * @param projectName project name
@@ -553,7 +557,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "deleteProcessDefinitionById", notes = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -577,7 +581,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "batchDeleteProcessDefinitionByIds", notes = "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", type = "String")
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, type = "String")
     })
     @GetMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -649,6 +653,9 @@ public class ProcessDefinitionController extends BaseController {
      * @return process definition list
      */
     @ApiOperation(value = "queryProcessDefinitionAllByProjectId", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", required = true, dataType = "Int", example = "100")
+    })
     @GetMapping(value = "/queryProcessDefinitionAllByProjectId")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)

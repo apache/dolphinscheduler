@@ -25,7 +25,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -103,8 +102,8 @@ public class TenantController extends BaseController {
     @ApiOperation(value = "queryTenantlistPaging", notes = "QUERY_TENANT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -114,13 +113,14 @@ public class TenantController extends BaseController {
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
                                         @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = tenantService.queryTenantList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
 
@@ -142,18 +142,18 @@ public class TenantController extends BaseController {
 
 
     /**
-     * udpate tenant
+     * update tenant
      *
      * @param loginUser login user
-     * @param id tennat id
-     * @param tenantCode tennat code
+     * @param id tenant id
+     * @param tenantCode tenant code
      * @param queueId queue id
      * @param description description
      * @return update result code
      */
     @ApiOperation(value = "updateTenant", notes = "UPDATE_TENANT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
             @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
@@ -182,7 +182,7 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
 
     })
     @PostMapping(value = "/delete")

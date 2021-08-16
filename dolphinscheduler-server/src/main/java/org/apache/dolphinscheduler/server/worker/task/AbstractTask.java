@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
-import java.util.List;
 import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 
@@ -34,11 +34,6 @@ import org.slf4j.Logger;
  * executive task
  */
 public abstract class AbstractTask {
-
-    /**
-     * varPool string
-     */
-    protected String varPool;
 
     /**
      * taskExecutionContext
@@ -55,11 +50,6 @@ public abstract class AbstractTask {
      * SHELL process pid
      */
     protected int processId;
-
-    /**
-     * SHELL result string
-     */
-    protected String resultString;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -81,7 +71,7 @@ public abstract class AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
+     * @param logger               logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -126,25 +116,17 @@ public abstract class AbstractTask {
      *
      * @param logs log list
      */
-    public void logHandle(List<String> logs) {
+    public void logHandle(LinkedBlockingQueue<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
         if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
             logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         } else {
-            // note: if the logs is a SynchronizedList and will be modified concurrently,
-            // we should must use foreach to iterate the element, otherwise will throw a ConcurrentModifiedException(#issue 5528)
             StringJoiner joiner = new StringJoiner("\n\t");
-            logs.forEach(joiner::add);
+            while (!logs.isEmpty()) {
+                joiner.add(logs.poll());
+            }
             logger.info(" -> {}", joiner);
         }
-    }
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public String getVarPool() {
-        return varPool;
     }
 
     /**
@@ -174,14 +156,6 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
     }
 
     /**
