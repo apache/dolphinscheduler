@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 
 
@@ -60,8 +60,8 @@ public class StateEventResponseService {
      */
     private Thread responseWorker;
 
-    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper;
-    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper) {
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
         if (this.processInstanceMapper == null) {
             this.processInstanceMapper = processInstanceMapper;
         }
@@ -123,18 +123,20 @@ public class StateEventResponseService {
 
     private void writeResponse(StateEvent stateEvent, ExecutionStatus status){
         Channel channel = stateEvent.getChannel();
-        StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
-        channel.writeAndFlush(command.convert2Command());
+        if(channel != null){
+            StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
+            channel.writeAndFlush(command.convert2Command());
+        }
     }
 
     private void persist(StateEvent stateEvent) {
-        if(this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())){
+        if(!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())){
             writeResponse(stateEvent, ExecutionStatus.FAILURE);
             return;
         }
 
-        MasterExecThread masterExecThread = this.processInstanceMapper.get(stateEvent.getProcessInstanceId());
-        masterExecThread.addStateEvent(stateEvent);
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(stateEvent.getProcessInstanceId());
+        workflowExecuteThread.addStateEvent(stateEvent);
         writeResponse(stateEvent, ExecutionStatus.SUCCESS);
     }
 

@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,7 +60,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
-    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps){
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps){
         this.taskResponseService.init(processInstanceExecMaps);
     }
 

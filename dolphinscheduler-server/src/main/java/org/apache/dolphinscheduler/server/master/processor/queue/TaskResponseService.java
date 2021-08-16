@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -71,8 +71,8 @@ public class TaskResponseService {
      */
     private Thread taskResponseWorker;
 
-    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper;
-    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper) {
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
         if (this.processInstanceMapper == null) {
             this.processInstanceMapper = processInstanceMapper;
         }
@@ -190,16 +190,14 @@ public class TaskResponseService {
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
-        //TODO...
-        //补数完毕，process instance id就变成新的了，所以这个地方判断多线程处理的时候可能有问题
-        MasterExecThread masterExecThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
-        if(masterExecThread != null){
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+        if(workflowExecuteThread != null){
             StateEvent stateEvent = new StateEvent();
             stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
             stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
             stateEvent.setExecutionStatus(taskResponseEvent.getState());
             stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-            masterExecThread.addStateEvent(stateEvent);
+            workflowExecuteThread.addStateEvent(stateEvent);
         }
     }
 

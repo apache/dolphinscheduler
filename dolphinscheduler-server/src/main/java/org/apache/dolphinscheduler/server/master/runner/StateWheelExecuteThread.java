@@ -44,13 +44,13 @@ public class StateWheelExecuteThread extends Thread {
 
     ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
     ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
-    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps;
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
 
     private int stateCheckIntervalSecs;
 
     public StateWheelExecuteThread(ConcurrentHashMap<Integer, ProcessInstance> processInstances,
                                    ConcurrentHashMap<Integer, TaskInstance> taskInstances,
-                                   ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps,
+                                   ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps,
                                    int stateCheckIntervalSecs) {
         this.processInstanceCheckList = processInstances;
         this.taskInstanceCheckList = taskInstances;
@@ -122,8 +122,8 @@ public class StateWheelExecuteThread extends Thread {
         if (!processInstanceExecMaps.containsKey(stateEvent.getProcessInstanceId())) {
             return;
         }
-        MasterExecThread masterExecThread = this.processInstanceExecMaps.get(stateEvent.getProcessInstanceId());
-        masterExecThread.addStateEvent(stateEvent);
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecMaps.get(stateEvent.getProcessInstanceId());
+        workflowExecuteThread.addStateEvent(stateEvent);
     }
 
     private boolean processDependCheck(TaskInstance taskInstance) {

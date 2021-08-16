@@ -22,11 +22,13 @@ import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.netty.channel.Channel;
@@ -71,20 +73,19 @@ public class StateEventCallbackService {
      * @param host
      * @return callback channel
      */
-    private NettyRemoteChannel newRemoteChannel(String host) {
+    private NettyRemoteChannel newRemoteChannel(Host host) {
         Channel newChannel;
-        NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host);
+        NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host.getAddress());
         if (nettyRemoteChannel != null) {
             if (nettyRemoteChannel.isActive()) {
                 return nettyRemoteChannel;
             }
-            newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
-            if (newChannel != null) {
-                return newRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), nettyRemoteChannel.getHost().getAddress());
-            }
+        }
+        newChannel = nettyRemotingClient.getChannel(host);
+        if (newChannel != null) {
+            return newRemoteChannel(newChannel, host.getAddress());
         }
         return null;
-
     }
 
     public int pause(int ntries) {
@@ -116,19 +117,22 @@ public class StateEventCallbackService {
      *
      * @param command        commandDS
      */
-    public void sendAck(String host, Command command) {
-        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
-        if (nettyRemoteChannel != null) {
-            nettyRemoteChannel.writeAndFlush(command);
-        }
-    }
+//    public void sendAck(String host, Command command) {
+//        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
+//        if (nettyRemoteChannel != null) {
+//            nettyRemoteChannel.writeAndFlush(command);
+//        }
+//    }
 
     /**
+     *
      * send result
      *
      * @param command        command
      */
-    public void sendResult(String host, Command command) {
+    public void sendResult(String address, int port, Command command) {
+
+        Host host = new Host(address, port);
         NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
         if (nettyRemoteChannel != null) {
             nettyRemoteChannel.writeAndFlush(command);

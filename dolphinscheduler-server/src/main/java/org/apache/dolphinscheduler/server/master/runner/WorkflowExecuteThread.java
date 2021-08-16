@@ -77,7 +77,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
@@ -91,12 +90,12 @@ import com.google.common.collect.Table;
 /**
  * master exec thread,split dag
  */
-public class MasterExecThread implements Runnable {
+public class WorkflowExecuteThread implements Runnable {
 
     /**
-     * logger of MasterExecThread
+     * logger of WorkflowExecuteThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(MasterExecThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThread.class);
     /**
      * runing TaskNode
      */
@@ -185,7 +184,7 @@ public class MasterExecThread implements Runnable {
      */
     private Map<String, Object> propToValue = new ConcurrentHashMap<>();
 
-    private ConcurrentLinkedDeque<StateEvent> stateEvents = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
     private List<Date> complementListDate = Lists.newLinkedList();
 
@@ -197,13 +196,13 @@ public class MasterExecThread implements Runnable {
 
 
     /**
-     * constructor of MasterExecThread
+     * constructor of WorkflowExecuteThread
      *  @param processInstance processInstance
      * @param processService processService
      * @param nettyRemotingClient nettyRemotingClient
      * @param taskTimeoutCheckList
      */
-    public MasterExecThread(ProcessInstance processInstance
+    public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyRemotingClient nettyRemotingClient
             , ProcessAlertManager processAlertManager
@@ -470,114 +469,6 @@ public class MasterExecThread implements Runnable {
         if (this.taskInstanceHashMap.size() == 0) {
             initTaskQueue();
             submitPostNode(null);
-        }
-    }
-
-
-    /**
-     * execute process
-     *
-     * @throws Exception exception
-     */
-    private void executeProcess() throws Exception {
-        prepareProcess();
-        runProcess();
-        endProcess();
-    }
-
-    /**
-     * execute complement process
-     *
-     * @throws Exception exception
-     */
-    private void executeComplementProcess() throws Exception {
-
-        Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-
-        Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-        Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        processService.saveProcessInstance(processInstance);
-
-        // get schedules
-        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinition.getId());
-        List<Date> listDate = Lists.newLinkedList();
-        if (!CollectionUtils.isEmpty(schedules)) {
-            for (Schedule schedule : schedules) {
-                listDate.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedule.getCrontab()));
-            }
-        }
-        // get first fire date
-        Iterator<Date> iterator = null;
-        Date scheduleDate;
-        if (!CollectionUtils.isEmpty(listDate)) {
-            iterator = listDate.iterator();
-            scheduleDate = iterator.next();
-            processInstance.setScheduleTime(scheduleDate);
-            processService.updateProcessInstance(processInstance);
-        } else {
-            scheduleDate = processInstance.getScheduleTime();
-            if (scheduleDate == null) {
-                scheduleDate = startDate;
-            }
-        }
-
-        while (Stopper.isRunning()) {
-            logger.info("process {} start to complement {} data", processInstance.getId(), DateUtils.dateToString(scheduleDate));
-            // prepare dag and other info
-            prepareProcess();
-
-            if (dag == null) {
-                logger.error("process {} dag is null, please check out parameters",
-                        processInstance.getId());
-                processInstance.setState(ExecutionStatus.SUCCESS);
-                processService.updateProcessInstance(processInstance);
-                return;
-            }
-
-            // execute process ,waiting for end
-            runProcess();
-
-            endProcess();
-            // process instance failure ，no more complements
-            if (!processInstance.getState().typeIsSuccess()) {
-                logger.info("process {} state {}, complement not completely!", processInstance.getId(), processInstance.getState());
-                break;
-            }
-            //  current process instance success ,next execute
-            if (null == iterator) {
-                // loop by day
-                scheduleDate = DateUtils.getSomeDay(scheduleDate, 1);
-                if (scheduleDate.after(endDate)) {
-                    // all success
-                    logger.info("process {} complement completely!", processInstance.getId());
-                    break;
-                }
-            } else {
-                // loop by schedule date
-                if (!iterator.hasNext()) {
-                    // all success
-                    logger.info("process {} complement completely!", processInstance.getId());
-                    break;
-                }
-                scheduleDate = iterator.next();
-            }
-            // flow end
-            // execute next process instance complement data
-            processInstance.setScheduleTime(scheduleDate);
-            if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-                cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
-                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            }
-
-            processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-            processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-            processInstance.setId(0);
-            processInstance.setStartTime(new Date());
-            processInstance.setEndTime(null);
-            processService.saveProcessInstance(processInstance);
         }
     }
 
@@ -1240,129 +1131,6 @@ public class MasterExecThread implements Runnable {
             }
         }
         return false;
-    }
-
-    /**
-     * submit and watch the tasks, until the work flow stop
-     */
-    private void runProcess() {
-//        // submit start node
-//        submitPostNode(null);
-//        boolean sendTimeWarning = false;
-//        while (!processInstance.isProcessInstanceStop() && Stopper.isRunning()) {
-//
-//            // send warning email if process time out.
-//            if (!sendTimeWarning && checkProcessTimeOut(processInstance)) {
-//                processAlertManager.sendProcessTimeoutAlert(processInstance,
-//                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-//                        processInstance.getProcessDefinitionVersion()));
-//                sendTimeWarning = true;
-//            }
-//            for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskProcessorMaps.entrySet()) {
-//                Future<Boolean> future = entry.getValue();
-//                TaskInstance task = entry.getKey().getTaskInstance();
-//
-//                if (!future.isDone()) {
-//                    continue;
-//                }
-//
-//                // node monitor thread complete
-//                task = this.processService.findTaskInstanceById(task.getId());
-//
-//                if (task == null) {
-//                    this.taskFailedSubmit = true;
-//                    activeTaskProcessorMaps.remove(entry.getKey());
-//                    continue;
-//                }
-//
-//                // node monitor thread complete
-//                if (task.getState().typeIsFinished()) {
-//                    activeTaskProcessorMaps.remove(entry.getKey());
-//                }
-//
-//                logger.info("task :{}, id:{} complete, state is {} ",
-//                        task.getName(), task.getId(), task.getState());
-//                // node success , post node submit
-//                if (task.getState() == ExecutionStatus.SUCCESS) {
-//                    processInstance = processService.findProcessInstanceById(processInstance.getId());
-//                    processInstance.setVarPool(task.getVarPool());
-//                    processService.updateProcessInstance(processInstance);
-//                    completeTaskList.put(task.getName(), task);
-//                    submitPostNode(task.getName());
-//                    continue;
-//                }
-//                // node fails, retry first, and then execute the failure process
-//                if (task.getState().typeIsFailure()) {
-//                    if (task.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
-//                        this.recoverToleranceFaultTaskList.add(task);
-//                    }
-//                    if (task.taskCanRetry()) {
-//                        addTaskToStandByList(task);
-//                    } else {
-//                        completeTaskList.put(task.getName(), task);
-//                        if (task.isConditionsTask()
-//                                || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
-//                            submitPostNode(task.getName());
-//                        } else {
-//                            errorTaskList.put(task.getName(), task);
-//                            if (processInstance.getFailureStrategy() == FailureStrategy.END) {
-//                                killAllTasks();
-//                            }
-//                        }
-//                    }
-//                    continue;
-//                }
-//                // other status stop/pause
-//                completeTaskList.put(task.getName(), task);
-//            }
-//            // send alert
-//            if (CollectionUtils.isNotEmpty(this.recoverToleranceFaultTaskList)) {
-//                processAlertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
-//                this.recoverToleranceFaultTaskList.clear();
-//            }
-//            // updateProcessInstance completed task status
-//            // failure priority is higher than pause
-//            // if a task fails, other suspended tasks need to be reset kill
-//            // check if there exists forced success nodes in errorTaskList
-//            if (errorTaskList.size() > 0) {
-//                for (Map.Entry<String, TaskInstance> entry : completeTaskList.entrySet()) {
-//                    TaskInstance completeTask = entry.getValue();
-//                    if (completeTask.getState() == ExecutionStatus.PAUSE) {
-//                        completeTask.setState(ExecutionStatus.KILL);
-//                        completeTaskList.put(entry.getKey(), completeTask);
-//                        processService.updateTaskInstance(completeTask);
-//                    }
-//                }
-//                for (Map.Entry<String, TaskInstance> entry : errorTaskList.entrySet()) {
-//                    TaskInstance errorTask = entry.getValue();
-//                    TaskInstance currentTask = processService.findTaskInstanceById(errorTask.getId());
-//                    if (currentTask == null) {
-//                        continue;
-//                    }
-//                    // for nodes that have been forced success
-//                    if (errorTask.getState().typeIsFailure() && currentTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
-//                        // update state in this thread and remove from errorTaskList
-//                        errorTask.setState(currentTask.getState());
-//                        logger.info("task: {} has been forced success, remove it from error task list", errorTask.getName());
-//                        errorTaskList.remove(errorTask.getName());
-//                        // submit post nodes
-//                        submitPostNode(errorTask.getName());
-//                    }
-//                }
-//            }
-//            if (canSubmitTaskToQueue()) {
-//                submitStandByTask();
-//            }
-//            try {
-//                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-//            } catch (InterruptedException e) {
-//                logger.error(e.getMessage(), e);
-//                Thread.currentThread().interrupt();
-//            }
-//            updateProcessInstanceState();
-//        }
-//
-//        logger.info("process:{} end, state :{}", processInstance.getId(), processInstance.getState());
     }
 
     /**

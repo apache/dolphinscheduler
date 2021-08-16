@@ -29,7 +29,8 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
@@ -96,7 +97,10 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterSchedulerService masterSchedulerService;
 
-    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps = new ConcurrentHashMap<>();
+    @Autowired
+    private EventExecuteService eventExecuteService;
+
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
 
 
     /**
@@ -122,18 +126,24 @@ public class MasterServer implements IStoppable {
         ackProcessor.init(processInstanceExecMaps);
         TaskResponseProcessor taskResponseProcessor = new TaskResponseProcessor();
         taskResponseProcessor.init(processInstanceExecMaps);
+        StateEventProcessor stateEventProcessor = new StateEventProcessor();
+        stateEventProcessor.init(processInstanceExecMaps);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, ackProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, new StateEventProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
         this.nettyRemotingServer.start();
 
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
+
+        this.eventExecuteService.init(this.processInstanceExecMaps);
+        this.eventExecuteService.start();
         // scheduler start
         this.masterSchedulerService.init(this.processInstanceExecMaps);
+
 
         this.masterSchedulerService.start();
 
