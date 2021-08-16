@@ -70,8 +70,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Lists;
-
 /**
  * executor service impl
  */
@@ -548,26 +546,29 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     return processService.createCommand(command);
                 } else if (runMode == RunMode.RUN_MODE_PARALLEL) {
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
-                    List<Date> listDate = new LinkedList<>();
+                    LinkedList<Date> listDate = new LinkedList<>();
                     if (!CollectionUtils.isEmpty(schedules)) {
                         for (Schedule item : schedules) {
                             listDate.addAll(CronUtils.getSelfFireDateList(start, end, item.getCrontab()));
                         }
                     }
                     if (!CollectionUtils.isEmpty(listDate)) {
+                        int effectThreadsCount = expectedParallelismNumber == null ? listDate.size() : Math.min(listDate.size(), expectedParallelismNumber);
+                        logger.info("In parallel mode, current expectedParallelismNumber:{}", effectThreadsCount);
 
-                        int effectThreadsCount = expectedParallelismNumber == null ? 1 : Math.min(listDate.size(), expectedParallelismNumber);
-                        logger.info("In parallel mode, current expectedParallelismNumber:{}", expectedParallelismNumber);
+                        int chunkSize = listDate.size() / effectThreadsCount;
+                        listDate.addFirst(start);
+                        listDate.addLast(end);
 
-                        int average = listDate.size() / effectThreadsCount;
-                        int slice = listDate.size() % effectThreadsCount == 0 ? average : average + 1;
-
-                        Lists.partition(listDate, slice).stream().forEach(partition -> {
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(partition.get(0)));
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(partition.get(partition.size() - 1)));
+                        for (int i = 0; i < effectThreadsCount; i++) {
+                            int rangeStart = i == 0 ? i : (i * chunkSize);
+                            int rangeEnd = i == effectThreadsCount - 1 ? listDate.size() - 1
+                                    : rangeStart + chunkSize + 1;
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(rangeEnd)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
-                        });
+                        }
 
                         return effectThreadsCount;
                     } else {
