@@ -20,14 +20,15 @@ package org.apache.dolphinscheduler.spi.resource;
 /**
  * resource storage exception
  */
-public class ResourceStorageException extends RuntimeException{
+public class ResourceStorageException extends RuntimeException {
 
     public ResourceStorageException(String message, Throwable cause) {
         super(message, cause);
     }
+
     public ResourceStorageException(String message, Throwable cause, Object... args) {
 
-        super(String.format(message,args), cause);
+        super(String.format(message, args), cause);
     }
 
     public ResourceStorageException(String message) {

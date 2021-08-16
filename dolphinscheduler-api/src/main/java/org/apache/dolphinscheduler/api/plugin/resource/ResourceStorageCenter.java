@@ -65,7 +65,6 @@ public class ResourceStorageCenter {
         return ResourceStorageCenterHelper.INSTANCE;
     }
 
-
     public boolean resourceStoragePluginStart() {
         return null != resourceStorage;
     }
@@ -105,7 +104,6 @@ public class ResourceStorageCenter {
         }
     }
 
-
     public byte[] catFile(String filePath) {
         return resourceStorage.catFile(filePath);
     }
@@ -126,14 +124,12 @@ public class ResourceStorageCenter {
         resourceStorage.uploadLocalFile(localFileName, resourceStorageName, overwrite);
     }
 
-    //todo 是否需要删除源文件
-    public void copyFile(String filePath, String targetFilePath, boolean overwrite,boolean deleteSouurce) {
-        resourceStorage.copyFile(filePath, targetFilePath, overwrite,deleteSouurce);
+    public void copyFile(String filePath, String targetFilePath, boolean overwrite, boolean deleteSouurce) {
+        resourceStorage.copyFile(filePath, targetFilePath, overwrite, deleteSouurce);
     }
 
     public void downloadFileToLocal(String resourceFilePath, String localFilePath) {
         resourceStorage.downloadFileToLocal(resourceFilePath, localFilePath);
     }
-
 
 }

@@ -38,9 +38,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
@@ -563,7 +561,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resourceStorageCenter.uploadLocalFile(localFileName, resourceStorageFilename, true);
         return true;
     }
-
 
     /**
      * get resource storage full name
@@ -1329,14 +1326,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             List<Resource> fileList = resourcesMapper.queryResourceList(null, userId, ResourceType.FILE.getCode());
 
-
             if (CollectionUtils.isNotEmpty(fileList)) {
                 ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileList);
                 ResourceComponent resourceComponent = resourceTreeVisitor.visit();
                 copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
             }
-
-
             //udf resources
             List<Resource> udfResourceList = resourcesMapper.queryResourceList(
                     null, userId, ResourceType.UDF.ordinal());

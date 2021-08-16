@@ -20,16 +20,15 @@ package org.apache.dolphinscheduler.plugin.resource.s3;
 import java.util.function.Function;
 
 public enum S3StorageConfiguration {
-    S3_ACCESS_KEY ("aws.access.key.id",null, value -> value),
-    S3_SECRET_KEY ( "aws.secret.key",null, value -> value),
-    S3_ENDPOINT("s3.endpoint",null,value->value),
-    S3_BUCKET_NAME("s3.bucket.name","dolphinscheduler",value->value),
-    S3_MAX_ERROR_RETRY("s3.max.error.retry",3,value->value),
-    S3_MAX_CONNECTIONS("s3.max.connections",50,value->value),
-    S3_SOCKET_TIME_OUT_MS("s3.socket.time.out.ms",50000,value->value),
-    S3_CONNECTION_TIME_OUT_MS("s3.connection.timeout",50000,value->value),
-    S3_PROTOCOL("s3.protocol","https",value->value)
-    ;
+    S3_ACCESS_KEY("aws.access.key.id", null, value -> value),
+    S3_SECRET_KEY("aws.secret.key", null, value -> value),
+    S3_ENDPOINT("s3.endpoint", null, value -> value),
+    S3_BUCKET_NAME("s3.bucket.name", "dolphinscheduler", value -> value),
+    S3_MAX_ERROR_RETRY("s3.max.error.retry", 3, value -> value),
+    S3_MAX_CONNECTIONS("s3.max.connections", 50, value -> value),
+    S3_SOCKET_TIME_OUT_MS("s3.socket.time.out.ms", 50000, value -> value),
+    S3_CONNECTION_TIME_OUT_MS("s3.connection.timeout", 50000, value -> value),
+    S3_PROTOCOL("s3.protocol", "https", value -> value);
 
     <T> S3StorageConfiguration(String name, T defaultValue, Function<String, T> converter) {
         this.name = name;

@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.spi.resource;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
-import org.apache.dolphinscheduler.spi.register.Registry;
-import org.apache.dolphinscheduler.spi.register.RegistryException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

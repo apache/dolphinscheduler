@@ -25,18 +25,18 @@ import org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod;
 
 import java.io.IOException;
 
-
 public class HadoopKerberosUtils {
 
-    public static void authenticate(HdfsConfiguration conf, String user, String keytabPath){
+    public static void authenticate(HdfsConfiguration conf, String user, String keytabPath) {
         UserGroupInformation.setConfiguration(conf);
-        if(! UserGroupInformation.isSecurityEnabled())
+        if (!UserGroupInformation.isSecurityEnabled()) {
             return;
+        }
         try {
             UserGroupInformation.getCurrentUser().setAuthenticationMethod(AuthenticationMethod.KERBEROS);
-            UserGroupInformation.loginUserFromKeytab(user,keytabPath);
+            UserGroupInformation.loginUserFromKeytab(user, keytabPath);
         } catch (IOException e) {
-          throw new ResourceStorageException("load kerberos authenticate error",e);
+            throw new ResourceStorageException("load kerberos authenticate error", e);
         }
     }
 }

@@ -21,12 +21,9 @@ import java.util.function.Function;
 
 public enum HdfsStorageConfiguration {
 
-    ROOT_USER("hdfs.root.user",null, value -> value),
-    UPLOAD_PATH("resource.upload.path","/dolphinscheduler",value->value),
-    FS_DEFAULT_FS("fs.defaultFS",null,value->value),
-
-
-
+    ROOT_USER("hdfs.root.user", null, value -> value),
+    UPLOAD_PATH("resource.upload.path", "/dolphinscheduler", value -> value),
+    FS_DEFAULT_FS("fs.defaultFS", null, value -> value),
     ;
 
     <T> HdfsStorageConfiguration(String name, T defaultValue, Function<String, T> converter) {

@@ -93,7 +93,6 @@ public class HdfsStorage implements ResourceStorage {
             }
         }
 
-
         String hdfsUser = ROOT_USER.getParameterValue(config.get(ROOT_USER.getName()));
     }
 
