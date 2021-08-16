@@ -136,7 +136,8 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
             @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String") //todo:This parameter is not needed when the pid is known
+            //todo:This parameter is not needed when the pid is known
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ApiException(CREATE_RESOURCE_ERROR)
