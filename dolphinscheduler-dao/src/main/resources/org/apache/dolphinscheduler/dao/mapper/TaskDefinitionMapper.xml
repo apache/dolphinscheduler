@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
     <sql id="baseSql">
-        id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
         worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time
     </sql>
@@ -28,7 +28,7 @@
         <include refid="baseSql"/>
         from t_ds_task_definition
         WHERE project_code = #{projectCode}
-        and `name` = #{taskDefinitionName}
+        and name = #{taskDefinitionName}
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
