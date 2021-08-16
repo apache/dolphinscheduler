@@ -133,4 +133,29 @@ public class FlinkArgsUtilsTest {
         assertEquals(5, result.size());
     }
 
+    /**
+     * Test buildSqlArgs
+     */
+    @Test
+    public void testBuildSqlArgs() {
+        others = "-f flinkDemo.sql";
+        mainArgs = "-j flink-connector-jdbc_2.11-1.13.0.jar";
+
+        //Define params
+        FlinkParameters param = new FlinkParameters();
+
+        param.setProgramType(ProgramType.SQL);
+        param.setMainArgs(mainArgs);
+        param.setOthers(others);
+
+        //Invoke buildArgs
+        List<String> result = FlinkArgsUtils.buildArgs(param);
+        for (String s : result) {
+            logger.info(s);
+        }
+
+        assertEquals(others, result.get(0));
+        assertEquals(mainArgs, result.get(1));
+    }
+
 }

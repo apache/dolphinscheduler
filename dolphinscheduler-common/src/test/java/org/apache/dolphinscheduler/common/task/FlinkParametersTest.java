@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class FlinkParametersTest {
     @Test
@@ -32,6 +34,9 @@ public class FlinkParametersTest {
         Assert.assertTrue(CollectionUtils.isEmpty(flinkParameters.getResourceFilesList()));
 
         ResourceInfo mainResource = new ResourceInfo();
+        flinkParameters.setMainJar(mainResource);
+        Assert.assertTrue(CollectionUtils.isEmpty(flinkParameters.getResourceFilesList()));
+
         mainResource.setRes("testFlinkMain-1.0.0-SNAPSHOT.jar");
         flinkParameters.setMainJar(mainResource);
 
