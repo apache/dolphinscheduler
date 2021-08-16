@@ -133,6 +133,26 @@
           </div>
         </m-list-box>
 
+        <!-- Blocking node -->
+        <m-list-box v-if="nodeData.taskType === 'BLOCKING'">
+          <div slot="text">{{$t('Blocking Condition')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="blockingCondition" size="small">
+              <el-radio :label="'BlockingOnFailed'" :disabled="isDetails">{{$t('Blocking on Failed')}}</el-radio>
+              <el-radio :label="'BlockingOnSuccess'" :disabled="isDetails">{{$t('Blocking on Success')}}</el-radio>
+            </el-radio-group>
+          </div>
+        </m-list-box>
+        <m-list-box v-if="nodeData.taskType === 'BLOCKING'">
+          <div slot="text">{{$t('Alert When Blocking')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="alertWhenBlocking" size="small">
+              <el-radio :label="true" :disabled="isDetails">{{$t('Alert')}}</el-radio>
+              <el-radio :label="false" :disabled="isDetails">{{$t('Do not Alert')}}</el-radio>
+            </el-radio-group>
+          </div>
+        </m-list-box>
+
         <!-- Task timeout alarm -->
         <m-timeout-alarm
           v-if="nodeData.taskType !== 'DEPENDENT'"
@@ -258,6 +278,15 @@
           :backfill-item="backfillItem"
           :pre-node="nodeData.preNode">
         </m-conditions>
+
+        <m-conditions
+          v-if="nodeData.taskType === 'BLOCKING'"
+          ref="CONDITIONS"
+          @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
+          :backfill-item="backfillItem"
+          :pre-node="nodeData.preNode">
+        </m-conditions>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
@@ -367,7 +396,11 @@
         // preTasks
         preTaskIdsInWorkflow: [],
         preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
+        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
+        // blocking condition
+        blockingCondition: 'BlockingOnFailed',
+        // alert when blocking
+        alertWhenBlocking: false
       }
     },
     /**
@@ -613,7 +646,9 @@
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
-            branch: this.branch
+            branch: this.branch,
+            blockingCondition: this.blockingCondition,
+            alertWhenBlocking: this.alertWhenBlocking
           },
           fromThis: this
         })
@@ -725,6 +760,8 @@
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
+        this.blockingCondition = o.blockingCondition || 'BlockingOnFailed'
+        this.alertWhenBlocking = o.alertWhenBlocking || false
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
@@ -780,7 +817,9 @@
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
           successBranch: this.successBranch,
-          failedBranch: this.failedBranch
+          failedBranch: this.failedBranch,
+          blockingCondition: this.blockingCondition,
+          alertWhenBlocking: this.alertWhenBlocking
         }
       }
     },

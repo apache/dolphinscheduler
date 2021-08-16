@@ -691,5 +691,11 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
   Info: '提示',
   'Datasource userName': '所属用户',
-  'Resource userName': '所属用户'
+  'Resource userName': '所属用户',
+  'Alert When Blocking': '阻断时告警',
+  'Blocking Condition': '阻断时机',
+  'Blocking on Failed': '失败时阻断',
+  'Blocking on Success': '成功时阻断',
+  Alert: '告警',
+  'Do not Alert': '不告警'
 }
