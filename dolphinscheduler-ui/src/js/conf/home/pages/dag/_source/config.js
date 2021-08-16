@@ -308,6 +308,10 @@ const tasksType = {
   CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
+  },
+  BLOCKING: {
+    desc: 'BLOCKING',
+    color: '#E46F15'
   }
 }
 
