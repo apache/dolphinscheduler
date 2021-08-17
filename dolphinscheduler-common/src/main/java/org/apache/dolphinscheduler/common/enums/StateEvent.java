@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import io.netty.channel.Channel;
@@ -80,13 +81,13 @@ public class StateEvent {
 
     @Override
     public String toString() {
-        return "State Event :" +
-                "key: " + key +
-                " type: " + type.toString() +
-                " executeStatus: " + executionStatus +
-                " task instance id: " + taskInstanceId +
-                " process instance id: " + processInstanceId +
-                " context: " + context
+        return "State Event :"
+                + "key: " + key
+                + " type: " + type.toString()
+                + " executeStatus: " + executionStatus
+                + " task instance id: " + taskInstanceId
+                + " process instance id: " + processInstanceId
+                + " context: " + context
                 ;
     }
 
