@@ -41,6 +41,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-resource-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!--springboot-->

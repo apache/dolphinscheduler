@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
@@ -64,7 +63,7 @@ import org.slf4j.LoggerFactory;
 import com.github.rholder.retry.RetryException;
 
 /**
- *  task scheduler thread
+ * task scheduler thread
  */
 public class TaskExecuteThread implements Runnable, Delayed {
 
@@ -104,7 +103,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private AlertClientService alertClientService;
 
     /**
-     *  constructor
+     * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
@@ -215,6 +215,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get global paras map
+     *
      * @return map
      */
     private Map<String, String> getGlobalParamsMap() {
@@ -229,7 +230,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return globalParamsMap;
     }
 
-
     /**
      * kill task
      */
@@ -238,7 +238,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             try {
                 task.cancelApplication(true);
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -257,22 +257,22 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
         Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
 
-        for (Map.Entry<String,String> resource : resEntries) {
+        for (Map.Entry<String, String> resource : resEntries) {
             String fullName = resource.getKey();
             String tenantCode = resource.getValue();
             File resFile = new File(execLocalPath, fullName);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    ResourceStorageCenter resourceStorageCenter=ResourceStorageCenter.getInstance();
-                   if(! resourceStorageCenter.resourceStoragePluginStart()){
-                       throw new ResourceStorageException("not install resource storage plugin");
-                   }
-                    String resourceFilePath =  resourceStorageCenter.getResourceStorageFileName(ResourceType.FILE.name(), tenantCode,fullName);
+                    ResourceStorageCenter resourceStorageCenter = ResourceStorageCenter.getInstance();
+                    if (!resourceStorageCenter.resourceStoragePluginStart()) {
+                        throw new ResourceStorageException("not install resource storage plugin");
+                    }
+                    String resourceFilePath = resourceStorageCenter.getResourceStorageFileName(ResourceType.FILE.name(), tenantCode, fullName);
                     logger.info("get resource file from resource storage :{}", resourceFilePath);
                     resourceStorageCenter.downloadFileToLocal(resourceFilePath, execLocalPath + File.separator + fullName);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage());
                 }
             } else {
@@ -319,6 +319,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get current TaskExecutionContext
+     *
      * @return TaskExecutionContext
      */
     public TaskExecutionContext getTaskExecutionContext() {
