@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 /**
- *
+ * interface of task processor in master
  */
 public interface ITaskProcessor {
 
