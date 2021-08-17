@@ -117,6 +117,7 @@ public class MasterSchedulerService extends Thread {
     public synchronized void start() {
         super.setName("MasterSchedulerService");
         super.start();
+        this.stateWheelExecuteThread.start();
     }
 
     public void close() {
@@ -187,6 +188,8 @@ public class MasterSchedulerService extends Thread {
                         if(processInstance.getTimeout() > 0){
                             this.processTimeoutCheckList.put(processInstance.getId(),processInstance);
                         }
+                        logger.info("command {} process {} start...",
+                                command.getId(), processInstance.getId());
                         masterExecService.execute(workflowExecuteThread);
                     }
                 } catch (Exception e) {

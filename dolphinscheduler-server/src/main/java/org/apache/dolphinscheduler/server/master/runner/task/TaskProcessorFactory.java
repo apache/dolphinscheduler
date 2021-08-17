@@ -16,34 +16,35 @@
  */
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import org.apache.dolphinscheduler.common.Constants;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Strings;
 
+
 public class TaskProcessorFactory {
 
+    public static final Map<String, ITaskProcessFactory> PROCESS_FACTORY_MAP = new ConcurrentHashMap<>();
 
-    public static final Map<String, ITaskProcessor> PROCESSOR_MAP = new LinkedHashMap<>();
-
-    private static final String DEFAULT_PROCESSOR = "default";
+    private static final String DEFAULT_PROCESSOR = Constants.COMMON_TASK_TYPE;
 
     static {
-        for(ITaskProcessor iTaskProcessor: ServiceLoader.load(ITaskProcessor.class)){
-            PROCESSOR_MAP.put(iTaskProcessor.getType(), iTaskProcessor);
+        for(ITaskProcessFactory iTaskProcessor: ServiceLoader.load(ITaskProcessFactory.class)){
+            PROCESS_FACTORY_MAP.put(iTaskProcessor.type(), iTaskProcessor);
         }
     }
 
     public static ITaskProcessor getTaskProcessor(String type){
         if (Strings.isNullOrEmpty(type)) {
-            return PROCESSOR_MAP.get(DEFAULT_PROCESSOR);
+            return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
         }
-        if(!PROCESSOR_MAP.containsKey(type)){
-            return PROCESSOR_MAP.get(DEFAULT_PROCESSOR);
+        if(!PROCESS_FACTORY_MAP.containsKey(type)){
+            return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
         }
-        return PROCESSOR_MAP.get(type);
+        return PROCESS_FACTORY_MAP.get(type).create();
     }
 
 }

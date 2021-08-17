@@ -80,10 +80,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     boolean allDependentItemFinished;
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
         this.taskInstance = taskInstance;
-        if (!processService.submitTask(taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval)) {
+        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+
+        if (this.taskInstance == null) {
             return false;
         }
         taskDefinition = processService.findTaskDefinition(

@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -62,14 +63,14 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = taskInstance;
-        if (!processService.submitTask(taskInstance, maxRetryTimes, commitInterval)) {
+        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+
+        if (this.taskInstance == null) {
             return false;
         }
         dispatchTask(taskInstance, processInstance);
-        this.taskInstance = taskInstance;
         return true;
     }
 
@@ -98,7 +99,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public String getType() {
-        return "default";
+        return Constants.COMMON_TASK_TYPE;
     }
 
     private boolean dispatchTask(TaskInstance taskInstance, ProcessInstance processInstance) {

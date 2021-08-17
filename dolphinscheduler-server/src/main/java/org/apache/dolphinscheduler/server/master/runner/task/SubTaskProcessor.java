@@ -36,10 +36,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SubTaskProcessor extends BaseTaskProcessor{
 
-    ProcessInstance processInstance;
+    private ProcessInstance processInstance;
 
-    ProcessInstance subProcessInstance = null;
-    TaskDefinition taskDefinition;
+    private ProcessInstance subProcessInstance = null;
+    private TaskDefinition taskDefinition;
 
     /**
      * run lock
@@ -49,15 +49,17 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = taskInstance;
         taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+                task.getTaskCode(), task.getTaskDefinitionVersion()
         );
-        if (!processService.submitTask(this.taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval)) {
+        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+
+        if (this.taskInstance == null) {
             return false;
         }
+
         return true;
     }
 

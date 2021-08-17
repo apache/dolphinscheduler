@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -36,6 +38,7 @@ import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -47,6 +50,7 @@ import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +98,8 @@ public class MasterRegistryClient {
 
     private MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread > processInstanceExecMaps;
+
 
     /**
      * master start time
@@ -101,6 +107,14 @@ public class MasterRegistryClient {
     private String startTime;
 
     private String localNodePath;
+
+
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
+        this.startTime = DateUtils.dateToString(new Date());
+        this.registryClient = RegistryClient.getInstance();
+        this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
+        this.processInstanceExecMaps = processInstanceExecMaps;
+    }
 
     public void start() {
         String nodeLock = registryClient.getMasterStartUpLockPath();
@@ -281,19 +295,33 @@ public class MasterRegistryClient {
             }
 
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-            if (processInstance != null) {
-                taskInstance.setProcessInstance(processInstance);
+            if (workerHost == null || processInstance.getHost().equalsIgnoreCase(workerHost)) {
+                // only failover the task owned myself
+                if (processInstance != null) {
+                    taskInstance.setProcessInstance(processInstance);
+                }
+
+                TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                        .buildTaskInstanceRelatedInfo(taskInstance)
+                        .buildProcessInstanceRelatedInfo(processInstance)
+                        .create();
+                // only kill yarn job if exists , the local thread has exited
+                ProcessUtils.killYarnJob(taskExecutionContext);
+
+                taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
+                processService.saveTaskInstance(taskInstance);
+                if(!processInstanceExecMaps.containsKey(processInstance.getId())){
+                    return;
+                }
+                WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
+                StateEvent stateEvent = new StateEvent();
+                stateEvent.setTaskInstanceId(taskInstance.getId());
+                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                stateEvent.setProcessInstanceId(processInstance.getId());
+                stateEvent.setExecutionStatus(taskInstance.getState());
+                workflowExecuteThreadNotify.addStateEvent(stateEvent);
             }
 
-            TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                    .buildTaskInstanceRelatedInfo(taskInstance)
-                    .buildProcessInstanceRelatedInfo(processInstance)
-                    .create();
-            // only kill yarn job if exists , the local thread has exited
-            ProcessUtils.killYarnJob(taskExecutionContext);
-
-            taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
-            processService.saveTaskInstance(taskInstance);
         }
         logger.info("end worker[{}] failover ...", workerHost);
     }
@@ -329,12 +357,6 @@ public class MasterRegistryClient {
         registryClient.releaseLock(registryClient.getMasterLockPath());
     }
 
-    @PostConstruct
-    public void init() {
-        this.startTime = DateUtils.dateToString(new Date());
-        this.registryClient = RegistryClient.getInstance();
-        this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-    }
 
     /**
      * registry

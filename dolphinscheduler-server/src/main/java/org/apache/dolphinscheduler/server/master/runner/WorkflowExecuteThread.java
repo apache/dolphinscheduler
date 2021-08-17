@@ -228,16 +228,17 @@ public class WorkflowExecuteThread implements Runnable {
         } catch (Exception e) {
             logger.error("handler error:",e);
         }
-
     }
-    private void handleEvents(){
-        while(this.stateEvents.size() > 0){
+
+    private void handleEvents() {
+        while (this.stateEvents.size() > 0) {
 
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
-                this.stateEventHandler(stateEvent);
-                this.stateEvents.remove(stateEvent);
-            }catch (Exception e){
+                if (stateEventHandler(stateEvent)) {
+                    this.stateEvents.remove(stateEvent);
+                }
+            } catch (Exception e) {
                 logger.error("state handle error:", e);
 
             }
@@ -591,13 +592,13 @@ public class WorkflowExecuteThread implements Runnable {
             if (submit) {
                 this.taskInstanceHashMap.put(taskInstance.getId(), taskInstance.getTaskCode(), taskInstance);
                 activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
-
+                taskProcessor.run();
                 addTimeoutCheck(taskInstance);
                 TaskDefinition taskDefinition = processService.findTaskDefinition(
                         taskInstance.getTaskCode(),
                         taskInstance.getTaskDefinitionVersion());
                 taskInstance.setTaskDefine(taskDefinition);
-                if(taskProcessor.getType() != "default" && taskProcessor.taskState().typeIsFinished()){
+                if(taskProcessor.getType() != Constants.COMMON_TASK_TYPE && taskProcessor.taskState().typeIsFinished()){
                     StateEvent stateEvent = new StateEvent();
                     stateEvent.setProcessInstanceId(this.processInstance.getId());
                     stateEvent.setTaskInstanceId(taskInstance.getId());
@@ -1111,11 +1112,15 @@ public class WorkflowExecuteThread implements Runnable {
      * @param taskInstance task instance
      */
     private void removeTaskFromStandbyList(TaskInstance taskInstance) {
-        logger.info("remove task from stand by list: {}", taskInstance.getName());
+        logger.info("remove task from stand by list, id: {} name:{}",
+                taskInstance.getId(),
+                taskInstance.getName());
         try {
             readyToSubmitTaskQueue.remove(taskInstance);
         } catch (Exception e) {
-            logger.error("remove task instance from readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
+            logger.error("remove task instance from readyToSubmitTaskQueue error, task id:{}, Name: {}",
+                    taskInstance.getId(),
+                    taskInstance.getName(), e);
         }
     }
 

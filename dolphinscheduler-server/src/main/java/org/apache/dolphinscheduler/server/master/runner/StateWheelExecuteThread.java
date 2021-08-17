@@ -101,7 +101,6 @@ public class StateWheelExecuteThread extends Thread {
                 processDependCheck(taskInstance);
             }
         }
-
     }
 
     private void checkProcess() {

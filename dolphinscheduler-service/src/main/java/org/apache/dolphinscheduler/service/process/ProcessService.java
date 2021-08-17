@@ -1020,7 +1020,7 @@ public class ProcessService {
      * @param commitInterval
      * @return
      */
-    public boolean submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval){
+    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval){
 
         int retryTimes = 1;
         boolean submitDB = false;
@@ -1043,7 +1043,7 @@ public class ProcessService {
             }
             retryTimes += 1;
         }
-        return true;
+        return task;
     }
 
     /**
