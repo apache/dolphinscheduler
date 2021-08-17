@@ -25,8 +25,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -70,10 +68,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return create result code
      * @throws Exception exception
      */
@@ -111,11 +109,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         // save
         tenantMapper.insert(tenant);
 
-        // if hdfs startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            createTenantDirIfNotExists(tenantCode);
-        }
-
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -135,7 +128,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -154,11 +147,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser  login user
-     * @param id         tenant id
+     * @param loginUser login user
+     * @param id tenant id
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return update result code
      * @throws Exception exception
      */
@@ -185,16 +178,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
          * if the tenant code is modified, the original resource needs to be copied to the new tenant.
          */
         if (!tenant.getTenantCode().equals(tenantCode)) {
-            if (checkTenantExists(tenantCode)) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState()) {
-                    String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-                    //init hdfs resource
-                    HadoopUtils.getInstance().mkdir(resourcePath);
-                    HadoopUtils.getInstance().mkdir(udfsPath);
-                }
-            } else {
+            if (!checkTenantExists(tenantCode)) {
                 putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
                 return result;
             }
@@ -261,13 +245,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
 
         // if resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
-
-            if (HadoopUtils.getInstance().exists(tenantPath)) {
-                HadoopUtils.getInstance().delete(tenantPath, true);
-            }
-        }
+        //if () {
+        // fixme need delete resource
+        // }
 
         tenantMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByTenantId(id, -1);

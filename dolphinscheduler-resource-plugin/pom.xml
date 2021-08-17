@@ -37,6 +37,7 @@
         </dependency>
     </dependencies>
     <modules>
+        <module>dolphinscheduler-resource-api</module>
         <module>dolphinscheduler-resource-hdfs</module>
         <module>dolphinscheduler-resource-s3</module>
     </modules>

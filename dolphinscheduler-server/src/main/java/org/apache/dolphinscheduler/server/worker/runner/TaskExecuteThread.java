@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -40,6 +41,8 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.resource.ResourceStorageException;
+import org.apache.dolphinscheduler.spi.resource.api.ResourceStorageCenter;
 
 import org.apache.commons.collections.MapUtils;
 
@@ -142,7 +145,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
             downloadResource(taskExecutionContext.getExecutePath(),
                     taskExecutionContext.getResources(),
                     logger);
-
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
@@ -262,10 +264,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, fullName);
-
-                    logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
+                    ResourceStorageCenter resourceStorageCenter=ResourceStorageCenter.getInstance();
+                   if(! resourceStorageCenter.resourceStoragePluginStart()){
+                       throw new ResourceStorageException("not install resource storage plugin");
+                   }
+                    String resourceFilePath =  resourceStorageCenter.getResourceStorageFileName(ResourceType.FILE.name(), tenantCode,fullName);
+                    logger.info("get resource file from resource storage :{}", resourceFilePath);
+                    resourceStorageCenter.downloadFileToLocal(resourceFilePath, execLocalPath + File.separator + fullName);
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);
                     throw new RuntimeException(e.getMessage());

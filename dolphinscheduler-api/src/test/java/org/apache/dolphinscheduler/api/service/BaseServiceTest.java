@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -94,22 +93,6 @@ public class BaseServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
         //has params
         baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
-    }
-
-    @Test
-    public void testCreateTenantDirIfNotExists() {
-
-        PowerMockito.mockStatic(HadoopUtils.class);
-        PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
-
-        try {
-            baseService.createTenantDirIfNotExists("test");
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-            logger.error("CreateTenantDirIfNotExists error ",e);
-            e.printStackTrace();
-        }
-
     }
 
     @Test

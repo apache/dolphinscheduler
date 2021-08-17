@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.plugin.resource;
+package org.apache.dolphinscheduler.spi.resource.api;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.common.PropertyUtils;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.resource.ResourceStorage;
 import org.apache.dolphinscheduler.spi.resource.ResourceStoragePluginManager;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
 
 public class ResourceStorageCenter {
 
@@ -96,7 +95,7 @@ public class ResourceStorageCenter {
 
         resourceStoragePluginManager = new ResourceStoragePluginManager(pluginName);
 
-        DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(resourcePluginManagerConfig, ImmutableList.of(resourceStoragePluginManager));
+        DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(resourcePluginManagerConfig, Collections.singletonList(resourceStoragePluginManager));
         try {
             registryPluginLoader.loadPlugins();
         } catch (Exception e) {
@@ -132,4 +131,24 @@ public class ResourceStorageCenter {
         resourceStorage.downloadFileToLocal(resourceFilePath, localFilePath);
     }
 
+    /**
+     * get resource storage full name
+     */
+    public String getResourceStorageFileName(String resourceType, String tenantCode, String fileName) {
+        return String.format("s%/s%", getResourceBasePath(resourceType, tenantCode), fileName);
+    }
+
+    /**
+     * get resource storage base path
+     */
+    public String getResourceBasePath(String resourceType, String tenantCode) {
+        String fileType = null;
+        if (resourceType.equals("FILE")) {
+            fileType = "resources";
+        }
+        if (resourceType.equals("UEF")) {
+            fileType = "udfs";
+        }
+        return String.format("s%/s%", fileType, tenantCode);
+    }
 }

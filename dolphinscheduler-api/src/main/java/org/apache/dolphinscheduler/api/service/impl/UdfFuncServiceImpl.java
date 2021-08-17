@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.spi.resource.api.ResourceStorageCenter;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -88,8 +88,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         Result<Object> result = new Result<>();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (!ResourceStorageCenter.getInstance().resourceStoragePluginStart()) {
+            logger.error("resource upload not startup ");
             putMsg(result, Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP);
             return result;
         }
@@ -133,7 +133,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     }
 
     /**
-     *
      * @param name name
      * @return check result code
      */
@@ -145,7 +144,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     /**
      * query udf function
      *
-     * @param id  udf function id
+     * @param id udf function id
      * @return udf function detail
      */
     @Override
@@ -165,7 +164,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * updateProcessInstance udf function
      *
      * @param udfFuncId udf function id
-     * @param type  resource type
+     * @param type resource type
      * @param funcName function name
      * @param argTypes argument types
      * @param database data base
@@ -194,8 +193,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (!ResourceStorageCenter.getInstance().resourceStoragePluginStart()) {
+            logger.error("resource upload not startup");
             putMsg(result, Status.RESOURCE_STORAGE_PLUGIN_NOT_STARTUP);
             return result;
         }
@@ -250,7 +249,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         Result result = new Result();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotal((int)udfFuncList.getTotal());
+        pageInfo.setTotal((int) udfFuncList.getTotal());
         pageInfo.setTotalList(udfFuncList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -279,7 +278,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * query udf list
      *
      * @param loginUser login user
-     * @param type  udf type
+     * @param type udf type
      * @return udf func list
      */
     @Override

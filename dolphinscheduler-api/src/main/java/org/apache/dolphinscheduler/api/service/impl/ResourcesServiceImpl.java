@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.plugin.resource.ResourceStorageCenter;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -52,6 +51,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.spi.resource.api.ResourceStorageCenter;
 
 import org.apache.commons.beanutils.BeanMap;
 
@@ -321,7 +321,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // verify whether the resource exists in storage
         // get the path of origin file in storage
         //resource
-        String originResourceStorageFileName = getResourceStorageFileName(resource.getType(), tenantCode, originFullName);
+        String originResourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(resource.getType().name(), tenantCode, originFullName);
         if (!resourceStorageCenter.exists(originResourceStorageFileName)) {
             logger.error("{} not exist", originResourceStorageFileName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -443,11 +443,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // get the path of dest file in hdfs
-        String destFileName = getResourceStorageFileName(resource.getType(), tenantCode, fullName);
+        String destFileName = resourceStorageCenter.getResourceStorageFileName(resource.getType().name(), tenantCode, fullName);
 
         try {
             logger.info("start resource storage copy {} -> {}", originResourceStorageFileName, destFileName);
-            resourceStorageCenter.copyFile(originResourceStorageFileName, destFileName, true,true);
+            resourceStorageCenter.copyFile(originResourceStorageFileName, destFileName, true, true);
         } catch (Exception e) {
             logger.error(MessageFormat.format("resource storage file copy {0} -> {1} fail", originResourceStorageFileName, destFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
@@ -527,7 +527,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal, resourcesIds);
 
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int)resourceIPage.getTotal());
+        pageInfo.setTotal((int) resourceIPage.getTotal());
         pageInfo.setTotalList(resourceIPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -557,30 +557,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // save file to resource storage,
 
-        String resourceStorageFilename = getResourceStorageFileName(type, tenantCode, fullName);
+        String resourceStorageFilename = resourceStorageCenter.getResourceStorageFileName(type.name(), tenantCode, fullName);
         resourceStorageCenter.uploadLocalFile(localFileName, resourceStorageFilename, true);
         return true;
-    }
-
-    /**
-     * get resource storage full name
-     */
-    private String getResourceStorageFileName(ResourceType resourceType, String tenantCode, String fileName) {
-        return String.format("s%/s%", getResourceBasePath(resourceType, tenantCode), fileName);
-    }
-
-    /**
-     * get resource storage base path
-     */
-    private String getResourceBasePath(ResourceType resourceType, String tenantCode) {
-        String fileType = null;
-        if (resourceType.equals(ResourceType.FILE)) {
-            fileType = "resources";
-        }
-        if (resourceType.equals(ResourceType.UDF)) {
-            fileType = "udfs";
-        }
-        return String.format("s%/s%", fileType, tenantCode);
     }
 
     /**
@@ -700,7 +679,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // get hdfs file by type
-        String resourceStorageFileName = getResourceStorageFileName(resource.getType(), tenantCode, resource.getFullName());
+        String resourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(resource.getType().name(), tenantCode, resource.getFullName());
 
         //delete data in database
         resourcesMapper.deleteIds(needDeleteResourceIdArray);
@@ -733,7 +712,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 String tenantCode = tenant.getTenantCode();
 
                 try {
-                    String resourceStorageFileName = getResourceStorageFileName(type, tenantCode, fullName);
+                    String resourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(type.name(), tenantCode, fullName);
                     if (resourceStorageCenter.exists(resourceStorageFileName)) {
                         logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, RegexUtils.escapeNRT(fullName), resourceStorageFileName);
                         putMsg(result, Status.RESOURCE_FILE_EXIST, resourceStorageFileName);
@@ -830,7 +809,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // resource storage path
-        String resourceStorageFileName = getResourceStorageFileName(ResourceType.FILE, tenantCode, resource.getFullName());
+        String resourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(ResourceType.FILE.name(), tenantCode, resource.getFullName());
         logger.info("resource storagee path is {}", resourceStorageFileName);
         try {
             if (resourceStorageCenter.exists(resourceStorageFileName)) {
@@ -1024,7 +1003,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             // get resource file storage path
-            resourceStorageFileName = getResourceStorageFileName(ResourceType.FILE, tenantCode, resourceName);
+            resourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(ResourceType.FILE.name(), tenantCode, resourceName);
 
             resourceStorageCenter.uploadLocalFile(localFilename, resourceStorageFileName, true);
         } catch (Exception e) {
@@ -1077,7 +1056,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = tenant.getTenantCode();
 
-        String resourceStorageFileName = getResourceStorageFileName(resource.getType(), tenantCode, resource.getFullName());
+        String resourceStorageFileName = resourceStorageCenter.getResourceStorageFileName(resource.getType().name(), tenantCode, resource.getFullName());
 
         String localFileName = FileUtils.getDownloadFilename(resource.getAlias());
         logger.info("resource storage path is {}, download local filename is {}", resourceStorageFileName, localFileName);
@@ -1316,11 +1295,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public boolean updateUserWhenUserChange(String newTenantCode, String oldTenantId, Integer userId) {
 
         if (resourceStorageCenter.resourceStoragePluginStart() && StringUtils.isNotBlank(oldTenantId)) {
-            String oldResourcePath = getResourceBasePath(ResourceType.FILE, newTenantCode);
-            String oldUdfsPath = getResourceBasePath(ResourceType.UDF, newTenantCode);
+            String oldResourcePath = resourceStorageCenter.getResourceBasePath(ResourceType.FILE.name(), newTenantCode);
+            String oldUdfsPath = resourceStorageCenter.getResourceBasePath(ResourceType.UDF.name(), newTenantCode);
 
-            String newResourcePath = getResourceBasePath(ResourceType.FILE, newTenantCode);
-            String newUdfsPath = getResourceBasePath(ResourceType.UDF, newTenantCode);
+            String newResourcePath = resourceStorageCenter.getResourceBasePath(ResourceType.FILE.name(), newTenantCode);
+            String newUdfsPath = resourceStorageCenter.getResourceBasePath(ResourceType.UDF.name(), newTenantCode);
 
             // list all files, maybe you should consider paging query later
 
@@ -1365,7 +1344,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         throw new ServiceException(Status.RESOURCE_NOT_EXIST);
                     }
                     String newPath = String.format("%s/%s", dstBasePath, component.getFullName());
-                    resourceStorageCenter.copyFile(oldPath, newPath, false,true);
+                    resourceStorageCenter.copyFile(oldPath, newPath, false, true);
                     continue;
                 }
 

@@ -23,11 +23,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,21 +116,6 @@ public class BaseServiceImpl implements BaseService {
             return true;
         }
         return false;
-    }
-
-    /**
-     * create tenant dir if not exists
-     *
-     * @param tenantCode tenant code
-     * @throws IOException if hdfs operation exception
-     */
-    @Override
-    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        // init resource path and udf path
-        HadoopUtils.getInstance().mkdir(resourcePath);
-        HadoopUtils.getInstance().mkdir(udfsPath);
     }
 
     /**
