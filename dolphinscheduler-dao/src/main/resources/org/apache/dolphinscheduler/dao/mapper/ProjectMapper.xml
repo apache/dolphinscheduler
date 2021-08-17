@@ -88,7 +88,9 @@
             )
         </if>
         <if test="searchName!=null and searchName != ''">
-            and p.name like concat('%', #{searchName}, '%')
+            AND (p.name LIKE concat('%', #{searchName}, '%')
+            OR p.description LIKE concat('%', #{searchName}, '%')
+            )
         </if>
         order by p.create_time desc
     </select>
