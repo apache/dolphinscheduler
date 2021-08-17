@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.enums;
 
 import io.netty.channel.Channel;
 
-
+/**
+ * state event
+ */
 public class StateEvent {
 
     /**
