@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -64,7 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
 
 /**
  * users service test
@@ -287,9 +285,6 @@ public class UsersServiceTest {
     public void testDeleteUserById() {
         User loginUser = new User();
         try {
-            when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
-            when(userMapper.selectById(1)).thenReturn(getUser());
-            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
             //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
@@ -300,17 +295,8 @@ public class UsersServiceTest {
             result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-
-            // user is project owner
-            Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
             result = usersService.deleteUserById(loginUser, 1);
-            Assert.assertEquals(Status.TRANSFORM_PROJECT_OWNERSHIP, result.get(Constants.STATUS));
-
-            //success
-            Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(null);
-            result = usersService.deleteUserById(loginUser, 1);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         } catch (Exception e) {
             logger.error("delete user error", e);
             Assert.assertTrue(false);
