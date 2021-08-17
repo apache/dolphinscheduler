@@ -201,7 +201,7 @@ public class MasterRegistryClient {
                 failoverMaster(serverHost);
                 break;
             case WORKER:
-                failoverWorker(serverHost, true);
+                failoverWorker(serverHost, true, true);
                 break;
             default:
                 break;
@@ -284,7 +284,7 @@ public class MasterRegistryClient {
      * @param workerHost worker host
      * @param needCheckWorkerAlive need check worker alive
      */
-    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) {
+    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive, boolean checkOwner) {
         logger.info("start worker[{}] failover ...", workerHost);
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
@@ -295,8 +295,11 @@ public class MasterRegistryClient {
             }
 
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-            if (workerHost == null || processInstance.getHost().equalsIgnoreCase(workerHost)) {
-                // only failover the task owned myself
+            if (workerHost == null
+                    || !checkOwner
+                    || processInstance.getHost().equalsIgnoreCase(workerHost)) {
+                // only failover the task owned myself if worker down.
+                // failover master need handle worker at the same time
                 if (processInstance != null) {
                     taskInstance.setProcessInstance(processInstance);
                 }
@@ -310,7 +313,7 @@ public class MasterRegistryClient {
 
                 taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
                 processService.saveTaskInstance(taskInstance);
-                if(!processInstanceExecMaps.containsKey(processInstance.getId())){
+                if (!processInstanceExecMaps.containsKey(processInstance.getId())) {
                     return;
                 }
                 WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
@@ -345,6 +348,7 @@ public class MasterRegistryClient {
             }
             processService.processNeedFailoverProcessInstances(processInstance);
         }
+        failoverWorker(masterHost, true, false);
 
         logger.info("master failover end");
     }
