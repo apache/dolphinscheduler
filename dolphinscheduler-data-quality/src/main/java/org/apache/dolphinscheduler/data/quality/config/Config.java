@@ -76,6 +76,10 @@ public class Config {
         return config.size() <= 0;
     }
 
+    public boolean isNotEmpty() {
+        return config.size() > 0;
+    }
+
     public void put(String key, Object value) {
         this.config.put(key,value);
     }

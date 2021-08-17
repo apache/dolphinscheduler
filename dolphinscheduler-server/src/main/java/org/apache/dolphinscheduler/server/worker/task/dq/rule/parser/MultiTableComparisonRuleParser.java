@@ -17,17 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq.rule.parser;
 
-import static org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager.MULTI_TABLE_COMPARISON_WRITER_SQL;
-
 import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
+import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
+import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.DataQualityConfiguration;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.EnvConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.ReaderConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.TransformerConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.WriterConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,19 +38,19 @@ public class MultiTableComparisonRuleParser implements IRuleParser {
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
                                           DataQualityTaskExecutionContext context) throws DolphinException {
 
-        List<ReaderConfig> readerConfigList =
+        List<BaseConfig> readerConfigList =
                 RuleParserUtils.getReaderConfigList(inputParameterValue,context);
-        List<TransformerConfig> transformerConfigList = new ArrayList<>();
+        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList,context);
 
-        List<WriterConfig> writerConfigList = RuleParserUtils.getWriterConfigList(
-                ParameterUtils.convertParameterPlaceholders(MULTI_TABLE_COMPARISON_WRITER_SQL,inputParameterValue),
+        List<BaseConfig> transformerConfigList = new ArrayList<>();
+
+        List<BaseConfig> writerConfigList = RuleParserUtils.getWriterConfigList(
+                ParameterUtils.convertParameterPlaceholders(RuleManager.MULTI_TABLE_COMPARISON_WRITER_SQL,inputParameterValue),
                 context);
-        EnvConfig envConfig = new EnvConfig();
-        envConfig.setType("batch");
 
         return new DataQualityConfiguration(
                 context.getRuleName(),
-                envConfig,
+                RuleParserUtils.getEnvConfig(),
                 readerConfigList,
                 writerConfigList,
                 transformerConfigList);

@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import java.util.Map;
+import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * TransformerConfig
+ * DqComparisonTypeMapper
  */
-public class TransformerConfig extends BaseConfig {
+public interface DqComparisonTypeMapper extends BaseMapper<DqComparisonType> {
 
-    public TransformerConfig() {}
-
-    public TransformerConfig(String type, Map<String,Object> config) {
-        super(type, config);
-    }
 }

@@ -17,7 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq;
 
-import org.apache.dolphinscheduler.common.Constants;
+import static org.apache.dolphinscheduler.common.Constants.DATA_TIME;
+import static org.apache.dolphinscheduler.common.Constants.ERROR_OUTPUT_PATH;
+import static org.apache.dolphinscheduler.common.Constants.REGEXP_PATTERN;
+import static org.apache.dolphinscheduler.common.Constants.SLASH;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -89,17 +95,7 @@ public class DataQualityTask extends AbstractYarnTask {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext
                         = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
 
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime time = LocalDateTime.now();
-        String now = df.format(time);
-
-        inputParameter.put("rule_type",dataQualityTaskExecutionContext.getRuleType().getCode() + "");
-        inputParameter.put("rule_name","'" + dataQualityTaskExecutionContext.getRuleName() + "'");
-        inputParameter.put("create_time","'" + now + "'");
-        inputParameter.put("update_time","'" + now + "'");
-        inputParameter.put("process_definition_id",dqTaskExecutionContext.getProcessDefineId() + "");
-        inputParameter.put("process_instance_id",dqTaskExecutionContext.getProcessInstanceId() + "");
-        inputParameter.put("task_instance_id",dqTaskExecutionContext.getTaskInstanceId() + "");
+        operateInputParameter(inputParameter, dataQualityTaskExecutionContext);
 
         RuleManager ruleManager = new RuleManager(
                 inputParameter,
@@ -110,14 +106,52 @@ public class DataQualityTask extends AbstractYarnTask {
 
         dataQualityParameters
                 .getSparkParameters()
-                .setMainArgs(
-                        "\"" + replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
+                .setMainArgs("\""
+                        + StringUtils.replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
 
         dataQualityParameters
                 .getSparkParameters()
                 .setQueue(dqTaskExecutionContext.getQueue());
 
         setMainJarName();
+
+        logger.info("dataQualityParameters: " + JSONUtils.toJsonString(dataQualityParameters));
+    }
+
+    private void operateInputParameter(Map<String, String> inputParameter, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
+        LocalDateTime time = LocalDateTime.now();
+        String now = df.format(time);
+
+        inputParameter.put("rule_id", String.valueOf(dataQualityTaskExecutionContext.getRuleId()));
+        inputParameter.put("rule_type", String.valueOf(dataQualityTaskExecutionContext.getRuleType().getCode()));
+        inputParameter.put("rule_name", StringUtils.wrapperSingleQuotes(dataQualityTaskExecutionContext.getRuleName()));
+        inputParameter.put("create_time", StringUtils.wrapperSingleQuotes(now));
+        inputParameter.put("update_time", StringUtils.wrapperSingleQuotes(now));
+        inputParameter.put("process_definition_id", String.valueOf(dqTaskExecutionContext.getProcessDefineId()));
+        inputParameter.put("process_instance_id", String.valueOf(dqTaskExecutionContext.getProcessInstanceId()));
+        inputParameter.put("task_instance_id", String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
+        inputParameter.put("task_definition_id", String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
+
+        if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
+            inputParameter.put(DATA_TIME,StringUtils.wrapperSingleQuotes(now));
+        }
+
+        if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
+            inputParameter.put(REGEXP_PATTERN,StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
+        }
+
+        if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {
+            inputParameter.put(ERROR_OUTPUT_PATH,
+                    dataQualityTaskExecutionContext.getHdfsPath()
+                            + SLASH + dqTaskExecutionContext.getProcessDefineId()
+                            + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
+                            + UNDERLINE + dqTaskExecutionContext.getTaskName());
+        } else {
+            inputParameter.put(ERROR_OUTPUT_PATH,"");
+        }
+
+        logger.info("inputParameter: " + JSONUtils.toJsonString(inputParameter));
     }
 
     @Override
@@ -151,23 +185,12 @@ public class DataQualityTask extends AbstractYarnTask {
     @Override
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
-        mainJar.setRes(System.getProperty("user.dir") + File.separator + "lib" + File.separator + CommonUtils.getDqJarName());
+        mainJar.setRes(System.getProperty("user.dir") + File.separator + "lib" + File.separator + CommonUtils.getDataQualityJarName());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 
     @Override
     public AbstractParameters getParameters() {
         return dataQualityParameters;
-    }
-
-    private String replaceDoubleBrackets(String mainParameter) {
-        mainParameter = mainParameter
-                .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
-                .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
-        if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT) || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
-            return replaceDoubleBrackets(mainParameter);
-        } else {
-            return  mainParameter;
-        }
     }
 }

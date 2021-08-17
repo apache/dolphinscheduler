@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_QUOTES;
+
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.exception.DolphinException;
 
 import java.io.IOException;
@@ -173,5 +176,20 @@ public class StringUtils {
 
     private static String hex(char ch) {
         return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
+    }
+
+    public static String wrapperSingleQuotes(String value) {
+        return SINGLE_QUOTES + value + SINGLE_QUOTES;
+    }
+
+    public static String replaceDoubleBrackets(String mainParameter) {
+        mainParameter = mainParameter
+                .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
+                .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
+        if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT) || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
+            return replaceDoubleBrackets(mainParameter);
+        } else {
+            return  mainParameter;
+        }
     }
 }

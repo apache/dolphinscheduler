@@ -21,6 +21,10 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Component
  */
@@ -29,6 +33,24 @@ public interface Component {
     Config getConfig();
 
     ValidateResult validateConfig();
+
+    default ValidateResult validate(List<String> requiredOptions) {
+        List<String> nonExistsOptions = new ArrayList<>();
+        requiredOptions.forEach(x -> {
+            if (!getConfig().has(x)) {
+                nonExistsOptions.add(x);
+            }
+        });
+
+        if (!nonExistsOptions.isEmpty()) {
+            return new ValidateResult(
+                    false,
+                    nonExistsOptions.stream().map(option ->
+                            "[" + option + "]").collect(Collectors.joining(",")) + " is not exist");
+        } else {
+            return new ValidateResult(true, "");
+        }
+    }
 
     void prepare(SparkRuntimeEnvironment prepareEnv);
 }

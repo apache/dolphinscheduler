@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.data.quality.flow.batch.BatchTransformer;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.Collections;
+
 /**
  * SqlTransformer
  */
@@ -45,11 +47,7 @@ public class SqlTransformer implements BatchTransformer {
 
     @Override
     public ValidateResult validateConfig() {
-        if (config.has(SQL)) {
-            return new ValidateResult(true, "");
-        } else {
-            return new ValidateResult(false, "please specify [sql]");
-        }
+        return validate(Collections.singletonList(SQL));
     }
 
     @Override

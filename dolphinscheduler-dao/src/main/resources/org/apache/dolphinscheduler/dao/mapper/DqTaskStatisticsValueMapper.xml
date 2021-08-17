@@ -17,21 +17,6 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqRuleMapper">
-    <select id="queryRuleListPaging" resultType="org.apache.dolphinscheduler.dao.entity.DqRule">
-        SELECT a.id, a.name, a.type, b.user_name, a.create_time, a.update_time
-        FROM t_ds_dq_rule a left join t_ds_user b on a.user_id = b.id
-        <where>
-            <if test=" searchVal != null and searchVal != ''">
-                and a.name like concat('%', #{searchVal}, '%')
-            </if>
-            <if test="startTime != null ">
-                and a.update_time > #{startTime} and a.update_time <![CDATA[ <=]]> #{endTime}
-            </if>
-            <if test=" ruleType != -1">
-                and a.rule_type = #{ruleType}
-            </if>
-        </where>
-        order by a.update_time desc
-    </select>
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper">
+
 </mapper>

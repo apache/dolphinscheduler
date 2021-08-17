@@ -27,15 +27,11 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum DqFailureStrategy {
     /**
-     * 0-ending process when dqs tasks failed.
-     * 1-continue running when dqs tasks failed.
-     * 2-ending process and alter when dqs tasks failed.
-     * 3-continue running and alter when dqs tasks failed.
+     * 0-alert and continue when dqc tasks failed.
+     * 1-alert and block when dqc tasks failed.
      **/
-    END(0, "end"),
-    CONTINUE(1, "continue"),
-    END_ALTER(2, "end_alter"),
-    CONTINUE_ALTER(3, "continue_alter");
+    ALERT(0, "alert"),
+    BLOCK(1, "block");
 
     DqFailureStrategy(int code, String description) {
         this.code = code;

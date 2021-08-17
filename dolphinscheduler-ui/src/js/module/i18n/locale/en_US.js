@@ -686,16 +686,18 @@ export default {
   'Rule Type': 'Rule Type',
   'Statistics Value': 'Statistics Value',
   'Comparison Value': 'Comparison Value',
+  'Comparison Type': 'Comparison Type',
   'Check Type': 'Check Type',
   Operator: 'Operator',
   Threshold: 'Threshold',
   'Single Table': 'Single Table',
-  'Single Table Custon Sql': 'Single Table Custon Sql',
+  'Single Table Custom Sql': 'Single Table Custom Sql',
   'Multi Table Accuracy': 'Multi Table Accuracy',
   'Multi Table Comparison': 'Multi Table Comparison',
-  'Statistics Compare Fixed Value': 'Statistics Compare Fixed Value',
-  'Statistics Compare Comparsion': 'Statistics Compare Comparsion',
+  '(Comparison-Statistics)/Comparison Percentage':'(Comparison-Statistics)/Comparison Percentage',
+  'Comparison Minus Statistics': 'Comparison Minus Statistics',
+  'Statistics Minus Comparison': 'Statistics Minus Comparison',
   'Statistics Comparison Percentage': 'Statistics Comparison Percentage',
-  'End And Alert': 'End And Alert',
-  'Continue And Alert': 'Continue And Alert'
+  'Alert': 'Alert',
+  'Block': 'Block'
 }

@@ -17,23 +17,29 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.batch.reader;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.DOTS;
+import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
+import static org.apache.dolphinscheduler.data.quality.Constants.JDBC;
+import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.data.quality.Constants.TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.URL;
+import static org.apache.dolphinscheduler.data.quality.Constants.USER;
+
 import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchReader;
-import org.apache.dolphinscheduler.data.quality.utils.TypesafeConfigUtils;
+import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
 
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * AbstractJdbcSource
@@ -53,23 +59,7 @@ public class JdbcReader implements BatchReader {
 
     @Override
     public ValidateResult validateConfig() {
-        List<String> requiredOptions = Arrays.asList("url", "table", "user", "password");
-
-        List<String> nonExistsOptions = new ArrayList<>();
-        requiredOptions.forEach(x -> {
-            if (!config.has(x)) {
-                nonExistsOptions.add(x);
-            }
-        });
-
-        if (!nonExistsOptions.isEmpty()) {
-            return new ValidateResult(
-                    false,
-                    "please specify " + nonExistsOptions.stream().map(option ->
-                            "[" + option + "]").collect(Collectors.joining(",")) + " as non-empty string");
-        } else {
-            return new ValidateResult(true, "");
-        }
+        return validate(Arrays.asList(URL, TABLE, USER, PASSWORD));
     }
 
     @Override
@@ -85,14 +75,14 @@ public class JdbcReader implements BatchReader {
     private DataFrameReader jdbcReader(SparkSession sparkSession) {
 
         DataFrameReader reader = sparkSession.read()
-                .format("jdbc")
-                .option("url", config.getString("url"))
-                .option("dbtable", config.getString("table"))
-                .option("user", config.getString("user"))
-                .option("password", config.getString("password"))
-                .option("driver", config.getString("driver"));
+                .format(JDBC)
+                .option(URL, config.getString(URL))
+                .option(DB_TABLE, config.getString(TABLE))
+                .option(USER, config.getString(USER))
+                .option(PASSWORD, config.getString(PASSWORD))
+                .option(DRIVER, config.getString(DRIVER));
 
-        Config jdbcConfig = TypesafeConfigUtils.extractSubConfigThrowable(config, "jdbc.", false);
+        Config jdbcConfig = ConfigUtils.extractSubConfig(config, JDBC + DOTS, false);
 
         if (!config.isEmpty()) {
             Map<String,String> optionMap = new HashMap<>(16);

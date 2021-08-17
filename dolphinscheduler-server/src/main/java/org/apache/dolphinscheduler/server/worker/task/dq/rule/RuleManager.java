@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq.rule;
 
+import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TYPE;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
@@ -40,35 +42,60 @@ public class RuleManager {
     private final Map<String, String> inputParameterValue;
     private final DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
+    private static final String FIXED_VALUE_COMPARISON_TYPE = "0";
     private static final String BASE_SQL =
-            "SELECT ${rule_type} as rule_type,"
+            "select ${rule_type} as rule_type,"
                     + "${rule_name} as rule_name,"
                     + "${process_definition_id} as process_definition_id,"
                     + "${process_instance_id} as process_instance_id,"
                     + "${task_instance_id} as task_instance_id,"
                     + "${statistics_name} AS statistics_value, "
                     + "${comparison_name} AS comparison_value,"
+                    + "${comparison_type} AS comparison_type,"
                     + "${check_type} as check_type,"
                     + "${threshold} as threshold, "
                     + "${operator} as operator, "
                     + "${failure_strategy} as failure_strategy, "
+                    + "'${error_output_path}' as error_output_path, "
                     + "${create_time} as create_time,"
                     + "${update_time} as update_time ";
 
     public static final String DEFAULT_COMPARISON_WRITER_SQL =
-                    BASE_SQL + "from ${statistics_table} FULL JOIN ${comparison_table}";
+                    BASE_SQL + "from ${statistics_table} full join ${comparison_table}";
 
     public static final String MULTI_TABLE_COMPARISON_WRITER_SQL =
                     BASE_SQL
                     + "from ( ${statistics_execute_sql} ) tmp1 "
-                    + "join "
-                    + "( ${comparison_execute_sql} ) tmp2 ";
+                    + "join ( ${comparison_execute_sql} ) tmp2";
 
     public static final String SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL =
                     BASE_SQL
                     + "from ( ${statistics_execute_sql} ) tmp1 "
-                    + "join "
-                    + "${comparison_table}";
+                    + "join ${comparison_table}";
+
+    public static final String TASK_STATISTICS_VALUE_WRITER_SQL =
+                    "select "
+                    + "${process_definition_id} as process_definition_id,"
+                    + "${task_definition_id} as task_definition_id,"
+                    + "${rule_id} as rule_id,"
+                    + "'${statistics_name}'AS statistics_name, "
+                    + "${statistics_name} AS statistics_value,"
+                    + "${data_time} as data_time,"
+                    + "${create_time} as create_time,"
+                    + "${update_time} as update_time "
+                    + "from ( ${statistics_execute_sql} ) tmp1 ";
+
+    public static final String TASK_STATISTICS_VALUE_WRITER_SQL_2 =
+            "select "
+                    + "${process_definition_id} as process_definition_id,"
+                    + "${task_definition_id} as task_definition_id,"
+                    + "${rule_id} as rule_id,"
+                    + "'${statistics_name}'AS statistics_name, "
+                    + "${statistics_name} AS statistics_value,"
+                    + "${data_time} as data_time,"
+                    + "${create_time} as create_time,"
+                    + "${update_time} as update_time "
+                    + "from ${statistics_table}";
 
     public RuleManager(Map<String, String> inputParameterValue, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         this.inputParameterValue = inputParameterValue;
@@ -86,6 +113,8 @@ public class RuleManager {
         inputParameterValueResult.putAll(inputParameterValue);
 
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
+
+        inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, FIXED_VALUE_COMPARISON_TYPE);
 
         IRuleParser ruleParser = null;
         switch (dataQualityTaskExecutionContext.getRuleType()) {

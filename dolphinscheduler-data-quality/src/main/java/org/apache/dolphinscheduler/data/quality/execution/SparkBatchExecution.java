@@ -52,10 +52,8 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
         if (!readers.isEmpty()) {
             Dataset<Row> ds = readers.get(0).read(environment);
             for (BatchTransformer tf:transformers) {
-                if (ds.takeAsList(1).size() > 0) {
-                    ds = executeTransformer(environment, tf, ds);
-                    registerTransformTempView(tf, ds);
-                }
+                ds = executeTransformer(environment, tf, ds);
+                registerTransformTempView(tf, ds);
             }
 
             for (BatchWriter sink: writers) {

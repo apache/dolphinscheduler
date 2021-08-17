@@ -29,7 +29,7 @@ import org.apache.spark.sql.Row;
 public interface BatchWriter extends Component {
 
     /**
-     * write
+     * write data to target storage
      * @param data data
      * @param environment environment
      */

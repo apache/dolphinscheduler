@@ -57,13 +57,13 @@ public class TransformerFactory {
     }
 
     private BatchTransformer getTransformer(TransformerConfig transformerConfig) throws DataQualityException {
-        TransformerType type = TransformerType.getType(transformerConfig.getType());
+        TransformerType transformerType = TransformerType.getType(transformerConfig.getType());
         Config config = new Config(transformerConfig.getConfig());
-        if (type != null) {
-            if (type == TransformerType.SQL) {
+        if (transformerType != null) {
+            if (transformerType == TransformerType.SQL) {
                 return new SqlTransformer(config);
             }
-            throw new DataQualityException("writer type $readerType is not supported!");
+            throw new DataQualityException("transformer type " + transformerType + " is not supported!");
         }
 
         return null;

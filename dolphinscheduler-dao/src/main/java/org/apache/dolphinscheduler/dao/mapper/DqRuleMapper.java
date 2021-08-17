@@ -36,14 +36,12 @@ public interface DqRuleMapper extends BaseMapper<DqRule> {
      *
      * @param page page
      * @param searchVal searchVal
-     * @param userId userId
      * @param ruleType ruleType
      * @param startTime startTime
      * @return endTime endTime
      */
     IPage<DqRule> queryRuleListPaging(IPage<DqRule> page,
                                       @Param("searchVal") String searchVal,
-                                      @Param("userId") int userId,
                                       @Param("ruleType") int ruleType,
                                       @Param("startTime") Date startTime,
                                       @Param("endTime") Date endTime);

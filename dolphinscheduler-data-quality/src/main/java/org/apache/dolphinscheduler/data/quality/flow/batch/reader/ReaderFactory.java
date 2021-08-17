@@ -66,7 +66,7 @@ public class ReaderFactory {
                 case HIVE:
                     return new HiveReader(config);
                 default:
-                    throw new DataQualityException("connector type ${connectorType} is not supported!");
+                    throw new DataQualityException("reader type " + readerType + " is not supported!");
             }
         }
 

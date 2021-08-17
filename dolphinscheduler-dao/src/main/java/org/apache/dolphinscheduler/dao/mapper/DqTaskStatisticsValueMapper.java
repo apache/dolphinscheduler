@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import java.util.Map;
+import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * ReaderConfig
+ * DqTaskStatisticsValueMapper
  */
-public class ReaderConfig extends BaseConfig {
+public interface DqTaskStatisticsValueMapper extends BaseMapper<DqTaskStatisticsValue> {
 
-    public ReaderConfig() {}
-
-    public ReaderConfig(String type, Map<String,Object> config) {
-        super(type, config);
-    }
 }

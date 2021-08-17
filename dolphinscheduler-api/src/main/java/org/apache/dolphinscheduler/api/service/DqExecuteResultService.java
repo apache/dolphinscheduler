@@ -26,8 +26,6 @@ import java.util.Map;
  */
 public interface DqExecuteResultService {
 
-    Map<String, Object> getByTaskInstanceId(int taskInstanceId);
-
     Map<String, Object> queryResultListPaging(User loginUser,
                                               String searchVal,
                                               Integer state,

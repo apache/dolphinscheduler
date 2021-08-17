@@ -33,20 +33,20 @@ public class DataQualityConfiguration {
     private EnvConfig envConfig;
 
     @JsonProperty("readers")
-    private List<ReaderConfig> readerConfigs;
+    private List<BaseConfig> readerConfigs;
 
     @JsonProperty("transformers")
-    private List<TransformerConfig> transformerConfigs;
+    private List<BaseConfig> transformerConfigs;
 
     @JsonProperty("writers")
-    private List<WriterConfig> writerConfigs;
+    private List<BaseConfig> writerConfigs;
 
     public DataQualityConfiguration(){}
 
     public DataQualityConfiguration(String name,
-                                    List<ReaderConfig> readerConfigs,
-                                    List<WriterConfig> writerConfigs,
-                                    List<TransformerConfig> transformerConfigs) {
+                                    List<BaseConfig> readerConfigs,
+                                    List<BaseConfig> writerConfigs,
+                                    List<BaseConfig> transformerConfigs) {
         this.name = name;
         this.readerConfigs = readerConfigs;
         this.writerConfigs = writerConfigs;
@@ -55,9 +55,9 @@ public class DataQualityConfiguration {
 
     public DataQualityConfiguration(String name,
                                     EnvConfig envConfig,
-                                    List<ReaderConfig> readerConfigs,
-                                    List<WriterConfig> writerConfigs,
-                                    List<TransformerConfig> transformerConfigs) {
+                                    List<BaseConfig> readerConfigs,
+                                    List<BaseConfig> writerConfigs,
+                                    List<BaseConfig> transformerConfigs) {
         this.name = name;
         this.envConfig = envConfig;
         this.readerConfigs = readerConfigs;
@@ -81,27 +81,27 @@ public class DataQualityConfiguration {
         this.envConfig = envConfig;
     }
 
-    public List<ReaderConfig> getReaderConfigs() {
+    public List<BaseConfig> getReaderConfigs() {
         return readerConfigs;
     }
 
-    public void setReaderConfigs(List<ReaderConfig> readerConfigs) {
+    public void setReaderConfigs(List<BaseConfig> readerConfigs) {
         this.readerConfigs = readerConfigs;
     }
 
-    public List<TransformerConfig> getTransformerConfigs() {
+    public List<BaseConfig> getTransformerConfigs() {
         return transformerConfigs;
     }
 
-    public void setTransformerConfigs(List<TransformerConfig> transformerConfigs) {
+    public void setTransformerConfigs(List<BaseConfig> transformerConfigs) {
         this.transformerConfigs = transformerConfigs;
     }
 
-    public List<WriterConfig> getWriterConfigs() {
+    public List<BaseConfig> getWriterConfigs() {
         return writerConfigs;
     }
 
-    public void setWriterConfigs(List<WriterConfig> writerConfigs) {
+    public void setWriterConfigs(List<BaseConfig> writerConfigs) {
         this.writerConfigs = writerConfigs;
     }
 

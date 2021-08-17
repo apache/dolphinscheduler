@@ -38,7 +38,7 @@ public class DqExecuteResult implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
-     * process_defined_id
+     * process defined id
      */
     @TableField(value = "process_definition_id")
     private long processDefinitionId;
@@ -48,7 +48,7 @@ public class DqExecuteResult implements Serializable {
     @TableField(exist = false)
     private String  processDefinitionName;
     /**
-     * process_instance_id
+     * process instance id
      */
     @TableField(value = "process_instance_id")
     private long processInstanceId;
@@ -58,7 +58,7 @@ public class DqExecuteResult implements Serializable {
     @TableField(exist = false)
     private String processInstanceName;
     /**
-     * task_instance_id
+     * task instance id
      */
     @TableField(value = "task_instance_id")
     private long taskInstanceId;
@@ -68,32 +68,42 @@ public class DqExecuteResult implements Serializable {
     @TableField(exist = false)
     private String taskName;
     /**
-     * rule_type
+     * rule type
      */
     @TableField(value = "rule_type")
     private RuleType ruleType;
     /**
-     * rule_name
+     * rule name
      */
     @TableField(value = "rule_name")
     private String ruleName;
     /**
-     * statistics_value
+     * statistics value
      */
     @TableField(value = "statistics_value")
     private double statisticsValue;
     /**
-     * comparison_value
+     * comparison value
      */
     @TableField(value = "comparison_value")
     private double comparisonValue;
     /**
-     * check_type
+     * comparison type
+     */
+    @TableField(value = "comparison_type")
+    private int comparisonType;
+    /**
+     * comparison type name
+     */
+    @TableField(exist = false)
+    private String comparisonTypeName;
+    /**
+     * check type
      */
     @TableField(value = "check_type")
     private CheckType checkType;
     /**
-     * task_instance_id
+     * threshold
      */
     @TableField(value = "threshold")
     private double threshold;
@@ -103,7 +113,7 @@ public class DqExecuteResult implements Serializable {
     @TableField(value = "operator")
     private int operator;
     /**
-     * operator
+     * failure strategy
      */
     @TableField(value = "failure_strategy")
     private int failureStrategy;
@@ -113,7 +123,7 @@ public class DqExecuteResult implements Serializable {
     @TableField(value = "user_id")
     private int userId;
     /**
-     * user_name
+     * user name
      */
     @TableField(exist = false)
     private String userName;
@@ -122,6 +132,12 @@ public class DqExecuteResult implements Serializable {
      */
     @TableField(value = "state")
     private DqTaskState state;
+    /**
+     * error output path
+     */
+    @TableField(value = "error_output_path")
+    private String errorOutputPath;
+
     /**
      * create_time
      */
@@ -295,6 +311,30 @@ public class DqExecuteResult implements Serializable {
         this.taskName = taskName;
     }
 
+    public int getComparisonType() {
+        return comparisonType;
+    }
+
+    public void setComparisonType(int comparisonType) {
+        this.comparisonType = comparisonType;
+    }
+
+    public String getComparisonTypeName() {
+        return comparisonTypeName;
+    }
+
+    public void setComparisonTypeName(String comparisonTypeName) {
+        this.comparisonTypeName = comparisonTypeName;
+    }
+
+    public String getErrorOutputPath() {
+        return errorOutputPath;
+    }
+
+    public void setErrorOutputPath(String errorOutputPath) {
+        this.errorOutputPath = errorOutputPath;
+    }
+
     @Override
     public String toString() {
         return "DqExecuteResult{" 
@@ -309,6 +349,8 @@ public class DqExecuteResult implements Serializable {
                 + ", ruleName='" + ruleName + '\''
                 + ", statisticsValue=" + statisticsValue
                 + ", comparisonValue=" + comparisonValue
+                + ", comparisonType=" + comparisonType
+                + ", comparisonTypeName=" + comparisonTypeName
                 + ", checkType=" + checkType
                 + ", threshold=" + threshold
                 + ", operator=" + operator
@@ -316,6 +358,7 @@ public class DqExecuteResult implements Serializable {
                 + ", userId=" + userId
                 + ", userName='" + userName + '\''
                 + ", state=" + state
+                + ", errorOutputPath=" + errorOutputPath
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

@@ -15,26 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.data.quality.enums;
+package org.apache.dolphinscheduler.data.quality.flow.batch.writer.file;
+
+import org.apache.dolphinscheduler.data.quality.config.Config;
+import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
+import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+
+import java.util.Collections;
 
 /**
- * WriterType
+ * LocalFileWriter
  */
-public enum WriterType {
-    /**
-     * JDBC
-     */
-    JDBC,
-    LOCAL_FILE,
-    HDFS_FILE;
+public class LocalFileWriter extends BaseFileWriter {
 
-    public static WriterType getType(String name) {
-        for (WriterType type: WriterType.values()) {
-            if (type.name().equalsIgnoreCase(name)) {
-                return type;
-            }
-        }
+    public LocalFileWriter(Config config) {
+        super(config);
+    }
 
-        return null;
+    @Override
+    public void write(Dataset<Row> data, SparkRuntimeEnvironment environment) {
+        outputImpl(data,"file://");
+    }
+
+    @Override
+    public ValidateResult validateConfig() {
+        return checkConfigImpl(Collections.singletonList("file://"));
     }
 }

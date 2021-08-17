@@ -36,20 +36,20 @@
       <div class="list">
         <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.state" :placeholder="$t('State')" size="mini">
           <el-option
-                  v-for="city in stateTypeList"
-                  :key="city.label"
-                  :value="city.code"
-                  :label="city.label">
+                  v-for="item in stateTypeList"
+                  :key="item.label"
+                  :value="item.code"
+                  :label="item.label">
           </el-option>
         </el-select>
       </div>
       <div class="list">
         <el-select style="width: 140px;" @change="_onChangeRuleType" :value="searchParams.ruleType" :placeholder="$t('Rule Type')" size="mini">
           <el-option
-                  v-for="city in ruleTypeList"
-                  :key="city.label"
-                  :value="city.code"
-                  :label="city.label">
+                  v-for="item in ruleTypeList"
+                  :key="item.label"
+                  :value="item.code"
+                  :label="item.label">
           </el-option>
         </el-select>
       </div>

@@ -19,116 +19,98 @@ import i18n from '@/module/i18n'
 
 const dataQualityTaskState = [
   {
-    id: 0,
-    desc: `${i18n.$t('Default')}`,
-    code: 0
+    code: 0,
+    label: `${i18n.$t('Default')}`
+
   },
   {
-    id: 1,
-    desc: `${i18n.$t('Success')}`,
-    code: 1
+    code: 1,
+    label: `${i18n.$t('Success')}`
+
   },
   {
-    id: 2,
-    desc: `${i18n.$t('Failure')}`,
-    code: 2
+    code: 2,
+    label: `${i18n.$t('Failure')}`
   }
 ]
 
 const operator = [
   {
-    id: 0,
-    desc: '=',
+    label: '=',
     code: 0
   },
   {
-    id: 1,
-    desc: '<',
+    label: '<',
     code: 1
   },
   {
-    id: 2,
-    desc: '<=',
+    label: '<=',
     code: 2
   },
   {
-    id: 3,
-    desc: '>',
+    label: '>',
     code: 3
   },
   {
-    id: 4,
-    desc: '>=',
+    label: '>=',
     code: 4
   },
   {
-    id: 5,
-    desc: '!=',
+    label: '!=',
     code: 5
   }
 ]
 
 const ruleType = [
   {
-    id: 0,
-    desc: `${i18n.$t('Single Table')}`,
-    code: 0
+    code: 0,
+    label: `${i18n.$t('Single Table')}`
+
   },
   {
-    id: 1,
-    desc: `${i18n.$t('Single Table Custon Sql')}`,
-    code: 1
+    code: 1,
+    label: `${i18n.$t('Single Table Custom Sql')}`
+
   },
   {
-    id: 2,
-    desc: `${i18n.$t('Multi Table Accuracy')}`,
-    code: 2
+    code: 2,
+    label: `${i18n.$t('Multi Table Accuracy')}`
+
   },
   {
-    id: 3,
-    desc: `${i18n.$t('Multi Table Comparison')}`,
-    code: 3
+    code: 3,
+    label: `${i18n.$t('Multi Table Comparison')}`
+
   }
 ]
 
 const checkType = [
   {
-    id: 0,
-    desc: `${i18n.$t('Statistics Compare Fixed Value')}`,
+    label: `${i18n.$t('Comparison Minus Statistics')}`,
     code: 0
   },
   {
-    id: 1,
-    desc: `${i18n.$t('Statistics Compare Comparsion')}`,
+    label: `${i18n.$t('Statistics Minus Comparison')}`,
     code: 1
   },
   {
-    id: 2,
-    desc: `${i18n.$t('Statistics Comparison Percentage')}`,
+    label: `${i18n.$t('Statistics Comparison Percentage')}`,
     code: 2
+  },
+  {
+    label: `${i18n.$t('(Comparison-Statistics)/Comparison Percentage')}`,
+    code: 3
   }
 ]
 
 const failureStrategy = [
   {
-    id: 0,
-    desc: `${i18n.$t('End')}`,
+    label: `${i18n.$t('Alert')}`,
     code: 0
   },
   {
-    id: 1,
-    desc: `${i18n.$t('Continue')}`,
+    label: `${i18n.$t('Block')}`,
     code: 1
-  },
-  {
-    id: 2,
-    desc: `${i18n.$t('End And Alert')}`,
-    code: 2
-  },
-  {
-    id: 3,
-    desc: `${i18n.$t('Continue And Alert')}`,
-    code: 3
   }
 ]
 

@@ -156,8 +156,7 @@ public class TaskResponseService {
                             taskResponseEvent.getStartTime(),
                             taskResponseEvent.getWorkerAddress(),
                             taskResponseEvent.getExecutePath(),
-                            taskResponseEvent.getLogPath(),
-                            taskResponseEvent.getTaskInstanceId());
+                            taskResponseEvent.getLogPath());
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
@@ -179,7 +178,6 @@ public class TaskResponseService {
                                 taskResponseEvent.getEndTime(),
                                 taskResponseEvent.getProcessId(),
                                 taskResponseEvent.getAppIds(),
-                                taskResponseEvent.getTaskInstanceId(),
                                 taskResponseEvent.getVarPool()
                         );
                     }
@@ -210,27 +208,19 @@ public class TaskResponseService {
     }
 
     private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent, DqExecuteResult dqExecuteResult) {
-
         if (isFailure(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
                 dqExecuteResult.setState(DqTaskState.FAILURE);
                 switch (dqFailureStrategy) {
-                    case END:
-                        taskResponseEvent.setState(ExecutionStatus.FAILURE);
-                        logger.info("task is failre and end");
+                    case ALERT:
+                        sendAlert(dqExecuteResult);
+                        logger.info("task is failre, continue and alert");
                         break;
-                    case CONTINUE:
-                        logger.info("task is failre and continue");
-                        break;
-                    case END_ALTER:
+                    case BLOCK:
                         taskResponseEvent.setState(ExecutionStatus.FAILURE);
                         sendAlert(dqExecuteResult);
                         logger.info("task is failre, end and alert");
-                        break;
-                    case CONTINUE_ALTER:
-                        sendAlert(dqExecuteResult);
-                        logger.info("task is failre, continue and alert");
                         break;
                     default:
                         break;
@@ -254,13 +244,32 @@ public class TaskResponseService {
 
         boolean isFailure = false;
         if (operatorType != null) {
-            if (CheckType.STATISTICS_COMPARE_FIXED_VALUE == checkType) {
-                isFailure = getCompareResult(operatorType,statisticsValue,threshold);
-            } else if (CheckType.STATISTICS_COMPARE_COMPARISON == checkType) {
-                isFailure = getCompareResult(operatorType,comparisonValue - statisticsValue,threshold);
-            } else if (CheckType.STATISTICS_COMPARISON_PERCENTAGE == checkType) {
-                isFailure = getCompareResult(operatorType,statisticsValue / comparisonValue * 100,threshold);
+            double srcValue = 0;
+            switch (checkType) {
+                case COMPARISON_MINUS_STATISTICS:
+                    srcValue = comparisonValue - statisticsValue;
+                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    break;
+                case STATISTICS_MINUS_COMPARISON:
+                    srcValue = statisticsValue - comparisonValue;
+                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    break;
+                case STATISTICS_COMPARISON_PERCENTAGE:
+                    if (comparisonValue > 0) {
+                        srcValue = statisticsValue / comparisonValue * 100;
+                    }
+                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    break;
+                case STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE:
+                    if (comparisonValue > 0) {
+                        srcValue = (comparisonValue - statisticsValue) / comparisonValue * 100;
+                    }
+                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    break;
+                default:
+                    break;
             }
+
         }
         return isFailure;
     }

@@ -222,6 +222,11 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * QUESTION ?
+     */
+    public static final String QUESTION = "?";
+
+    /**
      * SPACE " "
      */
     public static final String SPACE = " ";
@@ -1048,9 +1053,14 @@ public final class Constants {
     public static final String PSTREE = "pstree";
 
     /**
-     * dolphinscheduler.env.path
+     * data.quality.jar.name
      */
-    public static final String DOLPHINSCHEDULER_DQ_JAR_NAME = "dq.jar.name";
+    public static final String DATA_QUALITY_JAR_NAME = "data-quality.jar.name";
+
+    /**
+     * data.quality.error.output.path
+     */
+    public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
 
     /**
      * double brackets left
@@ -1088,7 +1098,7 @@ public final class Constants {
     public static final String STATISTICS_NAME = "statistics_name";
     public static final String STATISTICS_EXECUTE_SQL = "statistics_execute_sql";
     public static final String COMPARISON_NAME = "comparison_name";
-    public static final String COMPARISON_TITLE = "comparison_title";
+    public static final String COMPARISON_TYPE = "comparison_type";
     public static final String COMPARISON_VALUE = "comparison_value";
     public static final String COMPARISON_EXECUTE_SQL = "comparison_execute_sql";
     public static final String MAPPING_COLUMNS = "mapping_columns";
@@ -1103,8 +1113,14 @@ public final class Constants {
     public static final String WRITER_CONNECTOR_TYPE = "writer_connector_type";
     public static final String WRITER_DATASOURCE_ID = "writer_datasource_id";
     public static final String TASK_INSTANCE_ID = "task_instance_id";
-    public static final String NAME = "";
     public static final String SMALL = "small";
     public static final String CHANGE = "change";
     public static final String RULE_NAME = "rule_name";
+    public static final String DATA_TIME = "data_time";
+    public static final String REGEXP_PATTERN = "regexp_pattern";
+    public static final String ERROR_OUTPUT_PATH = "error_output_path";
+    public static final String INDEX = "index";
+    public static final String PATH = "path";
+    public static final String HDFS_FILE = "hdfs_file";
+    public static final String BATCH = "batch";
 }

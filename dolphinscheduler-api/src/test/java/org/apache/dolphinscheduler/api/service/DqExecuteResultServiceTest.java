@@ -47,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -61,16 +60,6 @@ public class DqExecuteResultServiceTest {
 
     @Mock
     DqExecuteResultMapper dqExecuteResultMapper;
-
-    @Test
-    public void testGetByTaskInstanceId() {
-
-        when(dqExecuteResultMapper.selectOne(
-                new QueryWrapper<DqExecuteResult>().eq("task_instance_id",1)))
-                .thenReturn(getExecuteResult());
-        Map<String,Object> result = dqExecuteResultService.getByTaskInstanceId(1);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
 
     @Test
     public void testQueryResultListPaging() {
@@ -93,14 +82,6 @@ public class DqExecuteResultServiceTest {
         Map<String,Object> result = dqExecuteResultService.queryResultListPaging(
                 loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
-
-    public DqExecuteResult getExecuteResult() {
-        DqExecuteResult dqExecuteResult = new DqExecuteResult();
-        dqExecuteResult.setId(1);
-        dqExecuteResult.setState(DqTaskState.FAILURE);
-
-        return dqExecuteResult;
     }
 
     public List<DqExecuteResult> getExecuteResultList() {

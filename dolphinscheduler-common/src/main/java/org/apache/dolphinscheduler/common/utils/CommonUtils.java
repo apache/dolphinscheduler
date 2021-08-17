@@ -42,8 +42,8 @@ public class CommonUtils {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
 
-    public static String getDqJarName() {
-        String dqsJarName = PropertyUtils.getString(Constants.DOLPHINSCHEDULER_DQ_JAR_NAME);
+    public static String getDataQualityJarName() {
+        String dqsJarName = PropertyUtils.getString(Constants.DATA_QUALITY_JAR_NAME);
 
         if (StringUtils.isEmpty(dqsJarName)) {
             return "dolphinscheduler-data-quality.jar";

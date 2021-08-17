@@ -30,10 +30,7 @@ import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * HiveReader
@@ -53,23 +50,7 @@ public class HiveReader implements BatchReader {
 
     @Override
     public ValidateResult validateConfig() {
-        List<String> requiredOptions = Arrays.asList(DATABASE, TABLE);
-
-        List<String> nonExistsOptions = new ArrayList<>();
-        requiredOptions.forEach(x -> {
-            if (!config.has(x)) {
-                nonExistsOptions.add(x);
-            }
-        });
-
-        if (!nonExistsOptions.isEmpty()) {
-            return new ValidateResult(
-                    false,
-                    "please specify " + nonExistsOptions.stream().map(option ->
-                            "[" + option + "]").collect(Collectors.joining(",")) + " as non-empty string");
-        } else {
-            return new ValidateResult(true, "");
-        }
+        return validate(Arrays.asList(DATABASE, TABLE));
     }
 
     @Override

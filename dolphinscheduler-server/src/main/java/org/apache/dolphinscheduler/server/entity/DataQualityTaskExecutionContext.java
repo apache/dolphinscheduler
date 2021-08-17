@@ -31,11 +31,15 @@ import java.util.List;
 public class DataQualityTaskExecutionContext implements Serializable {
 
     /**
-     * ruleName
+     * rule id
+     */
+    private int ruleId;
+    /**
+     * rule name
      */
     private String ruleName;
     /**
-     * ruleType
+     * rule type
      */
     private RuleType ruleType;
     /**
@@ -46,56 +50,82 @@ public class DataQualityTaskExecutionContext implements Serializable {
      *  execute sql list
      */
     private List<DqRuleExecuteSql> executeSqlList;
-
     /**
-     * sourceConnectorType
+     * if comparison value calculate from statistics value table
+     */
+    private boolean comparisonNeedStatisticsValueTable = false;
+    /**
+     * compare with fixed value
+     */
+    private boolean compareWithFixedValue = false;
+    /**
+     * error output path
+     */
+    private String hdfsPath;
+    /**
+     * sourceConnector type
      */
     private String sourceConnectorType;
-
     /**
-     * sourceType
+     * source type
      */
     private int sourceType;
-
     /**
-     * sourceConnectionParams
+     * source connection params
      */
     private String sourceConnectionParams;
-
     /**
-     * targetConnectorType
+     * target connector type
      */
     private String targetConnectorType;
-
     /**
-     * targetType
+     * target type
      */
     private int targetType;
-
     /**
-     * targetConnectionParams
+     * target connection params
      */
     private String targetConnectionParams;
-
     /**
-     * sourceConnectorType
+     * source connector type
      */
     private String writerConnectorType;
-
     /**
-     * writerType
+     * writer type
      */
     private int writerType;
-
     /**
      * writer table
      */
     private String writerTable;
-
     /**
-     * writerConnectionParams
+     * writer connection params
      */
     private String writerConnectionParams;
+    /**
+     * statistics value connector type
+     */
+    private String statisticsValueConnectorType;
+    /**
+     * statistics value type
+     */
+    private int statisticsValueType;
+    /**
+     * statistics value table
+     */
+    private String statisticsValueTable;
+    /**
+     * statistics value writer connection params
+     */
+    private String statisticsValueWriterConnectionParams;
+
+    public int getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(int ruleId) {
+        this.ruleId = ruleId;
+    }
 
     public String getSourceConnectorType() {
         return sourceConnectorType;
@@ -177,6 +207,38 @@ public class DataQualityTaskExecutionContext implements Serializable {
         this.writerConnectorType = writerConnectorType;
     }
 
+    public String getStatisticsValueConnectorType() {
+        return statisticsValueConnectorType;
+    }
+
+    public void setStatisticsValueConnectorType(String statisticsValueConnectorType) {
+        this.statisticsValueConnectorType = statisticsValueConnectorType;
+    }
+
+    public int getStatisticsValueType() {
+        return statisticsValueType;
+    }
+
+    public void setStatisticsValueType(int statisticsValueType) {
+        this.statisticsValueType = statisticsValueType;
+    }
+
+    public String getStatisticsValueTable() {
+        return statisticsValueTable;
+    }
+
+    public void setStatisticsValueTable(String statisticsValueTable) {
+        this.statisticsValueTable = statisticsValueTable;
+    }
+
+    public String getStatisticsValueWriterConnectionParams() {
+        return statisticsValueWriterConnectionParams;
+    }
+
+    public void setStatisticsValueWriterConnectionParams(String statisticsValueWriterConnectionParams) {
+        this.statisticsValueWriterConnectionParams = statisticsValueWriterConnectionParams;
+    }
+
     public String getRuleName() {
         return ruleName;
     }
@@ -221,5 +283,29 @@ public class DataQualityTaskExecutionContext implements Serializable {
             this.executeSqlList = new ArrayList<>();
         }
         this.executeSqlList.add(executeSqlDefinition);
+    }
+
+    public boolean isComparisonNeedStatisticsValueTable() {
+        return comparisonNeedStatisticsValueTable;
+    }
+
+    public void setComparisonNeedStatisticsValueTable(boolean comparisonNeedStatisticsValueTable) {
+        this.comparisonNeedStatisticsValueTable = comparisonNeedStatisticsValueTable;
+    }
+
+    public boolean isCompareWithFixedValue() {
+        return compareWithFixedValue;
+    }
+
+    public void setCompareWithFixedValue(boolean compareWithFixedValue) {
+        this.compareWithFixedValue = compareWithFixedValue;
+    }
+
+    public String getHdfsPath() {
+        return hdfsPath;
+    }
+
+    public void setHdfsPath(String hdfsPath) {
+        this.hdfsPath = hdfsPath;
     }
 }

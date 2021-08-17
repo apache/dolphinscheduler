@@ -40,11 +40,13 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
@@ -88,6 +90,9 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Override
     public  Map<String, Object> getRuleFormCreateJsonById(int id) {
@@ -176,7 +181,6 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 dqRuleMapper.queryRuleListPaging(
                         page,
                         searchVal,
-                        loginUser.getId(),
                         ruleType,
                         start,
                         end);
@@ -269,6 +273,16 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 for (DbType dbtype: DbType.values()) {
                     paramsOptions = new ParamsOptions(dbtype.getDescp().toUpperCase(),dbtype.getCode(),false);
                     options.add(paramsOptions);
+                }
+                break;
+            case COMPARISON_TYPE:
+                options = new ArrayList<>();
+                ParamsOptions comparisonOptions = null;
+                List<DqComparisonType> list = dqComparisonTypeMapper.selectList(new QueryWrapper<DqComparisonType>().orderByAsc("id"));
+
+                for (DqComparisonType type: list) {
+                    comparisonOptions = new ParamsOptions(type.getType(), type.getId(),false);
+                    options.add(comparisonOptions);
                 }
                 break;
             default:

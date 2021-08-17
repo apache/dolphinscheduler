@@ -69,7 +69,7 @@
     },
     methods: {
       _rtRuleType (code) {
-        return _.filter(ruleType, v => v.code === code)[0].desc
+        return _.filter(ruleType, v => v.code === code)[0].label
       }
     },
     watch: {

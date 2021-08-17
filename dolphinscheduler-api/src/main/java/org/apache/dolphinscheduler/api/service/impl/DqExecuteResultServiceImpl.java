@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
@@ -37,7 +36,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -49,19 +47,6 @@ public class DqExecuteResultServiceImpl extends BaseService implements DqExecute
 
     @Autowired
     private DqExecuteResultMapper dqExecuteResultMapper;
-
-    @Override
-    public Map<String, Object> getByTaskInstanceId(int taskInstanceId) {
-
-        Map<String, Object> result = new HashMap<>(5);
-
-        DqExecuteResult dqExecuteResult =
-                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq("task_instance_id",taskInstanceId));
-
-        result.put(Constants.DATA_LIST, dqExecuteResult);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
 
     @Override
     public Map<String, Object> queryResultListPaging(User loginUser,

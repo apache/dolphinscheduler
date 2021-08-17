@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
@@ -72,6 +73,7 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
@@ -180,6 +182,9 @@ public class ProcessService {
 
     @Autowired
     private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+
+    @Autowired
+    private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -1500,12 +1505,13 @@ public class ProcessService {
      * @param host host
      * @param executePath executePath
      * @param logPath logPath
-     * @param taskInstId taskInstId
      */
-    public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
+    public void changeTaskState(TaskInstance taskInstance,
+                                ExecutionStatus state,
+                                Date startTime,
+                                String host,
                                 String executePath,
-                                String logPath,
-                                int taskInstId) {
+                                String logPath) {
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
         taskInstance.setHost(host);
@@ -1556,14 +1562,12 @@ public class ProcessService {
      *
      * @param state state
      * @param endTime endTime
-     * @param taskInstId taskInstId
      * @param varPool varPool
      */
     public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
-                                int taskInstId,
                                 String varPool) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
@@ -2114,5 +2118,9 @@ public class ProcessService {
 
     public List<DqRuleExecuteSql> getDqExecuteSql(int ruleId) {
         return dqRuleExecuteSqlMapper.getExecuteSqlList(ruleId);
+    }
+
+    public DqComparisonType getComparisonTypeById(int id) {
+        return dqComparisonTypeMapper.selectById(id);
     }
 }

@@ -207,8 +207,21 @@
             this.fApi.on('target_datasource_id-change', this.targetDatasourceIdChange)
             this.fApi.on('src_table-change', this.srcTableChange)
             this.fApi.on('target_table-change', this.targetTableChange)
+            this.fApi.on('comparison_type-change', this.comparisonTypeChange)
           })
         })
+      },
+
+      comparisonTypeChange () {
+        if (this.fApi.getValue('comparison_type') === 1) {
+          this.fApi.append(this.getComparisonNameInput(), 'comparison_type')
+        } else {
+          this.fApi.removeField('comparison_name')
+        }
+      },
+
+      getComparisonNameInput () {
+        return this.$formCreate.maker.input('固定值', 'comparison_name', this.inputEntryValueMap.comparison_name)
       },
 
       srcConnectorTypeChange () {
@@ -307,7 +320,7 @@
       /**
        * Get rule list
        */
-      _getRuluList () {
+      _getRuleList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getRuleList', 1).then(res => {
             this.ruleNameList = []
@@ -368,6 +381,14 @@
                       item, 'src_table',
                       { datasourceId: this.inputEntryValueMap.src_datasource_id, tableName: this.inputEntryValueMap[item] },
                       'src_field', [])
+
+                    if (item === 'comparison_type') {
+                      if (this.inputEntryValueMap.comparison_type === 1) {
+                        this.fApi.append(this.getComparisonNameInput(), 'comparison_type')
+                      } else {
+                        this.fApi.removeField('comparison_name')
+                      }
+                    }
 
                     this.fApi.setValue(item, this.inputEntryValueMap[item])
                   }
@@ -538,7 +559,7 @@
     },
 
     mounted () {
-      this._getRuluList()
+      this._getRuleList()
     },
 
     components: {

@@ -43,6 +43,7 @@
         </el-table-column>
         <el-table-column prop="statisticsValue" :label="$t('Statistics Value')"></el-table-column>
         <el-table-column prop="comparisonValue" :label="$t('Comparison Value')"></el-table-column>
+        <el-table-column prop="comparisonTypeName" :label="$t('Comparison Type')"></el-table-column>
         <el-table-column :label="$t('Check Type')" width="200">
           <template slot-scope="scope">
             {{_rtCheckType(scope.row.checkType)}}
@@ -91,19 +92,19 @@
     },
     methods: {
       _rtTaskState (code) {
-        return _.filter(dataQualityTaskState, v => v.code === code)[0].desc
+        return _.filter(dataQualityTaskState, v => v.code === code)[0].label
       },
       _rtCheckType (code) {
-        return _.filter(checkType, v => v.code === code)[0].desc
+        return _.filter(checkType, v => v.code === code)[0].label
       },
       _rtRuleType (code) {
-        return _.filter(ruleType, v => v.code === code)[0].desc
+        return _.filter(ruleType, v => v.code === code)[0].label
       },
       _rtOperator (code) {
-        return _.filter(operator, v => v.code === code)[0].desc
+        return _.filter(operator, v => v.code === code)[0].label
       },
       _rtFailureStrategy (code) {
-        return _.filter(failureStrategy, v => v.code === code)[0].desc
+        return _.filter(failureStrategy, v => v.code === code)[0].label
       },
       _go (item) {
         this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })

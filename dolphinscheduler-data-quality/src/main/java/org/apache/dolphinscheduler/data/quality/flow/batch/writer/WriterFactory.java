@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.data.quality.enums.WriterType;
 import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
+import org.apache.dolphinscheduler.data.quality.flow.batch.writer.file.HdfsFileWriter;
+import org.apache.dolphinscheduler.data.quality.flow.batch.writer.file.LocalFileWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +68,16 @@ public class WriterFactory {
         WriterType writerType = WriterType.getType(writerConfig.getType());
         Config config = new Config(writerConfig.getConfig());
         if (writerType != null) {
-            if (writerType == WriterType.JDBC) {
-                return new JdbcWriter(config);
+            switch (writerType) {
+                case JDBC:
+                    return new JdbcWriter(config);
+                case LOCAL_FILE:
+                    return new LocalFileWriter(config);
+                case HDFS_FILE:
+                    return new HdfsFileWriter(config);
+                default:
+                    throw new DataQualityException("writer type " + writerType + " is not supported!");
             }
-            throw new DataQualityException("writer type $readerType is not supported!");
         }
 
         return null;

@@ -15,18 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter;
+package org.apache.dolphinscheduler.data.quality.flow.batch.writer.file;
 
-import java.util.Map;
+import org.apache.dolphinscheduler.data.quality.config.Config;
+import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
+import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
+
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+
+import java.util.Collections;
 
 /**
- * WriterConfig
+ * HdfsFileWriter
  */
-public class WriterConfig extends BaseConfig {
+public class HdfsFileWriter extends BaseFileWriter {
 
-    public WriterConfig() {}
+    public HdfsFileWriter(Config config) {
+        super(config);
+    }
 
-    public WriterConfig(String type, Map<String,Object> config) {
-        super(type, config);
+    @Override
+    public void write(Dataset<Row> data, SparkRuntimeEnvironment environment) {
+        outputImpl(data,"hdfs://");
+    }
+
+    @Override
+    public ValidateResult validateConfig() {
+        return checkConfigImpl(Collections.singletonList("hdfs://"));
     }
 }

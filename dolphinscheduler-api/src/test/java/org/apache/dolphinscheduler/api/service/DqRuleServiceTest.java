@@ -130,7 +130,7 @@ public class DqRuleServiceTest {
         page.setRecords(getRuleList());
 
         when(dqRuleMapper.queryRuleListPaging(
-                any(IPage.class), eq(""), eq(loginUser.getId()), eq(ruleType), eq(start), eq(end))).thenReturn(page);
+                any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());

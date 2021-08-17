@@ -28,11 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
+import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.DataQualityConfiguration;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.EnvConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.ReaderConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.TransformerConfig;
-import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.WriterConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +43,6 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
     @Override
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
                                           DataQualityTaskExecutionContext context) throws DolphinException {
-
         DqRuleExecuteSql statisticsSql =
                 RuleParserUtils.getExecuteSqlListByType(
                         context.getExecuteSqlList(), ExecuteSqlType.STATISTICS).get(0);
@@ -54,9 +50,12 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
 
         int index = 1;
 
-        List<ReaderConfig> readerConfigList =
+        List<BaseConfig> readerConfigList =
                 RuleParserUtils.getReaderConfigList(inputParameterValue,context);
-        List<TransformerConfig> transformerConfigList = new ArrayList<>();
+
+        RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList,context);
+
+        List<BaseConfig> transformerConfigList = new ArrayList<>();
 
         List<MappingColumn> mappingColumnList = RuleParserUtils.getMappingColumnList(inputParameterValue.get(MAPPING_COLUMNS));
 
@@ -71,18 +70,17 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
                 inputParameterValue,
                 transformerConfigList);
 
-        List<WriterConfig> writerConfigList = RuleParserUtils.getWriterConfigList(
-                index,
-                inputParameterValue,
-                transformerConfigList,
-                context,
-                RuleManager.DEFAULT_COMPARISON_WRITER_SQL);
-        EnvConfig envConfig = new EnvConfig();
-        envConfig.setType("batch");
+        String writerSql = RuleManager.DEFAULT_COMPARISON_WRITER_SQL;
+        if (context.isCompareWithFixedValue()) {
+            writerSql = writerSql.replaceAll("full join \\$\\{comparison_table}","");
+        }
+
+        List<BaseConfig> writerConfigList = RuleParserUtils.getAllWriterConfigList(inputParameterValue,
+                context, index, transformerConfigList, writerSql,RuleManager.TASK_STATISTICS_VALUE_WRITER_SQL_2);
 
         return new DataQualityConfiguration(
                 context.getRuleName(),
-                envConfig,
+                RuleParserUtils.getEnvConfig(),
                 readerConfigList,
                 writerConfigList,
                 transformerConfigList);

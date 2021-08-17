@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -28,41 +26,38 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-/**
- * RuleExecuteSql
- */
-@TableName("t_ds_dq_rule_execute_sql")
-public class DqRuleExecuteSql implements Serializable {
+@TableName("t_ds_dq_comparison_type")
+public class DqComparisonType implements Serializable {
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
-     * index，ensure the execution order of sql
-     */
-    @TableField(value = "index")
-    private int index;
-    /**
-     * SQL Statement
-     */
-    @TableField(value = "sql")
-    private String sql;
-    /**
-     * table alias name
-     */
-    @TableField(value = "table_alias")
-    private String tableAlias;
-    /**
-     * input entry type: default,statistics,comparison,check
+     * type
      */
     @TableField(value = "type")
-    private ExecuteSqlType type = ExecuteSqlType.MIDDLE;
+    private String type;
     /**
-     * is error output sql
+     * execute sql
      */
-    @TableField(value = "is_error_output_sql")
-    private boolean isErrorOutputSql;
+    @TableField(value = "execute_sql")
+    private String executeSql;
+    /**
+     * output table
+     */
+    @TableField(value = "output_table")
+    private String outputTable;
+    /**
+     * comparison name
+     */
+    @TableField(value = "name")
+    private String name;
+    /**
+     * is inner source
+     */
+    @TableField(value = "is_inner_source")
+    private Boolean isInnerSource;
     /**
      * create_time
      */
@@ -84,44 +79,44 @@ public class DqRuleExecuteSql implements Serializable {
         this.id = id;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTableAlias() {
-        return tableAlias;
-    }
-
-    public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
-    }
-
-    public ExecuteSqlType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(ExecuteSqlType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public boolean isErrorOutputSql() {
-        return isErrorOutputSql;
+    public String getExecuteSql() {
+        return executeSql;
     }
 
-    public void setErrorOutputSql(boolean errorOutputSql) {
-        isErrorOutputSql = errorOutputSql;
+    public void setExecuteSql(String executeSql) {
+        this.executeSql = executeSql;
+    }
+
+    public String getOutputTable() {
+        return outputTable;
+    }
+
+    public void setOutputTable(String outputTable) {
+        this.outputTable = outputTable;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getInnerSource() {
+        return isInnerSource;
+    }
+
+    public void setInnerSource(Boolean innerSource) {
+        isInnerSource = innerSource;
     }
 
     public Date getCreateTime() {
@@ -142,13 +137,14 @@ public class DqRuleExecuteSql implements Serializable {
 
     @Override
     public String toString() {
-        return "DqRuleExecuteSql{"
+        return "DqComparisonType{"
                 + "id=" + id
-                + ", index=" + index
-                + ", sql='" + sql + '\''
-                + ", tableAlias='" + tableAlias + '\''
-                + ", type=" + type
-                + ", isErrorOutputSql=" + isErrorOutputSql
+                + ", type='"
+                + type + '\''
+                + ", executeSql='" + executeSql + '\''
+                + ", outputTable='" + outputTable + '\''
+                + ", name='" + name + '\''
+                + ", isInnerSource='" + isInnerSource + '\''
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

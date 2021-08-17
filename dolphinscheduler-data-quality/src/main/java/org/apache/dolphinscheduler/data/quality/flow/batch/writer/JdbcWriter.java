@@ -17,6 +17,17 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.batch.writer;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.APPEND;
+import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
+import static org.apache.dolphinscheduler.data.quality.Constants.JDBC;
+import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.data.quality.Constants.SAVE_MODE;
+import static org.apache.dolphinscheduler.data.quality.Constants.SQL;
+import static org.apache.dolphinscheduler.data.quality.Constants.TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.URL;
+import static org.apache.dolphinscheduler.data.quality.Constants.USER;
+
 import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
@@ -26,10 +37,7 @@ import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,48 +62,30 @@ public class JdbcWriter implements BatchWriter {
 
     @Override
     public ValidateResult validateConfig() {
-        List<String> requiredOptions = Arrays.asList("url", "table", "user", "password");
-
-        List<String> nonExistsOptions = new ArrayList<>();
-        requiredOptions.forEach(x -> {
-            if (!config.has(x)) {
-                nonExistsOptions.add(x);
-            }
-        });
-
-        if (!nonExistsOptions.isEmpty()) {
-            return new ValidateResult(
-                    false,
-                    "please specify" + nonExistsOptions.stream().map(option ->
-                            "[" + option + "]").collect(Collectors.joining(",")) + " as non-empty string");
-        } else {
-            return new ValidateResult(true, "");
-        }
+        return validate(Arrays.asList(URL, TABLE, USER, PASSWORD));
     }
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-
-        if (StringUtils.isEmpty(config.getString("save_mode"))) {
-            config.put("save_mode","append");
+        if (StringUtils.isEmpty(config.getString(SAVE_MODE))) {
+            config.put(SAVE_MODE,APPEND);
         }
     }
 
     @Override
     public void write(Dataset<Row> data, SparkRuntimeEnvironment env) {
-
-        if (!StringUtils.isBlank(config.getString("sql"))) {
-            data = env.sparkSession().sql(config.getString("sql"));
+        if (!StringUtils.isBlank(config.getString(SQL))) {
+            data = env.sparkSession().sql(config.getString(SQL));
         }
 
         data.write()
-            .format("jdbc")
-            .option("driver",config.getString("driver"))
-            .option("url",config.getString("url"))
-            .option("dbtable", config.getString("table"))
-            .option("user", config.getString("user"))
-            .option("password", config.getString("password"))
-            .mode(config.getString("save_mode"))
+            .format(JDBC)
+            .option(DRIVER,config.getString(DRIVER))
+            .option(URL,config.getString(URL))
+            .option(DB_TABLE, config.getString(TABLE))
+            .option(USER, config.getString(USER))
+            .option(PASSWORD, config.getString(PASSWORD))
+            .mode(config.getString(SAVE_MODE))
             .save();
     }
 }
