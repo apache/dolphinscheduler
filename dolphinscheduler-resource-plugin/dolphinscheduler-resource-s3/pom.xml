@@ -46,6 +46,18 @@
             <artifactId>aws-java-sdk-core</artifactId>
             <version>1.12.9</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+           <scope>provided</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
