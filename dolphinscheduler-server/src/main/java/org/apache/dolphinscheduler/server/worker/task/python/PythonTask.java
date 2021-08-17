@@ -29,9 +29,10 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
-import org.slf4j.Logger;
 
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 /**
  *  python task
