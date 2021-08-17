@@ -28,19 +28,23 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.logging.log4j.core.tools.CustomLoggerGenerator;
 
 import java.util.Date;
-
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
  */
 public class SubTaskProcessor extends BaseTaskProcessor{
 
-
-
     ProcessInstance processInstance;
 
     ProcessInstance subProcessInstance = null;
     TaskDefinition taskDefinition;
+
+    /**
+     * run lock
+     */
+    private final Lock runLock = new ReentrantLock();
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
@@ -64,8 +68,8 @@ public class SubTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public void run() {
-
         try{
+            this.runLock.lock();
             if(setSubWorkFlow()){
                 updateTaskState();
             }
@@ -74,7 +78,8 @@ public class SubTaskProcessor extends BaseTaskProcessor{
                     this.processInstance.getId(),
                     this.taskInstance.getId(),
                     e);
-
+        }finally {
+            this.runLock.unlock();
         }
     }
 

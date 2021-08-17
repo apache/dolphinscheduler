@@ -592,7 +592,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        processService.removeTaskLogFile(processInstanceId);
+        try {
+            processService.removeTaskLogFile(processInstanceId);
+        }catch (Exception e){
+            logger.error("remove task log failed", e);
+        }
+
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
 
