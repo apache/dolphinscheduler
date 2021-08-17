@@ -19,8 +19,11 @@ package org.apache.dolphinscheduler.remote.command.log;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.Assert;
+
 import org.apache.dolphinscheduler.remote.command.Command;
+
 import org.junit.Test;
 
 public class RemoveTaskLogResponseCommandTest {

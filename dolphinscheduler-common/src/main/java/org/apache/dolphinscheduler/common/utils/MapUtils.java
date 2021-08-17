@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class MapUtils {
 
     public static void combineMap(Map<String, List<String>> originMap,
-        Map<String, List<String>> newMap) {
+                                  Map<String, List<String>> newMap) {
         for (String key : newMap.keySet()) {
             List<String> filePaths = originMap.get(key);
             if (filePaths == null) {
