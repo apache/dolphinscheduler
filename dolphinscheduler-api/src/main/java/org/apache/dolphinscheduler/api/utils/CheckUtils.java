@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;

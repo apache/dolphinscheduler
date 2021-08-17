@@ -18,18 +18,252 @@
   <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
       <span class="name">{{$t('Current node settings')}}</span>
+      <span class="go-subtask">
+        <!-- Component can't pop up box to do component processing -->
+        <m-log :item="backfillItem">
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon el-icon-alarm-clock"></em><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><em class="ansicon el-icon-document"></em><em>{{$t('View log')}}</em></a></template>
+        </m-log>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ri-node-tree"></em><em>{{$t('Enter this child node')}}</em></a>
+      </span>
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="form-model">
-        <template>
-          <form-create
-            v-model="fApi"
-            :rule="rule"
-            :option="option"
-            @submit="onSubmit"
-          ></form-create>
-        </template>
+        <!-- Node name -->
+        <m-list-box>
+          <div slot="text">{{$t('Node name')}}</div>
+          <div slot="content">
+            <el-input
+              type="text"
+              v-model="name"
+              size="small"
+              :disabled="isDetails"
+              :placeholder="$t('Please enter name (required)')"
+              maxlength="100"
+              @blur="_verifName()">
+            </el-input>
+          </div>
+        </m-list-box>
 
+        <!-- Running sign -->
+        <m-list-box>
+          <div slot="text">{{$t('Run flag')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="runFlag" size="small">
+              <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
+              <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
+            </el-radio-group>
+          </div>
+        </m-list-box>
+
+        <!-- description -->
+        <m-list-box>
+          <div slot="text">{{$t('Description')}}</div>
+          <div slot="content">
+            <el-input
+              :rows="2"
+              type="textarea"
+              :disabled="isDetails"
+              v-model="desc"
+              :placeholder="$t('Please enter description')">
+            </el-input>
+          </div>
+        </m-list-box>
+
+        <!-- Task priority -->
+        <m-list-box>
+          <div slot="text">{{$t('Task priority')}}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <m-priority v-model="taskInstancePriority"></m-priority>
+            </span>
+            <span class="text-b">{{$t('Worker group')}}</span>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
+          </div>
+        </m-list-box>
+
+        <!-- Number of failed retries -->
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
+          <div slot="text">{{$t('Number of failed retries')}}</div>
+          <div slot="content">
+            <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]"></m-select-input>
+            <span>({{$t('Times')}})</span>
+            <span class="text-b">{{$t('Failed retry interval')}}</span>
+            <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]"></m-select-input>
+            <span>({{$t('Minute')}})</span>
+          </div>
+        </m-list-box>
+
+        <!-- Delay execution time -->
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
+          <div slot="text">{{$t('Delay execution time')}}</div>
+          <div slot="content">
+            <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
+            <span>({{$t('Minute')}})</span>
+          </div>
+        </m-list-box>
+
+        <!-- Branch flow -->
+        <m-list-box v-if="nodeData.taskType === 'CONDITIONS'">
+          <div slot="text">{{$t('State')}}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <el-select style="width: 157px;" size="small" v-model="successNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
+            </span>
+            <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
+            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable>
+              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
+          </div>
+        </m-list-box>
+        <m-list-box v-if="nodeData.taskType === 'CONDITIONS'">
+          <div slot="text">{{$t('State')}}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <el-select style="width: 157px;" size="small" v-model="failedNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
+            </span>
+            <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
+            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable>
+              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
+          </div>
+        </m-list-box>
+
+        <!-- Task timeout alarm -->
+        <m-timeout-alarm
+          v-if="nodeData.taskType !== 'DEPENDENT'"
+          ref="timeout"
+          :backfill-item="backfillItem"
+          @on-timeout="_onTimeout">
+        </m-timeout-alarm>
+        <!-- Dependent timeout alarm -->
+        <m-dependent-timeout
+          v-if="nodeData.taskType === 'DEPENDENT'"
+          ref="dependentTimeout"
+          :backfill-item="backfillItem"
+          @on-timeout="_onDependentTimeout">
+        </m-dependent-timeout>
+
+        <!-- shell node -->
+        <m-shell
+          v-if="nodeData.taskType === 'SHELL'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SHELL"
+          :backfill-item="backfillItem">
+        </m-shell>
+        <!-- waterdrop node -->
+        <m-waterdrop
+          v-if="nodeData.taskType === 'WATERDROP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="WATERDROP"
+          :backfill-item="backfillItem">
+        </m-waterdrop>
+        <!-- sub_process node -->
+        <m-sub-process
+          v-if="nodeData.taskType === 'SUB_PROCESS'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          @on-set-process-name="_onSetProcessName"
+          ref="SUB_PROCESS"
+          :backfill-item="backfillItem">
+        </m-sub-process>
+        <!-- procedure node -->
+        <m-procedure
+          v-if="nodeData.taskType === 'PROCEDURE'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="PROCEDURE"
+          :backfill-item="backfillItem">
+        </m-procedure>
+        <!-- sql node -->
+        <m-sql
+          v-if="nodeData.taskType === 'SQL'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SQL"
+          :create-node-id="nodeData.id"
+          :backfill-item="backfillItem">
+        </m-sql>
+        <!-- spark node -->
+        <m-spark
+          v-if="nodeData.taskType === 'SPARK'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SPARK"
+          :backfill-item="backfillItem">
+        </m-spark>
+        <m-flink
+          v-if="nodeData.taskType === 'FLINK'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="FLINK"
+          :backfill-item="backfillItem">
+        </m-flink>
+        <!-- mr node -->
+        <m-mr
+          v-if="nodeData.taskType === 'MR'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="MR"
+          :backfill-item="backfillItem">
+        </m-mr>
+        <!-- python node -->
+        <m-python
+          v-if="nodeData.taskType === 'PYTHON'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="PYTHON"
+          :backfill-item="backfillItem">
+        </m-python>
+        <!-- dependent node -->
+        <m-dependent
+          v-if="nodeData.taskType === 'DEPENDENT'"
+          @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
+          ref="DEPENDENT"
+          :backfill-item="backfillItem">
+        </m-dependent>
+        <m-http
+          v-if="nodeData.taskType === 'HTTP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="HTTP"
+          :backfill-item="backfillItem">
+        </m-http>
+        <m-datax
+          v-if="nodeData.taskType === 'DATAX'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="DATAX"
+          :backfill-item="backfillItem">
+        </m-datax>
+        <m-sqoop
+          v-if="nodeData.taskType === 'SQOOP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SQOOP"
+          :backfill-item="backfillItem">
+        </m-sqoop>
+        <m-conditions
+          v-if="nodeData.taskType === 'CONDITIONS'"
+          ref="CONDITIONS"
+          @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
+          :backfill-item="backfillItem"
+          :pre-node="nodeData.preNode">
+        </m-conditions>
+        <!-- Pre-tasks in workflow -->
+        <m-pre-tasks
+          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
+          @on-pre-tasks="_onPreTasks"
+          ref="PRE_TASK"
+          :backfill-item="backfillItem"></m-pre-tasks>
       </div>
     </div>
     <div class="bottom-box">
@@ -75,19 +309,6 @@
     name: 'form-model',
     data () {
       return {
-        fApi: null,
-        rule: [],
-        option: {
-          "form": {
-            "labelPosition": "right",
-            "size": "mini",
-            "labelWidth": "125px",
-            "hideRequiredAsterisk": false,
-            "showMessage": true,
-            "inlineMessage": false
-          }
-        },
-
         // loading
         spinnerLoading: false,
         // node name
@@ -277,10 +498,10 @@
        * verification name
        */
       _verifName () {
-        // if (!_.trim(this.name)) {
-        //   this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
-        //   return false
-        // }
+        if (!_.trim(this.name)) {
+          this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
+          return false
+        }
         if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
@@ -309,7 +530,65 @@
        * Global verification procedure
        */
       _verification () {
+        // Verify name
+        if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if (!this._verifWorkGroup()) {
+          return
+        }
+        // Verify task alarm parameters
+        if (this.nodeData.taskType === 'DEPENDENT') {
+          if (!this.$refs.dependentTimeout._verification()) {
+            return
+          }
+        } else {
+          if (!this.$refs.timeout._verification()) {
+            return
+          }
+        }
 
+        // Verify node parameters
+        if (!this.$refs[this.nodeData.taskType]._verification()) {
+          return
+        }
+        // Verify preTasks and update dag-things
+        if (this.$refs.PRE_TASK) {
+          if (!this.$refs.PRE_TASK._verification()) {
+            return
+          } else {
+            // Sync data-targetarr
+            $(`#${this.nodeData.id}`).attr(
+              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
+
+            // Update JSP connections
+            let plumbIns = JSP.JspInstance
+            let targetId = this.nodeData.id
+
+            // Update new connections
+            this.preTasksToAdd.map(sourceId => {
+              plumbIns.connect({
+                source: sourceId,
+                target: targetId,
+                type: 'basic',
+                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
+              })
+            })
+
+            // Update remove connections
+            let currentConnects = plumbIns.getAllConnections()
+            let len = currentConnects.length
+            for (let i = 0; i < len; i++) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
+                plumbIns.deleteConnection(currentConnects[i])
+                i -= 1
+                len -= 1
+              }
+            }
+          }
+        }
 
         $(`#${this.nodeData.id}`).find('span').text(this.name)
         this.conditionResult.successNode[0] = this.successBranch
@@ -317,7 +596,6 @@
         // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
-            rule : this.rule,
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.name,
@@ -394,316 +672,6 @@
     created () {
       // Unbind copy and paste events
       JSP.removePaste()
-
-      if (this.nodeData.taskType  === 'SHELL') {
-        this.rule=[
-          {
-            "type": "input",
-            "field": "ozt5rtyif8up",
-            "title": "节点名称",
-            "info": "",
-            "_fc_drag_tag": "input",
-            "hidden": false,
-            "display": true,
-            "value": "",
-            "props": {
-              "clearable": true,
-              "prefixIcon": "",
-              "autofocus": false
-            }
-          },
-          {
-            "type": "radio",
-            "field": "6jf5rtyils0m",
-            "title": "运行状态",
-            "info": "",
-            "props": {
-              "type": "default",
-              "disabled": false,
-              "_optionType": 0
-            },
-            "options": [
-              {
-                "value": "1",
-                "label": "正常"
-              },
-              {
-                "value": "2",
-                "label": "禁止执行"
-              }
-            ],
-            "_fc_drag_tag": "radio",
-            "hidden": false,
-            "display": true,
-            "value": "1"
-          },
-          {
-            "type": "FcRow",
-            "children": [
-              {
-                "type": "col",
-                "props": {
-                  "span": 12
-                },
-                "children": [
-                  {
-                    "type": "select",
-                    "field": "bqs1lqblz8ljy",
-                    "title": "任务优先级",
-                    "info": "",
-                    "effect": {
-                      "fetch": ""
-                    },
-                    "options": [
-                      {
-                        "value": "HIGHEST",
-                        "label": "HIGHEST",
-                        "unicode": "el-icon-top",
-                        "color": "#ff0000"
-                      },
-                      {
-                        "value": "HIGH",
-                        "label": "HIGH",
-                        "unicode": "el-icon-top",
-                        "color": "#ff0000"
-                      },
-                      {
-                        "value": "MEDIUM",
-                        "label": "MEDIUM",
-                        "unicode": "el-icon-top",
-                        "color": "#ff0000"
-                      },
-                      {
-                        "value": "LOW",
-                        "label": "LOW",
-                        "unicode": "el-icon-top",
-                        "color": "#ff0000"
-                      },
-                      {
-                        "value": "LOWEST",
-                        "label": "LOWEST",
-                        "unicode": "el-icon-top",
-                        "color": "#ff0000"
-                      }
-                    ],
-                    "_fc_drag_tag": "select",
-                    "hidden": false,
-                    "display": true,
-                    "props": {
-                      "filterable": true,
-                      "clearable": false
-                    },
-                    "value": "MEDIUM"
-                  }
-                ],
-                "_fc_drag_tag": "col",
-                "hidden": false,
-                "display": true
-              },
-              {
-                "type": "col",
-                "props": {
-                  "span": 12
-                },
-                "children": [
-                  {
-                    "type": "select",
-                    "field": "8lx1lqbm8ofiq",
-                    "title": "work分组",
-                    "info": "",
-                    "effect": {
-                      "fetch": {
-                        "action": "https://www.baidu.com",
-                        "method": "GET",
-                        "data": {},
-                        "headers": {},
-                        "_parse": "[[FORM-CREATE-PREFIX-function (res){\n   return res.data;\n}-FORM-CREATE-SUFFIX]]",
-                        "to": "options",
-                        "parse": "[[FORM-CREATE-PREFIX-function (res){\n   return res.data;\n}-FORM-CREATE-SUFFIX]]"
-                      }
-                    },
-                    "_fc_drag_tag": "select",
-                    "hidden": false,
-                    "display": true,
-                    "props": {
-                      "_optionType": 1
-                    }
-                  }
-                ],
-                "_fc_drag_tag": "col",
-                "hidden": false,
-                "display": true
-              }
-            ],
-            "_fc_drag_tag": "row",
-            "hidden": false,
-            "display": true
-          },
-          {
-            "type": "FcRow",
-            "children": [
-              {
-                "type": "col",
-                "props": {
-                  "span": 12,
-                  "offset": 0,
-                  "push": 0,
-                  "pull": 0
-                },
-                "children": [
-                  {
-                    "type": "inputNumber",
-                    "field": "kd7g1dleuqld5",
-                    "title": "失败重试次数",
-                    "info": "",
-                    "_fc_drag_tag": "inputNumber",
-                    "hidden": false,
-                    "display": true
-                  }
-                ],
-                "_fc_drag_tag": "col",
-                "hidden": false,
-                "display": true
-              },
-              {
-                "type": "col",
-                "props": {
-                  "span": 12,
-                  "offset": 0,
-                  "push": 0,
-                  "pull": 0
-                },
-                "children": [
-                  {
-                    "type": "inputNumber",
-                    "field": "x63g1dlewutys",
-                    "title": "失败重试间隔",
-                    "info": "",
-                    "_fc_drag_tag": "inputNumber",
-                    "hidden": false,
-                    "display": true
-                  }
-                ],
-                "_fc_drag_tag": "col",
-                "hidden": false,
-                "display": true
-              }
-            ],
-            "_fc_drag_tag": "row",
-            "hidden": false,
-            "display": true
-          },
-          {
-            "type": "FcRow",
-            "children": [
-              {
-                "type": "col",
-                "props": {
-                  "span": 12
-                },
-                "children": [
-                  {
-                    "type": "inputNumber",
-                    "field": "pjug1dlg2z4e3",
-                    "title": "延时执行时间",
-                    "info": "",
-                    "_fc_drag_tag": "inputNumber",
-                    "hidden": false,
-                    "display": true
-                  }
-                ],
-                "_fc_drag_tag": "col",
-                "hidden": false,
-                "display": true
-              }
-            ],
-            "_fc_drag_tag": "row",
-            "hidden": false,
-            "display": true
-          },
-          {
-            "type": "switch",
-            "field": "timeout",
-            "title": "超时告警",
-            "info": "",
-            "props": {
-              "activeValue": "1",
-              "activeColor": "",
-              "disabled": false
-            },
-            "_fc_drag_tag": "switch",
-            "hidden": false,
-            "display": true,
-            "value": false,
-            "control":[
-              {
-                "value":"1",
-                "rule":[
-                  {
-                    "type": "radio",
-                    "field": "ebd1lqjhz7k2d",
-                    "title": "超时策略",
-                    "info": "",
-                    "effect": {
-                      "fetch": ""
-                    },
-                    "props": {
-                      "disabled": false,
-                      "type": "default"
-                    },
-                    "options": [
-                      {
-                        "value": "1",
-                        "label": "超时告警"
-                      },
-                      {
-                        "value": "2",
-                        "label": "超时失败"
-                      }
-                    ],
-                    "_fc_drag_tag": "radio",
-                    "hidden": false,
-                    "display": true,
-                    "value": "1"
-                  },
-                  {
-                    "type": "inputNumber",
-                    "field": "s7n1lqk23fu3r",
-                    "title": "超时时长",
-                    "info": "分钟",
-                    "props": {
-                      "controls": true,
-                      "controlsPosition": "right",
-                      "min": 0
-                    },
-                    "_fc_drag_tag": "inputNumber",
-                    "hidden": false,
-                    "display": true,
-                    "value": 30
-                  }
-                ]
-              }
-            ]
-          },
-
-          {
-            "type": "input",
-            "field": "yzmg1dlhrvegp",
-            "title": "输入框",
-            "info": "",
-            "props": {
-              "type": "textarea",
-              "placeholder": "",
-              "clearable": true,
-              "showPassword": false
-            },
-            "_fc_drag_tag": "input",
-            "hidden": false,
-            "display": true
-          }
-        ]
-      }
-    debugger
       // Backfill data
       let taskList = this.store.state.dag.tasks
 
@@ -725,8 +693,6 @@
       }
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
-        this.rule = o.rule
-
         this.code = o.code
         this.name = o.name
         this.taskInstancePriority = o.taskInstancePriority
@@ -799,7 +765,6 @@
       // Define the item model
       _item () {
         return {
-          rule: this.rule,
           type: this.nodeData.taskType,
           id: this.nodeData.id,
           code: this.code,
