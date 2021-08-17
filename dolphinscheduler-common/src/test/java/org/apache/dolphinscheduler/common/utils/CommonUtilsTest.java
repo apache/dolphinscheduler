@@ -89,12 +89,6 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void getHdfsDataBasePath() {
-        logger.info(HadoopUtils.getHdfsDataBasePath());
-        Assert.assertTrue(true);
-    }
-
-    @Test
     public void getDownloadFilename() {
         logger.info(FileUtils.getDownloadFilename("a.txt"));
         Assert.assertTrue(true);
@@ -103,12 +97,6 @@ public class CommonUtilsTest {
     @Test
     public void getUploadFilename() {
         logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void getHdfsDir() {
-        logger.info(HadoopUtils.getHdfsResDir("1234"));
         Assert.assertTrue(true);
     }
 
