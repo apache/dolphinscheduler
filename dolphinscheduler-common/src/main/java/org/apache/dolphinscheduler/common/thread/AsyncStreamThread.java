@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * StreamGobbler
@@ -31,7 +31,7 @@ public class AsyncStreamThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncStreamThread.class);
 
-    private InputStream inputStream;
+    private final InputStream inputStream;
 
     public AsyncStreamThread(InputStream inputStream) {
         this.inputStream = inputStream;
