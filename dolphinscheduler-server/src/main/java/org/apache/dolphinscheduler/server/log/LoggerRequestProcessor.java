@@ -17,21 +17,6 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import io.netty.channel.Channel;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.dolphinscheduler.common.cmd.LinuxSystem;
 import org.apache.dolphinscheduler.common.cmd.OsSystemNativeCommand;
 import org.apache.dolphinscheduler.common.thread.AsyncStreamThread;
@@ -50,8 +35,24 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.netty.channel.Channel;
 
 /**
  * logger request process logic
@@ -77,35 +78,35 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         switch (commandType) {
             case GET_LOG_BYTES_REQUEST:
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
-                    command.getBody(), GetLogBytesRequestCommand.class);
+                        command.getBody(), GetLogBytesRequestCommand.class);
                 byte[] bytes = getFileContentBytes(getLogRequest.getPath());
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
                 break;
             case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
-                    command.getBody(), ViewLogRequestCommand.class);
+                        command.getBody(), ViewLogRequestCommand.class);
                 String msg = LoggerUtils.readWholeFileContent(viewLogRequest.getPath());
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
                 RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(
-                    command.getBody(), RollViewLogRequestCommand.class);
+                        command.getBody(), RollViewLogRequestCommand.class);
                 List<String> lines = readPartFileContent(rollViewLogRequest.getPath(),
-                    rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
+                        rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
                     builder.append(line + "\r\n");
                 }
                 RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(
-                    builder.toString());
+                        builder.toString());
                 channel
-                    .writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
+                        .writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
                 break;
             case REMOVE_TAK_LOG_REQUEST:
                 RemoveTaskLogRequestCommand removeTaskLogRequest = JSONUtils.parseObject(
-                    command.getBody(), RemoveTaskLogRequestCommand.class);
+                        command.getBody(), RemoveTaskLogRequestCommand.class);
                 List<String> taskLogPaths = removeTaskLogRequest.getPath();
                 OsSystemNativeCommand os = new LinuxSystem();
                 String cmd = "";
@@ -117,7 +118,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                     status = Boolean.FALSE;
                 }
                 RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(
-                    status);
+                        status);
                 channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
             default:
@@ -138,7 +139,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private byte[] getFileContentBytes(String filePath) {
         try (InputStream in = new FileInputStream(filePath);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
@@ -156,12 +157,12 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      *
      * @param filePath file path
      * @param skipLine skip line
-     * @param limit    read lines limit
+     * @param limit read lines limit
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,
-        int skipLine,
-        int limit) {
+                                             int skipLine,
+                                             int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
