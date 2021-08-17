@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.cmd;
 
-public class LinuxSystem implements OsSystemNativeCommand{
+public class LinuxSystem implements OsSystemNativeCommand {
 
     @Override
     public String deleteCmd() {
-        return "rm -rf "+REPLACE_HOLDER;
+        return "rm -rf ";
     }
 
     @Override
     public String stopProcess() {
-        return "kill -9 "+REPLACE_HOLDER;
+        return "kill -9 ";
     }
 
 }

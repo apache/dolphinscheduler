@@ -29,7 +29,7 @@ public class RemoveTaskLogResponseCommandTest {
     @Test
     public void testConvert2Command() {
         RemoveTaskLogRequestCommand removeTaskLogRequestCommand = new RemoveTaskLogRequestCommand();
-        List<String> t= new ArrayList<String>();
+        List<String> t = new ArrayList<>();
         t.add("/opt/zhangsan");
         removeTaskLogRequestCommand.setPath(t);
         Command command = removeTaskLogRequestCommand.convert2Command();

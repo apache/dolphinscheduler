@@ -415,7 +415,7 @@ public class ProcessInstanceController extends BaseController {
                         deleteFailedIdList.add(strProcessInstanceId);
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
-                    if(Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
+                    if (Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         MapUtils.combineMap(taskLogFiles, tempTaskLogFiles);
                     }
                 } catch (Exception e) {

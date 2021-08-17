@@ -56,7 +56,14 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.common.utils.MapUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
@@ -434,8 +441,8 @@ public class ProcessService {
         }
         try (LogClientService logClient = new LogClientService()) {
             for (String key : taskLogFiles.keySet()) {
-                String ip = key.split("-")[0];
-                Integer port = Integer.valueOf(key.split("-")[1]);
+                String ip = key.split(":")[0];
+                Integer port = Integer.valueOf(key.split(":")[1]);
                 logClient.removeMultiTasksLog(ip, port, taskLogFiles.get(key));
             }
         }
@@ -460,9 +467,9 @@ public class ProcessService {
             } catch (Exception e) {
                 ip = taskInstance.getHost();
             }
-            String k = ip+""+port;
+            String k = ip + ":" + port;
             List<String> files = taskLogFiles.get(k);
-            if (files == null ){
+            if (files == null) {
                 files = new ArrayList<>();
                 taskLogFiles.put(k, files);
             }

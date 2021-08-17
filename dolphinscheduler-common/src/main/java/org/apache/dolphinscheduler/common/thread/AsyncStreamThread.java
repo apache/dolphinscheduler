@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.thread;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,10 +58,10 @@ public class AsyncStreamThread extends Thread {
             logger.error("I/O error occurs {}", e.getMessage());
         } finally {
             try {
-                if (inputBufferReader!=null){
+                if (inputBufferReader != null) {
                     inputBufferReader.close();
                 }
-                if (inputStreamReader!=null){
+                if (inputStreamReader != null) {
                     inputStreamReader.close();
                 }
             } catch (IOException e) {

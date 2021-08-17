@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.log;
 
 import io.netty.channel.Channel;
+
 import org.apache.dolphinscheduler.common.cmd.LinuxSystem;
 import org.apache.dolphinscheduler.common.cmd.OsSystemNativeCommand;
 import org.apache.dolphinscheduler.common.thread.AsyncStreamThread;
@@ -25,13 +26,25 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.log.*;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -95,11 +108,11 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 List<String> taskLogPaths = removeTaskLogRequest.getPath();
                 OsSystemNativeCommand os = new LinuxSystem();
                 String cmd = "";
-                for (String path : taskLogPaths){
+                for (String path : taskLogPaths) {
                     cmd += os.deleteCmd()+path+";";
                 }
                 Boolean status = true;
-                if (removeFile(cmd)==-1){
+                if (removeFile(cmd) == -1) {
                     status = Boolean.FALSE;
                 }
                 RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(status);
