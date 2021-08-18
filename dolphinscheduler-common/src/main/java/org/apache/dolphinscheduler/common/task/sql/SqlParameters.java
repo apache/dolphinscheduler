@@ -251,8 +251,9 @@ public class SqlParameters extends AbstractParameters {
                 sqlResultFormat.put(key, new ArrayList<>());
             }
             for (Map<String, String> info : sqlResult) {
-                for (String key : info.keySet()) {
-                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
+                for (Map.Entry<String, String> entry : info.entrySet()) {
+                    String key = entry.getKey();
+                    sqlResultFormat.get(key).add(String.valueOf(entry.getValue()));
                 }
             }
             for (Property info : outProperty) {
