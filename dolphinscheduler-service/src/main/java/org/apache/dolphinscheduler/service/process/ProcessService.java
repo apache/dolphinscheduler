@@ -437,7 +437,7 @@ public class ProcessService {
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
             Map<String, List<String>> tf = getTaskLogFiles(subId);
-            MapUtils.combineMap(taskFiles, tf);
+            MapUtils.putAll(taskFiles, tf);
             deleteWorkProcessInstanceById(subId);
         }
         return taskFiles;

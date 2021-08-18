@@ -627,12 +627,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-        MapUtils.combineMap(taskFiles, processService.getTaskLogFiles(processInstanceId));
+        MapUtils.putAll(taskFiles, processService.getTaskLogFiles(processInstanceId));
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
 
         Map<String, List<String>> newMap = processService
                 .deleteAllSubWorkProcessByParentId(processInstanceId);
-        MapUtils.combineMap(taskFiles, newMap);
+        MapUtils.putAll(taskFiles, newMap);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 
         if (delete > 0) {
