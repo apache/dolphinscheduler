@@ -19,7 +19,10 @@ aspectjweaver-1.9.6.jar
 async-http-client-1.6.5.jar
 audience-annotations-0.5.0.jar
 avro-1.7.4.jar
-aws-java-sdk-1.7.4.jar
+aws-java-sdk-core-1.12.9.jar
+aws-java-sdk-kms-1.12.9.jar
+aws-java-sdk-s3-1.12.9.jar
+aws-java-sdk-sts-1.12.9.jar
 bonecp-0.8.0.RELEASE.jar
 byte-buddy-1.9.16.jar
 checker-compat-qual-2.0.0.jar
@@ -91,6 +94,7 @@ htrace-core-3.1.0-incubating.jar
 httpclient-4.4.1.jar
 httpcore-4.4.1.jar
 httpmime-4.5.13.jar
+ion-java-1.0.2.jar
 j2objc-annotations-1.1.jar
 jackson-annotations-2.10.5.jar
 jackson-core-2.10.5.jar
@@ -98,11 +102,15 @@ jackson-core-asl-1.9.13.jar
 jackson-databind-2.10.5.jar
 jackson-datatype-jdk8-2.9.10.jar
 jackson-datatype-jsr310-2.9.10.jar
+jackson-dataformat-cbor-2.9.10.jar
 jackson-jaxrs-1.9.13.jar
+jackson-jaxrs-1.8.3.jar
 jackson-mapper-asl-1.9.13.jar
 jackson-module-parameter-names-2.9.10.jar
 jackson-xc-1.9.13.jar
+jackson-xc-1.8.3.jar
 jamon-runtime-2.3.1.jar
+jmespath-java-1.12.9.jar
 janino-3.0.16.jar
 java-xmlbuilder-0.4.jar
 javassist-3.26.0-GA.jar
@@ -239,6 +247,7 @@ springfox-spring-web-2.9.2.jar
 springfox-swagger-common-2.9.2.jar
 springfox-swagger-ui-2.9.2.jar
 springfox-swagger2-2.9.2.jar
+servlet-api-2.5.jar
 swagger-annotations-1.5.20.jar
 swagger-bootstrap-ui-1.9.3.jar
 swagger-models-1.5.24.jar
