@@ -81,6 +81,7 @@ public class HdfsStorage implements ResourceStorage {
                         return true;
                     });
                 } catch (IOException | InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     throw new ResourceStorageException("hdfs user authed error", e);
                 }
             } else {
