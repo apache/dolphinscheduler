@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.spi.task;
 
 public class TaskConstants {
 
-    public TaskConstants() {
+    private TaskConstants() {
         throw new IllegalStateException("Utility class");
     }
 

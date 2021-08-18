@@ -64,7 +64,7 @@ public enum ExecutionStatus {
     private final int code;
     private final String descp;
 
-    private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP = new HashMap<>();
+    private static final HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP = new HashMap<>();
 
     static {
         for (ExecutionStatus executionStatus : ExecutionStatus.values()) {
