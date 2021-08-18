@@ -49,6 +49,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("groupName","cxc test group name");
         paramsMap.add("groupType", AlertType.EMAIL.toString());
         paramsMap.add("description","cxc junit 测试告警描述");
+        paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-group/create")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -103,7 +104,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -111,9 +112,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     public void testUpdateAlertgroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","22");
-        paramsMap.add("groupName", "hd test group name");
+        paramsMap.add("groupName", "cxc test group name");
         paramsMap.add("groupType",AlertType.EMAIL.toString());
         paramsMap.add("description","update alter group");
+        paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-group/update")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -121,14 +123,14 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testVerifyGroupName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("groupName","hd test group name");
+        paramsMap.add("groupName","cxc test group name");
         MvcResult mvcResult = mockMvc.perform(get("/alert-group/verify-group-name")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -151,24 +153,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testGrantUser() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("alertgroupId","2");
-        paramsMap.add("userIds","2");
-
-        MvcResult mvcResult = mockMvc.perform(post("/alert-group/grant-user")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -183,7 +168,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertTrue(result != null && result.isStatus(Status.ALERT_GROUP_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
