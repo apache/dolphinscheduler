@@ -26,6 +26,9 @@ public class ParamsProps {
 
     private String placeholder;
 
+    /**
+     * input box size, optional value medium/small/mini
+     */
     private String size = "small";
 
     public void setSize(String size) {

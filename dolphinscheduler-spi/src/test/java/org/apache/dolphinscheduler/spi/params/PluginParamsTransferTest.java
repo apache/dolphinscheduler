@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
