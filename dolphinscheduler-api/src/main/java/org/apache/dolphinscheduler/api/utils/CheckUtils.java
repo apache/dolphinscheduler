@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-
 /**
  * check utils
  */
@@ -43,8 +43,7 @@ public class CheckUtils {
     /**
      * check username
      *
-     * @param userName
-     *            user name
+     * @param userName user name
      * @return true if user name regex valid,otherwise return false
      */
     public static boolean checkUserName(String userName) {
@@ -165,10 +164,8 @@ public class CheckUtils {
     /**
      * regex check
      *
-     * @param str
-     *            input string
-     * @param pattern
-     *            regex pattern
+     * @param str input string
+     * @param pattern regex pattern
      * @return true if regex pattern is right, otherwise return false
      */
     private static boolean regexChecks(String str, Pattern pattern) {
