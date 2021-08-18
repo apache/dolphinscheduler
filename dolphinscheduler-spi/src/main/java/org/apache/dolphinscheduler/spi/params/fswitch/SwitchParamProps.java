@@ -25,11 +25,6 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 public class SwitchParamProps extends ParamsProps {
 
     /**
-     * whether to disable, the default value is false
-     */
-    private Boolean disabled;
-
-    /**
      * the width of the switch (pixels)
      */
     private Integer width;
@@ -78,14 +73,6 @@ public class SwitchParamProps extends ParamsProps {
      * name attribute
      */
     private String name;
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
 
     public Integer getWidth() {
         return width;

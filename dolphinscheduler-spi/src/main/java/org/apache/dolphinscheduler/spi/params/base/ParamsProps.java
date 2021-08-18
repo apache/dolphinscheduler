@@ -31,6 +31,11 @@ public class ParamsProps {
      */
     private String size = "small";
 
+    /**
+     * whether to disable, the default value is false
+     */
+    private Boolean disabled;
+
     public void setSize(String size) {
         this.size = size;
     }
@@ -50,4 +55,11 @@ public class ParamsProps {
         return this;
     }
 
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
 }

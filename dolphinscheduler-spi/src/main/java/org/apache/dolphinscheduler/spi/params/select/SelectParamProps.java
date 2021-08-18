@@ -30,11 +30,6 @@ public class SelectParamProps extends ParamsProps {
     private Boolean multiple;
 
     /**
-     * whether to disable, the default value is false
-     */
-    private Boolean disabled;
-
-    /**
      * as the key name that uniquely identifies the value, it is required when the binding value is the object type
      */
     private String valueKey;
@@ -120,14 +115,6 @@ public class SelectParamProps extends ParamsProps {
 
     public void setMultiple(Boolean multiple) {
         this.multiple = multiple;
-    }
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
     }
 
     public String getValueKey() {

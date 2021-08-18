@@ -15,38 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params.radio;
+package org.apache.dolphinscheduler.spi.params.base;
 
-import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
+public enum ResizeType {
 
-/**
- * front-end radio component props attributes
- */
-public class RadioParamProps extends ParamsProps {
+    NONE("none"),
+    BOTH("both"),
+    HORIZONTAL("horizontal"),
+    VERTICAL("vertical");
 
-    /**
-     * the color of the text when Radio is activated in the form of a button
-     */
-    private String textColor;
+    private String value;
 
-    /**
-     * the fill color and border color of the button form of Radio when activated
-     */
-    private String fill;
-
-    public String getTextColor() {
-        return textColor;
-    }
-
-    public void setTextColor(String textColor) {
-        this.textColor = textColor;
-    }
-
-    public String getFill() {
-        return fill;
-    }
-
-    public void setFill(String fill) {
-        this.fill = fill;
+    ResizeType(String value) {
+        this.value = value;
     }
 }

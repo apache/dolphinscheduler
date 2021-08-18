@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.junit.After;
 import org.junit.Assert;
@@ -111,7 +112,7 @@ public class PluginParamsTransferTest {
         emailShowTypeList.add(new ParamsOptions("attachment", "attachment", false));
         emailShowTypeList.add(new ParamsOptions("tableattachment", "tableattachment", false));
         RadioParam showType = new RadioParam.Builder("showType", "showType")
-                .setParamsOptionsList(emailShowTypeList)
+                .setOptions(emailShowTypeList)
                 .setValue("table")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();

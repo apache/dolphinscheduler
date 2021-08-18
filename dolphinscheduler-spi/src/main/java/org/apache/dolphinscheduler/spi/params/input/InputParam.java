@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params;
+package org.apache.dolphinscheduler.spi.params.input;
 
-import org.apache.dolphinscheduler.spi.params.base.FormType;
-import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
+import static org.apache.dolphinscheduler.spi.params.base.FormType.INPUT;
+
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
@@ -33,6 +33,8 @@ public class InputParam extends PluginParams {
     private InputParam(Builder builder) {
         super(builder);
     }
+    
+    private InputParamProps props;
 
     public static Builder newBuilder(String name, String title) {
         return new Builder(name, title);
@@ -41,23 +43,22 @@ public class InputParam extends PluginParams {
     public static class Builder extends PluginParams.Builder {
 
         public Builder(String name, String title) {
-            super(name, FormType.INPUT, title);
+            super(name, INPUT, title);
         }
 
+        private InputParamProps props;
+
+        public Builder setProps(InputParamProps props) {
+            this.props = props;
+            return this;
+        }
+        
         public Builder setPlaceholder(String placeholder) {
             if (this.props == null) {
-                this.setProps(new ParamsProps());
+                this.setProps(new InputParamProps());
             }
 
             this.props.setPlaceholder(placeholder);
-            return this;
-        }
-
-        public Builder addValidate(Validate validate) {
-            if (this.validateList == null) {
-                this.validateList = new ArrayList<>();
-            }
-            this.validateList.add(validate);
             return this;
         }
 
@@ -66,13 +67,13 @@ public class InputParam extends PluginParams {
             return this;
         }
 
-        public Builder setProps(ParamsProps props) {
-            this.props = props;
+        public Builder setTitle(String title) {
+            this.title = title;
             return this;
         }
 
-        public Builder setTitle(String title) {
-            this.title = title;
+        public Builder setInfo(String info) {
+            this.info = info;
             return this;
         }
 
@@ -86,9 +87,32 @@ public class InputParam extends PluginParams {
             return this;
         }
 
+        public Builder addValidate(Validate validate) {
+            if (this.validateList == null) {
+                this.validateList = new ArrayList<>();
+            }
+            this.validateList.add(validate);
+            return this;
+        }
+
+        public Builder setHidden(Boolean hidden) {
+            this.hidden = hidden;
+            return this;
+        }
+
+        public Builder setDisplay(Boolean display) {
+            this.display = display;
+            return this;
+        }
+
         @Override
         public InputParam build() {
             return new InputParam(this);
         }
+    }
+
+    @Override
+    public InputParamProps getProps() {
+        return props;
     }
 }

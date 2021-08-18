@@ -45,11 +45,6 @@ public class InputNumberParamProps extends ParamsProps {
     private Integer precision;
 
     /**
-     * whether to disable, the default value is false
-     */
-    private Boolean disabled;
-
-    /**
      * whether to use the control button, the default value is true
      */
     private Boolean controls;
@@ -99,14 +94,6 @@ public class InputNumberParamProps extends ParamsProps {
 
     public void setPrecision(Integer precision) {
         this.precision = precision;
-    }
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
     }
 
     public Boolean getControls() {
