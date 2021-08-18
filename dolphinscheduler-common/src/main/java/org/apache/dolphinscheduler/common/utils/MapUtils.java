@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class MapUtils {
 
-    public static void combineMap(Map<String, List<String>> originMap,
+    public static void putAll(Map<String, List<String>> originMap,
                                   Map<String, List<String>> newMap) {
         for (String key : newMap.keySet()) {
             List<String> filePaths = originMap.get(key);
