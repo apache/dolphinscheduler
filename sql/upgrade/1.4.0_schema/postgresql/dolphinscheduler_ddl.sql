@@ -658,6 +658,32 @@ d//
 delimiter ;
 SELECT uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_schedules_A_add_timezone();
+
+--
+-- Table structure for table t_ds_environment
+--
+DROP TABLE IF EXISTS t_ds_environment;
+CREATE TABLE t_ds_environment (
+    id serial NOT NULL  ,
+    code bigint NOT NULL,
+    name varchar(100) DEFAULT NULL ,
+    config text DEFAULT NULL ,
+    description text ,
+    operator int DEFAULT NULL ,
+    create_time timestamp DEFAULT NULL ,
+    update_time timestamp DEFAULT NULL ,
+    PRIMARY KEY (id) ,
+    CONSTRAINT environment_name_unique UNIQUE (name),
+    CONSTRAINT environment_code_unique UNIQUE (code)
+);
+
+ALTER TABLE t_ds_task_definition ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_task_definition.environment_code is 'environment code';
+
+ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_task_definition_log.environment_code is 'environment code';
+
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

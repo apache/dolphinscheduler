@@ -348,6 +348,7 @@ CREATE TABLE t_ds_task_definition (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT NULL,
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -377,6 +378,7 @@ CREATE TABLE t_ds_task_definition_log (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT NULL,
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -913,4 +915,22 @@ CREATE TABLE t_ds_alert_plugin_instance (
   update_time timestamp NULL,
   instance_name varchar(200) NULL,
   CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+);
+
+--
+-- Table structure for table t_ds_environment
+--
+DROP TABLE IF EXISTS t_ds_environment;
+CREATE TABLE t_ds_environment (
+  id serial NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(100) DEFAULT NULL ,
+  config text DEFAULT NULL ,
+  description text ,
+  operator int DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id) ,
+  CONSTRAINT environment_name_unique UNIQUE (name),
+  CONSTRAINT environment_code_unique UNIQUE (code)
 );

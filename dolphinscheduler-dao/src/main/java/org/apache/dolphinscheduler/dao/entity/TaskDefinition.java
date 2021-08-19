@@ -129,6 +129,11 @@ public class TaskDefinition {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * fail retry times
      */
     private int failRetryTimes;
@@ -395,6 +400,13 @@ public class TaskDefinition {
         this.delayTime = delayTime;
     }
 
+    public Long getEnvironmentCode(){
+        return this.environmentCode;
+    }
+    public void setEnvironmentCode(Long environmentCode){
+        this.environmentCode=environmentCode;
+    }
+
     @Override
     public String toString() {
         return "TaskDefinition{"
@@ -414,6 +426,7 @@ public class TaskDefinition {
                 + ", userName='" + userName + '\''
                 + ", projectName='" + projectName + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
                 + ", failRetryTimes=" + failRetryTimes
                 + ", failRetryInterval=" + failRetryInterval
                 + ", timeoutFlag=" + timeoutFlag

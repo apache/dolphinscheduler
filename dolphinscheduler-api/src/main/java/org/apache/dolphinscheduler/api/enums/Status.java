@@ -309,7 +309,17 @@ public enum Status {
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012, "failed to delete the alert instance, there is an alarm group associated with this alert instance",
             "删除告警实例失败，存在与此告警实例关联的警报组"),
-    PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用");
+    PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用"),
+
+    CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
+    ENVIRONMENT_NAME_EXISTS(120002,"this enviroment name [{0}] already exists","环境名称[{0}]已经存在"),
+    ENVIRONMENT_NAME_IS_NULL(120003,"this enviroment name shouldn't be empty.","环境名称不能为空"),
+    ENVIRONMENT_CONFIG_IS_NULL(120004,"this enviroment config shouldn't be empty.","环境配置信息不能为空"),
+    UPDATE_ENVIRONMENT_ERROR(120005, "update environment [{0}] info error", "更新环境[{0}]信息失败"),
+    DELETE_ENVIRONMENT_ERROR(120006, "delete environment [{0}] error", "删除环境[{0}]信息失败"),
+    DELETE_ENVIRONMENT_RELATED_TASK_EXISTS(120007, "this environment has been used in tasks,so you can't delete it.", "该环境已经被任务使用，所以不能删除该环境信息"),
+    QUERY_ENVIRONMENT_BY_NAME_ERROR(1200008, "not found environment [{0}] ", "查询环境名称[{0}]信息不存在"),
+    QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment [{0}] ", "查询环境编码[{0}]不存在");
 
 
     private final int code;

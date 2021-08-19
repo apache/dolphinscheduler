@@ -157,6 +157,12 @@ public class TaskExecutionContext implements Serializable {
     private String envFile;
 
     /**
+     * envContent
+     */
+    private String envConfigContent;
+
+
+    /**
      * definedParams
      */
     private Map<String, String> definedParams;
@@ -408,6 +414,14 @@ public class TaskExecutionContext implements Serializable {
 
     public void setEnvFile(String envFile) {
         this.envFile = envFile;
+    }
+
+    public String getEnvConfigContent(){
+        return envConfigContent;
+    }
+
+    public void setEnvConfigContent(String content){
+        this.envConfigContent=content;
     }
 
     public Map<String, String> getDefinedParams() {

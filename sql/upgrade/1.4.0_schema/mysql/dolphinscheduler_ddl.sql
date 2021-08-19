@@ -632,6 +632,28 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
+
+-- ----------------------------
+-- Table structure for t_ds_environment
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment`;
+CREATE TABLE `t_ds_environment` (
+   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+   `code` int(11) DEFAULT NULL COMMENT 'encoding',
+   `name` varchar(100) NOT NULL COMMENT 'environment config name',
+   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+   `description` text NULL DEFAULT NULL COMMENT 'the details',
+   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `environment_name_unique` (`name`),
+   UNIQUE KEY `environment_code_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

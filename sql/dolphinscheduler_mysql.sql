@@ -461,6 +461,7 @@ CREATE TABLE `t_ds_task_definition` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -491,6 +492,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -968,3 +970,21 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_environment
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment`;
+CREATE TABLE `t_ds_environment` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` int(11) DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'environment name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_name_unique` (`name`),
+  UNIQUE KEY `environment_code_unique` (`name`),
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
