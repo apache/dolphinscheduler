@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -55,6 +55,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,19 +103,35 @@ public class TaskExecuteThread implements Runnable, Delayed {
      */
     private AlertClientService alertClientService;
 
+    private TaskPluginManager taskPluginManager;
+
     /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
-            , TaskCallbackService taskCallbackService
-            , Logger taskLogger, AlertClientService alertClientService) {
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
+                             TaskCallbackService taskCallbackService,
+                             Logger taskLogger,
+                             AlertClientService alertClientService) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.taskLogger = taskLogger;
         this.alertClientService = alertClientService;
+    }
+
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
+                             TaskCallbackService taskCallbackService,
+                             Logger taskLogger,
+                             AlertClientService alertClientService,
+                             TaskPluginManager taskPluginManager) {
+        this.taskExecutionContext = taskExecutionContext;
+        this.taskCallbackService = taskCallbackService;
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskLogger = taskLogger;
+        this.alertClientService = alertClientService;
+        this.taskPluginManager = taskPluginManager;
     }
 
     @Override
@@ -150,23 +169,29 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            task = TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
+            TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
+
+            //TODO Temporary operation, To be adjusted
+            TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            task = taskChannel.createTask(taskRequest, taskLogger);
             // task init
-            task.init();
+            this.task.init();
             //init varPool
-            task.getParameters().setVarPool(taskExecutionContext.getVarPool());
+            //TODO Temporary operation, To be adjusted
+//            this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
             // task handle
-            task.handle();
+            this.task.handle();
 
             // task result process
-            task.after();
+            this.task.after();
 
-            responseCommand.setStatus(task.getExitStatus().getCode());
+            responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
-            responseCommand.setProcessId(task.getProcessId());
-            responseCommand.setAppIds(task.getAppIds());
-            responseCommand.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
-            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
+            responseCommand.setProcessId(this.task.getProcessId());
+            responseCommand.setAppIds(this.task.getAppIds());
+            //TODO Temporary operation, To be adjusted
+//            responseCommand.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
+            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
         } catch (Exception e) {
             logger.error("task scheduler failure", e);
             kill();
