@@ -305,7 +305,7 @@ CREATE TABLE `t_ds_alertgroup`(
   `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
   `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_alertgroup_name_UN` (`group_name`)
+  UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -319,7 +319,7 @@ DROP TABLE IF EXISTS `t_ds_command`;
 CREATE TABLE `t_ds_command` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'Command type: 0 start workflow, 1 start execution from current node, 2 resume fault-tolerant workflow, 3 resume pause process, 4 start execution from failed node, 5 complement, 6 schedule, 7 rerun, 8 pause, 9 stop, 10 resume waiting thread',
-  `process_definition_id` int(11) DEFAULT NULL COMMENT 'process definition id',
+  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process definition code',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'Node dependency type: 0 current node, 1 forward, 2 backward',
   `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'Failed policy: 0 end, 1 continue',
@@ -352,7 +352,7 @@ CREATE TABLE `t_ds_datasource` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`)
+  UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -367,7 +367,7 @@ CREATE TABLE `t_ds_error_command` (
   `id` int(11) NOT NULL COMMENT 'key',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
-  `process_definition_id` int(11) DEFAULT NULL COMMENT 'process definition id',
+  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process definition code',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type',
   `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'failure strategy',
@@ -747,7 +747,7 @@ CREATE TABLE `t_ds_resources` (
 DROP TABLE IF EXISTS `t_ds_schedules`;
 CREATE TABLE `t_ds_schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',

@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.dao.entity.User;
+public class ArrayUtils {
 
-import java.util.Map;
+    public static byte[] clone(byte[] array) {
+        return array == null ? null : (byte[])((byte[])array.clone());
+    }
 
-/**
- * process task relation service
- */
-public interface ProcessTaskRelationService {
-
-    /**
-     * query process task relation
-     *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionCode process definition code
-     */
-    Map<String, Object> queryProcessTaskRelation(User loginUser,
-                                                 String projectName,
-                                                 Long processDefinitionCode);
+    public static byte[] addAll(byte[] array1, byte[] array2) {
+        if (array1 == null) {
+            return clone(array2);
+        } else if (array2 == null) {
+            return clone(array1);
+        } else {
+            byte[] joinedArray = new byte[array1.length + array2.length];
+            System.arraycopy(array1, 0, joinedArray, 0, array1.length);
+            System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
+            return joinedArray;
+        }
+    }
 }
-

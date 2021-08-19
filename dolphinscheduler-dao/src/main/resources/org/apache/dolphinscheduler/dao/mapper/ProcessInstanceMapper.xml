@@ -116,7 +116,7 @@
         <if test="executorId != 0">
             and instance.executor_id = #{executorId}
         </if>
-        order by instance.start_time desc
+        order by instance.start_time desc,instance.end_time desc
     </select>
     <update id="setFailoverByHostAndStateArray">
         update t_ds_process_instance

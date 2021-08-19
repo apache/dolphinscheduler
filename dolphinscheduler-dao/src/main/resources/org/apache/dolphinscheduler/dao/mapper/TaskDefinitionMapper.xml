@@ -91,4 +91,17 @@
         delete from t_ds_task_definition
         where code = #{code}
     </delete>
+    <insert id="batchInsert">
+        insert into t_ds_task_definition (code, `name`, version, description, project_code, user_id,
+        task_type, task_params, flag, task_priority, worker_group, fail_retry_times, fail_retry_interval,
+        timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, create_time, update_time)
+        values
+        <foreach collection="taskDefinitions" item="taskDefinition" separator=",">
+            (#{taskDefinition.code},#{taskDefinition.name},#{taskDefinition.version},#{taskDefinition.description},
+            #{taskDefinition.projectCode},#{taskDefinition.userId},#{taskDefinition.taskType},#{taskDefinition.taskParams},
+            #{taskDefinition.flag},#{taskDefinition.taskPriority},#{taskDefinition.workerGroup},#{taskDefinition.failRetryTimes},
+            #{taskDefinition.failRetryInterval},#{taskDefinition.timeoutFlag},#{taskDefinition.timeoutNotifyStrategy},#{taskDefinition.timeout},
+            #{taskDefinition.delayTime},#{taskDefinition.resourceIds},#{taskDefinition.createTime},#{taskDefinition.updateTime})
+        </foreach>
+    </insert>
 </mapper>

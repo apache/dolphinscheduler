@@ -44,18 +44,22 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
- * abstract registry client
+ * registry client singleton
  */
-@Service
 public class RegistryClient extends RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
-    private void loadRegistry() {
-        init();
+    private static RegistryClient registryClient = new RegistryClient();
+
+    private RegistryClient() {
+        super.init();
+    }
+
+    public static RegistryClient getInstance() {
+        return registryClient;
     }
 
     /**

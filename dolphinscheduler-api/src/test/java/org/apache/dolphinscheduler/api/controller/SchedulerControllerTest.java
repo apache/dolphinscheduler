@@ -23,13 +23,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -37,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -164,9 +162,8 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","30");
 
-        Map<String, Object> mockResult = success();
         PageInfo<Resource> pageInfo = new PageInfo<>(1, 10);
-        mockResult.put(Constants.DATA_LIST, pageInfo);
+        Result mockResult = Result.success(pageInfo);
 
         Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(Integer.class), isA(Integer.class))).thenReturn(mockResult);

@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FA
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -64,16 +63,16 @@ public class WorkerGroupController extends BaseController {
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id        worker group id
-     * @param name      worker group name
-     * @param addrList  addr list
+     * @param id worker group id
+     * @param name worker group name
+     * @param addrList addr list
      * @return create or update result code
      */
     @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
-            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+        @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
     })
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
@@ -92,16 +91,16 @@ public class WorkerGroupController extends BaseController {
      * query worker groups paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return worker group list page
      */
     @ApiOperation(value = "queryAllWorkerGroupsPaging", notes = "QUERY_WORKER_GROUP_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -112,13 +111,14 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam("pageSize") Integer pageSize,
                                              @RequestParam(value = "searchVal", required = false) String searchVal
     ) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
@@ -141,12 +141,12 @@ public class WorkerGroupController extends BaseController {
      * delete worker group by id
      *
      * @param loginUser login user
-     * @param id        group id
+     * @param id group id
      * @return delete result code
      */
     @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
+        @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
     })
     @PostMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)

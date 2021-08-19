@@ -35,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-
 /**
  * process definition
  */
@@ -51,7 +50,7 @@ public class ProcessDefinition {
     /**
      * code
      */
-    private Long code;
+    private long code;
 
     /**
      * name
@@ -69,23 +68,9 @@ public class ProcessDefinition {
     private ReleaseState releaseState;
 
     /**
-     * project id
-     * TODO: delete
-     */
-    @TableField(exist = false)
-    private int projectId;
-
-    /**
      * project code
      */
-    private Long projectCode;
-
-    /**
-     * definition json string
-     * TODO: delete
-     */
-    @TableField(exist = false)
-    private String processDefinitionJson;
+    private long projectCode;
 
     /**
      * description
@@ -149,12 +134,6 @@ public class ProcessDefinition {
     private String locations;
 
     /**
-     * connects array for web
-     * TODO: delete
-     */
-    private String connects;
-
-    /**
      * schedule release state : online/offline
      */
     @TableField(exist = false)
@@ -190,17 +169,16 @@ public class ProcessDefinition {
 
     public ProcessDefinition(){}
 
-    public ProcessDefinition(Long projectCode,
+    public ProcessDefinition(long projectCode,
                              String name,
-                             Long code,
+                             long code,
                              String description,
                              String globalParams,
                              String locations,
-                             String connects,
                              int timeout,
                              int userId,
                              int tenantId) {
-        set(projectCode, name, description, globalParams, connects, locations, timeout, tenantId);
+        set(projectCode, name, description, globalParams, locations, timeout, tenantId);
         this.code = code;
         this.userId = userId;
         Date date = new Date();
@@ -212,7 +190,6 @@ public class ProcessDefinition {
                     String name,
                     String description,
                     String globalParams,
-                    String connects,
                     String locations,
                     int timeout,
                     int tenantId) {
@@ -221,7 +198,6 @@ public class ProcessDefinition {
         this.description = description;
         this.globalParams = globalParams;
         this.locations = locations;
-        this.connects = connects;
         this.timeout = timeout;
         this.tenantId = tenantId;
         this.flag = Flag.YES;
@@ -259,28 +235,12 @@ public class ProcessDefinition {
         this.releaseState = releaseState;
     }
 
-    public String getProcessDefinitionJson() {
-        return processDefinitionJson;
-    }
-
-    public void setProcessDefinitionJson(String processDefinitionJson) {
-        this.processDefinitionJson = processDefinitionJson;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public int getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
     }
 
     public Date getUpdateTime() {
@@ -328,10 +288,9 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        if (globalParams == null) {
+        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
-        } else {
-            this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
     }
@@ -341,7 +300,6 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONUtils.toJsonString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
@@ -364,14 +322,6 @@ public class ProcessDefinition {
 
     public void setLocations(String locations) {
         this.locations = locations;
-    }
-
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
     }
 
     public ReleaseState getScheduleReleaseState() {
@@ -422,19 +372,19 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
-    public Long getProjectCode() {
+    public long getProjectCode() {
         return projectCode;
     }
 
-    public void setProjectCode(Long projectCode) {
+    public void setProjectCode(long projectCode) {
         this.projectCode = projectCode;
     }
 
@@ -454,9 +404,7 @@ public class ProcessDefinition {
             + ", code=" + code
             + ", version=" + version
             + ", releaseState=" + releaseState
-            + ", projectId=" + projectId
             + ", projectCode=" + projectCode
-            + ", processDefinitionJson='" + processDefinitionJson + '\''
             + ", description='" + description + '\''
             + ", globalParams='" + globalParams + '\''
             + ", globalParamList=" + globalParamList
@@ -468,7 +416,6 @@ public class ProcessDefinition {
             + ", userName='" + userName + '\''
             + ", projectName='" + projectName + '\''
             + ", locations='" + locations + '\''
-            + ", connects='" + connects + '\''
             + ", scheduleReleaseState=" + scheduleReleaseState
             + ", timeout=" + timeout
             + ", warningGroupId=" + warningGroupId

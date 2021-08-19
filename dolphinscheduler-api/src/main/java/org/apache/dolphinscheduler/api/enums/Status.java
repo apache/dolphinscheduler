@@ -184,8 +184,6 @@ public enum Status {
     SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR(10153
             , "Switch process definition version error: not exists process definition version, [process definition id {0}] [version number {1}]", "切换工作流版本出错：工作流版本信息不存在，[工作流id {0}] [版本号 {1}]"),
     QUERY_PROCESS_DEFINITION_VERSIONS_ERROR(10154, "query process definition versions error", "查询工作流历史版本信息出错"),
-    QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR(10155
-            , "query process definition versions error: [page number:{0}] < 1 or [page size:{1}] < 1", "查询工作流历史版本出错：[pageNo:{0}] < 1 或 [pageSize:{1}] < 1"),
     DELETE_PROCESS_DEFINITION_VERSION_ERROR(10156, "delete process definition version error", "删除工作流历史版本出错"),
 
     QUERY_USER_CREATED_PROJECT_ERROR(10157, "query user created project error error", "查询用户创建的项目错误"),
@@ -270,7 +268,7 @@ public enum Status {
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]", "工作流任务关系已存在, processCode:[{0}]"),
     PROCESS_DAG_IS_EMPTY(50035, "process dag can not be empty", "工作流dag不能为空"),
     CHECK_PROCESS_TASK_RELATION_ERROR(50036, "check process task relation error", "工作流任务关系参数错误"),
-    CREATE_TASK_DEFINITION(50037, "create task definition", "创建任务错误"),
+    CREATE_TASK_DEFINITION_ERROR(50037, "create task definition error", "创建任务错误"),
     UPDATE_TASK_DEFINITION_ERROR(50038, "update task definition error", "更新任务定义错误"),
     QUERY_TASK_DEFINITION_VERSIONS_ERROR(50039, "query task definition versions error", "查询任务历史版本信息出错"),
     SWITCH_TASK_DEFINITION_VERSION_ERROR(50040, "Switch task definition version error", "切换任务版本出错"),

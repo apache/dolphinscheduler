@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -37,6 +38,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -49,7 +51,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
-
     String taskDefinitionJson = "{\n"
             + "    \"type\": \"SQL\",\n"
             + "    \"id\": \"tasks-27297\",\n"
@@ -119,52 +120,91 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void createTaskDefinition() {
-        String projectName = "project_test1";
+        long projectCode = 1L;
 
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-
-        TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
-
-        Mockito.when(processService.saveTaskDefinition(Mockito.eq(loginUser)
-                , Mockito.eq(project.getCode())
-                , Mockito.eq(taskNode)
-                , Mockito.any(TaskDefinition.class)))
-                .thenReturn(1);
-
+        String createTaskDefinitionJson = "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
+        List<TaskDefinition> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinition.class);
+        Mockito.when(taskDefinitionMapper.batchInsert(Mockito.anyList())).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.batchInsert(Mockito.anyList())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .createTaskDefinition(loginUser, projectName, taskDefinitionJson);
-
+                .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
     }
 
     @Test
-    public void queryTaskDefinitionByName() {
-        String projectName = "project_test1";
-        String taskName = "task";
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+    public void updateTaskDefinition () {
+        String updateTaskDefinitionJson = "{\n"
+                +   "\"name\": \"test12111\",\n"
+                +   "\"description\": \"test\",\n"
+                +   "\"taskType\": \"SHELL\",\n"
+                +   "\"flag\": 0,\n"
+                +   "\"taskParams\": \"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo 11\\\",\\\"conditionResult\\\": "
+                +   "{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]},\\\"dependence\\\":{}}\",\n"
+                +   "\"taskPriority\": 0,\n"
+                +   "\"workerGroup\": \"default\",\n"
+                +   "\"failRetryTimes\": 0,\n"
+                +   "\"failRetryInterval\": 1,\n"
+                +   "\"timeoutFlag\": 1,\n"
+                +   "\"timeoutNotifyStrategy\": 0,\n"
+                +   "\"timeout\": 0,\n"
+                +   "\"delayTime\": 0,\n"
+                +   "\"resourceIds\": \"\"\n"
+                +   "}";
+        long projectCode = 1L;
+        long taskCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(processService.isTaskOnline(taskCode)).thenReturn(Boolean.FALSE);
+        Mockito.when(taskDefinitionMapper.queryByDefinitionCode(taskCode)).thenReturn(new TaskDefinition());
+        Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
+        result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, taskCode, updateTaskDefinitionJson);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void queryTaskDefinitionByName() {
+        String taskName = "task";
+        long projectCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -172,27 +212,25 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-                .queryTaskDefinitionByName(loginUser, projectName, taskName);
+                .queryTaskDefinitionByName(loginUser, projectCode, taskName);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
     public void deleteTaskDefinitionByCode() {
-        String projectName = "project_test1";
+        long projectCode = 1L;
 
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -200,63 +238,28 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-                .deleteTaskDefinitionByCode(loginUser, projectName, 11L);
+                .deleteTaskDefinitionByCode(loginUser, projectCode, 11L);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
-    }
-
-    @Test
-    public void updateTaskDefinition() {
-        String projectName = "project_test1";
-
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
-
-        User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-
-        TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
-
-        Mockito.when(processService.updateTaskDefinition(Mockito.eq(loginUser)
-                , Mockito.eq(project.getCode())
-                , Mockito.eq(taskNode)
-                , Mockito.any(TaskDefinition.class)))
-                .thenReturn(1);
-
-        Mockito.when(taskDefinitionMapper.queryByDefinitionCode(11L))
-                .thenReturn(new TaskDefinition());
-
-        Map<String, Object> relation = taskDefinitionService
-                .updateTaskDefinition(loginUser, projectName, 11L, taskDefinitionJson);
-
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
     public void switchVersion() {
-        String projectName = "project_test1";
         int version = 1;
-        Long taskCode = 11L;
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        long taskCode = 11L;
+        long projectCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -267,7 +270,7 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinition());
         
         Map<String, Object> relation = taskDefinitionService
-                .switchVersion(loginUser, projectName, taskCode, version);
+                .switchVersion(loginUser, projectCode, taskCode, version);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -284,15 +287,42 @@ public class TaskDefinitionServiceImplTest {
     /**
      * get mock Project
      *
-     * @param projectName projectName
+     * @param projectCode projectCode
      * @return Project
      */
-    private Project getProject(String projectName) {
+    private Project getProject(long projectCode) {
         Project project = new Project();
         project.setId(1);
-        project.setName(projectName);
+        project.setCode(projectCode);
+        project.setName("test");
         project.setUserId(1);
         return project;
     }
 
+    @Test
+    public void checkJson() {
+        String taskDefinitionJson = "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        Assert.assertFalse(taskDefinitionLogs.isEmpty());
+        String taskParams = "{\"resourceList\":[],\"localParams\":[{\"prop\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+            + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
+            + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
+        ShellParameters parameters = JSONUtils.parseObject(taskParams, ShellParameters.class);
+        Assert.assertNotNull(parameters);
+    }
+
+    @Test
+    public void genTaskCodeList() {
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> genTaskCodeList = taskDefinitionService.genTaskCodeList(loginUser, 10);
+        Assert.assertEquals(Status.SUCCESS, genTaskCodeList.get(Constants.STATUS));
+    }
 }

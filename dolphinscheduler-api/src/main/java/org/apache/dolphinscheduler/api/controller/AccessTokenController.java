@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_LIS
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ACCESS_TOKEN_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -64,10 +63,10 @@ public class AccessTokenController extends BaseController {
     /**
      * create token
      *
-     * @param loginUser  login user
-     * @param userId     token for user id
+     * @param loginUser login user
+     * @param userId token for user id
      * @param expireTime expire time for the token
-     * @param token      token
+     * @param token token
      * @return create result state code
      */
     @ApiIgnore
@@ -87,8 +86,8 @@ public class AccessTokenController extends BaseController {
     /**
      * generate token string
      *
-     * @param loginUser  login user
-     * @param userId     token for user
+     * @param loginUser login user
+     * @param userId token for user
      * @param expireTime expire time
      * @return token string
      */
@@ -108,16 +107,16 @@ public class AccessTokenController extends BaseController {
      * query access token list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return token list of page number and page size
      */
     @ApiOperation(value = "queryAccessTokenList", notes = "QUERY_ACCESS_TOKEN_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -128,20 +127,20 @@ public class AccessTokenController extends BaseController {
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
 
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = accessTokenService.queryAccessTokenList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
      * delete access token by id
      *
      * @param loginUser login user
-     * @param id        token id
+     * @param id token id
      * @return delete result code
      */
     @ApiIgnore
@@ -159,11 +158,11 @@ public class AccessTokenController extends BaseController {
     /**
      * update token
      *
-     * @param loginUser  login user
-     * @param id         token id
-     * @param userId     token for user
+     * @param loginUser login user
+     * @param id token id
+     * @param userId token for user
      * @param expireTime token expire time
-     * @param token      token string
+     * @param token token string
      * @return update result code
      */
     @ApiIgnore

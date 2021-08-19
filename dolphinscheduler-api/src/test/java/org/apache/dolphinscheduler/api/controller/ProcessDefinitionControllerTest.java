@@ -73,14 +73,13 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testCreateProcessDefinition() throws Exception {
         String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
-                + "\"condition_type\":0,\"condition_params\":{}},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
-                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":{}}]";
+                + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
 
         long projectCode = 1L;
         String name = "dag_test";
         String description = "desc test";
         String globalParams = "[]";
-        String connects = "[]";
         String locations = "[]";
         int timeout = 0;
         String tenantCode = "root";
@@ -89,10 +88,10 @@ public class ProcessDefinitionControllerTest {
         result.put(Constants.DATA_LIST, 1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                connects, locations, timeout, tenantCode, json)).thenReturn(result);
+                locations, timeout, tenantCode, json)).thenReturn(result);
 
         Result response = processDefinitionController.createProcessDefinition(user, projectCode, name, description, globalParams,
-                connects, locations, timeout, tenantCode, json);
+                locations, timeout, tenantCode, json);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -102,6 +101,15 @@ public class ProcessDefinitionControllerTest {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    public void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
         }
     }
 
@@ -127,7 +135,6 @@ public class ProcessDefinitionControllerTest {
         long projectCode = 1L;
         String name = "dag_test";
         String description = "desc test";
-        String connects = "[]";
         String globalParams = "[]";
         int timeout = 0;
         String tenantCode = "root";
@@ -137,10 +144,10 @@ public class ProcessDefinitionControllerTest {
         result.put("processDefinitionId", 1);
 
         Mockito.when(processDefinitionService.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                connects, locations, timeout, tenantCode, json)).thenReturn(result);
+                locations, timeout, tenantCode, json)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                connects, locations, timeout, tenantCode, json, ReleaseState.OFFLINE);
+                locations, timeout, tenantCode, json, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -162,12 +169,10 @@ public class ProcessDefinitionControllerTest {
         long projectCode = 1L;
         String name = "dag_test";
         String description = "desc test";
-        String connects = "[]";
         long code = 1L;
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setProjectCode(projectCode);
-        processDefinition.setConnects(connects);
         processDefinition.setDescription(description);
         processDefinition.setCode(code);
         processDefinition.setLocations(locations);
@@ -234,12 +239,10 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         String name = "dag_test";
         String description = "desc test";
-        String connects = "[]";
         int id = 1;
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setProjectName(projectName);
-        processDefinition.setConnects(connects);
         processDefinition.setDescription(description);
         processDefinition.setId(id);
         processDefinition.setLocations(locations);
@@ -250,7 +253,6 @@ public class ProcessDefinitionControllerTest {
 
         ProcessDefinition processDefinition2 = new ProcessDefinition();
         processDefinition2.setProjectName(projectName);
-        processDefinition2.setConnects(connects);
         processDefinition2.setDescription(description);
         processDefinition2.setId(id2);
         processDefinition2.setLocations(locations);
@@ -338,9 +340,9 @@ public class ProcessDefinitionControllerTest {
         String searchVal = "";
         int userId = 1;
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, new PageInfo<Resource>(1, 10));
+        result.setData(new PageInfo<Resource>(1, 10));
 
         Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, searchVal, pageNo, pageSize, userId)).thenReturn(result);
         Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectCode, pageNo, searchVal, userId, pageSize);
@@ -349,20 +351,21 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
-    public void testBatchExportProcessDefinitionByIds() throws Exception {
+    public void testBatchExportProcessDefinitionByCodes() {
         String processDefinitionIds = "1,2";
         long projectCode = 1L;
         HttpServletResponse response = new MockHttpServletResponse();
-        Mockito.doNothing().when(this.processDefinitionService).batchExportProcessDefinitionByIds(user, projectCode, processDefinitionIds, response);
-        processDefinitionController.batchExportProcessDefinitionByIds(user, projectCode, processDefinitionIds, response);
+        Mockito.doNothing().when(this.processDefinitionService).batchExportProcessDefinitionByCodes(user, projectCode, processDefinitionIds, response);
+        processDefinitionController.batchExportProcessDefinitionByCodes(user, projectCode, processDefinitionIds, response);
     }
 
     @Test
     public void testQueryProcessDefinitionVersions() {
+
         long projectCode = 1L;
-        Map<String, Object> resultMap = new HashMap<>();
+        Result resultMap = new Result();
         putMsg(resultMap, Status.SUCCESS);
-        resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
+        resultMap.setData(new PageInfo<ProcessDefinitionLog>(1, 10));
         Mockito.when(processDefinitionService.queryProcessDefinitionVersions(
                 user
                 , projectCode

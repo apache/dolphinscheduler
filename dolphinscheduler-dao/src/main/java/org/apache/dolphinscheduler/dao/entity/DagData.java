@@ -45,6 +45,9 @@ public class DagData {
         this.taskDefinitionList = taskDefinitionList;
     }
 
+    public DagData() {
+    }
+
     public ProcessDefinition getProcessDefinition() {
         return processDefinition;
     }

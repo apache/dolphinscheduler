@@ -44,7 +44,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/monitor/master/list")
             .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/   )
+           /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
@@ -55,14 +55,13 @@ public class MonitorControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testListWorker() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/monitor/worker/list")
             .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/   )
+           /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
@@ -73,13 +72,12 @@ public class MonitorControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryDatabaseState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/monitor/database")
             .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/   )
+            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
@@ -91,12 +89,11 @@ public class MonitorControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testQueryZookeeperState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/monitor/zookeeper/list")
             .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/   )
+            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();

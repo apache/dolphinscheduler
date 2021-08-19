@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -42,7 +42,6 @@ public interface ProcessDefinitionService {
      * @param name process definition name
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -55,7 +54,6 @@ public interface ProcessDefinitionService {
                                                 String name,
                                                 String description,
                                                 String globalParams,
-                                                String connects,
                                                 String locations,
                                                 int timeout,
                                                 String tenantCode,
@@ -82,12 +80,12 @@ public interface ProcessDefinitionService {
      * @param userId user id
      * @return process definition page
      */
-    Map<String, Object> queryProcessDefinitionListPaging(User loginUser,
-                                                         long projectCode,
-                                                         String searchVal,
-                                                         Integer pageNo,
-                                                         Integer pageSize,
-                                                         Integer userId);
+    Result queryProcessDefinitionListPaging(User loginUser,
+                                            long projectCode,
+                                            String searchVal,
+                                            Integer pageNo,
+                                            Integer pageSize,
+                                            Integer userId);
 
     /**
      * query detail of process definition
@@ -150,7 +148,6 @@ public interface ProcessDefinitionService {
      * @param code process definition code
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -163,7 +160,6 @@ public interface ProcessDefinitionService {
                                                 long code,
                                                 String description,
                                                 String globalParams,
-                                                String connects,
                                                 String locations,
                                                 int timeout,
                                                 String tenantCode,
@@ -208,17 +204,17 @@ public interface ProcessDefinitionService {
                                                  ReleaseState releaseState);
 
     /**
-     * batch export process definition by ids
+     * batch export process definition by codes
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionIds process definition ids
+     * @param processDefinitionCodes process definition codes
      * @param response http servlet response
      */
-    void batchExportProcessDefinitionByIds(User loginUser,
-                                           long projectCode,
-                                           String processDefinitionIds,
-                                           HttpServletResponse response);
+    void batchExportProcessDefinitionByCodes(User loginUser,
+                                             long projectCode,
+                                             String processDefinitionCodes,
+                                             HttpServletResponse response);
 
     /**
      * import process definition
@@ -233,14 +229,12 @@ public interface ProcessDefinitionService {
                                                 MultipartFile file);
 
     /**
-     * check the process definition node meets the specifications
+     * check the process task relation json
      *
-     * @param processData process data
-     * @param processDefinitionJson process definition json
+     * @param processTaskRelationJson process task relation json
      * @return check result code
      */
-    Map<String, Object> checkProcessNodeList(ProcessData processData,
-                                             String processDefinitionJson);
+    Map<String, Object> checkProcessNodeList(String processTaskRelationJson);
 
     /**
      * get task node details based on process definition
@@ -263,8 +257,8 @@ public interface ProcessDefinitionService {
      * @return task node list
      */
     Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser,
-                                                            long projectCode,
-                                                            String defineCodeList);
+                                                        long projectCode,
+                                                        String defineCodeList);
 
     /**
      * query process definition all by project code
@@ -277,12 +271,12 @@ public interface ProcessDefinitionService {
     /**
      * Encapsulates the TreeView structure
      *
-     * @param processId process definition id
+     * @param code process definition code
      * @param limit limit
      * @return tree view json data
      * @throws Exception exception
      */
-    Map<String, Object> viewTree(Integer processId,
+    Map<String, Object> viewTree(long code,
                                  Integer limit) throws Exception;
 
     /**
@@ -297,7 +291,7 @@ public interface ProcessDefinitionService {
     Map<String, Object> switchProcessDefinitionVersion(User loginUser,
                                                        long projectCode,
                                                        int processDefinitionId,
-                                                       long version);
+                                                       int version);
 
     /**
      * query the pagination versions info by one certain process definition code
@@ -309,7 +303,7 @@ public interface ProcessDefinitionService {
      * @param processDefinitionCode process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
-    Map<String, Object> queryProcessDefinitionVersions(User loginUser,
+    Result queryProcessDefinitionVersions(User loginUser,
                                                        long projectCode,
                                                        int pageNo,
                                                        int pageSize,
@@ -327,15 +321,7 @@ public interface ProcessDefinitionService {
     Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser,
                                                               long projectCode,
                                                               int processDefinitionId,
-                                                              long version);
+                                                              int version);
 
-    /**
-     * check has associated process definition
-     *
-     * @param processDefinitionId process definition id
-     * @param version version
-     * @return The query result has a specific process definition return true
-     */
-    boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version);
 }
 

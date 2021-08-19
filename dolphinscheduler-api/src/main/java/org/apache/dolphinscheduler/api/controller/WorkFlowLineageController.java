@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -53,34 +54,36 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "WORK_FLOW_LINEAGE_TAG")
 @RestController
-@RequestMapping("lineages/{projectId}")
+@RequestMapping("lineages/{projectCode}")
 public class WorkFlowLineageController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageController.class);
 
     @Autowired
     private WorkFlowLineageService workFlowLineageService;
 
+    @ApiOperation(value = "queryWorkFlowLineageByName", notes = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/list-name")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                    @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
+                                                                    @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true, example = "1") @PathVariable long projectCode,
                                                                     @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
         try {
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
+            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectCode);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
 
+    @ApiOperation(value = "queryWorkFlowLineageByIds", notes = "QUERY_WORKFLOW_LINEAGE_BY_IDS_NOTES")
     @GetMapping(value = "/list-ids")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
+                                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true, example = "1") @PathVariable long projectCode,
                                                                  @ApiIgnore @RequestParam(value = "ids", required = false) String ids) {
         try {
             ids = ParameterUtils.handleEscapes(ids);
@@ -92,10 +95,10 @@ public class WorkFlowLineageController extends BaseController {
                 }
             }
 
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(idsSet, projectId);
+            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(idsSet, projectCode);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }

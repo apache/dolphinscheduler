@@ -42,7 +42,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * data source controller test
  */
-public class DataSourceControllerTest extends AbstractControllerTest{
+public class DataSourceControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
@@ -70,7 +70,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Ignore
     @Test
     public void testUpdateDataSource() throws Exception {
@@ -97,8 +96,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-
     @Ignore
     @Test
     public void testQueryDataSource() throws Exception {
@@ -115,7 +112,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testQueryDataSourceList() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -130,7 +126,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryDataSourceListPaging() throws Exception {
@@ -148,7 +143,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Ignore
     @Test
@@ -173,7 +167,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Ignore
     @Test
     public void testConnectionTest() throws Exception {
@@ -190,8 +183,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-
     @Test
     public void testVerifyDataSourceName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -206,7 +197,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testAuthedDatasource() throws Exception {
@@ -223,7 +213,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testUnauthDatasource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -239,7 +228,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testGetKerberosStartupState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/datasources/kerberos-startup-state")
@@ -251,8 +239,6 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
-
 
     @Ignore
     @Test

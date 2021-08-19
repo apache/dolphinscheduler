@@ -14,26 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.fasterxml.jackson.databind.JsonNode;
+package org.apache.dolphinscheduler.api.utils;
+
+import org.apache.dolphinscheduler.common.model.Server;
+
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
- * ProcessAddTaskParam
+ * zookeeper monitor utils test
  */
-public interface ProcessAddTaskParam {
+@Ignore
+public class RegistryCenterUtilsTest {
 
-    /**
-     * add export task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addExportSpecialParam(JsonNode taskNode);
+    @Test
+    public void testGetMasterList(){
+        List<Server> masterServerList = RegistryCenterUtils.getMasterServers();
+        List<Server> workerServerList = RegistryCenterUtils.getWorkerServers();
 
-    /**
-     * add task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addImportSpecialParam(JsonNode taskNode);
+        Assert.assertTrue(masterServerList.size() >= 0);
+        Assert.assertTrue(workerServerList.size() >= 0);
+    }
+
 }

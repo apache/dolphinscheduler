@@ -209,7 +209,7 @@ CREATE TABLE t_ds_alertgroup(
   create_time    timestamp    DEFAULT NULL,
   update_time    timestamp    DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT t_ds_alertgroup_name_UN UNIQUE (group_name)
+  CONSTRAINT t_ds_alertgroup_name_un UNIQUE (group_name)
 ) ;
 
 --
@@ -220,7 +220,7 @@ DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
   command_type int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
@@ -250,7 +250,7 @@ CREATE TABLE t_ds_datasource (
   create_time timestamp NOT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id),
-  CONSTRAINT t_ds_datasource_name_UN UNIQUE (name, type)
+  CONSTRAINT t_ds_datasource_name_un UNIQUE (name, type)
 ) ;
 
 --
@@ -262,7 +262,7 @@ CREATE TABLE t_ds_error_command (
   id int NOT NULL ,
   command_type int DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
@@ -296,7 +296,6 @@ CREATE TABLE t_ds_process_definition (
   user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
-  connects text ,
   warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
@@ -321,7 +320,6 @@ CREATE TABLE t_ds_process_definition_log (
   user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
-  connects text ,
   warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
@@ -611,7 +609,7 @@ CREATE TABLE t_ds_resources (
 DROP TABLE IF EXISTS t_ds_schedules;
 CREATE TABLE t_ds_schedules (
   id int NOT NULL  ,
-  process_definition_id int NOT NULL ,
+  process_definition_code bigint NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,

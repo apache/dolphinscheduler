@@ -14,35 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.common.model.Server;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import java.util.List;
+package org.apache.dolphinscheduler.api.dto;
+
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 
 /**
- * zookeeper monitor utils test
+ * DagDataSchedule
  */
-@Ignore
-public class RegistryMonitorUtilsTest {
+public class DagDataSchedule extends DagData {
 
+    /**
+     * schedule
+     */
+    private Schedule schedule;
 
-    @Test
-    public void testGetMasterList(){
-
-        RegistryMonitor registryMonitor = new RegistryMonitor();
-
-
-        List<Server> masterServerList = registryMonitor.getMasterServers();
-
-        List<Server> workerServerList = registryMonitor.getWorkerServers();
-
-        Assert.assertTrue(masterServerList.size() >= 0);
-        Assert.assertTrue(workerServerList.size() >= 0);
-
-
+    public DagDataSchedule(DagData dagData) {
+        super();
+        this.setProcessDefinition(dagData.getProcessDefinition());
+        this.setTaskDefinitionList(dagData.getTaskDefinitionList());
+        this.setProcessTaskRelationList(dagData.getProcessTaskRelationList());
     }
 
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
 }
