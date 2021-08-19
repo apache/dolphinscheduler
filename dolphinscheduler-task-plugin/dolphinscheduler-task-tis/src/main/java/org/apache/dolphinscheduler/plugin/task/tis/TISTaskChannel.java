@@ -5,6 +5,7 @@ import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
 /**
+ *
  **/
 public class TISTaskChannel implements TaskChannel {
     @Override
@@ -14,6 +15,6 @@ public class TISTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskRequest taskRequest, org.slf4j.Logger logger) {
-        return null;
+        return new TISTask(taskRequest, logger);
     }
 }
