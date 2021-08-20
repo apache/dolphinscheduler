@@ -389,12 +389,6 @@ public final class Constants {
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
 
     /**
-     * default log buffer size in AbstractCommandExecutor
-     */
-    public static final int DEFAULT_LOG_BUFFER_SIZE = 128;
-
-
-    /**
      * time unit secong to minutes
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;

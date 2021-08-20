@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -61,17 +63,17 @@ public abstract class AbstractCommandExecutor {
     protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
-     *  process
+     * process
      */
     private Process process;
 
     /**
-     *  log handler
+     * log handler
      */
     protected Consumer<LinkedBlockingQueue<String>> logHandler;
 
     /**
-     *  logger
+     * logger
      */
     protected Logger logger;
 
@@ -99,7 +101,7 @@ public abstract class AbstractCommandExecutor {
         this.logHandler = logHandler;
         this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
-        this.logBuffer = new LinkedBlockingQueue<>(Constants.DEFAULT_LOG_BUFFER_SIZE);
+        this.logBuffer = new LinkedBlockingQueue<>();
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
 
@@ -224,7 +226,7 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(process.exitValue());
 
             // if yarn task , yarn state is final state
-            if (process.exitValue() == 0){
+            if (process.exitValue() == 0) {
                 result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }
         } else {
@@ -234,7 +236,7 @@ public abstract class AbstractCommandExecutor {
         }
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-            taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
+                taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
 
         return result;
     }
@@ -242,6 +244,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * cancel application
+     *
      * @throws Exception exception
      */
     public void cancelApplication() throws Exception {
@@ -272,6 +275,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * soft kill
+     *
      * @param processId process id
      * @return process is killed
      * @throws InterruptedException interrupted exception
@@ -296,6 +300,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * hard kill
+     *
      * @param processId process id
      */
     private void hardKill(int processId) {
@@ -314,6 +319,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * print command
+     *
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
@@ -344,6 +350,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * get the standard output of the process
+     *
      * @param process process
      */
     private void parseProcessOutput(Process process) {
@@ -393,7 +400,7 @@ public abstract class AbstractCommandExecutor {
         try {
             for (String appId : appIds) {
                 logger.info("check yarn application status, appId:{}", appId);
-                while(Stopper.isRunning()){
+                while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
                     logger.debug("check yarn application status, appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
@@ -401,7 +408,7 @@ public abstract class AbstractCommandExecutor {
                         return false;
                     }
 
-                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
                         break;
                     }
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -444,6 +451,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * convert file to list
+     *
      * @param filename file name
      * @return line list
      */
@@ -451,7 +459,7 @@ public abstract class AbstractCommandExecutor {
         List<String> lineList = new ArrayList<>(100);
         File file = new File(filename);
 
-        if (!file.exists()){
+        if (!file.exists()) {
             return lineList;
         }
 
@@ -468,6 +476,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * find app id
+     *
      * @param line line
      * @return appid
      */
@@ -525,7 +534,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * when log buffer siz or flush time reach condition , then flush
      *
-     * @param lastFlushTime  last flush time
+     * @param lastFlushTime last flush time
      * @return last flush time
      */
     private long flush(long lastFlushTime) {
@@ -545,7 +554,10 @@ public abstract class AbstractCommandExecutor {
     protected List<String> commandOptions() {
         return Collections.emptyList();
     }
+
     protected abstract String buildCommandFilePath();
+
     protected abstract String commandInterpreter();
+
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }
