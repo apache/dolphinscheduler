@@ -124,6 +124,13 @@ public class ServerNodeManager implements InitializingBean {
 
     public static volatile Integer MASTER_SIZE = 0;
 
+    public static Integer getSlot() {
+        if (SLOT_LIST.size() > 0) {
+            return SLOT_LIST.get(0);
+        }
+        return 0;
+    }
+
 
     /**
      * init listener
@@ -154,7 +161,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * load nodes from zookeeper
      */
-    private void load() {
+    public void load() {
         /**
          * master nodes from zookeeper
          */
@@ -266,9 +273,20 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateMasterNodes(){
-        Set<String> currentNodes = registryClient.getMasterNodesDirectly();
-        List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
-        syncMasterNodes(currentNodes, masterNodes);
+        SLOT_LIST.clear();
+        this.masterNodes.clear();
+        String nodeLock = registryClient.getMasterLockPath();
+        try{
+            registryClient.getLock(nodeLock);
+            Set<String> currentNodes = registryClient.getMasterNodesDirectly();
+            List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
+            syncMasterNodes(currentNodes, masterNodes);
+        }catch (Exception e){
+            logger.error("update master nodes error", e);
+        }finally {
+            registryClient.releaseLock(nodeLock);
+        }
+
     }
 
     /**
@@ -294,16 +312,17 @@ public class ServerNodeManager implements InitializingBean {
     private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            this.masterNodes.clear();
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            ServerNodeManager.SLOT_LIST.clear();
             int index = masterPriorityQueue.getIndex(NetUtils.getHost());
             if(index >= 0){
-                ServerNodeManager.MASTER_SIZE = nodes.size();
-                ServerNodeManager.SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getHost()) + 1);
+                MASTER_SIZE = nodes.size();
+                SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getHost()));
             }
+            logger.info("update master nodes, master size: {}, slot: {}",
+                    MASTER_SIZE, SLOT_LIST.toString()
+            );
         } finally {
             masterLock.unlock();
         }

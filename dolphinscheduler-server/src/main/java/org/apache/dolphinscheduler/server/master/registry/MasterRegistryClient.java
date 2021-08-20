@@ -47,15 +47,12 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,8 +92,6 @@ public class MasterRegistryClient {
      * heartbeat executor
      */
     private ScheduledExecutorService heartBeatExecutor;
-
-    private MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
     private ConcurrentHashMap<Integer, WorkflowExecuteThread > processInstanceExecMaps;
 

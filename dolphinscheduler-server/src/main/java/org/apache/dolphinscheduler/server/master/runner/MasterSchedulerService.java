@@ -208,24 +208,28 @@ public class MasterSchedulerService extends Thread {
         int pageNumber = 0;
         Command result = null;
         while (Stopper.isRunning()) {
-            if (ServerNodeManager.SLOT_LIST.size() == 0) {
+            if(ServerNodeManager.MASTER_SIZE == 0){
                 return null;
             }
-            int slot = ServerNodeManager.SLOT_LIST.get(0);
             List<Command> commandList = processService.findCommandPage(ServerNodeManager.MASTER_SIZE, pageNumber);
             if(commandList.size() == 0){
                 break;
             }
-            if (slot == 0 || commandList.size() == 0) {
+            if (commandList.size() == 0) {
                 return null;
             }
             for (Command command : commandList) {
-                if (command.getId() % slot == 0) {
+                int slot = ServerNodeManager.getSlot();
+                if (ServerNodeManager.MASTER_SIZE != 0
+                        && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
                     result = command;
                     break;
                 }
             }
             if(result != null){
+                logger.info("find command {}, slot:{} :",
+                        result.getId(),
+                        ServerNodeManager.getSlot());
                 break;
             }
             pageNumber += 1;

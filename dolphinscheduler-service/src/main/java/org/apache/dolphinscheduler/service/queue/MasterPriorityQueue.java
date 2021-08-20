@@ -103,7 +103,7 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server>{
     private class ServerComparator implements Comparator<Server> {
         @Override
         public int compare(Server o1, Server o2) {
-            return o1.getCreateTime().before(o2.getCreateTime()) ? 0 : 1;
+            return o1.getCreateTime().before(o2.getCreateTime()) ? 1 : 0;
         }
     }
 
