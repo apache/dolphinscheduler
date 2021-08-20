@@ -48,7 +48,7 @@ public class JDBCSourceGenerator implements ISourceGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        StringBuilder JDBCSourceSb = new StringBuilder();
+        StringBuilder jdbcSourceSb = new StringBuilder();
 
         try {
             SourceJDBCParameter sourceJDBCParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceJDBCParameter.class);
@@ -61,7 +61,7 @@ public class JDBCSourceGenerator implements ISourceGenerator {
 
                 if (null != baseDataSource) {
 
-                    JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
+                    jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
                         .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getJdbcUrl()).append(Constants.DOUBLE_QUOTES)
                         .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
                         .append(Constants.SPACE).append(baseDataSource.getUser())
@@ -71,25 +71,25 @@ public class JDBCSourceGenerator implements ISourceGenerator {
                     //sqoop table & sql query
                     if (sourceJDBCParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
                         if (StringUtils.isNotEmpty(sourceJDBCParameter.getSrcTable())) {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.TABLE)
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.TABLE)
                                 .append(Constants.SPACE).append(sourceJDBCParameter.getSrcTable());
                         }
 
                         if (StringUtils.isNotEmpty(sourceJDBCParameter.getSrcColumns())) {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
                                 .append(Constants.SPACE).append(sourceJDBCParameter.getSrcColumns());
                         }
                     } else if (sourceJDBCParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
                         && StringUtils.isNotEmpty(sourceJDBCParameter.getSrcQuerySql())) {
 
                         String srcQuery = sourceJDBCParameter.getSrcQuerySql();
-                        JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY)
+                        jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY)
                             .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(srcQuery);
 
                         if (srcQuery.toLowerCase().contains(SqoopConstants.QUERY_WHERE)) {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_CONDITION).append(Constants.DOUBLE_QUOTES);
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_CONDITION).append(Constants.DOUBLE_QUOTES);
                         } else {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_WITHOUT_CONDITION).append(Constants.DOUBLE_QUOTES);
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_WITHOUT_CONDITION).append(Constants.DOUBLE_QUOTES);
                         }
                     }
 
@@ -103,7 +103,7 @@ public class JDBCSourceGenerator implements ISourceGenerator {
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_HIVE)
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_HIVE)
                                 .append(Constants.SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
@@ -118,7 +118,7 @@ public class JDBCSourceGenerator implements ISourceGenerator {
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            JDBCSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_JAVA)
+                            jdbcSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_JAVA)
                                 .append(Constants.SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
@@ -128,6 +128,6 @@ public class JDBCSourceGenerator implements ISourceGenerator {
             logger.error(String.format("Sqoop task JDBC source params build failed: [%s]", e.getMessage()));
         }
 
-        return JDBCSourceSb.toString();
+        return jdbcSourceSb.toString();
     }
 }

@@ -1,5 +1,4 @@
- 
-/*
+ /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -45,7 +44,7 @@ public class JDBCTargetGenerator implements ITargetGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        StringBuilder JDBCTargetSb = new StringBuilder();
+        StringBuilder jdbcTargetSb = new StringBuilder();
 
         try {
             TargetJDBCParameter targetJDBCParameter =
@@ -61,10 +60,7 @@ public class JDBCTargetGenerator implements ITargetGenerator {
                     sqoopTaskExecutionContext.getTargetConnectionParams());
 
                 if (null != baseDataSource) {
-
-
-
- JDBCTargetSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
+                    jdbcTargetSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
                         .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getJdbcUrl()).append(Constants.DOUBLE_QUOTES)
                         .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
                         .append(Constants.SPACE).append(baseDataSource.getUser())
@@ -74,33 +70,33 @@ public class JDBCTargetGenerator implements ITargetGenerator {
                         .append(Constants.SPACE).append(targetJDBCParameter.getTargetTable());
                         
                     if (StringUtils.isNotEmpty(targetJDBCParameter.getTargetColumns())) {
-                        JDBCTargetSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
+                        jdbcTargetSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
                             .append(Constants.SPACE).append(targetJDBCParameter.getTargetColumns());
                     }
 
                     if (StringUtils.isNotEmpty(targetJDBCParameter.getFieldsTerminated())) {
-                        JDBCTargetSb.append(Constants.SPACE).append(SqoopConstants.FIELDS_TERMINATED_BY);
+                        jdbcTargetSb.append(Constants.SPACE).append(SqoopConstants.FIELDS_TERMINATED_BY);
                         if (targetJDBCParameter.getFieldsTerminated().contains("'")) {
-                            JDBCTargetSb.append(Constants.SPACE).append(targetJDBCParameter.getFieldsTerminated());
+                            jdbcTargetSb.append(Constants.SPACE).append(targetJDBCParameter.getFieldsTerminated());
 
                         } else {
-                            JDBCTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetJDBCParameter.getFieldsTerminated()).append(Constants.SINGLE_QUOTES);
+                            jdbcTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetJDBCParameter.getFieldsTerminated()).append(Constants.SINGLE_QUOTES);
                         }
                     }
 
                     if (StringUtils.isNotEmpty(targetJDBCParameter.getLinesTerminated())) {
-                        JDBCTargetSb.append(Constants.SPACE).append(SqoopConstants.LINES_TERMINATED_BY);
+                        jdbcTargetSb.append(Constants.SPACE).append(SqoopConstants.LINES_TERMINATED_BY);
                         if (targetJDBCParameter.getLinesTerminated().contains(Constants.SINGLE_QUOTES)) {
-                            JDBCTargetSb.append(Constants.SPACE).append(targetJDBCParameter.getLinesTerminated());
+                            jdbcTargetSb.append(Constants.SPACE).append(targetJDBCParameter.getLinesTerminated());
                         } else {
-                            JDBCTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetJDBCParameter.getLinesTerminated()).append(Constants.SINGLE_QUOTES);
+                            jdbcTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetJDBCParameter.getLinesTerminated()).append(Constants.SINGLE_QUOTES);
                         }
                     }
 
                     if (targetJDBCParameter.getIsUpdate()
                         && StringUtils.isNotEmpty(targetJDBCParameter.getTargetUpdateKey())
                         && StringUtils.isNotEmpty(targetJDBCParameter.getTargetUpdateMode())) {
-                        JDBCTargetSb.append(Constants.SPACE).append(SqoopConstants.UPDATE_KEY)
+                        jdbcTargetSb.append(Constants.SPACE).append(SqoopConstants.UPDATE_KEY)
                             .append(Constants.SPACE).append(targetJDBCParameter.getTargetUpdateKey())
                             .append(Constants.SPACE).append(SqoopConstants.UPDATE_MODE)
                             .append(Constants.SPACE).append(targetJDBCParameter.getTargetUpdateMode());
@@ -111,6 +107,6 @@ public class JDBCTargetGenerator implements ITargetGenerator {
             logger.error(String.format("Sqoop JDBC target params build failed: [%s]", e.getMessage()));
         }
 
-        return JDBCTargetSb.toString();
+        return jdbcTargetSb.toString();
     }
 }

@@ -112,8 +112,7 @@
                        {id: 1, code: 'POSTGRESQL', disabled: false},
                        {id: 5, code: 'ORACLE', disabled: false},
                        {id: 6, code: 'SQLSERVER', disabled: false}],
-                    datasource:sourceMysqlParams.srcDatasource }"
-            >
+                    datasource:sourceMysqlParams.srcDatasource }">
             </m-datasource>
           </div>
         </m-list-box>
@@ -445,8 +444,7 @@
                        {id: 1, code: 'POSTGRESQL', disabled: false},
                        {id: 5, code: 'ORACLE', disabled: false},
                        {id: 6, code: 'SQLSERVER', disabled: false}],
-                      datasource:targetMysqlParams.targetDatasource }"
-            >
+                      datasource:targetMysqlParams.targetDatasource }">
             </m-datasource>
           </div>
         </m-list-box>
