@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
@@ -30,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -40,6 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 
 /**
  * task definition service impl
@@ -105,6 +111,45 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         } else {
             putMsg(result, Status.CREATE_ENVIRONMENT_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * query environment paging
+     *
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return environment list page
+     */
+    @Override
+    public Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal) {
+        Result result = new Result();
+        PageInfo<Environment> pageInfo = new PageInfo<>(pageNo, pageSize);
+
+        Page<Environment> page = new Page<>(pageNo, pageSize);
+
+        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
+
+        List<Environment> environmentList = environmentIPage.getRecords();
+        pageInfo.setTotal((int) environmentIPage.getTotal());
+        pageInfo.setTotalList(environmentList);
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query all environment
+     *
+     * @return all environment list
+     */
+    @Override
+    public Map<String, Object> queryAllEnvironmentList() {
+        Map<String,Object> result =new HashMap<>();
+        List<Environment> environmentList = environmentMapper.queryAllEnvironmentList();
+        result.put(Constants.DATA_LIST,environmentList);
+        putMsg(result,Status.SUCCESS);
         return result;
     }
 

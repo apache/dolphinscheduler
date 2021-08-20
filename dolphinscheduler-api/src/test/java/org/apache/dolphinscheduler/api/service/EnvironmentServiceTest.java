@@ -26,8 +26,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
+import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.util.Lists;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -126,6 +128,17 @@ public class EnvironmentServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
+    }
+
+    @Test
+    public void testQueryAllEnvironmentList() {
+        Mockito.when(environmentMapper.queryAllEnvironmentList()).thenReturn(Lists.newArrayList(getEnvironment()));
+        Map<String, Object> result  = environmentService.queryAllEnvironmentList();
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+
+        List<Environment> list = (List<Environment>)(result.get(Constants.DATA_LIST));
+        Assert.assertEquals(1,list.size());
     }
 
     @Test

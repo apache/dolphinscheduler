@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -69,6 +70,24 @@ public interface EnvironmentService {
      * @param desc environment desc
      */
     Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc);
+
+    /**
+     * query environment paging
+     *
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return environment list page
+     */
+    Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal);
+
+    /**
+     * query all environment
+     *
+     * @return all environment list
+     */
+    Map<String, Object> queryAllEnvironmentList();
+
 
 }
 

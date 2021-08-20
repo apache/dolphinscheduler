@@ -988,3 +988,18 @@ CREATE TABLE `t_ds_environment` (
   UNIQUE KEY `environment_name_unique` (`name`),
   UNIQUE KEY `environment_code_unique` (`name`),
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_environment_worker_group_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
+CREATE TABLE `t_ds_environment_worker_group_relation` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `environment_code` int(11) NOT NULL COMMENT 'environment code',
+  `worker_group_name` varchar(255) NOT NULL COMMENT 'worker group name',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

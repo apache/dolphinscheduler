@@ -922,15 +922,30 @@ CREATE TABLE t_ds_alert_plugin_instance (
 --
 DROP TABLE IF EXISTS t_ds_environment;
 CREATE TABLE t_ds_environment (
-  id serial NOT NULL  ,
+  id serial NOT NULL,
   code bigint NOT NULL,
-  name varchar(100) DEFAULT NULL ,
-  config text DEFAULT NULL ,
-  description text ,
-  operator int DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id) ,
+  name varchar(100) DEFAULT NULL,
+  config text DEFAULT NULL,
+  description text,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id),
   CONSTRAINT environment_name_unique UNIQUE (name),
   CONSTRAINT environment_code_unique UNIQUE (code)
+);
+
+--
+-- Table structure for table t_ds_environment_worker_group_relation
+--
+DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
+CREATE TABLE t_ds_environment_worker_group_relation (
+  id serial NOT NULL,
+  environment_code bigint NOT NULL,
+  worker_group_name varchar(255) NOT NULL,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id) ,
+  CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group_name)
 );

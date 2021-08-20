@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 
 import java.util.Date;
@@ -140,6 +142,22 @@ public class EnvironmentMapperTest {
         List<Environment> environments = environmentMapper.queryAllEnvironmentList();
         Assert.assertEquals(environments.size(), 1);
         Assert.assertEquals(entity.toString(),environments.get(0).toString());
+    }
+
+    /**
+     * test query environment list paging
+     */
+    @Test
+    public void testQueryEnvironmentListPaging() {
+        Environment entity = insertOne();
+        Page<Environment> page = new Page<>(1, 10);
+        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"");
+        List<Environment> environmentList = environmentIPage.getRecords();
+        Assert.assertEquals(environmentList.size(), 1);
+
+        environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"abc");
+        environmentList = environmentIPage.getRecords();
+        Assert.assertEquals(environmentList.size(), 0);
     }
 
     /**

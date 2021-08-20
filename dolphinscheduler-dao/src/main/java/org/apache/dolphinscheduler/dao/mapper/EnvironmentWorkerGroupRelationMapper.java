@@ -17,55 +17,41 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
- * environment mapper interface
+ * environment worker group relation mapper interface
  */
-public interface EnvironmentMapper extends BaseMapper<Environment> {
+public interface EnvironmentWorkerGroupRelationMapper extends BaseMapper<EnvironmentWorkerGroupRelation> {
 
     /**
-     * query environment by name
-     *
-     * @param name name
-     * @return environment
-     */
-    Environment queryByEnvironmentName(@Param("environmentName") String name);
-
-    /**
-     * query environment by code
+     * environment worker group relation by environmentCode
      *
      * @param environmentCode environmentCode
-     * @return environment
+     * @return EnvironmentWorkerGroupRelation list
      */
-    Environment queryByEnvironmentCode(@Param("environmentCode") Long environmentCode);
+    List<EnvironmentWorkerGroupRelation> queryByEnvironmentCode(@Param("environmentCode") Long environmentCode);
 
     /**
-     * query all environment list
-     * @return environment list
-     */
-    List<Environment> queryAllEnvironmentList();
-
-    /**
-     * environment page
-     * @param page page
-     * @param searchName searchName
-     * @return environment Ipage
-     */
-    IPage<Environment> queryEnvironmentListPaging(IPage<Environment> page, @Param("searchName") String searchName);
-
-    /**
-     * delete environment by code
+     * environment worker group relation by workerGroupName
      *
-     * @param code code
+     * @param workerGroupName workerGroupName
+     * @return EnvironmentWorkerGroupRelation list
+     */
+    List<EnvironmentWorkerGroupRelation> queryByWorkerGroupName(@Param("workerGroupName") String workerGroupName);
+
+    /**
+     * delete environment worker group relation by processCode
+     *
+     * @param environmentCode environmentCode
+     * @param workerGroupName workerGroupName
      * @return int
      */
-    int deleteByCode(@Param("code") Long code);
+    int deleteByCode(@Param("environmentCode") Long environmentCode, @Param("workerGroupName") String workerGroupName);
 }

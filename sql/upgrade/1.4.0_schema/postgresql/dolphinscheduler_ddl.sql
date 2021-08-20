@@ -684,6 +684,21 @@ ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT 
 comment on column t_ds_task_definition_log.environment_code is 'environment code';
 
 
+--
+-- Table structure for table t_ds_environment_worker_group_relation
+--
+DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
+CREATE TABLE t_ds_environment_worker_group_relation (
+    id serial NOT NULL,
+    environment_code bigint NOT NULL,
+    worker_group_name varchar(255) NOT NULL,
+    operator int DEFAULT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id) ,
+    CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group_name)
+);
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

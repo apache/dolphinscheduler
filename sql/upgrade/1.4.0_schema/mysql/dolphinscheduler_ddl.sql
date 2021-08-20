@@ -655,6 +655,21 @@ ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` int(11) default N
 ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
 
 -- ----------------------------
+-- Table structure for t_ds_environment_worker_group_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
+CREATE TABLE `t_ds_environment_worker_group_relation` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `environment_code` int(11) NOT NULL COMMENT 'environment code',
+  `worker_group_name` varchar(255) NOT NULL COMMENT 'worker group name',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
 
