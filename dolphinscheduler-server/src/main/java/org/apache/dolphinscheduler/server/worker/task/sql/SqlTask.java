@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
@@ -181,9 +182,14 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getLocalParametersMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
-
+        if(MapUtils.isEmpty(paramsMap)){
+            paramsMap=new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
         // spell SQL according to the final user-defined variable
-        if(paramsMap == null){
+        if(paramsMap.isEmpty()){
             sqlBuilder.append(sql);
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }

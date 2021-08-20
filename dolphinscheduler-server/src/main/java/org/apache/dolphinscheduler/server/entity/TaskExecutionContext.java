@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.entity;
 
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
@@ -190,6 +191,19 @@ public class TaskExecutionContext implements Serializable{
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    /**
+     * business param
+     */
+    private Map<String, Property> paramsMap;
+
+    public Map<String, Property> getParamsMap() {
+        return paramsMap;
+    }
+
+    public void setParamsMap(Map<String, Property> paramsMap) {
+        this.paramsMap = paramsMap;
+    }
 
     /**
      *  procedure TaskExecutionContext

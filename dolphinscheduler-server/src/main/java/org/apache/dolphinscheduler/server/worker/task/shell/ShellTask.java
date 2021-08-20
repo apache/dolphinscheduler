@@ -32,6 +32,9 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+
+import org.apache.commons.collections.MapUtils;
+
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -138,20 +141,11 @@ public class ShellTask extends AbstractTask {
         shellParameters.getLocalParametersMap(),
         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
         taskExecutionContext.getScheduleTime());
-    // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if (taskExecutionContext.getScheduleTime() != null) {
-      if (paramsMap == null) {
-        paramsMap = new HashMap<>();
-      }
-      Date date = taskExecutionContext.getScheduleTime();
-      if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
-        date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
-      }
-      String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
-      Property p = new Property();
-      p.setValue(dateTime);
-      p.setProp(Constants.PARAMETER_DATETIME);
-      paramsMap.put(Constants.PARAMETER_DATETIME, p);
+    if(MapUtils.isEmpty(paramsMap)){
+      paramsMap=new HashMap<>();
+    }
+    if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
+      paramsMap.putAll(taskExecutionContext.getParamsMap());
     }
     script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
 

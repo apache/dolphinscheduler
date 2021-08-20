@@ -29,8 +29,12 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
+
+import org.apache.commons.collections.MapUtils;
+
 import org.slf4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -120,6 +124,12 @@ public class PythonTask extends AbstractTask {
             pythonParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
+    if(MapUtils.isEmpty(paramsMap)){
+      paramsMap=new HashMap<>();
+    }
+    if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
+      paramsMap.putAll(taskExecutionContext.getParamsMap());
+    }
     if (paramsMap != null){
       rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }
