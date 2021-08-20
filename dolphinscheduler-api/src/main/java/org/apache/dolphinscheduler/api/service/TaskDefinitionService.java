@@ -66,12 +66,12 @@ public interface TaskDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param taskCode task code
-     * @param taskDefinitionJson task definition json
+     * @param taskDefinitionJsonObj task definition json object
      */
     Map<String, Object> updateTaskDefinition(User loginUser,
                                              long projectCode,
                                              long taskCode,
-                                             String taskDefinitionJson);
+                                             String taskDefinitionJsonObj);
 
     /**
      * update task definition
@@ -134,17 +134,37 @@ public interface TaskDefinitionService {
      * @param loginUser login user
      * @param projectCode project code
      * @param searchVal search value
+     * @param userId user id
      * @param pageNo page number
      * @param pageSize page size
-     * @param userId user id
      * @return task definition page
      */
     Result queryTaskDefinitionListPaging(User loginUser,
                                          long projectCode,
                                          String searchVal,
+                                         Integer userId,
                                          Integer pageNo,
-                                         Integer pageSize,
-                                         Integer userId);
+                                         Integer pageSize);
+
+    /**
+     * query task definition list paging
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskType taskType
+     * @param searchVal search value
+     * @param userId user id
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return task definition page
+     */
+    Result queryTaskDefinitionByTaskType(User loginUser,
+                                         long projectCode,
+                                         String taskType,
+                                         String searchVal,
+                                         Integer userId,
+                                         Integer pageNo,
+                                         Integer pageSize);
 
     /**
      * gen task code list
