@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.plugin;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -32,96 +31,98 @@ import com.google.common.collect.ImmutableList;
  */
 public class DolphinPluginManagerConfig {
 
-    /**
-     * The dir of the Alert Plugin in.
-     * When AlertServer is running on the server, it will load the Alert Plugin from this directory.
-     */
-    private File installedPluginsDir;
+	/**
+	 * The dir of the Alert Plugin in. When AlertServer is running on the server, it
+	 * will load the Alert Plugin from this directory.
+	 */
+	private File installedPluginsDir;
 
-    /**
-     * The plugin should be load.
-     * The installedPluginsDir is empty when we development and run server in IDEA. Then we can config which plugin should be load by param name alert.plugin.binding in the alert.properties file
-     */
-    private List<String> plugins;
+	/**
+	 * The plugin should be load. The installedPluginsDir is empty when we
+	 * development and run server in IDEA. Then we can config which plugin should be
+	 * load by param name alert.plugin.binding in the alert.properties file
+	 */
+	private List<String> plugins;
 
-    /**
-     * Development, When AlertServer is running on IDE, AlertPluginLoad can load Alert Plugin from local Repository.
-     */
-    private String mavenLocalRepository = System.getProperty("user.home") + "/.m2/repository";
-    private List<String> mavenRemoteRepository = ImmutableList.of("https://repo1.maven.org/maven2/");
+	/**
+	 * Development, When AlertServer is running on IDE, AlertPluginLoad can load
+	 * Alert Plugin from local Repository.
+	 */
+	private String mavenLocalRepository = System.getProperty("user.home") + "/.m2/repository";
+	private List<String> mavenRemoteRepository = ImmutableList.of("https://repo1.maven.org/maven2/");
 
-    File getInstalledPluginsDir() {
-        return installedPluginsDir;
-    }
+	File getInstalledPluginsDir() {
+		return installedPluginsDir;
+	}
 
-    /**
-     * @param pluginDir plugin directory
-     */
-    public void setInstalledPluginsDir(String pluginDir) {
-        requireNonNull(pluginDir, "pluginDir can not be null");
-        File pluginDirFile = new File(pluginDir);
-        if (!pluginDirFile.exists()) {
-        	try {
-        		System.out.println(pluginDirFile.getAbsolutePath());
+	/**
+	 * @param pluginDir plugin directory
+	 */
+	public void setInstalledPluginsDir(String pluginDir) {
+		requireNonNull(pluginDir, "pluginDir can not be null");
+		File pluginDirFile = new File(pluginDir);
+		if (!pluginDirFile.exists()) {
+			try {
+				System.out.println(pluginDirFile.getAbsolutePath());
 				pluginDirFile.createNewFile();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            //throw new IllegalArgumentException(format("plugin dir not exists ! %s", pluginDirFile.getPath()));
-        }
-        this.installedPluginsDir = pluginDirFile;
-    }
+			// throw new IllegalArgumentException(format("plugin dir not exists ! %s",
+			// pluginDirFile.getPath()));
+		}
+		this.installedPluginsDir = pluginDirFile;
+	}
 
-    public List<String> getPlugins() {
-        return plugins;
-    }
+	public List<String> getPlugins() {
+		return plugins;
+	}
 
-    public DolphinPluginManagerConfig setPlugins(List<String> plugins) {
-        this.plugins = plugins;
-        return this;
-    }
+	public DolphinPluginManagerConfig setPlugins(List<String> plugins) {
+		this.plugins = plugins;
+		return this;
+	}
 
-    /**
-     * When development and run server in IDE, this method can set plugins in alert.properties .
-     * Then when you start AlertServer in IDE, the plugin can be load.
-     * eg:
-     * file: alert.properties
-     * alert.plugin=\
-     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
-     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
-     *
-     * @param plugins plugins
-     * @return DolphinPluginManagerConfig
-     */
-    public DolphinPluginManagerConfig setPlugins(String plugins) {
-        if (plugins == null) {
-            this.plugins = null;
-        } else {
-            this.plugins = ImmutableList.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(plugins));
-        }
-        return this;
-    }
+	/**
+	 * When development and run server in IDE, this method can set plugins in
+	 * alert.properties . Then when you start AlertServer in IDE, the plugin can be
+	 * load. eg: file: alert.properties alert.plugin=\
+	 * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
+	 * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
+	 *
+	 * @param plugins plugins
+	 * @return DolphinPluginManagerConfig
+	 */
+	public DolphinPluginManagerConfig setPlugins(String plugins) {
+		if (plugins == null) {
+			this.plugins = null;
+		} else {
+			this.plugins = ImmutableList.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(plugins));
+		}
+		return this;
+	}
 
-    String getMavenLocalRepository() {
-        return mavenLocalRepository;
-    }
+	String getMavenLocalRepository() {
+		return mavenLocalRepository;
+	}
 
-    public void setMavenLocalRepository(String mavenLocalRepository) {
-        this.mavenLocalRepository = mavenLocalRepository;
-    }
+	public void setMavenLocalRepository(String mavenLocalRepository) {
+		this.mavenLocalRepository = mavenLocalRepository;
+	}
 
-    List<String> getMavenRemoteRepository() {
-        return mavenRemoteRepository;
-    }
+	List<String> getMavenRemoteRepository() {
+		return mavenRemoteRepository;
+	}
 
-    public DolphinPluginManagerConfig setMavenRemoteRepository(List<String> mavenRemoteRepository) {
-        this.mavenRemoteRepository = mavenRemoteRepository;
-        return this;
-    }
+	public DolphinPluginManagerConfig setMavenRemoteRepository(List<String> mavenRemoteRepository) {
+		this.mavenRemoteRepository = mavenRemoteRepository;
+		return this;
+	}
 
-    public DolphinPluginManagerConfig setMavenRemoteRepository(String mavenRemoteRepository) {
-        this.mavenRemoteRepository = ImmutableList.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(mavenRemoteRepository));
-        return this;
-    }
+	public DolphinPluginManagerConfig setMavenRemoteRepository(String mavenRemoteRepository) {
+		this.mavenRemoteRepository = ImmutableList
+				.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(mavenRemoteRepository));
+		return this;
+	}
 }
