@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,6 +72,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private DataSourceMapper dataSourceMapper;
+
+    @Mock
+    private DataSourceUserMapper datasourceUserMapper;
 
     @Test
     public void createDataSourceTest() {
