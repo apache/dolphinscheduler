@@ -55,8 +55,6 @@ import org.springframework.context.ApplicationContext;
 public class HttpTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(HttpTaskTest.class);
 
-
-
     private HttpTask httpTask;
 
     private ProcessService processService;
@@ -168,7 +166,7 @@ public class HttpTaskTest {
 
         } catch (IOException e) {
             e.printStackTrace();
-        };
+        }
     }
 
     @Test
