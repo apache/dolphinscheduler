@@ -336,21 +336,13 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private boolean taskStateChangeHandler(StateEvent stateEvent) {
-        logger.info("task event handler: {}", stateEvent.toString());
-        logger.info("work flow {}, active tasks:{}",
-                this.processInstance.getId(),
-                activeTaskProcessorMaps.keySet().toString());
         TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
         if (stateEvent.getExecutionStatus().typeIsFinished()) {
             taskFinished(task);
         }else if(activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())){
-            logger.info("recheck the task {} status", stateEvent.getTaskInstanceId());
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             iTaskProcessor.run();
-            logger.info("work flow {} task {} state:{} ",
-                    processInstance.getId(),
-                    stateEvent.getTaskInstanceId(),
-                    iTaskProcessor.taskState());
+
             if(iTaskProcessor.taskState().typeIsFinished()){
                 task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 taskFinished(task);
@@ -362,6 +354,10 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void taskFinished(TaskInstance task){
+        logger.info("work flow {} task {} state:{} ",
+                processInstance.getId(),
+                task.getId(),
+                task.getState());
         if (task.taskCanRetry()) {
             addTaskToStandByList(task);
             return ;
