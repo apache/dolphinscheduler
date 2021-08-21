@@ -151,23 +151,13 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void updateTaskDefinition () {
-        String updateTaskDefinitionJson = "{\n"
-                +   "\"name\": \"test12111\",\n"
-                +   "\"description\": \"test\",\n"
-                +   "\"taskType\": \"SHELL\",\n"
-                +   "\"flag\": 0,\n"
-                +   "\"taskParams\": \"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo 11\\\",\\\"conditionResult\\\": "
-                +   "{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]},\\\"dependence\\\":{}}\",\n"
-                +   "\"taskPriority\": 0,\n"
-                +   "\"workerGroup\": \"default\",\n"
-                +   "\"failRetryTimes\": 0,\n"
-                +   "\"failRetryInterval\": 1,\n"
-                +   "\"timeoutFlag\": 1,\n"
-                +   "\"timeoutNotifyStrategy\": 0,\n"
-                +   "\"timeout\": 0,\n"
-                +   "\"delayTime\": 0,\n"
-                +   "\"resourceIds\": \"\"\n"
-                +   "}";
+        String taskDefinitionJson = "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
         long projectCode = 1L;
         long taskCode = 1L;
 
@@ -186,7 +176,8 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.queryByDefinitionCode(taskCode)).thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
-        result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, taskCode, updateTaskDefinitionJson);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode)).thenReturn(1);
+        result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, taskCode, taskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
