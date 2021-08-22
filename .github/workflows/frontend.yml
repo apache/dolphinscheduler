@@ -19,31 +19,44 @@ name: Frontend
 
 on:
   push:
+    branches:
+      - dev
     paths:
-      - '.github/workflows/ci_frontend.yml'
+      - '.github/workflows/frontend.yml'
       - 'dolphinscheduler-ui/**'
   pull_request:
     paths:
-      - '.github/workflows/ci_frontend.yml'
+      - '.github/workflows/frontend.yml'
       - 'dolphinscheduler-ui/**'
 
+defaults:
+  run:
+    working-directory: dolphinscheduler-ui
+
+concurrency:
+  group: frontend-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  Compile-check:
+  build:
+    name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ ubuntu-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v2
         with:
-          submodule: true
+          submodules: true
+      - if: matrix.os == 'ubuntu-latest'
+        name: Sanity Check
+        uses: ./.github/actions/sanity-check
       - name: Set up Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          version: 8
-      - name: Compile
+          node-version: 8
+      - name: Compile and Build
         run: |
-          cd dolphinscheduler-ui
           npm install node-sass --unsafe-perm
           npm install
           npm run lint

@@ -83,22 +83,24 @@ public class ExecutorController extends BaseController {
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
      * @param timeout timeout
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
-            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
-            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
-            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
-            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
-            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
-            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
-            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+        @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
+        @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
+        @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
+        @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
+        @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+        @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -118,7 +120,9 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
-                                       @RequestParam(value = "startParams", required = false) String startParams) {
+                                       @RequestParam(value = "startParams", required = false) String startParams,
+                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber
+    ) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -129,7 +133,7 @@ public class ExecutorController extends BaseController {
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
-                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
+                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap, expectedParallelismNumber);
         return returnDataList(result);
     }
 
