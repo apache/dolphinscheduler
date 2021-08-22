@@ -114,8 +114,6 @@ public class TISTaskTest {
         // https://github.com/dreamhead/moco/blob/master/moco-doc/websocket-apis.md
         // https://github.com/dreamhead/moco/blob/master/moco-doc/socket-apis.md#json-text
         // https://blog.csdn.net/qq_36450484/article/details/99655976
-
-
         HttpServer server = jsonHttpServer(8080, pathResource("org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
 
 

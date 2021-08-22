@@ -49,21 +49,8 @@ public class TISParameters extends AbstractParameters {
             logger.error("checkParameters faild targetJobName can not be null");
             return false;
         }
-//        if (getTisHostProp() == null) {
-//            logger.error("checkParameters faild getTisHostProp() can not be null");
-//            return false;
-//        }
         return true;
     }
-
-//    public String getTisHost() {
-//        return getTisHostProp().getValue();
-//    }
-
-//    private Property getTisHostProp() {
-//
-//        return this.getVarPoolMap().get(KEY_POOL_VAR_TIS_HOST);
-//    }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {

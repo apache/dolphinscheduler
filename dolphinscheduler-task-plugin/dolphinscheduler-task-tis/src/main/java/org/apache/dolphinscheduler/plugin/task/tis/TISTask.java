@@ -93,7 +93,7 @@ public class TISTask extends AbstractTask {
             int taskId;
             WebSocket webSocket = null;
             try (CloseableHttpClient client = HttpClients.createDefault();
-                 // 触发开始执行
+                 // trigger to start TIS dataX task
                  CloseableHttpResponse response = client.execute(post)) {
                 ajaxResult = p(triggerUrl, response, BizResult.class);
                 if (!ajaxResult.isSuccess()) {
@@ -155,7 +155,6 @@ public class TISTask extends AbstractTask {
     @Override
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
-        // cancel remote tis task
     }
 
     private WebSocket receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws InterruptedException, java.util.concurrent.ExecutionException {
@@ -167,8 +166,6 @@ public class TISTask extends AbstractTask {
                     @Override
                     public void onOpen(WebSocket websocket) {
                         // WebSocket connection opened
-
-                        System.out.println("---------------------------------------");
                     }
 
                     @Override
@@ -176,10 +173,6 @@ public class TISTask extends AbstractTask {
                         // WebSocket connection closed
                     }
 
-//                    @Override
-//                    public void onBinaryFrame(byte[] payload, boolean finalFragment, int rsv) {
-//
-//                    }
 
                     public void onTextFrame(String payload, boolean finalFragment, int rsv) {
                         ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
