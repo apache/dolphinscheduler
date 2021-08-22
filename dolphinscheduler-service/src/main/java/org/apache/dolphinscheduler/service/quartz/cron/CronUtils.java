@@ -62,7 +62,6 @@ public class CronUtils {
         return QUARTZ_CRON_PARSER.parse(cronExpression);
     }
 
-
     /**
      * build a new CronExpression based on the string cronExpression
      *

@@ -106,5 +106,4 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
         }
     }
 
-
 }
