@@ -41,7 +41,7 @@ public class AsyncStreamThread extends Thread {
     @Override
     public void run() {
         try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader inputBufferReader = new BufferedReader(inputStreamReader)){
+                BufferedReader inputBufferReader = new BufferedReader(inputStreamReader)) {
             String line;
             StringBuilder output = new StringBuilder();
             while ((line = inputBufferReader.readLine()) != null) {
