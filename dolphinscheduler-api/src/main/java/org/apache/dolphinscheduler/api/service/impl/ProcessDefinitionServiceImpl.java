@@ -1347,12 +1347,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, resultStatus);
             return result;
         }
-
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
-
         PageInfo<ProcessDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<ProcessDefinitionLog> page = new Page<>(pageNo, pageSize);
-        IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, processDefinition.getCode());
+        IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code);
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
 
         pageInfo.setTotalList(processDefinitionLogs);
