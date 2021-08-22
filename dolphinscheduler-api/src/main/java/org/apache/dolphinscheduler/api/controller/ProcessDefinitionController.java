@@ -130,7 +130,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param targetProjectCode target project code
      * @return copy result code
      */
-    @ApiOperation(value = "batchCopyProcessDefinitions", notes = "COPY_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "batchCopyByCodes", notes = "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
         @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "Long", example = "123")
