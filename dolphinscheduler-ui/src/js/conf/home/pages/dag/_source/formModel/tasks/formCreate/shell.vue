@@ -33,7 +33,6 @@
   import clickoutside from '@/module/util/clickoutside'
   import formCreate from '@form-create/element-ui'
 
-  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mSelectInput from '../_source/selectInput'
   import mTimeoutAlarm from '../_source/timeoutAlarm'
