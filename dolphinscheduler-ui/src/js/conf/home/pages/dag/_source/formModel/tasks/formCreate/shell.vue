@@ -34,6 +34,7 @@
   import formCreate from '@form-create/element-ui'
 
   import { mapActions } from 'vuex'
+  import JSP from './././plugIn/jsPlumbHandle'
   import mSelectInput from '../_source/selectInput'
   import mTimeoutAlarm from '../_source/timeoutAlarm'
   import mDependentTimeout from '../_source/dependentTimeout'
@@ -43,7 +44,7 @@
   import mPriority from '@/module/components/priority/priority'
 
   let editor
-  formCreate.directive('clickoutside',clickoutside)
+  formCreate.directive('clickoutside', clickoutside)
   formCreate.component('mSelectInput', mSelectInput)
   formCreate.component('mTimeoutAlarm', mTimeoutAlarm)
   formCreate.component('mDependentTimeout', mDependentTimeout)
@@ -66,7 +67,7 @@
         // description
         desc: '',
         // Node echo data
-        backfillItem: {},
+        // backfillItem: {},
         cacheBackfillItem: {},
         successNode: 'success',
         failedNode: 'failed',
@@ -264,7 +265,7 @@
         }
         // Verify task alarm parameters
         if (!this.$refs.timeout._verification()) {
-            return
+          return
         }
 
         // Verify node parameters
@@ -416,11 +417,11 @@
                                 children: [
                                   {
                                     type: 'em',
-                                    class: "ansicon el-icon-alarm-clock"
+                                    class: 'ansicon el-icon-alarm-clock'
                                   },
                                   {
                                     type: 'em',
-                                    children:[$t('View history')]
+                                    children: [$t('View history')]
                                   }
                                 ]
                               }
@@ -436,11 +437,11 @@
                                 children: [
                                   {
                                     type: 'em',
-                                    class: "ansicon el-icon-document"
+                                    class: 'ansicon el-icon-document'
                                   },
                                   {
                                     type: 'em',
-                                    children:[$t('View log')]
+                                    children: [$t('View log')]
                                   }
                                 ]
                               }
@@ -529,7 +530,7 @@
                                 ]
                               }
                             ]
-                          },
+                          }
                         ]
                       },
                       /* description */
@@ -581,7 +582,7 @@
                                     type: 'm-priority',
                                     props: {
                                       value: this.taskInstancePriority
-                                    }  
+                                    }
                                   }
                                 ]
                               },
@@ -639,13 +640,13 @@
                               {
                                 type: 'span',
                                 children: [$t('Minute')]
-                              },
+                              }
                             ]
                           }
                         ]
                       },
                       /* Delay execution time */
-                      { 
+                      {
                         type: 'm-list-box',
                         children: [
                           {
@@ -1131,7 +1132,7 @@
       }
     },
     created () {
-            // Unbind copy and paste events
+      // Unbind copy and paste events
       JSP.removePaste()
       // Backfill data
       let taskList = this.store.state.dag.tasks
@@ -1261,16 +1262,16 @@
       }
     },
     // eslint-disable-next-line vue/no-unused-components
-    components: { 
+    components: {
       mSelectInput,
       mTimeoutAlarm,
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
       mPreTasks,
-      mLocalParams, 
-      mListBox, 
-      mScriptBox, 
+      mLocalParams,
+      mListBox,
+      mScriptBox,
       Treeselect
     }
   }
