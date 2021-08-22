@@ -115,17 +115,17 @@ public class SubProcessTaskTest {
     @Test
     public void testBasicSuccess() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
-//        SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        //SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
+        //taskExecThread.call();
+        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
     public void testBasicFailure() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
-//        SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
+        //SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
+        //taskExecThread.call();
+        //Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
     private TaskNode getTaskNode() {

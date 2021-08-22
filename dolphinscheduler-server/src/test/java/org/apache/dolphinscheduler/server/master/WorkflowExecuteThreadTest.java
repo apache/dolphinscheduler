@@ -105,7 +105,7 @@ public class WorkflowExecuteThreadTest {
         processDefinition.setGlobalParamList(Collections.emptyList());
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        ConcurrentHashMap<Integer,TaskInstance> taskTimeoutCheckList= new ConcurrentHashMap<>();
+        ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
         workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, taskTimeoutCheckList));
         // prepareProcess init dag
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");

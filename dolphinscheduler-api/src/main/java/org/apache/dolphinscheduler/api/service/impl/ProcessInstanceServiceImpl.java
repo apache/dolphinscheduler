@@ -594,7 +594,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         try {
             processService.removeTaskLogFile(processInstanceId);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("remove task log failed", e);
         }
 

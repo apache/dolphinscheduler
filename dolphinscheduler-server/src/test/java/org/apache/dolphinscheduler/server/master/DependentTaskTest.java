@@ -156,9 +156,6 @@ public class DependentTaskTest {
                         getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, "B", dependentProcessInstance)
                 ).collect(Collectors.toList()));
 
-//        DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
@@ -178,10 +175,6 @@ public class DependentTaskTest {
                         getTaskInstanceForValidTaskList(2000, ExecutionStatus.FAILURE, "A", dependentProcessInstance),
                         getTaskInstanceForValidTaskList(2000, ExecutionStatus.SUCCESS, "B", dependentProcessInstance)
                 ).collect(Collectors.toList()));
-
-//        DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
@@ -241,9 +234,9 @@ public class DependentTaskTest {
                         getTaskInstanceForValidTaskList(3001, ExecutionStatus.SUCCESS, "C", processInstance300)
                 ).collect(Collectors.toList()));
 
-//        DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        //taskExecThread.call();
+        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     /**
@@ -275,9 +268,9 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.SUCCESS));
 
-//        DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        //taskExecThread.call();
+        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
@@ -288,9 +281,9 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.FAILURE));
 
-//        DependentTaskExecThread dependentTask = new DependentTaskExecThread(taskInstance);
-//        dependentTask.call();
-//        Assert.assertEquals(ExecutionStatus.FAILURE, dependentTask.getTaskInstance().getState());
+        //DependentTaskExecThread dependentTask = new DependentTaskExecThread(taskInstance);
+        //dependentTask.call();
+        //Assert.assertEquals(ExecutionStatus.FAILURE, dependentTask.getTaskInstance().getState());
     }
 
     /**
@@ -326,7 +319,7 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(dependentProcessInstance);
 
-//        DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
+        //DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
@@ -339,8 +332,8 @@ public class DependentTaskTest {
                 })
                 .thenThrow(new IllegalStateException("have not been stopped as expected"));
 
-//        taskExecThread.call();
-//        Assert.assertEquals(ExecutionStatus.KILL, taskExecThread.getTaskInstance().getState());
+        //taskExecThread.call();
+        //Assert.assertEquals(ExecutionStatus.KILL, taskExecThread.getTaskInstance().getState());
     }
 
     private ProcessInstance getProcessInstance() {
