@@ -42,13 +42,17 @@ import org.slf4j.LoggerFactory;
 public class LogClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
+
+    private final NettyClientConfig clientConfig;
+
+    private final NettyRemotingClient client;
+
+    private volatile boolean isRunning;
+
     /**
      * request time out
      */
     private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
-    private final NettyClientConfig clientConfig;
-    private final NettyRemotingClient client;
-    private volatile boolean isRunning;
 
     /**
      * construct client
@@ -82,8 +86,7 @@ public class LogClientService implements AutoCloseable {
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host,
-            port, path, skipLineNum, limit);
+        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         String result = "";
         final Host address = new Host(host, port);
@@ -92,7 +95,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
-                    response.getBody(), RollViewLogResponseCommand.class);
+                        response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
         } catch (Exception e) {
@@ -124,7 +127,7 @@ public class LogClientService implements AutoCloseable {
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
                     ViewLogResponseCommand viewLog = JSONUtils.parseObject(
-                        response.getBody(), ViewLogResponseCommand.class);
+                            response.getBody(), ViewLogResponseCommand.class);
                     result = viewLog.getMsg();
                 }
             }
@@ -154,7 +157,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
-                    response.getBody(), GetLogBytesResponseCommand.class);
+                        response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData();
             }
         } catch (Exception e) {
@@ -174,7 +177,7 @@ public class LogClientService implements AutoCloseable {
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
-                    response.getBody(), RemoveTaskLogResponseCommand.class);
+                        response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }
         } catch (Exception e) {
@@ -182,7 +185,7 @@ public class LogClientService implements AutoCloseable {
         } finally {
             this.client.closeChannel(address);
         }
-        return true;
+        return Boolean.TRUE;
     }
 
     public boolean isRunning() {

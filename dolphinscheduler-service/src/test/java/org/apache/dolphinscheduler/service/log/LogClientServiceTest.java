@@ -55,8 +55,7 @@ public class LogClientServiceTest {
         PowerMockito.mockStatic(NetUtils.class);
         PowerMockito.when(NetUtils.getHost()).thenReturn(localMachine);
         PowerMockito.mockStatic(LoggerUtils.class);
-        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString()))
-            .thenReturn("application_xx_11");
+        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("application_xx_11");
 
         LogClientService logClientService = new LogClientService();
         String log = logClientService.viewLog(localMachine, port, path);
@@ -73,15 +72,12 @@ public class LogClientServiceTest {
         PowerMockito.when(NetUtils.getHost()).thenReturn(localMachine + "1");
 
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments()
-            .thenReturn(remotingClient);
+        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
-        command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand(""))
-            .getBytes(StandardCharsets.UTF_8));
-        PowerMockito.when(remotingClient
-            .sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-            .thenReturn(command);
+        command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
+        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                .thenReturn(command);
         LogClientService logClientService = new LogClientService();
         String log = logClientService.viewLog(localMachine, port, path);
         Assert.assertNotNull(log);
@@ -90,8 +86,7 @@ public class LogClientServiceTest {
     @Test(expected = None.class)
     public void testClose() throws Exception {
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments()
-            .thenReturn(remotingClient);
+        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
         PowerMockito.doNothing().when(remotingClient).close();
 
         LogClientService logClientService = new LogClientService();
@@ -101,14 +96,12 @@ public class LogClientServiceTest {
     @Test
     public void testRollViewLog() throws Exception {
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments()
-            .thenReturn(remotingClient);
+        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RollViewLogResponseCommand("success")));
-        PowerMockito.when(remotingClient
-            .sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-            .thenReturn(command);
+        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         String msg = logClientService.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
@@ -118,15 +111,12 @@ public class LogClientServiceTest {
     @Test
     public void testGetLogBytes() throws Exception {
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments()
-            .thenReturn(remotingClient);
+        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
-        command.setBody(JSONUtils.toJsonByteArray(
-            new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
-        PowerMockito.when(remotingClient
-            .sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-            .thenReturn(command);
+        command.setBody(JSONUtils.toJsonByteArray(new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
+        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         byte[] logBytes = logClientService.getLogBytes("localhost", 1234, "/tmp/log");
@@ -136,19 +126,16 @@ public class LogClientServiceTest {
     @Test
     public void testRemoveTaskLog() throws Exception {
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments()
-            .thenReturn(remotingClient);
+        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RemoveTaskLogResponseCommand(true)));
-        PowerMockito.when(remotingClient
-            .sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-            .thenReturn(command);
+        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                .thenReturn(command);
 
         LogClientService logClientService = new LogClientService();
         Map<String, List<String>> taskLogFiles = new HashMap<>();
-        Boolean status = logClientService
-            .removeMultiTasksLog("localhost", 1234, Arrays.asList("/log/path"));
+        Boolean status = logClientService.removeMultiTasksLog("localhost", 1234, Arrays.asList("/log/path"));
         Assert.assertTrue(status);
     }
 

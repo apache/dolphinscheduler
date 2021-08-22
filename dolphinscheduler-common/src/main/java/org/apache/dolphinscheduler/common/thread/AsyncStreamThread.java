@@ -40,12 +40,8 @@ public class AsyncStreamThread extends Thread {
 
     @Override
     public void run() {
-        InputStreamReader inputStreamReader = null;
-        BufferedReader inputBufferReader = null;
-
-        try {
-            inputStreamReader = new InputStreamReader(inputStream);
-            inputBufferReader = new BufferedReader(inputStreamReader);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader inputBufferReader = new BufferedReader(inputStreamReader)){
             String line;
             StringBuilder output = new StringBuilder();
             while ((line = inputBufferReader.readLine()) != null) {
@@ -53,21 +49,10 @@ public class AsyncStreamThread extends Thread {
                 output.append(System.getProperty("line.separator"));
             }
             if (output.length() > 0) {
-                logger.info("out put msg is{}", output);
+                logger.info("out put msg is {}", output);
             }
         } catch (IOException e) {
             logger.error("I/O error occurs {}", e.getMessage());
-        } finally {
-            try {
-                if (inputBufferReader != null) {
-                    inputBufferReader.close();
-                }
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
-                }
-            } catch (IOException e) {
-                logger.error("I/O error occurs {}", e.getMessage());
-            }
         }
     }
 
