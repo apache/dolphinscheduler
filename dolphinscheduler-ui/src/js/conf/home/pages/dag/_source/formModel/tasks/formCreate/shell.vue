@@ -1205,7 +1205,7 @@
       let item = this.store.state.dag.resourcesListS
       diGuiTree(item)
       this.resourceOptions = item
-      let o = this.backfillItem
+      o = this.backfillItem
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
