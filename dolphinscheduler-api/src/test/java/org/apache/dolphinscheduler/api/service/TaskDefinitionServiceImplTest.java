@@ -22,15 +22,12 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -50,7 +47,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
@@ -74,7 +70,8 @@ public class TaskDefinitionServiceImplTest {
     private ProcessService processService;
 
     @Mock
-    private ProcessTaskRelationMapper processTaskRelationMapper;;
+    private ProcessTaskRelationMapper processTaskRelationMapper;
+    ;
 
     @Test
     public void createTaskDefinition() {
@@ -102,13 +99,13 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.batchInsert(Mockito.anyList())).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.batchInsert(Mockito.anyList())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
+            .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
     }
 
     @Test
-    public void updateTaskDefinition () {
+    public void updateTaskDefinition() {
         String taskDefinitionJson = "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
             + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
             + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
@@ -156,10 +153,10 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), taskName))
-                .thenReturn(new TaskDefinition());
+            .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-                .queryTaskDefinitionByName(loginUser, projectCode, taskName);
+            .queryTaskDefinitionByName(loginUser, projectCode, taskName);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -181,10 +178,10 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(processTaskRelationMapper.queryByTaskCode(Mockito.anyLong()))
             .thenReturn(new ArrayList<>());
         Mockito.when(taskDefinitionMapper.deleteByCode(Mockito.anyLong()))
-                .thenReturn(1);
+            .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-                .deleteTaskDefinitionByCode(loginUser, projectCode, Mockito.anyLong());
+            .deleteTaskDefinitionByCode(loginUser, projectCode, Mockito.anyLong());
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -207,13 +204,13 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version))
-                .thenReturn(new TaskDefinitionLog());
+            .thenReturn(new TaskDefinitionLog());
 
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode))
-                .thenReturn(new TaskDefinition());
+            .thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(new TaskDefinitionLog())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .switchVersion(loginUser, projectCode, taskCode, version);
+            .switchVersion(loginUser, projectCode, taskCode, version);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
