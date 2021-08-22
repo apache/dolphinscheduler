@@ -79,26 +79,6 @@ public class TaskDefinitionLogMapperTest {
     }
 
     @Test
-    public void testQueryByDefinitionName() {
-        User user = new User();
-        user.setUserName("un");
-        userMapper.insert(user);
-        User un = userMapper.queryByUserNameAccurately("un");
-
-        Project project = new Project();
-        project.setCode(1L);
-        project.setCreateTime(new Date());
-        project.setUpdateTime(new Date());
-        projectMapper.insert(project);
-
-        TaskDefinitionLog taskDefinitionLog = insertOne(un.getId());
-
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper
-                .queryByDefinitionName(taskDefinitionLog.getProjectCode(), taskDefinitionLog.getName());
-        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
-    }
-
-    @Test
     public void testQueryMaxVersionForDefinition() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         int version = taskDefinitionLogMapper
