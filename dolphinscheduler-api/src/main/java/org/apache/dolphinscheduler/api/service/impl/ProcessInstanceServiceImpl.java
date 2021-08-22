@@ -188,8 +188,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return process instance detail
      */
     @Override
-    public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName,
-                                                        Integer processId) {
+    public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
@@ -201,7 +200,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
 
         ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-               processInstance.getProcessDefinitionVersion());
+                processInstance.getProcessDefinitionVersion());
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
@@ -236,9 +235,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Override
     public Result queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
-                                           String startDate, String endDate,
-                                           String searchVal, String executorName, ExecutionStatus stateType, String host,
-                                           Integer pageNo, Integer pageSize) {
+                                                        String startDate, String endDate,
+                                                        String searchVal, String executorName, ExecutionStatus stateType, String host,
+                                                        Integer pageNo, Integer pageSize) {
 
         Result result = new Result();
         Project project = projectMapper.queryByName(projectName);
@@ -246,7 +245,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            putMsg(result, resultEnum);
+            putMsg(result,resultEnum);
             return result;
         }
 
@@ -259,7 +258,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            putMsg(result, resultEnum);
+            putMsg(result,resultEnum);
             return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
@@ -328,8 +327,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * add dependent result for dependent task
      */
-    private void addDependResultForTaskList(List<TaskInstance> taskInstanceList)
-            throws IOException {
+    private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<String> logResult = loggerService.queryLog(
@@ -577,8 +575,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName,
-                                                         Integer processInstanceId, Map<String, List<String>> taskFiles) {
+    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId, Map<String, List<String>> taskFiles) {
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);

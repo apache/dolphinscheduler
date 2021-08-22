@@ -2238,8 +2238,7 @@ public class ProcessService {
                                                            ProcessData processData, Project project,
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
-        Integer version = processDefineLogMapper
-                .queryMaxVersionForDefinition(processDefinitionCode);
+        Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
         processDefinitionLog.setUserId(operator.getId());
         processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version + 1);
@@ -2386,8 +2385,7 @@ public class ProcessService {
     }
 
     public boolean isTaskOnline(Long taskCode) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper
-                .queryByTaskCode(taskCode);
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> processDefinitionCodes = processTaskRelationList
                     .stream()
@@ -2451,16 +2449,12 @@ public class ProcessService {
                     v.setVersion(processTaskRelation.getPostTaskVersion());
                     List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
                     if (processTaskRelation.getPreTaskCode() > 0) {
-                        preTaskNodeList.add(
-                                new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "",
-                                        processTaskRelation.getPreTaskVersion()));
+                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
                     }
                     v.setPreTaskNodeList(preTaskNodeList);
                 } else {
                     List<PreviousTaskNode> preTaskDefinitionList = v.getPreTaskNodeList();
-                    preTaskDefinitionList.add(
-                            new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "",
-                                    processTaskRelation.getPreTaskVersion()));
+                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
                 }
                 return v;
             });
@@ -2552,7 +2546,7 @@ public class ProcessService {
      * add authorized resources
      *
      * @param ownResources own resources
-     * @param userId userId
+     * @param userId       userId
      */
     private void addAuthorizedResources(List<Resource> ownResources, int userId) {
         List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);

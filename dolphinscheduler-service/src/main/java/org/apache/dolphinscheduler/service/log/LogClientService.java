@@ -78,11 +78,11 @@ public class LogClientService implements AutoCloseable {
     /**
      * roll view log
      *
-     * @param host        host
-     * @param port        port
-     * @param path        path
+     * @param host host
+     * @param port port
+     * @param path path
      * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param limit limit
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
