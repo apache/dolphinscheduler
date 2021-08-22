@@ -53,20 +53,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
@@ -81,7 +74,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "PROCESS_DEFINITION_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/process")
+@RequestMapping("projects/{projectCode}/process-definitions")
 public class ProcessDefinitionController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionController.class);
@@ -110,7 +103,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String")
     })
-    @PostMapping(value = "/save")
+    @PostMapping(value = "")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -138,12 +131,12 @@ public class ProcessDefinitionController extends BaseController {
      * @param targetProjectCode target project code
      * @return copy result code
      */
-    @ApiOperation(value = "copy", notes = "COPY_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "batchCopyProcessDefinitions", notes = "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
         @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "Long", example = "123")
     })
-    @PostMapping(value = "/copy")
+    @PostMapping(value = "/batch-copy")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -163,12 +156,12 @@ public class ProcessDefinitionController extends BaseController {
      * @param targetProjectCode target project code
      * @return move result code
      */
-    @ApiOperation(value = "moveProcessDefinition", notes = "MOVE_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "batchMoveByCodes", notes = "MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
         @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "Long", example = "123")
     })
-    @PostMapping(value = "/move")
+    @PostMapping(value = "/batch-move")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_MOVE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -226,14 +219,14 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
         @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "name", required = true) String name,
-                                          @RequestParam(value = "code", required = true) long code,
+                                          @PathVariable(value = "code", required = true) long code,
                                           @RequestParam(value = "description", required = false) String description,
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                           @RequestParam(value = "locations", required = false) String locations,
@@ -273,7 +266,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
-    @GetMapping(value = "/versions")
+    @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_VERSIONS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -281,7 +274,7 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
-                                                 @RequestParam(value = "code") long code) {
+                                                 @PathVariable(value = "code") long code) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -306,14 +299,14 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/version/switch")
+    @GetMapping(value = "/{code}/version/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_PROCESS_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result switchProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                 @RequestParam(value = "code") long code,
-                                                 @RequestParam(value = "version") int version) {
+                                                 @PathVariable(value = "code") long code,
+                                                 @PathVariable(value = "version") int version) {
         Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectCode, code, version);
         return returnDataList(result);
     }
@@ -332,14 +325,14 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/version/delete")
+    @DeleteMapping(value = "/{code}/version/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                 @RequestParam(value = "code") long code,
-                                                 @RequestParam(value = "version") int version) {
+                                                 @PathVariable(value = "code") long code,
+                                                 @PathVariable(value = "version") int version) {
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionVersion(loginUser, projectCode, code, version);
         return returnDataList(result);
     }
@@ -359,13 +352,13 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
         @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_RELEASE", required = true, dataType = "ReleaseState"),
     })
-    @PostMapping(value = "/release")
+    @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "code", required = true) long code,
+                                           @PathVariable(value = "code", required = true) long code,
                                            @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
         Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
         return returnDataList(result);
@@ -383,13 +376,13 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789")
     })
-    @GetMapping(value = "/select-by-code")
+    @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @RequestParam(value = "code", required = true) long code) {
+                                               @PathVariable(value = "code", required = true) long code) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, code);
         return returnDataList(result);
     }
@@ -406,7 +399,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataType = "String")
     })
-    @GetMapping(value = "/select-by-name")
+    @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -453,7 +446,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping(value = "")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -486,13 +479,13 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
         @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/view-tree")
+    @GetMapping(value = "/{code}/view-tree")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                           @RequestParam("code") long code,
+                           @PathVariable("code") long code,
                            @RequestParam("limit") Integer limit) {
         Map<String, Object> result = processDefinitionService.viewTree(code, limit);
         return returnDataList(result);
@@ -510,12 +503,12 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100")
     })
-    @GetMapping(value = "gen-task-list")
+    @GetMapping(value = "/{code}/tasks")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
     public Result getNodeListByDefinitionCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam("code") long code) {
+                                              @PathVariable("code") long code) {
         Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code);
         return returnDataList(result);
     }
@@ -528,11 +521,11 @@ public class ProcessDefinitionController extends BaseController {
      * @param codes process definition codes
      * @return node list data
      */
-    @ApiOperation(value = "getNodeListByDefinitionCodes", notes = "GET_NODE_LIST_BY_DEFINITION_CODE_NOTES")
+    @ApiOperation(value = "getTaskListByDefinitionCodes", notes = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
     })
-    @GetMapping(value = "gen-task-list-map")
+    @GetMapping(value = "/batch-query-tasks")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
     public Result getNodeListMapByDefinitionCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -554,13 +547,13 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @RequestParam("code") long code) {
+                                                @PathVariable("code") long code) {
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
         return returnDataList(result);
     }
@@ -577,7 +570,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "String")
     })
-    @GetMapping(value = "/batch-delete")
+    @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -622,7 +615,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "String")
     })
-    @GetMapping(value = "/export")
+    @PostMapping(value = "/batch-export")
     @ResponseBody
     @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "response"})
     public void batchExportProcessDefinitionByCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -644,7 +637,7 @@ public class ProcessDefinitionController extends BaseController {
      * @return process definition list
      */
     @ApiOperation(value = "queryAllByProjectCode", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_CODE_NOTES")
-    @GetMapping(value = "/queryAllByProjectCode")
+    @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
