@@ -58,7 +58,6 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.MapUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
@@ -427,7 +426,7 @@ public class ProcessService {
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
             Map<String, List<String>> tf = getTaskLogFiles(subId);
-            MapUtils.putAll(taskFiles, tf);
+            tf.forEach((key, val) -> taskFiles.computeIfAbsent(key, __ -> new ArrayList<>()).addAll(val));
             deleteWorkProcessInstanceById(subId);
         }
         return taskFiles;

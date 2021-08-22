@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.utils.MapUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -416,7 +415,7 @@ public class ProcessInstanceController extends BaseController {
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
                     if (Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        MapUtils.putAll(taskLogFiles, tempTaskLogFiles);
+                        tempTaskLogFiles.forEach((key, val) -> taskLogFiles.computeIfAbsent(key, __ -> new ArrayList<>()).addAll(val));
                     }
                 } catch (Exception e) {
                     deleteFailedIdList.add(strProcessInstanceId);

@@ -47,7 +47,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.MapUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
@@ -590,11 +589,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-        MapUtils.putAll(taskFiles, processService.getTaskLogFiles(processInstanceId));
+        processService.getTaskLogFiles(processInstanceId).forEach((key, val) -> taskFiles.computeIfAbsent(key, __ -> new ArrayList<>()).addAll(val));
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
 
         Map<String, List<String>> newMap = processService.deleteAllSubWorkProcessByParentId(processInstanceId);
-        MapUtils.putAll(taskFiles, newMap);
+        newMap.forEach((key, val) -> taskFiles.computeIfAbsent(key, __ -> new ArrayList<>()).addAll(val));
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 
         if (delete > 0) {
