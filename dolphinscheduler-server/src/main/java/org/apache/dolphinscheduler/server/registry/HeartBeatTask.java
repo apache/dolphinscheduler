@@ -93,7 +93,7 @@ public class HeartBeatTask implements Runnable {
         }
     }
 
-    public String heartBeatInfo(){
+    public String heartBeatInfo() {
         double loadAverage = OSUtils.loadAverage();
         double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
         int status = Constants.NORMAL_NODE_STATUS;
@@ -120,7 +120,6 @@ public class HeartBeatTask implements Runnable {
             builder.append(Constants.COMMA).append(hostWeight);
         }
         return builder.toString();
-
     }
 
 }

@@ -71,6 +71,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return pause();
             case TIMEOUT:
                 return timeout();
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+
         }
         return false;
     }

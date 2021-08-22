@@ -158,8 +158,8 @@ public class LowerWeightHostManager extends CommonHostManager {
                 String[] parts = heartbeat.split(Constants.COMMA);
                 int status = Integer.parseInt(parts[8]);
                 if (status == Constants.ABNORMAL_NODE_STATUS) {
-//                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
-//                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
                     return null;
                 }
                 double cpu = Double.parseDouble(parts[0]);

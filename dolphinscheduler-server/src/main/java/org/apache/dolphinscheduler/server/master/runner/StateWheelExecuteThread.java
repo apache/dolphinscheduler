@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.runner;
 
+package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -58,7 +58,6 @@ public class StateWheelExecuteThread extends Thread {
         this.stateCheckIntervalSecs = stateCheckIntervalSecs;
     }
 
-
     @Override
     public void run() {
 
@@ -67,7 +66,7 @@ public class StateWheelExecuteThread extends Thread {
             try {
                 checkProcess();
                 checkTask();
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
             }
             ThreadUtil.sleepAtLeastIgnoreInterrupts(stateCheckIntervalSecs);

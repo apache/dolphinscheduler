@@ -453,7 +453,6 @@ public class WorkflowExecuteThread implements Runnable {
         return true;
     }
 
-
     private boolean needComplementProcess() {
         if (processInstance.isComplementData()
                 && Flag.NO == processInstance.getIsSubProcess()) {

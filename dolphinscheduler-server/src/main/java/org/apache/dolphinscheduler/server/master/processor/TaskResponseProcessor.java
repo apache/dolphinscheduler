@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
 /**
- *  task response processor
+ * task response processor
  */
 public class TaskResponseProcessor implements NettyRequestProcessor {
 
@@ -55,12 +55,12 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
      */
     private final TaskInstanceCacheManager taskInstanceCacheManager;
 
-    public TaskResponseProcessor(){
+    public TaskResponseProcessor() {
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps){
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
         this.taskResponseService.init(processInstanceExecMaps);
     }
 
@@ -89,7 +89,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
                 responseCommand.getVarPool(),
                 channel,
                 responseCommand.getProcessInstanceId()
-                );
+        );
         taskResponseService.addResponse(taskResponseEvent);
     }
 
