@@ -67,7 +67,7 @@
         // description
         desc: '',
         // Node echo data
-        // backfillItem: {},
+        backfillItem: {},
         cacheBackfillItem: {},
         successNode: 'success',
         failedNode: 'failed',
@@ -148,7 +148,6 @@
     directives: { clickoutside },
     mixins: [disabledState],
     props: {
-      backfillItem: Object,
       nodeData: Object
     },
     methods: {
@@ -1261,7 +1260,7 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
-    // eslint-disable-next-line vue/no-unused-components
+    /* eslint-disable */
     components: {
       mSelectInput,
       mTimeoutAlarm,
@@ -1274,6 +1273,7 @@
       mScriptBox,
       Treeselect
     }
+    /* eslint-enable */
   }
 </script>
 
