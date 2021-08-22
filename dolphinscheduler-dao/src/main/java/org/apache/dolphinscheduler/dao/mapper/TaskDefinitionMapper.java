@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * task definition mapper interface
@@ -40,24 +42,16 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param name name
      * @return task definition
      */
-    TaskDefinition queryByDefinitionName(@Param("projectCode") long projectCode,
-                                      @Param("taskDefinitionName") String name);
-
-    /**
-     * query task definition by id
-     *
-     * @param taskDefinitionId taskDefinitionId
-     * @return task definition
-     */
-    TaskDefinition queryByDefinitionId(@Param("taskDefinitionId") int taskDefinitionId);
+    TaskDefinition queryByName(@Param("projectCode") long projectCode,
+                               @Param("name") String name);
 
     /**
      * query task definition by code
      *
-     * @param taskDefinitionCode taskDefinitionCode
+     * @param code taskDefinitionCode
      * @return task definition
      */
-    TaskDefinition queryByDefinitionCode(@Param("taskDefinitionCode") long taskDefinitionCode);
+    TaskDefinition queryByCode(@Param("code") long code);
 
     /**
      * query all task definition list
@@ -66,14 +60,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<TaskDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
-
-    /**
-     * query task definition by ids
-     *
-     * @param ids ids
-     * @return task definition list
-     */
-    List<TaskDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
 
     /**
      * count task definition group by user
@@ -114,4 +100,22 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return int
      */
     int batchInsert(@Param("taskDefinitions") List<TaskDefinitionLog> taskDefinitions);
+
+    /**
+     * task definition page
+     *
+     * @param page page
+     * @param taskType taskType
+     * @param searchVal searchVal
+     * @param userId userId
+     * @param projectCode projectCode
+     * @param isAdmin isAdmin
+     * @return task definition IPage
+     */
+    IPage<TaskDefinition> queryDefineListPaging(IPage<TaskDefinition> page,
+                                                @Param("projectCode") long projectCode,
+                                                @Param("taskType") String taskType,
+                                                @Param("searchVal") String searchVal,
+                                                @Param("userId") int userId,
+                                                @Param("isAdmin") boolean isAdmin);
 }

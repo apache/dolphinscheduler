@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -51,6 +53,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task definition service impl
@@ -77,6 +82,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * create task definition
@@ -159,7 +167,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             totalSuccessNumber++;
         }
         for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
-            TaskDefinition task = taskDefinitionMapper.queryByDefinitionCode(taskDefinitionToUpdate.getCode());
+            TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionToUpdate.getCode());
             if (task == null) {
                 newTaskDefinitionLogs.add(taskDefinitionToUpdate);
             } else {
@@ -203,7 +211,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(project.getCode(), taskName);
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), taskName);
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskName);
         } else {
@@ -268,7 +276,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
             return result;
         }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
@@ -332,7 +340,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
             return result;
         }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
@@ -340,46 +348,123 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
         taskDefinitionLog.setUserId(loginUser.getId());
         taskDefinitionLog.setUpdateTime(new Date());
-        taskDefinitionMapper.updateById(taskDefinitionLog);
-        result.put(Constants.DATA_LIST, taskCode);
+        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionLog);
+        if (switchVersion > 0) {
+            result.put(Constants.DATA_LIST, taskCode);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.SWITCH_TASK_DEFINITION_VERSION_ERROR);
+        }
+        return result;
+    }
+
+    @Override
+    public Result queryTaskDefinitionVersions(User loginUser,
+                                              long projectCode,
+                                              long taskCode,
+                                              int pageNo,
+                                              int pageSize) {
+        Result result = new Result();
+        Project project = projectMapper.queryByCode(projectCode);
+        // check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result, resultStatus);
+            return result;
+        }
+        PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<TaskDefinitionLog> page = new Page<>(pageNo, pageSize);
+        IPage<TaskDefinitionLog> taskDefinitionVersionsPaging = taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode);
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionVersionsPaging.getRecords();
+
+        pageInfo.setTotalList(taskDefinitionLogs);
+        pageInfo.setTotal((int) taskDefinitionVersionsPaging.getTotal());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
     @Override
-    public Map<String, Object> queryTaskDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize, long taskCode) {
-        return null;
-    }
-
-    @Override
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+        } else {
+            int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
+            if (delete > 0) {
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.DELETE_TASK_DEFINITION_VERSION_ERROR);
+            }
+        }
+        return result;
     }
 
     @Override
     public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+        } else {
+            result.put(Constants.DATA_LIST, taskDefinition);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
     }
 
     @Override
     public Result queryTaskDefinitionListPaging(User loginUser,
-                                                long projectCode,
-                                                String searchVal,
-                                                Integer userId,
-                                                Integer pageNo,
-                                                Integer pageSize) {
-        return null;
-    }
-
-    @Override
-    public Result queryTaskDefinitionByTaskType(User loginUser,
                                                 long projectCode,
                                                 String taskType,
                                                 String searchVal,
                                                 Integer userId,
                                                 Integer pageNo,
                                                 Integer pageSize) {
-        return null;
+        Result result = new Result();
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result, resultStatus);
+            return result;
+        }
+        if (StringUtils.isNotBlank(taskType)) {
+            taskType = taskType.toUpperCase();
+        }
+        Page<TaskDefinition> page = new Page<>(pageNo, pageSize);
+        IPage<TaskDefinition> taskDefinitionIPage = taskDefinitionMapper.queryDefineListPaging(
+            page, projectCode, taskType, searchVal, userId, isAdmin(loginUser));
+        if (StringUtils.isNotBlank(taskType)) {
+            List<TaskDefinition> records = taskDefinitionIPage.getRecords();
+            for (TaskDefinition pd : records) {
+                TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
+                User user = userMapper.selectById(taskDefinitionLog.getOperator());
+                pd.setModifyBy(user.getUserName());
+            }
+            taskDefinitionIPage.setRecords(records);
+        }
+        PageInfo<TaskDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) taskDefinitionIPage.getTotal());
+        pageInfo.setTotalList(taskDefinitionIPage.getRecords());
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     @Override
@@ -405,4 +490,3 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return result;
     }
 }
-

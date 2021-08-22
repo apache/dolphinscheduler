@@ -177,6 +177,12 @@ public class TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    /**
+     * modify user name
+     */
+    @TableField(exist = false)
+    private String modifyBy;
+
     public TaskDefinition() {
     }
 
@@ -399,6 +405,14 @@ public class TaskDefinition {
 
     public String getDependence() {
         return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
+    }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
     }
 
     @Override
