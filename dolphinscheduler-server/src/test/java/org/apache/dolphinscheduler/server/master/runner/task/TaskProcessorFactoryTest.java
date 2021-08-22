@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TaskProcessorFactoryTest {
-
 
     @Test
     public void testFactory() {

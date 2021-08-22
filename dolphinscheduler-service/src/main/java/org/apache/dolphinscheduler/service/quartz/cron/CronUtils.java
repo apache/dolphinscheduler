@@ -149,7 +149,6 @@ public class CronUtils {
         return dateList;
     }
 
-
     /**
      * gets all scheduled times for a period of time based on self dependency
      *

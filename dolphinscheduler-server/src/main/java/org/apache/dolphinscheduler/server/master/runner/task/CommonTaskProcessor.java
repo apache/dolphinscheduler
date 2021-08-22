@@ -176,6 +176,4 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 taskInstance.getName(), taskInstance.getId());
         return true;
     }
-
-
 }
