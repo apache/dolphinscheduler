@@ -243,6 +243,13 @@
           ref="DATAX"
           :backfill-item="backfillItem">
         </m-datax>
+        <m-tis
+          v-if="nodeData.taskType === 'TIS'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          :backfill-item="backfillItem"
+          ref="TIS">
+        </m-tis>
         <m-sqoop
           v-if="nodeData.taskType === 'SQOOP'"
           @on-params="_onParams"
@@ -292,6 +299,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mTis from './tasks/tis'
   import mConditions from './tasks/conditions'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
@@ -799,6 +807,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mTis,
       mSqoop,
       mConditions,
       mSelectInput,
