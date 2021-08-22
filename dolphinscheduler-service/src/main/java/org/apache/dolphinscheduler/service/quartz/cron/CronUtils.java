@@ -161,10 +161,10 @@ public class CronUtils {
     return dateList;
   }
 
-
   /**
-   *  gets all scheduled times for a period of time based on self dependency
-   *  if schedulers is empty then default scheduler = 1 day
+   * gets all scheduled times for a period of time based on self dependency
+   * if schedulers is empty then default scheduler = 1 day
+   *
    * @param startTime
    * @param endTime
    * @param schedules

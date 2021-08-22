@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
@@ -26,7 +27,6 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -44,6 +44,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+/**
+ * dependent task processor
+ */
 public class DependentTaskProcessor extends BaseTaskProcessor {
 
     private DependentParameters dependentParameters;
@@ -59,15 +62,13 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
-
     /**
      * dependent date
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dependentDate;
 
-
-    DependResult result ;
+    DependResult result;
 
     ProcessInstance processInstance;
     TaskDefinition taskDefinition;
@@ -75,14 +76,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
-
-
     boolean allDependentItemFinished;
 
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = taskInstance;
+        this.taskInstance = task;
         this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
         if (this.taskInstance == null) {
@@ -113,7 +112,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
         }
-        if(allDependentItemFinished){
+        if (allDependentItemFinished) {
             getTaskDependResult();
             endTask();
         }
@@ -123,8 +122,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy =
                 taskDefinition.getTimeoutNotifyStrategy();
-        if(TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy){
+        if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
+                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
         logger.info("dependent task {} timeout, strategy {} ",
@@ -165,7 +164,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         return true;
     }
 
-
     /**
      * judge all dependent tasks finish
      *
@@ -187,7 +185,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         }
         return finish;
     }
-
 
     /**
      * get dependent result

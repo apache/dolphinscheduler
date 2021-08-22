@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
@@ -93,8 +92,7 @@ public class MasterRegistryClient {
      */
     private ScheduledExecutorService heartBeatExecutor;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread > processInstanceExecMaps;
-
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
 
     /**
      * master start time
@@ -102,7 +100,6 @@ public class MasterRegistryClient {
     private String startTime;
 
     private String localNodePath;
-
 
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
         this.startTime = DateUtils.dateToString(new Date());

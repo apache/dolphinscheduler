@@ -48,7 +48,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 @Service
-public class EventExecuteService extends Thread{
+public class EventExecuteService extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(EventExecuteService.class);
 
@@ -70,11 +70,11 @@ public class EventExecuteService extends Thread{
     private StateEventCallbackService stateEventCallbackService;
 
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps ;
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
     private ConcurrentHashMap<String, WorkflowExecuteThread> eventHandlerMap = new ConcurrentHashMap();
     ListeningExecutorService listeningExecutorService;
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps){
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
 
         eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
 
@@ -103,7 +103,7 @@ public class EventExecuteService extends Thread{
             try {
                 eventHandler();
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error("Event service thread error", e);
             }
         }
@@ -131,7 +131,7 @@ public class EventExecuteService extends Thread{
                         notifyProcessChanged();
                         logger.info("process instance {} finished.", processInstanceId);
                     }
-                    if(workflowExecuteThread.getProcessInstance().getId() != processInstanceId){
+                    if (workflowExecuteThread.getProcessInstance().getId() != processInstanceId) {
                         processInstanceExecMaps.remove(processInstanceId);
                         processInstanceExecMaps.put(workflowExecuteThread.getProcessInstance().getId(), workflowExecuteThread);
 
@@ -143,19 +143,19 @@ public class EventExecuteService extends Thread{
                     Map<ProcessInstance, TaskInstance> fatherMaps
                             = processService.notifyProcessList(processInstanceId, 0);
 
-                    for(ProcessInstance processInstance : fatherMaps.keySet()){
+                    for (ProcessInstance processInstance : fatherMaps.keySet()) {
                         String address = NetUtils.getAddr(masterConfig.getListenPort());
-//                        if(processInstance.getHost().equalsIgnoreCase(address)){
-//                            notifyMyself(processInstance, fatherMaps.get(processInstance));
-//                        } else{
+                        if (processInstance.getHost().equalsIgnoreCase(address)) {
+                            notifyMyself(processInstance, fatherMaps.get(processInstance));
+                        } else {
                             notifyProcess(processInstance, fatherMaps.get(processInstance));
-//                        }
+                        }
                     }
                 }
 
-                private void notifyMyself(ProcessInstance processInstance,TaskInstance taskInstance){
+                private void notifyMyself(ProcessInstance processInstance, TaskInstance taskInstance) {
                     logger.info("notify process {} task {} state change", processInstance.getId(), taskInstance.getId());
-                    if(!processInstanceExecMaps.containsKey(processInstance.getId())){
+                    if (!processInstanceExecMaps.containsKey(processInstance.getId())) {
                         return;
                     }
                     WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
@@ -167,8 +167,13 @@ public class EventExecuteService extends Thread{
                     workflowExecuteThreadNotify.addStateEvent(stateEvent);
                 }
 
-                private void notifyProcess(ProcessInstance processInstance, TaskInstance taskInstance){
+                private void notifyProcess(ProcessInstance processInstance, TaskInstance taskInstance) {
                     String host = processInstance.getHost();
+                    if (StringUtils.isEmpty(host)) {
+                        logger.info("process {} host is empty, cannot notify task {} now.",
+                                processInstance.getId(), taskInstance.getId());
+                        return;
+                    }
                     String address = host.split(":")[0];
                     int port = Integer.parseInt(host.split(":")[1]);
                     logger.info("notify process {} task {} state change, host:{}",
@@ -187,5 +192,4 @@ public class EventExecuteService extends Thread{
             Futures.addCallback(future, futureCallback, this.listeningExecutorService);
         }
     }
-
-    }
+}

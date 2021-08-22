@@ -26,7 +26,6 @@ public enum StateEventType {
     PROCESS_TIMEOUT(2, "process timeout"),
     TASK_TIMEOUT(3, "task timeout");
 
-
     StateEventType(int code, String descp) {
         this.code = code;
         this.descp = descp;

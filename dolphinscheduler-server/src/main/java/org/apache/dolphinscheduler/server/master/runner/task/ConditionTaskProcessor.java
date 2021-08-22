@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -43,8 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.LoggerFactory;
 
-public class ConditionTaskProcessor extends BaseTaskProcessor{
-
+/**
+ * condition task processor
+ */
+public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     /**
      * dependent parameters
@@ -101,9 +104,9 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public void run() {
-        if(conditionResult.equals(DependResult.WAITING)){
+        if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
-        }else{
+        } else {
             endTask();
         }
     }
@@ -117,10 +120,10 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     }
 
     @Override
-    protected boolean taskTimeout(){
+    protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy =
                 taskDefinition.getTimeoutNotifyStrategy();
-        if(taskTimeoutStrategy == TaskTimeoutStrategy.WARN){
+        if (taskTimeoutStrategy == TaskTimeoutStrategy.WARN) {
             return true;
         }
         logger.info("condition task {} timeout, strategy {} ",
@@ -131,7 +134,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     }
 
     @Override
-    protected boolean killTask(){
+    protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
@@ -196,7 +199,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
                 Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
         return dependResult;
     }
-
 
     /**
      *

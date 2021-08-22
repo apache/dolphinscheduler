@@ -272,18 +272,18 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-    private void updateMasterNodes(){
+    private void updateMasterNodes() {
         SLOT_LIST.clear();
         this.masterNodes.clear();
         String nodeLock = registryClient.getMasterLockPath();
-        try{
+        try {
             registryClient.getLock(nodeLock);
             Set<String> currentNodes = registryClient.getMasterNodesDirectly();
             List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodes);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("update master nodes error", e);
-        }finally {
+        } finally {
             registryClient.releaseLock(nodeLock);
         }
 
@@ -306,7 +306,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * sync master nodes
      *
-     * @param nodes master nodes
+     * @param nodes       master nodes
      * @param masterNodes
      */
     private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
@@ -316,7 +316,7 @@ public class ServerNodeManager implements InitializingBean {
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
             int index = masterPriorityQueue.getIndex(NetUtils.getHost());
-            if(index >= 0){
+            if (index >= 0) {
                 MASTER_SIZE = nodes.size();
                 SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getHost()));
             }
@@ -332,7 +332,7 @@ public class ServerNodeManager implements InitializingBean {
      * sync worker group nodes
      *
      * @param workerGroup worker group
-     * @param nodes worker nodes
+     * @param nodes       worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes) {
         workerGroupLock.lock();

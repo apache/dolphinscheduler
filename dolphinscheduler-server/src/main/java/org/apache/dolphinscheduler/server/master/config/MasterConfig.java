@@ -145,10 +145,11 @@ public class MasterConfig {
         this.masterDispatchTaskNumber = masterDispatchTaskNumber;
     }
 
-    public int getStateWheelInterval(){
+    public int getStateWheelInterval() {
         return this.stateWheelInterval;
     }
-    public void setStateWheelInterval(int stateWheelInterval){
-        this.stateWheelInterval =  stateWheelInterval;
+
+    public void setStateWheelInterval(int stateWheelInterval) {
+        this.stateWheelInterval = stateWheelInterval;
     }
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -25,8 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.logging.log4j.core.tools.CustomLoggerGenerator;
-
 import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  */
-public class SubTaskProcessor extends BaseTaskProcessor{
+public class SubTaskProcessor extends BaseTaskProcessor {
 
     private ProcessInstance processInstance;
 
@@ -70,17 +69,17 @@ public class SubTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public void run() {
-        try{
+        try {
             this.runLock.lock();
-            if(setSubWorkFlow()){
+            if (setSubWorkFlow()) {
                 updateTaskState();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("work flow {} sub task {} exceptions",
                     this.processInstance.getId(),
                     this.taskInstance.getId(),
                     e);
-        }finally {
+        } finally {
             this.runLock.unlock();
         }
     }
@@ -89,8 +88,8 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy =
                 taskDefinition.getTimeoutNotifyStrategy();
-        if(TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy){
+        if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
+                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
         logger.info("sub process task {} timeout, strategy {} ",
@@ -106,7 +105,7 @@ public class SubTaskProcessor extends BaseTaskProcessor{
                 this.taskInstance.getId(),
                 subProcessInstance.getId(),
                 subProcessInstance.getState().getDescp());
-        if(subProcessInstance != null && subProcessInstance.getState().typeIsFinished()){
+        if (subProcessInstance != null && subProcessInstance.getState().typeIsFinished()) {
             taskInstance.setState(subProcessInstance.getState());
             taskInstance.setEndTime(new Date());
             processService.saveTaskInstance(taskInstance);
@@ -121,7 +120,7 @@ public class SubTaskProcessor extends BaseTaskProcessor{
 
     private boolean pauseSubWorkFlow() {
         ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
+        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
@@ -135,11 +134,11 @@ public class SubTaskProcessor extends BaseTaskProcessor{
         logger.info("set work flow {} task {} running",
                 this.processInstance.getId(),
                 this.taskInstance.getId());
-        if(this.subProcessInstance != null){
+        if (this.subProcessInstance != null) {
             return true;
         }
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
+        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
 
@@ -157,7 +156,7 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     @Override
     protected boolean killTask() {
         ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
+        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
             return false;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);

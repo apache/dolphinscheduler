@@ -53,6 +53,7 @@ public class StateEventResponseCommand implements Serializable {
     public void setKey(String key) {
         this.key = key;
     }
+
     /**
      * package response command
      *

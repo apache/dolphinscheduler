@@ -128,8 +128,6 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -759,7 +757,7 @@ public class ProcessService {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
-                if(processInstance == null){
+                if (processInstance == null) {
                     return processInstance;
                 }
                 CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
@@ -1012,15 +1010,15 @@ public class ProcessService {
         updateTaskInstance(taskInstance);
     }
 
-
     /**
      * retry submit task to db
+     *
      * @param taskInstance
      * @param commitRetryTimes
      * @param commitInterval
      * @return
      */
-    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval){
+    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
 
         int retryTimes = 1;
         boolean submitDB = false;

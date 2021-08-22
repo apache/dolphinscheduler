@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class MasterPriorityQueue implements TaskPriorityQueue<Server>{
+public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
 
     /**
      * queue size
@@ -62,27 +61,27 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server>{
         return queue.size();
     }
 
-    public void putList(List<Server> serverList){
-        for(Server server : serverList){
+    public void putList(List<Server> serverList) {
+        for (Server server : serverList) {
             this.queue.put(server);
         }
         refreshMasterList();
     }
 
-    public void remove(Server server){
+    public void remove(Server server) {
         this.queue.remove(server);
     }
 
-    public void clear(){
+    public void clear() {
         queue.clear();
         refreshMasterList();
     }
 
-    private void refreshMasterList(){
+    private void refreshMasterList() {
         hostIndexMap.clear();
         Iterator<Server> iterator = queue.iterator();
         int index = 0;
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Server server = iterator.next();
             hostIndexMap.put(server.getHost(), index);
             index += 1;
@@ -90,8 +89,8 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server>{
 
     }
 
-    public int getIndex(String host){
-        if(!hostIndexMap.containsKey(host)){
+    public int getIndex(String host) {
+        if (!hostIndexMap.containsKey(host)) {
             return -1;
         }
         return hostIndexMap.get(host);

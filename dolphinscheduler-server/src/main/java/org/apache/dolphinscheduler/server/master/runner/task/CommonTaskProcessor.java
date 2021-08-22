@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -33,7 +34,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.logging.log4j.util.Strings;
 
@@ -43,7 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
+/**
+ * common task processor
+ */
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Autowired
@@ -90,6 +92,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     /**
      * common task cannot be paused
+     *
      * @return
      */
     @Override
@@ -105,7 +108,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private boolean dispatchTask(TaskInstance taskInstance, ProcessInstance processInstance) {
 
         try {
-            if(taskUpdateQueue == null){
+            if (taskUpdateQueue == null) {
                 this.initQueue();
             }
             if (taskInstance.getState().typeIsFinished()) {
@@ -134,7 +137,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     public void initQueue() {
-        this.taskUpdateQueue =  SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
+        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
     }
 
     @Override

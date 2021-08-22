@@ -39,15 +39,23 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     /**
      * pause task, common tasks donot need this.
+     *
      * @return
      */
     protected abstract boolean pauseTask();
 
     /**
      * kill task, all tasks need to realize this function
+     *
      * @return
      */
     protected abstract boolean killTask();
+
+    /**
+     * task timeout process
+     * @return
+     */
+    protected abstract boolean taskTimeout();
 
     @Override
     public void run() {
@@ -56,7 +64,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public boolean action(TaskAction taskAction) {
 
-        switch (taskAction){
+        switch (taskAction) {
             case STOP:
                 return stop();
             case PAUSE:
@@ -67,19 +75,15 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return false;
     }
 
-    protected boolean timeout(){
-        if(timeout){
+    protected boolean timeout() {
+        if (timeout) {
             return true;
         }
         timeout = taskTimeout();
         return timeout;
     }
 
-    protected abstract boolean taskTimeout();
-
-
     /**
-     *
      * @return
      */
     protected boolean pause() {
@@ -97,7 +101,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         killed = killTask();
         return killed;
     }
-
 
     @Override
     public String getType() {

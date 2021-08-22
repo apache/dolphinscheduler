@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Strings;
 
-
+/**
+ * the factory to create task processor
+ */
 public class TaskProcessorFactory {
 
     public static final Map<String, ITaskProcessFactory> PROCESS_FACTORY_MAP = new ConcurrentHashMap<>();
@@ -32,16 +34,16 @@ public class TaskProcessorFactory {
     private static final String DEFAULT_PROCESSOR = Constants.COMMON_TASK_TYPE;
 
     static {
-        for(ITaskProcessFactory iTaskProcessor: ServiceLoader.load(ITaskProcessFactory.class)){
+        for (ITaskProcessFactory iTaskProcessor : ServiceLoader.load(ITaskProcessFactory.class)) {
             PROCESS_FACTORY_MAP.put(iTaskProcessor.type(), iTaskProcessor);
         }
     }
 
-    public static ITaskProcessor getTaskProcessor(String type){
+    public static ITaskProcessor getTaskProcessor(String type) {
         if (Strings.isNullOrEmpty(type)) {
             return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
         }
-        if(!PROCESS_FACTORY_MAP.containsKey(type)){
+        if (!PROCESS_FACTORY_MAP.containsKey(type)) {
             return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
         }
         return PROCESS_FACTORY_MAP.get(type).create();

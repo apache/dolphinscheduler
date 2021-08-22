@@ -25,7 +25,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- *  execute task request command
+ * execute task request command
  */
 public class TaskExecuteAckCommand implements Serializable {
 
@@ -35,14 +35,14 @@ public class TaskExecuteAckCommand implements Serializable {
     private int taskInstanceId;
 
     /**
-     *  process instance id
+     * process instance id
      */
     private int processInstanceId;
 
     /**
      * startTime
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -55,7 +55,7 @@ public class TaskExecuteAckCommand implements Serializable {
      */
     private int status;
 
-     /**
+    /**
      * logPath
      */
     private String logPath;
@@ -114,7 +114,7 @@ public class TaskExecuteAckCommand implements Serializable {
     }
 
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */

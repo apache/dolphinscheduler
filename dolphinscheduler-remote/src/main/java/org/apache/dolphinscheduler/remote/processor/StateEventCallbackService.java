@@ -28,11 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.netty.channel.Channel;
-
 
 /**
  * task callback service
@@ -61,7 +59,7 @@ public class StateEventCallbackService {
     /**
      * add callback channel
      *
-     * @param channel        channel
+     * @param channel channel
      */
     public void addRemoteChannel(String host, NettyRemoteChannel channel) {
         REMOTE_CHANNELS.put(host, channel);
@@ -94,7 +92,7 @@ public class StateEventCallbackService {
 
     private NettyRemoteChannel newRemoteChannel(Channel newChannel, long opaque, String host) {
         NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel, opaque);
-        addRemoteChannel(host , remoteChannel);
+        addRemoteChannel(host, remoteChannel);
         return remoteChannel;
     }
 
@@ -106,37 +104,22 @@ public class StateEventCallbackService {
 
     /**
      * remove callback channels
-     *
      */
     public void remove(String host) {
         REMOTE_CHANNELS.remove(host);
     }
 
     /**
-     * send ack
-     *
-     * @param command        commandDS
-     */
-//    public void sendAck(String host, Command command) {
-//        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
-//        if (nettyRemoteChannel != null) {
-//            nettyRemoteChannel.writeAndFlush(command);
-//        }
-//    }
-
-    /**
-     *
      * send result
      *
-     * @param command        command
+     * @param command command
      */
     public void sendResult(String address, int port, Command command) {
-
+        logger.info("send result, host:{}, command:{}", address, command.toString());
         Host host = new Host(address, port);
         NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
         if (nettyRemoteChannel != null) {
             nettyRemoteChannel.writeAndFlush(command);
         }
-
     }
 }

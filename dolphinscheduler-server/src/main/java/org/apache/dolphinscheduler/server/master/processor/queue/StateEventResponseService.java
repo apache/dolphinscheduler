@@ -18,11 +18,10 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +60,12 @@ public class StateEventResponseService {
     private Thread responseWorker;
 
     private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
+
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
         if (this.processInstanceMapper == null) {
             this.processInstanceMapper = processInstanceMapper;
         }
     }
-
 
     @PostConstruct
     public void start() {
@@ -89,7 +88,6 @@ public class StateEventResponseService {
 
     /**
      * put task to attemptQueue
-     *
      */
     public void addResponse(StateEvent stateEvent) {
         try {
@@ -121,16 +119,16 @@ public class StateEventResponseService {
         }
     }
 
-    private void writeResponse(StateEvent stateEvent, ExecutionStatus status){
+    private void writeResponse(StateEvent stateEvent, ExecutionStatus status) {
         Channel channel = stateEvent.getChannel();
-        if(channel != null){
+        if (channel != null) {
             StateEventResponseCommand command = new StateEventResponseCommand(status.getCode(), stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }
 
     private void persist(StateEvent stateEvent) {
-        if(!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())){
+        if (!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())) {
             writeResponse(stateEvent, ExecutionStatus.FAILURE);
             return;
         }
