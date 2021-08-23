@@ -265,7 +265,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
-    @GetMapping(value = "/{code}/version")
+    @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_VERSIONS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -298,7 +298,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/{code}/version/{version}")
+    @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_PROCESS_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -324,7 +324,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @DeleteMapping(value = "/{code}/version/{version}")
+    @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
