@@ -265,7 +265,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
-    @GetMapping(value = "/{code}/versions")
+    @GetMapping(value = "/{code}/version")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_VERSIONS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
