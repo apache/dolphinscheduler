@@ -208,6 +208,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-standalone-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -310,7 +315,6 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-test</artifactId>
                 <version>${curator.test}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -661,7 +665,6 @@
                 <artifactId>javax.mail</artifactId>
                 <version>1.6.2</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -1209,5 +1212,6 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-standalone-server</module>
     </modules>
 </project>

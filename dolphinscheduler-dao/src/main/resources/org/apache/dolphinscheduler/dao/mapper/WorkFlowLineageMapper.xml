@@ -64,8 +64,7 @@
                 and project_code = #{projectCode}
     </select>
 
-    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage"
-            databaseId="mysql">
+    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
         select tepd.id as work_flow_id,tepd.name as work_flow_name,
                "" as source_work_flow_id,
                 tepd.release_state as work_flow_publish_status,

@@ -34,15 +34,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * property utils
- * single instance
- */
 public class PropertyUtils {
-
-    /**
-     * logger
-     */
     private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
     private static final Properties properties = new Properties();
@@ -55,9 +47,6 @@ public class PropertyUtils {
         loadPropertyFile(COMMON_PROPERTIES_PATH);
     }
 
-    /**
-     * init properties
-     */
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
@@ -68,6 +57,13 @@ public class PropertyUtils {
                 System.exit(1);
             }
         }
+
+        // Override from system properties
+        System.getProperties().forEach((k, v) -> {
+            final String key = String.valueOf(k);
+            logger.info("Overriding property from system property: {}", key);
+            PropertyUtils.setValue(key, String.valueOf(v));
+        });
     }
 
     /**
