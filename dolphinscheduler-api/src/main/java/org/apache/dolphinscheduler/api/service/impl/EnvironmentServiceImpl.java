@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setName(name);
         env.setConfig(config);
         env.setDescription(desc);
+        env.setOperator(loginUser.getId());
+        env.setCreateTime(new Date());
+        env.setUpdateTime(new Date());
         long code = 0L;
         try {
             code = SnowFlakeUtils.getInstance().nextId();
@@ -146,7 +150,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      */
     @Override
     public Map<String, Object> queryAllEnvironmentList() {
-        Map<String,Object> result =new HashMap<>();
+        Map<String,Object> result = new HashMap<>();
         List<Environment> environmentList = environmentMapper.queryAllEnvironmentList();
         result.put(Constants.DATA_LIST,environmentList);
         putMsg(result,Status.SUCCESS);
@@ -255,6 +259,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setName(name);
         env.setConfig(config);
         env.setDescription(desc);
+        env.setOperator(loginUser.getId());
+        env.setUpdateTime(new Date());
 
         int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode,code));
         if (update > 0) {
@@ -262,6 +268,31 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         } else {
             putMsg(result, Status.UPDATE_ENVIRONMENT_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * verify environment name
+     *
+     * @param environmentName environment name
+     * @return true if the environment name not exists, otherwise return false
+     */
+    @Override
+    public Map<String, Object> verifyEnvironment(String environmentName){
+        Map<String, Object> result = new HashMap<>();
+
+        if (StringUtils.isEmpty(environmentName)) {
+            putMsg(result, Status.ENVIRONMENT_NAME_IS_NULL);
+            return result;
+        }
+
+        Environment environment = environmentMapper.queryByEnvironmentName(environmentName);
+        if (environment != null) {
+            putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, environmentName);
+            return result;
+        }
+
+        result.put(Constants.STATUS, Status.SUCCESS);
         return result;
     }
 

@@ -639,5 +639,41 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * get environment list pages
+   */
+  getEnvironmentListPaging ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * create environment
+   */
+  createEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/create', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update environment
+   */
+  updateEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/update', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

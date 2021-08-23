@@ -88,6 +88,14 @@ public interface EnvironmentService {
      */
     Map<String, Object> queryAllEnvironmentList();
 
+    /**
+     * verify environment name
+     *
+     * @param environmentName environment name
+     * @return true if the environment name not exists, otherwise return false
+     */
+    Map<String, Object> verifyEnvironment(String environmentName);
+
 
 }
 

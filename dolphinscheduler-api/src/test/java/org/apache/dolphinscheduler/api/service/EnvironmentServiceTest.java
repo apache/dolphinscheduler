@@ -17,15 +17,22 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -142,6 +149,20 @@ public class EnvironmentServiceTest {
     }
 
     @Test
+    public void testQueryEnvironmentListPaging() {
+        IPage<Environment> page = new Page<>(1, 10);
+        page.setRecords(getList());
+        page.setTotal(1L);
+        Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName))).thenReturn(page);
+
+        Result result = environmentService.queryEnvironmentListPaging(10, 1, environmentName);
+        logger.info(result.toString());
+        PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
+    }
+
+
+    @Test
     public void testQueryEnvironmentByName() {
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
@@ -185,6 +206,18 @@ public class EnvironmentServiceTest {
         result = environmentService.deleteEnvironmentByCode(loginUser,1L);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testVerifyEnvironment() {
+        Map<String, Object> result = environmentService.verifyEnvironment("");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+
+        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
+        result = environmentService.verifyEnvironment(environmentName);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
     }
 
     private Environment getEnvironment() {
@@ -247,5 +280,11 @@ public class EnvironmentServiceTest {
         loginUser.setUserName(testUserName);
         loginUser.setId(1);
         return loginUser;
+    }
+
+    private List<Environment> getList() {
+        List<Environment> list = new ArrayList<>();
+        list.add(getEnvironment());
+        return list;
     }
 }

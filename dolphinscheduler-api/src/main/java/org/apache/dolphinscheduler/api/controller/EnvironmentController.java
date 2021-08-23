@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
@@ -28,12 +24,24 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
@@ -42,7 +50,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
  */
 @Api(tags = "ENVIRONMENT_TAG")
 @RestController
-@RequestMapping("environments")
+@RequestMapping("environment")
 public class EnvironmentController extends BaseController {
 
     @Autowired
@@ -91,7 +99,7 @@ public class EnvironmentController extends BaseController {
             @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
             @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -196,6 +204,28 @@ public class EnvironmentController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllEnvironmentList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = environmentService.queryAllEnvironmentList();
+        return returnDataList(result);
+    }
+
+    /**
+     * verify environment and environment name
+     *
+     * @param loginUser login user
+     * @param environmentName environment name
+     * @return true if the environment name not exists, otherwise return false
+     */
+    @ApiOperation(value = "verifyEnvironment", notes = "VERIFY_ENVIRONMENT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String")
+    })
+    @PostMapping(value = "/verify-environment")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_ENVIRONMENT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result verifyEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                              @RequestParam(value = "environmentName") String environmentName
+    ) {
+        Map<String, Object> result = environmentService.verifyEnvironment(environmentName);
         return returnDataList(result);
     }
 }
