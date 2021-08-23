@@ -31,7 +31,10 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,12 +118,16 @@ public class SparkTask extends AbstractYarnTask {
             sparkParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
+        if(MapUtils.isEmpty(paramsMap)){
+            paramsMap=new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
 
         String command = null;
 
-        if (null != paramsMap) {
-            command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
-        }
+        command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("spark task command: {}", command);
 
