@@ -43,8 +43,7 @@ public class CheckUtils {
     /**
      * check username
      *
-     * @param userName
-     *            user name
+     * @param userName user name
      * @return true if user name regex valid,otherwise return false
      */
     public static boolean checkUserName(String userName) {
@@ -54,8 +53,7 @@ public class CheckUtils {
     /**
      * check email
      *
-     * @param email
-     *            email
+     * @param email email
      * @return true if email regex valid, otherwise return false
      */
     public static boolean checkEmail(String email) {
@@ -69,8 +67,7 @@ public class CheckUtils {
     /**
      * check project description
      *
-     * @param desc
-     *            desc
+     * @param desc desc
      * @return true if description regex valid, otherwise return false
      */
     public static Map<String, Object> checkDesc(String desc) {
@@ -78,7 +75,7 @@ public class CheckUtils {
         if (StringUtils.isNotEmpty(desc) && desc.length() > 200) {
             result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             result.put(Constants.MSG,
-                MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+                    MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -88,8 +85,7 @@ public class CheckUtils {
     /**
      * check extra info
      *
-     * @param otherParams
-     *            other parames
+     * @param otherParams other parames
      * @return true if other parameters are valid, otherwise return false
      */
     public static boolean checkOtherParams(String otherParams) {
@@ -99,8 +95,7 @@ public class CheckUtils {
     /**
      * check password
      *
-     * @param password
-     *            password
+     * @param password password
      * @return true if password regex valid, otherwise return false
      */
     public static boolean checkPassword(String password) {
@@ -110,8 +105,7 @@ public class CheckUtils {
     /**
      * check phone phone can be empty.
      *
-     * @param phone
-     *            phone
+     * @param phone phone
      * @return true if phone regex valid, otherwise return false
      */
     public static boolean checkPhone(String phone) {
@@ -121,8 +115,7 @@ public class CheckUtils {
     /**
      * check task node parameter
      *
-     * @param taskNode
-     *            TaskNode
+     * @param taskNode TaskNode
      * @return true if task node parameters are valid, otherwise return false
      */
     public static boolean checkTaskNodeParameters(TaskNode taskNode) {
@@ -133,6 +126,8 @@ public class CheckUtils {
         }
         if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getDependence());
+        } else if (TaskType.SWITCH.getDesc().equalsIgnoreCase(taskType)) {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getSwitchResult());
         } else {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getParams());
         }
@@ -147,28 +142,22 @@ public class CheckUtils {
     /**
      * check params
      *
-     * @param userName
-     *            user name
-     * @param password
-     *            password
-     * @param email
-     *            email
-     * @param phone
-     *            phone
+     * @param userName user name
+     * @param password password
+     * @param email    email
+     * @param phone    phone
      * @return true if user parameters are valid, other return false
      */
     public static boolean checkUserParams(String userName, String password, String email, String phone) {
         return CheckUtils.checkUserName(userName) && CheckUtils.checkEmail(email) && CheckUtils.checkPassword(password)
-               && CheckUtils.checkPhone(phone);
+                && CheckUtils.checkPhone(phone);
     }
 
     /**
      * regex check
      *
-     * @param str
-     *            input string
-     * @param pattern
-     *            regex pattern
+     * @param str     input string
+     * @param pattern regex pattern
      * @return true if regex pattern is right, otherwise return false
      */
     private static boolean regexChecks(String str, Pattern pattern) {
