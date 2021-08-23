@@ -101,8 +101,8 @@ public class MasterExecThreadTest {
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
         Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
-        processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
+        processDefinition.setGlobalParamMap(Collections.emptyMap());
+        processDefinition.setGlobalParamList(Collections.emptyList());
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
         Mockito.when(processInstance.getProcessDefinitionCode()).thenReturn(processDefinitionCode);
 
@@ -257,7 +257,7 @@ public class MasterExecThreadTest {
     }
 
     private List<Schedule> zeroSchedulerList() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     private List<Schedule> oneSchedulerList() {

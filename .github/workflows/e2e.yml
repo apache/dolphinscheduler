@@ -20,26 +20,26 @@ env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
-name: e2e Test
+name: Test
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-
-  build:
-    name: Test
+  test:
+    name: E2E
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v2
         with:
-          submodule: true
-      - name: Check License Header
-        uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          key: ${{ runner.os }}-maven
       - name: Build Image
         run: |
           sh ./docker/build/hooks/build

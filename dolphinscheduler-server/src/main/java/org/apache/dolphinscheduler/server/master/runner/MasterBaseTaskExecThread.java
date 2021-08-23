@@ -191,7 +191,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     * dispatcht task
+     * dispatch task
      *
      * @param taskInstance taskInstance
      * @return whether submit task success

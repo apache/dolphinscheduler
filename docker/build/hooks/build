@@ -39,8 +39,8 @@ echo "Repo: $DOCKER_REPO"
 echo -e "Current Directory is $(pwd)\n"
 
 # maven package(Project Directory)
-echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
-mvn -B clean compile package -Prelease -Dmaven.test.skip=true
+echo -e "./mvnw -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+./mvnw -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
 # mv dolphinscheduler-bin.tar.gz file to docker/build directory
 echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-${VERSION}-bin.tar.gz $(pwd)/docker/build/\n"

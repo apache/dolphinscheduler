@@ -22,23 +22,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -51,79 +44,65 @@ public class ExecutorControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
-    @MockBean
-    private ExecutorService executorService;
-
+    @Ignore
     @Test
     public void testStartProcessInstance() throws Exception {
-        Map<String, Object> resultData = new HashMap<>();
-        resultData.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(executorService.execProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyInt(),
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyInt(), Mockito.any())).thenReturn(resultData);
-
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", "1");
+        paramsMap.add("processDefinitionId", "40");
         paramsMap.add("scheduleTime", "");
         paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
         paramsMap.add("startNodeList", "");
         paramsMap.add("taskDependType", "");
         paramsMap.add("execType", "");
         paramsMap.add("warningType", String.valueOf(WarningType.NONE));
-        paramsMap.add("warningGroupId", "1");
+        paramsMap.add("warningGroupId", "");
         paramsMap.add("receivers", "");
         paramsMap.add("receiversCc", "");
         paramsMap.add("runMode", "");
         paramsMap.add("processInstancePriority", "");
-        paramsMap.add("workerGroupId", "1");
+        paramsMap.add("workerGroupId", "");
         paramsMap.add("timeout", "");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", 1L)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-process-instance", "cxc_1113")
             .header("sessionId", sessionId)
             .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
+    @Ignore
     @Test
     public void testExecute() throws Exception {
-        Map<String, Object> resultData = new HashMap<>();
-        resultData.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(executorService.execute(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.any())).thenReturn(resultData);
-
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processInstanceId", "40");
         paramsMap.add("executeType", String.valueOf(ExecuteType.NONE));
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/execute", 1L)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
             .header("sessionId", sessionId)
             .params(paramsMap))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testStartCheck() throws Exception {
-        Map<String, Object> resultData = new HashMap<>();
-        resultData.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(executorService.startCheckByProcessDefinedCode(Mockito.anyLong())).thenReturn(resultData);
+    public void testStartCheckProcessDefinition() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-check", 1L)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-check", "cxc_1113")
             .header(SESSION_ID, sessionId)
-            .param("processDefinitionCode", "1"))
+            .param("processDefinitionId", "40"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

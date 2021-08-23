@@ -40,5 +40,10 @@ header:
     - '**/.gitignore'
     - '**/LICENSE'
     - '**/NOTICE'
+    - '**/node_modules/**'
+    - '.github/actions/comment-on-issue/**'
+    - '.github/actions/lable-on-issue/**'
+    - '.github/actions/reviewdog-setup/**'
+    - '.github/actions/translate-on-issue/**'
 
   comment: on-failure

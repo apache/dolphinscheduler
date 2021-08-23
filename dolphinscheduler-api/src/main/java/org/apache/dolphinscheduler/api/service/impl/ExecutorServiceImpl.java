@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -89,6 +90,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private MonitorService monitorService;
 
+
+    @Autowired
+    private ProcessInstanceMapper processInstanceMapper;
+
+
     @Autowired
     private ProcessService processService;
 
@@ -100,7 +106,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
-     * @param failureStrategy failuer strategy
+     * @param failureStrategy failure strategy
      * @param startNodeList start nodelist
      * @param taskDependType node dependency type
      * @param warningType warning type
@@ -110,6 +116,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return execute process instance code
      */
     @Override
@@ -119,7 +126,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
-                                                   Map<String, String> startParams) {
+                                                   Map<String, String> startParams, Integer expectedParallelismNumber) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -156,7 +163,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          */
         int create = this.createCommand(commandType, processDefinition.getCode(),
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, startParams);
+                warningGroupId, runMode, processInstancePriority, workerGroup, startParams, expectedParallelismNumber);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -485,7 +492,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup,
-                              Map<String, String> startParams) {
+                              Map<String, String> startParams, Integer expectedParallelismNumber) {
 
         /**
          * instantiate command schedule instance
@@ -542,21 +549,31 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     return processService.createCommand(command);
                 } else if (runMode == RunMode.RUN_MODE_PARALLEL) {
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefineCode);
-                    List<Date> listDate = new LinkedList<>();
+                    LinkedList<Date> listDate = new LinkedList<>();
                     if (!CollectionUtils.isEmpty(schedules)) {
                         for (Schedule item : schedules) {
                             listDate.addAll(CronUtils.getSelfFireDateList(start, end, item.getCrontab()));
                         }
                     }
                     if (!CollectionUtils.isEmpty(listDate)) {
-                        // loop by schedule date
-                        for (Date date : listDate) {
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
+                        int effectThreadsCount = expectedParallelismNumber == null ? listDate.size() : Math.min(listDate.size(), expectedParallelismNumber);
+                        logger.info("In parallel mode, current expectedParallelismNumber:{}", effectThreadsCount);
+
+                        int chunkSize = listDate.size() / effectThreadsCount;
+                        listDate.addFirst(start);
+                        listDate.addLast(end);
+
+                        for (int i = 0; i < effectThreadsCount; i++) {
+                            int rangeStart = i == 0 ? i : (i * chunkSize);
+                            int rangeEnd = i == effectThreadsCount - 1 ? listDate.size() - 1
+                                    : rangeStart + chunkSize + 1;
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(rangeEnd)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                         }
-                        return listDate.size();
+
+                        return effectThreadsCount;
                     } else {
                         // loop by day
                         int runCunt = 0;

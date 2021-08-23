@@ -249,6 +249,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     curator-client 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/4.3.0, Apache 2.0
     curator-framework 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-framework/4.3.0, Apache 2.0
     curator-recipes 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-recipes/4.3.0, Apache 2.0
+    curator-test 2.12.0: https://mvnrepository.com/artifact/org.apache.curator/curator-test/2.12.0, Apache 2.0
     datanucleus-api-jdo 4.2.1: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-api-jdo/4.2.1, Apache 2.0
     datanucleus-core 4.1.6: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-core/4.1.6, Apache 2.0
     datanucleus-rdbms 4.1.7: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.7, Apache 2.0
