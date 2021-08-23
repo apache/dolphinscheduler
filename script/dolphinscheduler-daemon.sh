@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -87,6 +87,8 @@ elif [ "$command" = "zookeeper-server" ]; then
   #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
   LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
   CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
+elif [ "$command" = "standalone-server" ]; then
+  CLASS=org.apache.dolphinscheduler.server.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
   exit 1
