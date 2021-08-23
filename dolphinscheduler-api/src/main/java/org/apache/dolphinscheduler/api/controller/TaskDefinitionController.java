@@ -53,7 +53,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "TASK_DEFINITION_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/task-definitions")
+@RequestMapping("projects/{projectCode}/task-definition")
 public class TaskDefinitionController extends BaseController {
 
     @Autowired
