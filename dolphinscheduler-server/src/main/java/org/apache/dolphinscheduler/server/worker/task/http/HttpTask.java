@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.http;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
@@ -49,6 +50,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -138,6 +140,12 @@ public class HttpTask extends AbstractTask {
 
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
 
         List<HttpProperty> httpPropertyList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(httpParameters.getHttpParams())) {

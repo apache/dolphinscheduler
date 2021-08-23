@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.python;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -118,6 +120,12 @@ public class PythonTask extends AbstractTask {
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
         
         try {
             rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
@@ -125,10 +133,8 @@ public class PythonTask extends AbstractTask {
         catch (StringIndexOutOfBoundsException e) {
             logger.error("setShareVar field format error, raw python script : {}", rawPythonScript);
         }
-        
-        if (paramsMap != null) {
-            rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
-        }
+
+        rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
 
         logger.info("raw python script : {}", pythonParameters.getRawScript());
         logger.info("task dir : {}", taskDir);

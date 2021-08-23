@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
@@ -55,10 +56,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -155,6 +153,12 @@ public class DataxTask extends AbstractTask {
 
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            if (MapUtils.isEmpty(paramsMap)) {
+                paramsMap = new HashMap<>();
+            }
+            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+                paramsMap.putAll(taskExecutionContext.getParamsMap());
+            }
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
