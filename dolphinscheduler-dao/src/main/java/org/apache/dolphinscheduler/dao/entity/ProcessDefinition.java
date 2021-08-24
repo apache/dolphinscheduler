@@ -167,7 +167,7 @@ public class ProcessDefinition {
     @TableField(exist = false)
     private int warningGroupId;
 
-    public ProcessDefinition(){}
+    public ProcessDefinition() {}
 
     public ProcessDefinition(long projectCode,
                              String name,

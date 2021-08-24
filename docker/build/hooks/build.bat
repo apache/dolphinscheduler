@@ -39,8 +39,8 @@ echo "Repo: %DOCKER_REPO%"
 echo "Current Directory is %cd%"
 
 :: maven package(Project Directory)
-echo "call mvn clean compile package -Prelease"
-call mvn clean compile package -Prelease -DskipTests=true
+echo "mvn clean package -Prelease -DskipTests=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+call mvn clean package -Prelease -DskipTests=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 if "%errorlevel%"=="1" goto :mvnFailed
 
 :: move dolphinscheduler-bin.tar.gz file to docker/build directory
