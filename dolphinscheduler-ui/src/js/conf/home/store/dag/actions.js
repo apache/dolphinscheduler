@@ -83,7 +83,7 @@ export default {
    */
   getProcessDefinitionVersionsPage ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload. processDefinitionCode}/versions`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.processDefinitionCode}/versions`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
