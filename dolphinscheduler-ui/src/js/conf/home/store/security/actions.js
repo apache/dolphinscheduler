@@ -675,5 +675,26 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * delete environment
+   */
+  deleteEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/delete', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  verifyEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/verify-environment', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

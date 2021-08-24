@@ -700,6 +700,8 @@ export default {
   'Environment Code': 'Environment Code',
   'Environment Config': 'Environment Config',
   'Environment Desc': 'Environment Desc',
+  'Environment Worker Group': 'Worker Groups',
   'Please enter environment config': 'Please enter environment config',
-  'Please enter environment desc': 'Please enter environment desc'
+  'Please enter environment desc': 'Please enter environment desc',
+  'Please select worker groups': 'Please select worker groups'
 }

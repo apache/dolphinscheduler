@@ -700,6 +700,8 @@ export default {
   'Environment Code': '环境编码',
   'Environment Config': '环境配置',
   'Environment Desc': '详细描述',
+  'Environment Worker Group': 'Worker组',
   'Please enter environment config': '请输入环境配置信息',
-  'Please enter environment desc': '请输入详细描述'
+  'Please enter environment desc': '请输入详细描述',
+  'Please select worker groups': '请选择Worker分组'
 }

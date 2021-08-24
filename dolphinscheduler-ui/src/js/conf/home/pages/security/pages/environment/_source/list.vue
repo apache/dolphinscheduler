@@ -19,23 +19,37 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="environmentName" :label="$t('Name')"></el-table-column>
-        <el-table-column prop="environment" :label="$t('Environment value')"></el-table-column>
-        <el-table-column :label="$t('Create Time')" min-width="120">
+        <el-table-column prop="name" :label="$t('Environment Name')" width="150"></el-table-column>
+        <el-table-column prop="config" :label="$t('Environment Config')"></el-table-column>
+        <el-table-column prop="description" :label="$t('Environment Desc')" min-width="50"></el-table-column>
+        <el-table-column :label="$t('Create Time')" min-width="50">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" min-width="120">
+        <el-table-column :label="$t('Update Time')" min-width="50">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
-            <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
-            </el-tooltip>
+          <el-tooltip :content="$t('Edit')" placement="top">
+             <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+           </el-tooltip>
+           <el-tooltip :content="$t('Delete')" placement="top">
+             <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
+             <el-popconfirm
+               :confirmButtonText="$t('Confirm')"
+               :cancelButtonText="$t('Cancel')"
+               icon="el-icon-info"
+               iconColor="red"
+               :title="$t('Delete?')"
+               @onConfirm="_delete(scope.row,scope.row.id)"
+             >
+               <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+             </el-popconfirm>
+           </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -61,9 +75,15 @@
       ...mapActions('security', ['deleteEnvironment']),
       _delete (item, i) {
         this.deleteEnvironment({
-          id: item.id
+          environmentCode: item.code
         }).then(res => {
-          this.list.splice(i, 1)
+          let newList = []
+          this.list.forEach(item => {
+            if (item.id !== i) {
+              newList.push(item)
+            }
+          })
+          this.list = newList
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')

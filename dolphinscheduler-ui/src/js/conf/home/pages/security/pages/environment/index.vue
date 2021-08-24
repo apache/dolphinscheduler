@@ -19,9 +19,9 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create('')">{{$t('Create environment')}}</el-button>
+          <el-button size="mini" @click="_create()">{{$t('Create environment')}}</el-button>
           <el-dialog
-            :title="item ? $t('Edit environment') : $t('Create environment')"
+            :title="item && item.name ? $t('Edit environment') : $t('Create environment')"
             :v-if="createEnvironmentDialog"
             :visible.sync="createEnvironmentDialog"
             width="auto">
@@ -87,7 +87,6 @@
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         item: {},
         createEnvironmentDialog: false
-
       }
     },
     mixins: [listUrlParamHandle],
@@ -108,10 +107,11 @@
         this.searchParams.pageSize = val
       },
       _onEdit (item) {
-        this._create(item)
-      },
-      _create (item) {
         this.item = item
+        this.createEnvironmentDialog = true
+      },
+      _create () {
+        this.item = {}
         this.createEnvironmentDialog = true
       },
       onUpdate () {
@@ -129,7 +129,6 @@
         }
         this.isLoading = !flag
         this.getEnvironmentListPaging(this.searchParams).then(res => {
-          console.log(res)
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
