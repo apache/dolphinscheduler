@@ -27,6 +27,9 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
 
+import org.apache.commons.collections.MapUtils;
+
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -74,8 +77,14 @@ public class SqoopTask extends AbstractYarnTask {
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(sqoopTaskExecutionContext,getParameters());
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
+        }
 
-        if (paramsMap != null) {
+        if (MapUtils.isNotEmpty(paramsMap)) {
             String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
             logger.info("sqoop script: {}", resultScripts);
             return resultScripts;
