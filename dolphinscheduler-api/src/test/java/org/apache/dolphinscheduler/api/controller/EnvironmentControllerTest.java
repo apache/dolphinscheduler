@@ -68,7 +68,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
     public void testCreateEnvironment() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("environmentName",environmentName);
+        paramsMap.add("name",environmentName);
         paramsMap.add("config",config);
         paramsMap.add("description",desc);
 
@@ -91,8 +91,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
     @Test
     public void testUpdateEnvironment() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("environmentCode", environmentCode);
-        paramsMap.add("environmentName","environment_test_update");
+        paramsMap.add("code", environmentCode);
+        paramsMap.add("name","environment_test_update");
         paramsMap.add("config","this is config content");
         paramsMap.add("desc","the test environment update");
 
@@ -173,7 +173,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("environmentName",environmentName);
 
-        MvcResult mvcResult = mockMvc.perform(get("/environment/verify-environment")
+        MvcResult mvcResult = mockMvc.perform(post("/environment/verify-environment")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -182,8 +182,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-//        Assert.assertTrue(result.isStatus(Status.QUEUE_VALUE_EXIST));
-//        logger.info("verify environment return result:{}", mvcResult.getResponse().getContentAsString());
+        Assert.assertTrue(result.isStatus(Status.ENVIRONMENT_NAME_EXISTS));
+        logger.info("verify environment return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
 
@@ -193,7 +193,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("environmentCode", environmentCode);
 
-        MvcResult mvcResult = mockMvc.perform(get("/environment/delete")
+        MvcResult mvcResult = mockMvc.perform(post("/environment/delete")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

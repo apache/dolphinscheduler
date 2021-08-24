@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-@Rollback(true)
+@Rollback(false)
 public class EnvironmentMapperTest {
 
     @Autowired

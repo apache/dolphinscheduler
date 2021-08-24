@@ -129,15 +129,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Override
     public Result queryEnvironmentListPaging(Integer pageNo, Integer pageSize, String searchVal) {
         Result result = new Result();
-        PageInfo<Environment> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         Page<Environment> page = new Page<>(pageNo, pageSize);
 
         IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, searchVal);
 
-        List<Environment> environmentList = environmentIPage.getRecords();
+        PageInfo<Environment> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) environmentIPage.getTotal());
-        pageInfo.setTotalList(environmentList);
+        pageInfo.setTotalList(environmentIPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -266,7 +265,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.UPDATE_ENVIRONMENT_ERROR);
+            putMsg(result, Status.UPDATE_ENVIRONMENT_ERROR, name);
         }
         return result;
     }

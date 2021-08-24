@@ -60,7 +60,7 @@ public class EnvironmentController extends BaseController {
      * create environment
      *
      * @param loginUser   login user
-     * @param environmentName environment name
+     * @param name environment name
      * @param config config
      * @param description description
      * @return returns an error if it exists
@@ -76,11 +76,11 @@ public class EnvironmentController extends BaseController {
     @ApiException(CREATE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("environmentName") String environmentName,
+                                @RequestParam("name") String name,
                                 @RequestParam("config") String config,
                                 @RequestParam(value = "description", required = false) String description) {
 
-        Map<String, Object> result = environmentService.createEnvironment(loginUser, environmentName, config, description);
+        Map<String, Object> result = environmentService.createEnvironment(loginUser, name, config, description);
         return returnDataList(result);
     }
 
@@ -88,16 +88,16 @@ public class EnvironmentController extends BaseController {
      * update environment
      *
      * @param loginUser   login user
-     * @param environmentCode   environment code
-     * @param environmentName environment name
+     * @param code   environment code
+     * @param name environment name
      * @param config environment config
      * @param description description
      * @return update result code
      */
     @ApiOperation(value = "updateEnvironment", notes = "UPDATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
-            @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
+            @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String")
     })
@@ -106,11 +106,11 @@ public class EnvironmentController extends BaseController {
     @ApiException(UPDATE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateEnvironment(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam("environmentCode") Long environmentCode,
-                                    @RequestParam("environmentName") String environmentName,
+                                    @RequestParam("code") Long code,
+                                    @RequestParam("name") String name,
                                     @RequestParam("config") String config,
                                     @RequestParam(value = "description", required = false) String description) {
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, environmentCode, environmentName, config, description);
+        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, code, name, config, description);
         return returnDataList(result);
     }
 
@@ -164,7 +164,7 @@ public class EnvironmentController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = environmentService.queryEnvironmentListPaging(pageSize, pageNo, searchVal);
+        result = environmentService.queryEnvironmentListPaging(pageNo, pageSize, searchVal);
         return result;
     }
 
@@ -179,7 +179,7 @@ public class EnvironmentController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
     })
-    @GetMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

@@ -155,7 +155,7 @@ public class EnvironmentServiceTest {
         page.setTotal(1L);
         Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName))).thenReturn(page);
 
-        Result result = environmentService.queryEnvironmentListPaging(10, 1, environmentName);
+        Result result = environmentService.queryEnvironmentListPaging(1, 10, environmentName);
         logger.info(result.toString());
         PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
