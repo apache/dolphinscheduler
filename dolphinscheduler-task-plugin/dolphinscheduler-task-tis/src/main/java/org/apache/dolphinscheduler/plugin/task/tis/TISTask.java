@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.task.tis;
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -23,6 +24,7 @@ import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,11 +33,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.asynchttpclient.Dsl;
-import org.asynchttpclient.ws.WebSocket;
-import org.asynchttpclient.ws.WebSocketListener;
-import org.asynchttpclient.ws.WebSocketUpgradeHandler;
-import org.slf4j.Logger;
 
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.asynchttpclient.Dsl;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
+import org.slf4j.Logger;
 
 /**
  * TIS DataX Task
@@ -54,7 +57,6 @@ public class TISTask extends AbstractTask {
     private final TaskRequest taskExecutionContext;
 
     private TISParameters tisParameters;
-
 
     public TISTask(TaskRequest taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -96,7 +98,7 @@ public class TISTask extends AbstractTask {
             try (CloseableHttpClient client = HttpClients.createDefault();
                  // trigger to start TIS dataX task
                  CloseableHttpResponse response = client.execute(post)) {
-                ajaxResult = p(triggerUrl, response, BizResult.class);
+                ajaxResult = processResponse(triggerUrl, response, BizResult.class);
                 if (!ajaxResult.isSuccess()) {
                     List<String> errormsg = ajaxResult.getErrormsg();
                     StringBuffer errs = new StringBuffer();
@@ -119,7 +121,7 @@ public class TISTask extends AbstractTask {
                         entity = new StringEntity("{\n taskid: " + taskId + "\n, log: false }", StandardCharsets.UTF_8);
                         post.setEntity(entity);
                         status = client.execute(post);
-                        StatusResult execStatus = p(getStatusUrl, status, StatusResult.class);
+                        StatusResult execStatus = processResponse(getStatusUrl, status, StatusResult.class);
                         Map bizresult = execStatus.getBizresult();
                         Map s = (Map) bizresult.get("status");
                         execState = ExecResult.parse((Integer) s.get("state"));
@@ -135,7 +137,7 @@ public class TISTask extends AbstractTask {
                 try {
                     webSocket.sendCloseFrame();
                 } catch (Throwable e) {
-
+                    logger.warn(e.getMessage(), e);
                 }
             }
 
@@ -174,7 +176,6 @@ public class TISTask extends AbstractTask {
                         // WebSocket connection closed
                     }
 
-
                     public void onTextFrame(String payload, boolean finalFragment, int rsv) {
                         ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
                         logger.info(execLog.getMsg());
@@ -199,7 +200,7 @@ public class TISTask extends AbstractTask {
         return webSocketClient;
     }
 
-    private <T extends AjaxResult> T p(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
+    private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
         StatusLine resStatus = response.getStatusLine();
         if (HttpURLConnection.HTTP_OK != resStatus.getStatusCode()) {
             throw new IllegalStateException("request server " + applyUrl + " faild:" + resStatus.getReasonPhrase());
@@ -209,7 +210,6 @@ public class TISTask extends AbstractTask {
         T result = JSONUtils.parseObject(resp, clazz);
         return result;
     }
-
 
     @Override
     public AbstractParameters getParameters() {
@@ -241,7 +241,7 @@ public class TISTask extends AbstractTask {
         }
     }
 
-    private static abstract class AjaxResult<T> {
+    private abstract static class AjaxResult<T> {
 
         private boolean success;
 
