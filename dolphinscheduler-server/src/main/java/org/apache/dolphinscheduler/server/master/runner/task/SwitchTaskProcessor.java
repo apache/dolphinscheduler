@@ -85,8 +85,15 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public void run() {
-        if(!this.taskState().typeIsFinished() && setSwitchResult()){
-            endTaskState();
+        try {
+            if (!this.taskState().typeIsFinished() && setSwitchResult()) {
+                endTaskState();
+            }
+        } catch (Exception e) {
+            logger.error("update work flow {} switch task {} state error:",
+                    this.processInstance.getId(),
+                    this.taskInstance.getId(),
+                    e);
         }
     }
 
@@ -116,13 +123,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         return TaskType.SWITCH.getDesc();
     }
 
-
     @Override
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
     }
 
-    private boolean setSwitchResult(){
+    private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
                 taskInstance.getProcessInstanceId()
         );
