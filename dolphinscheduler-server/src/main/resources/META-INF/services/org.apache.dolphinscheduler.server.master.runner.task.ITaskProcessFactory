@@ -19,3 +19,4 @@ org.apache.dolphinscheduler.server.master.runner.task.CommonTaskProcessFactory
 org.apache.dolphinscheduler.server.master.runner.task.ConditionTaskProcessFactory
 org.apache.dolphinscheduler.server.master.runner.task.DependentTaskProcessFactory
 org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessFactory
+org.apache.dolphinscheduler.server.master.runner.task.SwitchTaskProcessFactory
