@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
+import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -41,11 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -72,7 +68,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
         @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, type = "String")
     })
-    @PostMapping(value = "")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -153,7 +149,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/{code}/version/{version}")
+    @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_TASK_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -179,7 +175,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @DeleteMapping(value = "/{code}/version/{version}")
+    @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -255,7 +251,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
-    @GetMapping(value = "")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

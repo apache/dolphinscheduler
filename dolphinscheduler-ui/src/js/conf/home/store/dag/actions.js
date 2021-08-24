@@ -44,8 +44,7 @@ export default {
    */
   getTaskState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/task-list-by-process-id`, {
-        processInstanceId: payload
+      io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, {
       }, res => {
         const arr = _.map(res.data.taskList, v => {
           return _.cloneDeep(_.assign(tasksState[v.state], {
@@ -69,8 +68,7 @@ export default {
    */
   editProcessState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/process/release`, {
-        processId: payload.processId,
+      io.post(`projects/${state.projectCode}/process-definition/${payload.processId}/release`, {
         releaseState: payload.releaseState
       }, res => {
         resolve(res)
@@ -85,7 +83,7 @@ export default {
    */
   getProcessDefinitionVersionsPage ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/versions`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload. processDefinitionCode}/versions`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -98,7 +96,7 @@ export default {
    */
   switchProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/version/switch`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.processDefinitionId}/versions/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -111,7 +109,7 @@ export default {
    */
   deleteProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/version/delete`, payload, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.processDefinitionId}/versiond/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -139,7 +137,7 @@ export default {
    */
   verifDAGName ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/verify-name`, {
+      io.get(`projects/${state.projectCode}/process-definition/verify-name`, {
         name: payload
       }, res => {
         state.name = payload
@@ -155,8 +153,7 @@ export default {
    */
   getProcessDetails ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/select-by-id`, {
-        processId: payload
+      io.get(`projects/${state.projectCode}/process-definition/${payload}`, {
       }, res => {
         // process definition code
         state.code = res.data.code
@@ -197,7 +194,7 @@ export default {
    */
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/process/copy`, {
+      io.post(`projects/${state.projectCode}/process-definition/batch-copy`, {
         processDefinitionIds: payload.processDefinitionIds,
         targetProjectId: payload.targetProjectId
       }, res => {
@@ -213,7 +210,7 @@ export default {
    */
   moveProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/process/move`, {
+      io.post(`projects/${state.projectCode}/process-definition/batch-move`, {
         processDefinitionIds: payload.processDefinitionIds,
         targetProjectId: payload.targetProjectId
       }, res => {
@@ -229,7 +226,7 @@ export default {
    */
   getAllItems ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('projects/created-and-authorized-project', {}, res => {
+      io.get('projects/created-and-authed', {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -242,8 +239,7 @@ export default {
    */
   getInstancedetail ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/select-by-id`, {
-        processInstanceId: payload
+      io.get(`projects/${state.projectCode}/process-instances/${payload}`, {
       }, res => {
         // code
         state.code = res.data.processDefinitionCode
@@ -294,7 +290,7 @@ export default {
         tenantId: state.tenantId,
         timeout: state.timeout
       }
-      io.post(`projects/${state.projectName}/process/save`, {
+      io.post(`projects/${state.projectCode}/process-definition`, {
         processDefinitionJson: JSON.stringify(data),
         name: _.trim(state.name),
         description: _.trim(state.description),
@@ -318,13 +314,12 @@ export default {
         tenantId: state.tenantId,
         timeout: state.timeout
       }
-      io.post(`projects/${state.projectName}/process/update`, {
+      io.put(`projects/${state.projectCode}/process-definition/${payload}`, {
         processDefinitionJson: JSON.stringify(data),
         locations: JSON.stringify(state.locations),
         connects: JSON.stringify(state.connects),
         name: _.trim(state.name),
         description: _.trim(state.description),
-        id: payload,
         releaseState: state.releaseState
       }, res => {
         resolve(res)
@@ -345,11 +340,10 @@ export default {
         tenantId: state.tenantId,
         timeout: state.timeout
       }
-      io.post(`projects/${state.projectName}/instance/update`, {
+      io.put(`projects/${state.projectCode}/process-instances/${payload}`, {
         processInstanceJson: JSON.stringify(data),
         locations: JSON.stringify(state.locations),
         connects: JSON.stringify(state.connects),
-        processInstanceId: payload,
         syncDefine: state.syncDefine
       }, res => {
         resolve(res)
@@ -368,7 +362,7 @@ export default {
         resolve()
         return
       }
-      io.get(`projects/${state.projectName}/process/list`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/list`, payload, res => {
         state.processListS = res.data
         resolve(res.data)
       }).catch(res => {
@@ -381,7 +375,7 @@ export default {
    */
   getProcessListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition`, payload, res => {
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -397,7 +391,7 @@ export default {
         resolve()
         return
       }
-      io.get('projects/query-project-list', payload, res => {
+      io.get('projects/list', payload, res => {
         state.projectListS = res.data
         resolve(res.data)
       }).catch(res => {
@@ -410,7 +404,7 @@ export default {
    */
   getProcessByProjectId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/queryProcessDefinitionAllByProjectId`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/all`, payload, res => {
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -474,7 +468,7 @@ export default {
    */
   getProcessInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances`, payload, res => {
         state.instanceListS = res.data.totalList
         resolve(res.data)
       }).catch(res => {
@@ -531,7 +525,7 @@ export default {
    */
   getSubProcessId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/select-sub-process`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/query-sub-by-parent`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -628,7 +622,7 @@ export default {
    */
   deleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/delete`, payload, res => {
+      io.delete(`projects/${state.projectCode}/process-instances/${payload}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -640,7 +634,7 @@ export default {
    */
   batchDeleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/batch-delete`, payload, res => {
+      io.post(`projects/${state.projectCode}/process-instances/batch-delete`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -652,7 +646,7 @@ export default {
    */
   deleteDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/delete`, payload, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -664,7 +658,7 @@ export default {
    */
   batchDeleteDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/batch-delete`, payload, res => {
+      io.post(`projects/${state.projectCode}/process-definition/batch-delete`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -696,7 +690,7 @@ export default {
       }
     }
 
-    io.get(`projects/${state.projectName}/process/export`, { processDefinitionIds: payload.processDefinitionIds }, res => {
+    io.post(`projects/${state.projectCode}/process-definition/batch-export`, { processDefinitionIds: payload.processDefinitionIds }, res => {
       downloadBlob(res, payload.fileName)
     }, e => {
 
@@ -710,7 +704,7 @@ export default {
    */
   getViewvariables ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/view-variables`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload}/view-variables`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -734,7 +728,7 @@ export default {
    */
   getTaskInstanceList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/task-instance/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/task-instances`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -746,7 +740,7 @@ export default {
    */
   forceTaskSuccess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/task-instance/force-success`, payload, res => {
+      io.post(`projects/${state.projectCode}/task-instances/${payload}/force-success`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -782,7 +776,7 @@ export default {
    */
   getViewTree ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/view-tree`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.processId}/view-tree`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -794,7 +788,7 @@ export default {
    */
   getViewGantt ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/instance/view-gantt`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload}/view-gantt`, {}, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -806,7 +800,7 @@ export default {
    */
   getProcessTasksList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/gen-task-list`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload}/tasks`, {}, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -815,7 +809,7 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/get-task-list`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/tatch-query-tasks`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
