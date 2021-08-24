@@ -14,28 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+package org.apache.dolphinscheduler.server.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
-/**
- * resource process definition utils test
- */
-public class ResourceProcessDefinitionUtilsTest {
-    @Test
-    public void getResourceProcessDefinitionMapTest(){
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",1L);
-        map.put("resource_ids","1,2,3");
-        mapList.add(map);
-        Assert.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
+public class SwitchTaskUtils {
+    private static ScriptEngineManager manager;
+    private static ScriptEngine engine;
+
+    static {
+        manager = new ScriptEngineManager();
+        engine = manager.getEngineByName("js");
+    }
+
+    public static boolean evaluate(String expression) throws ScriptException {
+        Object result = engine.eval(expression);
+        return (Boolean) result;
     }
 
 }
