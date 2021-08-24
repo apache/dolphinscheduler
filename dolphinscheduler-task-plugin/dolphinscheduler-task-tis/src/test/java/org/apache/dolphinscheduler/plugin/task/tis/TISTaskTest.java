@@ -1,4 +1,5 @@
-package org.apache.dolphinscheduler.plugin.task.tis;/*
+package org.apache.dolphinscheduler.plugin.task.tis;
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -89,9 +90,6 @@ public class TISTaskTest {
         Assert.assertNotNull(new TISTask(null, logger));
     }
 
-    /**
-     * Method: init
-     */
     @Test
     public void testInit()
             throws Exception {
@@ -102,20 +100,10 @@ public class TISTaskTest {
         }
     }
 
-    /**
-     * Method: handle()
-     */
     @Test
     public void testHandle()
             throws Exception {
-        String taskName = "mysql_elastic";
-        int taskid = 1087;
-
-        // https://github.com/dreamhead/moco/blob/master/moco-doc/websocket-apis.md
-        // https://github.com/dreamhead/moco/blob/master/moco-doc/socket-apis.md#json-text
-        // https://blog.csdn.net/qq_36450484/article/details/99655976
         HttpServer server = jsonHttpServer(8080, pathResource("org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
-
 
         running(server, () -> {
             tisTask.handle();
@@ -135,9 +123,6 @@ public class TISTaskTest {
         }
     }
 
-    /**
-     * Method: cancelApplication()
-     */
     @Test
     public void testCancelApplication()
             throws Exception {

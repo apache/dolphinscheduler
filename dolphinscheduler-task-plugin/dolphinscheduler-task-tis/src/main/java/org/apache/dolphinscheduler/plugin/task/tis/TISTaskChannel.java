@@ -21,9 +21,6 @@ import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
-/**
- *
- **/
 public class TISTaskChannel implements TaskChannel {
     @Override
     public void cancelApplication(boolean status) {
