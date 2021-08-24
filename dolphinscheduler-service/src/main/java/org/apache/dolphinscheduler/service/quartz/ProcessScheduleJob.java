@@ -75,8 +75,8 @@ public class ProcessScheduleJob implements Job {
 
         // query schedule
         Schedule schedule = getProcessService().querySchedule(scheduleId);
-        if (schedule == null) {
-            logger.warn("process schedule does not exist in db，delete schedule job in quartz, projectId:{}, scheduleId:{}", projectId, scheduleId);
+        if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
+            logger.warn("process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}", projectId, scheduleId);
             deleteJob(projectId, scheduleId);
             return;
         }

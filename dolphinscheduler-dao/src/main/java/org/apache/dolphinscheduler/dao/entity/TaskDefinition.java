@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -175,6 +176,12 @@ public class TaskDefinition {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * modify user name
+     */
+    @TableField(exist = false)
+    private String modifyBy;
 
     public TaskDefinition() {
     }
@@ -400,34 +407,70 @@ public class TaskDefinition {
         return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
     }
 
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        TaskDefinition that = (TaskDefinition) o;
+        return failRetryTimes == that.failRetryTimes
+            && failRetryInterval == that.failRetryInterval
+            && timeout == that.timeout
+            && delayTime == that.delayTime
+            && Objects.equals(name, that.name)
+            && Objects.equals(description, that.description)
+            && Objects.equals(taskType, that.taskType)
+            && Objects.equals(taskParams, that.taskParams)
+            && flag == that.flag
+            && taskPriority == that.taskPriority
+            && Objects.equals(workerGroup, that.workerGroup)
+            && timeoutFlag == that.timeoutFlag
+            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+            && Objects.equals(resourceIds, that.resourceIds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, taskType, taskParams, flag, taskPriority, workerGroup, failRetryTimes,
+            failRetryInterval, timeoutFlag, timeoutNotifyStrategy, timeout, delayTime, resourceIds);
+    }
+
     @Override
     public String toString() {
         return "TaskDefinition{"
-                + "id=" + id
-                + ", code=" + code
-                + ", name='" + name + '\''
-                + ", version=" + version
-                + ", description='" + description + '\''
-                + ", projectCode=" + projectCode
-                + ", userId=" + userId
-                + ", taskType=" + taskType
-                + ", taskParams='" + taskParams + '\''
-                + ", taskParamList=" + taskParamList
-                + ", taskParamMap=" + taskParamMap
-                + ", flag=" + flag
-                + ", taskPriority=" + taskPriority
-                + ", userName='" + userName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", failRetryTimes=" + failRetryTimes
-                + ", failRetryInterval=" + failRetryInterval
-                + ", timeoutFlag=" + timeoutFlag
-                + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
-                + ", timeout=" + timeout
-                + ", delayTime=" + delayTime
-                + ", resourceIds='" + resourceIds + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", code=" + code
+            + ", name='" + name + '\''
+            + ", version=" + version
+            + ", description='" + description + '\''
+            + ", projectCode=" + projectCode
+            + ", userId=" + userId
+            + ", taskType=" + taskType
+            + ", taskParams='" + taskParams + '\''
+            + ", taskParamList=" + taskParamList
+            + ", taskParamMap=" + taskParamMap
+            + ", flag=" + flag
+            + ", taskPriority=" + taskPriority
+            + ", userName='" + userName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", failRetryTimes=" + failRetryTimes
+            + ", failRetryInterval=" + failRetryInterval
+            + ", timeoutFlag=" + timeoutFlag
+            + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
+            + ", timeout=" + timeout
+            + ", delayTime=" + delayTime
+            + ", resourceIds='" + resourceIds + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

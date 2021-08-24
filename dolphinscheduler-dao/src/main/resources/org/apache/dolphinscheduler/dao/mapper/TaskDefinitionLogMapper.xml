@@ -23,27 +23,16 @@
         worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, operator, operate_time, create_time, update_time
     </sql>
-    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
-        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
-        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
-        td.timeout, td.delay_time, td.resource_ids, td.operator,td.operate_time, td.create_time, td.update_time,
-        u.user_name,p.name as project_name
-        from t_ds_task_definition_log td
-        JOIN t_ds_user u ON td.user_id = u.id
-        JOIN  t_ds_project p ON td.project_code = p.code
-        WHERE p.code = #{projectCode}
-        and td.name = #{taskDefinitionName}
-    </select>
     <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
         select max(version)
         from t_ds_task_definition_log
-        WHERE code = #{taskDefinitionCode}
+        WHERE code = #{code}
     </select>
     <select id="queryByDefinitionCodeAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition_log
-        WHERE code = #{taskDefinitionCode}
+        WHERE code = #{code}
         and version = #{version}
     </select>
     <select id="queryByTaskDefinitions" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
@@ -73,4 +62,17 @@
              #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime})
         </foreach>
     </insert>
+    <delete id="deleteByCodeAndVersion">
+        delete
+        from t_ds_task_definition_log
+        where code = #{code}
+          and version = #{version}
+    </delete>
+    <select id="queryTaskDefinitionVersionsPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition_log
+        where code = #{code}
+        order by version desc
+    </select>
 </mapper>

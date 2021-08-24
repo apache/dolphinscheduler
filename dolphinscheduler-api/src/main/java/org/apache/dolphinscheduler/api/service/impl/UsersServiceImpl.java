@@ -313,7 +313,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      *
      * @param loginUser login user
      * @param pageNo page number
-     * @param searchVal search avlue
+     * @param searchVal search value
      * @param pageSize page size
      * @return user list page
      */
@@ -347,7 +347,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName user name
      * @param userPassword user password
      * @param email email
-     * @param tenantId tennat id
+     * @param tenantId tenant id
      * @param phone phone
      * @param queue queue
      * @return update result code
