@@ -32,7 +32,7 @@
         </if>
         order by update_time desc
     </select>
-    <select id="queryAlertGroupName" resultType="Map">
+    <select id="queryAlertGroupVo" resultType="org.apache.dolphinscheduler.dao.vo.AlertGroupVo">
         select id, group_name
         from t_ds_alertgroup
         where 1 = 1

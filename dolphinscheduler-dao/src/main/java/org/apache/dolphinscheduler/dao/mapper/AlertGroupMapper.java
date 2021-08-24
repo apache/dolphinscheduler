@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -85,11 +85,11 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
 
     /**
-     * alert group page
+     * query alertGroupVo page list
      * @param page page
      * @param groupName groupName
-     * @return map IPage: include alert group id and group_name
+     * @return IPage<AlertGroupVo>: include alert group id and group_name
      */
-    IPage<Map<String, Object>> queryAlertGroupName(Page<Map<String, Object>> page,
-                                               @Param("groupName") String groupName);
+    IPage<AlertGroupVo> queryAlertGroupVo(Page<AlertGroupVo> page,
+                                          @Param("groupName") String groupName);
 }
