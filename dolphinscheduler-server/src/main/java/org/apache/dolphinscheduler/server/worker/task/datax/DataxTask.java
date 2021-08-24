@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
@@ -40,6 +39,7 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -56,7 +56,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

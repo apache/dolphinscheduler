@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.python;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -30,6 +29,8 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.HashMap;
 import java.util.Map;

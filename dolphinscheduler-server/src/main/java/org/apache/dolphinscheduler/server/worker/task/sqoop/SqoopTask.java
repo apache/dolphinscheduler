@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -27,6 +26,8 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.HashMap;
 import java.util.Map;

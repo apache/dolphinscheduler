@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Event;
@@ -61,8 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.rholder.retry.RetryException;
-
-import static java.util.Calendar.DAY_OF_MONTH;
 
 /**
  *  task scheduler thread
@@ -187,7 +187,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
     }
 
-    private void preBuildBusinessParams(){
+    private void preBuildBusinessParams() {
         Map<String, Property> paramsMap = new HashMap<>();
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
         if (taskExecutionContext.getScheduleTime() != null) {
@@ -248,7 +248,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
         return globalParamsMap;
     }
-
 
     /**
      * kill task
