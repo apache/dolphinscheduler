@@ -57,4 +57,20 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl i
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * query all environment worker group relation
+     *
+     * @return all relation list
+     */
+    @Override
+    public Map<String, Object> queryAllEnvironmentWorkerGroupRelationList() {
+        Map<String, Object> result = new HashMap<>();
+
+        List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
+
+        result.put(Constants.DATA_LIST,relations);
+        putMsg(result,Status.SUCCESS);
+        return result;
+    }
 }

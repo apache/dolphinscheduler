@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ENVIRONMENT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ENVIRONMENT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ENVIRONMENT_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ENVIRONMENT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ENVIRONMENT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_ENVIRONMENT_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
@@ -43,8 +50,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-import static org.apache.dolphinscheduler.api.enums.Status.*;
-
 /**
  * environment controller
  */
@@ -69,7 +74,8 @@ public class EnvironmentController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", required = true, dataType = "String")
+            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -78,9 +84,10 @@ public class EnvironmentController extends BaseController {
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("name") String name,
                                 @RequestParam("config") String config,
-                                @RequestParam(value = "description", required = false) String description) {
+                                @RequestParam(value = "description", required = false) String description,
+                                @RequestParam(value = "workerGroups", required = false) String workerGroups) {
 
-        Map<String, Object> result = environmentService.createEnvironment(loginUser, name, config, description);
+        Map<String, Object> result = environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
         return returnDataList(result);
     }
 
@@ -99,7 +106,8 @@ public class EnvironmentController extends BaseController {
             @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
             @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -109,8 +117,9 @@ public class EnvironmentController extends BaseController {
                                     @RequestParam("code") Long code,
                                     @RequestParam("name") String name,
                                     @RequestParam("config") String config,
-                                    @RequestParam(value = "description", required = false) String description) {
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, code, name, config, description);
+                                    @RequestParam(value = "description", required = false) String description,
+                                    @RequestParam(value = "workerGroups", required = false) String workerGroups) {
+        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, code, name, config, description, workerGroups);
         return returnDataList(result);
     }
 

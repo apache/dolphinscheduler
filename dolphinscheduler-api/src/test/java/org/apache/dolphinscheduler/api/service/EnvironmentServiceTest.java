@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -27,9 +25,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import java.util.ArrayList;
@@ -51,6 +50,8 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * environment service test
@@ -67,11 +68,16 @@ public class EnvironmentServiceTest {
     private EnvironmentMapper environmentMapper;
 
     @Mock
+    private EnvironmentWorkerGroupRelationMapper relationMapper;
+
+    @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
     public static final String testUserName = "environmentServerTest";
 
     public static final String environmentName = "Env1";
+
+    public static final String workerGroups = "[\"default\"]";
 
     @Before
     public void setUp(){
@@ -84,54 +90,69 @@ public class EnvironmentServiceTest {
     @Test
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
-        Map<String, Object> result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc());
+        Map<String, Object> result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        result = environmentService.createEnvironment(loginUser,environmentName,"",getDesc());
+        result = environmentService.createEnvironment(loginUser,environmentName,"",getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.createEnvironment(loginUser,"",getConfig(),getDesc());
+        result = environmentService.createEnvironment(loginUser,"",getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
+        result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),"test");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc());
+        result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.insert(Mockito.any(Environment.class))).thenReturn(1);
-        result = environmentService.createEnvironment(loginUser,"testName","test","test");
+        Mockito.when(relationMapper.insert(Mockito.any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
+        result = environmentService.createEnvironment(loginUser,"testName","test","test",workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
 
     @Test
+    public void testCheckParams(){
+        Map<String, Object> result = environmentService.checkParams(environmentName,getConfig(),"test");
+        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+    }
+
+    @Test
     public void testUpdateEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc());
+        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,"",getDesc());
+        result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,"",getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,"",getConfig(),getDesc());
+        result = environmentService.updateEnvironmentByCode(loginUser,1L,"",getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
+        result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc(),"test");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.updateEnvironmentByCode(loginUser,2L,environmentName,getConfig(),getDesc());
+        result = environmentService.updateEnvironmentByCode(loginUser,2L,environmentName,getConfig(),getDesc(),workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.update(Mockito.any(Environment.class),Mockito.any(Wrapper.class))).thenReturn(1);
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,"testName","test","test");
+        result = environmentService.updateEnvironmentByCode(loginUser,1L,"testName","test","test",workerGroups);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -160,7 +181,6 @@ public class EnvironmentServiceTest {
         PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
-
 
     @Test
     public void testQueryEnvironmentByName() {

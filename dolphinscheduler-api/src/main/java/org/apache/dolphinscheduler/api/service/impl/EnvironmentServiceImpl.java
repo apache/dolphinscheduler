@@ -17,24 +17,27 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     private EnvironmentMapper environmentMapper;
 
     @Autowired
+    private EnvironmentWorkerGroupRelationMapper relationMapper;
+
+    @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
 
     /**
@@ -69,17 +75,17 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param name environment name
      * @param config environment config
      * @param desc environment desc
+     * @param workerGroups worker groups
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc) {
+    public Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
-
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
-        Map<String, Object> checkResult = checkParams(name,config);
+        Map<String, Object> checkResult = checkParams(name,config,workerGroups);
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
         }
@@ -110,6 +116,22 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         }
 
         if (environmentMapper.insert(env) > 0) {
+            if (StringUtils.isNotEmpty(workerGroups)) {
+                List<String> workerGroupList=JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>(){});
+                if (CollectionUtils.isNotEmpty(workerGroupList)) {
+                    workerGroupList.stream().forEach(workerGroup ->{
+                        if(StringUtils.isNotEmpty(workerGroup)){
+                            EnvironmentWorkerGroupRelation relation=new EnvironmentWorkerGroupRelation();
+                            relation.setEnvironmentCode(env.getCode());
+                            relation.setWorkerGroupName(workerGroup);
+                            relation.setOperator(loginUser.getId());
+                            relation.setCreateTime(new Date());
+                            relation.setUpdateTime(new Date());
+                            relationMapper.insert(relation);
+                        }
+                    });
+                }
+            }
             result.put(Constants.DATA_LIST, env.getCode());
             putMsg(result, Status.SUCCESS);
         } else {
@@ -233,16 +255,17 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param name environment name
      * @param config environment config
      * @param desc environment desc
+     * @param workerGroups worker groups
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc) {
+    public Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
-        Map<String, Object> checkResult = checkParams(name,config);
+        Map<String, Object> checkResult = checkParams(name,config,workerGroups);
         if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkResult;
         }
@@ -263,6 +286,32 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode,code));
         if (update > 0) {
+
+            Map<String,EnvironmentWorkerGroupRelation> relationMap=relationMapper.queryByEnvironmentCode(env.getCode()).stream().collect(Collectors.toMap(item -> item.uniqueRelationKey(),item -> item));
+            List<EnvironmentWorkerGroupRelation> deleteRelations = new ArrayList<>();
+            List<EnvironmentWorkerGroupRelation> addRelations = new ArrayList<>();
+            if (StringUtils.isNotEmpty(workerGroups)) {
+                List<String> workerGroupList=JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>(){});
+                if (CollectionUtils.isNotEmpty(workerGroupList)) {
+                    workerGroupList.stream().forEach(workerGroup ->{
+                        if(StringUtils.isNotEmpty(workerGroup)){
+                            EnvironmentWorkerGroupRelation relation=new EnvironmentWorkerGroupRelation();
+                            relation.setEnvironmentCode(env.getCode());
+                            relation.setWorkerGroupName(workerGroup);
+                            relation.setOperator(loginUser.getId());
+                            relation.setCreateTime(new Date());
+                            relation.setUpdateTime(new Date());
+
+                            relationMap.get(relation.uniqueRelationKey());
+
+                            addRelations.add(relation);
+                        }
+                    });
+                }
+            }
+//            if(CollectionUtils.isNotEmpty(relations)){
+//
+//            }
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.UPDATE_ENVIRONMENT_ERROR, name);
@@ -295,7 +344,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         return result;
     }
 
-    public Map<String, Object> checkParams(String name, String config) {
+    public Map<String, Object> checkParams(String name, String config, String workerGroups) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(name)) {
             putMsg(result, Status.ENVIRONMENT_NAME_IS_NULL);
@@ -304,6 +353,13 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         if (StringUtils.isEmpty(config)) {
             putMsg(result, Status.ENVIRONMENT_CONFIG_IS_NULL);
             return result;
+        }
+        if (StringUtils.isNotEmpty(workerGroups)){
+            List<String> workerGroupList=JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>(){});
+            if (CollectionUtils.isEmpty(workerGroupList)) {
+                putMsg(result, Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID);
+                return result;
+            }
         }
         result.put(Constants.STATUS, Status.SUCCESS);
         return result;

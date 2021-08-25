@@ -321,7 +321,8 @@ public enum Status {
     QUERY_ENVIRONMENT_BY_NAME_ERROR(1200008, "not found environment [{0}] ", "查询环境名称[{0}]信息不存在"),
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
-    VERIFY_ENVIRONMENT_ERROR(10133, "verify environment error", "验证环境信息错误");
+    VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
+    ENVIRONMENT_WORKER_GROUPS_IS_INVALID(1200012, "environment worker groups is invalid format", "环境关联的工作组参数解析错误");
 
 
     private final int code;

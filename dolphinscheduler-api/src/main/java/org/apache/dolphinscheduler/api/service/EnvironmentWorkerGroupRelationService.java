@@ -31,5 +31,12 @@ public interface EnvironmentWorkerGroupRelationService {
      * @param environmentCode environment code
      */
     Map<String, Object> queryEnvironmentWorkerGroupRelation(Long environmentCode);
+
+    /**
+     * query all environment worker group relation
+     *
+     * @return all relation list
+     */
+    Map<String, Object> queryAllEnvironmentWorkerGroupRelationList();
 }
 

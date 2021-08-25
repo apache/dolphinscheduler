@@ -102,6 +102,13 @@ public class EnvironmentWorkerGroupRelation {
         this.updateTime = updateTime;
     }
 
+    public String uniqueRelationKey() {
+        return "EnvironmentWorkerGroupRelation{"
+                + ", environmentCode= " + environmentCode
+                + ", workerGroupName= " + workerGroupName
+                + "}";
+    }
+
     @Override
     public String toString() {
         return "EnvironmentWorkerGroupRelation{"

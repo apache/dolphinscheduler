@@ -58,4 +58,12 @@ public class EnvironmentWorkerGroupRelationServiceTest {
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
 
+    @Test
+    public void testQueryAllEnvironmentWorkerGroupRelationList() {
+        Mockito.when(relationMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
+        Map<String, Object> result = relationService.queryAllEnvironmentWorkerGroupRelationList();
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+    }
+
 }

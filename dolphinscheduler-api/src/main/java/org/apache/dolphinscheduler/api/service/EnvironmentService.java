@@ -34,8 +34,9 @@ public interface EnvironmentService {
      * @param name environment name
      * @param config environment config
      * @param desc environment desc
+     * @param workerGroups worker groups
      */
-    Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc);
+    Map<String, Object> createEnvironment(User loginUser, String name, String config, String desc, String workerGroups);
 
     /**
      * query environment
@@ -68,8 +69,9 @@ public interface EnvironmentService {
      * @param name environment name
      * @param config environment config
      * @param desc environment desc
+     * @param workerGroups worker groups
      */
-    Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc);
+    Map<String, Object> updateEnvironmentByCode(User loginUser, Long code, String name, String config, String desc, String workerGroups);
 
     /**
      * query environment paging
@@ -95,7 +97,6 @@ public interface EnvironmentService {
      * @return true if the environment name not exists, otherwise return false
      */
     Map<String, Object> verifyEnvironment(String environmentName);
-
 
 }
 
