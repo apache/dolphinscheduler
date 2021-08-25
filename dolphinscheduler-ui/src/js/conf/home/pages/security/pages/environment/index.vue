@@ -78,6 +78,8 @@
         total: null,
         isLoading: true,
         environmentList: [],
+        workerGroupList: [],
+        environmentWorkerGroupRelationList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -92,7 +94,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getEnvironmentListPaging']),
+      ...mapActions('security', ['getEnvironmentListPaging', 'getWorkerGroupsAll']),
       /**
        * Query
        */
@@ -111,7 +113,7 @@
         this.createEnvironmentDialog = true
       },
       _create () {
-        this.item = {}
+        this.item = { workerGroupOptions: this.workerGroupList }
         this.createEnvironmentDialog = true
       },
       onUpdate () {
@@ -128,15 +130,19 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getEnvironmentListPaging(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+        Promise.all([this.getEnvironmentListPaging(this.searchParams), this.getWorkerGroupsAll()]).then((values) => {
+          if (this.searchParams.pageNo > 1 && values[0].totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.environmentList = []
-            this.environmentList = res.totalList
-            this.total = res.total
+            this.environmentList = values[0].totalList
+            this.total = values[0].total
             this.isLoading = false
           }
+          this.workerGroupList = values[1]
+          this.environmentList.forEach(item => {
+            item.workerGroupOptions = this.workerGroupList
+          })
         }).catch(e => {
           this.isLoading = false
         })

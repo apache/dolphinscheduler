@@ -64,10 +64,10 @@
               style="display: block;"
               :placeholder="$t('Please select worker groups')">
               <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in workerGroupOptions"
+                :key="item.id"
+                :label="item.id"
+                :value="item.name">
               </el-option>
             </el-select>
           </template>
@@ -78,6 +78,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopover from '@/module/components/popup/popover'
@@ -89,13 +90,7 @@
       return {
         store,
         workerGroups: [],
-        options: [{
-          value: 'Worker Group1',
-          label: 'Worker Group1'
-        }, {
-          value: 'Worker Group2',
-          label: 'Worker Group2'
-        }],
+        workerGroupOptions: [],
         environment: '',
         name: '',
         config: '',
@@ -117,6 +112,14 @@
       item: Object
     },
     methods: {
+      ...mapActions('security', ['getWorkerGroupsAll']),
+      _getWorkerGroupList () {
+        this.getWorkerGroupsAll().then(res => {
+          this.workerGroups = res
+          console.log('get Worker Group List')
+          console.log(this.workerGroups)
+        })
+      },
       _ok () {
         if (!this._verification()) {
           return
@@ -125,7 +128,8 @@
         let param = {
           name: _.trim(this.name),
           config: _.trim(this.config),
-          description: _.trim(this.description)
+          description: _.trim(this.description),
+          workerGroups: JSON.stringify(this.workerGroups)
         }
 
         let $then = (res) => {
@@ -199,6 +203,7 @@
           this.name = val.name
           this.config = val.config
           this.description = val.description
+          this.workerGroupOptions = val.workerGroupOptions
         },
         deep: true
       }
@@ -209,6 +214,7 @@
         this.config = this.item.config
         this.description = this.item.description
       }
+      this.workerGroupOptions = this.item.workerGroupOptions
     },
     mounted () {
     },
