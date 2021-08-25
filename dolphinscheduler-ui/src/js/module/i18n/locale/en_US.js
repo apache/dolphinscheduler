@@ -125,7 +125,11 @@ export default {
   'Slot Number': 'Slot Number',
   'Please enter Slot number': 'Please enter Slot number',
   Parallelism: 'Parallelism',
+  'Custom Parallelism': 'Configure parallelism',
   'Please enter Parallelism': 'Please enter Parallelism',
+  'Parallelism tip': 'If there are a large number of tasks requiring complement, you can use the custom parallelism to ' +
+  'set the complement task thread to a reasonable value to avoid too large impact on the server.',
+  'Parallelism number should be positive integer': 'Parallelism number should be positive integer',
   'TaskManager Number': 'TaskManager Number',
   'Please enter TaskManager number': 'Please enter TaskManager number',
   'App Name': 'App Name',
@@ -691,5 +695,7 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate',
   Info: 'Info',
   'Datasource userName': 'owner',
-  'Resource userName': 'owner'
+  'Resource userName': 'owner',
+  condition: 'condition',
+  'The condition content cannot be empty': 'The condition content cannot be empty'
 }

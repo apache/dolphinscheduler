@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -34,6 +35,14 @@ public interface AlertGroupService {
     Map<String, Object> queryAlertgroup();
 
     /**
+     * query alert group by id
+     *
+     * @param loginUser login user
+     * @param id alert group id
+     * @return one alert group
+     */
+    Map<String, Object> queryAlertGroupById(User loginUser, Integer id);
+    /**
      * paging query alarm group list
      *
      * @param loginUser login user
@@ -42,7 +51,7 @@ public interface AlertGroupService {
      * @param pageSize page size
      * @return alert group list page
      */
-    Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create alert group

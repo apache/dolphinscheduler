@@ -8,6 +8,7 @@ Dolphin Scheduler Official Website
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 [![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)
+[![Join the chat at https://gitter.im/apache-dolphinscheduler/community](https://badges.gitter.im/apache-dolphinscheduler/community.svg)](https://gitter.im/apache-dolphinscheduler/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 
@@ -79,7 +80,7 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-s
 
 ## Thanks
 
-DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
+DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, quartz, and many open-source projects of Apache and so on.
 We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
 
 ## Get Help
@@ -91,11 +92,11 @@ We would like to express our deep gratitude to all the open-source projects used
 
 You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
 1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw).
-2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
+2. Follow the [Twitter account of DolphinScheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
 ### Contributor over time
   
-[![Contributor over time](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=apache/dolphinscheduler)](https://www.apiseven.com/en/contributor-graph?chart=contributorOverTime&repo=apache/dolphinscheduler)
+[![Contributor over time](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=apache/dolphinscheduler)](https://www.apiseven.com/en/contributor-graph?chart=contributorOverTime&repo=apache/dolphinscheduler) 
 
 ## How to Contribute
 

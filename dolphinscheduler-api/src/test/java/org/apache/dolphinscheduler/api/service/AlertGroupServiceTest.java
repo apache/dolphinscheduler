@@ -23,12 +23,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,21 +78,21 @@ public class AlertGroupServiceTest {
 
     @Test
     public void testListPaging() {
-        IPage<AlertGroup> page = new Page<>(1, 10);
+        IPage<AlertGroupVo> page = new Page<>(1, 10);
         page.setTotal(1L);
-        page.setRecords(getList());
-        Mockito.when(alertGroupMapper.queryAlertGroupPage(any(Page.class), eq(groupName))).thenReturn(page);
+        page.setRecords(getAlertGroupVoList());
+        Mockito.when(alertGroupMapper.queryAlertGroupVo(any(Page.class), eq(groupName))).thenReturn(page);
         User user = new User();
         // no operate
-        Map<String, Object> result = alertGroupService.listPaging(user, groupName, 1, 10);
+        Result result = alertGroupService.listPaging(user, groupName, 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), (int) result.getCode());
         //success
         user.setUserType(UserType.ADMIN_USER);
         result = alertGroupService.listPaging(user, groupName, 1, 10);
         logger.info(result.toString());
-        PageInfo<AlertGroup> pageInfo = (PageInfo<AlertGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        PageInfo<AlertGroupVo> pageInfo = (PageInfo<AlertGroupVo>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
     }
 
@@ -213,6 +215,25 @@ public class AlertGroupServiceTest {
         alertGroup.setId(1);
         alertGroup.setGroupName(groupName);
         return alertGroup;
+    }
+
+    /**
+     * get AlertGroupVo list
+     */
+    private List<AlertGroupVo> getAlertGroupVoList() {
+        List<AlertGroupVo> alertGroupVos = new ArrayList<>();
+        alertGroupVos.add(getAlertGroupVoEntity());
+        return alertGroupVos;
+    }
+
+    /**
+     * get AlertGroupVo entity
+     */
+    private AlertGroupVo getAlertGroupVoEntity() {
+        AlertGroupVo alertGroupVo = new AlertGroupVo();
+        alertGroupVo.setId(1);
+        alertGroupVo.setGroupName(groupName);
+        return alertGroupVo;
     }
 
 }
