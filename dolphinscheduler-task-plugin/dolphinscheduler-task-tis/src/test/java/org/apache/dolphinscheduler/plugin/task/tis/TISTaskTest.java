@@ -1,4 +1,3 @@
-package org.apache.dolphinscheduler.plugin.task.tis;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,11 +15,26 @@ package org.apache.dolphinscheduler.plugin.task.tis;
  * limitations under the License.
  */
 
-import com.github.dreamhead.moco.HttpServer;
-import org.apache.commons.io.IOUtils;
+package org.apache.dolphinscheduler.plugin.task.tis;
+
+import static com.github.dreamhead.moco.Moco.pathResource;
+import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
+import static com.github.dreamhead.moco.Runner.running;
+
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
+
+import org.apache.commons.io.IOUtils;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,14 +43,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
-import static com.github.dreamhead.moco.Moco.pathResource;
-import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
-import static com.github.dreamhead.moco.Runner.running;
-
+import com.github.dreamhead.moco.HttpServer;
 
 public class TISTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(TISTaskTest.class);
@@ -57,7 +64,6 @@ public class TISTaskTest {
         props.setTaskTimeout(0);
         props.setTaskParams("{\"targetJobName\":\"mysql_elastic\"}");
 
-
         taskExecutionContext = Mockito.mock(TaskRequest.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
@@ -66,8 +72,8 @@ public class TISTaskTest {
         Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
-//        Mockito.when(taskExecutionContext.getVarPool())
-//                .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST + "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
+        //        Mockito.when(taskExecutionContext.getVarPool())
+        //                .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST + "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
         Map<String, String> gloabParams = Collections.singletonMap(TISTask.KEY_POOL_VAR_TIS_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
