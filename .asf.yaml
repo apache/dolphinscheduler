@@ -1,0 +1,47 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+github:
+  description: |
+    Apache DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG
+    visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing
+    various types of jobs available `out of the box`.
+  homepage: https://dolphinscheduler.apache.org/
+  labels:
+    - airflow
+    - schedule
+    - job-scheduler
+    - oozie
+    - task-scheduler
+    - azkaban
+    - distributed-schedule-system
+    - workflow-scheduling-system
+    - etl-dependency
+    - workflow-platform
+    - cronjob-schedule
+    - job-schedule
+    - task-schedule
+    - workflow-schedule
+    - data-schedule
+  enabled_merge_buttons:
+    squash: true
+    merge: false
+    rebase: false
+  protected_branches:
+    dev:
+      required_status_checks:
+        strict: true
