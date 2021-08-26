@@ -392,13 +392,17 @@ public class MasterRegistryClient {
      * remove registry info
      */
     public void unRegistry() {
-        String address = getLocalAddress();
-        String localNodePath = getMasterPath();
-        registryClient.remove(localNodePath);
-        logger.info("master node : {} unRegistry to register center.", address);
-        heartBeatExecutor.shutdown();
-        logger.info("heartbeat executor shutdown");
-        registryClient.close();
+        try{
+            String address = getLocalAddress();
+            String localNodePath = getMasterPath();
+            registryClient.remove(localNodePath);
+            logger.info("master node : {} unRegistry to register center.", address);
+            heartBeatExecutor.shutdown();
+            logger.info("heartbeat executor shutdown");
+            registryClient.close();
+        }catch (Exception e){
+            logger.error("remove registry path exception ", e);
+        }
     }
 
     /**
