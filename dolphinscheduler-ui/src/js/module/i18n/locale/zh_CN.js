@@ -154,7 +154,7 @@ export default {
   'Mail subject required': '邮件主题必填',
   'Child Node': '子节点',
   'Please select a sub-Process': '请选择子工作流',
-  Edit: '编辑',
+  Edit: '更新',
   'Switch To This Version': '切换到该版本',
   'Datasource Name': '数据源名称',
   'Please enter datasource name': '请输入数据源名称',
