@@ -52,6 +52,7 @@ public interface ExecutorService {
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return execute process instance code
      */
     Map<String, Object> execProcessInstance(User loginUser, String projectName,
@@ -60,7 +61,7 @@ public interface ExecutorService {
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Integer timeout,
-                                            Map<String, String> startParams);
+                                            Map<String, String> startParams, Integer expectedParallelismNumber);
 
     /**
      * check whether the process definition can be executed

@@ -125,7 +125,10 @@ export default {
   'Slot Number': 'Slot数量',
   'Please enter Slot number': '请输入Slot数量',
   Parallelism: '并行度',
+  'Custom Parallelism': '自定义并行度',
   'Please enter Parallelism': '请输入并行度',
+  'Parallelism number should be positive integer': '并行度必须为正整数',
+  'Parallelism tip': '如果存在大量任务需要补数时,可以利用自定义并行度将补数的任务线程设置成合理的数值,避免对服务器造成过大的影响',
   'TaskManager Number': 'TaskManager数量',
   'Please enter TaskManager number': '请输入TaskManager数量',
   'App Name': '任务名称',
@@ -691,5 +694,7 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
   Info: '提示',
   'Datasource userName': '所属用户',
-  'Resource userName': '所属用户'
+  'Resource userName': '所属用户',
+  condition: '条件',
+  'The condition content cannot be empty': '条件内容不能为空'
 }

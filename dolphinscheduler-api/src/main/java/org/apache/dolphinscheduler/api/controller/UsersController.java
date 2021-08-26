@@ -119,7 +119,7 @@ public class UsersController extends BaseController {
      *
      * @param loginUser login user
      * @param pageNo    page number
-     * @param searchVal search avlue
+     * @param searchVal search value
      * @param pageSize  page size
      * @return user list page
      */
@@ -137,13 +137,14 @@ public class UsersController extends BaseController {
                                 @RequestParam("pageNo") Integer pageNo,
                                 @RequestParam("pageSize") Integer pageSize,
                                 @RequestParam(value = "searchVal", required = false) String searchVal) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
 
@@ -155,7 +156,7 @@ public class UsersController extends BaseController {
      * @param userName     user name
      * @param userPassword user password
      * @param email        email
-     * @param tenantId     tennat id
+     * @param tenantId     tenant id
      * @param phone        phone
      * @param queue        queue
      * @return update result code
@@ -435,7 +436,7 @@ public class UsersController extends BaseController {
      * @param repeatPassword repeat password
      * @param email          user email
      */
-    @ApiOperation(value="registerUser",notes = "REGISTER_USER_NOTES")
+    @ApiOperation(value = "registerUser",notes = "REGISTER_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
@@ -463,7 +464,7 @@ public class UsersController extends BaseController {
      *
      * @param userName       user name
      */
-    @ApiOperation(value="activateUser",notes = "ACTIVATE_USER_NOTES")
+    @ApiOperation(value = "activateUser",notes = "ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
     })

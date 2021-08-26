@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -191,7 +193,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     * dispatcht task
+     * dispatch task
      *
      * @param taskInstance taskInstance
      * @return whether submit task success
@@ -201,7 +203,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         try {
             if (taskInstance.isConditionsTask()
                     || taskInstance.isDependTask()
-                    || taskInstance.isSubProcess()) {
+                    || taskInstance.isSubProcess()
+                    || taskInstance.isSwitchTask()
+            ) {
                 return true;
             }
             if (taskInstance.getState().typeIsFinished()) {
@@ -320,5 +324,14 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
         return timeoutSeconds - usedTime;
+    }
+
+    protected String getThreadName() {
+        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+        return String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
     }
 }
