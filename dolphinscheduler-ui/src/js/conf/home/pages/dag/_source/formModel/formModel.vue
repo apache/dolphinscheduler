@@ -77,8 +77,18 @@
             <span class="label-box" style="width: 193px;display: inline-block;">
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
-            <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroup"></m-worker-groups>
+          </div>
+        </m-list-box>
+
+        <!-- Worker group and environment -->
+        <m-list-box>
+          <div slot="text">{{$t('Worker group')}}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <m-worker-groups v-model="workerGroup"></m-worker-groups>
+            </span>
+            <span class="text-b">{{$t('Environment Name')}}</span>
+            <m-related-environment v-model="environmentCode"></m-related-environment>
           </div>
         </m-list-box>
 
@@ -299,6 +309,7 @@
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
+  import mRelatedEnvironment from './_source/relatedEnvironment'
   import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
@@ -354,6 +365,8 @@
         taskInstancePriority: 'MEDIUM',
         // worker group id
         workerGroup: 'default',
+        // selected environment
+        environmentCode: '',
         stateList: [
           {
             value: 'success',
@@ -488,6 +501,7 @@
             waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
+            environmentCode: this.environmentCode,
             status: this.status,
             branch: this.branch
           },
@@ -612,6 +626,7 @@
             waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
+            environmentCode: this.environmentCode,
             status: this.status,
             branch: this.branch
           },
@@ -705,6 +720,8 @@
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
         }
+        console.log('o...')
+        console.log(o)
         // If the workergroup has been deleted, set the default workergroup
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
           let workerGroup = this.store.state.security.workerGroupsListAll[i].id
@@ -712,6 +729,7 @@
             break
           }
         }
+
         if (o.workerGroup === undefined) {
           this.store.dispatch('dag/getTaskInstanceList', {
             pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
@@ -721,7 +739,7 @@
         } else {
           this.workerGroup = o.workerGroup
         }
-
+        this.environmentCode = o.environmentCode
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
@@ -806,6 +824,7 @@
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
+      mRelatedEnvironment,
       mPreTasks
     }
   }

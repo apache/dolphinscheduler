@@ -696,5 +696,19 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * get all environment
+   */
+  getEnvironmentAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/query-environment-list', payload, res => {
+        let list = res.data
+        state.environmentListAll = list
+        resolve(list)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

@@ -15,43 +15,44 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.List;
 
 /**
- * EnvironmentWorkerGroupRelation
+ * EnvironmentDto
  */
-@TableName("t_ds_environment_worker_group_relation")
-public class EnvironmentWorkerGroupRelation {
+public class EnvironmentDto {
 
-    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
      * environment code
      */
-    private Long environmentCode;
+    private Long code;
 
     /**
-     * worker group name
+     * environment name
      */
-    private String workerGroupName;
+    private String name;
+
+    /**
+     * config content
+     */
+    private String config;
+
+    private String description;
+
+    private List<String> workerGroups;
 
     /**
      * operator user id
      */
     private Integer operator;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -62,20 +63,36 @@ public class EnvironmentWorkerGroupRelation {
         this.id = id;
     }
 
-    public String getWorkerGroupName() {
-        return workerGroupName;
+    public String getName() {
+        return name;
     }
 
-    public void setWorkerGroupName(String workerGroupName) {
-        this.workerGroupName = workerGroupName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
+    public Long getCode() {
+        return this.code;
     }
 
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
+    public void setCode(Long code) {
+        this.code = code;
+    }
+
+    public String getConfig() {
+        return this.config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Integer getOperator() {
@@ -102,16 +119,11 @@ public class EnvironmentWorkerGroupRelation {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public String toString() {
-        return "EnvironmentWorkerGroupRelation{"
-                + "id= " + id
-                + ", environmentCode= " + environmentCode
-                + ", workerGroupName= " + workerGroupName
-                + ", operator= " + operator
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + "}";
+    public List<String> getWorkerGroups() {
+        return workerGroups;
     }
 
+    public void setWorkerGroups(List<String> workerGroups) {
+        this.workerGroups = workerGroups;
+    }
 }

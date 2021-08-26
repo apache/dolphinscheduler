@@ -149,7 +149,8 @@
             code: this.item.code,
             name: _.trim(this.name),
             config: _.trim(this.config),
-            description: _.trim(this.description)
+            description: _.trim(this.description),
+            workerGroups: JSON.stringify(this.workerGroups)
           }
           this.store.dispatch('security/updateEnvironment', updateParam).then(res => {
             $then(res)
@@ -203,6 +204,7 @@
           this.name = val.name
           this.config = val.config
           this.description = val.description
+          this.workerGroups = val.workerGroups
           this.workerGroupOptions = val.workerGroupOptions
         },
         deep: true
@@ -213,6 +215,7 @@
         this.name = this.item.name
         this.config = this.item.config
         this.description = this.item.description
+        this.workerGroups = this.item.workerGroups
       }
       this.workerGroupOptions = this.item.workerGroupOptions
     },

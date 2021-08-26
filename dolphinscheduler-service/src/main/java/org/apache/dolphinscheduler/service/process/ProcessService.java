@@ -2170,6 +2170,7 @@ public class ProcessService {
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
+        taskDefinition.setEnvironmentCode(taskNode.getEnvironmentCode());
         taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
         taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
         taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
@@ -2464,6 +2465,7 @@ public class ProcessService {
             v.setParams(JSONUtils.toJsonString(taskParamsMap));
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+            v.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                     taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));
