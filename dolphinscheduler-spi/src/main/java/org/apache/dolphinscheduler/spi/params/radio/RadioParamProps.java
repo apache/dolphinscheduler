@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,12 +15,38 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import org.slf4j.Logger;
+package org.apache.dolphinscheduler.spi.params.radio;
 
-public interface TaskChannel {
+import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
-    void cancelApplication(boolean status);
+/**
+ * front-end radio component props attributes
+ */
+public class RadioParamProps extends ParamsProps {
 
-    AbstractTask createTask(TaskRequest taskRequest, Logger logger);
+    /**
+     * the color of the text when Radio is activated in the form of a button
+     */
+    private String textColor;
 
+    /**
+     * the fill color and border color of the button form of Radio when activated
+     */
+    private String fill;
+
+    public String getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
+
+    public String getFill() {
+        return fill;
+    }
+
+    public void setFill(String fill) {
+        this.fill = fill;
+    }
 }

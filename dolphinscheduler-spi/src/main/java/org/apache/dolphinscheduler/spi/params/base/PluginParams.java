@@ -81,12 +81,12 @@ public class PluginParams {
     /**
      * whether to hide, the default value is false
      */
-    protected boolean hidden;
+    protected Boolean hidden;
 
     /**
      * whether to display, the default value is true
      */
-    protected boolean display;
+    protected Boolean display;
 
     protected PluginParams(Builder builder) {
 
@@ -132,9 +132,9 @@ public class PluginParams {
 
         protected List<Validate> validateList;
 
-        protected boolean hidden;
+        protected Boolean hidden;
 
-        protected boolean display;
+        protected Boolean display;
 
         public Builder(String name,
                        FormType formType,
@@ -158,8 +158,8 @@ public class PluginParams {
                        @JsonProperty("name") String fieldName,
                        @JsonProperty("validate") List<Validate> validateList,
                        @JsonProperty("info") String info,
-                       @JsonProperty("hidden") boolean hidden,
-                       @JsonProperty("display") boolean display
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
         ) {
             requireNonNull(name, "name is null");
             requireNonNull(formType, "formType is null");

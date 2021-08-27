@@ -15,32 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params;
+package org.apache.dolphinscheduler.spi.params.inputNumber;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_OPTIONS;
+import static org.apache.dolphinscheduler.spi.params.base.FormType.INPUTNUMBER;
 
-import org.apache.dolphinscheduler.spi.params.base.FormType;
-import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * radio
+ * front-end input number component
  */
-public class RadioParam extends PluginParams {
+public class InputNumberParam extends PluginParams {
 
-    @JsonProperty(STRING_PLUGIN_PARAM_OPTIONS)
-    private List<ParamsOptions> paramsOptionsList;
-
-    private RadioParam(Builder builder) {
+    private InputNumberParam(Builder builder) {
         super(builder);
-        this.paramsOptionsList = builder.paramsOptionsList;
     }
+
+    private InputNumberParamProps props;
 
     public static Builder newBuilder(String name, String title) {
         return new Builder(name, title);
@@ -48,17 +42,14 @@ public class RadioParam extends PluginParams {
 
     public static class Builder extends PluginParams.Builder {
 
-        private List<ParamsOptions> paramsOptionsList;
-
         public Builder(String name, String title) {
-            super(name, FormType.RADIO, title);
+            super(name, INPUTNUMBER, title);
         }
 
-        public Builder addValidate(Validate validate) {
-            if (this.validateList == null) {
-                this.validateList = new ArrayList<>();
-            }
-            this.validateList.add(validate);
+        private InputNumberParamProps props;
+
+        public Builder setProps(InputNumberParamProps props) {
+            this.props = props;
             return this;
         }
 
@@ -72,6 +63,11 @@ public class RadioParam extends PluginParams {
             return this;
         }
 
+        public Builder setInfo(String info) {
+            this.info = info;
+            return this;
+        }
+
         public Builder setValue(Object value) {
             this.value = value;
             return this;
@@ -82,27 +78,27 @@ public class RadioParam extends PluginParams {
             return this;
         }
 
-        public Builder setParamsOptionsList(List<ParamsOptions> paramsOptionsList) {
-            this.paramsOptionsList = paramsOptionsList;
-            return this;
-        }
-
-        public Builder addParamsOptions(ParamsOptions paramsOptions) {
-            if (this.paramsOptionsList == null) {
-                this.paramsOptionsList = new ArrayList<>();
+        public Builder addValidate(Validate validate) {
+            if (this.validateList == null) {
+                this.validateList = new ArrayList<>();
             }
-
-            this.paramsOptionsList.add(paramsOptions);
+            this.validateList.add(validate);
             return this;
         }
 
-        @Override
-        public RadioParam build() {
-            return new RadioParam(this);
+        public Builder setHidden(Boolean hidden) {
+            this.hidden = hidden;
+            return this;
+        }
+
+        public Builder setDisplay(Boolean display) {
+            this.display = display;
+            return this;
         }
     }
 
-    public List<ParamsOptions> getParamsOptionsList() {
-        return paramsOptionsList;
+    @Override
+    public InputNumberParamProps getProps() {
+        return props;
     }
 }
