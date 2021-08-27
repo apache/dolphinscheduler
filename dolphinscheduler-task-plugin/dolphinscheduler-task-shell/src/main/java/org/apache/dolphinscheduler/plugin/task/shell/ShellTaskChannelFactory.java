@@ -17,10 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShellTaskChannelFactory implements TaskChannelFactory {
@@ -31,11 +36,26 @@ public class ShellTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "Shell";
+        return "SHELL";
     }
 
     @Override
     public List<PluginParams> getParams() {
-        return null;
+        List<PluginParams> paramsList = new ArrayList<>();
+
+        InputParam nodeName = InputParam.newBuilder("name", "$t('Node name')")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        RadioParam runFlag = RadioParam.newBuilder("runFlag", "运行标志")
+                .addParamsOptions(new ParamsOptions("NORMAL", "NORMAL", false))
+                .addParamsOptions(new ParamsOptions("FORBIDDEN", "FORBIDDEN", false))
+                .build();
+
+        paramsList.add(nodeName);
+        paramsList.add(runFlag);
+        return paramsList;
     }
 }

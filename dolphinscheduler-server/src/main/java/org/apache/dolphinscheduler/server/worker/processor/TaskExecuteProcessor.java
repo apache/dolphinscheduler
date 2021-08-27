@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
@@ -74,6 +75,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private AlertClientService alertClientService;
 
+    private TaskPluginManager taskPluginManager;
+
     /**
      * taskExecutionContextCacheManager
      */
@@ -102,9 +105,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
     }
 
-    public TaskExecuteProcessor(AlertClientService alertClientService) {
+    public TaskExecuteProcessor(AlertClientService alertClientService, TaskPluginManager taskPluginManager) {
         this();
         this.alertClientService = alertClientService;
+        this.taskPluginManager = taskPluginManager;
     }
 
     @Override
@@ -177,7 +181,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task to manager
-        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))) {
+        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService, taskPluginManager))) {
             logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getQueueSize());
         }
     }
