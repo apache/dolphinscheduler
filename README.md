@@ -80,7 +80,7 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-s
 
 ## Thanks
 
-DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
+DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, quartz, and many open-source projects of Apache and so on.
 We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
 
 ## Get Help
@@ -92,7 +92,7 @@ We would like to express our deep gratitude to all the open-source projects used
 
 You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
 1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw).
-2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
+2. Follow the [Twitter account of DolphinScheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
 ### Contributor over time
   

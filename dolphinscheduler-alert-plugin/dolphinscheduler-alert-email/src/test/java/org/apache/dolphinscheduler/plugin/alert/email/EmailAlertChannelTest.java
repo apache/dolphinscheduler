@@ -22,11 +22,10 @@ import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
-import org.apache.dolphinscheduler.spi.params.base.DataType;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -142,7 +141,7 @@ public class EmailAlertChannelTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
         RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
-                .setParamsOptionsList(emailShowTypeList)
+                .setOptions(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();

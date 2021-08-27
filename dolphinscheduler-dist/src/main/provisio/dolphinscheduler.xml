@@ -74,4 +74,10 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <!-- Task Plugins -->
+    <artifactSet to="lib/plugin/task/shell">
+        <artifact id="${project.groupId}:dolphinscheduler-task-shell:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>

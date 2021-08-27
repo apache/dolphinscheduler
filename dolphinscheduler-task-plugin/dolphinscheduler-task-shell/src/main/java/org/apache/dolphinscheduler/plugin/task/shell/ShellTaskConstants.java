@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,12 +15,11 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import org.slf4j.Logger;
+package org.apache.dolphinscheduler.plugin.task.shell;
 
-public interface TaskChannel {
+public class ShellTaskConstants {
 
-    void cancelApplication(boolean status);
+    private ShellTaskConstants() {
 
-    AbstractTask createTask(TaskRequest taskRequest, Logger logger);
-
+    }
 }

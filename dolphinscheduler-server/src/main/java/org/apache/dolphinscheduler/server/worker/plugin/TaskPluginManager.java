@@ -83,6 +83,10 @@ public class TaskPluginManager extends AbstractDolphinPluginManager {
 
     private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
+    public Map<String, TaskChannel> getTaskChannelMap() {
+        return taskChannelMap;
+    }
+
     @Override
     public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
         for (TaskChannelFactory taskChannelFactory : dolphinSchedulerPlugin.getTaskChannelFactorys()) {
