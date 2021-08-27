@@ -133,7 +133,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                         if (StringUtils.isNotEmpty(workerGroup)) {
                             EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                             relation.setEnvironmentCode(env.getCode());
-                            relation.setWorkerGroupName(workerGroup);
+                            relation.setWorkerGroup(workerGroup);
                             relation.setOperator(loginUser.getId());
                             relation.setCreateTime(new Date());
                             relation.setUpdateTime(new Date());
@@ -171,7 +171,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         if (CollectionUtils.isNotEmpty(environmentIPage.getRecords())) {
             Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
-                    .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroupName,Collectors.toList())));
+                    .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroup,Collectors.toList())));
 
             List<EnvironmentDto> dtoList = environmentIPage.getRecords().stream().map(environment -> {
                 EnvironmentDto dto = new EnvironmentDto();
@@ -203,7 +203,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         if (CollectionUtils.isNotEmpty(environmentList)) {
             Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
-                    .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroupName,Collectors.toList())));
+                    .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroup,Collectors.toList())));
 
             List<EnvironmentDto> dtoList = environmentList.stream().map(environment -> {
                 EnvironmentDto dto = new EnvironmentDto();
@@ -236,7 +236,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             putMsg(result, Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, code);
         } else {
             List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
-                    .map(item -> item.getWorkerGroupName())
+                    .map(item -> item.getWorkerGroup())
                     .collect(Collectors.toList());
 
             EnvironmentDto dto = new EnvironmentDto();
@@ -262,7 +262,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             putMsg(result, Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, name);
         } else {
             List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
-                    .map(item -> item.getWorkerGroupName())
+                    .map(item -> item.getWorkerGroup())
                     .collect(Collectors.toList());
 
             EnvironmentDto dto = new EnvironmentDto();
@@ -347,7 +347,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         Set<String> existWorkerGroupSet = relationMapper
                 .queryByEnvironmentCode(code)
                 .stream()
-                .map(item -> item.getWorkerGroupName())
+                .map(item -> item.getWorkerGroup())
                 .collect(Collectors.toSet());
 
         Set<String> deleteWorkerGroupSet = SetUtils.difference(existWorkerGroupSet,workerGroupSet).toSet();
@@ -380,7 +380,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                 if (StringUtils.isNotEmpty(key)) {
                     EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                     relation.setEnvironmentCode(code);
-                    relation.setWorkerGroupName(key);
+                    relation.setWorkerGroup(key);
                     relation.setUpdateTime(new Date());
                     relation.setCreateTime(new Date());
                     relation.setOperator(loginUser.getId());

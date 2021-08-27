@@ -88,7 +88,7 @@
               <m-worker-groups v-model="workerGroup"></m-worker-groups>
             </span>
             <span class="text-b">{{$t('Environment Name')}}</span>
-            <m-related-environment v-model="environmentCode"></m-related-environment>
+            <m-related-environment v-model="environmentCode" :workerGroup="workerGroup"></m-related-environment>
           </div>
         </m-list-box>
 
@@ -367,6 +367,7 @@
         workerGroup: 'default',
         // selected environment
         environmentCode: '',
+        selectedWorkerGroup: '',
         stateList: [
           {
             value: 'success',
@@ -467,6 +468,9 @@
             fromThis: this
           })
         }
+      },
+      _onUpdateWorkerGroup (o) {
+        this.selectedWorkerGroup = o
       },
       /**
        * return params
@@ -720,8 +724,6 @@
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
         }
-        console.log('o...')
-        console.log(o)
         // If the workergroup has been deleted, set the default workergroup
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
           let workerGroup = this.store.state.security.workerGroupsListAll[i].id

@@ -370,8 +370,6 @@ export default {
       }
       io.get(`projects/${state.projectName}/process/list`, payload, res => {
         state.processListS = res.data
-        console.log('list...')
-        console.log(res.data)
         resolve(res.data)
       }).catch(res => {
         reject(res)

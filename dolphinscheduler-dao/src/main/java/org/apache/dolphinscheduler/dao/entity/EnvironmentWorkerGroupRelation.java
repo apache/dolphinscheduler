@@ -39,9 +39,9 @@ public class EnvironmentWorkerGroupRelation {
     private Long environmentCode;
 
     /**
-     * worker group name
+     * worker group id
      */
-    private String workerGroupName;
+    private String workerGroup;
 
     /**
      * operator user id
@@ -62,12 +62,12 @@ public class EnvironmentWorkerGroupRelation {
         this.id = id;
     }
 
-    public String getWorkerGroupName() {
-        return workerGroupName;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupName(String workerGroupName) {
-        this.workerGroupName = workerGroupName;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public Long getEnvironmentCode() {
@@ -107,7 +107,7 @@ public class EnvironmentWorkerGroupRelation {
         return "EnvironmentWorkerGroupRelation{"
                 + "id= " + id
                 + ", environmentCode= " + environmentCode
-                + ", workerGroupName= " + workerGroupName
+                + ", workerGroup= " + workerGroup
                 + ", operator= " + operator
                 + ", createTime= " + createTime
                 + ", updateTime= " + updateTime

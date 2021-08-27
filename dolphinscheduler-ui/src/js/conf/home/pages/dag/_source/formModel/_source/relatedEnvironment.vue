@@ -35,55 +35,73 @@
     name: 'form-related-environment',
     data () {
       return {
-        selectedValue: this.value,
-        environmentOptions: []
+        selectedValue: null,
+        selectedWorkerGroup: this.workerGroup,
+        environmentOptions: [],
+        environmentList: []
       }
     },
     mixins: [disabledState],
     props: {
-      value: {
+      environmentCode: {
+        type: String
+      },
+      workerGroup: {
         type: String
       }
     },
     model: {
-      prop: 'value',
+      prop: 'environmentCode',
       event: 'environmentCodeEvent'
     },
     methods: {
       _onChange (o) {
         this.$emit('environmentCodeEvent', o)
+      },
+      _getEnvironmentAll () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/getEnvironmentAll').then(res => {
+            resolve(res)
+          }).catch(e => {
+            reject(e)
+          })
+        })
+      },
+      _initEnvironmentOptions (workerGroup) {
+        this.environmentOptions = []
+        if (this.environmentList && workerGroup) {
+          this.environmentList.forEach(item => {
+            if (item.workerGroups && item.workerGroups.length > 0) {
+              if (item.workerGroups.indexOf(workerGroup) >= 0) {
+                this.environmentOptions.push({ code: item.code, name: item.name })
+              }
+            }
+          })
+        }
+        this.selectedValue = this.environmentCode
       }
     },
     watch: {
-      value (val) {
+      environmentCode: function (val) {
         this.selectedValue = val
+      },
+      workerGroup: function (val) {
+        this.selectedWorkerGroup = val
+        this._initEnvironmentOptions(this.selectedWorkerGroup)
       }
     },
     created () {
       let stateEnvironmentList = this.store.state.security.environmentListAll || []
-      let environmentList = []
-
-      console.log(this.value)
-      console.log(stateEnvironmentList)
 
       if (stateEnvironmentList.length && stateEnvironmentList.length > 0) {
-        console.log('1')
-        environmentList = stateEnvironmentList
+        this.environmentList = stateEnvironmentList
+        this._initEnvironmentOptions(this.workerGroup)
       } else {
-        console.log('2')
-        this.store.commit('security/getEnvironmentAll').then(res => {
-          console.log('dispatch....')
-          console.log(res)
-          environmentList = res
+        this._getEnvironmentAll().then(res => {
+          this.environmentList = res
+          this._initEnvironmentOptions(this.workerGroup)
         })
       }
-
-      environmentList.forEach(item => {
-        this.environmentOptions.push({ code: item.code, name: item.name })
-      })
-
-      console.log('environment list ....')
-      console.log(environmentList)
     }
   }
 </script>

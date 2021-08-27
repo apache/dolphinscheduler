@@ -22,7 +22,11 @@
         <el-table-column prop="name" :label="$t('Environment Name')" width="150"></el-table-column>
         <el-table-column prop="config" :label="$t('Environment Config')"></el-table-column>
         <el-table-column prop="description" :label="$t('Environment Desc')" min-width="50"></el-table-column>
-        <el-table-column prop="workerGroups" :label="$t('Environment Worker Group')" min-width="50"></el-table-column>
+        <el-table-column :label="$t('Environment Worker Group')" min-width="50">
+          <template slot-scope="scope">
+            <span>{{ scope.row.workerGroups ? scope.row.workerGroups.join(",") : "" }}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="50">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>

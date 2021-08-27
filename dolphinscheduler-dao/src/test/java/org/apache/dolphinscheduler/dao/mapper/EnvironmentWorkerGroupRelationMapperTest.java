@@ -67,7 +67,7 @@ public class EnvironmentWorkerGroupRelationMapperTest {
         //insertOne
         EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
         relation.setEnvironmentCode(1L);
-        relation.setWorkerGroupName("default");
+        relation.setWorkerGroup("default");
         relation.setOperator(1);
         relation.setUpdateTime(new Date());
         relation.setCreateTime(new Date());

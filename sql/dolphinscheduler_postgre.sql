@@ -942,10 +942,10 @@ DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
 CREATE TABLE t_ds_environment_worker_group_relation (
   id serial NOT NULL,
   environment_code bigint NOT NULL,
-  worker_group_name varchar(255) NOT NULL,
+  worker_group varchar(255) NOT NULL,
   operator int DEFAULT NULL,
   create_time timestamp DEFAULT NULL,
   update_time timestamp DEFAULT NULL,
   PRIMARY KEY (id) ,
-  CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group_name)
+  CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
 );
