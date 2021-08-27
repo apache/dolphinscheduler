@@ -34,6 +34,7 @@
         <module>dolphinscheduler-task-flink</module>
         <module>dolphinscheduler-task-python</module>
         <module>dolphinscheduler-task-spark</module>
+        <module>dolphinscheduler-task-tis</module>
     </modules>
 
 
