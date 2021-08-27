@@ -586,6 +586,8 @@ export default {
   'Spark Version': 'Spark版本',
   TargetDataBase: '目标库',
   TargetTable: '目标表',
+  TargetJobName: 'TIS目标任务名',
+  'Please enter TIS DataX job name': '请输入TIS DataX任务名',
   'Please enter the table of target': '请输入目标表名',
   'Please enter a Target Table(required)': '请输入目标表(必填)',
   SpeedByte: '限流(字节数)',
