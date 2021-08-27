@@ -181,6 +181,7 @@ public class WorkerServer implements IStoppable {
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
+            this.springApplicationContext.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
         }
