@@ -288,10 +288,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         for (ProcessDefinition pd : records) {
             ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryMaxVersionDefinitionLog(pd.getCode());
-//            int operator = processDefinitionLog.getOperator();
-//            User user = userMapper.selectById(operator);
-
-            pd.setModifyBy(pd.getUserName());
+            int operator = processDefinitionLog.getOperator();
+            User user = userMapper.selectById(operator);
+            pd.setModifyBy(user.getUserName());
             pd.setProjectId(project.getId());
         }
 
