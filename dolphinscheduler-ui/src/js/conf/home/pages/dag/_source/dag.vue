@@ -159,7 +159,8 @@
         :visible.sync="nodeDrawer"
         size=""
         :with-header="false">
-        <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+        <m-form-model v-if="nodeDrawer && nodeData.taskType !== 'SHELL'" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+        <shell-form-model v-if="nodeDrawer && nodeData.taskType === 'SHELL'" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></shell-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"
@@ -201,6 +202,7 @@
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
   import mFormLineModel from './formModel/formLineModel'
+  import shellFormModel from './formModel/tasks/formCreate/shell.vue'
   import { formatDate } from '@/module/filter/filter'
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
@@ -884,7 +886,7 @@
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name', 'projectId'])
     },
-    components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart }
+    components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart, shellFormModel }
   }
 </script>
 

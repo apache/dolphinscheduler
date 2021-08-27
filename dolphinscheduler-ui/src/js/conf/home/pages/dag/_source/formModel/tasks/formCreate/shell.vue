@@ -21,6 +21,7 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
+  import mLog from '../../log'
   import mListBox from '../_source/listBox'
   import mScriptBox from '../_source/scriptBox'
   import mLocalParams from '../_source/localParams'
@@ -29,22 +30,23 @@
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
   import Clipboard from 'clipboard'
-  import { diGuiTree, searchTree } from '././_source/resourceTree'
+  import { diGuiTree, searchTree } from '../_source/resourceTree'
   import clickoutside from '@/module/util/clickoutside'
   import formCreate from '@form-create/element-ui'
 
   import { mapActions } from 'vuex'
-  import JSP from './././plugIn/jsPlumbHandle'
-  import mSelectInput from '../_source/selectInput'
-  import mTimeoutAlarm from '../_source/timeoutAlarm'
-  import mDependentTimeout from '../_source/dependentTimeout'
-  import mWorkerGroups from '../_source/workerGroups'
-  import mPreTasks from '../tasks/pre_tasks'
-  import { isNameExDag, rtBantpl } from './././plugIn/util'
+  import JSP from '../../../plugIn/jsPlumbHandle'
+  import mSelectInput from '../../_source/selectInput'
+  import mTimeoutAlarm from '../../_source/timeoutAlarm'
+  import mDependentTimeout from '../../_source/dependentTimeout'
+  import mWorkerGroups from '../../_source/workerGroups'
+  import mPreTasks from '../pre_tasks'
+  import { isNameExDag, rtBantpl } from '../../../plugIn/util'
   import mPriority from '@/module/components/priority/priority'
 
   let editor
   formCreate.directive('clickoutside', clickoutside)
+  formCreate.component('mLog', mLog)
   formCreate.component('mSelectInput', mSelectInput)
   formCreate.component('mTimeoutAlarm', mTimeoutAlarm)
   formCreate.component('mDependentTimeout', mDependentTimeout)
@@ -56,10 +58,12 @@
   formCreate.component('mListBox', mListBox)
   formCreate.component('mLocalParams', mLocalParams)
   formCreate.component('mScriptBox', mScriptBox)
+
   export default {
     name: 'shell-form-model',
     data () {
       return {
+        $f: {},
         // loading
         spinnerLoading: false,
         // node name
@@ -198,7 +202,7 @@
           item: {
             type: this.nodeData.taskType,
             id: this.nodeData.id,
-            name: this.name,
+            name: this.$f.form.name,
             code: this.code,
             params: this.params,
             desc: this.desc,
@@ -222,7 +226,7 @@
        * verification name
        */
       _verifName () {
-        if (!_.trim(this.name)) {
+        if (!_.trim(this.$f.form.name)) {
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
@@ -230,11 +234,11 @@
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
-        if (this.name === this.backfillItem.name) {
+        if (this.$f.form.name === this.backfillItem.name) {
           return true
         }
         // Name repeat depends on dom backfill dependent store
-        if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
+        if (isNameExDag(this.$f.form.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
           this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
         }
@@ -263,7 +267,7 @@
           return
         }
         // Verify task alarm parameters
-        if (!this.$refs.timeout._verification()) {
+        if (!this.$f.el('timeout')._verification()) {
           return
         }
 
@@ -272,8 +276,8 @@
           return
         }
         // Verify preTasks and update dag-things
-        if (this.$refs.PRE_TASK) {
-          if (!this.$refs.PRE_TASK._verification()) {
+        if (this.$f.el('PRE_TASK')) {
+          if (!this.$f.el('PRE_TASK')._verification()) {
             return
           } else {
             // Sync data-targetarr
@@ -308,7 +312,7 @@
           }
         }
 
-        $(`#${this.nodeData.id}`).find('span').text(this.name)
+        $(`#${this.nodeData.id}`).find('span').text(this.$f.form.name)
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
         // Store the corresponding node data structure
@@ -316,7 +320,7 @@
           item: {
             type: this.nodeData.taskType,
             id: this.nodeData.id,
-            name: this.name,
+            name: this.$f.form.name,
             code: this.code,
             params: this.params,
             desc: this.desc,
@@ -474,16 +478,16 @@
                             children: [
                               {
                                 type: 'el-input',
+                                field: 'name',
                                 props: {
                                   type: 'text',
-                                  value: this.name,
                                   size: 'small',
                                   disabled: this.isDetails,
                                   placeholder: i18n.$t('Please enter name (required)'),
                                   maxlength: '100'
                                 },
                                 on: {
-                                  blur: this._veriName
+                                  blur: this._verifName
                                 }
                               }
                             ]
@@ -504,29 +508,27 @@
                             slot: 'content',
                             children: [
                               {
-                                type: 'el-radio-group',
+                                type: 'radio',
+                                field: 'runFlag',
                                 props: {
-                                  value: this.runFlag,
                                   size: 'small'
                                 },
-                                children: [
+                                style: {
+                                  verticalAlign: 'middle',
+                                  paddingTop: '0',
+                                  marginTop: '0'
+                                },
+                                options: [
                                   {
-                                    type: 'el-radio',
-                                    props: {
-                                      label: '"NORMAL"',
-                                      disabled: this.isDetails,
-                                      children: [$t('Normal')]
-                                    }
+                                    value: 'NORMAL',
+                                    label: i18n.$t('Normal'),
+                                    disabled: this.isDetails
                                   },
                                   {
-                                    type: 'el-radio',
-                                    props: {
-                                      label: '"FORBIDDEN"',
-                                      disabled: this.isDetails,
-                                      children: [$t('Prohibition execution')]
-                                    }
-                                  }
-                                ]
+                                    value: 'FORBIDDEN',
+                                    label: i18n.$t('Prohibition execution'),
+                                    disabled: this.isDetails
+                                  }]
                               }
                             ]
                           }
@@ -547,11 +549,11 @@
                             children: [
                               {
                                 type: 'el-input',
+                                field: 'desc',
                                 props: {
                                   rows: '2',
                                   type: 'textarea',
                                   disabled: this.isDetails,
-                                  value: this.desc,
                                   placeholder: i18n.$t('Please enter description')
                                 }
                               }
@@ -617,7 +619,7 @@
                                 type: 'm-select-input',
                                 value: this.maxRetryTimes,
                                 props: {
-                                  list: '[0,1,2,3,4]'
+                                  list: [0, 1, 2, 3, 4]
                                 }
                               },
                               {
@@ -633,7 +635,7 @@
                                 type: 'm-select-input',
                                 value: this.retryInterval,
                                 props: {
-                                  list: '[1,10,30,60,120]'
+                                  list: [1, 10, 30, 60, 120]
                                 }
                               },
                               {
@@ -661,7 +663,7 @@
                                 type: 'm-select-input',
                                 props: {
                                   value: this.delayTime,
-                                  list: '[0,1,5,10]'
+                                  list: [0, 1, 5, 10]
                                 }
                               },
                               {
@@ -675,8 +677,8 @@
                       /* Task timeout alarm */
                       {
                         type: 'm-timeout-alarm',
+                        field: 'timeout',
                         props: {
-                          ref: 'timeout',
                           backfillItem: this.backfillItem
                         },
                         on: {
@@ -687,8 +689,8 @@
                       {
                         type: 'div',
                         class: 'shell-model',
+                        field: 'shell',
                         props: {
-                          ref: 'SHELL',
                           backfillItem: this.backfillItem
                         },
                         on: {
@@ -698,7 +700,6 @@
                         children: [
                           {
                             type: 'm-list-box',
-                            props: {},
                             children: [
                               {
                                 type: 'div',
@@ -708,7 +709,6 @@
                               {
                                 type: 'div',
                                 slot: 'content',
-                                title: i18n.$t('Script'),
                                 children: [
                                   {
                                     type: 'div',
@@ -717,10 +717,10 @@
                                       {
                                         type: 'input',
                                         name: 'code-shell-mirror',
-                                        attrs: { id: 'code-shell-mirror' },
-                                        value: '',
+                                        field: 'code',
                                         props: {
-                                          type: 'textarea'
+                                          type: 'textarea',
+                                          id: 'code-shell-mirror'
                                         }
                                       },
                                       {
@@ -756,7 +756,7 @@
                                 children: [
                                   {
                                     type: 'treeselect',
-                                    field: 'resource',
+                                    field: 'resourceList',
                                     name: 'treeselect',
                                     value: this.resourceList,
                                     props: {
@@ -815,8 +815,8 @@
                                 children: [
                                   {
                                     type: 'm-local-params',
+                                    field: 'refLocalParams',
                                     props: {
-                                      ref: 'refLocalParams',
                                       udpList: this.localParams,
                                       hide: true
                                     },
@@ -829,7 +829,7 @@
                             ]
                           },
                           {
-                            type: 'ElDialog',
+                            type: 'el-dialog',
                             props: {
                               visible: this.scriptBoxDialog,
                               appendToBody: true,
@@ -854,8 +854,8 @@
                       /* Pre-tasks in workflow */
                       {
                         type: 'm-pre-tasks',
+                        field: 'PRE_TASK',
                         props: {
-                          ref: 'PRE_TASK',
                           backfillItem: this.backfillItem
                         },
                         on: {
@@ -880,9 +880,9 @@
                         props: {
                           type: 'text',
                           size: 'small',
-                          id: 'cancelBtn',
-                          children: [$t('Cancel')]
-                        }
+                          id: 'cancelBtn'
+                        },
+                        children: [$t('Cancel')]
                       },
                       {
                         type: 'el-button',
@@ -891,9 +891,9 @@
                           size: 'small',
                           round: true,
                           loading: this.spinnerLoading,
-                          disabled: this.isDetails,
-                          children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')]
+                          disabled: this.isDetails
                         },
+                        children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')],
                         on: {
                           click: this.ok
                         }
@@ -966,7 +966,7 @@
         }
 
         // localParams Subcomponent verification
-        if (!this.$refs.refLocalParams._verifProp()) {
+        if (!this.$f.el('refLocalParams')._verifProp()) {
           return false
         }
         // noRes
@@ -1091,7 +1091,7 @@
           type: this.nodeData.taskType,
           id: this.nodeData.id,
           code: this.code,
-          name: this.name,
+          name: this.$f.form.name,
           desc: this.desc,
           runFlag: this.runFlag,
           dependence: this.cacheDependence,
@@ -1155,7 +1155,7 @@
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.code = o.code
-        this.name = o.name
+        this.$f.form.name = o.name
         this.taskInstancePriority = o.taskInstancePriority
         this.runFlag = o.runFlag || 'NORMAL'
         this.desc = o.desc
@@ -1244,13 +1244,12 @@
     },
     mounted () {
       let self = this
-      $('#cancelBtn').mousedown(function (event) {
-        event.preventDefault()
-        self.close()
-      })
-
       this._initRule()
       setTimeout(() => {
+        $('#cancelBtn').mousedown(function (event) {
+          event.preventDefault()
+          self.close()
+        })
         this._handlerEditor()
       }, 200)
     },
@@ -1278,10 +1277,18 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  @import "././formModel";
+  @import "../../formModel";
   .ans-radio-disabled {
     .ans-radio-inner:after {
       background-color: #6F8391
     }
+  }
+  .el-form-item {
+    margin-bottom: 0px;
+  }
+  .el-radio-group {
+    vertical-align: middle;
+    padding-top: 0px;
+    margin-top: 0px;
   }
 </style>
