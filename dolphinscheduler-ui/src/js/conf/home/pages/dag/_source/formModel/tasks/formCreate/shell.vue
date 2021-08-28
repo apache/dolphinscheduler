@@ -66,6 +66,7 @@
         $f: {},
         // loading
         spinnerLoading: false,
+        node: '',
         // node name
         name: '',
         // description
@@ -183,17 +184,6 @@
       _seeHistory () {
         this.$emit('seeHistory', this.backfillItem.name)
       },
-      /**
-       * return params
-       */
-      _onParams (o) {
-        this.params = Object.assign({}, o)
-      },
-
-      _onCacheParams (o) {
-        this.params = Object.assign(this.params, {}, o)
-        this._cacheItem()
-      },
 
       _cacheItem () {
         this.conditionResult.successNode[0] = this.successBranch
@@ -203,21 +193,19 @@
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.$f.form.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            dependence: this.cacheDependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            status: this.status,
-            branch: this.branch
+            code: this.$f.form.code,
+            params: this.$f.form.params,
+            desc: this.$f.form.desc,
+            runFlag: this.$f.form.runFlag,
+            conditionResult: this.$f.form.conditionResult,
+            dependence: this.$f.form.cacheDependence,
+            maxRetryTimes: this.$f.form.maxRetryTimes,
+            retryInterval: this.$f.form.retryInterval,
+            delayTime: this.$f.form.delayTime,
+            timeout: this.$f.form.timeout,
+            waitStartTimeout: this.$f.form.waitStartTimeout,
+            taskInstancePriority: this.$f.form.taskInstancePriority,
+            workerGroup: this.$f.form.workerGroup
           },
           fromThis: this
         })
@@ -316,26 +304,25 @@
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
         // Store the corresponding node data structure
+        // $(this.$f.el()).append(form);
         this.$emit('addTaskInfo', {
           item: {
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.$f.form.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            dependence: this.dependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
+            code: this.$f.form.code,
+            params: this.$f.form.params,
+            desc: this.$f.form.desc,
+            runFlag: this.$f.form.runFlag,
+            conditionResult: this.$f.form.conditionResult,
+            dependence: this.$f.form.dependence,
+            maxRetryTimes: this.$f.form.maxRetryTimes,
+            retryInterval: this.$f.form.retryInterval,
+            delayTime: this.$f.form.delayTime,
             timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            status: this.status,
-            branch: this.branch
+            waitStartTimeout: this.$f.form.waitStartTimeout,
+            taskInstancePriority: this.$f.form.taskInstancePriority,
+            workerGroup: this.$f.form.workerGroup
           },
           fromThis: this
         })
@@ -381,6 +368,7 @@
           {
             type: 'div',
             class: 'form-model-wrapper',
+            field: 'formWrapper',
             directives: [
               {
                 name: 'clickoutside',
@@ -486,6 +474,7 @@
                                   placeholder: i18n.$t('Please enter name (required)'),
                                   maxlength: '100'
                                 },
+                                sync: [{ disabled: this.isDetails }],
                                 on: {
                                   blur: this._verifName
                                 }
@@ -555,7 +544,8 @@
                                   type: 'textarea',
                                   disabled: this.isDetails,
                                   placeholder: i18n.$t('Please enter description')
-                                }
+                                },
+                                sync: [{ disabled: this.isDetails }]
                               }
                             ]
                           }
@@ -581,9 +571,7 @@
                                 children: [
                                   {
                                     type: 'm-priority',
-                                    props: {
-                                      value: this.taskInstancePriority
-                                    }
+                                    field: 'taskInstancePriority'
                                   }
                                 ]
                               },
@@ -594,9 +582,7 @@
                               },
                               {
                                 type: 'm-worker-groups',
-                                props: {
-                                  value: this.workerGroup
-                                }
+                                field: 'workerGroup'
                               }
                             ]
                           }
@@ -617,6 +603,7 @@
                             children: [
                               {
                                 type: 'm-select-input',
+                                field: 'maxRetryTimes',
                                 value: this.maxRetryTimes,
                                 props: {
                                   list: [0, 1, 2, 3, 4]
@@ -633,6 +620,7 @@
                               },
                               {
                                 type: 'm-select-input',
+                                field: 'retryInterval',
                                 value: this.retryInterval,
                                 props: {
                                   list: [1, 10, 30, 60, 120]
@@ -661,8 +649,9 @@
                             children: [
                               {
                                 type: 'm-select-input',
+                                field: 'delayTime',
+                                value: this.delayTime,
                                 props: {
-                                  value: this.delayTime,
                                   list: [0, 1, 5, 10]
                                 }
                               },
@@ -681,6 +670,7 @@
                         props: {
                           backfillItem: this.backfillItem
                         },
+                        sync: [{ backfillItem: this.backfillItem }],
                         on: {
                           onTimeout: this._onTimeout
                         }
@@ -690,13 +680,6 @@
                         type: 'div',
                         class: 'shell-model',
                         field: 'shell',
-                        props: {
-                          backfillItem: this.backfillItem
-                        },
-                        on: {
-                          onParams: this._onParams,
-                          onCacheParams: this._onCacheParams
-                        },
                         children: [
                           {
                             type: 'm-list-box',
@@ -768,13 +751,13 @@
                                       disabled: this.isDetails,
                                       valueConsistsOf: this.valueConsistsOf
                                     },
+                                    sync: [{ options: this.resourceOptions }, { valueConsistsOf: this.valueConsistsOf }, { disabled: this.isDetails }],
                                     children: [
                                       {
                                         type: 'div',
                                         slot: 'value-label',
-                                        slotScope: 'node',
+                                        field: 'node',
                                         children: [
-                                          '{{ node.raw.fullName }}',
                                           {
                                             type: 'span',
                                             class: 'copy-path',
@@ -820,6 +803,7 @@
                                       udpList: this.localParams,
                                       hide: true
                                     },
+                                    sync: [{ udpList: this.localParams }],
                                     on: {
                                       onLocalParams: this._onLocalParams
                                     }
@@ -842,6 +826,7 @@
                                 props: {
                                   item: this.item
                                 },
+                                sync: [{ item: this.item }],
                                 on: {
                                   getSriptBoxValue: this.getSriptBoxValue,
                                   closeAble: this.closeAble
@@ -858,6 +843,7 @@
                         props: {
                           backfillItem: this.backfillItem
                         },
+                        sync: [{ backfillItem: this.backfillItem }],
                         on: {
                           onPreTasks: this._onPreTasks
                         }
@@ -893,6 +879,7 @@
                           loading: this.spinnerLoading,
                           disabled: this.isDetails
                         },
+                        sync: [{ backfillItem: this.backfillItem }, { loading: this.spinnerLoading }, { disabled: this.isDetails }],
                         children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')],
                         on: {
                           click: this.ok
@@ -907,6 +894,7 @@
         ]
       },
       _copyPath (e, node) {
+        console.log(e, node)
         e.stopPropagation()
         let clipboard = new Clipboard('.copy-path', {
           text: function () {
@@ -947,7 +935,7 @@
        *
        */
       _onResourcesData (a) {
-        this.resourceList = a
+        this.$f.form.resourceList = a
       },
       /**
        * cache resourceList
@@ -975,17 +963,17 @@
           return false
         }
         // Process resourcelist
-        let dataProcessing = _.map(this.resourceList, v => {
+        let dataProcessing = _.map(this.$f.form.resourceList, v => {
           return {
             id: v
           }
         })
         // storage
-        this.$emit('on-params', {
+        this.params = {
           resourceList: dataProcessing,
           localParams: this.localParams,
           rawScript: editor.getValue()
-        })
+        }
         return true
       },
       /**
@@ -1015,8 +1003,8 @@
       dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
-        if (this.resourceList.length > 0) {
-          this.resourceList.forEach(v => {
+        if (this.$f.form.resourceList.length > 0) {
+          this.$f.form.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
@@ -1029,7 +1017,7 @@
           Array.prototype.diff = function (a) {
             return this.filter(function (i) { return a.indexOf(i) < 0 })
           }
-          let diffSet = this.resourceList.diff(resourceIdArr)
+          let diffSet = this.$f.form.resourceList.diff(resourceIdArr)
           let optionsCmp = []
           if (diffSet.length > 0) {
             diffSet.forEach(item => {
@@ -1058,6 +1046,95 @@
             this.resourceOptions = this.resourceOptions.concat(noResources)
           }
         }
+      },
+      backfill () {
+        let o = Object.assign({}, this.backfillItem)
+        console.log(o)
+        if (!_.isEmpty(o)) {
+          this.code = o.code
+          this.$f.form.name = o.name
+          this.$f.form.taskInstancePriority = o.taskInstancePriority
+          this.$f.form.runFlag = o.runFlag || 'NORMAL'
+          this.$f.form.desc = o.desc
+          this.$f.form.maxRetryTimes = o.maxRetryTimes
+          this.$f.form.retryInterval = o.retryInterval
+          this.$f.form.delayTime = o.delayTime
+          if (o.conditionResult) {
+            this.successBranch = o.conditionResult.successNode[0]
+            this.failedBranch = o.conditionResult.failedNode[0]
+          }
+          // If the workergroup has been deleted, set the default workergroup
+          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+            let workerGroup = this.store.state.security.workerGroupsListAll[i].id
+            if (o.workerGroup === workerGroup) {
+              break
+            }
+          }
+          if (o.workerGroup === undefined) {
+            this.store.dispatch('dag/getTaskInstanceList', {
+              pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
+            }).then(res => {
+              this.$f.form.workerGroup = res.totalList[0].workerGroup
+            })
+          } else {
+            this.$f.form.workerGroup = o.workerGroup
+          }
+
+          this.$f.form.params = o.params || {}
+          this.$f.form.dependence = o.dependence || {}
+          this.$f.form.cacheDependence = o.dependence || {}
+        } else {
+          this.$f.form.workerGroup = this.store.state.security.workerGroupsListAll[0].id
+        }
+
+        this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
+        this.isContentBox = true
+
+        // Init value of preTask selector
+        let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
+        if (!_.isEmpty(this.backfillItem)) {
+          if (preTaskIds && preTaskIds.length) {
+            this.backfillItem.preTasks = preTaskIds.split(',')
+          } else {
+            this.backfillItem.preTasks = []
+          }
+        }
+
+        o = this.backfillItem
+        // Non-null objects represent backfill
+        if (!_.isEmpty(o)) {
+          this.rawScript = o.params.rawScript || ''
+
+          // backfill resourceList
+          let backResource = o.params.resourceList || []
+          let resourceList = o.params.resourceList || []
+          if (resourceList.length) {
+            _.map(resourceList, v => {
+              if (!v.id) {
+                this.store.dispatch('dag/getResourceId', {
+                  type: 'FILE',
+                  fullName: '/' + v.res
+                }).then(res => {
+                  this.$f.form.resourceList.push(res.id)
+                  this.dataProcess(backResource)
+                }).catch(e => {
+                  this.$f.form.resourceList.push(v.res)
+                  this.dataProcess(backResource)
+                })
+              } else {
+                this.$f.form.resourceList.push(v.id)
+                this.dataProcess(backResource)
+              }
+            })
+            this.cacheResourceList = resourceList
+          }
+
+          // backfill localParams
+          let localParams = o.params.localParams || []
+          if (localParams.length) {
+            this.localParams = localParams
+          }
+        }
       }
     },
     watch: {
@@ -1069,7 +1146,8 @@
       },
       // Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val)
+        this.params = Object.assign(this.params, {}, val)
+        this._cacheItem()
       },
       resourceIdArr (arr) {
         let result = []
@@ -1087,30 +1165,33 @@
     computed: {
       // Define the item model
       _item () {
+        if (!this.$f) {
+          return {}
+        }
         return {
           type: this.nodeData.taskType,
           id: this.nodeData.id,
           code: this.code,
           name: this.$f.form.name,
-          desc: this.desc,
-          runFlag: this.runFlag,
-          dependence: this.cacheDependence,
-          maxRetryTimes: this.maxRetryTimes,
-          retryInterval: this.retryInterval,
-          delayTime: this.delayTime,
-          timeout: this.timeout,
-          waitStartTimeout: this.waitStartTimeout,
-          taskInstancePriority: this.taskInstancePriority,
-          workerGroup: this.workerGroup,
-          successBranch: this.successBranch,
-          failedBranch: this.failedBranch
+          desc: this.$f.form.desc,
+          runFlag: this.$f.form.runFlag,
+          dependence: this.$f.form.cacheDependence,
+          maxRetryTimes: this.$f.form.maxRetryTimes,
+          retryInterval: this.$f.form.retryInterval,
+          delayTime: this.$f.form.delayTime,
+          timeout: this.$f.form.timeout,
+          waitStartTimeout: this.$f.form.waitStartTimeout,
+          taskInstancePriority: this.$f.form.taskInstancePriority,
+          workerGroup: this.$f.form.workerGroup,
+          successBranch: this.$f.form.successBranch,
+          failedBranch: this.$f.form.failedBranch
         }
       },
       resourceIdArr () {
         let isResourceId = []
         let resourceIdArr = []
-        if (this.resourceList.length > 0) {
-          this.resourceList.forEach(v => {
+        if (this.$f && this.$f.form.resourceList && this.$f.form.resourceList.length > 0) {
+          this.$f.form.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
@@ -1135,110 +1216,20 @@
       JSP.removePaste()
       // Backfill data
       let taskList = this.store.state.dag.tasks
-
+      let item = this.store.state.dag.resourcesListS
+      diGuiTree(item)
+      this.resourceOptions = item
       // fillback use cacheTasks
       let cacheTasks = this.store.state.dag.cacheTasks
-      let o = {}
       if (cacheTasks[this.nodeData.id]) {
-        o = cacheTasks[this.nodeData.id]
         this.backfillItem = cacheTasks[this.nodeData.id]
       } else {
         if (taskList.length) {
           taskList.forEach(v => {
             if (v.id === this.nodeData.id) {
-              o = v
               this.backfillItem = v
             }
           })
-        }
-      }
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        this.code = o.code
-        this.$f.form.name = o.name
-        this.taskInstancePriority = o.taskInstancePriority
-        this.runFlag = o.runFlag || 'NORMAL'
-        this.desc = o.desc
-        this.maxRetryTimes = o.maxRetryTimes
-        this.retryInterval = o.retryInterval
-        this.delayTime = o.delayTime
-        if (o.conditionResult) {
-          this.successBranch = o.conditionResult.successNode[0]
-          this.failedBranch = o.conditionResult.failedNode[0]
-        }
-        // If the workergroup has been deleted, set the default workergroup
-        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-          let workerGroup = this.store.state.security.workerGroupsListAll[i].id
-          if (o.workerGroup === workerGroup) {
-            break
-          }
-        }
-        if (o.workerGroup === undefined) {
-          this.store.dispatch('dag/getTaskInstanceList', {
-            pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
-          }).then(res => {
-            this.workerGroup = res.totalList[0].workerGroup
-          })
-        } else {
-          this.workerGroup = o.workerGroup
-        }
-
-        this.params = o.params || {}
-        this.dependence = o.dependence || {}
-        this.cacheDependence = o.dependence || {}
-      } else {
-        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
-      }
-      this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
-      this.isContentBox = true
-
-      // Init value of preTask selector
-      let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
-      if (!_.isEmpty(this.backfillItem)) {
-        if (preTaskIds && preTaskIds.length) {
-          this.backfillItem.preTasks = preTaskIds.split(',')
-        } else {
-          this.backfillItem.preTasks = []
-        }
-      }
-
-      let item = this.store.state.dag.resourcesListS
-      diGuiTree(item)
-      this.resourceOptions = item
-      o = this.backfillItem
-
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        this.rawScript = o.params.rawScript || ''
-
-        // backfill resourceList
-        let backResource = o.params.resourceList || []
-        let resourceList = o.params.resourceList || []
-        if (resourceList.length) {
-          _.map(resourceList, v => {
-            if (!v.id) {
-              this.store.dispatch('dag/getResourceId', {
-                type: 'FILE',
-                fullName: '/' + v.res
-              }).then(res => {
-                this.resourceList.push(res.id)
-                this.dataProcess(backResource)
-              }).catch(e => {
-                this.resourceList.push(v.res)
-                this.dataProcess(backResource)
-              })
-            } else {
-              this.resourceList.push(v.id)
-              this.dataProcess(backResource)
-            }
-          })
-          this.cacheResourceList = resourceList
-        }
-
-        // backfill localParams
-        let localParams = o.params.localParams || []
-        if (localParams.length) {
-          this.localParams = localParams
         }
       }
     },
@@ -1246,10 +1237,12 @@
       let self = this
       this._initRule()
       setTimeout(() => {
+        window.$$ = this
         $('#cancelBtn').mousedown(function (event) {
           event.preventDefault()
           self.close()
         })
+        this.backfill()
         this._handlerEditor()
       }, 200)
     },
