@@ -394,7 +394,7 @@
       _seeHistory () {
         this.self.$router.push({
           name: 'task-instance',
-          params: { projectId: this.projectId },
+          params: { projectId: this.self.projectId },
           query: {
             processInstanceId: this.self.$route.params.id,
             taskName: this.backfillItem.name
