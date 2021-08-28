@@ -276,7 +276,7 @@
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
         <el-button type="text" size="small" id="cancelBtn"> {{$t('Cancel')}} </el-button>
-        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? $t('Loading...') : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>

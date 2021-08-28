@@ -49,7 +49,7 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <el-button type="primary" round size="small" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : $t('Edit')}}</el-button>
+        <el-button type="primary" round size="small" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? $t('Loading...') : $t('Edit')}}</el-button>
       </template>
     </m-list-box-f>
   </div>
