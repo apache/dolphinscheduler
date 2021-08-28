@@ -1283,8 +1283,7 @@ public class ProcessService {
         // in the recovery mode after the Kill,
         // sub-process and dependent tasks should be submitted with SUBMITTED_SUCCESS state
         // to run a sub/ref-task/process check at least once in waitTaskQuit()
-        if (state == ExecutionStatus.KILL && !(taskInstance.isSubProcess() || taskInstance.isDependTask()))
-        {
+        if (state == ExecutionStatus.KILL && !(taskInstance.isSubProcess() || taskInstance.isDependTask())) {
             return ExecutionStatus.SUBMITTED_SUCCESS;
         }
 
