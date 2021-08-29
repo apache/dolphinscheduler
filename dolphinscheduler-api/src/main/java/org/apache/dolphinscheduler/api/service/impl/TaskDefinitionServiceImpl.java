@@ -148,8 +148,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             taskDefinitionLog.setUserId(loginUser.getId());
             taskDefinitionLog.setVersion(1);
             taskDefinitionLog.setCreateTime(now);
-            totalSuccessCode.add(taskDefinitionLog.getCode());
-            newTaskDefinitionLogs.add(taskDefinitionLog);
             if (taskDefinitionLog.getCode() == 0) {
                 long code;
                 try {
