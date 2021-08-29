@@ -1279,6 +1279,14 @@ public class ProcessService {
      */
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
+        
+        // in the recovery mode after the Kill/Pause/Stop command,
+        // sub-process and dependent tasks should be submitted with SUBMITTED_SUCCESS state
+        // to run a sub/ref-task/process check at least once in waitTaskQuit()
+        if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
+            return ExecutionStatus.SUBMITTED_SUCCESS;
+        }
+
         // running, delayed or killed
         // the task already exists in task queue
         // return state
