@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -495,8 +496,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //check exist
-        User tempUser = userMapper.selectById(id);
-        if (tempUser == null) {
+        if (!checkUserExist(id)) {
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
@@ -547,8 +547,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         //check exist
-        User tempUser = userMapper.selectById(userId);
-        if (tempUser == null) {
+        if (!checkUserExist(userId)) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -593,8 +592,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
+        //check exist
+        if (!checkUserExist(userId)) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -691,8 +690,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
+        //check exist
+        if (!checkUserExist(userId)) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -739,8 +738,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
+        //check exist
+        if (!checkUserExist(userId)) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -1118,5 +1117,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, res);
         return result;
+    }
+
+    /**
+     * check user exist
+     *
+     * @param userId
+     * @return true if exist else return false
+     */
+    private boolean checkUserExist(int userId) {
+        return BooleanUtils.isTrue(userMapper.existUserById(userId));
     }
 }

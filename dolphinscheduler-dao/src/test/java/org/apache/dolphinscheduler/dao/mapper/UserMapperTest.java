@@ -333,4 +333,12 @@ public class UserMapperTest {
         insertOne();
         Assert.assertTrue(userMapper.existUser(queueName));
     }
+
+    @Test
+    public void testExistUserById() {
+        int userId = 2;
+        Assert.assertNull(userMapper.existUserById(userId));
+        User user = insertOne();
+        Assert.assertTrue(userMapper.existUserById(user.getId()));
+    }
 }

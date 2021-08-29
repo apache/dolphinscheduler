@@ -123,4 +123,9 @@
             #{id}
         </foreach>
     </select>
+    <select id="existUserById" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_user
+        where id = #{userId} limit 1
+    </select>
 </mapper>

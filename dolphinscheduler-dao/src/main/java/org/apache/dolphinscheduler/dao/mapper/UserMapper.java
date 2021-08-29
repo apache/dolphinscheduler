@@ -124,4 +124,11 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user list
      */
     List<User> selectByIds(@Param("ids") List<Integer> ids);
+
+    /**
+     * check the user exist by userId
+     * @param userId
+     * @return true if exist else return null
+     */
+    Boolean existUserById(@Param("userId") int userId);
 }
