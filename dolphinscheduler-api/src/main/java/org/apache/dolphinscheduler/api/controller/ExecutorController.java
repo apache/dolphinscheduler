@@ -121,7 +121,8 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
-                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber
+                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) Integer dryRun
     ) {
 
         if (timeout == null) {
@@ -133,7 +134,7 @@ public class ExecutorController extends BaseController {
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
-                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap, expectedParallelismNumber);
+                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap, expectedParallelismNumber, dryRun);
         return returnDataList(result);
     }
 

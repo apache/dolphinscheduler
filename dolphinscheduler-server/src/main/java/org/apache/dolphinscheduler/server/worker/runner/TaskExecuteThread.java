@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -105,6 +107,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private AlertClientService alertClientService;
 
     /**
+     * task instance service
+     */
+    private static TaskInstanceMapper taskInstanceMapper;
+
+    /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
@@ -160,13 +167,23 @@ public class TaskExecuteThread implements Runnable, Delayed {
             preBuildBusinessParams();
             //init varPool
             task.getParameters().setVarPool(taskExecutionContext.getVarPool());
-            // task handle
-            task.handle();
 
-            // task result process
-            task.after();
+            taskInstanceMapper = SpringApplicationContext.getBean(TaskInstanceMapper.class);
+            TaskInstance taskInstance = taskInstanceMapper.selectById(taskExecutionContext.getTaskInstanceId());
+            Integer dryRun = taskInstance.getDryRun();
 
-            responseCommand.setStatus(task.getExitStatus().getCode());
+            if (!dryRun.equals(Constants.DRY_RUN_STATE)) {
+                // task handle
+                task.handle();
+
+                // task result process
+                task.after();
+
+                responseCommand.setStatus(task.getExitStatus().getCode());
+            } else {
+                responseCommand.setStatus(ExecutionStatus.SUCCESS.getCode());
+                task.setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
+            }
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());

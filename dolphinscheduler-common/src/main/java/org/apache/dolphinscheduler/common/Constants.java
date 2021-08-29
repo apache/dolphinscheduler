@@ -1105,4 +1105,11 @@ public final class Constants {
     public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
     public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
     public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
+
+    /**
+     * dry run state
+     */
+    public static final Integer NORMAL_STATE = 0;
+    public static final Integer DRY_RUN_STATE = 1;
+
 }
