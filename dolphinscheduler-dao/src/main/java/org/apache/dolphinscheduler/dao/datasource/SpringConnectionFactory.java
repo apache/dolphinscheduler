@@ -166,6 +166,7 @@ public class SpringConnectionFactory {
         Properties properties = new Properties();
         properties.setProperty("MySQL", "mysql");
         properties.setProperty("PostgreSQL", "pg");
+        properties.setProperty("h2", "h2");
         databaseIdProvider.setProperties(properties);
         return databaseIdProvider;
     }
