@@ -165,7 +165,6 @@ public class ProcessInstanceController extends BaseController {
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
-     * @param flag flag
      * @param locations locations
      * @param tenantCode tenantCode
      * @return update result code
@@ -179,8 +178,7 @@ public class ProcessInstanceController extends BaseController {
         @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
         @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "String"),
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "Int", example = "0"),
-        @ApiImplicitParam(name = "flag", value = "RECOVERY_PROCESS_INSTANCE_FLAG", type = "Flag")
+        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "Int", example = "0")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -195,10 +193,9 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                        @RequestParam(value = "tenantCode", required = true) String tenantCode,
-                                        @RequestParam(value = "flag", required = false) Flag flag) {
+                                        @RequestParam(value = "tenantCode", required = true) String tenantCode) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, processInstanceId,
-            taskRelationJson, scheduleTime, syncDefine, flag, globalParams, locations, timeout, tenantCode);
+            taskRelationJson, scheduleTime, syncDefine, globalParams, locations, timeout, tenantCode);
         return returnDataList(result);
     }
 

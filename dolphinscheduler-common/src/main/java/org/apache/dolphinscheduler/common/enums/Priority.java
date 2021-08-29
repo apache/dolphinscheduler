@@ -35,7 +35,7 @@ public enum Priority {
     LOW(3, "low"),
     LOWEST(4, "lowest");
 
-    Priority(int code, String descp){
+    Priority(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
