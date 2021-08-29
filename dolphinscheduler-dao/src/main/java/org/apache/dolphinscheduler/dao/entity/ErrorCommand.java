@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -109,6 +110,13 @@ public class ErrorCommand {
      */
     private String workerGroup;
 
+    /**
+     * dry run state
+     */
+    @TableField("dry_run")
+    private Integer dryRun;
+
+
     public ErrorCommand(){}
 
     public ErrorCommand(Command command, String message){
@@ -126,6 +134,7 @@ public class ErrorCommand {
         this.updateTime = command.getUpdateTime();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
+        this.dryRun = command.getDryRun();
     }
 
     public ErrorCommand(
@@ -139,7 +148,8 @@ public class ErrorCommand {
             int warningGroupId,
             Date scheduleTime,
             Priority processInstancePriority,
-            String message){
+            String message,
+            Integer dryRun){
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionId = processDefinitionId;
@@ -153,6 +163,7 @@ public class ErrorCommand {
         this.updateTime = new Date();
         this.processInstancePriority = processInstancePriority;
         this.message = message;
+        this.dryRun = dryRun;
     }
 
 
@@ -277,6 +288,14 @@ public class ErrorCommand {
         this.message = message;
     }
 
+    public Integer getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(Integer dryRun) {
+        this.dryRun = dryRun;
+    }
+
     @Override
     public String toString() {
         return "ErrorCommand{" +
@@ -295,6 +314,7 @@ public class ErrorCommand {
                 ", updateTime=" + updateTime +
                 ", message='" + message + '\'' +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", dryRun='" + dryRun + '\'' +
                 '}';
     }
 }

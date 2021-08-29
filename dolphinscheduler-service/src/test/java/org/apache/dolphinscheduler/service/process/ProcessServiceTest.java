@@ -285,6 +285,7 @@ public class ProcessServiceTest {
         commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
         command5.setCommandParam(JSONUtils.toJsonString(commandParams));
         command5.setCommandType(CommandType.START_PROCESS);
+        command5.setDryRun(Constants.NORMAL_STATE);
         ProcessInstance processInstance1 = processService.handleCommand(logger, host, validThreadNum, command5);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
     }

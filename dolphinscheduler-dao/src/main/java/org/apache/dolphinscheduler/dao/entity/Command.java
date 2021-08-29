@@ -114,6 +114,13 @@ public class Command {
     @TableField("worker_group")
     private String workerGroup;
 
+    /**
+     * if dry run
+     */
+    @TableField("dry_run")
+    private Integer dryRun;
+
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -132,7 +139,8 @@ public class Command {
             int warningGroupId,
             Date scheduleTime,
             String workerGroup,
-            Priority processInstancePriority) {
+            Priority processInstancePriority,
+            Integer dryRun) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionId = processDefinitionId;
@@ -146,6 +154,7 @@ public class Command {
         this.updateTime = new Date();
         this.workerGroup = workerGroup;
         this.processInstancePriority = processInstancePriority;
+        this.dryRun = dryRun;
     }
 
 
@@ -262,6 +271,14 @@ public class Command {
         this.workerGroup = workerGroup;
     }
 
+    public Integer getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(Integer dryRun) {
+        this.dryRun = dryRun;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -332,6 +349,7 @@ public class Command {
         result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
+        result = 31 * result + (dryRun != null ? dryRun.hashCode() : 0);
         return result;
     }
     @Override
@@ -351,6 +369,7 @@ public class Command {
                 ", processInstancePriority=" + processInstancePriority +
                 ", updateTime=" + updateTime +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", dryRun='" + dryRun + '\'' +
                 '}';
     }
 }
