@@ -404,7 +404,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
-     * @param flag flag
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
@@ -414,7 +413,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId, String taskRelationJson,
-                                                     String scheduleTime, Boolean syncDefine, Flag flag, String globalParams,
+                                                     String scheduleTime, Boolean syncDefine, String globalParams,
                                                      String locations, int timeout, String tenantCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project

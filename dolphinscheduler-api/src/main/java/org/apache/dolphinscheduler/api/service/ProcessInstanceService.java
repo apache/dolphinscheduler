@@ -119,7 +119,6 @@ public interface ProcessInstanceService {
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
-     * @param flag flag
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
@@ -132,7 +131,6 @@ public interface ProcessInstanceService {
                                               String taskRelationJson,
                                               String scheduleTime,
                                               Boolean syncDefine,
-                                              Flag flag,
                                               String globalParams,
                                               String locations,
                                               int timeout,

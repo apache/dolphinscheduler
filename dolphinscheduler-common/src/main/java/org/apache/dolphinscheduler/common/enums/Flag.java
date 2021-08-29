@@ -35,7 +35,7 @@ public enum Flag {
     YES(1, "yes");
 
 
-    Flag(int code, String descp){
+    Flag(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
