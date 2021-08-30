@@ -49,6 +49,7 @@ cron-utils-5.0.5.jar
 curator-client-4.3.0.jar
 curator-framework-4.3.0.jar
 curator-recipes-4.3.0.jar
+curator-test-2.12.0.jar
 curvesapi-1.06.jar
 datanucleus-api-jdo-4.2.1.jar
 datanucleus-core-4.1.6.jar

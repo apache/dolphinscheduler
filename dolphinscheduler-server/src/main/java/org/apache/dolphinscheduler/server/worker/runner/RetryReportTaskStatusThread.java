@@ -49,6 +49,7 @@ public class RetryReportTaskStatusThread implements Runnable {
 
     public void start(){
         Thread thread = new Thread(this,"RetryReportTaskStatusThread");
+        thread.setDaemon(true);
         thread.start();
     }
 
