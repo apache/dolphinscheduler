@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.ConditionType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
 
@@ -25,6 +26,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * process task relation
@@ -86,6 +89,8 @@ public class ProcessTaskRelation {
     /**
      * condition parameters
      */
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String conditionParams;
 
     /**
@@ -236,19 +241,19 @@ public class ProcessTaskRelation {
     @Override
     public String toString() {
         return "ProcessTaskRelation{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", processDefinitionVersion=" + processDefinitionVersion
-                + ", projectCode=" + projectCode
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", preTaskCode=" + preTaskCode
-                + ", preTaskVersion=" + preTaskVersion
-                + ", postTaskCode=" + postTaskCode
-                + ", postTaskVersion=" + postTaskVersion
-                + ", conditionType=" + conditionType
-                + ", conditionParams='" + conditionParams + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", processDefinitionVersion=" + processDefinitionVersion
+            + ", projectCode=" + projectCode
+            + ", processDefinitionCode=" + processDefinitionCode
+            + ", preTaskCode=" + preTaskCode
+            + ", preTaskVersion=" + preTaskVersion
+            + ", postTaskCode=" + postTaskCode
+            + ", postTaskVersion=" + postTaskVersion
+            + ", conditionType=" + conditionType
+            + ", conditionParams='" + conditionParams + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }

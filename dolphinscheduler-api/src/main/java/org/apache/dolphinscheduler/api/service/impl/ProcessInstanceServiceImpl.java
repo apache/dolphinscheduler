@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -401,6 +402,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param loginUser login user
      * @param projectCode project code
      * @param taskRelationJson process task relation json
+     * @param taskDefinitionJson taskDefinitionJson
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
@@ -413,7 +415,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId, String taskRelationJson,
-                                                     String scheduleTime, Boolean syncDefine, String globalParams,
+                                                     String taskDefinitionJson, String scheduleTime, Boolean syncDefine, String globalParams,
                                                      String locations, int timeout, String tenantCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -433,26 +435,42 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        //check workflow json is valid
-        result = processDefinitionService.checkProcessNodeList(taskRelationJson);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
-        }
         setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout);
         if (Boolean.TRUE.equals(syncDefine)) {
+            List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+            if (taskDefinitionLogs.isEmpty()) {
+                putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
+                return result;
+            }
+            for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
+                    putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
+                    return result;
+                }
+            }
+            if (!processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
+                putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+                return result;
+            }
+            ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+            List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+            //check workflow json is valid
+            result = processDefinitionService.checkProcessNodeList(taskRelationJson);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                putMsg(result, Status.TENANT_NOT_EXIST);
+                return result;
+            }
+
             processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(), globalParams, locations, timeout, tenant.getId());
             processDefinition.setUpdateTime(new Date());
             int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, false);
             if (insertVersion > 0) {
                 int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
-                    processDefinition.getCode(), insertVersion, taskRelationList);
+                    processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs);
                 if (insertResult > 0) {
                     putMsg(result, Status.SUCCESS);
                     result.put(Constants.DATA_LIST, processDefinition);
