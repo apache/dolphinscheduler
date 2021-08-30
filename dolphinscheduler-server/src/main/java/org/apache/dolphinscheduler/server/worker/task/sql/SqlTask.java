@@ -182,25 +182,17 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getLocalParametersMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
-        }
         if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
             paramsMap.putAll(taskExecutionContext.getParamsMap());
         }
         // spell SQL according to the final user-defined variable
-        if(paramsMap.isEmpty()){
-            sqlBuilder.append(sql);
-            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
                     ParamUtils.convert(paramsMap));
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
-        
+
         //new
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
@@ -358,7 +350,7 @@ public class SqlTask extends AbstractTask {
             }
         }
     }
-    
+
     /**
      * create connection
      *

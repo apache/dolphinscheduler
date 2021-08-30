@@ -124,15 +124,10 @@ public class PythonTask extends AbstractTask {
             pythonParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
-    if(MapUtils.isEmpty(paramsMap)){
-      paramsMap=new HashMap<>();
-    }
     if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
       paramsMap.putAll(taskExecutionContext.getParamsMap());
     }
-    if (paramsMap != null){
-      rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
-    }
+    rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
 
     logger.info("raw python script : {}", pythonParameters.getRawScript());
     logger.info("task dir : {}", taskDir);

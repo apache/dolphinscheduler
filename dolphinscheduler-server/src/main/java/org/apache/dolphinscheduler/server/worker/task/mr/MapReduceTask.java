@@ -93,9 +93,6 @@ public class MapReduceTask extends AbstractYarnTask {
                 mapreduceParameters.getLocalParametersMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
-        }
         if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
             paramsMap.putAll(taskExecutionContext.getParamsMap());
         }

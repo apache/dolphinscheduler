@@ -81,19 +81,12 @@ public class SqoopTask extends AbstractYarnTask {
             sqoopParameters.getLocalParametersMap(),
             CommandType.of(sqoopTaskExecutionContext.getCmdTypeIfComplement()),
             sqoopTaskExecutionContext.getScheduleTime());
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
-        }
         if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())){
             paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
         }
-        if (paramsMap != null) {
-            String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-            logger.info("sqoop script: {}", resultScripts);
-            return resultScripts;
-        }
-
-        return null;
+        String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        logger.info("sqoop script: {}", resultScripts);
+        return resultScripts;
     }
 
     @Override
