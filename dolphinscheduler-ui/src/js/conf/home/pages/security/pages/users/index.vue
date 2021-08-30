@@ -45,7 +45,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapMutations } from 'vuex'
   import mList from './_source/list'
   import mCreateUser from './_source/createUser'
   import mSpin from '@/module/components/spin/spin'
@@ -72,6 +72,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
+      ...mapMutations('user', ['setUserInfo']),
       ...mapActions('security', ['getUsersListP']),
       /**
        * Query
@@ -103,7 +104,8 @@
           render (h) {
             return h(mCreateUser, {
               on: {
-                onUpdate () {
+                onUpdate (param) {
+                  self.setUserInfo(param)
                   self._debounceGET('false')
                   modal.remove()
                 },
