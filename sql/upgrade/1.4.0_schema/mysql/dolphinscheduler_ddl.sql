@@ -654,6 +654,12 @@ CREATE TABLE `t_ds_environment` (
 ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
 
+ALTER TABLE t_ds_command ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
 -- ----------------------------

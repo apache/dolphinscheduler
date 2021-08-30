@@ -17,6 +17,7 @@
 <template>
   <el-select
           :disabled="isDetails"
+          clearable
           @change="_onChange"
           v-model="selectedValue"
           size="small"
@@ -35,7 +36,7 @@
     name: 'form-related-environment',
     data () {
       return {
-        selectedValue: null,
+        selectedValue: '',
         selectedWorkerGroup: this.workerGroup,
         environmentOptions: [],
         environmentList: []
@@ -43,7 +44,7 @@
     },
     mixins: [disabledState],
     props: {
-      environmentCode: {
+      value: {
         type: String
       },
       workerGroup: {
@@ -51,7 +52,7 @@
       }
     },
     model: {
-      prop: 'environmentCode',
+      prop: 'value',
       event: 'environmentCodeEvent'
     },
     methods: {
@@ -74,16 +75,28 @@
             if (item.workerGroups && item.workerGroups.length > 0) {
               if (item.workerGroups.indexOf(workerGroup) >= 0) {
                 this.environmentOptions.push({ code: item.code, name: item.name })
+                if (item.code === this.value) {
+                  this.selectedValue = this.value
+                }
               }
             }
           })
         }
-        this.selectedValue = this.environmentCode
+
+        if (this.environmentOptions.length > 0) {
+          /// default to select this environment when only have one environment
+          if (this.environmentOptions.length === 1 && this.selectedValue === '') {
+            this.selectedValue = this.environmentOptions[0].code
+            this.$emit('environmentCodeEvent', this.selectedValue)
+          }
+        } else {
+          this.selectedValue = ''
+          this.$emit('environmentCodeEvent', this.selectedValue)
+        }
       }
     },
     watch: {
-      environmentCode: function (val) {
-        this.selectedValue = val
+      value: function (val) {
       },
       workerGroup: function (val) {
         this.selectedWorkerGroup = val

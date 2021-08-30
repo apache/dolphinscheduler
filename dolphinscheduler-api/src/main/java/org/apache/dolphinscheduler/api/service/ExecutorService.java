@@ -49,6 +49,7 @@ public interface ExecutorService {
      * @param warningGroupId notify group id
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group name
+     * @param environmentCode environment code
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
@@ -59,7 +60,7 @@ public interface ExecutorService {
                                             FailureStrategy failureStrategy, String startNodeList,
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
-                                            Priority processInstancePriority, String workerGroup, Integer timeout,
+                                            Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                             Map<String, String> startParams);
 
     /**

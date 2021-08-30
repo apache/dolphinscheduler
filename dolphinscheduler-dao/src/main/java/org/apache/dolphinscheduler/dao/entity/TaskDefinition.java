@@ -404,7 +404,7 @@ public class TaskDefinition {
         return this.environmentCode;
     }
     public void setEnvironmentCode(Long environmentCode){
-        this.environmentCode=environmentCode;
+        this.environmentCode = environmentCode;
     }
 
     @Override

@@ -531,6 +531,7 @@ public class ProcessService {
                     processInstance.getWarningGroupId(),
                     processInstance.getScheduleTime(),
                     processInstance.getWorkerGroup(),
+                    processInstance.getEnvironmentCode(),
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -1172,6 +1173,7 @@ public class ProcessService {
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
                 task.getWorkerGroup(),
+                task.getEnvironmentCode(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }
@@ -2170,7 +2172,7 @@ public class ProcessService {
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
-        taskDefinition.setEnvironmentCode(taskNode.getEnvironmentCode());
+        taskDefinition.setEnvironmentCode(Objects.isNull(taskNode.getEnvironmentCode()) ? -1 : taskNode.getEnvironmentCode());
         taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
         taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
         taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);

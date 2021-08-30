@@ -683,6 +683,20 @@ comment on column t_ds_task_definition.environment_code is 'environment code';
 ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT NULL;
 comment on column t_ds_task_definition_log.environment_code is 'environment code';
 
+ALTER TABLE t_ds_command ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_command.environment_code is 'environment code';
+
+ALTER TABLE t_ds_error_command ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_error_command.environment_code is 'environment code';
+
+ALTER TABLE t_ds_schedules ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_schedules.environment_code is 'environment code';
+
+ALTER TABLE t_ds_process_instance ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_process_instance.environment_code is 'environment code';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN environment_code bigint DEFAULT NULL;
+comment on column t_ds_task_instance.environment_code is 'environment code';
 
 --
 -- Table structure for table t_ds_environment_worker_group_relation

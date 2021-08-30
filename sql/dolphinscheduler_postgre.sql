@@ -232,6 +232,7 @@ CREATE TABLE t_ds_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   PRIMARY KEY (id)
 ) ;
 
@@ -273,6 +274,7 @@ CREATE TABLE t_ds_error_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   message text ,
   PRIMARY KEY (id)
 );
@@ -466,6 +468,7 @@ CREATE TABLE t_ds_process_instance (
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64) ,
+  environment_code bigint DEFAULT NULL,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
@@ -626,6 +629,7 @@ CREATE TABLE t_ds_schedules (
   warning_group_id int DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
@@ -673,6 +677,7 @@ CREATE TABLE t_ds_task_instance (
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,

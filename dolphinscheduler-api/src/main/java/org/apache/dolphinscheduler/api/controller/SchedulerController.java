@@ -99,6 +99,7 @@ public class SchedulerController extends BaseController {
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
             @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
     @PostMapping("/create")
@@ -113,9 +114,10 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                 @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
+                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
 
         return returnDataList(result);
     }
@@ -145,6 +147,7 @@ public class SchedulerController extends BaseController {
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
             @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority")
     })
     @PostMapping("/update")
@@ -158,10 +161,11 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                 @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
+                warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup, environmentCode);
         return returnDataList(result);
     }
 

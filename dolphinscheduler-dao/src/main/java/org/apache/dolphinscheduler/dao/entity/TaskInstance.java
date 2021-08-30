@@ -213,6 +213,10 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
 
     /**
      * executor id
@@ -414,6 +418,14 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
+    public Long getEnvironmentCode(){
+        return this.environmentCode;
+    }
+    public void setEnvironmentCode(Long environmentCode){
+        this.environmentCode = environmentCode;
+    }
+
+
     public DependentParameters getDependency() {
         if (this.dependency == null) {
             Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
@@ -598,6 +610,7 @@ public class TaskInstance implements Serializable {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", dependentResult='" + dependentResult + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime

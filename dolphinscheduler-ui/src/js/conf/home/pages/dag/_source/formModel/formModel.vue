@@ -88,7 +88,7 @@
               <m-worker-groups v-model="workerGroup"></m-worker-groups>
             </span>
             <span class="text-b">{{$t('Environment Name')}}</span>
-            <m-related-environment v-model="environmentCode" :workerGroup="workerGroup"></m-related-environment>
+            <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
           </div>
         </m-list-box>
 
@@ -478,12 +478,13 @@
       _onParams (o) {
         this.params = Object.assign({}, o)
       },
-
       _onCacheParams (o) {
         this.params = Object.assign(this.params, {}, o)
         this._cacheItem()
       },
-
+      _onUpdateEnvironmentCode (o) {
+        this.environmentCode = o
+      },
       _cacheItem () {
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
@@ -799,6 +800,7 @@
           waitStartTimeout: this.waitStartTimeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
+          environmentCode: this.environmentCode,
           successBranch: this.successBranch,
           failedBranch: this.failedBranch
         }

@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -109,6 +110,11 @@ public class ErrorCommand {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
     public ErrorCommand(){}
 
     public ErrorCommand(Command command, String message){
@@ -124,6 +130,7 @@ public class ErrorCommand {
         this.failureStrategy = command.getFailureStrategy();
         this.startTime = command.getStartTime();
         this.updateTime = command.getUpdateTime();
+        this.environmentCode = command.getEnvironmentCode();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
     }
@@ -277,6 +284,13 @@ public class ErrorCommand {
         this.message = message;
     }
 
+    public Long getEnvironmentCode(){
+        return this.environmentCode;
+    }
+    public void setEnvironmentCode(Long environmentCode){
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public String toString() {
         return "ErrorCommand{" +
@@ -295,6 +309,7 @@ public class ErrorCommand {
                 ", updateTime=" + updateTime +
                 ", message='" + message + '\'' +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", environmentCode='" + environmentCode + '\'' +
                 '}';
     }
 }
