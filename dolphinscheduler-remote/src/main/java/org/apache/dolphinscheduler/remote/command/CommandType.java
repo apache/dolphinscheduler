@@ -124,6 +124,11 @@ public enum CommandType {
     ALERT_SEND_RESPONSE,
 
     /**
+     * process host update
+     */
+    PROCESS_HOST_UPDATE,
+
+    /**
      * state event request
      */
     STATE_EVENT_REQUEST;

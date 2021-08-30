@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -67,6 +66,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -584,6 +584,12 @@ public class WorkflowExecuteThread implements Runnable {
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION &&
+                    taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)){
+
+                notifyProcessHostUpdate();
+
+            }
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
             if (submit) {
                 this.taskInstanceHashMap.put(taskInstance.getId(), taskInstance.getTaskCode(), taskInstance);
@@ -613,6 +619,12 @@ public class WorkflowExecuteThread implements Runnable {
             logger.error("submit standby task error", e);
             return null;
         }
+    }
+
+    private void notifyProcessHostUpdate() {
+        //TODO...
+
+
     }
 
     private void addTimeoutCheck(TaskInstance taskInstance) {

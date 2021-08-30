@@ -80,6 +80,17 @@ public class TaskCallbackService {
     }
 
     /**
+     * change remote channel
+     */
+    public void changeRemoteChannel(int taskInstanceId, NettyRemoteChannel channel){
+        if(!REMOTE_CHANNELS.containsKey(taskInstanceId)){
+            return;
+        }
+        REMOTE_CHANNELS.remove(taskInstanceId);
+        REMOTE_CHANNELS.put(taskInstanceId, channel);
+    }
+
+    /**
      * get callback channel
      *
      * @param taskInstanceId taskInstanceId
@@ -98,7 +109,6 @@ public class TaskCallbackService {
             }
         }
         return null;
-
     }
 
     public int pause(int ntries) {
