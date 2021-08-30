@@ -419,7 +419,7 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
             shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
-        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, processInstanceFinishRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.CREATE_TASK_DEFINITION_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
