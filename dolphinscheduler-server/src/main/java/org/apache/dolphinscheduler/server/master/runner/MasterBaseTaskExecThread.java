@@ -200,6 +200,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
         try {
             if (taskInstance.isConditionsTask()
+                    || taskInstance.isBlockingTask()
                     || taskInstance.isDependTask()
                     || taskInstance.isSubProcess()) {
                 return true;
