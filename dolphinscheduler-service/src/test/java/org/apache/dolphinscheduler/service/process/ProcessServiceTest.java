@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
@@ -116,6 +117,9 @@ public class ProcessServiceTest {
 
     @Mock
     private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+
+    @Mock
+    private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Test
     public void testCreateSubCommand() {
