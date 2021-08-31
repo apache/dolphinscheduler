@@ -243,7 +243,8 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
+                + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -442,7 +443,8 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},"
+                + "{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -722,7 +724,8 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},"
+                + "{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -1053,7 +1056,8 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
+                + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -1134,7 +1138,6 @@ public class DataQualityTaskTest {
         inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
         inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
 
-//        dataQualityTaskExecutionContext.setHdfsPath("hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
         dataQualityTaskExecutionContext.setSourceConnectionParams(
@@ -1174,7 +1177,6 @@ public class DataQualityTaskTest {
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
                         + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
-
 
         dataQualityTaskExecutionContext.setRuleName("跨表准确性");
         dataQualityTaskExecutionContext.setRuleType(RuleType.MULTI_TABLE_ACCURACY);

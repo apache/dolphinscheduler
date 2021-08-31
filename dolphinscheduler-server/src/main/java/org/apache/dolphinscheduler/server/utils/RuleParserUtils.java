@@ -190,11 +190,11 @@ public class RuleParserUtils {
     }
 
     public static List<BaseConfig> getSingleTableCustomSqlTransformerConfigList(int index,
-            Map<String, String> inputParameterValueResult){
+            Map<String, String> inputParameterValueResult) {
         List<BaseConfig> list = new ArrayList<>();
 
         Map<String,Object> config = new HashMap<>();
-        config.put(INDEX,index+1);
+        config.put(INDEX,index + 1);
         config.put(SQL,ParameterUtils.convertParameterPlaceholders(inputParameterValueResult.get(STATISTICS_EXECUTE_SQL),inputParameterValueResult));
         config.put(OUTPUT_TABLE,inputParameterValueResult.get(SRC_TABLE));
         inputParameterValueResult.put(STATISTICS_TABLE,inputParameterValueResult.get(SRC_TABLE));
@@ -397,7 +397,7 @@ public class RuleParserUtils {
 
     public static List<DqRuleExecuteSql> getExecuteSqlListByType(
             List<DqRuleExecuteSql> allExecuteSqlList, ExecuteSqlType executeSqlType) {
-        if(CollectionUtils.isEmpty(allExecuteSqlList)){
+        if (CollectionUtils.isEmpty(allExecuteSqlList)) {
             return allExecuteSqlList;
         }
 
@@ -458,7 +458,7 @@ public class RuleParserUtils {
     public static BaseConfig getErrorOutputWriter(Map<String, String> inputParameterValueResult,
                                                  DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DqRuleExecuteSql errorOutputSql = null;
-        if(CollectionUtils.isEmpty(dataQualityTaskExecutionContext.getExecuteSqlList())) {
+        if (CollectionUtils.isEmpty(dataQualityTaskExecutionContext.getExecuteSqlList())) {
             return null;
         }
 
