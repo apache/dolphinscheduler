@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
-import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -61,7 +60,6 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -121,9 +119,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private ProjectService projectService;
 
     @Autowired
-    private TaskDefinitionService taskDefinitionService;
-
-    @Autowired
     private UserMapper userMapper;
 
     @Autowired
@@ -147,21 +142,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
-
-    @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private SchedulerService schedulerService;
-
-    @Autowired
-    private TenantMapper tenantMapper;
-
     /**
      * create process definition
      *
@@ -178,7 +158,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return create result code
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        long projectCode,
                                                        String name,
@@ -202,9 +182,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
             return result;
         }
-
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        createTaskDefinition(result, loginUser, projectCode, taskDefinitionLogs, taskDefinitionJson);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
         List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson);
+        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson, taskDefinitionLogs);
         if (checkRelationJson.get(Constants.STATUS) != Status.SUCCESS) {
             return checkRelationJson;
         }
@@ -214,8 +198,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.TENANT_NOT_EXIST);
             return result;
         }
-
-        taskDefinitionService.createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
 
         long processDefinitionCode;
         try {
@@ -227,16 +209,59 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
             globalParams, locations, timeout, loginUser.getId(), tenant.getId());
 
-        return createProcessDefine(loginUser, result, taskRelationList, processDefinition);
+        return createProcessDefine(loginUser, result, taskRelationList, processDefinition, taskDefinitionLogs);
+    }
+
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private SchedulerService schedulerService;
+
+    @Autowired
+    private TenantMapper tenantMapper;
+
+    private void createTaskDefinition(Map<String, Object> result,
+                                      User loginUser,
+                                      long projectCode,
+                                      List<TaskDefinitionLog> taskDefinitionLogs,
+                                      String taskDefinitionJson) {
+        if (taskDefinitionLogs.isEmpty()) {
+            logger.error("taskDefinitionJson invalid: {}", taskDefinitionJson);
+            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
+            return;
+        }
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
+                logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
+                putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
+                return;
+            }
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
+            if (taskDefinition != null) {
+                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
+                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
+                return;
+            }
+        }
+        if (processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+        }
     }
 
     private Map<String, Object> createProcessDefine(User loginUser,
                                                     Map<String, Object> result,
                                                     List<ProcessTaskRelationLog> taskRelationList,
-                                                    ProcessDefinition processDefinition) {
+                                                    ProcessDefinition processDefinition,
+                                                    List<TaskDefinitionLog> taskDefinitionLogs) {
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
         if (insertVersion > 0) {
-            int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion, taskRelationList);
+            int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs);
             if (insertResult > 0) {
                 putMsg(result, Status.SUCCESS);
                 // return processDefinitionCode
@@ -250,7 +275,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-    private Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson) {
+    private Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs) {
         Map<String, Object> result = new HashMap<>();
         try {
             if (taskRelationList == null || taskRelationList.isEmpty()) {
@@ -259,7 +284,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
 
-            List<TaskNode> taskNodeList = processService.transformTask(taskRelationList);
+            List<TaskNode> taskNodeList = processService.transformTask(taskRelationList, taskDefinitionLogs);
             if (taskNodeList.size() != taskRelationList.size()) {
                 Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode).collect(Collectors.toSet());
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
@@ -276,7 +301,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             // check whether the task relation json is normal
             for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
-                if (processTaskRelationLog.getPostTaskCode() == 0 || processTaskRelationLog.getPostTaskVersion() == 0) {
+                if (processTaskRelationLog.getPostTaskCode() == 0) {
                     logger.error("the post_task_code or post_task_version can't be zero");
                     putMsg(result, Status.CHECK_PROCESS_TASK_RELATION_ERROR);
                     return result;
@@ -419,7 +444,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param taskDefinitionJson taskDefinitionJson
      * @return update result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> updateProcessDefinition(User loginUser,
                                                        long projectCode,
@@ -439,8 +464,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        createTaskDefinition(result, loginUser, projectCode, taskDefinitionLogs, taskDefinitionJson);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
         List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson);
+        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson, taskDefinitionLogs);
         if (checkRelationJson.get(Constants.STATUS) != Status.SUCCESS) {
             return checkRelationJson;
         }
@@ -470,20 +500,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
-        taskDefinitionService.createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenant.getId());
-        return updateProcessDefine(loginUser, result, taskRelationList, processDefinition);
+        return updateProcessDefine(loginUser, result, taskRelationList, processDefinition, taskDefinitionLogs);
     }
 
     private Map<String, Object> updateProcessDefine(User loginUser,
                                                     Map<String, Object> result,
                                                     List<ProcessTaskRelationLog> taskRelationList,
-                                                    ProcessDefinition processDefinition) {
+                                                    ProcessDefinition processDefinition,
+                                                    List<TaskDefinitionLog> taskDefinitionLogs) {
         processDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
         if (insertVersion > 0) {
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
-                processDefinition.getCode(), insertVersion, taskRelationList);
+                processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs);
             if (insertResult > 0) {
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, processDefinition);
@@ -818,7 +848,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
         });
-        Map<String, Object> createProcessResult = createProcessDefine(loginUser, result, taskRelationList, processDefinition);
+        Map<String, Object> createProcessResult = createProcessDefine(loginUser, result, taskRelationList, processDefinition, null);
         if (Status.SUCCESS.equals(createProcessResult.get(Constants.STATUS))) {
             putMsg(createProcessResult, Status.SUCCESS);
         } else {
@@ -894,7 +924,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(processTaskRelationJson, ProcessTaskRelationLog.class);
             // Check whether the task node is normal
-            List<TaskNode> taskNodes = processService.transformTask(taskRelationList);
+            List<TaskNode> taskNodes = processService.transformTask(taskRelationList, Lists.newArrayList());
 
             if (CollectionUtils.isEmpty(taskNodes)) {
                 logger.error("process node info is empty");
@@ -1254,9 +1284,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
-                createProcessDefine(loginUser, result, taskRelationList, processDefinition);
+                createProcessDefine(loginUser, result, taskRelationList, processDefinition, Lists.newArrayList());
             } else {
-                updateProcessDefine(loginUser, result, taskRelationList, processDefinition);
+                updateProcessDefine(loginUser, result, taskRelationList, processDefinition, Lists.newArrayList());
             }
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
