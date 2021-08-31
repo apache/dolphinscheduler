@@ -46,10 +46,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -58,15 +55,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -427,6 +416,7 @@ public class MasterExecThread implements Runnable {
      */
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         MasterBaseTaskExecThread abstractExecThread = null;
+        logger.info("submit task to execute, task info:{}",taskInstance);
         if (taskInstance.isSubProcess()) {
             abstractExecThread = new SubProcessTaskExecThread(taskInstance);
         } else if (taskInstance.isDependTask()) {
@@ -436,6 +426,7 @@ public class MasterExecThread implements Runnable {
         } else {
             abstractExecThread = new MasterTaskExecThread(taskInstance);
         }
+        logger.info("submit task to execute, taskExecThread:{}",abstractExecThread);
         Future<Boolean> future = taskExecService.submit(abstractExecThread);
         activeTaskNode.putIfAbsent(abstractExecThread, future);
         return abstractExecThread.getTaskInstance();
@@ -515,6 +506,20 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setWorkerGroup(processWorkerGroup);
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
+            }
+
+            Long processEnvironmentCode = Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
+            Long taskEnvironmentCode = Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
+            if (!processEnvironmentCode.equals(-1L) && taskEnvironmentCode.equals(-1L)) {
+                taskInstance.setEnvironmentCode(processEnvironmentCode);
+            } else {
+                taskInstance.setEnvironmentCode(taskEnvironmentCode);
+            }
+            if (!taskInstance.getEnvironmentCode().equals(-1L)) {
+                Environment environment=processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
+                if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
+                    taskInstance.setEnvironmentConfig(environment.getConfig());
+                }
             }
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());

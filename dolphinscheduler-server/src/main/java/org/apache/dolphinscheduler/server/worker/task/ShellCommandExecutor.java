@@ -89,6 +89,8 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         logger.info("tenantCode user:{}, task dir:{}", taskExecutionContext.getTenantCode(),
                 taskExecutionContext.getTaskAppId());
 
+        logger.info("current environment config:{}",taskExecutionContext.getEnvironmentConfig());
+
         // create if non existence
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("create command file:{}", commandFile);

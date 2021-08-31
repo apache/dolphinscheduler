@@ -698,6 +698,9 @@ comment on column t_ds_process_instance.environment_code is 'environment code';
 ALTER TABLE t_ds_task_instance ADD COLUMN environment_code bigint DEFAULT NULL;
 comment on column t_ds_task_instance.environment_code is 'environment code';
 
+ALTER TABLE t_ds_task_instance ADD COLUMN environment_config text DEFAULT '';
+comment on column t_ds_task_instance.environment_config is 'environment config';
+
 --
 -- Table structure for table t_ds_environment_worker_group_relation
 --

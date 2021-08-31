@@ -157,9 +157,9 @@ public class TaskExecutionContext implements Serializable {
     private String envFile;
 
     /**
-     * envContent
+     * environmentConfig
      */
-    private String envConfigContent;
+    private String environmentConfig;
 
 
     /**
@@ -416,12 +416,12 @@ public class TaskExecutionContext implements Serializable {
         this.envFile = envFile;
     }
 
-    public String getEnvConfigContent(){
-        return envConfigContent;
+    public String getEnvironmentConfig(){
+        return environmentConfig;
     }
 
-    public void setEnvConfigContent(String content){
-        this.envConfigContent=content;
+    public void setEnvironmentConfig(String config){
+        this.environmentConfig = config;
     }
 
     public Map<String, String> getDefinedParams() {
@@ -566,6 +566,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", taskTimeoutStrategy=" + taskTimeoutStrategy
                 + ", taskTimeout=" + taskTimeout
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", delayTime=" + delayTime
                 + ", resources=" + resources
                 + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext

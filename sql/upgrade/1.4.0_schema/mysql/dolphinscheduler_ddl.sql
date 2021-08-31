@@ -659,6 +659,7 @@ ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` int(11) default NUL
 ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` int(11) default '' COMMENT 'environment config' AFTER `environment_code`;
 
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
