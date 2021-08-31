@@ -182,18 +182,14 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getLocalParametersMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
+        if (paramsMap == null) {
+            sqlBuilder.append(sql);
+            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }
         if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())){
             paramsMap.putAll(taskExecutionContext.getParamsMap());
         }
         // spell SQL according to the final user-defined variable
-        if(paramsMap.isEmpty()){
-            sqlBuilder.append(sql);
-            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
                     ParamUtils.convert(paramsMap));
