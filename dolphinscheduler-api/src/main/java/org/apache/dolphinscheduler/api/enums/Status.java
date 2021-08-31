@@ -276,6 +276,7 @@ public enum Status {
     DELETE_TASK_DEFINE_BY_CODE_ERROR(50042, "delete task definition by code error", "删除任务定义错误"),
     QUERY_DETAIL_OF_TASK_DEFINITION_ERROR(50043, "query detail of task definition error", "查询任务详细信息错误"),
     QUERY_TASK_DEFINITION_LIST_PAGING_ERROR(50044, "query task definition list paging error", "分页查询任务定义列表错误"),
+    TASK_DEFINITION_NAME_EXISTED(50045, "task definition name [{0}] already exists", "任务定义名称[{0}]已经存在"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
