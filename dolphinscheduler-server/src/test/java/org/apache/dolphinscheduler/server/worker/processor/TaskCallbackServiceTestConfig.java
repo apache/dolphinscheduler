@@ -18,11 +18,13 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
@@ -172,4 +174,13 @@ public class TaskCallbackServiceTestConfig {
         return Mockito.mock(DqRuleExecuteSqlMapper.class);
     }
 
+    @Bean
+    public DqComparisonTypeMapper dqComparisonTypeMapper() {
+        return Mockito.mock(DqComparisonTypeMapper.class);
+    }
+
+    @Bean
+    public SpringConnectionFactory springConnectionFactory() {
+        return Mockito.mock(SpringConnectionFactory.class);
+    }
 }
