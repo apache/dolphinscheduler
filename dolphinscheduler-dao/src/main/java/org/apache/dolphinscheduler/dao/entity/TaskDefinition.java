@@ -38,6 +38,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * task definition
@@ -89,6 +91,8 @@ public class TaskDefinition {
     /**
      * user defined parameters
      */
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String taskParams;
 
     /**
@@ -435,12 +439,6 @@ public class TaskDefinition {
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
             && Objects.equals(resourceIds, that.resourceIds);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, description, taskType, taskParams, flag, taskPriority, workerGroup, failRetryTimes,
-            failRetryInterval, timeoutFlag, timeoutNotifyStrategy, timeout, delayTime, resourceIds);
     }
 
     @Override
