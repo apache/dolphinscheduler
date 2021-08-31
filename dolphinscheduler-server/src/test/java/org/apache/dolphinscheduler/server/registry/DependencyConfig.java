@@ -212,5 +212,7 @@ public class DependencyConfig {
     }
 
     @Bean
-    public SpringConnectionFactory springConnectionFactory() {return Mockito.mock(SpringConnectionFactory.class);}
+    public SpringConnectionFactory springConnectionFactory() {
+        return Mockito.mock(SpringConnectionFactory.class);
+    }
 }
