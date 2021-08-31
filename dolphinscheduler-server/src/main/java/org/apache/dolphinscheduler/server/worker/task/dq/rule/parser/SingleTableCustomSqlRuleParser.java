@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.DataQualityConfiguration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +41,15 @@ public class SingleTableCustomSqlRuleParser implements IRuleParser {
                 RuleParserUtils.getReaderConfigList(inputParameterValue,context);
         RuleParserUtils.addStatisticsValueTableReaderConfig(readerConfigList,context);
 
-        List<BaseConfig> transformerConfigList = new ArrayList<>();
+        List<BaseConfig> transformerConfigList = RuleParserUtils
+                .getSingleTableCustomSqlTransformerConfigList(index,inputParameterValue);
 
         //replace the placeholder in execute sql list
         index = RuleParserUtils.replaceExecuteSqlPlaceholder(
-                                        context.getExecuteSqlList(),
-                                        index,
-                                        inputParameterValue,
-                transformerConfigList);
+                                    context.getExecuteSqlList(),
+                                    index,
+                                    inputParameterValue,
+                                    transformerConfigList);
 
         String writerSql = RuleManager.SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL;
         if (context.isCompareWithFixedValue()) {

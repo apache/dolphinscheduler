@@ -699,6 +699,6 @@ export default {
   'Comparison Minus Statistics': '比对值-统计值',
   'Statistics Minus Comparison': '统计值-比对值',
   'Statistics Comparison Percentage': '统计值/比对值',
-  'Alert': '告警',
-  'Block': '阻断'
+  Alert: '告警',
+  Block: '阻断'
 }

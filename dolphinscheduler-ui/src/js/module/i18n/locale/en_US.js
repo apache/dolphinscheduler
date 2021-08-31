@@ -694,10 +694,10 @@ export default {
   'Single Table Custom Sql': 'Single Table Custom Sql',
   'Multi Table Accuracy': 'Multi Table Accuracy',
   'Multi Table Comparison': 'Multi Table Comparison',
-  '(Comparison-Statistics)/Comparison Percentage':'(Comparison-Statistics)/Comparison Percentage',
+  '(Comparison-Statistics)/Comparison Percentage': '(Comparison-Statistics)/Comparison Percentage',
   'Comparison Minus Statistics': 'Comparison Minus Statistics',
   'Statistics Minus Comparison': 'Statistics Minus Comparison',
   'Statistics Comparison Percentage': 'Statistics Comparison Percentage',
-  'Alert': 'Alert',
-  'Block': 'Block'
+  Alert: 'Alert',
+  Block: 'Block'
 }

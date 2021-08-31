@@ -76,7 +76,7 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
         }
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getAllWriterConfigList(inputParameterValue,
-                context, index, transformerConfigList, writerSql,RuleManager.TASK_STATISTICS_VALUE_WRITER_SQL_2);
+                context, index, transformerConfigList, writerSql,RuleManager.TASK_STATISTICS_VALUE_WRITER_SQL);
 
         return new DataQualityConfiguration(
                 context.getRuleName(),

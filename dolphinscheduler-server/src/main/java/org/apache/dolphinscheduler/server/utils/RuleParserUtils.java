@@ -32,6 +32,8 @@ import static org.apache.dolphinscheduler.common.Constants.PATH;
 import static org.apache.dolphinscheduler.common.Constants.SQL;
 import static org.apache.dolphinscheduler.common.Constants.SRC_FILTER;
 import static org.apache.dolphinscheduler.common.Constants.SRC_TABLE;
+import static org.apache.dolphinscheduler.common.Constants.STATISTICS_EXECUTE_SQL;
+import static org.apache.dolphinscheduler.common.Constants.STATISTICS_TABLE;
 import static org.apache.dolphinscheduler.common.Constants.TABLE;
 import static org.apache.dolphinscheduler.common.Constants.TARGET_FILTER;
 import static org.apache.dolphinscheduler.common.Constants.TARGET_TABLE;
@@ -150,7 +152,7 @@ public class RuleParserUtils {
         checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
         checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
 
-        if (midExecuteSqlDefinitionList != null) {
+        if (CollectionUtils.isNotEmpty(midExecuteSqlDefinitionList)) {
             for (DqRuleExecuteSql executeSqlDefinition:midExecuteSqlDefinitionList) {
                 index = setTransformerConfig(
                         index,
@@ -160,12 +162,14 @@ public class RuleParserUtils {
             }
         }
 
-        for (DqRuleExecuteSql executeSqlDefinition:statisticsExecuteSqlDefinitionList) {
-            index = setTransformerConfig(
-                    index,
-                    inputParameterValueResult,
-                    transformerConfigList,
-                    executeSqlDefinition);
+        if (CollectionUtils.isNotEmpty(statisticsExecuteSqlDefinitionList)) {
+            for (DqRuleExecuteSql executeSqlDefinition:statisticsExecuteSqlDefinitionList) {
+                index = setTransformerConfig(
+                        index,
+                        inputParameterValueResult,
+                        transformerConfigList,
+                        executeSqlDefinition);
+            }
         }
 
         return index;
@@ -174,7 +178,7 @@ public class RuleParserUtils {
     private static int setTransformerConfig(int index,
                                      Map<String, String> inputParameterValueResult,
                                      List<BaseConfig> transformerConfigList,
-                                            DqRuleExecuteSql executeSqlDefinition) {
+                                     DqRuleExecuteSql executeSqlDefinition) {
         Map<String,Object> config = new HashMap<>();
         config.put(INDEX,index++);
         config.put(SQL,ParameterUtils.convertParameterPlaceholders(executeSqlDefinition.getSql(),inputParameterValueResult));
@@ -183,6 +187,20 @@ public class RuleParserUtils {
         BaseConfig transformerConfig = new BaseConfig(SQL,config);
         transformerConfigList.add(transformerConfig);
         return index;
+    }
+
+    public static List<BaseConfig> getSingleTableCustomSqlTransformerConfigList(int index,
+            Map<String, String> inputParameterValueResult){
+        List<BaseConfig> list = new ArrayList<>();
+
+        Map<String,Object> config = new HashMap<>();
+        config.put(INDEX,index+1);
+        config.put(SQL,ParameterUtils.convertParameterPlaceholders(inputParameterValueResult.get(STATISTICS_EXECUTE_SQL),inputParameterValueResult));
+        config.put(OUTPUT_TABLE,inputParameterValueResult.get(SRC_TABLE));
+        inputParameterValueResult.put(STATISTICS_TABLE,inputParameterValueResult.get(SRC_TABLE));
+        BaseConfig transformerConfig = new BaseConfig(SQL,config);
+        list.add(transformerConfig);
+        return  list;
     }
 
     private static String getCoalesceString(String table, String column) {
@@ -379,6 +397,10 @@ public class RuleParserUtils {
 
     public static List<DqRuleExecuteSql> getExecuteSqlListByType(
             List<DqRuleExecuteSql> allExecuteSqlList, ExecuteSqlType executeSqlType) {
+        if(CollectionUtils.isEmpty(allExecuteSqlList)){
+            return allExecuteSqlList;
+        }
+
         return allExecuteSqlList
                 .stream()
                 .filter(x -> x.getType() == executeSqlType)
@@ -386,7 +408,7 @@ public class RuleParserUtils {
     }
 
     private static void checkAndReplace(List<DqRuleExecuteSql> list, String checkValue, String replaceSrc) {
-        if (StringUtils.isEmpty(checkValue)) {
+        if (StringUtils.isEmpty(checkValue) && CollectionUtils.isNotEmpty(list)) {
             for (DqRuleExecuteSql executeSqlDefinition:list) {
                 String sql = executeSqlDefinition.getSql();
                 sql = sql.replace(replaceSrc,"");
@@ -436,6 +458,10 @@ public class RuleParserUtils {
     public static BaseConfig getErrorOutputWriter(Map<String, String> inputParameterValueResult,
                                                  DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DqRuleExecuteSql errorOutputSql = null;
+        if(CollectionUtils.isEmpty(dataQualityTaskExecutionContext.getExecuteSqlList())) {
+            return null;
+        }
+
         for (DqRuleExecuteSql executeSql : dataQualityTaskExecutionContext.getExecuteSqlList()) {
             if (executeSql.isErrorOutputSql()) {
                 errorOutputSql = executeSql;
@@ -445,7 +471,7 @@ public class RuleParserUtils {
 
         BaseConfig baseConfig = null;
         if (StringUtils.isNotEmpty(inputParameterValueResult.get(ERROR_OUTPUT_PATH))
-            && errorOutputSql != null) {
+                && errorOutputSql != null) {
             baseConfig = new BaseConfig();
             Map<String,Object> config = new HashMap<>();
             config.put(PATH,inputParameterValueResult.get(ERROR_OUTPUT_PATH));

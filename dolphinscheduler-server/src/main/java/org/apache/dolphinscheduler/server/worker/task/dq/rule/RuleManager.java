@@ -70,22 +70,9 @@ public class RuleManager {
 
     public static final String SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL =
                     BASE_SQL
-                    + "from ( ${statistics_execute_sql} ) tmp1 "
+                    + "from ( ${statistics_table} ) tmp1 "
                     + "join ${comparison_table}";
-
     public static final String TASK_STATISTICS_VALUE_WRITER_SQL =
-                    "select "
-                    + "${process_definition_id} as process_definition_id,"
-                    + "${task_definition_id} as task_definition_id,"
-                    + "${rule_id} as rule_id,"
-                    + "'${statistics_name}'AS statistics_name, "
-                    + "${statistics_name} AS statistics_value,"
-                    + "${data_time} as data_time,"
-                    + "${create_time} as create_time,"
-                    + "${update_time} as update_time "
-                    + "from ( ${statistics_execute_sql} ) tmp1 ";
-
-    public static final String TASK_STATISTICS_VALUE_WRITER_SQL_2 =
             "select "
                     + "${process_definition_id} as process_definition_id,"
                     + "${task_definition_id} as task_definition_id,"

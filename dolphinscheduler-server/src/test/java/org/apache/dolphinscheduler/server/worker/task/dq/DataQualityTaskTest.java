@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq;
 
+import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
 
 import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
@@ -74,13 +75,19 @@ public class DataQualityTaskTest {
             taskExecutionContext.setEnvFile(".dolphinscheduler_env.sh");
             taskExecutionContext.setStartTime(new Date());
             taskExecutionContext.setTaskTimeout(0);
-            taskExecutionContext.setTaskParams("{\"ruleId\":1,\"sparkParameters\":"
-                    + "{\"deployMode\":\"client\",\"localParams\":[],\"driverCores\":\"2\",\"driverMemory\":\"512M\","
-                    + "\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"others\":\"\"},"
-                    + "\"ruleInputParameter\":{\"src_connector_type\":1,\"src_datasource_id\":1,"
-                    + "\"src_table\":\"12\",\"src_filter\":\"23\",\"src_field\":\"123\",\"check_type\":\"0\",\"operator\":\"0\",\"threshold\":"
-                    + "\"123123\",\"failure_strategy\":\"0\",\"comparison_title\":\"表总行数\",\"writer_connector_type\":\"1\",\"writer_datasource_id\":1}}");
-            taskExecutionContext.setDataQualityTaskExecutionContext(getDataQualityTaskExecutionContext());
+            taskExecutionContext.setTaskParams("{\"ruleId\":10,"
+                    + "\"localParams\":[],"
+                    + "\"sparkParameters\":{\"deployMode\":\"cluster\",\"driverCores\":1,"
+                    + "\"driverMemory\":\"512M\",\"numExecutors\":2,"
+                    + "\"executorMemory\":\"2G\",\"executorCores\":2,"
+                    + "\"others\":\"--conf spark.yarn.maxAppAttempts=1 \"},"
+                    + "\"ruleInputParameter\":{\"src_connector_type\":0,"
+                    + "\"src_datasource_id\":2,\"src_table\":\"dqs_result\","
+                    + "\"src_filter\":null,\"check_type\":\"0\","
+                    + "\"operator\":\"3\",\"threshold\":\"1\","
+                    + "\"failure_strategy\":\"0\",\"comparison_type\":1,"
+                    + "\"comparison_name\":\"10\"}}");
+            taskExecutionContext.setDataQualityTaskExecutionContext(getSingleTableContext());
             DataQualityTask dataQualityTask = new DataQualityTask(taskExecutionContext, logger);
             dataQualityTask.init();
             dataQualityTask.buildCommand();
@@ -91,46 +98,58 @@ public class DataQualityTaskTest {
 
     @Test
     public void testSingleTable() throws Exception {
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = getDataQualityTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = getSingleTableContext();
 
         Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","date='2012-10-05'");
-        inputParameterValue.put("src_field","id");
-
-        inputParameterValue.put("rule_type","0");
-        inputParameterValue.put("rule_name","'空值检测'");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("check_type","1");
+        inputParameterValue.put("src_connector_type","0");
+        inputParameterValue.put("src_datasource_id","2");
+        inputParameterValue.put("src_table","src_result");
+        inputParameterValue.put("check_type","0");
+        inputParameterValue.put("operator","3");
         inputParameterValue.put("threshold","1");
-        inputParameterValue.put("create_time","'2020-01-01 10:00:00'");
-        inputParameterValue.put("update_time","'2020-01-01 10:00:00'");
+        inputParameterValue.put("failure_strategy","0");
+        inputParameterValue.put("comparison_type","1");
+        inputParameterValue.put("comparison_name","10");
+        inputParameterValue.put("rule_id","10");
+        inputParameterValue.put("rule_type","0");
+        inputParameterValue.put("rule_name","'表行数校验'");
+        inputParameterValue.put("create_time","'2021-08-12 10:15:48'");
+        inputParameterValue.put("update_time","'2021-08-12 10:15:48'");
+        inputParameterValue.put("process_definition_id","21");
+        inputParameterValue.put("process_instance_id","284");
+        inputParameterValue.put("task_instance_id","287");
+        inputParameterValue.put("task_definition_id","287");
+        inputParameterValue.put("data_time","'2021-08-12 10:15:48'");
+        inputParameterValue.put("error_output_path","hdfs://192.168.0.1:8022/user/ods/data_quality_error_data/21_284_287");
 
         RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
-        String expect = "{\"name\":\"空值检测\",\"connectors\":[{\"type\":\"JDBC\","
-                + "\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\","
-                + "\"user\":\"test\",\"table\":\"test1\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}}],"
-                + "\"writers\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\","
-                + "\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"dqs_result\","
-                + "\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\",\"sql\":\"SELECT 0 as rule_type,'空值检测' as rule_name,"
-                + "1 as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss_count.miss AS statistics_value, "
-                + "total_count.total AS comparison_value,1 as check_type,1 as threshold, 0 as operator, "
-                + "0 as failure_strategy, '2020-01-01 10:00:00' as create_time,"
-                + "'2020-01-01 10:00:00' as update_time from miss_count FULL JOIN total_count\"}}],"
-                + "\"executors\":[{\"index\":\"1\",\"execute.sql\":\"SELECT count(*) AS miss FROM test1 WHERE (id is null or id = '')"
-                + " AND (date='2012-10-05') \",\"table.alias\":\"miss_count\"},{\"index\":\"2\","
-                + "\"execute.sql\":\"SELECT COUNT(*) AS total FROM test1 WHERE (date='2012-10-05')\",\"table.alias\":\"total_count\"}]}";
+        String expect = "{\"name\":\"表行数校验\",\"env\":{\"type\":\"batch\",\"config\":null},"
+                + "\"readers\":[{\"type\":\"JDBC\",\"config\":"
+                + "{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\","
+                + "\"user\":\"test\",\"output_table\":\"test_src_result\",\"table\":\"src_result\","
+                + "\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}}],"
+                + "\"transformers\":[{\"type\":\"sql\",\"config\":{\"index\":1,"
+                + "\"output_table\":\"table_count\",\"sql\":\"SELECT COUNT(*) AS total FROM test_src_result \"}}],"
+                + "\"writers\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\","
+                + "\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"dqc_result\","
+                + "\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\","
+                + "\"sql\":\"select 0 as rule_type,'表行数校验' as rule_name,21 as process_definition_id,284 as process_instance_id,"
+                + "287 as task_instance_id,table_count.total AS statistics_value, 10 AS comparison_value,1 AS comparison_type,"
+                + "0 as check_type,1 as threshold, 3 as operator, 0 as failure_strategy, "
+                + "'hdfs://192.168.0.1:8022/user/ods/data_quality_error_data/21_284_287' as error_output_path, "
+                + "'2021-08-12 10:15:48' as create_time,'2021-08-12 10:15:48' as update_time from table_count \"}},"
+                + "{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\","
+                + "\"user\":\"test\",\"table\":\"dqc_statistics_value\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\","
+                + "\"sql\":\"select 21 as process_definition_id,287 as task_definition_id,10 as rule_id,'table_count.total'AS statistics_name, "
+                + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
+                + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
-    private DataQualityTaskExecutionContext getDataQualityTaskExecutionContext() {
+    private DataQualityTaskExecutionContext getSingleTableContext() {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
 
-        dataQualityTaskExecutionContext.setRuleName("空值检测");
+        dataQualityTaskExecutionContext.setRuleName("表行数校验");
         dataQualityTaskExecutionContext.setRuleType(RuleType.SINGLE_TABLE);
 
         List<DqRuleInputEntry> defaultInputEntryList = new ArrayList<>();
@@ -157,12 +176,11 @@ public class DataQualityTaskTest {
         srcDatasourceId.setCanEdit(true);
         srcDatasourceId.setShow(true);
         srcDatasourceId.setValue(null);
-        srcDatasourceId.setPlaceholder("${comparison_value}");
         srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID);
         srcDatasourceId.setInputType(InputType.DEFAULT);
         srcDatasourceId.setValueType(ValueType.NUMBER);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        srcDatasourceId.setCreateTime(new Date());
+        srcDatasourceId.setUpdateTime(new Date());
 
         DqRuleInputEntry srcTable = new DqRuleInputEntry();
         srcTable.setTitle("源数据表");
@@ -174,8 +192,8 @@ public class DataQualityTaskTest {
         srcTable.setOptionSourceType(OptionSourceType.DEFAULT);
         srcTable.setInputType(InputType.DEFAULT);
         srcTable.setValueType(ValueType.STRING);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        srcTable.setCreateTime(new Date());
+        srcTable.setUpdateTime(new Date());
 
         DqRuleInputEntry srcFilter = new DqRuleInputEntry();
         srcFilter.setTitle("源表过滤条件");
@@ -187,8 +205,8 @@ public class DataQualityTaskTest {
         srcFilter.setOptionSourceType(OptionSourceType.DEFAULT);
         srcFilter.setInputType(InputType.DEFAULT);
         srcFilter.setValueType(ValueType.LIKE_SQL);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        srcFilter.setCreateTime(new Date());
+        srcFilter.setUpdateTime(new Date());
 
         DqRuleInputEntry srcField = new DqRuleInputEntry();
         srcField.setTitle("检测列");
@@ -201,8 +219,8 @@ public class DataQualityTaskTest {
         srcField.setOptionSourceType(OptionSourceType.DEFAULT);
         srcField.setInputType(InputType.DEFAULT);
         srcField.setValueType(ValueType.STRING);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        srcField.setCreateTime(new Date());
+        srcField.setUpdateTime(new Date());
 
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
         statisticsName.setTitle("统计值");
@@ -210,13 +228,13 @@ public class DataQualityTaskTest {
         statisticsName.setType(FormType.INPUT);
         statisticsName.setCanEdit(false);
         statisticsName.setShow(false);
-        statisticsName.setValue("miss_count.miss");
+        statisticsName.setValue("table_count.total");
         statisticsName.setPlaceholder("${statistics_name}");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT);
         statisticsName.setInputType(InputType.STATISTICS);
         statisticsName.setValueType(ValueType.STRING);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        statisticsName.setCreateTime(new Date());
+        statisticsName.setUpdateTime(new Date());
 
         DqRuleInputEntry checkType = new DqRuleInputEntry();
         checkType.setTitle("检测方式");
@@ -225,13 +243,13 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"统计值与固定值比较\",\"value\":\"0\"},{\"label\":\"统计值与比对值比较\",\"value\":\"1\"},{\"label\":\"统计值占比对值百分比\",\"value\":\"2\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
         checkType.setPlaceholder("检测类型");
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        checkType.setCreateTime(new Date());
+        checkType.setUpdateTime(new Date());
 
         DqRuleInputEntry operator = new DqRuleInputEntry();
         operator.setTitle("操作符");
@@ -248,8 +266,8 @@ public class DataQualityTaskTest {
         operator.setInputType(InputType.CHECK);
         operator.setValueType(ValueType.STRING);
         operator.setPlaceholder("操作符");
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        operator.setCreateTime(new Date());
+        operator.setUpdateTime(new Date());
 
         DqRuleInputEntry threshold = new DqRuleInputEntry();
         threshold.setTitle("阈值");
@@ -260,8 +278,8 @@ public class DataQualityTaskTest {
         threshold.setPlaceholder("Please enter threshold, number is needed");
         threshold.setInputType(InputType.CHECK);
         threshold.setValueType(ValueType.NUMBER);
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        threshold.setCreateTime(new Date());
+        threshold.setUpdateTime(new Date());
 
         DqRuleInputEntry afterFailure = new DqRuleInputEntry();
         afterFailure.setTitle("失败策略");
@@ -270,13 +288,13 @@ public class DataQualityTaskTest {
         afterFailure.setCanEdit(true);
         afterFailure.setShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT);
-        afterFailure.setOptions("[{\"label\":\"结束\",\"value\":\"0\"},{\"label\":\"继续\",\"value\":\"1\"},{\"label\":\"结束并告警\",\"value\":\"2\"},{\"label\":\"继续并告警\",\"value\":\"3\"}]");
+        afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
         afterFailure.setInputType(InputType.CHECK);
         afterFailure.setValueType(ValueType.STRING);
         afterFailure.setPlaceholder("失败策略");
-        srcConnectorType.setCreateTime(new Date());
-        srcConnectorType.setUpdateTime(new Date());
+        afterFailure.setCreateTime(new Date());
+        afterFailure.setUpdateTime(new Date());
 
         defaultInputEntryList.add(checkType);
         defaultInputEntryList.add(operator);
@@ -290,55 +308,12 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(srcField);
         defaultInputEntryList.add(statisticsName);
 
-        DqRuleExecuteSql executeSqlDefinition2 = new DqRuleExecuteSql();
-        executeSqlDefinition2.setIndex(0);
-        executeSqlDefinition2.setSql("SELECT count(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter}) ");
-        executeSqlDefinition2.setTableAlias("miss_count");
-        executeSqlDefinition2.setType(ExecuteSqlType.STATISTICS);
-        dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition2);
-
         DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
         executeSqlDefinition3.setIndex(0);
         executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
-        executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition3.setTableAlias("table_count");
+        executeSqlDefinition3.setType(ExecuteSqlType.STATISTICS);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
-
-        DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
-        comparisonTitle.setTitle("比对值");
-        comparisonTitle.setField("comparison_title");
-        comparisonTitle.setType(FormType.INPUT);
-        comparisonTitle.setCanEdit(false);
-        comparisonTitle.setShow(true);
-        comparisonTitle.setValue("表总行数");
-        comparisonTitle.setPlaceholder("${comparison_title}");
-        comparisonTitle.setInputType(InputType.COMPARISON);
-        comparisonTitle.setValueType(ValueType.STRING);
-
-        DqRuleInputEntry comparisonValue = new DqRuleInputEntry();
-        comparisonValue.setTitle("比对值");
-        comparisonValue.setField("comparison_value");
-        comparisonValue.setType(FormType.INPUT);
-        comparisonValue.setCanEdit(false);
-        comparisonValue.setShow(false);
-        comparisonValue.setPlaceholder("${comparison_value}");
-        comparisonValue.setInputType(InputType.COMPARISON);
-        comparisonValue.setValueType(ValueType.NUMBER);
-
-        DqRuleInputEntry comparisonName = new DqRuleInputEntry();
-        comparisonName.setTitle("比对值名");
-        comparisonName.setField("comparison_name");
-        comparisonName.setType(FormType.INPUT);
-        comparisonName.setCanEdit(false);
-        comparisonName.setShow(false);
-        comparisonName.setValue("total_count.total");
-        comparisonName.setPlaceholder("${comparison_name}");
-        comparisonName.setInputType(InputType.COMPARISON);
-        comparisonName.setValueType(ValueType.STRING);
-
-        defaultInputEntryList.add(comparisonTitle);
-        defaultInputEntryList.add(comparisonValue);
-        defaultInputEntryList.add(comparisonName);
 
         dataQualityTaskExecutionContext.setRuleInputEntryList(defaultInputEntryList);
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
@@ -353,7 +328,7 @@ public class DataQualityTaskTest {
 
         dataQualityTaskExecutionContext.setWriterType(0);
         dataQualityTaskExecutionContext.setWriterConnectorType("JDBC");
-        dataQualityTaskExecutionContext.setWriterTable("dqs_result");
+        dataQualityTaskExecutionContext.setWriterTable("dqc_result");
         dataQualityTaskExecutionContext.setWriterConnectionParams(
                 "{\"address\":\"jdbc:mysql://localhost:3306\","
                         + "\"database\":\"test\","
@@ -361,6 +336,19 @@ public class DataQualityTaskTest {
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
                         + "\"other\":\"autoReconnect=true\"}");
+
+        dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
+        dataQualityTaskExecutionContext.setStatisticsValueType(0);
+        dataQualityTaskExecutionContext.setStatisticsValueTable("dqc_statistics_value");
+        dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(
+                "{\"address\":\"jdbc:mysql://localhost:3306\","
+                + "\"database\":\"test\","
+                + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                + "\"user\":\"test\","
+                + "\"password\":\"test\","
+                + "\"other\":\"autoReconnect=true\"}");
+
+        dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
         return dataQualityTaskExecutionContext;
     }
 
@@ -415,6 +403,17 @@ public class DataQualityTaskTest {
         srcConnectorType.setCreateTime(new Date());
         srcConnectorType.setUpdateTime(new Date());
 
+        DqRuleInputEntry srcFilter = new DqRuleInputEntry();
+        srcFilter.setTitle("源表过滤条件");
+        srcFilter.setField("src_filter");
+        srcFilter.setType(FormType.INPUT);
+        srcFilter.setCanEdit(true);
+        srcFilter.setShow(true);
+        srcFilter.setPlaceholder("Please enter source filter expression");
+        srcFilter.setOptionSourceType(OptionSourceType.DEFAULT);
+        srcFilter.setInputType(InputType.DEFAULT);
+        srcFilter.setValueType(ValueType.LIKE_SQL);
+
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
         statisticsName.setTitle("统计值名");
         statisticsName.setField("statistics_name");
@@ -436,17 +435,6 @@ public class DataQualityTaskTest {
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT);
         statisticsExecuteSql.setValueType(ValueType.LIKE_SQL);
 
-        DqRuleInputEntry srcFilter = new DqRuleInputEntry();
-        srcFilter.setTitle("源表过滤条件");
-        srcFilter.setField("src_filter");
-        srcFilter.setType(FormType.INPUT);
-        srcFilter.setCanEdit(true);
-        srcFilter.setShow(true);
-        srcFilter.setPlaceholder("Please enter source filter expression");
-        srcFilter.setOptionSourceType(OptionSourceType.DEFAULT);
-        srcFilter.setInputType(InputType.DEFAULT);
-        srcFilter.setValueType(ValueType.LIKE_SQL);
-
         DqRuleInputEntry checkType = new DqRuleInputEntry();
         checkType.setTitle("检测方式");
         checkType.setField("check_type");
@@ -454,7 +442,7 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"统计值与固定值比较\",\"value\":\"0\"},{\"label\":\"统计值与比对值比较\",\"value\":\"1\"},{\"label\":\"统计值占比对值百分比\",\"value\":\"2\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -493,7 +481,7 @@ public class DataQualityTaskTest {
         afterFailure.setCanEdit(true);
         afterFailure.setShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT);
-        afterFailure.setOptions("[{\"label\":\"结束\",\"value\":\"0\"},{\"label\":\"继续\",\"value\":\"1\"},{\"label\":\"结束并告警\",\"value\":\"2\"},{\"label\":\"继续并告警\",\"value\":\"3\"}]");
+        afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
         afterFailure.setInputType(InputType.CHECK);
         afterFailure.setValueType(ValueType.STRING);
@@ -510,57 +498,34 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(statisticsExecuteSql);
         defaultInputEntryList.add(srcFilter);
 
-        DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
-        executeSqlDefinition3.setIndex(0);
-        executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
-        executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
-        dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
-
-        DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
-        comparisonTitle.setTitle("比对值");
-        comparisonTitle.setField("comparison_title");
-        comparisonTitle.setType(FormType.INPUT);
-        comparisonTitle.setCanEdit(false);
-        comparisonTitle.setShow(true);
-        comparisonTitle.setValue("表总行数");
-        comparisonTitle.setPlaceholder("Please enter comparison title");
-        comparisonTitle.setInputType(InputType.COMPARISON);
-        comparisonTitle.setValueType(ValueType.STRING);
-
-        DqRuleInputEntry comparisonName = new DqRuleInputEntry();
-        comparisonName.setTitle("比对值名");
-        comparisonName.setField("comparison_name");
-        comparisonName.setType(FormType.INPUT);
-        comparisonName.setCanEdit(false);
-        comparisonName.setShow(false);
-        comparisonName.setValue("total_count.total");
-        comparisonName.setInputType(InputType.COMPARISON);
-        comparisonName.setValueType(ValueType.STRING);
-
-        defaultInputEntryList.add(comparisonTitle);
-        defaultInputEntryList.add(comparisonName);
-
         dataQualityTaskExecutionContext.setRuleInputEntryList(defaultInputEntryList);
 
         Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","date='2012-10-05'");
+        inputParameterValue.put("src_connector_type","0");
+        inputParameterValue.put("src_datasource_id","2");
+        inputParameterValue.put("src_table","person");
         inputParameterValue.put("statistics_name","miss");
-        inputParameterValue.put("statistics_execute_sql","select count(1) as miss from test1 where date='2012-10-05' and a=1 ");
-
+        inputParameterValue.put("statistics_execute_sql","select count(*) as miss from ${src_table} where (sex = null or sex='') and age=1");
+        inputParameterValue.put("src_filter","age=1");
+        inputParameterValue.put("check_type","2");
+        inputParameterValue.put("operator","3");
+        inputParameterValue.put("threshold","50");
+        inputParameterValue.put("failure_strategy","1");
+        inputParameterValue.put("comparison_type","1");
+        inputParameterValue.put("comparison_name","3");
+        inputParameterValue.put("rule_id","1");
         inputParameterValue.put("rule_type","1");
         inputParameterValue.put("rule_name","'自定义SQL'");
+        inputParameterValue.put("create_time","'2021-08-30 00:00:00'");
+        inputParameterValue.put("update_time","'2021-08-30 00:00:00'");
         inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
         inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1");
-        inputParameterValue.put("create_time","'2020-01-01 10:00:00'");
-        inputParameterValue.put("update_time","'2020-01-01 10:00:00'");
+        inputParameterValue.put("task_instance_id","1");
+        inputParameterValue.put("task_definition_id","1");
+        inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
+        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test2");
 
+        dataQualityTaskExecutionContext.setRuleInputEntryList(defaultInputEntryList);
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
         dataQualityTaskExecutionContext.setSourceConnectionParams(
@@ -568,34 +533,56 @@ public class DataQualityTaskTest {
                         + "\"database\":\"test\","
                         + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
                         + "\"user\":\"test\","
-                        + "\"password\":\"test\","
-                        + "\"other\":\"autoReconnect=true\"}");
+                        + "\"password\":\"test\"}");
 
-        dataQualityTaskExecutionContext.setWriterType(0);
+        dataQualityTaskExecutionContext.setWriterType(1);
         dataQualityTaskExecutionContext.setWriterConnectorType("JDBC");
-        dataQualityTaskExecutionContext.setWriterTable("dqs_result");
+        dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
         dataQualityTaskExecutionContext.setWriterConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\","
-                        + "\"database\":\"test\","
-                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                "{\"address\":\"jdbc:postgresql://localhost:5432\","
+                        + "\"database\":\"dolphinscheduler\","
+                        + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"autoReconnect=true\"}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+
+        dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
+        dataQualityTaskExecutionContext.setStatisticsValueType(1);
+        dataQualityTaskExecutionContext.setStatisticsValueTable("t_ds_dq_task_statistics_value");
+        dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(
+                "{\"address\":\"jdbc:postgresql://localhost:5432\","
+                        + "\"database\":\"dolphinscheduler\","
+                        + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\","
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+
+        dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
 
         RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
-        String expect = "{\"name\":\"自定义SQL\",\"connectors\":[{\"type\":\"JDBC\","
-                + "\"config\":{\"database\":\"test\",\"password\":\"test\","
-                + "\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\","
-                + "\"table\":\"test1\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}}],"
-                + "\"writers\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":"
-                + "\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\","
-                + "\"table\":\"dqs_result\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\","
-                + "\"sql\":\"SELECT 1 as rule_type,'自定义SQL' as rule_name,1 as process_definition_id,1 as"
-                + " process_instance_id,1 as task_instance_id,miss AS statistics_value, total_count.total AS "
-                + "comparison_value,1 as check_type,1 as threshold, 0 as operator, 0 as failure_strategy, '2020-01-01 10:00:00' "
-                + "as create_time,'2020-01-01 10:00:00' as update_time from ( select count(1) as miss from test1 where date='2012-10-05' "
-                + "and a=1  ) tmp1 join total_count\"}}],\"executors\":[{\"index\":\"1\",\"execute.sql\":\"SELECT COUNT(*) AS total FROM "
-                + "test1 WHERE (date='2012-10-05')\",\"table.alias\":\"total_count\"}]}";
+        String expect = "{\"name\":\"自定义SQL\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\":[{\"type\":\"JDBC\","
+                + "\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":"
+                + "\"test\",\"output_table\":\"test_person\",\"table\":\"person\",\"url\":"
+                + "\"jdbc:mysql://localhost:3306/test\"}}],\"transformers\":[{\"type\":\"sql\",\"config\":"
+                + "{\"index\":2,\"output_table\":\"test_person\",\"sql\":\"select count(*) as "
+                + "miss from test_person where (sex = null or sex='') and age=1\"}}],\"writers\":"
+                + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":"
+                + "\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
+                + "\"t_ds_dq_execute_result\",\"url\":"
+                + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding"
+                + "=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as rule_type,'自定义SQL' as rule_name,1 "
+                + "as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss AS "
+                + "statistics_value, 3 AS comparison_value,1 AS comparison_type,2 as check_type,50 as "
+                + "threshold, 3 as operator, 1 as failure_strategy, 'hdfs://localhost:8022/user/ods/"
+                + "data_quality_error_data/1_1_test2' as error_output_path, '2021-08-30 00:00:00' as "
+                + "create_time,'2021-08-30 00:00:00' as update_time from ( test_person ) tmp1 \"}},"
+                + "{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":\"test\",\"driver\":"
+                + "\"org.postgresql.Driver\",\"user\":\"test\",\"table\":\"t_ds_dq_task_statistics_value\",\"url\":"
+                + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding="
+                + "UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as "
+                + "task_definition_id,1 as rule_id,'miss'AS statistics_name, miss AS statistics_value,"
+                + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
+                + "as update_time from test_person\"}}]}";
 
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
@@ -735,7 +722,7 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"统计值与固定值比较\",\"value\":\"0\"},{\"label\":\"统计值与比对值比较\",\"value\":\"1\"},{\"label\":\"统计值占比对值百分比\",\"value\":\"2\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -774,7 +761,7 @@ public class DataQualityTaskTest {
         afterFailure.setCanEdit(true);
         afterFailure.setShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT);
-        afterFailure.setOptions("[{\"label\":\"结束\",\"value\":\"0\"},{\"label\":\"继续\",\"value\":\"1\"},{\"label\":\"结束并告警\",\"value\":\"2\"},{\"label\":\"继续并告警\",\"value\":\"3\"}]");
+        afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
         afterFailure.setInputType(InputType.CHECK);
         afterFailure.setValueType(ValueType.STRING);
@@ -800,60 +787,80 @@ public class DataQualityTaskTest {
         dataQualityTaskExecutionContext.setRuleInputEntryList(defaultInputEntryList);
 
         Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
+        inputParameterValue.put("src_connector_type","0");
+        inputParameterValue.put("src_datasource_id","2");
         inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("statistics_name","count1");
-        inputParameterValue.put("statistics_execute_sql","select count(1) as count1 from test.test1");
-
-        inputParameterValue.put("target_connector_type","HIVE");
-        inputParameterValue.put("target_datasource_id","1");
+        inputParameterValue.put("statistics_name","src");
+        inputParameterValue.put("statistics_execute_sql","select count(*) as src from ${src_table} where c1>20");
+        inputParameterValue.put("target_connector_type","2");
+        inputParameterValue.put("target_datasource_id","3");
         inputParameterValue.put("target_table","test1_1");
-        inputParameterValue.put("comparison_name","count2");
-        inputParameterValue.put("comparison_execute_sql","select count(1) as count2 from default.test1_1");
-
+        inputParameterValue.put("comparison_name","target");
+        inputParameterValue.put("comparison_execute_sql","select count(*) as target from ${target_table} where c1>20");
+        inputParameterValue.put("check_type","1");
+        inputParameterValue.put("operator","3");
+        inputParameterValue.put("threshold","2");
+        inputParameterValue.put("failure_strategy","0");
+        inputParameterValue.put("rule_id","4");
         inputParameterValue.put("rule_type","3");
         inputParameterValue.put("rule_name","'跨表值比对'");
+        inputParameterValue.put("create_time","'2021-08-25 00:00:00'");
+        inputParameterValue.put("update_time","'2021-08-25 00:00:00'");
         inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
         inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1");
-        inputParameterValue.put("create_time","'2020-01-01 10:00:00'");
-        inputParameterValue.put("update_time","'2020-01-01 10:00:00'");
+        inputParameterValue.put("task_instance_id","1");
+        inputParameterValue.put("task_definition_id","1");
+        inputParameterValue.put("data_time","'2021-08-25 00:00:00'");
+        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_1");
 
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
         dataQualityTaskExecutionContext.setSourceConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"test\","
-                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\",\"user\":\"test\",\"password\":\"test\",\"other\":"
-                        + "\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:mysql://localhost:3306\","
+                        + "\"database\":\"test\","
+                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\"}");
 
         dataQualityTaskExecutionContext.setTargetConnectorType("HIVE");
         dataQualityTaskExecutionContext.setTargetType(2);
         dataQualityTaskExecutionContext.setTargetConnectionParams(
-                "{\"address\":\"jdbc:hive2://localhost:10000\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\","
-                        + "\"user\":\"test\",\"password\":\"test\",\"other\":\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:hive2://localhost:10000\","
+                        + "\"database\":\"default\","
+                        + "\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\"}");
 
-        dataQualityTaskExecutionContext.setWriterType(0);
+        dataQualityTaskExecutionContext.setWriterType(1);
         dataQualityTaskExecutionContext.setWriterConnectorType("JDBC");
-        dataQualityTaskExecutionContext.setWriterTable("dqs_result");
+        dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
         dataQualityTaskExecutionContext.setWriterConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
-                        + "\"user\":\"test\",\"password\":\"test\",\"other\":\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:postgresql://localhost:5432\","
+                        + "\"database\":\"dolphinscheduler\","
+                        + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\","
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
-        String expect = "{\"name\":\"跨表值比对\",\"connectors\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\","
-                + "\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"test1\",\"url\":"
-                + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}},{\"type\":\"HIVE\",\"config\":{\"database\":"
-                + "\"default\",\"password\":\"test\",\"driver\":\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\","
-                + "\"table\":\"test1_1\",\"url\":\"jdbc:hive2://localhost:10000/default;autoReconnect=true\"}}],\"writers\":"
-                + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
-                + "\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"dqs_result\",\"url\":"
-                + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\",\"sql\":\"SELECT 3 as rule_type,'跨表值比对'"
-                + " as rule_name,1 as process_definition_id,1 as process_instance_id,1 as task_instance_id,count1 AS statistics_value, "
-                + "count2 AS comparison_value,1 as check_type,1 as threshold, 0 as operator, 0 as failure_strategy, '2020-01-01 10:00:00' as "
-                + "create_time,'2020-01-01 10:00:00' as update_time from ( select count(1) as count1 from test.test1 ) tmp1 join "
-                + "( select count(1) as count2 from default.test1_1 ) tmp2 \"}}],\"executors\":[]}";
+        String expect = "{\"name\":\"跨表值比对\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\""
+                + ":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
+                + "\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"output_table\":\"test_test1\",\"table\":"
+                + "\"test1\",\"url\":\"jdbc:mysql://localhost:3306/test\"}},{\"type\":\"HIVE\",\"config\":"
+                + "{\"database\":\"default\",\"password\":\"test\",\"driver\":\"org.apache.hive.jdbc.HiveDriver\",\"user\":"
+                + "\"test\",\"output_table\":\"default_test1_1\",\"table\":\"test1_1\",\"url\":"
+                + "\"jdbc:hive2://localhost:10000/default\"}}],\"transformers\":[],\"writers\":"
+                + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":"
+                + "\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
+                + "\"t_ds_dq_execute_result\",\"url\":"
+                + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\","
+                + "\"sql\":\"select 3 as rule_type,'跨表值比对' as rule_name,"
+                + "1 as process_definition_id,1 as process_instance_id,1 as task_instance_id,src AS statistics_value, "
+                + "target AS comparison_value,0 AS comparison_type,1 as check_type,2 as threshold, 3 as operator, "
+                + "0 as failure_strategy, 'hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_1' "
+                + "as error_output_path, '2021-08-25 00:00:00' as create_time,'2021-08-25 00:00:00' as update_time "
+                + "from ( select count(*) as src from test_test1 where c1>20 ) tmp1 join ( select count(*) as target from default_test1_1 "
+                + "where c1>20 ) tmp2\"}}]}";
+
         RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
@@ -993,13 +1000,21 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(mappingColumns);
         defaultInputEntryList.add(statisticsName);
 
+        DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
+        executeSqlDefinition3.setIndex(0);
+        executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
+        executeSqlDefinition3.setTableAlias("total_count");
+        executeSqlDefinition3.setType(ExecuteSqlType.MIDDLE);
+        dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
+
         DqRuleExecuteSql executeSqlDefinition1 = new DqRuleExecuteSql();
         executeSqlDefinition1.setIndex(0);
-        executeSqlDefinition1.setSql("SELECT * FROM (SELECT * FROM ${src_table} WHERE (${src_filter})) "
+        executeSqlDefinition1.setSql("SELECT ${src_table}.* FROM (SELECT * FROM ${src_table} WHERE (${src_filter})) "
                 + "${src_table} LEFT JOIN (SELECT * FROM ${target_table} WHERE (${target_filter})) "
                 + "${target_table} ON ${on_clause} WHERE ${where_clause}");
         executeSqlDefinition1.setTableAlias("miss_items");
         executeSqlDefinition1.setType(ExecuteSqlType.MIDDLE);
+        executeSqlDefinition1.setErrorOutputSql(true);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition1);
 
         DqRuleExecuteSql executeSqlDefinition2 = new DqRuleExecuteSql();
@@ -1008,13 +1023,6 @@ public class DataQualityTaskTest {
         executeSqlDefinition2.setTableAlias("miss_count");
         executeSqlDefinition2.setType(ExecuteSqlType.STATISTICS);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition2);
-
-        DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
-        executeSqlDefinition3.setIndex(0);
-        executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${target_table} WHERE (${target_filter})");
-        executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
-        dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
 
         DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
         comparisonTitle.setTitle("比对值");
@@ -1034,6 +1042,10 @@ public class DataQualityTaskTest {
         comparisonName.setValue("total_count.total");
         comparisonName.setPlaceholder("${comparison_name}");
 
+        DqRuleInputEntry comparisonTable = new DqRuleInputEntry();
+        comparisonTable.setField(COMPARISON_TABLE);
+        comparisonTable.setValue("total_count");
+
         DqRuleInputEntry checkType = new DqRuleInputEntry();
         checkType.setTitle("检测方式");
         checkType.setField("check_type");
@@ -1041,7 +1053,7 @@ public class DataQualityTaskTest {
         checkType.setCanEdit(true);
         checkType.setShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT);
-        checkType.setOptions("[{\"label\":\"统计值与固定值比较\",\"value\":\"0\"},{\"label\":\"统计值与比对值比较\",\"value\":\"1\"},{\"label\":\"统计值占比对值百分比\",\"value\":\"2\"}]");
+        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK);
         checkType.setValueType(ValueType.STRING);
@@ -1079,7 +1091,7 @@ public class DataQualityTaskTest {
         afterFailure.setCanEdit(true);
         afterFailure.setShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT);
-        afterFailure.setOptions("[{\"label\":\"结束\",\"value\":\"0\"},{\"label\":\"继续\",\"value\":\"1\"},{\"label\":\"结束并告警\",\"value\":\"2\"},{\"label\":\"继续并告警\",\"value\":\"3\"}]");
+        afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
         afterFailure.setInputType(InputType.CHECK);
         afterFailure.setValueType(ValueType.STRING);
@@ -1091,72 +1103,111 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(afterFailure);
         defaultInputEntryList.add(comparisonTitle);
         defaultInputEntryList.add(comparisonName);
+        defaultInputEntryList.add(comparisonTable);
 
         dataQualityTaskExecutionContext.setRuleInputEntryList(defaultInputEntryList);
 
         Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","a=0");
-
-        inputParameterValue.put("target_connector_type","HIVE");
-        inputParameterValue.put("target_datasource_id","1");
-        inputParameterValue.put("target_table","test1_1");
-        inputParameterValue.put("target_filter","b=1");
-
-        inputParameterValue.put("mapping_columns","[{\"src_field\":\"id\",\"operator\":\"=\",\"target_field\":\"id\"},{\"src_field\":\"company\",\"operator\":\"=\",\"target_field\":\"company\"}]");
-
+        inputParameterValue.put("src_connector_type","0");
+        inputParameterValue.put("src_datasource_id","2");
+        inputParameterValue.put("src_table","demo_src");
+        inputParameterValue.put("src_filter","age<100");
+        inputParameterValue.put("target_connector_type","2");
+        inputParameterValue.put("target_datasource_id","3");
+        inputParameterValue.put("target_table","demo_src");
+        inputParameterValue.put("target_filter","age<100");
+        inputParameterValue.put("mapping_columns","[{\"src_field\":\"hour\",\"operator\":\"=\",\"target_field\":\"hour\"}]");
+        inputParameterValue.put("check_type","2");
+        inputParameterValue.put("operator","3");
+        inputParameterValue.put("threshold","3");
+        inputParameterValue.put("failure_strategy","0");
+        inputParameterValue.put("comparison_type","7");
+        inputParameterValue.put("rule_id","3");
         inputParameterValue.put("rule_type","2");
         inputParameterValue.put("rule_name","'跨表准确性'");
+        inputParameterValue.put("create_time","'2021-08-30 00:00:00'");
+        inputParameterValue.put("update_time","'2021-08-30 00:00:00'");
         inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
         inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1");
-        inputParameterValue.put("create_time","'2020-01-01 10:00:00'");
-        inputParameterValue.put("update_time","'2020-01-01 10:00:00'");
+        inputParameterValue.put("task_instance_id","1");
+        inputParameterValue.put("task_definition_id","1");
+        inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
+        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
 
+//        dataQualityTaskExecutionContext.setHdfsPath("hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
         dataQualityTaskExecutionContext.setSourceConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"test\",\"jdbcUrl\":"
-                        + "\"jdbc:mysql://localhost:3306/test\",\"user\":\"test\",\"password\":\"test\",\"other\":\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:mysql://localhost:3306\","
+                        + "\"database\":\"test\","
+                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\"}");
 
         dataQualityTaskExecutionContext.setTargetConnectorType("HIVE");
         dataQualityTaskExecutionContext.setTargetType(2);
         dataQualityTaskExecutionContext.setTargetConnectionParams(
-                "{\"address\":\"jdbc:hive2://localhost:10000\",\"database\":\"default\","
-                        + "\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\",\"user\":\"test\",\"password\":\"test\","
-                        + "\"other\":\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:hive2://localhost:10000\","
+                        + "\"database\":\"default\","
+                        + "\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\"}");
 
-        dataQualityTaskExecutionContext.setWriterType(0);
+        dataQualityTaskExecutionContext.setWriterType(1);
         dataQualityTaskExecutionContext.setWriterConnectorType("JDBC");
-        dataQualityTaskExecutionContext.setWriterTable("dqs_result");
+        dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
         dataQualityTaskExecutionContext.setWriterConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
-                        + "\"user\":\"test\",\"password\":\"test\",\"other\":\"autoReconnect=true\"}");
+                "{\"address\":\"jdbc:postgresql://localhost:5432\","
+                        + "\"database\":\"dolphinscheduler\","
+                        + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\","
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+
+        dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
+        dataQualityTaskExecutionContext.setStatisticsValueType(1);
+        dataQualityTaskExecutionContext.setStatisticsValueTable("t_ds_dq_task_statistics_value");
+        dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(
+                "{\"address\":\"jdbc:postgresql://localhost:5432\","
+                        + "\"database\":\"dolphinscheduler\","
+                        + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\","
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+
 
         dataQualityTaskExecutionContext.setRuleName("跨表准确性");
         dataQualityTaskExecutionContext.setRuleType(RuleType.MULTI_TABLE_ACCURACY);
 
-        String expect = "{\"name\":\"跨表准确性\",\"connectors\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":"
-                + "\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"test1\",\"url\":"
-                + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}},{\"type\":\"HIVE\","
-                + "\"config\":{\"database\":\"default\",\"password\":\"test\",\"driver\":"
-                + "\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\",\"table\":\"test1_1\",\"url\":"
-                + "\"jdbc:hive2://localhost:10000/default;autoReconnect=true\"}}],\"writers\":[{\"type\":\"JDBC\",\"config\":"
-                + "{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":"
-                + "\"dqs_result\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\",\"sql\":\"SELECT 2 as rule_type,"
-                + "'跨表准确性' as rule_name,1 as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss_count.miss "
-                + "AS statistics_value, total_count.total AS comparison_value,1 as check_type,1 as threshold, 0 as operator, 0 as failure_strategy,"
-                + " '2020-01-01 10:00:00' as create_time,'2020-01-01 10:00:00' as update_time from miss_count FULL JOIN total_count\"}}],"
-                + "\"executors\":[{\"index\":\"1\",\"execute.sql\":\"SELECT * FROM (SELECT * FROM test1 WHERE (a=0)) test1 LEFT JOIN"
-                + " (SELECT * FROM test1_1 WHERE (b=1)) test1_1 ON coalesce(test1.id, '') = coalesce(test1_1.id, '') AND coalesce(test1.company, '')"
-                + " = coalesce(test1_1.company, '') WHERE ( NOT (test1.id IS NULL AND test1.company IS NULL )) AND "
-                + "( test1_1.id IS NULL AND test1_1.company IS NULL )\",\"table.alias\":\"miss_items\"},{\"index\":\"2\",\"execute.sql\":"
-                + "\"SELECT COUNT(*) AS miss FROM miss_items\",\"table.alias\":\"miss_count\"},{\"index\":\"3\",\"execute.sql\":"
-                + "\"SELECT COUNT(*) AS total FROM test1_1 WHERE (b=1)\",\"table.alias\":\"total_count\"}]}";
+        String expect = "{\"name\":\"跨表准确性\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\":"
+                + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
+                + "\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"output_table\":\"test_demo_src\",\"table\":"
+                + "\"demo_src\",\"url\":\"jdbc:mysql://localhost:3306/test\"}},{\"type\":\"HIVE\",\"config\":"
+                + "{\"database\":\"default\",\"password\":\"test\",\"driver\":"
+                + "\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\",\"output_table\":\"default_demo_src\",\"table\":"
+                + "\"demo_src\",\"url\":\"jdbc:hive2://localhost:10000/default\"}}],\"transformers\":"
+                + "[{\"type\":\"sql\",\"config\":{\"index\":1,\"output_table\":\"total_count\","
+                + "\"sql\":\"SELECT COUNT(*) AS total FROM test_demo_src WHERE (age<100)\"}},"
+                + "{\"type\":\"sql\",\"config\":{\"index\":2,\"output_table\":\"miss_items\",\"sql\":"
+                + "\"SELECT test_demo_src.* FROM (SELECT * FROM test_demo_src WHERE (age<100)) "
+                + "test_demo_src LEFT JOIN (SELECT * FROM default_demo_src WHERE (age<100)) default_demo_src ON coalesce(test_demo_src.hour, '') ="
+                + " coalesce(default_demo_src.hour, '') WHERE ( NOT (test_demo_src.hour IS NULL )) AND "
+                + "( default_demo_src.hour IS NULL )\"}},{\"type\":\"sql\",\"config\":{\"index\":3,\"output_table\":\"miss_count\","
+                + "\"sql\":\"SELECT COUNT(*) AS miss FROM miss_items\"}}],\"writers\":[{\"type\":\"JDBC\",\"config\":"
+                + "{\"database\":\"dolphinscheduler\",\"password\":\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
+                + "\"t_ds_dq_execute_result\",\"url\":\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified"
+                + "&characterEncoding=UTF-8&allowMultiQueries=true\",\"sql\":\"select 2 as rule_type,'跨表准确性' as rule_name,1 as process_definition_id,"
+                + "1 as process_instance_id,1 as task_instance_id,miss_count.miss AS statistics_value, total_count.total AS comparison_value,"
+                + "7 AS comparison_type,2 as check_type,3 as threshold, 3 as operator, 0 as failure_strategy, "
+                + "'hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test' as error_output_path, "
+                + "'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' as update_time from miss_count"
+                + " full join total_count\"}},{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\","
+                + "\"password\":\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
+                + "\"t_ds_dq_task_statistics_value\",\"url\":\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified"
+                + "&characterEncoding=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as task_definition_id,"
+                + "3 as rule_id,'miss_count.miss'AS statistics_name, miss_count.miss AS statistics_value,'2021-08-30 00:00:00' as data_time,"
+                + "'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' as update_time from miss_count\"}},{\"type\":\"hdfs_file\","
+                + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 
         RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));

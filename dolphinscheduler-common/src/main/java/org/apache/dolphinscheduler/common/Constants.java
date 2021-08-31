@@ -207,6 +207,10 @@ public final class Constants {
 
 
     /**
+     * dot .
+     */
+    public static final String DOT = ".";
+    /**
      * comma ,
      */
     public static final String COMMA = ",";
