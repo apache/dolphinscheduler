@@ -33,6 +33,7 @@ import org.apache.curator.test.TestingServer;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.sql.DataSource;
 
@@ -70,6 +71,15 @@ public class StandaloneServer {
 
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
+
+        final Path registryPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
+        ).toAbsolutePath();
+        if (Files.exists(registryPath)) {
+            System.setProperty("registry.plugin.binding", registryPath.toString());
+            System.setProperty("registry.plugin.dir", "");
+        }
 
         Thread.currentThread().setName("Standalone-Server");
 
