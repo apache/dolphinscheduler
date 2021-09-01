@@ -40,6 +40,8 @@
         <module>dolphinscheduler-task-datax</module>
         <module>dolphinscheduler-task-mr</module>
         <module>dolphinscheduler-task-procedure</module>
+        <module>dolphinscheduler-task-tis</module>
+
     </modules>
 
 
