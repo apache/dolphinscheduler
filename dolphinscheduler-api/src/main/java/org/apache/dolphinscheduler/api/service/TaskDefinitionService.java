@@ -91,16 +91,16 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user info to check auth
      * @param projectCode project code
+     * @param taskCode task definition code
      * @param pageNo page number
      * @param pageSize page size
-     * @param taskCode task definition code
      * @return the pagination task definition versions info of the certain task definition
      */
-    Map<String, Object> queryTaskDefinitionVersions(User loginUser,
-                                                    long projectCode,
-                                                    int pageNo,
-                                                    int pageSize,
-                                                    long taskCode);
+    Result queryTaskDefinitionVersions(User loginUser,
+                                       long projectCode,
+                                       long taskCode,
+                                       int pageNo,
+                                       int pageSize);
 
     /**
      * delete the certain task definition version by version and code
@@ -133,24 +133,6 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param searchVal search value
-     * @param userId user id
-     * @param pageNo page number
-     * @param pageSize page size
-     * @return task definition page
-     */
-    Result queryTaskDefinitionListPaging(User loginUser,
-                                         long projectCode,
-                                         String searchVal,
-                                         Integer userId,
-                                         Integer pageNo,
-                                         Integer pageSize);
-
-    /**
-     * query task definition list paging
-     *
-     * @param loginUser login user
-     * @param projectCode project code
      * @param taskType taskType
      * @param searchVal search value
      * @param userId user id
@@ -158,7 +140,7 @@ public interface TaskDefinitionService {
      * @param pageSize page size
      * @return task definition page
      */
-    Result queryTaskDefinitionByTaskType(User loginUser,
+    Result queryTaskDefinitionListPaging(User loginUser,
                                          long projectCode,
                                          String taskType,
                                          String searchVal,

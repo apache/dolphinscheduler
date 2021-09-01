@@ -70,6 +70,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryInterval(taskDefinition.getFailRetryInterval());
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
+        this.setModifyBy(taskDefinition.getModifyBy());
     }
 
     public int getOperator() {
