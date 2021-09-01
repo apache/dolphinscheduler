@@ -707,7 +707,7 @@ export default {
   'Environment Worker Group': 'Worker Groups',
   'Please enter environment config': 'Please enter environment config',
   'Please enter environment desc': 'Please enter environment desc',
-  'Please select worker groups': 'Please select worker groups'
+  'Please select worker groups': 'Please select worker groups',
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty'
 }

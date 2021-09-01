@@ -706,7 +706,7 @@ export default {
   'Environment Worker Group': 'Worker组',
   'Please enter environment config': '请输入环境配置信息',
   'Please enter environment desc': '请输入详细描述',
-  'Please select worker groups': '请选择Worker分组'
+  'Please select worker groups': '请选择Worker分组',
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空'
 }
