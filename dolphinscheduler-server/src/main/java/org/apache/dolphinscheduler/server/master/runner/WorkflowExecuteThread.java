@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -57,6 +58,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.ProcessHostUpdateCommand;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
@@ -96,6 +100,7 @@ public class WorkflowExecuteThread implements Runnable {
      * logger of WorkflowExecuteThread
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThread.class);
+    public static final long SEND_ASYNC_TIMEOUT_MILLIS = 10L * 1000L;
     /**
      * runing TaskNode
      */
@@ -586,9 +591,7 @@ public class WorkflowExecuteThread implements Runnable {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             if(taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION &&
                     taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)){
-
-                notifyProcessHostUpdate();
-
+                notifyProcessHostUpdate(taskInstance);
             }
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
             if (submit) {
@@ -621,10 +624,22 @@ public class WorkflowExecuteThread implements Runnable {
         }
     }
 
-    private void notifyProcessHostUpdate() {
+    private void notifyProcessHostUpdate(TaskInstance taskInstance) {
         //TODO...
 
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            return;
+        }
 
+        try {
+            ProcessHostUpdateCommand processHostUpdateCommand = new ProcessHostUpdateCommand();
+            processHostUpdateCommand.setProcessHost(NetUtils.getAddr(masterConfig.getListenPort()));
+            processHostUpdateCommand.setTaskInstanceId(taskInstance.getId());
+            Host host = new Host(taskInstance.getHost());
+            nettyRemotingClient.sendSync(host, processHostUpdateCommand.convert2Command(), SEND_ASYNC_TIMEOUT_MILLIS);
+        } catch (Exception e) {
+            logger.error("notify process host update", e);
+        }
     }
 
     private void addTimeoutCheck(TaskInstance taskInstance) {
