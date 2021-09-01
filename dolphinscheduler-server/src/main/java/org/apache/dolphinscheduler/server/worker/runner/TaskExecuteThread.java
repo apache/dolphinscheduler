@@ -37,10 +37,6 @@ import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCache
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-<<<<<<< HEAD
-=======
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
->>>>>>> task-plugin
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
