@@ -111,87 +111,28 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return result;
         }
-        int totalSuccessNumber = 0;
-        List<Long> totalSuccessCode = new ArrayList<>();
-        Date now = new Date();
-        List<TaskDefinitionLog> newTaskDefinitionLogs = new ArrayList<>();
-        List<TaskDefinitionLog> updateTaskDefinitionLogs = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
                 logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
             }
-            taskDefinitionLog.setProjectCode(projectCode);
-            taskDefinitionLog.setUpdateTime(now);
-            taskDefinitionLog.setOperateTime(now);
-            taskDefinitionLog.setOperator(loginUser.getId());
-            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
-                TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
-                    .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
-                if (definitionCodeAndVersion != null) {
-                    if (!taskDefinitionLog.equals(definitionCodeAndVersion)) {
-                        taskDefinitionLog.setUserId(definitionCodeAndVersion.getUserId());
-                        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionLog.getCode());
-                        if (version == null || version == 0) {
-                            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionLog.getCode());
-                            return result;
-                        }
-                        taskDefinitionLog.setVersion(version + 1);
-                        taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
-                        updateTaskDefinitionLogs.add(taskDefinitionLog);
-                        totalSuccessCode.add(taskDefinitionLog.getCode());
-                    }
-                    continue;
-                }
-            }
-            taskDefinitionLog.setUserId(loginUser.getId());
-            taskDefinitionLog.setVersion(1);
-            taskDefinitionLog.setCreateTime(now);
-            totalSuccessCode.add(taskDefinitionLog.getCode());
-            newTaskDefinitionLogs.add(taskDefinitionLog);
-            if (taskDefinitionLog.getCode() == 0) {
-                long code;
-                try {
-                    code = SnowFlakeUtils.getInstance().nextId();
-                    taskDefinitionLog.setVersion(1);
-                    taskDefinitionLog.setCode(code);
-                } catch (SnowFlakeException e) {
-                    logger.error("Task code get error, ", e);
-                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
-                    return result;
-                }
-            }
-            totalSuccessCode.add(taskDefinitionLog.getCode());
-            newTaskDefinitionLogs.add(taskDefinitionLog);
-            totalSuccessNumber++;
-        }
-        for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
-            TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionToUpdate.getCode());
-            if (task == null) {
-                newTaskDefinitionLogs.add(taskDefinitionToUpdate);
-            } else {
-                int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
-                int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-                if ((update & insert) != 1) {
-                    putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-                    return result;
-                }
-            }
-        }
-        if (!newTaskDefinitionLogs.isEmpty()) {
-            int insert = taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
-            int logInsert = taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
-            if ((logInsert & insert) == 0) {
-                putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
+            if (taskDefinition != null) {
+                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
+                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
                 return result;
             }
         }
-        Map<String, Object> resData = new HashMap<>();
-        resData.put("total", totalSuccessNumber);
-        resData.put("code", totalSuccessCode);
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, resData);
+        if (processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
+            Map<String, Object> resData = new HashMap<>();
+            resData.put("total", taskDefinitionLogs.size());
+            resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
+            putMsg(result, Status.SUCCESS);
+            result.put(Constants.DATA_LIST, resData);
+        } else {
+            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+        }
         return result;
     }
 
