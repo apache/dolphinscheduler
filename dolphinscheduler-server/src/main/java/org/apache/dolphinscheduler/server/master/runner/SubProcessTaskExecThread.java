@@ -113,6 +113,31 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
+     * wait for the establishment of sub-process-instance
+     * @throws InterruptedException
+     */
+    private void waitSubProcessEstablishment() throws InterruptedException {
+        if (subProcessInstance == null) {
+            while (Stopper.isRunning()) {
+                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                if (setTaskInstanceState()) {
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * check if both task and sub-process are both finished
+     * (when recover a stopping instance, subProcessInstance may still in running by fault-tolerant)
+     */
+    private boolean isTaskInstanceFinished() {
+        boolean isSubProcessFinished = (subProcessInstance == null || subProcessInstance.getState().typeIsFinished());
+        boolean isTaskFinished = taskInstance.getState().typeIsFinished();
+        return (Boolean.TRUE.equals(isSubProcessFinished) && Boolean.TRUE.equals(isTaskFinished));
+    }
+
+    /**
      * wait task quit
      * @throws InterruptedException
      */
@@ -120,21 +145,18 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
         logger.info("wait sub work flow: {} complete", this.taskInstance.getName());
 
-        if (taskInstance.getState().typeIsFinished()) {
+        if (isTaskInstanceFinished()) {
             logger.info("sub work flow task {} already complete. task state:{}, parent work flow instance state:{}",
                     this.taskInstance.getName(),
                     this.taskInstance.getState(),
                     this.processInstance.getState());
             return;
         }
+
+        // waiting for subflow process instance establishment
+        waitSubProcessEstablishment();
+
         while (Stopper.isRunning()) {
-            // waiting for subflow process instance establishment
-            if (subProcessInstance == null) {
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                if(!setTaskInstanceState()){
-                    continue;
-                }
-            }
             subProcessInstance = processService.findProcessInstanceById(subProcessInstance.getId());
             if (checkTaskTimeout()) {
                 this.checkTimeoutFlag = !alertTimeout();
