@@ -140,7 +140,7 @@ public interface TaskDefinitionService {
      * @param pageSize page size
      * @return task definition page
      */
-    Result queryTaskDefinitionListPaging(User loginUser,
+    Result  queryTaskDefinitionListPaging(User loginUser,
                                          long projectCode,
                                          String taskType,
                                          String searchVal,

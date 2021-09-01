@@ -288,46 +288,7 @@ public class TaskDefinitionController extends BaseController {
         }
         taskType = ParameterUtils.handleEscapes(taskType);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchVal, userId, pageNo, pageSize);
-    }
-
-    /**
-     * query task definition list paging by taskType
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param searchVal search value
-     * @param taskType taskType
-     * @param userId user id
-     * @param pageNo page number
-     * @param pageSize page size
-     * @return task definition page
-     */
-    @ApiOperation(value = "queryTaskDefinitionByTaskType", notes = "QUERY_TASK_DEFINITION_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = true, type = "String"),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
-    })
-    @GetMapping(value = "/query-by-type")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_DEFINITION_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryTaskDefinitionByTaskType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @RequestParam(value = "taskType", required = true) String taskType,
-                                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
-                                                @RequestParam("pageNo") Integer pageNo,
-                                                @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
-        searchVal = ParameterUtils.handleEscapes(searchVal);
-        return taskDefinitionService.queryTaskDefinitionByTaskType(loginUser, projectCode, taskType, searchVal, userId, pageNo, pageSize);
+        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, taskType, searchVal, userId, pageNo, pageSize);
     }
 
     /**
