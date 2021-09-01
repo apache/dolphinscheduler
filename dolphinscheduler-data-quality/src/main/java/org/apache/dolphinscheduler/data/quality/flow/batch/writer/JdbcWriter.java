@@ -39,15 +39,10 @@ import org.apache.spark.sql.Row;
 
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * JdbcWriter
  */
 public class JdbcWriter implements BatchWriter {
-
-    private static final Logger logger = LoggerFactory.getLogger(JdbcWriter.class);
 
     private final Config config;
 

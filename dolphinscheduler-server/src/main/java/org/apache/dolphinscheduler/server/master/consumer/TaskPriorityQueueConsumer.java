@@ -437,7 +437,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                     dqRuleExecuteSql.setTableAlias(type.getOutputTable());
                     executeSqlList.add(0,dqRuleExecuteSql);
 
-                    if (type.getInnerSource()) {
+                    if (Boolean.TRUE.equals(type.getInnerSource())) {
                         dataQualityTaskExecutionContext.setComparisonNeedStatisticsValueTable(true);
                     }
                 }

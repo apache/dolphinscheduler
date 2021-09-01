@@ -29,15 +29,10 @@ import org.apache.dolphinscheduler.data.quality.flow.batch.writer.file.LocalFile
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * WriterFactory
  */
 public class WriterFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(WriterFactory.class);
 
     private static class Singleton {
         static WriterFactory instance = new WriterFactory();

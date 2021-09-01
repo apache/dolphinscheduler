@@ -72,7 +72,7 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
 
         String writerSql = RuleManager.DEFAULT_COMPARISON_WRITER_SQL;
         if (context.isCompareWithFixedValue()) {
-            writerSql = writerSql.replaceAll("full join \\$\\{comparison_table}","");
+            writerSql = writerSql.replace("full join \\$\\{comparison_table}","");
         }
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getAllWriterConfigList(inputParameterValue,

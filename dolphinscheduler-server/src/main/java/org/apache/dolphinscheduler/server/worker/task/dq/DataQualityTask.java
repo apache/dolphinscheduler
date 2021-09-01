@@ -115,7 +115,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
         setMainJarName();
 
-        logger.info("dataQualityParameters: " + JSONUtils.toJsonString(dataQualityParameters));
+        logger.info("dataQualityParameters: {}", JSONUtils.toJsonString(dataQualityParameters));
     }
 
     private void operateInputParameter(Map<String, String> inputParameter, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
@@ -151,7 +151,7 @@ public class DataQualityTask extends AbstractYarnTask {
             inputParameter.put(ERROR_OUTPUT_PATH,"");
         }
 
-        logger.info("inputParameter: " + JSONUtils.toJsonString(inputParameter));
+        logger.info("DataQualityTask InputParameter: {}", JSONUtils.toJsonString(inputParameter));
     }
 
     @Override

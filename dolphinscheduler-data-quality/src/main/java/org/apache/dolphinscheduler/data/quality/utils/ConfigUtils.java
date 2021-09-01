@@ -22,12 +22,11 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ConfigUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    private ConfigUtils() {
+        throw new IllegalStateException("Construct ConfigUtils");
+    }
 
     /**
      * Extract sub config with fixed prefix

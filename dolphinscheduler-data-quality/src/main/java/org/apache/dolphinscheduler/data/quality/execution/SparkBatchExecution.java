@@ -45,9 +45,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
 
     @Override
     public void execute(List<BatchReader> readers, List<BatchTransformer> transformers, List<BatchWriter> writers) {
-        readers.forEach(reader -> {
-            registerInputTempView(reader, environment);
-        });
+        readers.forEach(reader -> registerInputTempView(reader, environment));
 
         if (!readers.isEmpty()) {
             Dataset<Row> ds = readers.get(0).read(environment);
@@ -65,12 +63,16 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
     }
 
     private void registerTempView(String tableName, Dataset<Row> ds) {
-        ds.createOrReplaceTempView(tableName);
+        if (ds != null) {
+            ds.createOrReplaceTempView(tableName);
+        } else {
+            throw new ConfigRuntimeException("dataset is null, can not createOrReplaceTempView");
+        }
     }
 
     private void registerInputTempView(BatchReader reader, SparkRuntimeEnvironment environment) {
         Config conf = reader.getConfig();
-        if (conf.has(OUTPUT_TABLE)) {
+        if (Boolean.TRUE.equals(conf.has(OUTPUT_TABLE))) {
             String tableName = conf.getString(OUTPUT_TABLE);
             registerTempView(tableName, reader.read(environment));
         } else {
@@ -83,7 +85,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
         Config config = transformer.getConfig();
         Dataset<Row> inputDataset;
         Dataset<Row> outputDataset = null;
-        if (config.has(INPUT_TABLE)) {
+        if (Boolean.TRUE.equals(config.has(INPUT_TABLE))) {
             String[] tableNames = config.getString(INPUT_TABLE).split(",");
 
             for (String sourceTableName: tableNames) {
@@ -99,7 +101,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
             outputDataset = dataset;
         }
 
-        if (config.has(TMP_TABLE)) {
+        if (Boolean.TRUE.equals(config.has(TMP_TABLE))) {
             if (outputDataset == null) {
                 outputDataset = dataset;
             }
@@ -112,7 +114,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
 
     private void registerTransformTempView(BatchTransformer transformer, Dataset<Row> ds) {
         Config config = transformer.getConfig();
-        if (config.has(OUTPUT_TABLE)) {
+        if (Boolean.TRUE.equals(config.has(OUTPUT_TABLE))) {
             String tableName = config.getString(OUTPUT_TABLE);
             registerTempView(tableName, ds);
         }
@@ -121,7 +123,7 @@ public class SparkBatchExecution implements Execution<BatchReader, BatchTransfor
     private void executeWriter(SparkRuntimeEnvironment environment, BatchWriter writer, Dataset<Row> ds) {
         Config config = writer.getConfig();
         Dataset<Row> inputDataSet = ds;
-        if (config.has(INPUT_TABLE)) {
+        if (Boolean.TRUE.equals(config.has(INPUT_TABLE))) {
             String sourceTableName = config.getString(INPUT_TABLE);
             inputDataSet = environment.sparkSession().read().table(sourceTableName);
         }

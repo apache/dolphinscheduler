@@ -37,7 +37,7 @@ public interface Component {
     default ValidateResult validate(List<String> requiredOptions) {
         List<String> nonExistsOptions = new ArrayList<>();
         requiredOptions.forEach(x -> {
-            if (!getConfig().has(x)) {
+            if (Boolean.FALSE.equals(getConfig().has(x))) {
                 nonExistsOptions.add(x);
             }
         });

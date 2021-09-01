@@ -24,7 +24,9 @@ import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
 import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
+import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.spark.sql.DataFrameWriter;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -45,7 +47,7 @@ public abstract class BaseFileWriter implements BatchWriter {
 
     private final Config config;
 
-    public BaseFileWriter(Config config) {
+    protected BaseFileWriter(Config config) {
         this.config = config;
     }
 
@@ -56,18 +58,18 @@ public abstract class BaseFileWriter implements BatchWriter {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-        Map<String,Object> defaultConfig = new HashMap<String, Object>(4) {{
-                put(PARTITION_BY, Collections.emptyList());
-                put(SAVE_MODE,"error");
-                put(SERIALIZER,"json");
-            }};
+        Map<String,Object> defaultConfig = new HashMap<String, Object>(4);
+
+        defaultConfig.put(PARTITION_BY, Collections.emptyList());
+        defaultConfig.put(SAVE_MODE,"error");
+        defaultConfig.put(SERIALIZER,"json");
 
         config.merge(defaultConfig);
     }
 
     protected ValidateResult checkConfigImpl(List<String> allowedUri) {
 
-        if (config.has(PATH) && !config.getString(PATH).trim().isEmpty()) {
+        if (Boolean.TRUE.equals(config.has(PATH)) && StringUtils.isNotEmpty(config.getString(PATH))) {
             String dir = config.getString(PATH);
             if (dir.startsWith("/") || uriInAllowedSchema(dir, allowedUri)) {
                 return new ValidateResult(true, "");
@@ -91,7 +93,7 @@ public abstract class BaseFileWriter implements BatchWriter {
 
         DataFrameWriter<Row> writer = df.write().mode(config.getString(SAVE_MODE));
 
-        if (config.getStringList(PARTITION_BY).size() > 0) {
+        if (CollectionUtils.isNotEmpty(config.getStringList(PARTITION_BY))) {
             List<String> partitionKeys = config.getStringList(PARTITION_BY);
             writer.partitionBy(partitionKeys.toArray(new String[]{}));
         }
@@ -99,9 +101,7 @@ public abstract class BaseFileWriter implements BatchWriter {
         Config fileConfig = ConfigUtils.extractSubConfig(config, "options.", false);
         if (fileConfig.isNotEmpty()) {
             Map<String,String> optionMap = new HashMap<>(16);
-            fileConfig.entrySet().forEach(x -> {
-                optionMap.put(x.getKey(),String.valueOf(x.getValue()));
-            });
+            fileConfig.entrySet().forEach(x -> optionMap.put(x.getKey(),String.valueOf(x.getValue())));
             writer.options(optionMap);
         }
 

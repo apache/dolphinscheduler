@@ -270,7 +270,9 @@ public class RuleParserUtils {
         List<BaseConfig> writerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConfig writerConfig = getStatisticsValueConfig(dataQualityTaskExecutionContext);
-            writerConfig.getConfig().put(SQL,ParameterUtils.convertParameterPlaceholders(sql,inputParameterValueResult));
+            if (writerConfig != null) {
+                writerConfig.getConfig().put(SQL,ParameterUtils.convertParameterPlaceholders(sql,inputParameterValueResult));
+            }
             writerConfigList.add(writerConfig);
         }
         return writerConfigList;
@@ -282,7 +284,9 @@ public class RuleParserUtils {
         List<BaseConfig> readerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConfig readerConfig = getStatisticsValueConfig(dataQualityTaskExecutionContext);
-            readerConfig.getConfig().put(OUTPUT_TABLE,dataQualityTaskExecutionContext.getStatisticsValueTable());
+            if (readerConfig != null) {
+                readerConfig.getConfig().put(OUTPUT_TABLE,dataQualityTaskExecutionContext.getStatisticsValueTable());
+            }
             readerConfigList.add(readerConfig);
         }
         return readerConfigList;

@@ -52,7 +52,7 @@ public class SqlTransformer implements BatchTransformer {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-
+        // Do nothing
     }
 
     @Override

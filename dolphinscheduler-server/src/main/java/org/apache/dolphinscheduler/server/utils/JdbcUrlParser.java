@@ -88,7 +88,7 @@ public class JdbcUrlParser {
             database = tempUri;
         }
 
-        if (StringUtils.isBlank(database)) {
+        if (StringUtils.isEmpty(database)) {
             return null;
         }
 

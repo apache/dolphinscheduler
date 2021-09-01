@@ -64,7 +64,7 @@ public class JdbcReader implements BatchReader {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-
+        // Do nothing
     }
 
     @Override
@@ -86,9 +86,7 @@ public class JdbcReader implements BatchReader {
 
         if (!config.isEmpty()) {
             Map<String,String> optionMap = new HashMap<>(16);
-            jdbcConfig.entrySet().forEach(x -> {
-                optionMap.put(x.getKey(),String.valueOf(x.getValue()));
-            });
+            jdbcConfig.entrySet().forEach(x -> optionMap.put(x.getKey(),String.valueOf(x.getValue())));
             reader.options(optionMap);
         }
 

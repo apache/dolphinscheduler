@@ -28,7 +28,6 @@ import org.apache.spark.sql.SparkSession;
 public class SparkRuntimeEnvironment {
 
     private static final String TYPE = "type";
-    private static final String STREAM = "stream";
     private static final String BATCH = "batch";
 
     private SparkSession sparkSession;
@@ -54,9 +53,7 @@ public class SparkRuntimeEnvironment {
     private SparkConf createSparkConf() {
         SparkConf conf = new SparkConf();
         this.config.entrySet()
-            .forEach(entry -> {
-                conf.set(entry.getKey(), String.valueOf(entry.getValue()));
-            });
+            .forEach(entry -> conf.set(entry.getKey(), String.valueOf(entry.getValue())));
         conf.set("spark.sql.crossJoin.enabled","true");
         return conf;
     }
@@ -66,7 +63,7 @@ public class SparkRuntimeEnvironment {
     }
 
     public boolean isBatch() {
-        return BATCH.equals(config.getString(TYPE).toLowerCase());
+        return BATCH.equalsIgnoreCase(config.getString(TYPE));
     }
 
     public SparkBatchExecution getBatchExecution() {
