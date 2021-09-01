@@ -35,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 1. 循环检测超时问题
- * 2. 循环检测依赖问题
+ * 1. timeout check wheel
+ * 2. dependent task check wheel
  */
 public class StateWheelExecuteThread extends Thread {
 
