@@ -25,7 +25,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-task-api</artifactId>
+    <artifactId>dolphinscheduler-task-http</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
         <dependency>
@@ -34,22 +35,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-task-http-${project.version}</finalName>
+    </build>
 </project>
