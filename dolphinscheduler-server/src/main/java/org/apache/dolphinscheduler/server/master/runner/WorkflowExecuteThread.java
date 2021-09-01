@@ -589,8 +589,8 @@ public class WorkflowExecuteThread implements Runnable {
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION &&
-                    taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)){
+            if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
+                    && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
@@ -671,6 +671,7 @@ public class WorkflowExecuteThread implements Runnable {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == taskVersion) {
                 return taskInstance;
+
             }
         }
         return null;

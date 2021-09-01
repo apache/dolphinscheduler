@@ -206,9 +206,6 @@ public class MasterSchedulerService extends Thread {
             }
             List<Command> commandList = processService.findCommandPage(ServerNodeManager.MASTER_SIZE, pageNumber);
             if (commandList.size() == 0) {
-                break;
-            }
-            if (commandList.size() == 0) {
                 return null;
             }
             for (Command command : commandList) {
