@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.mockito.ArgumentMatchers.any;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
@@ -160,7 +160,6 @@ public class DataSourceServiceTest {
         Result userNoOperationPerm = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), userNoOperationPerm.getCode().intValue());
 
-
         BaseConnectionParam connectionParam = mock(BaseConnectionParam.class);
         Connection connection = mock(Connection.class);
         DbType dataSourceType = postgreSqlDatasourceParam.getType();
@@ -211,7 +210,7 @@ public class DataSourceServiceTest {
         int pageNo = 1;
         int pageSize = 10;
         Result result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
-        Assert.assertEquals(Status.SUCCESS.getCode(),(int)result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
     @Test
