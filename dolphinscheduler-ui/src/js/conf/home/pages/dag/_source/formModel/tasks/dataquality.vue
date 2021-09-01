@@ -347,7 +347,7 @@
       /**
        * operate fields
        */
-      _operateFields() {
+      _operateFields () {
         let fields = this.fApi.fields()
         fields.forEach(item => {
           if (this.inputEntryValueMap[item] !== null) {
