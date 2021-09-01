@@ -416,11 +416,11 @@ public class TaskExecutionContext implements Serializable {
         this.envFile = envFile;
     }
 
-    public String getEnvironmentConfig(){
+    public String getEnvironmentConfig() {
         return environmentConfig;
     }
 
-    public void setEnvironmentConfig(String config){
+    public void setEnvironmentConfig(String config) {
         this.environmentConfig = config;
     }
 

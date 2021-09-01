@@ -122,6 +122,11 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String commandInterpreter() {
         String pythonHome = getPythonHome(taskExecutionContext.getEnvFile());
+
+        if (StringUtils.isNotBlank(taskExecutionContext.getEnvironmentConfig())) {
+            pythonHome = getPythonHomeFromEnvironmentConfig(taskExecutionContext.getEnvironmentConfig());
+        }
+        logger.info("PYTHON_HOME={}",pythonHome);
         return getPythonCommand(pythonHome);
     }
 
@@ -185,4 +190,34 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         return null;
     }
 
+    /**
+     * get python home from the environment config
+     *
+     * @param environmentConfig env config
+     * @return python home
+     */
+    public static String getPythonHomeFromEnvironmentConfig(String environmentConfig) {
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String[] lines = environmentConfig.split("\n");
+
+        for (String line : lines) {
+            if (StringUtils.isNotEmpty(StringUtils.trim(line))) {
+                if (line.contains(Constants.PYTHON_HOME)) {
+                    sb.append(line);
+                    break;
+                }
+            }
+        }
+        String result = sb.toString();
+        if (StringUtils.isEmpty(result)) {
+            return null;
+        }
+        String[] arrs = result.split(Constants.EQUAL_SIGN);
+        if (arrs.length == 2) {
+            return arrs[1];
+        }
+        return null;
+    }
 }
