@@ -53,7 +53,7 @@ public class SingleTableCustomSqlRuleParser implements IRuleParser {
 
         String writerSql = RuleManager.SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL;
         if (context.isCompareWithFixedValue()) {
-            writerSql = writerSql.replace("join \\$\\{comparison_table}","");
+            writerSql = writerSql.replaceAll("join \\$\\{comparison_table}","");
         }
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getAllWriterConfigList(inputParameterValue,
