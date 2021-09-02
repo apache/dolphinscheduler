@@ -143,11 +143,8 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
         
         Mockito.when(processService
-                .findProcessInstanceById(subProcessInstance.getId()))
-                .thenReturn(subProcessInstance);
-        Mockito.when(processService
-                .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
-                .thenReturn(null);
+                .findProcessInstanceById(processInstance.getId()))
+                .thenReturn(processInstance);
 
         taskInstance.setState(ExecutionStatus.KILL);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
