@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -85,4 +86,8 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.operateTime = operateTime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
 }
