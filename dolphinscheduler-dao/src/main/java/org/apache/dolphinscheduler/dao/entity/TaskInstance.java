@@ -430,17 +430,19 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-    public Long getEnvironmentCode(){
+    public Long getEnvironmentCode() {
         return this.environmentCode;
     }
-    public void setEnvironmentCode(Long environmentCode){
+
+    public void setEnvironmentCode(Long environmentCode) {
         this.environmentCode = environmentCode;
     }
 
-    public String getEnvironmentConfig(){
+    public String getEnvironmentConfig() {
         return this.environmentConfig;
     }
-    public void setEnvironmentConfig(String environmentConfig){
+
+    public void setEnvironmentConfig(String environmentConfig) {
         this.environmentConfig = environmentConfig;
     }
 
