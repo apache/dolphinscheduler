@@ -95,7 +95,7 @@
         </m-list-box>
 
         <!-- Delay execution time -->
-        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'&& nodeData.taskType !== 'SWITCH'">
           <div slot="text">{{$t('Delay execution time')}}</div>
           <div slot="content">
             <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
@@ -258,6 +258,13 @@
           :backfill-item="backfillItem"
           :pre-node="nodeData.preNode">
         </m-conditions>
+        <m-switch
+          v-if="nodeData.taskType === 'SWITCH'"
+          ref="SWITCH"
+          @on-switch-result="_onSwitchResult"
+          :backfill-item="backfillItem"
+          :nodeData="nodeData"
+        ></m-switch>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
@@ -269,7 +276,7 @@
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
         <el-button type="text" size="small" id="cancelBtn"> {{$t('Cancel')}} </el-button>
-        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? $t('Loading...') : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>
@@ -293,6 +300,7 @@
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
   import mConditions from './tasks/conditions'
+  import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
@@ -328,6 +336,7 @@
           successNode: [],
           failedNode: []
         },
+        switchResult: {},
         // dependence
         dependence: {},
         // cache dependence
@@ -385,6 +394,9 @@
        */
       _onDependent (o) {
         this.dependence = Object.assign(this.dependence, {}, o)
+      },
+      _onSwitchResult (o) {
+        this.switchResult = o
       },
       /**
        * Pre-tasks in workflow
@@ -480,6 +492,7 @@
             desc: this.desc,
             runFlag: this.runFlag,
             conditionResult: this.conditionResult,
+            switchResult: this.switchResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
@@ -604,6 +617,7 @@
             desc: this.desc,
             runFlag: this.runFlag,
             conditionResult: this.conditionResult,
+            switchResult: this.switchResult,
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
@@ -801,6 +815,7 @@
       mDatax,
       mSqoop,
       mConditions,
+      mSwitch,
       mSelectInput,
       mTimeoutAlarm,
       mDependentTimeout,

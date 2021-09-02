@@ -432,13 +432,11 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * @return all neighbor nodes of the node
    */
   private Set<Node> getNeighborNodes(Node node, final Map<Node, Map<Node, EdgeInfo>> edges) {
-    final Map<Node, EdgeInfo> neighborEdges = edges.get(node);
-
-    if (neighborEdges == null) {
-      return Collections.EMPTY_MAP.keySet();
-    }
-
-    return neighborEdges.keySet();
+        final Map<Node, EdgeInfo> neighborEdges = edges.get(node);
+        if (neighborEdges == null) {
+            return Collections.emptySet();
+        }
+        return neighborEdges.keySet();
   }
 
 

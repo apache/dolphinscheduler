@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
@@ -220,6 +221,19 @@ public class TaskExecutionContext implements Serializable {
      * taskInstance varPool
      */
     private String varPool;
+
+    /**
+     * business param
+     */
+    private Map<String, Property> paramsMap;
+
+    public Map<String, Property> getParamsMap() {
+        return paramsMap;
+    }
+
+    public void setParamsMap(Map<String, Property> paramsMap) {
+        this.paramsMap = paramsMap;
+    }
 
     /**
      * procedure TaskExecutionContext
