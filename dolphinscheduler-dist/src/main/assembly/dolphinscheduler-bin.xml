@@ -106,8 +106,146 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
 
+        <!-- Hadoop-Client Jar-->
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-hadoop-client/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>lib/hadoop-client/</outputDirectory>
+        </fileSet>
+
+        <!-- clickhouse -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-clickhouse/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-clickhouse-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/clickhouse/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-clickhouse/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/clickhouse/</outputDirectory>
+        </fileSet>
+
+        <!-- db2 -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-db2/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-db2-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/db2/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-db2/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/db2/</outputDirectory>
+        </fileSet>
+
+        <!-- hive -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-hive/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-hive-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/hive/</outputDirectory>
+        </fileSet>
+
+        <!-- mysql -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-mysql/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-mysql-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/mysql/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-mysql/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/mysql/</outputDirectory>
+        </fileSet>
+
+        <!-- oracle -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-oracle/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-oracle-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/oracle/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>
+                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-oracle/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/oracle/</outputDirectory>
+        </fileSet>
+
+        <!-- postgresql -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-postgresql/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-postgresql-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/postgresql/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>
+                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-postgresql/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/postgresql/</outputDirectory>
+        </fileSet>
+
+        <!-- sqlserver -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-sqlserver/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-sqlserver-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>plugin/sqlserver/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>
+                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-sqlserver/target/lib
+            </directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>jdbc/sqlserver/</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}
+            </directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
