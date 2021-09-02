@@ -487,7 +487,7 @@ export default {
    */
   getNotifyGroupList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', res => {
+      io.get('alert-groups/list', res => {
         state.notifyGroupListS = _.map(res.data, v => {
           return {
             id: v.id,
