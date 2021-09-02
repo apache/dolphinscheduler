@@ -124,7 +124,7 @@
         this.createEnvironmentDialog = false
       },
       _getList (flag) {
-        if (sessionStorage.getItem('isLeft') === 0) {
+        if (sessionStorage.getItem('isLeft') == 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
@@ -154,10 +154,6 @@
         // url no params get instance list
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
-    },
-    created () {
-    },
-    mounted () {
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
