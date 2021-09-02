@@ -69,6 +69,9 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
         prestoConnectionParam.setDatabase(prestoParam.getDatabase());
+        prestoConnectionParam.setDriverClassName(getDatasourceDriver());
+        prestoConnectionParam.setValidationQuery(getValidationQuery());
+        prestoConnectionParam.setProps(prestoParam.getOther());
 
         return prestoConnectionParam;
     }
@@ -81,6 +84,11 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.COM_PRESTO_JDBC_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.PRESTO_VALIDATION_QUERY;
     }
 
     @Override

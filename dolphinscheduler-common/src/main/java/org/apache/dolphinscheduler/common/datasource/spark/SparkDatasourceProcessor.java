@@ -87,6 +87,10 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
         sparkConnectionParam.setDatabase(sparkDatasourceParam.getDatabase());
         sparkConnectionParam.setAddress(address.toString());
         sparkConnectionParam.setJdbcUrl(jdbcUrl);
+        sparkConnectionParam.setDriverClassName(getDatasourceDriver());
+        sparkConnectionParam.setValidationQuery(getValidationQuery());
+        sparkConnectionParam.setProps(sparkDatasourceParam.getOther());
+
         if (CommonUtils.getKerberosStartupState()) {
             sparkConnectionParam.setPrincipal(sparkDatasourceParam.getPrincipal());
             sparkConnectionParam.setJavaSecurityKrb5Conf(sparkDatasourceParam.getJavaSecurityKrb5Conf());
@@ -105,6 +109,11 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.HIVE_VALIDATION_QUERY;
     }
 
     @Override

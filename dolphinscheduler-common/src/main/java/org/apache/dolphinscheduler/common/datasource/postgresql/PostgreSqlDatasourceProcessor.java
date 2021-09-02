@@ -66,7 +66,10 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         postgreSqlConnectionParam.setDatabase(postgreSqlParam.getDatabase());
         postgreSqlConnectionParam.setUser(postgreSqlParam.getUserName());
         postgreSqlConnectionParam.setPassword(CommonUtils.encodePassword(postgreSqlParam.getPassword()));
+        postgreSqlConnectionParam.setDriverClassName(getDatasourceDriver());
+        postgreSqlConnectionParam.setValidationQuery(getValidationQuery());
         postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
+        postgreSqlConnectionParam.setProps(postgreSqlParam.getOther());
 
         return postgreSqlConnectionParam;
     }
@@ -79,6 +82,11 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.ORG_POSTGRESQL_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.POSTGRESQL_VALIDATION_QUERY;
     }
 
     @Override

@@ -31,6 +31,12 @@ public interface DatasourceProcessor {
     void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
 
     /**
+     * get Datasource Client UniqueId
+     * @return UniqueId
+     */
+    String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType);
+
+    /**
      * create BaseDataSourceParamDTO by connectionJson
      *
      * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.Datasource}
@@ -57,6 +63,11 @@ public interface DatasourceProcessor {
      * get datasource Driver
      */
     String getDatasourceDriver();
+
+    /**
+     * get validation Query
+     */
+    String getValidationQuery();
 
     /**
      * get jdbcUrl by connection param, the jdbcUrl is different with ConnectionParam.jdbcUrl, this method will inject

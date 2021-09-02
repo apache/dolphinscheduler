@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.datasource.hive.HiveDataSourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.oracle.OracleDatasourceParamDTO;
@@ -37,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.utils.DatasourceUtil;
 
 import java.sql.Connection;
 import java.util.ArrayList;

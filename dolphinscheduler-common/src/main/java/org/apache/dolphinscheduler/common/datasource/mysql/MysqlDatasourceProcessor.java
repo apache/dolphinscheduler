@@ -83,7 +83,10 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         mysqlConnectionParam.setAddress(address);
         mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
         mysqlConnectionParam.setPassword(CommonUtils.encodePassword(mysqlDatasourceParam.getPassword()));
+        mysqlConnectionParam.setDriverClassName(getDatasourceDriver());
+        mysqlConnectionParam.setValidationQuery(getValidationQuery());
         mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
+        mysqlConnectionParam.setProps(mysqlDatasourceParam.getOther());
 
         return mysqlConnectionParam;
     }
@@ -96,6 +99,11 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.COM_MYSQL_JDBC_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.MYSQL_VALIDATION_QUERY;
     }
 
     @Override

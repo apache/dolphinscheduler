@@ -65,7 +65,10 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         clickhouseConnectionParam.setJdbcUrl(jdbcUrl);
         clickhouseConnectionParam.setUser(clickHouseParam.getUserName());
         clickhouseConnectionParam.setPassword(CommonUtils.encodePassword(clickHouseParam.getPassword()));
+        clickhouseConnectionParam.setDriverClassName(getDatasourceDriver());
+        clickhouseConnectionParam.setValidationQuery(getValidationQuery());
         clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
+        clickhouseConnectionParam.setProps(clickHouseParam.getOther());
         return clickhouseConnectionParam;
     }
 
@@ -77,6 +80,11 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.COM_CLICKHOUSE_JDBC_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.CLICKHOUSE_VALIDATION_QUERY;
     }
 
     @Override

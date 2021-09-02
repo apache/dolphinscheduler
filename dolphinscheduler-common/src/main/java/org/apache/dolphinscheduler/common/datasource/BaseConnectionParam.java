@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -46,7 +48,15 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String jdbcUrl;
 
+    protected String driverLocation;
+
+    protected String driverClassName;
+
+    protected String validationQuery;
+
     protected String other;
+
+    protected Map<String, String> props;
 
     public String getUser() {
         return user;
@@ -88,11 +98,43 @@ public abstract class BaseConnectionParam implements ConnectionParam {
         this.jdbcUrl = jdbcUrl;
     }
 
+    public String getDriverLocation() {
+        return driverLocation;
+    }
+
+    public void setDriverLocation(String driverLocation) {
+        this.driverLocation = driverLocation;
+    }
+
+    public String getDriverClassName() {
+        return driverClassName;
+    }
+
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
+
+    public String getValidationQuery() {
+        return validationQuery;
+    }
+
+    public void setValidationQuery(String validationQuery) {
+        this.validationQuery = validationQuery;
+    }
+
     public String getOther() {
         return other;
     }
 
     public void setOther(String other) {
         this.other = other;
+    }
+
+    public Map<String, String> getProps() {
+        return props;
+    }
+
+    public void setProps(Map<String, String> props) {
+        this.props = props;
     }
 }

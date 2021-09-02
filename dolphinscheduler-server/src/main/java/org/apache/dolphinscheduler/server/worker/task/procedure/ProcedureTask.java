@@ -17,19 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.task.procedure;
 
-import static org.apache.dolphinscheduler.common.enums.DataType.BOOLEAN;
-import static org.apache.dolphinscheduler.common.enums.DataType.DATE;
-import static org.apache.dolphinscheduler.common.enums.DataType.DOUBLE;
-import static org.apache.dolphinscheduler.common.enums.DataType.FLOAT;
-import static org.apache.dolphinscheduler.common.enums.DataType.INTEGER;
-import static org.apache.dolphinscheduler.common.enums.DataType.LONG;
-import static org.apache.dolphinscheduler.common.enums.DataType.TIME;
-import static org.apache.dolphinscheduler.common.enums.DataType.TIMESTAMP;
-import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -41,6 +30,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;

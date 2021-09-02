@@ -66,7 +66,10 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         db2ConnectionParam.setJdbcUrl(jdbcUrl);
         db2ConnectionParam.setUser(db2Param.getUserName());
         db2ConnectionParam.setPassword(CommonUtils.encodePassword(db2Param.getPassword()));
+        db2ConnectionParam.setDriverClassName(getDatasourceDriver());
+        db2ConnectionParam.setValidationQuery(getValidationQuery());
         db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
+        db2ConnectionParam.setProps(db2Param.getOther());
 
         return db2ConnectionParam;
     }
@@ -101,6 +104,11 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public DbType getDbType() {
         return DbType.DB2;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.DB2_VALIDATION_QUERY;
     }
 
     private String transformOther(Map<String, String> otherMap) {

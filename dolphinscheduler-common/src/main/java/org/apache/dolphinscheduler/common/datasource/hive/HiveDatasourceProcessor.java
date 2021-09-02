@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
@@ -84,6 +83,8 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         hiveConnectionParam.setJdbcUrl(jdbcUrl);
         hiveConnectionParam.setUser(hiveParam.getUserName());
         hiveConnectionParam.setPassword(CommonUtils.encodePassword(hiveParam.getPassword()));
+        hiveConnectionParam.setDriverClassName(getDatasourceDriver());
+        hiveConnectionParam.setValidationQuery(getValidationQuery());
 
         if (CommonUtils.getKerberosStartupState()) {
             hiveConnectionParam.setPrincipal(hiveParam.getPrincipal());
@@ -92,6 +93,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
             hiveConnectionParam.setLoginUserKeytabUsername(hiveParam.getLoginUserKeytabUsername());
         }
         hiveConnectionParam.setOther(transformOther(hiveParam.getOther()));
+        hiveConnectionParam.setProps(hiveParam.getOther());
         return hiveConnectionParam;
     }
 
@@ -103,6 +105,11 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.HIVE_VALIDATION_QUERY;
     }
 
     @Override
@@ -152,11 +159,11 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         String[] otherArray = otherParams.split(";", -1);
 
         for (String conf : otherArray) {
-            if (HiveConfUtils.isHiveConfVar(conf)) {
-                hiveConfListSb.append(conf).append(";");
-            } else {
+//            if (HiveConfUtils.isHiveConfVar(conf)) {
+//                hiveConfListSb.append(conf).append(";");
+//            } else {
                 sessionVarListSb.append(conf).append(";");
-            }
+//            }
         }
 
         // remove the last ";"

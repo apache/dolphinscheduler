@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+
 import org.apache.commons.collections4.MapUtils;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -76,4 +79,9 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
         }
     }
 
+    @Override
+    public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
+        BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
+        return MessageFormat.format("{0}@{1}@{2}", dbType.getDescp(), baseConnectionParam.getUser(), baseConnectionParam.getJdbcUrl());
+    }
 }

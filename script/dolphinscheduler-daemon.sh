@@ -57,13 +57,25 @@ pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
 
 cd $DOLPHINSCHEDULER_HOME
 
+PLUGIN_DIR=${DOLPHINSCHEDULER_HOME}/plugin
+JDBC_DRIVER_DIR=${DOLPHINSCHEDULER_HOME}/jdbc
+
+
+if [[ -z "$DOLPHINSCHEDULER_PLUGIN_OPTS" ]]; then
+  PLUGIN_OPTS="-Ddolphinscheduler.plugin.dir=$PLUGIN_DIR"
+fi
+
+if [[ -z "$DOLPHINSCHEDULER_JDBC_OPTS" ]]; then
+  JDBC_OPTS="-Ddolphinscheduler.jdbc.dir=$JDBC_DRIVER_DIR"
+fi
+
 export DOLPHINSCHEDULER_OPTS="-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:$DOLPHINSCHEDULER_LOG_DIR/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof -XshowSettings:vm $DOLPHINSCHEDULER_OPTS"
 
 if [ "$command" = "api-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
+  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS $PLUGIN_OPTS $JDBC_OPTS"
 elif [ "$command" = "master-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
@@ -73,7 +85,7 @@ elif [ "$command" = "worker-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
   HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
+  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS $PLUGIN_OPTS $JDBC_OPTS"
 elif [ "$command" = "alert-server" ]; then
   LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer

@@ -954,10 +954,23 @@ public final class Constants {
     public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
-    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+
+
+    /**
+     * validation Query
+     */
+    public static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
+    public static final String MYSQL_VALIDATION_QUERY = "select 1";
+    public static final String HIVE_VALIDATION_QUERY = "select 1";
+    public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
+    public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
+    public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
+    public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
+    public static final String PRESTO_VALIDATION_QUERY = "select 1";
 
     /**
      * database type

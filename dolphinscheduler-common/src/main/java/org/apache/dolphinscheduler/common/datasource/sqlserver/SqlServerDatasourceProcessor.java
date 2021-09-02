@@ -65,6 +65,9 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
         sqlServerConnectionParam.setOther(transformOther(sqlServerParam.getOther()));
         sqlServerConnectionParam.setUser(sqlServerParam.getUserName());
         sqlServerConnectionParam.setPassword(CommonUtils.encodePassword(sqlServerParam.getPassword()));
+        sqlServerConnectionParam.setDriverClassName(getDatasourceDriver());
+        sqlServerConnectionParam.setValidationQuery(getValidationQuery());
+        sqlServerConnectionParam.setProps(sqlServerParam.getOther());
         return sqlServerConnectionParam;
     }
 
@@ -76,6 +79,11 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.COM_SQLSERVER_JDBC_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.SQLSERVER_VALIDATION_QUERY;
     }
 
     @Override

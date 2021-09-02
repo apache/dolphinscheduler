@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.common.exception;
 /**
  * Base Exception class for DolphinScheduler
  */
-public class BaseException extends Exception {
+public class BaseException extends RuntimeException {
 
     public BaseException() {
     }
@@ -39,5 +39,13 @@ public class BaseException extends Exception {
 
     public BaseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public static BaseException getInstance(String message) {
+        return new BaseException(message);
+    }
+
+    public static BaseException getInstance(String message, Throwable cause) {
+        return new BaseException(message + ": " + cause.getMessage(), cause);
     }
 }

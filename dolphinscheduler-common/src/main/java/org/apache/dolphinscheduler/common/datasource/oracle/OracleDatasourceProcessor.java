@@ -81,7 +81,10 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         oracleConnectionParam.setJdbcUrl(jdbcUrl);
         oracleConnectionParam.setDatabase(oracleParam.getDatabase());
         oracleConnectionParam.setConnectType(oracleParam.getConnectType());
+        oracleConnectionParam.setDriverClassName(getDatasourceDriver());
+        oracleConnectionParam.setValidationQuery(getValidationQuery());
         oracleConnectionParam.setOther(transformOther(oracleParam.getOther()));
+        oracleConnectionParam.setProps(oracleParam.getOther());
 
         return oracleConnectionParam;
     }
@@ -94,6 +97,11 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getDatasourceDriver() {
         return Constants.COM_ORACLE_JDBC_DRIVER;
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return Constants.ORACLE_VALIDATION_QUERY;
     }
 
     @Override
