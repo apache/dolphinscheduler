@@ -2214,7 +2214,7 @@ public class ProcessService {
         return (result & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
-    public boolean isTaskOnline(Long taskCode) {
+    public boolean isTaskOnline(long taskCode) {
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> processDefinitionCodes = processTaskRelationList
