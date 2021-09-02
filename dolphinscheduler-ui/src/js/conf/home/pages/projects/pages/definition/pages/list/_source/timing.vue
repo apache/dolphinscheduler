@@ -154,7 +154,7 @@
     </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (timingData.item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : (timingData.item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
     </div>
   </div>
 </template>

@@ -42,6 +42,8 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -167,9 +169,15 @@ public class SqlTask extends AbstractTask {
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
 
         // spell SQL according to the final user-defined variable
-        if (paramsMap == null) {
+        if (MapUtils.isEmpty(paramsMap)) {
             sqlBuilder.append(sql);
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }
@@ -271,11 +279,11 @@ public class SqlTask extends AbstractTask {
 
     public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
         String result = null;
-        for (Property info :properties) {
+        for (Property info : properties) {
             if (Direct.OUT == info.getDirect()) {
-                List<Map<String,String>> updateRL = new ArrayList<>();
-                Map<String,String> updateRM = new HashMap<>();
-                updateRM.put(info.getProp(),updateResult);
+                List<Map<String, String>> updateRL = new ArrayList<>();
+                Map<String, String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
                 break;
@@ -490,6 +498,10 @@ public class SqlTask extends AbstractTask {
     public void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
+        if (MapUtils.isEmpty(sqlParamsMap)) {
+            logger.info("sqlParamsMap should not be Empty");
+            return;
+        }
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
         if (sqlParamsMap == null) {
             logger.info("printReplacedSql: sqlParamsMap is null.");
