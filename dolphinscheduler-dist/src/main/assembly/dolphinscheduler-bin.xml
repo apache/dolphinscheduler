@@ -127,7 +127,8 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-clickhouse/target/lib
+            <directory>
+                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-clickhouse/target/lib
             </directory>
             <includes>
                 <include>*.jar</include>
