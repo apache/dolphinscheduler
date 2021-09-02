@@ -138,6 +138,23 @@ public class SubProcessTaskTest {
         Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
+    @Test
+    public void testFaultTolerant2() {
+        TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
+        
+        Mockito.when(processService
+                .findProcessInstanceById(subProcessInstance.getId()))
+                .thenReturn(subProcessInstance);
+        Mockito.when(processService
+                .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
+                .thenReturn(null);
+
+        taskInstance.setState(ExecutionStatus.KILL);
+        SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
+        taskExecThread.call();
+        Assert.assertEquals(ExecutionStatus.KILL, taskExecThread.getTaskInstance().getState());
+    }
+
     private TaskNode getTaskNode() {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-10");
