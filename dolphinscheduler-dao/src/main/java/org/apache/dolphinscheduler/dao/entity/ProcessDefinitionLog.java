@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
-import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
