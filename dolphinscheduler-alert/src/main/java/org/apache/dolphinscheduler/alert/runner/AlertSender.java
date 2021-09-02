@@ -38,16 +38,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * alert sender
- */
 public class AlertSender {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertSender.class);
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private AlertPluginManager alertPluginManager;
+    private final AlertPluginManager alertPluginManager;
 
     public AlertSender(AlertPluginManager alertPluginManager) {
         this.alertPluginManager = alertPluginManager;
