@@ -34,7 +34,14 @@
         <module>dolphinscheduler-task-flink</module>
         <module>dolphinscheduler-task-python</module>
         <module>dolphinscheduler-task-spark</module>
+        <module>dolphinscheduler-task-http</module>
+        <module>dolphinscheduler-task-sql</module>
+        <module>dolphinscheduler-task-sqoop</module>
+        <module>dolphinscheduler-task-datax</module>
+        <module>dolphinscheduler-task-mr</module>
+        <module>dolphinscheduler-task-procedure</module>
         <module>dolphinscheduler-task-tis</module>
+
     </modules>
 
 
