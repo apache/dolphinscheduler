@@ -85,4 +85,8 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.operateTime = operateTime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
 }
