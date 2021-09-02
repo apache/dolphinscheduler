@@ -124,7 +124,7 @@
         this.createEnvironmentDialog = false
       },
       _getList (flag) {
-        if (sessionStorage.getItem('isLeft') == 0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
