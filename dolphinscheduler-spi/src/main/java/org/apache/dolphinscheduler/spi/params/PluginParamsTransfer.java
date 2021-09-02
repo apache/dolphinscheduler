@@ -62,7 +62,7 @@ public class PluginParamsTransfer {
      * @return return plugin params value
      */
     public static List<Map<String, Object>> generatePluginParams(String paramsJsonStr, String pluginParamsTemplate) {
-        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr);
+        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr, String.class, Object.class);
         return generatePluginParams(paramsMap, pluginParamsTemplate);
     }
 

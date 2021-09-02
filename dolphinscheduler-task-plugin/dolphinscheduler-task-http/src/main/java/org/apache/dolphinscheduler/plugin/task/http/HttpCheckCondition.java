@@ -15,27 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.flink;
+package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+/**
+ * http check condition
+ */
+public enum HttpCheckCondition {
+    /**
+     * 0 status_code_default:200
+     * 1 status_code_custom
+     * 2 body_contains
+     * 3 body_not_contains
+     */
+    STATUS_CODE_DEFAULT,STATUS_CODE_CUSTOM, BODY_CONTAINS, BODY_NOT_CONTAINS
 
-import java.util.List;
-
-public class FlinkTaskChannelFactory implements TaskChannelFactory {
-    @Override
-    public TaskChannel create() {
-        return new FlinkTaskChannel();
-    }
-
-    @Override
-    public String getName() {
-        return "FLINK";
-    }
-
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
 }

@@ -37,9 +37,11 @@ import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCache
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
 import org.apache.commons.collections.MapUtils;
 
@@ -173,12 +175,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
             //TODO Temporary operation, To be adjusted
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+
             task = taskChannel.createTask(taskRequest, taskLogger);
             // task init
             this.task.init();
             //init varPool
-            //TODO Temporary operation, To be adjusted
-//            this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
+            this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
             // task handle
             this.task.handle();
 
@@ -189,11 +191,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(this.task.getProcessId());
             responseCommand.setAppIds(this.task.getAppIds());
-            //TODO Temporary operation, To be adjusted
-//            responseCommand.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
+            responseCommand.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
         } catch (Throwable e) {
-            e.printStackTrace();
+
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
@@ -252,7 +253,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
         return globalParamsMap;
     }
-
 
     /**
      * kill task

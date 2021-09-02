@@ -14,28 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.task.http;
 
-package org.apache.dolphinscheduler.plugin.task.flink;
-
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
-
-import java.util.List;
-
-public class FlinkTaskChannelFactory implements TaskChannelFactory {
-    @Override
-    public TaskChannel create() {
-        return new FlinkTaskChannel();
-    }
-
-    @Override
-    public String getName() {
-        return "FLINK";
-    }
-
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
+/**
+ * http parameters type
+ */
+public enum HttpParametersType {
+    /**
+     * 0 parameter;
+     * 1 body;
+     * 2 headers;
+     */
+    PARAMETER,BODY,HEADERS
 }

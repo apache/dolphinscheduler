@@ -29,7 +29,7 @@ public class PythonTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "Python";
+        return "PYTHON";
     }
 
     @Override

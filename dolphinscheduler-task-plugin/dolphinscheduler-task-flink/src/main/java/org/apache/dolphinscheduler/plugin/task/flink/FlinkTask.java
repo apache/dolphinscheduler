@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 
 public class FlinkTask extends AbstractYarnTask {
 
-
     /**
      * flink command
      * usage: flink run [OPTIONS] <jar-file> <arguments>

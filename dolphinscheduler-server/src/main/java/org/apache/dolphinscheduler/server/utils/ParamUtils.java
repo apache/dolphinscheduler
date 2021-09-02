@@ -29,8 +29,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
-import org.apache.logging.log4j.util.Strings;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,7 +79,7 @@ public class ParamUtils {
             params.putAll(globalParamsMap);
         }
 
-        if (Strings.isNotBlank(taskExecutionContext.getExecutePath())) {
+        if (StringUtils.isNotBlank(taskExecutionContext.getExecutePath())) {
             params.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
         }
         params.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));

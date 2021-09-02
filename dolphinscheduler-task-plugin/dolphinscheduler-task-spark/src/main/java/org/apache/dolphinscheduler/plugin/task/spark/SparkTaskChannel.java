@@ -15,27 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.flink;
+package org.apache.dolphinscheduler.plugin.task.spark;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
-import java.util.List;
+import org.slf4j.Logger;
 
-public class FlinkTaskChannelFactory implements TaskChannelFactory {
+public class SparkTaskChannel implements TaskChannel {
+
     @Override
-    public TaskChannel create() {
-        return new FlinkTaskChannel();
+    public void cancelApplication(boolean status) {
+
     }
 
     @Override
-    public String getName() {
-        return "FLINK";
-    }
-
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
+    public AbstractTask createTask(TaskRequest taskRequest, Logger logger) {
+        return new SparkTask(taskRequest, logger);
     }
 }
