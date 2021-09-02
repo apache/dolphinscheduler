@@ -142,6 +142,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private SchedulerService schedulerService;
+
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * create process definition
      *
@@ -193,10 +205,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkRelationJson;
         }
 
-        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
+        int tenantId = -1;
+        if (!Constants.DEFAULT.equals(tenantCode)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                putMsg(result, Status.TENANT_NOT_EXIST);
+                return result;
+            }
+            tenantId = tenant.getId();
         }
 
         long processDefinitionCode;
@@ -207,22 +223,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-            globalParams, locations, timeout, loginUser.getId(), tenant.getId());
+            globalParams, locations, timeout, loginUser.getId(), tenantId);
 
         return createProcessDefine(loginUser, result, taskRelationList, processDefinition, taskDefinitionLogs);
     }
-
-    @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private SchedulerService schedulerService;
-
-    @Autowired
-    private TenantMapper tenantMapper;
 
     private void createTaskDefinition(Map<String, Object> result,
                                       User loginUser,
@@ -238,12 +242,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (!CheckUtils.checkTaskDefinitionParameters(taskDefinitionLog)) {
                 logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
-                return;
-            }
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
-            if (taskDefinition != null) {
-                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
-                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
                 return;
             }
         }
@@ -401,6 +399,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
         } else {
+            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
+            if (tenant != null) {
+                processDefinition.setTenantCode(tenant.getTenantCode());
+            }
             DagData dagData = processService.genDagData(processDefinition);
             result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
@@ -475,10 +477,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkRelationJson;
         }
 
-        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
+        int tenantId = -1;
+        if (!Constants.DEFAULT.equals(tenantCode)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                putMsg(result, Status.TENANT_NOT_EXIST);
+                return result;
+            }
+            tenantId = tenant.getId();
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
@@ -500,21 +506,28 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
-        processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenant.getId());
-        return updateProcessDefine(loginUser, result, taskRelationList, processDefinition, taskDefinitionLogs);
+        ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
+        processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
+        return updateProcessDefine(loginUser, result, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
     }
 
     private Map<String, Object> updateProcessDefine(User loginUser,
                                                     Map<String, Object> result,
                                                     List<ProcessTaskRelationLog> taskRelationList,
                                                     ProcessDefinition processDefinition,
+                                                    ProcessDefinition processDefinitionDeepCopy,
                                                     List<TaskDefinitionLog> taskDefinitionLogs) {
-        processDefinition.setUpdateTime(new Date());
-        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
+        int insertVersion;
+        if (processDefinition.equals(processDefinitionDeepCopy)) {
+            insertVersion = processDefinitionDeepCopy.getVersion();
+        } else {
+            processDefinition.setUpdateTime(new Date());
+            insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
+        }
         if (insertVersion > 0) {
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs);
-            if (insertResult > 0) {
+            if (insertResult == Constants.EXIT_CODE_SUCCESS) {
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, processDefinition);
             } else {
@@ -1286,7 +1299,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
                 createProcessDefine(loginUser, result, taskRelationList, processDefinition, Lists.newArrayList());
             } else {
-                updateProcessDefine(loginUser, result, taskRelationList, processDefinition, Lists.newArrayList());
+                updateProcessDefine(loginUser, result, taskRelationList, processDefinition, null, Lists.newArrayList());
             }
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
