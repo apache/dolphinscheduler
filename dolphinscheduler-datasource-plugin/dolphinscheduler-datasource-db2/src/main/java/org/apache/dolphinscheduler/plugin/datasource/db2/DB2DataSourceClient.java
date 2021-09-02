@@ -26,5 +26,4 @@ public class DB2DataSourceClient extends CommonDataSourceClient {
         super(baseConnectionParam);
     }
 
-
 }

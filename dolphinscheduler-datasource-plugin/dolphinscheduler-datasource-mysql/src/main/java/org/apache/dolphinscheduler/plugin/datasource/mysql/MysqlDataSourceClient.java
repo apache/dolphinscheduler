@@ -26,5 +26,4 @@ public class MysqlDataSourceClient extends CommonDataSourceClient {
         super(baseConnectionParam);
     }
 
-
 }

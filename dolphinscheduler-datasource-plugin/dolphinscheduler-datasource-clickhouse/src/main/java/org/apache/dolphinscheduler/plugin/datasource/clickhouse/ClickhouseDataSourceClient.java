@@ -26,5 +26,4 @@ public class ClickhouseDataSourceClient extends CommonDataSourceClient {
         super(baseConnectionParam);
     }
 
-
 }

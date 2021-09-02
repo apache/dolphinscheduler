@@ -159,11 +159,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         String[] otherArray = otherParams.split(";", -1);
 
         for (String conf : otherArray) {
-//            if (HiveConfUtils.isHiveConfVar(conf)) {
-//                hiveConfListSb.append(conf).append(";");
-//            } else {
-                sessionVarListSb.append(conf).append(";");
-//            }
+            sessionVarListSb.append(conf).append(";");
         }
 
         // remove the last ";"
