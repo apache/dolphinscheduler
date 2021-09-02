@@ -15,45 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.processor;
+package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
 
-/**
- * update process host
- * this used when master failover
- */
-public class HostUpdateProcessor implements NettyRequestProcessor {
+public class HostUpdateResponseProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(HostUpdateProcessor.class);
-
-    /**
-     * task callback service
-     */
-    private final TaskCallbackService taskCallbackService;
-
-    public HostUpdateProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-    }
+    private final Logger logger = LoggerFactory.getLogger(HostUpdateResponseProcessor.class);
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUST == command.getType(), String.format("invalid command type : %s", command.getType()));
-        HostUpdateCommand updateCommand = JSONUtils.parseObject(command.getBody(), HostUpdateCommand.class);
-        logger.info("received host update command : {}", updateCommand);
-        taskCallbackService.changeRemoteChannel(updateCommand.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
+        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
+        HostUpdateResponseProcessor responseCommand = JSONUtils.parseObject(command.getBody(), HostUpdateResponseProcessor.class);
+        logger.info("received process host response command : {}", responseCommand);
     }
 }

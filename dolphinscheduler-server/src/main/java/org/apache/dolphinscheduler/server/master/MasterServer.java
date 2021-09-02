@@ -102,7 +102,6 @@ public class MasterServer implements IStoppable {
 
     private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
 
-
     /**
      * master server startup, not use web service
      *

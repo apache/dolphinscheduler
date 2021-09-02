@@ -92,6 +92,4 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         );
         taskResponseService.addResponse(taskResponseEvent);
     }
-
-
 }

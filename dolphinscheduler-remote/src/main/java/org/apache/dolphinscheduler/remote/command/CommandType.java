@@ -30,12 +30,12 @@ public enum CommandType {
     REMOVE_TAK_LOG_RESPONSE,
 
     /**
-     *  roll view log request
+     * roll view log request
      */
     ROLL_VIEW_LOG_REQUEST,
 
     /**
-     *  roll view log response
+     * roll view log response
      */
     ROLL_VIEW_LOG_RESPONSE,
 
@@ -109,24 +109,29 @@ public enum CommandType {
     PING,
 
     /**
-     *  pong
+     * pong
      */
     PONG,
 
     /**
-     *  alert send request
+     * alert send request
      */
     ALERT_SEND_REQUEST,
 
     /**
-     *  alert send response
+     * alert send response
      */
     ALERT_SEND_RESPONSE,
 
     /**
      * process host update
      */
-    PROCESS_HOST_UPDATE,
+    PROCESS_HOST_UPDATE_REQUST,
+
+    /**
+     * process host update response
+     */
+    PROCESS_HOST_UPDATE_RESPONSE,
 
     /**
      * state event request

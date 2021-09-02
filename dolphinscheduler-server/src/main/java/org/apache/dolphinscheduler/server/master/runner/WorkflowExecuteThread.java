@@ -57,10 +57,10 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.ProcessHostUpdateCommand;
+import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
@@ -98,7 +98,6 @@ public class WorkflowExecuteThread implements Runnable {
      * logger of WorkflowExecuteThread
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThread.class);
-    public static final long SEND_ASYNC_TIMEOUT_MILLIS = 10L * 1000L;
     /**
      * runing TaskNode
      */
@@ -179,7 +178,8 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      *
      */
-    private NettyRemotingClient nettyRemotingClient;
+    private NettyExecutorManager nettyExecutorManager;
+
     /**
      * submit post node
      *
@@ -203,12 +203,12 @@ public class WorkflowExecuteThread implements Runnable {
      *
      * @param processInstance      processInstance
      * @param processService       processService
-     * @param nettyRemotingClient  nettyRemotingClient
+     * @param nettyExecutorManager  nettyExecutorManager
      * @param taskTimeoutCheckList
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
-            , NettyRemotingClient nettyRemotingClient
+            , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
             , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList) {
@@ -219,7 +219,7 @@ public class WorkflowExecuteThread implements Runnable {
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
-        this.nettyRemotingClient = nettyRemotingClient;
+        this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
     }
@@ -623,18 +623,16 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void notifyProcessHostUpdate(TaskInstance taskInstance) {
-        //TODO...
-
         if (StringUtils.isEmpty(taskInstance.getHost())) {
             return;
         }
 
         try {
-            ProcessHostUpdateCommand processHostUpdateCommand = new ProcessHostUpdateCommand();
-            processHostUpdateCommand.setProcessHost(NetUtils.getAddr(masterConfig.getListenPort()));
-            processHostUpdateCommand.setTaskInstanceId(taskInstance.getId());
+            HostUpdateCommand hostUpdateCommand = new HostUpdateCommand();
+            hostUpdateCommand.setProcessHost(NetUtils.getAddr(masterConfig.getListenPort()));
+            hostUpdateCommand.setTaskInstanceId(taskInstance.getId());
             Host host = new Host(taskInstance.getHost());
-            nettyRemotingClient.sendSync(host, processHostUpdateCommand.convert2Command(), SEND_ASYNC_TIMEOUT_MILLIS);
+            nettyExecutorManager.doExecute(host, hostUpdateCommand.convert2Command());
         } catch (Exception e) {
             logger.error("notify process host update", e);
         }

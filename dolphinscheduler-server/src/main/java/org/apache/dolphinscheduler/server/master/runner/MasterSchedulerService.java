@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -82,6 +83,9 @@ public class MasterSchedulerService extends Thread {
      * netty remoting client
      */
     private NettyRemotingClient nettyRemotingClient;
+
+    @Autowired
+    NettyExecutorManager nettyExecutorManager;
 
     /**
      * master exec service
@@ -174,7 +178,7 @@ public class MasterSchedulerService extends Thread {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
                             , processService
-                            , nettyRemotingClient
+                            , nettyExecutorManager
                             , processAlertManager
                             , masterConfig
                             , taskTimeoutCheckList);
