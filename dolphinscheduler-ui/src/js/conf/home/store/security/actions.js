@@ -42,13 +42,13 @@ export default {
         param: {
           groupName: payload.groupName
         },
-        api: 'alert-group/verify-group-name'
+        api: 'alert-groups/verify-name'
       },
       alarmInstance: {
         param: {
           alertInstanceName: payload.instanceName
         },
-        api: 'alert-plugin-instance/verify-alert-instance-name'
+        api: 'alert-plugin-instances/verify-name'
       }
     }
 
@@ -350,7 +350,7 @@ export default {
    */
   queryAlertGroupListPaging ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list-paging', payload, res => {
+      io.get('alert-groups', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -362,7 +362,7 @@ export default {
    */
   queryAlertPluginInstanceListPaging ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/list-paging', payload, res => {
+      io.get('alert-plugin-instances', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -398,7 +398,7 @@ export default {
    */
   queryAllAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/queryAll', payload, res => {
+      io.get('alert-plugin-instance/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -410,7 +410,7 @@ export default {
    */
   getAlertgroup ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', payload, res => {
+      io.get('alert-groups/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -422,7 +422,7 @@ export default {
    */
   createAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/create', payload, res => {
+      io.post('alert-groups', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -434,7 +434,7 @@ export default {
    */
   createAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/create', payload, res => {
+      io.post('alert-plugin-instances', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -446,7 +446,7 @@ export default {
    */
   updateAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/update', payload, res => {
+      io.put(`alert-plugin-instances/${payload.alertPluginInstanceId}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -458,7 +458,7 @@ export default {
    */
   updateAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/update', payload, res => {
+      io.put(`alert-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -470,7 +470,7 @@ export default {
    */
   deleteAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/delete', payload, res => {
+      io.delete(`alert-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -482,7 +482,7 @@ export default {
    */
   deletAelertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/delete', payload, res => {
+      io.delete(`alert-plugin-instance/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -605,7 +605,7 @@ export default {
    */
   getAlarmGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', payload, res => {
+      io.get('alert-groups/list', payload, res => {
         state.alarmGroupsListAll = res.data
         resolve(res)
       }).catch(e => {
