@@ -72,10 +72,10 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "createEnvironment", notes = "CREATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
+        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -107,7 +107,7 @@ public class EnvironmentController extends BaseController {
         @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
         @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
-        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
