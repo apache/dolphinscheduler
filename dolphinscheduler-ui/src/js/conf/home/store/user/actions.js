@@ -99,11 +99,7 @@ export default {
    */
   generateToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-<<<<<<< HEAD
       io.post('access-tokens/generate', payload, res => {
-=======
-      io.post(`access-tokens/generate`, payload, res => {
->>>>>>> 1227214339b25df523ea6ea7b07ce35a49f18ee4
         resolve(res.data)
       }).catch(e => {
         reject(e)
