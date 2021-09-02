@@ -121,7 +121,7 @@ public class EnvironmentServiceTest {
     }
 
     @Test
-    public void testCheckParams(){
+    public void testCheckParams() {
         Map<String, Object> result = environmentService.checkParams(environmentName,getConfig(),"test");
         Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
     }

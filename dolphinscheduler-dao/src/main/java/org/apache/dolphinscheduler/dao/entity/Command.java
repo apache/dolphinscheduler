@@ -14,15 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.apache.dolphinscheduler.common.enums.*;
-
-import java.util.Date;
 
 /**
  * command
@@ -33,7 +39,7 @@ public class Command {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -156,7 +162,6 @@ public class Command {
         this.processInstancePriority = processInstancePriority;
     }
 
-
     public TaskDependType getTaskDependType() {
         return taskDependType;
     }
@@ -188,7 +193,6 @@ public class Command {
     public void setProcessDefinitionId(int processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
-
 
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
@@ -270,10 +274,11 @@ public class Command {
         this.workerGroup = workerGroup;
     }
 
-    public Long getEnvironmentCode(){
+    public Long getEnvironmentCode() {
         return this.environmentCode;
     }
-    public void setEnvironmentCode(Long environmentCode){
+
+    public void setEnvironmentCode(Long environmentCode) {
         this.environmentCode = environmentCode;
     }
 
@@ -355,25 +360,26 @@ public class Command {
         result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
         return result;
     }
+
     @Override
     public String toString() {
-        return "Command{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionId=" + processDefinitionId +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", environmentCode='" + environmentCode + '\'' +
-                '}';
+        return "Command{"
+                + "id=" + id
+                + ", commandType=" + commandType
+                + ", processDefinitionId=" + processDefinitionId
+                + ", executorId=" + executorId
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", startTime=" + startTime
+                + ", processInstancePriority=" + processInstancePriority
+                + ", updateTime=" + updateTime
+                + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
+                + '}';
     }
 }
 

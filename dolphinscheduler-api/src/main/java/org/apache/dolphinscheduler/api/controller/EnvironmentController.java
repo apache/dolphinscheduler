@@ -72,10 +72,10 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "createEnvironment", notes = "CREATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -103,11 +103,11 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "updateEnvironment", notes = "UPDATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
-            @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
+        @ApiImplicitParam(name = "code", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100"),
+        @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataType = "String"),
+        @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", required = true, dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -131,7 +131,7 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "queryEnvironmentByCode", notes = "QUERY_ENVIRONMENT_BY_CODE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
     })
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
@@ -154,9 +154,9 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "queryEnvironmentListPaging", notes = "QUERY_ENVIRONMENT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -186,7 +186,7 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "deleteEnvironmentByCode", notes = "DELETE_ENVIRONMENT_BY_CODE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", required = true, dataType = "Long", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -225,7 +225,7 @@ public class EnvironmentController extends BaseController {
      */
     @ApiOperation(value = "verifyEnvironment", notes = "VERIFY_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "environmentName", value = "ENVIRONMENT_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/verify-environment")
     @ResponseStatus(HttpStatus.OK)

@@ -510,10 +510,11 @@ public class ProcessInstance {
         this.executorName = executorName;
     }
 
-    public Long getEnvironmentCode(){
+    public Long getEnvironmentCode() {
         return this.environmentCode;
     }
-    public void setEnvironmentCode(Long environmentCode){
+
+    public void setEnvironmentCode(Long environmentCode) {
         this.environmentCode = environmentCode;
     }
 
