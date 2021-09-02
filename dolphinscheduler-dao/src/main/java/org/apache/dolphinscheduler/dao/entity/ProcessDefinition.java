@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -150,6 +151,12 @@ public class ProcessDefinition {
     private int tenantId;
 
     /**
+     * tenant code
+     */
+    @TableField(exist = false)
+    private String tenantCode;
+
+    /**
      * modify user name
      */
     @TableField(exist = false)
@@ -167,7 +174,8 @@ public class ProcessDefinition {
     @TableField(exist = false)
     private int warningGroupId;
 
-    public ProcessDefinition() {}
+    public ProcessDefinition() {
+    }
 
     public ProcessDefinition(long projectCode,
                              String name,
@@ -356,6 +364,14 @@ public class ProcessDefinition {
         this.tenantId = tenantId;
     }
 
+    public String getTenantCode() {
+        return tenantCode;
+    }
+
+    public void setTenantCode(String tenantCode) {
+        this.tenantCode = tenantCode;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -397,11 +413,32 @@ public class ProcessDefinition {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProcessDefinition that = (ProcessDefinition) o;
+        return projectCode == that.projectCode
+            && userId == that.userId
+            && timeout == that.timeout
+            && tenantId == that.tenantId
+            && Objects.equals(name, that.name)
+            && releaseState == that.releaseState
+            && Objects.equals(description, that.description)
+            && Objects.equals(globalParams, that.globalParams)
+            && flag == that.flag
+            && Objects.equals(locations, that.locations);
+    }
+
+    @Override
     public String toString() {
         return "ProcessDefinition{"
             + "id=" + id
-            + ", name='" + name + '\''
             + ", code=" + code
+            + ", name='" + name + '\''
             + ", version=" + version
             + ", releaseState=" + releaseState
             + ", projectCode=" + projectCode
@@ -418,10 +455,11 @@ public class ProcessDefinition {
             + ", locations='" + locations + '\''
             + ", scheduleReleaseState=" + scheduleReleaseState
             + ", timeout=" + timeout
-            + ", warningGroupId=" + warningGroupId
             + ", tenantId=" + tenantId
+            + ", tenantCode='" + tenantCode + '\''
             + ", modifyBy='" + modifyBy + '\''
             + ", resourceIds='" + resourceIds + '\''
+            + ", warningGroupId=" + warningGroupId
             + '}';
     }
 }

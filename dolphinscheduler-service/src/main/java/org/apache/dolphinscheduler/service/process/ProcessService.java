@@ -2135,8 +2135,9 @@ public class ProcessService {
             if (task == null) {
                 newTaskDefinitionLogs.add(taskDefinitionToUpdate);
             } else {
-                int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
                 int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
+                taskDefinitionToUpdate.setId(task.getId());
+                int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
                 if ((update & insert) != 1) {
                     return false;
                 }
@@ -2177,10 +2178,6 @@ public class ProcessService {
      */
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                                 List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
-        if (!processTaskRelationList.isEmpty()) {
-            processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
-        }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
             taskDefinitionLogMap = taskDefinitionLogs.stream()
@@ -2203,12 +2200,21 @@ public class ProcessService {
             processTaskRelationLog.setOperator(operator.getId());
             processTaskRelationLog.setOperateTime(now);
         }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+        if (!processTaskRelationList.isEmpty()) {
+            Set<Integer> processTaskRelationSet = processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
+            Set<Integer> taskRelationSet = taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
+            if (CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet)) {
+                return Constants.EXIT_CODE_SUCCESS;
+            }
+            processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+        }
         int result = processTaskRelationMapper.batchInsert(taskRelationList);
         int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
-        return result & resultLog;
+        return (result & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
-    public boolean isTaskOnline(Long taskCode) {
+    public boolean isTaskOnline(long taskCode) {
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> processDefinitionCodes = processTaskRelationList

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -236,6 +237,30 @@ public class ProcessTaskRelation {
 
     public void setPostTaskVersion(int postTaskVersion) {
         this.postTaskVersion = postTaskVersion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProcessTaskRelation that = (ProcessTaskRelation) o;
+        return processDefinitionVersion == that.processDefinitionVersion
+            && projectCode == that.projectCode
+            && processDefinitionCode == that.processDefinitionCode
+            && preTaskCode == that.preTaskCode
+            && preTaskVersion == that.preTaskVersion
+            && postTaskCode == that.postTaskCode
+            && postTaskVersion == that.postTaskVersion
+            && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, processDefinitionVersion, projectCode, processDefinitionCode, preTaskCode, preTaskVersion, postTaskCode, postTaskVersion);
     }
 
     @Override

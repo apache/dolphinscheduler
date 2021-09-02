@@ -175,7 +175,7 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result startCheckProcessDefinition(@RequestParam(value = "processDefinitionCode") int processDefinitionCode) {
+    public Result startCheckProcessDefinition(@RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
         Map<String, Object> result = execService.startCheckByProcessDefinedCode(processDefinitionCode);
         return returnDataList(result);
     }

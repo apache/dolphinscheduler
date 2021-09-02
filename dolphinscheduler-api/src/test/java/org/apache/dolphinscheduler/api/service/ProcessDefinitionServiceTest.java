@@ -36,12 +36,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
@@ -96,6 +98,8 @@ public class ProcessDefinitionServiceTest {
     private ProcessInstanceService processInstanceService;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
+    @Mock
+    private TenantMapper tenantMapper;
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -173,7 +177,9 @@ public class ProcessDefinitionServiceTest {
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-
+        Tenant tenant = new Tenant();
+        tenant.setId(1);
+        tenant.setTenantCode("root");
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
 
@@ -195,6 +201,7 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(tenant);
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, 46L);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
