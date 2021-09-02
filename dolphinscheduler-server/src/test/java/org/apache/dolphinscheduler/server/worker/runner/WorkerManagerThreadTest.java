@@ -90,10 +90,12 @@ public class WorkerManagerThreadTest {
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");
         taskExecutionContext.setHost("localhost");
+        taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/exec/process/1/2/3/4");
 
         Command ackCommand = new TaskExecuteAckCommand().convert2Command();
-        Command responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId()).convert2Command();
+        Command responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext.getProcessInstanceId()).convert2Command();
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,
