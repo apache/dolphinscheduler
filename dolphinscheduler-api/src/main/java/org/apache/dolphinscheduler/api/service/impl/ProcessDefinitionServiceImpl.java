@@ -219,7 +219,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
         } catch (SnowFlakeException e) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return result;
         }
         ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
@@ -260,15 +260,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
         if (insertVersion > 0) {
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs);
-            if (insertResult > 0) {
+            if (insertResult == Constants.EXIT_CODE_SUCCESS) {
                 putMsg(result, Status.SUCCESS);
-                // return processDefinitionCode
-                result.put(Constants.DATA_LIST, processDefinition.getCode());
+                result.put(Constants.DATA_LIST, processDefinition);
             } else {
-                putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+                putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             }
         } else {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
         }
         return result;
     }
@@ -822,7 +821,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
         } catch (SnowFlakeException e) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
         List<TaskDefinitionLog> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
