@@ -116,6 +116,14 @@ public class ProcessInstanceServiceTest {
         + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
         + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
 
+    private String taskJson = "[{\"name\":\"shell1\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
+        + "\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},"
+        + "\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\","
+        + "\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"},{\"name\":\"shell2\",\"description\":\"\","
+        + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 2\",\"conditionResult\":{\"successNode\""
+        + ":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
+        + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
+
     @Test
     public void testQueryProcessInstanceList() {
         long projectCode = 1L;
@@ -372,7 +380,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Map<String, Object> proejctAuthFailRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
+            shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
         //process instance null
@@ -382,7 +390,7 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
         Map<String, Object> processInstanceNullRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
+            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
 
         //process instance not finish
@@ -390,7 +398,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
+            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstanceNotFinishRes.get(Constants.STATUS));
 
         //process instance finish
@@ -410,15 +418,15 @@ public class ProcessInstanceServiceTest {
         when(processDefinitionService.checkProcessNodeList(shellJson)).thenReturn(result);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "root");
-        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, processInstanceFinishRes.get(Constants.STATUS));
+            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
+        Assert.assertEquals(Status.CREATE_TASK_DEFINITION_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
 
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", false, Flag.YES, "", "", 0, "root");
+            shellJson, taskJson,"2020-02-21 00:00:00", false, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
