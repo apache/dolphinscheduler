@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.exception.BaseException;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class ReflectionUtils {
             }
             result = meth.newInstance(baseConnectionParam);
         } catch (Exception e) {
-            throw new RuntimeException("Datasource plugin constructor nonstandard");
+            throw BaseException.getInstance("Datasource plugin constructor nonstandard");
         }
         return result;
     }

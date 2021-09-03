@@ -104,7 +104,7 @@ public class DataSourceClientProvider {
         try {
             classLoader = ClassLoaderUtils.getCustomClassLoader(paths, threadClassLoader, filenameFilter);
         } catch (final MalformedURLException e) {
-            throw new RuntimeException("Plugin classpath init error.");
+            throw BaseException.getInstance("Plugin classpath init error.");
         }
         logger.info("Create InstanceClassLoader Success {}", classLoader.toString());
         return classLoader;
