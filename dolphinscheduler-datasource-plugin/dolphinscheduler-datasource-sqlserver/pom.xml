@@ -39,6 +39,12 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>azure-keyvault</artifactId>
+                    <groupId>com.microsoft.azure</groupId>
+                </exclusion>
+            </exclusions>
             <version>${mssql.jdbc.version}</version>
         </dependency>
 

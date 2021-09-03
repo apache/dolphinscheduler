@@ -146,15 +146,6 @@
             <outputDirectory>plugin/db2/</outputDirectory>
         </fileSet>
 
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-db2/target/lib
-            </directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <outputDirectory>jdbc/db2/</outputDirectory>
-        </fileSet>
-
         <!-- hive -->
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-hive/target/
@@ -175,15 +166,6 @@
             <outputDirectory>plugin/mysql/</outputDirectory>
         </fileSet>
 
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-mysql/target/lib
-            </directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <outputDirectory>jdbc/mysql/</outputDirectory>
-        </fileSet>
-
         <!-- oracle -->
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-oracle/target/
@@ -194,16 +176,6 @@
             <outputDirectory>plugin/oracle/</outputDirectory>
         </fileSet>
 
-        <fileSet>
-            <directory>
-                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-oracle/target/lib
-            </directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <outputDirectory>jdbc/oracle/</outputDirectory>
-        </fileSet>
-
         <!-- postgresql -->
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-postgresql/target/
@@ -212,16 +184,6 @@
                 <include>dolphinscheduler-datasource-postgresql-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/postgresql/</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>
-                ${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-postgresql/target/lib
-            </directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <outputDirectory>jdbc/postgresql/</outputDirectory>
         </fileSet>
 
         <!-- sqlserver -->

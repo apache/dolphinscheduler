@@ -39,6 +39,20 @@
         <dependency>
             <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>com.fasterxml.jackson.core</artifactId>
+                    <groupId>jackson-core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>com.fasterxml.jackson.core</artifactId>
+                    <groupId>jackson-databind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jaxb-api</artifactId>
+                    <groupId>javax.xml.bind</groupId>
+                </exclusion>
+            </exclusions>
             <version>${clickhouse.jdbc.version}</version>
         </dependency>
 
