@@ -91,8 +91,6 @@
         <guava.version>24.1-jre</guava.version>
         <postgresql.version>42.2.5</postgresql.version>
         <hive.jdbc.version>2.1.0</hive.jdbc.version>
-        <db2.jdbc.version>11.5.5.0</db2.jdbc.version>
-        <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <commons.io.version>2.4</commons.io.version>
         <oshi.core.version>3.9.1</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>

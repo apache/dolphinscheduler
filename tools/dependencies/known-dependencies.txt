@@ -80,14 +80,6 @@ hadoop-yarn-common-2.7.3.jar
 hadoop-yarn-server-common-2.7.3.jar
 hamcrest-core-1.3.jar
 hibernate-validator-6.0.21.Final.jar
-hive-common-2.1.0.jar
-hive-jdbc-2.1.0.jar
-hive-metastore-2.1.0.jar
-hive-orc-2.1.0.jar
-hive-serde-2.1.0.jar
-hive-service-2.1.0.jar
-hive-service-rpc-2.1.0.jar
-hive-storage-api-2.1.0.jar
 htrace-core-3.1.0-incubating.jar
 httpclient-4.4.1.jar
 httpcore-4.4.1.jar
@@ -197,7 +189,6 @@ poi-4.1.2.jar
 poi-ooxml-4.1.2.jar
 poi-ooxml-schemas-4.1.2.jar
 postgresql-42.2.5.jar
-presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 protostuff-core-1.7.2.jar
 protostuff-runtime-1.7.2.jar
