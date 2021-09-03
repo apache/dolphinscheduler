@@ -110,6 +110,7 @@
       }
     },
     mounted () {
+      // TODO
       window._debug = this
 
       if (this.type === 'instance') {

@@ -150,7 +150,7 @@
             }
           }
         }))
-        // for debug
+        // TODO will be deleted
         window._graph = graph
         this.registerX6Shape()
         this.bindGraphEvent()
@@ -195,7 +195,7 @@
           this.$refs.contextMenu.setCurrentTask({
             name: cell.data.taskName,
             type: cell.data.taskType,
-            id: Number(cell.id)
+            code: Number(cell.id)
           })
         })
         // node double click
@@ -243,23 +243,57 @@
         }
       },
       /**
+       * @param {number} limit
+       * @param {string} text
+       * Each Chinese character is equal to two chars
+       */
+      truncateText (text, n) {
+        const exp = /[\u4E00-\u9FA5]/
+        let res = ''
+        let len = text.length
+        let chinese = text.match(new RegExp(exp, 'g'))
+        if (chinese) {
+          len += chinese.length
+        }
+        if (len > n) {
+          let i = 0
+          let acc = 0
+          while (true) {
+            let char = text[i]
+            if (exp.test(char)) {
+              acc += 2
+            } else {
+              acc++
+            }
+            if (acc > n) break
+            res += char
+            i++
+          }
+          res += '...'
+        } else {
+          res = text
+        }
+        return res
+      },
+      /**
        * Set node name by id
-       * @param {string} id
+       * @param {string|number} id
        * @param {string} name
        */
       setNodeName (id, name) {
+        id += ''
         const node = this.graph.getCellById(id)
         if (node) {
-          node.attr('title/text', name)
+          const truncation = this.truncateText(name, 18)
+          node.attr('title/text', truncation)
           node.setData({ taskName: name })
         }
       },
       /**
        * Set node highlight
-       * @param {Node|string} node
+       * @param {Node} node
        */
       setNodeHighlight (node) {
-        if (typeof node === 'string') node = this.graph.getCellById(node)
         const url = require(`../images/task-icos/${node.data.taskType.toLocaleLowerCase()}_hover.svg`)
         node.setAttrs(NODE_HIGHLIGHT_PROPS.attrs)
         node.setAttrByPath('image/xlink:href', url)
@@ -281,10 +315,9 @@
       },
       /**
        * Set edge highlight
-       * @param {Edge|string} edge
+       * @param {Edge} edge
        */
       setEdgeHighlight (edge) {
-        if (typeof edge === 'string') edge = this.graph.getCellById(edge)
         edge.setAttrs(EDGE_HIGHLIGHT_PROPS.attrs)
         const labelName = this.getEdgeLabelName(edge)
         if (labelName) {
@@ -382,6 +415,11 @@
        * getEdges
        * @return {Edge[]} Edge is inherited from the Cell
        */
+      // interface Edge {
+      //   label: string;
+      //   sourceId: number;
+      //   targetId: number;
+      // }
       getEdges () {
         const edges = this.graph.getEdges()
         return edges.map((edge) => {
@@ -422,6 +460,7 @@
           type: 'dagre',
           rankdir: 'LR',
           align: 'UL',
+          // Calculate the node spacing based on the edge label length
           ranksepFunc: (d) => {
             const edges = this.graph.getOutgoingEdges(d.id)
             let max = 0
@@ -451,13 +490,14 @@
       },
       /**
        * add a node to the graph
-       * @param {string} id
+       * @param {string|number} id
        * @param {string} taskType
        * @param {{x:number;y:number}} coordinate Default is { x: 100, y: 100 }
        */
       addNode (id, taskType, coordinate = { x: 100, y: 100 }) {
+        id += ''
         if (!tasksType[taskType]) {
-          console.warn(`${taskType} is not supported currently`)
+          console.warn(`taskType:${taskType} is invalid!`)
           return
         }
         const node = this.genNodeJSON(id, taskType, '', coordinate)
@@ -465,14 +505,16 @@
       },
       /**
        * generate node json
-       * @param {number} id
+       * @param {number|string} id
        * @param {string} taskType
        * @param {{x:number;y:number}} coordinate Default is { x: 100, y: 100 }
        */
       genNodeJSON (id, taskType, taskName, coordinate = { x: 100, y: 100 }) {
+        id += ''
         const url = require(`../images/task-icos/${taskType.toLocaleLowerCase()}.svg`)
+        const truncation = taskName ? this.truncateText(taskName, 18) : id
         return {
-          id: id + '',
+          id: id,
           shape: X6_NODE_NAME,
           x: coordinate.x,
           y: coordinate.y,
@@ -486,43 +528,47 @@
               'xlink:href': url
             },
             title: {
-              text: taskName || id
+              text: truncation
             }
           }
         }
       },
       /**
        * generate edge json
-       * @param {number} sourceId
-       * @param {number} targetId
+       * @param {number|string} sourceId
+       * @param {number|string} targetId
        * @param {string} label
        */
       genEdgeJSON (sourceId, targetId, label = '') {
+        sourceId += ''
+        targetId += ''
         return {
           shape: X6_EDGE_NAME,
           source: {
-            cell: sourceId + '',
+            cell: sourceId,
             port: X6_PORT_NAME
           },
           target: {
-            cell: targetId + ''
+            cell: targetId
           },
           labels: label ? [label] : undefined
         }
       },
       /**
        * remove a node
-       * @param {string} id NodeId
+       * @param {string|number} id NodeId
        */
       removeNode (id) {
+        id += ''
         this.graph.removeNode(id)
         this.removeTask(id)
       },
       /**
        * remove an edge
-       * @param {string} id EdgeId
+       * @param {string|number} id EdgeId
        */
       removeEdge (id) {
+        id += ''
         this.graph.removeEdge(id)
       },
       /**

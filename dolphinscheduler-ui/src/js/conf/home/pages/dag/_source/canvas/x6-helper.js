@@ -123,10 +123,11 @@ export const NODE_PROPS = {
     title: {
       refX: 45,
       refY: 18,
-      fontFamily: 'Courier New,Microsoft Yahei',
+      fontFamily: 'Microsoft Yahei',
       fontSize: 12,
-      fontWeight: 'normal',
-      stroke: TITLE
+      fontWeight: 'bold',
+      fill: TITLE,
+      strokeWidth: 0
     }
   },
   ports: {
@@ -148,7 +149,7 @@ export const NODE_HIGHLIGHT_PROPS = {
       strokeDasharray: '5,2'
     },
     title: {
-      stroke: STROKE_BLUE
+      fill: STROKE_BLUE
     }
   }
 }

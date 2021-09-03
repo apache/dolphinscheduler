@@ -23,44 +23,32 @@
       top: `${top}px`,
     }"
   >
-    <div
-      class="menu-item"
-      :class="startAvailable ? '' : 'disable'"
-      @click="onStart(!startAvailable)"
-    >
+    <menu-item :disabled="!startAvailable" @on-click="onStart">
       {{ $t("Start") }}
-    </div>
-    <div
-      class="menu-item"
-      :class="readOnly ? 'disable' : ''"
-      @click="onEdit(readOnly)"
-    >
+    </menu-item>
+    <menu-item :disabled="readOnly" @on-click="onEdit">
       {{ $t("Edit") }}
-    </div>
-    <div
-      class="menu-item"
-      :class="readOnly ? 'disable' : ''"
-      @click="onCopy(readOnly)"
-    >
+    </menu-item>
+    <menu-item :disabled="readOnly" @on-click="onCopy">
       {{ $t("Copy") }}
-    </div>
-    <div
-      class="menu-item"
-      :class="readOnly ? 'disable' : ''"
-      @click="onDelete(readOnly)"
-    >
+    </menu-item>
+    <menu-item :disabled="readOnly" @on-click="onDelete">
       {{ $t("Delete") }}
-    </div>
+    </menu-item>
   </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { findComponentDownward } from '@/module/util/'
+  import { mapState, mapActions, mapMutations } from 'vuex'
+  import { findComponentDownward, uuid } from '@/module/util/'
+  import MenuItem from './menuItem.vue'
 
   export default {
     name: 'dag-context-menu',
     inject: ['dagChart'],
+    components: {
+      MenuItem
+    },
     data () {
       return {
         visible: false,
@@ -68,14 +56,14 @@
         top: 0,
         canvasRef: null,
         currentTask: {
-          id: 0,
+          code: 0,
           name: '',
           type: ''
         }
       }
     },
     computed: {
-      ...mapState('dag', ['isDetails', 'releaseState']),
+      ...mapState('dag', ['isDetails', 'releaseState', 'tasks']),
       startAvailable () {
         return (
           this.$route.name === 'projects-definition-details' &&
@@ -92,6 +80,8 @@
       })
     },
     methods: {
+      ...mapActions('dag', ['genTaskCodeList']),
+      ...mapMutations('dag', ['addTask']),
       getDagCanvasRef () {
         if (this.canvasRef) {
           return this.canvasRef
@@ -104,22 +94,49 @@
       setCurrentTask (task) {
         this.currentTask = { ...this.currentTask, ...task }
       },
-      onStart (isReadOnly) {
-        if (isReadOnly) return
+      onStart () {
         this.dagChart.startRunning(this.currentTask.name)
       },
-      onEdit (isReadOnly) {
-        if (isReadOnly) return
-        this.dagChart.openFormModel(this.currentTask.id, this.currentTask.type)
+      onEdit () {
+        this.dagChart.openFormModel(this.currentTask.code, this.currentTask.type)
       },
-      onCopy (isReadOnly) {
-        if (isReadOnly) return
-        console.log(1)
-      },
-      onDelete (isReadOnly) {
-        if (isReadOnly) return
+      onCopy () {
         const canvas = this.getDagCanvasRef()
-        canvas.removeNode(this.currentTask.id + '')
+        const nodes = canvas.getNodes()
+        const targetNode = nodes.find(
+          (node) => node.id === this.currentTask.code
+        )
+        const targetTask = this.tasks.find(
+          (task) => task.code === this.currentTask.code
+        )
+
+        if (!targetNode || !targetTask) return
+
+        this.genTaskCodeList({
+          genNum: 1
+        })
+          .then((res) => {
+            const [code] = res
+            const taskName = uuid(targetTask.name + '_')
+            const task = {
+              ...targetTask,
+              code,
+              name: taskName
+            }
+            canvas.addNode(code, this.currentTask.type, {
+              x: targetNode.position.x + 100,
+              y: targetNode.position.y + 100
+            })
+            this.addTask(task)
+            canvas.setNodeName(code, taskName)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
+      },
+      onDelete () {
+        const canvas = this.getDagCanvasRef()
+        canvas.removeNode(this.currentTask.code)
       },
       show (x = 0, y = 0) {
         const canvas = this.getDagCanvasRef()

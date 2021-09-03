@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.dag-context-menu{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+<template>
+  <div class="menu-item" :class="disabled ? 'disabled' : ''" @click="onClick">
+    <slot></slot>
+  </div>
+</template>
 
-  .menu-item{
-    padding: 5px 10px;
-    border-bottom: solid 1px #f2f3f7;
-    cursor: pointer;
-    color: rgb(89, 89, 89);
-    font-size: 12px;
-
-    &:hover:not(.disabled){
-      color: #262626;
-      background-color: #f5f5f5; 
-    }
-
-    &.disabled{
-      cursor: not-allowed;
-      color: rgba(89, 89, 89, .4);
+<script>
+  export default {
+    name: 'dag-context-menu-item',
+    props: {
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    },
+    data () {
+      return {}
+    },
+    methods: {
+      onClick (e) {
+        if (this.disabled) return
+        this.$emit('on-click', e)
+      }
     }
   }
-}
+</script>
