@@ -648,7 +648,7 @@ CREATE TABLE `t_ds_environment` (
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY (`id`),
    UNIQUE KEY `environment_name_unique` (`name`),
-   UNIQUE KEY `environment_code_unique` (`name`)
+   UNIQUE KEY `environment_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
