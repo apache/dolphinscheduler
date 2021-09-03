@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="19px" height="19px" viewBox="0 0 19 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 5</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作流-1" transform="translate(-2251.000000, -189.000000)">
+            <g id="编组-5" transform="translate(2251.814728, 189.592250)">
+                <rect id="矩形" x="0" y="-3.55271368e-15" width="18" height="18"></rect>
+                <g id="quanping" transform="translate(3.000000, 2.500000)" stroke="#288FFF" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8.44777331" y1="4.31586331" x2="11.9960991" y2="0.76753749" id="路径-6"></line>
+                    <line x1="0.35112166" y1="4.31586331" x2="3.89944748" y2="0.76753749" id="路径-6备份-2" transform="translate(2.125285, 2.541700) scale(-1, 1) translate(-2.125285, -2.541700) "></line>
+                    <line x1="8.44777331" y1="12.412515" x2="11.9960991" y2="8.86418914" id="路径-6备份" transform="translate(10.221936, 10.638352) scale(1, -1) translate(-10.221936, -10.638352) "></line>
+                    <line x1="0.35112166" y1="12.412515" x2="3.89944748" y2="8.86418914" id="路径-6备份-3" transform="translate(2.125285, 10.638352) scale(-1, -1) translate(-2.125285, -10.638352) "></line>
+                    <polyline id="路径-7" transform="translate(9.778395, 2.985241) rotate(-180.000000) translate(-9.778395, -2.985241) " points="8.44777331 1.65461895 11.1090177 1.65461895 11.1090177 4.31586331"></polyline>
+                    <polyline id="路径-7备份-4" transform="translate(9.778395, 10.194811) scale(1, -1) rotate(-180.000000) translate(-9.778395, -10.194811) " points="8.44777331 8.86418914 11.1090177 8.86418914 11.1090177 11.5254335"></polyline>
+                    <polyline id="路径-7备份-2" transform="translate(2.568825, 2.985241) scale(-1, 1) rotate(-180.000000) translate(-2.568825, -2.985241) " points="1.23820312 1.65461895 3.89944748 1.65461895 3.89944748 4.31586331"></polyline>
+                    <polyline id="路径-7备份-5" transform="translate(2.568825, 10.194811) scale(-1, -1) rotate(-180.000000) translate(-2.568825, -10.194811) " points="1.23820312 8.86418914 3.89944748 8.86418914 3.89944748 11.5254335"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

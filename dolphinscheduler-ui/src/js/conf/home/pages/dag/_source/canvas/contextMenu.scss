@@ -1,4 +1,3 @@
-import d3 from 'd3'
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,24 +14,29 @@ import d3 from 'd3'
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.dag-context-menu{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
 
-const DragZoom = function () {
-  this.element = {}
-  this.zoom = {}
-  this.scale = 1
+  .menu-item{
+    padding: 5px 10px;
+    border-bottom: solid 1px #f2f3f7;
+    cursor: pointer;
+    color: rgb(89, 89, 89);
+    font-size: 12px;
+
+    &:hover:not(.disable){
+      color: #262626;
+      background-color: #f5f5f5; 
+    }
+
+    &.disable{
+      cursor: not-allowed;
+      color: rgba(89, 89, 89, .4);
+    }
+  }
 }
-
-DragZoom.prototype.init = function () {
-  const $canvas = $('#canvas')
-  this.element = d3.select('#canvas')
-  this.zoom = d3.behavior.zoom()
-    .scaleExtent([0.5, 2])
-    .on('zoom', () => {
-      this.scale = d3.event.scale
-      $canvas.css('transform', 'scale(' + this.scale + ')')
-      $canvas.css('transform-origin', '0 0')
-    })
-  this.element.call(this.zoom).on('dblclick.zoom', null)
-}
-
-export default new DragZoom()

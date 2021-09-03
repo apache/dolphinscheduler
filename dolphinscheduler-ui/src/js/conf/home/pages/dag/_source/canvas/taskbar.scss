@@ -1,0 +1,166 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.dag-taskbar {
+  width: 190px;
+  height: 100%;
+  background-color: #fff;
+  margin-right: 20px;
+
+  .taskbar-title {
+    display: flex;
+    border-bottom: dashed 1px #e5e5e5;
+    height: 42px;
+    padding: 0 20px;
+    align-items: center;
+
+    h4 {
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  .tasks {
+    width: 100%;
+    padding: 10px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    max-height: calc(100% - 42px);
+    overflow: auto;
+
+    .draggable-box {
+      cursor: move;
+      width: 100%;
+      height: 32px;
+      margin-bottom: 10px;
+
+      .task-item {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border: 1px dashed #e4e4e4;
+        padding: 0 10px;
+        border-radius: 4px;
+
+        em {
+          margin-right: 10px;
+          display: block;
+          width: 18px;
+          height: 18px;
+          &.icos-shell {
+            background: url("../images/task-icos/shell.svg") no-repeat 50% 50%;
+          }
+          &.icos-sub_process {
+            background: url("../images/task-icos/sub_process.svg") no-repeat 50% 50%;
+          }
+          &.icos-procedure {
+            background: url("../images/task-icos/procedure.svg") no-repeat 50% 50%;
+          }
+          &.icos-sql {
+            background: url("../images/task-icos/sql.svg") no-repeat 50% 50%;
+          }
+          &.icos-flink {
+            background: url("../images/task-icos/flink.svg") no-repeat 50% 50%;
+          }
+          &.icos-mr {
+            background: url("../images/task-icos/mr.svg") no-repeat 50% 50%;
+          }
+          &.icos-python {
+            background: url("../images/task-icos/python.svg") no-repeat 50% 50%;
+          }
+          &.icos-dependent {
+            background: url("../images/task-icos/dependent.svg") no-repeat 50% 50%;
+          }
+          &.icos-http {
+            background: url("../images/task-icos/http.svg") no-repeat 50% 50%;
+          }
+          &.icos-datax {
+            background: url("../images/task-icos/datax.svg") no-repeat 50% 50%;
+          }
+          &.icos-sqoop {
+            background: url("../images/task-icos/sqoop.svg") no-repeat 50% 50%;
+          }
+          &.icos-conditions {
+            background: url("../images/task-icos/conditions.svg") no-repeat 50% 50%;
+          }
+          &.icos-waterdrop {
+            background: url("../images/task-icos/waterdrop.svg") no-repeat 50% 50%;
+          }
+          &.icos-spark {
+            background: url("../images/task-icos/spark.svg") no-repeat 50% 50%;
+          }
+        }
+
+        span {
+          font-size: 12px;
+        }
+
+        &:hover {
+          color: #288fff;
+          border: 1px dashed #288fff;
+          background: rgba(40, 143, 255, 0.1);
+
+          em {
+            &.icos-shell {
+              background: url("../images/task-icos/shell_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-sub_process {
+              background: url("../images/task-icos/sub_process_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-procedure {
+              background: url("../images/task-icos/procedure_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-sql {
+              background: url("../images/task-icos/sql_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-flink {
+              background: url("../images/task-icos/flink_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-mr {
+              background: url("../images/task-icos/mr_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-python {
+              background: url("../images/task-icos/python_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-dependent {
+              background: url("../images/task-icos/dependent_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-http {
+              background: url("../images/task-icos/http_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-datax {
+              background: url("../images/task-icos/datax_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-sqoop {
+              background: url("../images/task-icos/sqoop_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-conditions {
+              background: url("../images/task-icos/conditions_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-waterdrop {
+              background: url("../images/task-icos/waterdrop_hover.svg") no-repeat 50% 50%;
+            }
+            &.icos-spark {
+              background: url("../images/task-icos/spark_hover.svg") no-repeat 50% 50%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
