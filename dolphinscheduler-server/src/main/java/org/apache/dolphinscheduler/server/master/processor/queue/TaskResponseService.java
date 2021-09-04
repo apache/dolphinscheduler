@@ -88,13 +88,17 @@ public class TaskResponseService {
 
     @PreDestroy
     public void stop() {
-        this.taskResponseWorker.interrupt();
-        if (!eventQueue.isEmpty()) {
-            List<TaskResponseEvent> remainEvents = new ArrayList<>(eventQueue.size());
-            eventQueue.drainTo(remainEvents);
-            for (TaskResponseEvent event : remainEvents) {
-                this.persist(event);
+        try {
+            this.taskResponseWorker.interrupt();
+            if (!eventQueue.isEmpty()) {
+                List<TaskResponseEvent> remainEvents = new ArrayList<>(eventQueue.size());
+                eventQueue.drainTo(remainEvents);
+                for (TaskResponseEvent event : remainEvents) {
+                    this.persist(event);
+                }
             }
+        } catch (Exception e) {
+            logger.error("stop error:", e);
         }
     }
 
