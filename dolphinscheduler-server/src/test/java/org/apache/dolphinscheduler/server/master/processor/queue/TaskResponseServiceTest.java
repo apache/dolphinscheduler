@@ -57,20 +57,22 @@ public class TaskResponseServiceTest {
         taskRspService.start();
 
         ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
-            new Date(),
-            "127.*.*.*",
-            "path",
-            "logPath",
-            22,
-            channel);
+                new Date(),
+                "127.*.*.*",
+                "path",
+                "logPath",
+                22,
+                channel,
+                1);
 
         resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
-            new Date(),
-            1,
-            "ids",
-            22,
-            "varPol",
-            channel);
+                new Date(),
+                1,
+                "ids",
+                22,
+                "varPol",
+                channel,
+                1);
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);
@@ -91,5 +93,4 @@ public class TaskResponseServiceTest {
             taskRspService.stop();
         }
     }
-
 }
