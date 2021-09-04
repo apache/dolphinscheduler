@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,8 +49,8 @@ public class JdbcReaderTest extends FlowTestBase {
 
     @Test
     public void testJdbcConnectorExecute() {
-        JdbcReader jdbcConnector = new JdbcReader(buildReaderConfig());
-        jdbcConnector.read(sparkRuntimeEnvironment);
+        JdbcReader jdbcReader = new JdbcReader(buildReaderConfig());
+        Assert.assertNotNull(jdbcReader.read(sparkRuntimeEnvironment));
     }
 
     private Config buildReaderConfig() {

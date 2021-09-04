@@ -169,19 +169,19 @@ INSERT INTO `t_ds_dq_comparison_type`
 VALUES(1, '固定值', NULL, NULL, NULL, '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(2, '日波动', 'select round(avg(statistics_value),2) as day_avg from `t_ds_dq_task_statistics_value` where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and rule_id = ${rule_id} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(2, '日波动', 'select round(avg(statistics_value),2) as day_avg from `t_ds_dq_task_statistics_value` where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(3, '周波动', 'select round(avg(statistics_value),2) as week_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and rule_id = ${rule_id} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(3, '周波动', 'select round(avg(statistics_value),2) as week_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(4, '月波动', 'select round(avg(statistics_value),2) as month_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and rule_id = ${rule_id} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(4, '月波动', 'select round(avg(statistics_value),2) as month_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(5, '最近7天波动', 'select round(avg(statistics_value),2) as last_7_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and rule_id = ${rule_id} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(5, '最近7天波动', 'select round(avg(statistics_value),2) as last_7_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(6, '最近30天波动', 'select round(avg(statistics_value),2) as last_30_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and rule_id = ${rule_id} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(6, '最近30天波动', 'select round(avg(statistics_value),2) as last_30_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
 VALUES(7, '源表总行数', 'SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})', 'total_count', 'total_count.total', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
@@ -299,7 +299,7 @@ INSERT INTO `t_ds_dq_rule_execute_sql`
 VALUES(7, 1, 'SELECT COUNT(*) AS duplicates FROM duplicate_items', 'duplicate_count', 1, false, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_execute_sql`
 (`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
-VALUES(8, 1, 'SELECT * FROM (SELECT * FROM ${src_table} WHERE (${src_filter})) ${src_table} LEFT JOIN (SELECT * FROM ${target_table} WHERE (${target_filter})) ${target_table} ON ${on_clause} WHERE ${where_clause}', 'miss_items', 0, true, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(8, 1, 'SELECT ${src_table}.* FROM (SELECT * FROM ${src_table} WHERE (${src_filter})) ${src_table} LEFT JOIN (SELECT * FROM ${target_table} WHERE (${target_filter})) ${target_table} ON ${on_clause} WHERE ${where_clause}', 'miss_items', 0, true, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_execute_sql`
 (`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(9, 1, 'SELECT * FROM ${src_table} WHERE (${src_field} not regexp ''${regexp_pattern}'') AND (${src_filter}) ', 'regexp_items', 0, true, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
@@ -444,10 +444,11 @@ DROP TABLE IF EXISTS `t_ds_dq_task_statistics_value`;
 CREATE TABLE `t_ds_dq_task_statistics_value` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `process_definition_id` int(11) DEFAULT NULL,
-    `task_definition_id` int(11) DEFAULT NULL,
+    `task_instance_id` int(11) DEFAULT NULL,
     `rule_id` int(11) NOT NULL,
-    `statistics_name` varchar(255) DEFAULT NULL,
-    `statistics_value` double DEFAULT NULL,
+    `unique_code` varchar(255) NULL,
+    `statistics_name` varchar(255) NULL,
+    `statistics_value` double NULL,
     `data_time` datetime DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,

@@ -114,8 +114,6 @@ public class DataQualityTask extends AbstractYarnTask {
                 .setQueue(dqTaskExecutionContext.getQueue());
 
         setMainJarName();
-
-        logger.info("dataQualityParameters: {}", JSONUtils.toJsonString(dataQualityParameters));
     }
 
     private void operateInputParameter(Map<String, String> inputParameter, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
@@ -131,7 +129,6 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put("process_definition_id", String.valueOf(dqTaskExecutionContext.getProcessDefineId()));
         inputParameter.put("process_instance_id", String.valueOf(dqTaskExecutionContext.getProcessInstanceId()));
         inputParameter.put("task_instance_id", String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
-        inputParameter.put("task_definition_id", String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
             inputParameter.put(DATA_TIME,StringUtils.wrapperSingleQuotes(now));
@@ -150,8 +147,6 @@ public class DataQualityTask extends AbstractYarnTask {
         } else {
             inputParameter.put(ERROR_OUTPUT_PATH,"");
         }
-
-        logger.info("DataQualityTask InputParameter: {}", JSONUtils.toJsonString(inputParameter));
     }
 
     @Override

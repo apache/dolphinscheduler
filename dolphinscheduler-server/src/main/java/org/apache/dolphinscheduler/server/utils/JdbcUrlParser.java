@@ -63,10 +63,10 @@ public class JdbcUrlParser {
         }
 
         String driverName = jdbcUrl.substring(5, pos1);
-        String params = null;
-        String host = null;
-        String database = null;
-        String port = null;
+        String params = "";
+        String host = "";
+        String database = "";
+        String port = "";
         if (((pos2 = jdbcUrl.indexOf(SEMICOLON, pos1)) == -1) && ((pos2 = jdbcUrl.indexOf(QUESTION, pos1)) == -1)) {
             tempUri = jdbcUrl.substring(pos1 + 1);
         } else {

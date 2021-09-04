@@ -197,9 +197,17 @@ public class TaskResponseService {
 
     private void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
-            processService.updateDqExecuteResultUserId(taskResponseEvent.getTaskInstanceId());
+            int taskInstanceId = taskResponseEvent.getTaskInstanceId();
+            if (taskResponseEvent.getState().typeIsFailure()
+                    || taskResponseEvent.getState().typeIsCancel()) {
+                processService.deleteDqExecuteResultByTaskInstanceId(taskInstanceId);
+                processService.deleteTaskStatisticsValueByTaskInstanceId(taskInstanceId);
+                return;
+            }
+
+            processService.updateDqExecuteResultUserId(taskInstanceId);
             DqExecuteResult dqExecuteResult =
-                    processService.getDqExecuteResultByTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+                    processService.getDqExecuteResultByTaskInstanceId(taskInstanceId);
             if (dqExecuteResult != null) {
                 //check the result ,if result is failure do some operator by failure strategy
                 checkDqExecuteResult(taskResponseEvent, dqExecuteResult);

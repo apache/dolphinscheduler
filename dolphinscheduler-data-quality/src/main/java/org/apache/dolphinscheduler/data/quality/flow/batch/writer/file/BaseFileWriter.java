@@ -58,7 +58,7 @@ public abstract class BaseFileWriter implements BatchWriter {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-        Map<String,Object> defaultConfig = new HashMap<String, Object>(4);
+        Map<String,Object> defaultConfig = new HashMap<>();
 
         defaultConfig.put(PARTITION_BY, Collections.emptyList());
         defaultConfig.put(SAVE_MODE,"error");

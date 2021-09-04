@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -209,6 +210,11 @@ public class DependencyConfig {
     @Bean
     public DqComparisonTypeMapper dqComparisonTypeMapper() {
         return Mockito.mock(DqComparisonTypeMapper.class);
+    }
+
+    @Bean
+    public DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper() {
+        return Mockito.mock(DqTaskStatisticsValueMapper.class);
     }
 
     @Bean

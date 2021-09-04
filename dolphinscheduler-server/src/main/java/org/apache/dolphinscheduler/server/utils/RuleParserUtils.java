@@ -27,6 +27,9 @@ import static org.apache.dolphinscheduler.common.Constants.HDFS_FILE;
 import static org.apache.dolphinscheduler.common.Constants.INDEX;
 import static org.apache.dolphinscheduler.common.Constants.INPUT_TABLE;
 import static org.apache.dolphinscheduler.common.Constants.OUTPUT_TABLE;
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_BUSINESS_DATE;
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_CURRENT_DATE;
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_DATETIME;
 import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.Constants.PATH;
 import static org.apache.dolphinscheduler.common.Constants.SQL;
@@ -56,6 +59,8 @@ import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.EnvConfig;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parser.MappingColumn;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -485,5 +490,43 @@ public class RuleParserUtils {
         }
 
         return baseConfig;
+    }
+
+    public static String generateUniqueCode(Map<String, String> inputParameterValue) {
+
+        if (MapUtils.isEmpty(inputParameterValue)) {
+            return "-1";
+        }
+
+        Map<String,String> newInputParameterValue = new HashMap<>(inputParameterValue);
+
+        newInputParameterValue.remove("rule_type");
+        newInputParameterValue.remove("rule_name");
+        newInputParameterValue.remove("create_time");
+        newInputParameterValue.remove("update_time");
+        newInputParameterValue.remove("process_definition_id");
+        newInputParameterValue.remove("process_instance_id");
+        newInputParameterValue.remove("task_instance_id");
+        newInputParameterValue.remove("check_type");
+        newInputParameterValue.remove("operator");
+        newInputParameterValue.remove("threshold");
+        newInputParameterValue.remove("failure_strategy");
+        newInputParameterValue.remove("operator");
+        newInputParameterValue.remove("threshold");
+        newInputParameterValue.remove("data_time");
+        newInputParameterValue.remove("error_output_path");
+        newInputParameterValue.remove("comparison_type");
+        newInputParameterValue.remove("comparison_name");
+        newInputParameterValue.remove("comparison_table");
+        newInputParameterValue.remove(PARAMETER_CURRENT_DATE);
+        newInputParameterValue.remove(PARAMETER_BUSINESS_DATE);
+        newInputParameterValue.remove(PARAMETER_DATETIME);
+
+        StringBuilder sb = new StringBuilder();
+        for (String value : newInputParameterValue.values()) {
+            sb.append(value);
+        }
+
+        return Md5Utils.getMd5(sb.toString(),true);
     }
 }

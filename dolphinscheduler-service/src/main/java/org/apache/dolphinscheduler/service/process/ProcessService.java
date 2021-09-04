@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
+import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -78,6 +79,7 @@ import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -185,6 +187,9 @@ public class ProcessService {
 
     @Autowired
     private DqComparisonTypeMapper dqComparisonTypeMapper;
+
+    @Autowired
+    private DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -2106,6 +2111,18 @@ public class ProcessService {
 
     public int updateDqExecuteResultState(DqExecuteResult dqExecuteResult) {
         return dqExecuteResultMapper.updateById(dqExecuteResult);
+    }
+
+    public int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId) {
+        return dqExecuteResultMapper.delete(
+                new QueryWrapper<DqExecuteResult>()
+                        .eq(Constants.TASK_INSTANCE_ID,taskInstanceId));
+    }
+
+    public int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId) {
+        return dqTaskStatisticsValueMapper.delete(
+                new QueryWrapper<DqTaskStatisticsValue>()
+                        .eq(Constants.TASK_INSTANCE_ID,taskInstanceId));
     }
 
     public DqRule getDqRule(int ruleId) {

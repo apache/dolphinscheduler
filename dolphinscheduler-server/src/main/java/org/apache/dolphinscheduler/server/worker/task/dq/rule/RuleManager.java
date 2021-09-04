@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.server.worker.task.dq.rule;
 
 import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.UNIQUE_CODE;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.exception.DolphinException;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
@@ -75,9 +77,10 @@ public class RuleManager {
     public static final String TASK_STATISTICS_VALUE_WRITER_SQL =
             "select "
                     + "${process_definition_id} as process_definition_id,"
-                    + "${task_definition_id} as task_definition_id,"
+                    + "${task_instance_id} as task_instance_id,"
                     + "${rule_id} as rule_id,"
-                    + "'${statistics_name}'AS statistics_name, "
+                    + "${unique_code} as unique_code,"
+                    + "'${statistics_name}'AS statistics_name,"
                     + "${statistics_name} AS statistics_value,"
                     + "${data_time} as data_time,"
                     + "${create_time} as create_time,"
@@ -91,17 +94,17 @@ public class RuleManager {
 
     /**
      * @return DataQualityConfiguration
-     * @throws Exception Exception
+     * @throws DolphinException DolphinException
      */
     public DataQualityConfiguration generateDataQualityParameter() throws DolphinException {
 
         Map<String, String> inputParameterValueResult =
                 RuleParserUtils.getInputParameterMapFromEntryList(dataQualityTaskExecutionContext.getRuleInputEntryList());
         inputParameterValueResult.putAll(inputParameterValue);
-
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
-
         inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, FIXED_VALUE_COMPARISON_TYPE);
+        inputParameterValueResult.put(UNIQUE_CODE,
+                StringUtils.wrapperSingleQuotes(RuleParserUtils.generateUniqueCode(inputParameterValueResult)));
 
         IRuleParser ruleParser = null;
         switch (dataQualityTaskExecutionContext.getRuleType()) {

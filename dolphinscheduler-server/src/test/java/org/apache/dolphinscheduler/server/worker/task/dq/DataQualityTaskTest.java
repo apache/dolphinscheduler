@@ -118,7 +118,6 @@ public class DataQualityTaskTest {
         inputParameterValue.put("process_definition_id","21");
         inputParameterValue.put("process_instance_id","284");
         inputParameterValue.put("task_instance_id","287");
-        inputParameterValue.put("task_definition_id","287");
         inputParameterValue.put("data_time","'2021-08-12 10:15:48'");
         inputParameterValue.put("error_output_path","hdfs://192.168.0.1:8022/user/ods/data_quality_error_data/21_284_287");
 
@@ -523,7 +522,6 @@ public class DataQualityTaskTest {
         inputParameterValue.put("process_definition_id","1");
         inputParameterValue.put("process_instance_id","1");
         inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("task_definition_id","1");
         inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
         inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test2");
 
@@ -812,7 +810,6 @@ public class DataQualityTaskTest {
         inputParameterValue.put("process_definition_id","1");
         inputParameterValue.put("process_instance_id","1");
         inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("task_definition_id","1");
         inputParameterValue.put("data_time","'2021-08-25 00:00:00'");
         inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_1");
 
@@ -1134,7 +1131,6 @@ public class DataQualityTaskTest {
         inputParameterValue.put("process_definition_id","1");
         inputParameterValue.put("process_instance_id","1");
         inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("task_definition_id","1");
         inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
         inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
 

@@ -46,10 +46,10 @@ public class DqTaskStatisticsValue implements Serializable {
     @TableField(exist = false)
     private String  processDefinitionName;
     /**
-     * task definition id
+     * task instance id
      */
-    @TableField(value = "task_definition_id")
-    private long taskDefinitionId;
+    @TableField(value = "task_instance_id")
+    private long taskInstanceId;
     /**
      * task name
      */
@@ -123,12 +123,12 @@ public class DqTaskStatisticsValue implements Serializable {
         this.processDefinitionName = processDefinitionName;
     }
 
-    public long getTaskDefinitionId() {
-        return taskDefinitionId;
+    public long getTaskInstanceId() {
+        return taskInstanceId;
     }
 
-    public void setTaskDefinitionId(long taskDefinitionId) {
-        this.taskDefinitionId = taskDefinitionId;
+    public void setTaskInstanceId(long taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
     }
 
     public String getTaskName() {
@@ -209,7 +209,7 @@ public class DqTaskStatisticsValue implements Serializable {
                 + "id=" + id
                 + ", processDefinitionId=" + processDefinitionId
                 + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", taskDefinitionId=" + taskDefinitionId
+                + ", taskInstanceId=" + taskInstanceId
                 + ", taskName='" + taskName + '\''
                 + ", ruleId=" + ruleId
                 + ", ruleType=" + ruleType
