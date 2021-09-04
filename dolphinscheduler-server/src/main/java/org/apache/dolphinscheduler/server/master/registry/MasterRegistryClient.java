@@ -292,9 +292,12 @@ public class MasterRegistryClient {
                     || processInstance.getHost().equalsIgnoreCase(workerHost)) {
                 // only failover the task owned myself if worker down.
                 // failover master need handle worker at the same time
-                if (processInstance != null) {
-                    taskInstance.setProcessInstance(processInstance);
+                if (processInstance == null) {
+                    logger.error("failover error, the process {} of task {} do not exists.",
+                            taskInstance.getProcessInstanceId(), taskInstance.getId());
+                    continue;
                 }
+                taskInstance.setProcessInstance(processInstance);
 
                 TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                         .buildTaskInstanceRelatedInfo(taskInstance)
