@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_PAS
 import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_URL;
 import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_USERNAME;
 
+import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
@@ -31,9 +32,11 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.curator.test.TestingServer;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -48,27 +51,36 @@ public class StandaloneServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneServer.class);
 
     public static void main(String[] args) throws Exception {
+        Thread.currentThread().setName("Standalone-Server");
+
         System.setProperty("spring.profiles.active", "api");
 
-        final Path temp = Files.createTempDirectory("dolphinscheduler_");
-        LOGGER.info("H2 database directory: {}", temp);
-        System.setProperty(
-                SPRING_DATASOURCE_DRIVER_CLASS_NAME,
-                org.h2.Driver.class.getName()
-        );
-        System.setProperty(
-                SPRING_DATASOURCE_URL,
-                String.format("jdbc:h2:tcp://localhost/%s", temp.toAbsolutePath())
-        );
-        System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
-        System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
+        startDatabase();
 
-        Server.createTcpServer("-ifNotExists").start();
+        startRegistry();
 
-        final DataSource ds = ConnectionFactory.getInstance().getDataSource();
-        final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
-        runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
+        startAlertServer();
 
+        new SpringApplicationBuilder(
+                ApiApplicationServer.class,
+                MasterServer.class,
+                WorkerServer.class
+        ).run(args);
+    }
+
+    private static void startAlertServer() {
+        final Path alertPluginPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
+        ).toAbsolutePath();
+        if (Files.exists(alertPluginPath)) {
+            System.setProperty("alert.plugin.binding", alertPluginPath.toString());
+            System.setProperty("alert.plugin.dir", "");
+        }
+        AlertServer.getInstance().start();
+    }
+
+    private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
 
@@ -80,13 +92,26 @@ public class StandaloneServer {
             System.setProperty("registry.plugin.binding", registryPath.toString());
             System.setProperty("registry.plugin.dir", "");
         }
+    }
 
-        Thread.currentThread().setName("Standalone-Server");
+    private static void startDatabase() throws IOException, SQLException {
+        final Path temp = Files.createTempDirectory("dolphinscheduler_");
+        LOGGER.info("H2 database directory: {}", temp);
+        System.setProperty(
+                SPRING_DATASOURCE_DRIVER_CLASS_NAME,
+                org.h2.Driver.class.getName()
+        );
+        System.setProperty(
+                SPRING_DATASOURCE_URL,
+                String.format("jdbc:h2:tcp://localhost/%s;MODE=MySQL;DATABASE_TO_LOWER=true", temp.toAbsolutePath())
+        );
+        System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
+        System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
 
-        new SpringApplicationBuilder(
-                ApiApplicationServer.class,
-                MasterServer.class,
-                WorkerServer.class
-        ).run(args);
+        Server.createTcpServer("-ifNotExists").start();
+
+        final DataSource ds = ConnectionFactory.getInstance().getDataSource();
+        final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
+        runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
     }
 }
