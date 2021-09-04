@@ -87,7 +87,9 @@ public class TaskResponseServiceTest {
 
     @After
     public void after() {
-        taskRspService.stop();
+        if (taskRspService != null) {
+            taskRspService.stop();
+        }
     }
 
 }
