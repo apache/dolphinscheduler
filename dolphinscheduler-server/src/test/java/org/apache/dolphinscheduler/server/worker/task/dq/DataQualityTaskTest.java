@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq;
 
+import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
+
 import org.apache.dolphinscheduler.common.enums.dq.*;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
@@ -36,9 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.*;
-
-import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
 
 /**
  * DataQualityTaskTest
