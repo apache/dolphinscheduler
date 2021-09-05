@@ -113,6 +113,7 @@ public class StateEventResponseService {
                     persist(stateEvent);
                 } catch (InterruptedException e) {
                     logger.warn("persist task error", e);
+                    Thread.currentThread().interrupt();
                 }
             }
             logger.info("StateEventResponseWorker stopped");
