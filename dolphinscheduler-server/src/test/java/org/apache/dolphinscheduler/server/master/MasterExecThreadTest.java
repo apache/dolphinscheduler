@@ -22,41 +22,40 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.Flag;
+import javafx.concurrent.Task;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.BlockingTaskExecThread;
+import org.apache.dolphinscheduler.server.master.runner.MasterBaseTaskExecThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -82,11 +81,17 @@ public class MasterExecThreadTest {
 
     private ApplicationContext applicationContext;
 
+    private Field dag;
+
+    @InjectMocks
+    private ProcessAlertManager alertManager;
+
     @Before
     public void init() throws Exception {
         processService = mock(ProcessService.class);
 
         applicationContext = mock(ApplicationContext.class);
+        alertManager = mock(ProcessAlertManager.class);
         config = new MasterConfig();
         config.setMasterExecTaskNum(1);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
@@ -105,14 +110,13 @@ public class MasterExecThreadTest {
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config));
+        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, alertManager, config));
         // prepareProcess init dag
-        Field dag = MasterExecThread.class.getDeclaredField("dag");
+        dag = MasterExecThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(masterExecThread, new DAG());
         PowerMockito.doNothing().when(masterExecThread, "executeProcess");
         PowerMockito.doNothing().when(masterExecThread, "prepareProcess");
-        PowerMockito.doNothing().when(masterExecThread, "runProcess");
         PowerMockito.doNothing().when(masterExecThread, "endProcess");
     }
 
@@ -122,6 +126,7 @@ public class MasterExecThreadTest {
     @Test
     public void testParallelWithOutSchedule() throws ParseException {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
@@ -140,6 +145,7 @@ public class MasterExecThreadTest {
     @Test
     public void testParallelWithSchedule() {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
@@ -154,6 +160,7 @@ public class MasterExecThreadTest {
     @Test
     public void testParseStartNodeName() throws ParseException {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODE_NAMES, "t1,t2,t3");
             Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
@@ -170,6 +177,7 @@ public class MasterExecThreadTest {
     @Test
     public void testRetryTaskIntervalOverTime() {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             TaskInstance taskInstance = new TaskInstance();
             taskInstance.setId(0);
             taskInstance.setMaxRetryTimes(0);
@@ -187,6 +195,7 @@ public class MasterExecThreadTest {
     @Test
     public void testGetStartTaskInstanceList() {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             TaskInstance taskInstance1 = new TaskInstance();
             taskInstance1.setId(1);
             TaskInstance taskInstance2 = new TaskInstance();
@@ -214,6 +223,7 @@ public class MasterExecThreadTest {
     @Test
     public void testGetPreVarPool() {
         try {
+            PowerMockito.doNothing().when(masterExecThread, "runProcess");
             Set<String> preTaskName = new HashSet<>();
             preTaskName.add("test1");
             preTaskName.add("test2");
@@ -255,6 +265,68 @@ public class MasterExecThreadTest {
         }
     }
 
+    @Test
+    public void testBlockingWithNoBlocked(){
+        try{
+            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            dag.set(masterExecThread,genDagForBlockingTest());
+            TaskInstance blockingTaskInstance = getBlockingTaskInstance(false);
+            initEnvForBlockingTest(false,blockingTaskInstance,masterExecThreadClass);
+            // test method
+            Method main = masterExecThreadClass.getDeclaredMethod("runProcess");
+            main.setAccessible(true);
+            main.invoke(masterExecThread);
+            verify(processInstance).setBlockingFlag(false);
+            verify(processInstance,never()).setState(ExecutionStatus.READY_PAUSE);
+            Assert.assertEquals(false,processInstance.getBlockingFlag());
+            Assert.assertEquals(ExecutionStatus.SUCCESS,processInstance.getState());
+        }catch (Exception e){
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testBlockingWithBlockedWithoutAlert(){
+        try{
+            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            dag.set(masterExecThread,genDagForBlockingTest());
+            TaskInstance blockingTaskInstance = getBlockingTaskInstance(false);
+            initEnvForBlockingTest(true,blockingTaskInstance,masterExecThreadClass);
+            // test method
+            Method main = masterExecThreadClass.getDeclaredMethod("runProcess");
+            main.setAccessible(true);
+            main.invoke(masterExecThread);
+            verify(processInstance).setBlockingFlag(true);
+            verify(processInstance).setState(ExecutionStatus.READY_PAUSE);
+            verify(alertManager,never()).sendProcessBlockingAlert(processInstance,blockingTaskInstance,null);
+            Assert.assertEquals(true,processInstance.getBlockingFlag());
+            Assert.assertEquals(ExecutionStatus.READY_PAUSE,processInstance.getState());
+        }catch (Exception e){
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testBlockingWithBlockedWithAlert(){
+        try{
+            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            dag.set(masterExecThread,genDagForBlockingTest());
+            TaskInstance blockingTaskInstance = getBlockingTaskInstance(true);
+            initEnvForBlockingTest(true,blockingTaskInstance,masterExecThreadClass);
+            // test method
+            Method main = masterExecThreadClass.getDeclaredMethod("runProcess");
+            main.setAccessible(true);
+            main.invoke(masterExecThread);
+            verify(processInstance).setBlockingFlag(true);
+            verify(processInstance).setState(ExecutionStatus.READY_PAUSE);
+            verify(alertManager).sendProcessBlockingAlert(processInstance,blockingTaskInstance,null);
+            Assert.assertEquals(true,processInstance.getBlockingFlag());
+            Assert.assertEquals(ExecutionStatus.READY_PAUSE,processInstance.getState());
+        }catch (Exception e){
+            Assert.fail();
+        }
+    }
+
     private List<Schedule> zeroSchedulerList() {
         return Collections.EMPTY_LIST;
     }
@@ -265,6 +337,91 @@ public class MasterExecThreadTest {
         schedule.setCrontab("0 0 0 1/2 * ?");
         schedulerList.add(schedule);
         return schedulerList;
+    }
+
+    private TaskInstance getBlockingTaskInstance(boolean isAlert){
+        // define fake blocking task instance
+        TaskInstance blockingTaskInstance = new TaskInstance();
+        blockingTaskInstance.setId(1);
+        blockingTaskInstance.setName("1");
+        blockingTaskInstance.setTaskCode(1L);
+        blockingTaskInstance.setTaskDefinitionVersion(1);
+        blockingTaskInstance.setTaskType("BLOCKING");
+        blockingTaskInstance.setState(ExecutionStatus.SUCCESS);
+        blockingTaskInstance.setAlertWhenBlocking(isAlert);
+        return blockingTaskInstance;
+    }
+
+    private void initEnvForBlockingTest(boolean blockingLogic, TaskInstance blockingTaskInstance, Class<MasterExecThread> masterExecThreadClass){
+        try{
+            // init Spring Context
+            SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+            springApplicationContext.setApplicationContext(applicationContext);
+            // define task definition for blocking node
+            TaskDefinition taskDefinition = new TaskDefinition();
+            taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+            taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+            taskDefinition.setTimeout(0);
+            // define mock action
+            if(blockingLogic){
+                Mockito.when(processInstance.getBlockingFlag()).thenReturn(true);
+            } else {
+                Mockito.when(processInstance.getBlockingFlag()).thenReturn(false);
+            }
+            Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+            Mockito.when(processService.findTaskDefinition(blockingTaskInstance.getId(),blockingTaskInstance.getTaskDefinitionVersion()))
+                    .thenReturn(taskDefinition);
+            Mockito.when(processService.findTaskInstanceById(blockingTaskInstance.getId())).thenReturn(blockingTaskInstance);
+            Mockito.when(processService.updateProcessInstance(processInstance)).thenReturn(1);
+            Mockito.when(processService.findProcessInstanceById(processInstance.getId())).thenReturn(processInstance);
+            Mockito.when(processService.queryProjectWithUserByProcessInstanceId(blockingTaskInstance.getId())).thenReturn(null);
+            Mockito.doNothing().when(alertManager).sendProcessBlockingAlert(processInstance,blockingTaskInstance,null);
+            if(blockingLogic){
+                Mockito.when(processInstance.getState())
+                        .thenReturn(ExecutionStatus.SUCCESS)
+                        .thenReturn(ExecutionStatus.READY_PAUSE);
+            } else {
+                Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
+            }
+
+            Mockito.when(processInstance.isProcessInstanceStop())
+                    .thenReturn(false)
+                    .thenReturn(false)
+                    .thenReturn(true);
+            // define power mock action
+            PowerMockito.doNothing().when(masterExecThread,"submitPostNode",null);
+            PowerMockito.doNothing().when(masterExecThread,"submitPostNode","1");
+            PowerMockito.doNothing().when(masterExecThread,"submitStandByTask");
+            PowerMockito.when(masterExecThread,"canSubmitTaskToQueue").thenReturn(true);
+            // define fake active task node map
+            Map<MasterBaseTaskExecThread, Future<Boolean>> activeTaskNode = new ConcurrentHashMap<>();
+            activeTaskNode.put(new BlockingTaskExecThread(blockingTaskInstance),
+                    CompletableFuture.completedFuture(blockingLogic));
+            Field field = masterExecThreadClass.getDeclaredField("activeTaskNode");
+            field.setAccessible(true);
+            field.set(masterExecThread,activeTaskNode);
+
+        }catch (Exception e){
+            Assert.fail();
+        }
+    }
+
+    private DAG<String, TaskNode, TaskNodeRelation> genDagForBlockingTest(){
+        /**
+         * the test dag looks like below
+         * 1(blocking)
+        */
+        DAG<String, TaskNode, TaskNodeRelation> dag = new DAG<>();
+
+        TaskNode blockingNode = new TaskNode();
+        blockingNode.setName("1");
+        blockingNode.setType("BLOCKING");
+        blockingNode.setCode(1L);
+        blockingNode.setVersion(1);
+
+        dag.addNode("1",blockingNode);
+
+        return dag;
     }
 
 }
