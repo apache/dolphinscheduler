@@ -601,7 +601,7 @@ public class WorkflowExecuteThread implements Runnable {
                         taskInstance.getTaskCode(),
                         taskInstance.getTaskDefinitionVersion());
                 taskInstance.setTaskDefine(taskDefinition);
-                if (taskProcessor.getType() != Constants.COMMON_TASK_TYPE && taskProcessor.taskState().typeIsFinished()) {
+                if (taskProcessor.taskState().typeIsFinished()) {
                     StateEvent stateEvent = new StateEvent();
                     stateEvent.setProcessInstanceId(this.processInstance.getId());
                     stateEvent.setTaskInstanceId(taskInstance.getId());
