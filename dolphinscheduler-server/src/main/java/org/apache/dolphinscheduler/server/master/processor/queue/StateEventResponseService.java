@@ -111,8 +111,8 @@ public class StateEventResponseService {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
                     persist(stateEvent);
-                } catch (Exception e) {
-                    logger.error("persist task error", e);
+                } catch (InterruptedException e) {
+                    logger.warn("persist task error", e);
                 }
             }
             logger.info("StateEventResponseWorker stopped");
@@ -128,14 +128,18 @@ public class StateEventResponseService {
     }
 
     private void persist(StateEvent stateEvent) {
-        if (!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())) {
-            writeResponse(stateEvent, ExecutionStatus.FAILURE);
-            return;
-        }
+        try {
+            if (!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())) {
+                writeResponse(stateEvent, ExecutionStatus.FAILURE);
+                return;
+            }
 
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(stateEvent.getProcessInstanceId());
-        workflowExecuteThread.addStateEvent(stateEvent);
-        writeResponse(stateEvent, ExecutionStatus.SUCCESS);
+            WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(stateEvent.getProcessInstanceId());
+            workflowExecuteThread.addStateEvent(stateEvent);
+            writeResponse(stateEvent, ExecutionStatus.SUCCESS);
+        } catch (Exception e) {
+            logger.error("persist event queue error:", stateEvent.toString(), e);
+        }
     }
 
     public BlockingQueue<StateEvent> getEventQueue() {
