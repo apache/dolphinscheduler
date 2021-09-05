@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
 import org.apache.curator.test.TestingServer;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -70,7 +71,7 @@ public class StandaloneServer {
 
     private static void startAlertServer() {
         final Path alertPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                getCurrentPath(StandaloneServer.class),
                 "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
         ).toAbsolutePath();
         if (Files.exists(alertPluginPath)) {
@@ -85,7 +86,7 @@ public class StandaloneServer {
         System.setProperty("registry.servers", server.getConnectString());
 
         final Path registryPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                getCurrentPath(StandaloneServer.class),
                 "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
         ).toAbsolutePath();
         if (Files.exists(registryPath)) {
@@ -114,4 +115,21 @@ public class StandaloneServer {
         final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
         runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
     }
+
+    public static String getCurrentPath(Class<?> cls) {
+        String path = cls.getProtectionDomain().getCodeSource().getLocation().getPath();
+        path = path.replaceFirst("file:/", "");
+        path = path.replaceAll("!/", "");
+        if (path.lastIndexOf(File.separator) >= 0) {
+            path = path.substring(0, path.lastIndexOf(File.separator));
+        }
+        if (path.substring(0, 1).equalsIgnoreCase("/")) {
+            String osName = System.getProperty("os.name").toLowerCase();
+            if (osName.contains("window")) {
+                path = path.substring(1);
+            }
+        }
+        return path;
+    }
+
 }
