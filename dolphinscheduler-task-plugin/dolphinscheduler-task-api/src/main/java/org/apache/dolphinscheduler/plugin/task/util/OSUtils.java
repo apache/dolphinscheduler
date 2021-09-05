@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.util;
 
+import org.apache.dolphinscheduler.plugin.task.api.ShellExecutor;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;

@@ -15,16 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.spark;
 
-public class ArgsUtils {
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-    private ArgsUtils() throws IllegalStateException {
-        throw new IllegalStateException("Utility class");
+import java.util.List;
+
+public class SparkTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public String getName() {
+        return "spark";
     }
 
-    public static String escape(String arg) {
-        return arg.replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
+    @Override
+    public List<PluginParams> getParams() {
+        return null;
     }
 
+    @Override
+    public TaskChannel create() {
+        return new SparkTaskChannel();
+    }
 }

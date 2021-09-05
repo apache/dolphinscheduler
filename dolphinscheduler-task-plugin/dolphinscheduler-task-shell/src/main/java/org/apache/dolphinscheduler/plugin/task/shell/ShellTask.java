@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.dolphinscheduler.plugin.task.api.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
@@ -43,12 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-
 /**
  * shell task
  */
-public class ShellTask extends AbstractTask {
+public class ShellTask extends AbstractTaskExecutor {
 
     /**
      * shell parameters
@@ -71,10 +69,9 @@ public class ShellTask extends AbstractTask {
      * constructor
      *
      * @param taskRequest taskRequest
-     * @param logger logger
      */
-    public ShellTask(TaskRequest taskRequest, Logger logger) {
-        super(taskRequest, logger);
+    public ShellTask(TaskRequest taskRequest) {
+        super(taskRequest);
 
         this.taskRequest = taskRequest;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,

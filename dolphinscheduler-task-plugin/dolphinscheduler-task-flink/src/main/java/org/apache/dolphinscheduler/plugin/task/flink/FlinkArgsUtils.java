@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.plugin.task.api.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.util.ArgsUtils;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

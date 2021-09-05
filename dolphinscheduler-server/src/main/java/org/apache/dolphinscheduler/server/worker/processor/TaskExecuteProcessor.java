@@ -114,10 +114,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
-            String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
-            command.getBody(), TaskExecuteRequestCommand.class);
+                command.getBody(), TaskExecuteRequestCommand.class);
 
         logger.info("received command : {}", taskRequestCommand);
 
@@ -135,12 +135,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         setTaskCache(taskExecutionContext);
-        // custom logger
-        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()));
+        // todo custom logger
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
@@ -150,7 +145,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         logger.info("task instance local execute path : {}", execLocalPath);
         taskExecutionContext.setExecutePath(execLocalPath);
 
-        FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirIfAbsent(execLocalPath);
             if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
@@ -159,13 +153,12 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);
-            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
             taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
         FileUtils.taskLoggerThreadLocal.remove();
 
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
-            new NettyRemoteChannel(channel, command.getOpaque()));
+                new NettyRemoteChannel(channel, command.getOpaque()));
 
         // delay task process
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
@@ -181,7 +174,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task to manager
-        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService, taskPluginManager))) {
+        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager))) {
             logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getQueueSize());
         }
     }
@@ -223,9 +216,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-            taskExecutionContext.getProcessDefineCode(),
-            taskExecutionContext.getProcessDefineVersion(),
-            taskExecutionContext.getProcessInstanceId(),
-            taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId());
     }
 }

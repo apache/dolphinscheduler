@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 /**
  * abstract yarn task
  */
-public abstract class AbstractYarnTask extends AbstractTask {
+public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     /**
      * process task
      */
@@ -35,10 +35,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
      * Abstract Yarn Task
      *
      * @param taskRequest taskRequest
-     * @param logger logger
      */
-    public AbstractYarnTask(TaskRequest taskRequest, Logger logger) {
-        super(taskRequest, logger);
+    public AbstractYarnTask(TaskRequest taskRequest) {
+        super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
                 logger);

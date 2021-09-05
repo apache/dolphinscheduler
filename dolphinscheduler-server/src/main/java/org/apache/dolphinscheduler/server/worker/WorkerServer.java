@@ -167,6 +167,7 @@ public class WorkerServer implements IStoppable {
         }));
     }
 
+    // todo better
     private void initTaskPlugin() {
         taskPluginManager = new TaskPluginManager();
         DolphinPluginManagerConfig taskPluginManagerConfig = new DolphinPluginManagerConfig();

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.util;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

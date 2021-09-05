@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
+package org.apache.dolphinscheduler.plugin.task.util;
 
-import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+public class ArgsUtils {
 
-/**
- * Source Generator Interface
- */
-public interface ISourceGenerator {
+    private ArgsUtils() throws IllegalStateException {
+        throw new IllegalStateException("Utility class");
+    }
 
-    /**
-     * generate the source script
-     *
-     * @param sqoopParameters      sqoopParameters
-     * @param taskExecutionContext taskExecutionContext
-     * @return source script
-     */
-    String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext);
+    public static String escape(String arg) {
+        return arg.replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
+    }
+
 }

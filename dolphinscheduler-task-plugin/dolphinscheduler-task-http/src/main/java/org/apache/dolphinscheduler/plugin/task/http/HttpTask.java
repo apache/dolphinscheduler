@@ -1,12 +1,12 @@
 package org.apache.dolphinscheduler.plugin.task.http;
 
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.slf4j.Logger;
 
-public class HttpTask extends AbstractTask {
+public class HttpTask extends AbstractTaskExecutor {
 
     /**
      * taskExecutionContext
@@ -19,10 +19,9 @@ public class HttpTask extends AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger               logger
      */
-    public HttpTask(TaskRequest taskExecutionContext, Logger logger) {
-        super(taskExecutionContext, logger);
+    public HttpTask(TaskRequest taskExecutionContext) {
+        super(taskExecutionContext);
     }
 
     @Override
