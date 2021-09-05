@@ -32,7 +32,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
-    protected  Logger logger ;
+    protected Logger logger;
 
     /**
      * constructor

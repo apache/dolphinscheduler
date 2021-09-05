@@ -46,7 +46,7 @@ public class TISTaskTest {
 
     @Before
     public void before() throws Exception {
-/*
+    /*
         TaskProps props = new TaskProps();
         props.setExecutePath("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
