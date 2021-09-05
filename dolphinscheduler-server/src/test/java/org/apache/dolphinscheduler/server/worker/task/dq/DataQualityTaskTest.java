@@ -17,15 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq;
 
-import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
-import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
-
-import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
-import org.apache.dolphinscheduler.common.enums.dq.FormType;
-import org.apache.dolphinscheduler.common.enums.dq.InputType;
-import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-import org.apache.dolphinscheduler.common.enums.dq.ValueType;
+import org.apache.dolphinscheduler.common.enums.dq.*;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
@@ -34,13 +26,6 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +34,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import java.util.*;
+
+import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
 
 /**
  * DataQualityTaskTest
@@ -139,7 +129,7 @@ public class DataQualityTaskTest {
                 + "'2021-08-12 10:15:48' as create_time,'2021-08-12 10:15:48' as update_time from table_count \"}},"
                 + "{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\","
                 + "\"user\":\"test\",\"table\":\"dqc_statistics_value\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\","
-                + "\"sql\":\"select 21 as process_definition_id,287 as task_definition_id,10 as rule_id,'table_count.total'AS statistics_name, "
+                + "\"sql\":\"select 21 as process_definition_id,287 as task_instance_id,10 as rule_id,'7UKLW0QQTHM4L1UGSC1QNA==' as unique_code,'table_count.total'AS statistics_name,"
                 + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
                 + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
@@ -580,7 +570,7 @@ public class DataQualityTaskTest {
                 + "\"org.postgresql.Driver\",\"user\":\"test\",\"table\":\"t_ds_dq_task_statistics_value\",\"url\":"
                 + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding="
                 + "UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as "
-                + "task_definition_id,1 as rule_id,'miss'AS statistics_name, miss AS statistics_value,"
+                + "task_instance_id,1 as rule_id,'WFV9TY33ILAP7UT80GY49G==' as unique_code,'miss'AS statistics_name,miss AS statistics_value,"
                 + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
                 + "as update_time from test_person\"}}]}";
 
@@ -1202,8 +1192,8 @@ public class DataQualityTaskTest {
                 + " full join total_count\"}},{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\","
                 + "\"password\":\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
                 + "\"t_ds_dq_task_statistics_value\",\"url\":\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified"
-                + "&characterEncoding=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as task_definition_id,"
-                + "3 as rule_id,'miss_count.miss'AS statistics_name, miss_count.miss AS statistics_value,'2021-08-30 00:00:00' as data_time,"
+                + "&characterEncoding=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as task_instance_id,"
+                + "3 as rule_id,'ISLEDQKUH8FPDHOH163NVQ==' as unique_code,'miss_count.miss'AS statistics_name,miss_count.miss AS statistics_value,'2021-08-30 00:00:00' as data_time,"
                 + "'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' as update_time from miss_count\"}},{\"type\":\"hdfs_file\","
                 + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 
