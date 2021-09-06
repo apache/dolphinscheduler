@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
