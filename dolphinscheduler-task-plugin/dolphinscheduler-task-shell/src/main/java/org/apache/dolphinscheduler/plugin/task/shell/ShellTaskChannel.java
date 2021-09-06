@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.shell;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
-import org.slf4j.Logger;
-
 public class ShellTaskChannel implements TaskChannel {
     /**
      * shell parameters
@@ -34,8 +32,8 @@ public class ShellTaskChannel implements TaskChannel {
     }
 
     @Override
-    public ShellTask createTask(TaskRequest taskRequest, Logger logger) {
-        return new ShellTask(taskRequest, logger);
+    public ShellTask createTask(TaskRequest taskRequest) {
+        return new ShellTask(taskRequest);
     }
 
 }

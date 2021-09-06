@@ -128,7 +128,7 @@
                   @click="_saveChart"
                   icon="el-icon-document-checked"
                   >
-            {{spinnerLoading ? 'Loading...' : $t('Save')}}
+            {{spinnerLoading ? $t('Loading...') : $t('Save')}}
           </el-button>
           <span>
             <el-button
@@ -139,7 +139,7 @@
               @click="_version"
               :disabled="$route.params.id == null"
               icon="el-icon-info">
-              {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
+              {{spinnerLoading ? $t('Loading...') : $t('Version Info')}}
             </el-button>
           </span>
         </div>

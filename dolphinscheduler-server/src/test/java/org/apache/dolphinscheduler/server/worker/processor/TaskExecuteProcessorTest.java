@@ -119,7 +119,7 @@ public class TaskExecuteProcessorTest {
                 taskExecutionContext.getTaskInstanceId()));
 
         workerManager = PowerMockito.mock(WorkerManagerThread.class);
-        PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))).thenReturn(Boolean.TRUE);
+        PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService))).thenReturn(Boolean.TRUE);
 
         PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class))
                 .thenReturn(workerManager);
@@ -188,7 +188,7 @@ public class TaskExecuteProcessorTest {
     private static class SimpleTaskExecuteThread extends TaskExecuteThread {
 
         public SimpleTaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService, Logger taskLogger, AlertClientService alertClientService) {
-            super(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
+            super(taskExecutionContext, taskCallbackService, alertClientService);
         }
 
         @Override

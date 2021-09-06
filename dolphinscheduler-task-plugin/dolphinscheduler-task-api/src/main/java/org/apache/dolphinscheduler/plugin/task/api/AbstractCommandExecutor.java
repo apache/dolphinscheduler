@@ -21,6 +21,9 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILU
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SH;
 
+import org.apache.dolphinscheduler.plugin.task.util.LoggerUtils;
+import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.util.ThreadUtils;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;

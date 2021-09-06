@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 

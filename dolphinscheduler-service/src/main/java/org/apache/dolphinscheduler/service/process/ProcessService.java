@@ -2458,6 +2458,7 @@ public class ProcessService {
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
             Map<String, Object> taskParamsMap = v.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
             v.setConditionResult((String) taskParamsMap.get(Constants.CONDITION_RESULT));
+            v.setSwitchResult((String) taskParamsMap.get(Constants.SWITCH_RESULT));
             v.setDependence((String) taskParamsMap.get(Constants.DEPENDENCE));
             taskParamsMap.remove(Constants.CONDITION_RESULT);
             taskParamsMap.remove(Constants.DEPENDENCE);

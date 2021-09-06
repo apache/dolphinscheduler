@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
@@ -49,7 +49,7 @@ public class ShellTaskChannelFactory implements TaskChannelFactory {
                         .build())
                 .build();
 
-        RadioParam runFlag = RadioParam.newBuilder("runFlag", "运行标志")
+        RadioParam runFlag = RadioParam.newBuilder("runFlag", "RUN_FLAG")
                 .addParamsOptions(new ParamsOptions("NORMAL", "NORMAL", false))
                 .addParamsOptions(new ParamsOptions("FORBIDDEN", "FORBIDDEN", false))
                 .build();

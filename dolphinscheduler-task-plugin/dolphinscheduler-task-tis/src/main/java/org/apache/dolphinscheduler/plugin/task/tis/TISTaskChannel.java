@@ -28,7 +28,7 @@ public class TISTaskChannel implements TaskChannel {
     }
 
     @Override
-    public AbstractTask createTask(TaskRequest taskRequest, org.slf4j.Logger logger) {
-        return new TISTask(taskRequest, logger);
+    public AbstractTask createTask(TaskRequest taskRequest) {
+        return new TISTask(taskRequest);
     }
 }

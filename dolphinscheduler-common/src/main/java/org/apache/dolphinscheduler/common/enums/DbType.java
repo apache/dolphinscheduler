@@ -14,65 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.Arrays;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.google.common.base.Functions;
 
-import java.util.HashMap;
-
-/**
- * data base types
- */
 public enum DbType {
-    /**
-     * 0 mysql
-     * 1 postgresql
-     * 2 hive
-     * 3 spark
-     * 4 clickhouse
-     * 5 oracle
-     * 6 sqlserver
-     * 7 db2
-     * 8 presto
-     */
-    MYSQL(0, "mysql"),
-    POSTGRESQL(1, "postgresql"),
-    HIVE(2, "hive"),
-    SPARK(3, "spark"),
-    CLICKHOUSE(4, "clickhouse"),
-    ORACLE(5, "oracle"),
-    SQLSERVER(6, "sqlserver"),
-    DB2(7, "db2"),
-    PRESTO(8, "presto");
+    MYSQL(0),
+    POSTGRESQL(1),
+    HIVE(2),
+    SPARK(3),
+    CLICKHOUSE(4),
+    ORACLE(5),
+    SQLSERVER(6),
+    DB2(7),
+    PRESTO(8),
+    H2(9);
 
-    DbType(int code, String descp) {
+    DbType(int code) {
         this.code = code;
-        this.descp = descp;
     }
 
     @EnumValue
     private final int code;
-    private final String descp;
 
     public int getCode() {
         return code;
     }
 
-    public String getDescp() {
-        return descp;
-    }
+    private static final Map<Integer, DbType> DB_TYPE_MAP =
+            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
 
-
-    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap<>();
-
-    static {
-        for (DbType dbType:DbType.values()){
-            DB_TYPE_MAP.put(dbType.getCode(),dbType);
-        }
-    }
-
-    public static DbType of(int type){
-        if(DB_TYPE_MAP.containsKey(type)){
+    public static DbType of(int type) {
+        if (DB_TYPE_MAP.containsKey(type)) {
             return DB_TYPE_MAP.get(type);
         }
         return null;

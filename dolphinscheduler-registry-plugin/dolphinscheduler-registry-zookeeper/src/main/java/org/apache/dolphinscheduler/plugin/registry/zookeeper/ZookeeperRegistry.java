@@ -47,6 +47,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
@@ -195,12 +196,7 @@ public class ZookeeperRegistry implements Registry {
 
     @Override
     public void remove(String key) {
-
-        try {
-            client.delete().deletingChildrenIfNeeded().forPath(key);
-        } catch (Exception e) {
-            throw new RegistryException("zookeeper remove error", e);
-        }
+        delete(key);
     }
 
     @Override
@@ -269,6 +265,9 @@ public class ZookeeperRegistry implements Registry {
             client.delete()
                     .deletingChildrenIfNeeded()
                     .forPath(nodePath);
+        } catch (KeeperException.NoNodeException ignore) {
+            // the node is not exist, we can believe the node has been removed
+
         } catch (Exception e) {
             throw new RegistryException("zookeeper delete key error", e);
         }

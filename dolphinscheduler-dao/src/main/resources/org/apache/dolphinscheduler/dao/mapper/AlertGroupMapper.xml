@@ -32,6 +32,15 @@
         </if>
         order by update_time desc
     </select>
+    <select id="queryAlertGroupVo" resultType="org.apache.dolphinscheduler.dao.vo.AlertGroupVo">
+        select id, group_name
+        from t_ds_alertgroup
+        where 1 = 1
+        <if test="groupName != null and groupName != ''">
+            and group_name like concat('%', #{groupName}, '%')
+        </if>
+        order by update_time desc
+    </select>
     <select id="queryByGroupName" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>

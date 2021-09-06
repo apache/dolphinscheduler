@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
 
@@ -139,6 +140,28 @@ public class AlertGroupController extends BaseController {
         searchVal = ParameterUtils.handleEscapes(searchVal);
         return alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
     }
+    /**
+     * check alarm group detail by Id
+     *
+     * @param loginUser login user
+     * @param id alert group id
+     * @return one alert group
+     */
+
+    @ApiOperation(value = "queryAlertGroupById", notes = "QUERY_ALERT_GROUP_BY_ID_NOTES")
+    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", dataType = "Int", example = "1")
+    })
+    @PostMapping(value = "/query")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_ALERT_GROUP_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryAlertGroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                      @RequestParam("id") Integer id) {
+
+        Map<String, Object> result = alertGroupService.queryAlertGroupById(loginUser, id);
+        return returnDataList(result);
+    }
+
 
     /**
      * updateProcessInstance alert group

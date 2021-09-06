@@ -123,6 +123,7 @@ public class WorkerManagerThread implements Runnable {
 
     public void start() {
         Thread thread = new Thread(this, this.getClass().getName());
+        thread.setDaemon(true);
         thread.start();
     }
 

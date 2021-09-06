@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -30,7 +31,7 @@ import org.slf4j.Logger;
 /**
  * python task
  */
-public class PythonTask extends AbstractTask {
+public class PythonTask extends AbstractTaskExecutor {
 
     /**
      * python parameters
@@ -56,10 +57,9 @@ public class PythonTask extends AbstractTask {
      * constructor
      *
      * @param taskRequest taskRequest
-     * @param logger logger
      */
-    public PythonTask(TaskRequest taskRequest, Logger logger) {
-        super(taskRequest, logger);
+    public PythonTask(TaskRequest taskRequest) {
+        super(taskRequest);
         this.taskRequest = taskRequest;
 
         this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,

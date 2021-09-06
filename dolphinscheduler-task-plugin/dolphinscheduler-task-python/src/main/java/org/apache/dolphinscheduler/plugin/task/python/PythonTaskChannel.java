@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.python;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
-import org.slf4j.Logger;
-
 public class PythonTaskChannel implements TaskChannel {
     @Override
     public void cancelApplication(boolean status) {
@@ -29,7 +27,7 @@ public class PythonTaskChannel implements TaskChannel {
     }
 
     @Override
-    public PythonTask createTask(TaskRequest taskRequest, Logger logger) {
-        return new PythonTask(taskRequest, logger);
+    public PythonTask createTask(TaskRequest taskRequest) {
+        return new PythonTask(taskRequest);
     }
 }

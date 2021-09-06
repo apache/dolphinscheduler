@@ -48,8 +48,8 @@ public class FlinkTask extends AbstractYarnTask {
 
     private TaskRequest flinkRequest;
 
-    public FlinkTask(TaskRequest taskRequest, Logger logger) {
-        super(taskRequest, logger);
+    public FlinkTask(TaskRequest taskRequest) {
+        super(taskRequest);
         this.flinkRequest = taskRequest;
     }
 
