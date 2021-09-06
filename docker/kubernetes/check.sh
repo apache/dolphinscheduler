@@ -17,7 +17,7 @@
 #
 
 echo "------- check server status -------"
-until [ $(kubectl get pods| grep Running -c) -eq 10 ]; do
+until [ $(kubectl get pods | grep Running -c) -eq 10 ]; do
   counter=$((counter+1))
   if [ $counter -eq 90 ]; then
     echo "error: all servers start failed"
