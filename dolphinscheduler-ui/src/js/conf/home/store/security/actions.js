@@ -374,7 +374,7 @@ export default {
    */
   getPlugins ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('ui-plugins/queryUiPluginsByType', payload, res => {
+      io.get('ui-plugins/query-by-type', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -386,7 +386,7 @@ export default {
    */
   getUiPluginById ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('ui-plugins/queryUiPluginDetailById', payload, res => {
+      io.get(`ui-plugins/${payload.pluginId}`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -566,7 +566,7 @@ export default {
    */
   getWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/list-paging', payload, res => {
+      io.get('worker-groups', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -578,7 +578,7 @@ export default {
    */
   getWorkerGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/all-groups', payload, res => {
+      io.get('worker-groups/all', payload, res => {
         let list = res.data
         if (list.length > 0) {
           list = list.map(item => {
@@ -615,7 +615,7 @@ export default {
   },
   saveWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('worker-group/save', payload, res => {
+      io.post('worker-groups', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -624,7 +624,7 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('worker-group/delete-by-id', payload, res => {
+      io.delete(`worker-groups/${id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -633,7 +633,7 @@ export default {
   },
   getWorkerAddresses ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/worker-address-list', payload, res => {
+      io.get('worker-groups/worker-address-list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
