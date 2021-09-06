@@ -38,8 +38,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,7 +79,7 @@ public class ProjectController extends BaseController {
         @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
         @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -91,28 +94,28 @@ public class ProjectController extends BaseController {
      * update project
      *
      * @param loginUser login user
-     * @param projectCode project code
+     * @param code project code
      * @param projectName project name
      * @param description description
      * @return update result code
      */
     @ApiOperation(value = "update", notes = "UPDATE_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "123456"),
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456"),
         @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
         @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String"),
         @ApiImplicitParam(name = "userName", value = "USER_NAME", dataType = "String"),
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("projectCode") Long projectCode,
+                                @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "userName") String userName) {
-        Map<String, Object> result = projectService.update(loginUser, projectCode, projectName, description, userName);
+        Map<String, Object> result = projectService.update(loginUser, code, projectName, description, userName);
         return returnDataList(result);
     }
 
@@ -120,20 +123,20 @@ public class ProjectController extends BaseController {
      * query project details by code
      *
      * @param loginUser login user
-     * @param projectCode project code
+     * @param code project code
      * @return project detail information
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
     })
-    @GetMapping(value = "/query-by-code")
+    @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam("projectCode") long projectCode) {
-        Map<String, Object> result = projectService.queryByCode(loginUser, projectCode);
+                                     @PathVariable("code") long code) {
+        Map<String, Object> result = projectService.queryByCode(loginUser, code);
         return returnDataList(result);
     }
 
@@ -152,7 +155,7 @@ public class ProjectController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -175,20 +178,20 @@ public class ProjectController extends BaseController {
      * delete project by code
      *
      * @param loginUser login user
-     * @param projectCode project code
+     * @param code project code
      * @return delete result code
      */
     @ApiOperation(value = "delete", notes = "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "123456")
+        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("projectCode") Long projectCode) {
-        Map<String, Object> result = projectService.deleteProject(loginUser, projectCode);
+                                @PathVariable("code") Long code) {
+        Map<String, Object> result = projectService.deleteProject(loginUser, code);
         return returnDataList(result);
     }
 
@@ -203,7 +206,7 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/unauth-project")
+    @GetMapping(value = "/unauth")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -225,7 +228,7 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/authed-project")
+    @GetMapping(value = "/authed")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -242,7 +245,7 @@ public class ProjectController extends BaseController {
      * @return projects which the user create and authorized
      */
     @ApiOperation(value = "queryProjectCreatedAndAuthorizedByUser", notes = "QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_NOTES")
-    @GetMapping(value = "/created-and-authorized-project")
+    @GetMapping(value = "/created-and-authed")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -258,7 +261,7 @@ public class ProjectController extends BaseController {
      * @return all project list
      */
     @ApiOperation(value = "queryAllProjectList", notes = "QUERY_ALL_PROJECT_LIST_NOTES")
-    @GetMapping(value = "/query-project-list")
+    @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

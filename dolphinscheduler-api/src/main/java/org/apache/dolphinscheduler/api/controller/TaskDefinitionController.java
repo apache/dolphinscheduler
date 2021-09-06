@@ -39,9 +39,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,7 +62,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "TASK_DEFINITION_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/task")
+@RequestMapping("projects/{projectCode}/task-definition")
 public class TaskDefinitionController extends BaseController {
 
     @Autowired
@@ -79,7 +81,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
         @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, type = "String")
     })
-    @PostMapping(value = "/save")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -105,13 +107,13 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "taskDefinitionJsonObj", value = "TASK_DEFINITION_JSON", required = true, type = "String")
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                       @RequestParam(value = "code") long code,
+                                       @PathVariable(value = "code") long code,
                                        @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj) {
         Map<String, Object> result = taskDefinitionService.updateTaskDefinition(loginUser, projectCode, code, taskDefinitionJsonObj);
         return returnDataList(result);
@@ -134,13 +136,13 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
-    @GetMapping(value = "/versions")
+    @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_VERSIONS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskDefinitionVersions(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam(value = "code") long code,
+                                              @PathVariable(value = "code") long code,
                                               @RequestParam(value = "pageNo") int pageNo,
                                               @RequestParam(value = "pageSize") int pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
@@ -164,14 +166,14 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/version/switch")
+    @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_TASK_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result switchTaskDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam(value = "code") long code,
-                                              @RequestParam(value = "version") int version) {
+                                              @PathVariable(value = "code") long code,
+                                              @PathVariable(value = "version") int version) {
         Map<String, Object> result = taskDefinitionService.switchVersion(loginUser, projectCode, code, version);
         return returnDataList(result);
     }
@@ -190,14 +192,14 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
         @ApiImplicitParam(name = "version", value = "VERSION", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/version/delete")
+    @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_DEFINITION_VERSION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteTaskDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam(value = "code") long code,
-                                              @RequestParam(value = "version") int version) {
+                                              @PathVariable(value = "code") long code,
+                                              @PathVariable(value = "version") int version) {
         Map<String, Object> result = taskDefinitionService.deleteByCodeAndVersion(loginUser, projectCode, code, version);
         return returnDataList(result);
     }
@@ -214,13 +216,13 @@ public class TaskDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteTaskDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                             @RequestParam(value = "code") long code) {
+                                             @PathVariable(value = "code") long code) {
         Map<String, Object> result = taskDefinitionService.deleteTaskDefinitionByCode(loginUser, projectCode, code);
         return returnDataList(result);
     }
@@ -233,17 +235,17 @@ public class TaskDefinitionController extends BaseController {
      * @param code the task definition code
      * @return task definition detail
      */
-    @ApiOperation(value = "queryTaskDefinitionDetail", notes = "QUERY_TASK_DEFINITION_DETAIL_NOTES")
+    @ApiOperation(value = "queryTaskDefinitionByCode", notes = "QUERY_TASK_DEFINITION_DETAIL_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
-    @GetMapping(value = "/select-by-code")
+    @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskDefinitionDetail(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @RequestParam(value = "code") long code) {
+                                            @PathVariable(value = "code") long code) {
         Map<String, Object> result = taskDefinitionService.queryTaskDefinitionDetail(loginUser, projectCode, code);
         return returnDataList(result);
     }
@@ -268,7 +270,7 @@ public class TaskDefinitionController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -299,7 +301,7 @@ public class TaskDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "genNum", value = "GEN_NUM", required = true, dataType = "Int", example = "1")
     })
-    @GetMapping(value = "/gen-task-code-list")
+    @GetMapping(value = "/gen-task-codes")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
