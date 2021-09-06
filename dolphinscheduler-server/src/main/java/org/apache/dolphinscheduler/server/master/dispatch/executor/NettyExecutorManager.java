@@ -178,7 +178,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @return nodes
      */
     private Set<String> getAllNodes(ExecutionContext context){
-        Set<String> nodes = Collections.EMPTY_SET;
+        Set<String> nodes = Collections.emptySet();
         /**
          * executor type
          */

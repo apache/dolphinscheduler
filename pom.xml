@@ -682,7 +682,7 @@
                 <plugin>
                     <groupId>ca.vanzyl.maven.plugins</groupId>
                     <artifactId>provisio-maven-plugin</artifactId>
-                    <version>1.0.4</version>
+                    <version>1.0.7</version>
                     <extensions>true</extensions>
                 </plugin>
 
@@ -1204,6 +1204,7 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
+        <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
