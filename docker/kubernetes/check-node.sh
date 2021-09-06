@@ -16,16 +16,15 @@
 # limitations under the License.
 #
 
-echo "------- check server status -------"
-until [ $(kubectl get pods | grep Running -c) -eq 10 ]; do
+echo "------- check mini-kube master -------"
+until [ $(kubectl get nodes | grep NotReady -c) -eq 0 ]; do
   counter=$((counter+1))
   if [ $counter -eq 90 ]; then
-    echo "error: all servers start failed"
+    echo "error: master start failed"
     exit 1
   fi 
   echo "waiting for all servers started ..."
-  kubectl get pods
-  sleep 10
+  sleep 5
 done
-echo "all servers start successfully"
+echo "master start successfully"
 

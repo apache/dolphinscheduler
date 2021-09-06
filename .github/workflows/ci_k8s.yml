@@ -75,6 +75,9 @@ jobs:
           minikube version: 'v1.16.0'
           kubernetes version: 'v1.19.2'
           github token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Check master status
+        run: sh $(pwd)/docker/kubernetes/check-node.sh
 
       - name: Interact with the cluster
         run: kubectl get nodes
@@ -87,16 +90,22 @@ jobs:
 
       # Install Charts
       - name: Run chart-testing (install)
-        run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/. -n test
+        run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/. 
 
       # Check Server Status
       - name: Check Server Status
         run: sh $(pwd)/docker/kubernetes/check.sh
 
       - name: Interact with the cluster pods
-        run: kubectl get pods -n test
+        run: kubectl get pods 
 
-      # TODO: 
+      - name: kubectl get services
+        run: kubectl get services
+
+      - name: View the Deployment
+        run: kubectl get deployments
+
+
 
   #   runs-on: ubuntu-latest
   #     steps:
