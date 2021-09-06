@@ -53,8 +53,8 @@ public class SparkTask extends AbstractYarnTask {
      */
     private TaskRequest taskRequest;
 
-    public SparkTask(TaskRequest taskRequest, Logger logger) {
-        super(taskRequest, logger);
+    public SparkTask(TaskRequest taskRequest) {
+        super(taskRequest);
         this.taskRequest = taskRequest;
     }
 
@@ -128,7 +128,7 @@ public class SparkTask extends AbstractYarnTask {
         if (resourceId == 0) {
             resourceName = mainJar.getRes();
         } else {
-            //fixme when update resource maybe has error ,也许也可以交给上层去做控制 需要看资源是否可以抽象为共性 目前来讲我认为是可以的
+            //fixme when update resource maybe has error
             resourceName = mainJar.getResourceName().replaceFirst("/", "");
         }
         mainJar.setRes(resourceName);

@@ -114,24 +114,20 @@ public class TaskExecuteThread implements Runnable, Delayed {
      */
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
-                             Logger taskLogger,
                              AlertClientService alertClientService) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskLogger = taskLogger;
         this.alertClientService = alertClientService;
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
                              TaskCallbackService taskCallbackService,
-                             Logger taskLogger,
                              AlertClientService alertClientService,
                              TaskPluginManager taskPluginManager) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskLogger = taskLogger;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
     }
@@ -176,7 +172,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             //TODO Temporary operation, To be adjusted
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
 
-            task = taskChannel.createTask(taskRequest, taskLogger);
+            task = taskChannel.createTask(taskRequest);
             // task init
             this.task.init();
             //init varPool

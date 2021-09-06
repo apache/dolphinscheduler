@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -433,6 +434,8 @@ public class MasterExecThread implements Runnable {
             abstractExecThread = new DependentTaskExecThread(taskInstance);
         } else if (taskInstance.isConditionsTask()) {
             abstractExecThread = new ConditionsTaskExecThread(taskInstance);
+        } else if (taskInstance.isSwitchTask()) {
+            abstractExecThread = new SwitchTaskExecThread(taskInstance);
         } else {
             abstractExecThread = new MasterTaskExecThread(taskInstance);
         }
@@ -523,9 +526,9 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-    public void getPreVarPool(TaskInstance taskInstance,  Set<String> preTask) {
-        Map<String,Property> allProperty = new HashMap<>();
-        Map<String,TaskInstance> allTaskInstance = new HashMap<>();
+    public void getPreVarPool(TaskInstance taskInstance, Set<String> preTask) {
+        Map<String, Property> allProperty = new HashMap<>();
+        Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskName : preTask) {
                 TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
@@ -563,17 +566,17 @@ public class MasterExecThread implements Runnable {
                 TaskInstance otherTask = allTaskInstance.get(proName);
                 if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
                     allProperty.put(proName, thisProperty);
-                    allTaskInstance.put(proName,preTaskInstance);
+                    allTaskInstance.put(proName, preTaskInstance);
                 } else {
                     allProperty.put(proName, otherPro);
                 }
             } else {
                 allProperty.put(proName, thisProperty);
-                allTaskInstance.put(proName,preTaskInstance);
+                allTaskInstance.put(proName, preTaskInstance);
             }
         } else {
             allProperty.put(proName, thisProperty);
-            allTaskInstance.put(proName,preTaskInstance);
+            allTaskInstance.put(proName, preTaskInstance);
         }
     }
 
@@ -945,7 +948,7 @@ public class MasterExecThread implements Runnable {
             if (!sendTimeWarning && checkProcessTimeOut(processInstance)) {
                 processAlertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion()));
+                                processInstance.getProcessDefinitionVersion()));
                 sendTimeWarning = true;
             }
             for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskNode.entrySet()) {
@@ -974,7 +977,9 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
+                    ProcessDefinition relatedProcessDefinition = processInstance.getProcessDefinition();
                     processInstance = processService.findProcessInstanceById(processInstance.getId());
+                    processInstance.setProcessDefinition(relatedProcessDefinition);
                     processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);

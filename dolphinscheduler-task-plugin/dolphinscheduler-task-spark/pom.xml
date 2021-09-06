@@ -25,6 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-task-spark</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
     <dependencies>
     <dependency>
         <groupId>org.apache.dolphinscheduler</groupId>
@@ -36,12 +37,10 @@
         <artifactId>dolphinscheduler-task-api</artifactId>
         <version>${project.version}</version>
     </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-task-spark-${project.version}</finalName>
+    </build>
 
 </project>

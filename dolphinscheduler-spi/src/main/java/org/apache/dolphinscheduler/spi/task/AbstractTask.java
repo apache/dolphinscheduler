@@ -17,18 +17,10 @@
 
 package org.apache.dolphinscheduler.spi.task;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-
 /**
  * executive task
  */
 public abstract class AbstractTask {
-
-    public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
     /**
      * varPool string
@@ -39,11 +31,6 @@ public abstract class AbstractTask {
      * taskExecutionContext
      **/
     TaskRequest taskRequest;
-
-    /**
-     * log record
-     */
-    protected Logger logger;
 
     /**
      * SHELL process pid
@@ -75,11 +62,9 @@ public abstract class AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
      */
-    protected AbstractTask(TaskRequest taskExecutionContext, Logger logger) {
+    protected AbstractTask(TaskRequest taskExecutionContext) {
         this.taskRequest = taskExecutionContext;
-        this.logger = logger;
     }
 
     /**
@@ -113,19 +98,7 @@ public abstract class AbstractTask {
         this.cancel = status;
     }
 
-    /**
-     * log handle
-     *
-     * @param logs log list
-     */
-    public void logHandle(List<String> logs) {
-        // note that the "new line" is added here to facilitate log parsing
-        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
-            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-        } else {
-            logger.info(" -> {}", String.join("\n\t", logs));
-        }
-    }
+
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;

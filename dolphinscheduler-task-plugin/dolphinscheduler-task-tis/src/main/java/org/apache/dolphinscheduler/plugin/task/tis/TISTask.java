@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.tis;
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
@@ -50,7 +51,7 @@ import org.slf4j.Logger;
 /**
  * TIS DataX Task
  **/
-public class TISTask extends AbstractTask {
+public class TISTask extends AbstractTaskExecutor {
 
     public static final String WS_REQUEST_PATH = "/tjs/download/logfeedback";
     public static final String KEY_POOL_VAR_TIS_HOST = "tisHost";
@@ -58,8 +59,8 @@ public class TISTask extends AbstractTask {
 
     private TISParameters tisParameters;
 
-    public TISTask(TaskRequest taskExecutionContext, Logger logger) {
-        super(taskExecutionContext, logger);
+    public TISTask(TaskRequest taskExecutionContext) {
+        super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
     }
 

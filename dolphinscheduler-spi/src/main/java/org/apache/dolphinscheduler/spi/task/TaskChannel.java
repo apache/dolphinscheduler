@@ -15,12 +15,10 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import org.slf4j.Logger;
-
 public interface TaskChannel {
 
     void cancelApplication(boolean status);
 
-    AbstractTask createTask(TaskRequest taskRequest, Logger logger);
+    AbstractTask createTask(TaskRequest taskRequest);
 
 }

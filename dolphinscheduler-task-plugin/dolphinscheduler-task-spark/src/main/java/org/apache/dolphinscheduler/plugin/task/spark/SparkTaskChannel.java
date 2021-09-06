@@ -24,14 +24,13 @@ import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.slf4j.Logger;
 
 public class SparkTaskChannel implements TaskChannel {
-
     @Override
     public void cancelApplication(boolean status) {
 
     }
 
     @Override
-    public AbstractTask createTask(TaskRequest taskRequest, Logger logger) {
-        return new SparkTask(taskRequest, logger);
+    public AbstractTask createTask(TaskRequest taskRequest) {
+        return new SparkTask(taskRequest);
     }
 }
