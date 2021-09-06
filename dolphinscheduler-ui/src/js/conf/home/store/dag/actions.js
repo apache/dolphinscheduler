@@ -313,7 +313,7 @@ export default {
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout,
-        releaseState: state.releaseState,
+        releaseState: state.releaseState
       }, res => {
         resolve(res)
         state.isEditDag = false
