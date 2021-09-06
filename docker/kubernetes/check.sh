@@ -24,6 +24,7 @@ until [ $(kubectl get pods| grep Running -c) -eq 10 ]; do
     exit 1
   fi 
   echo "waiting for all servers started ..."
+  kubectl get nodes
   sleep 5
 done
 echo "all servers start successfully"
