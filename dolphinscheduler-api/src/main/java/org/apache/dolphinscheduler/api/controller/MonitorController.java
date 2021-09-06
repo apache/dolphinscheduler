@@ -61,7 +61,7 @@ public class MonitorController extends BaseController {
      * @return master list
      */
     @ApiOperation(value = "listMaster", notes = "MASTER_LIST_NOTES")
-    @GetMapping(value = "/master/list")
+    @GetMapping(value = "/masters")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -77,7 +77,7 @@ public class MonitorController extends BaseController {
      * @return worker information list
      */
     @ApiOperation(value = "listWorker", notes = "WORKER_LIST_NOTES")
-    @GetMapping(value = "/worker/list")
+    @GetMapping(value = "/workers")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -93,7 +93,7 @@ public class MonitorController extends BaseController {
      * @return data base state
      */
     @ApiOperation(value = "queryDatabaseState", notes = "QUERY_DATABASE_STATE_NOTES")
-    @GetMapping(value = "/database")
+    @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -109,7 +109,7 @@ public class MonitorController extends BaseController {
      * @return zookeeper information list
      */
     @ApiOperation(value = "queryZookeeperState", notes = "QUERY_ZOOKEEPER_STATE_NOTES")
-    @GetMapping(value = "/zookeeper/list")
+    @GetMapping(value = "/zookeepers")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

@@ -36,7 +36,7 @@ export default {
         param: {
           tenantCode: payload.tenantCode
         },
-        api: 'tenant/verify-tenant-code'
+        api: 'tenants/verify-code'
       },
       alertgroup: {
         param: {
@@ -272,7 +272,7 @@ export default {
    */
   getTenantListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('tenant/list-paging', payload, res => {
+      io.get('tenants', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -284,7 +284,7 @@ export default {
    */
   getTenantList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('tenant/list', payload, res => {
+      io.get('tenants/list', payload, res => {
         const list = res.data
         list.unshift({
           id: -1,
@@ -302,7 +302,7 @@ export default {
    */
   getQueueList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('queue/list', payload, res => {
+      io.get('queues/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -314,7 +314,7 @@ export default {
    */
   createQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/create', payload, res => {
+      io.post('tenants', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -326,7 +326,7 @@ export default {
    */
   updateQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/update', payload, res => {
+      io.put(`tenants/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -338,7 +338,7 @@ export default {
    */
   deleteQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/delete', payload, res => {
+      io.delete(`tenants/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -518,7 +518,7 @@ export default {
    */
   getQueueListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('queue/list-paging', payload, res => {
+      io.get('queues', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -530,7 +530,7 @@ export default {
    */
   createQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/create', payload, res => {
+      io.post('queues', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -542,7 +542,7 @@ export default {
    */
   updateQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/update', payload, res => {
+      io.put(`queues/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -554,7 +554,7 @@ export default {
    */
   verifyQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/verify-queue', payload, res => {
+      io.post('queues/verify', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

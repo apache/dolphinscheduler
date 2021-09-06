@@ -42,9 +42,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,7 +65,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "SCHEDULER_TAG")
 @RestController
-@RequestMapping("/projects/{projectCode}/schedule")
+@RequestMapping("/projects/{projectCode}/schedules")
 public class SchedulerController extends BaseController {
 
     public static final String DEFAULT_WARNING_TYPE = "NONE";
@@ -99,7 +101,7 @@ public class SchedulerController extends BaseController {
         @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
-    @PostMapping("/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -142,12 +144,12 @@ public class SchedulerController extends BaseController {
         @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
-    @PostMapping("/update")
+    @PutMapping("/{id}")
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                 @RequestParam(value = "id") Integer id,
+                                 @PathVariable(value = "id") Integer id,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
@@ -172,12 +174,12 @@ public class SchedulerController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @PostMapping("/online")
+    @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                         @RequestParam("id") Integer id) {
+                         @PathVariable("id") Integer id) {
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
@@ -194,12 +196,12 @@ public class SchedulerController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @PostMapping("/offline")
+    @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                          @RequestParam("id") Integer id) {
+                          @PathVariable("id") Integer id) {
 
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
         return returnDataList(result);
@@ -224,7 +226,7 @@ public class SchedulerController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "100")
 
     })
-    @GetMapping("/list-paging")
+    @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
@@ -248,22 +250,22 @@ public class SchedulerController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param scheduleId scheule id
+     * @param id scheule id
      * @return delete result code
      */
     @ApiOperation(value = "deleteScheduleById", notes = "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "scheduleId", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_CRON_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                     @RequestParam("scheduleId") Integer scheduleId
+                                     @RequestParam("id") Integer id
     ) {
-        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, scheduleId);
+        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, id);
         return returnDataList(result);
     }
 

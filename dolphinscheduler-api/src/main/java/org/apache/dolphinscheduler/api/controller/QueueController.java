@@ -35,7 +35,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "QUEUE_TAG")
 @RestController
-@RequestMapping("/queue")
+@RequestMapping("/queues")
 public class QueueController extends BaseController {
 
     @Autowired
@@ -91,7 +93,7 @@ public class QueueController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -122,7 +124,7 @@ public class QueueController extends BaseController {
         @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -148,12 +150,12 @@ public class QueueController extends BaseController {
         @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "id") int id,
+                              @PathVariable(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
         Map<String, Object> result = queueService.updateQueue(loginUser, id, queue, queueName);
@@ -173,7 +175,7 @@ public class QueueController extends BaseController {
         @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/verify-queue")
+    @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
