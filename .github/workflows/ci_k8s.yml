@@ -77,10 +77,10 @@ jobs:
         run: helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Dependency Update
-        run: helm dependency update .
+        run: helm dependency update $(pwd)/docker/kubernetes/dolphinscheduler/.
 
       - name: Run chart-testing (install)
-        run: helm install dolphinscheduler .
+        run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/.
 
       # Check Server Status
       - name: Check Server Status
