@@ -133,6 +133,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cronutils.model.Cron;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -305,6 +306,18 @@ public class ProcessService {
      */
     public Command findOneCommand() {
         return commandMapper.getOneToRun();
+    }
+
+    /**
+     * get command page
+     *
+     * @param pageSize
+     * @param pageNumber
+     * @return
+     */
+    public List<Command> findCommandPage(int pageSize, int pageNumber) {
+        Page<Command> commandPage = new Page<>(pageNumber, pageSize);
+        return commandMapper.queryCommandPage(commandPage).getRecords();
     }
 
     /**
@@ -520,6 +533,8 @@ public class ProcessService {
             }
             return;
         }
+        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD, String.valueOf(processInstance.getId()));
         // process instance quit by "waiting thread" state
@@ -529,7 +544,7 @@ public class ProcessService {
                     processInstance.getTaskDependType(),
                     processInstance.getFailureStrategy(),
                     processInstance.getExecutorId(),
-                    processInstance.getProcessDefinition().getId(),
+                    processDefinition.getId(),
                     JSONUtils.toJsonString(cmdParam),
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
@@ -763,6 +778,9 @@ public class ProcessService {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                if (processInstance == null) {
+                    return processInstance;
+                }
                 CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
 
                 // reset global params while repeat running is needed by cmdParam
@@ -1014,6 +1032,40 @@ public class ProcessService {
     }
 
     /**
+     * retry submit task to db
+     *
+     * @param taskInstance
+     * @param commitRetryTimes
+     * @param commitInterval
+     * @return
+     */
+    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
+
+        int retryTimes = 1;
+        boolean submitDB = false;
+        TaskInstance task = null;
+        while (retryTimes <= commitRetryTimes) {
+            try {
+                if (!submitDB) {
+                    // submit task to db
+                    task = submitTask(taskInstance);
+                    if (task != null && task.getId() != 0) {
+                        submitDB = true;
+                    }
+                }
+                if (!submitDB) {
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                }
+                Thread.sleep(commitInterval);
+            } catch (Exception e) {
+                logger.error("task commit to mysql failed", e);
+            }
+            retryTimes += 1;
+        }
+        return task;
+    }
+
+    /**
      * submit task to db
      * submit sub process to command
      *
@@ -1036,8 +1088,8 @@ public class ProcessService {
             createSubWorkProcess(processInstance, task);
         }
 
-        logger.info("end submit task to db successfully:{} state:{} complete, instance id:{} state: {}  ",
-                taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
+        logger.info("end submit task to db successfully:{} {} state:{} complete, instance id:{} state: {}  ",
+                taskInstance.getId(), taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
         return task;
     }
 
@@ -2562,4 +2614,21 @@ public class ProcessService {
         List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds) ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
         ownResources.addAll(relationResources);
     }
+
+    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId, int taskId) {
+        HashMap<ProcessInstance, TaskInstance> processTaskMap = new HashMap<>();
+        //find sub tasks
+        ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryBySubProcessId(processId);
+        if (processInstanceMap == null) {
+            return processTaskMap;
+        }
+        ProcessInstance fatherProcess = this.findProcessInstanceById(processInstanceMap.getParentProcessInstanceId());
+        TaskInstance fatherTask = this.findTaskInstanceById(processInstanceMap.getParentTaskInstanceId());
+
+        if (fatherProcess != null) {
+            processTaskMap.put(fatherProcess, fatherTask);
+        }
+        return processTaskMap;
+    }
+
 }
