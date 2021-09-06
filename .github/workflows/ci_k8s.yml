@@ -69,9 +69,23 @@ jobs:
 
       # Install
 
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.2.0
-        if: steps.list-changed.outputs.changed == 'true'
+      - name: Create k8s
+        uses: engineerd/setup-kind@v0.5.0
+        timeout-minutes: 10
+
+      - name: Waiting for images to be ready
+        timeout-minutes: 60
+        run: |
+          echo ${{ env.RELEASE_VERSION }}
+      - name: Kubernetes info # 这个step会打印出k8s的信息
+        timeout-minutes: 5
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          cat ~/.kube/config
+          ls -lah ~/.kube/config
+          cd ~/.kube/
+          pwd
       
       - name: Helm Repo Add
         run: helm repo add bitnami https://charts.bitnami.com/bitnami
