@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.spi.task.parser;
 
+package org.apache.dolphinscheduler.spi.task.paramparser;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for working with Strings that have placeholder values in them. A placeholder takes the form
@@ -34,7 +38,7 @@ import java.util.*;
  */
 public class PropertyPlaceholderHelper {
 
-    private static final Log logger = LogFactory.getLog(PropertyPlaceholderHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(PropertyPlaceholderHelper.class);
 
     private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<String, String>(4);
 
@@ -54,7 +58,6 @@ public class PropertyPlaceholderHelper {
     private final String valueSeparator;
 
     private final boolean ignoreUnresolvablePlaceholders;
-
 
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
@@ -92,7 +95,6 @@ public class PropertyPlaceholderHelper {
         this.valueSeparator = valueSeparator;
         this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
     }
-
 
     /**
      * Replaces all placeholders of format {@code ${name}} with the corresponding
@@ -168,8 +170,8 @@ public class PropertyPlaceholderHelper {
                     startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
                 }
                 else {
-                    throw new IllegalArgumentException("Could not resolve placeholder '" +
-                            placeholder + "'" + " in value \"" + value + "\"");
+                    throw new IllegalArgumentException("Could not resolve placeholder '"
+                            + placeholder + "'" + " in value \"" + value + "\"");
                 }
                 visitedPlaceholders.remove(originalPlaceholder);
             }
@@ -204,7 +206,6 @@ public class PropertyPlaceholderHelper {
         }
         return -1;
     }
-
 
     /**
      * Strategy interface used to resolve replacement values for placeholders contained in Strings.
@@ -249,7 +250,6 @@ public class PropertyPlaceholderHelper {
             throw new IllegalArgumentException(message);
         }
     }
-
 
 }
 

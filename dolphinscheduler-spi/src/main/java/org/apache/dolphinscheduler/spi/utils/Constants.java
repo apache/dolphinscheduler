@@ -52,4 +52,19 @@ public class Constants {
     /** string no */
     public static final String STRING_NO = "NO";
 
+    /**
+     * date format of yyyy-MM-dd HH:mm:ss
+     */
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * date format of yyyyMMddHHmmss
+     */
+    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+
+    /**
+     * date format of yyyyMMddHHmmssSSS
+     */
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+
 }

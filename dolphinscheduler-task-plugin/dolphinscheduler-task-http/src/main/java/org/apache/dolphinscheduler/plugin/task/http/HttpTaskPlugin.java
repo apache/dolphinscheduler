@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+
+import com.google.common.collect.ImmutableList;
 
 public class HttpTaskPlugin implements DolphinSchedulerPlugin {
 

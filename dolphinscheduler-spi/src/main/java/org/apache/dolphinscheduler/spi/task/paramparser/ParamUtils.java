@@ -15,24 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.util;
+package org.apache.dolphinscheduler.spi.task.paramparser;
 
-import com.google.common.base.Preconditions;
-import javafx.beans.property.Property;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.spi.enums.CommandType;
+import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
+import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -40,6 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import com.google.common.base.Preconditions;
 
 /**
  * param utils
@@ -61,7 +55,7 @@ public class ParamUtils {
     public static Map<String, Property> convert(TaskRequest taskExecutionContext, AbstractParameters parameters) {
         Preconditions.checkNotNull(taskExecutionContext);
         Preconditions.checkNotNull(parameters);
-        Map<String,Property> globalParams = getUserDefParamsMap(taskExecutionContext.getDefinedParams());
+        Map<String, Property> globalParams = getUserDefParamsMap(taskExecutionContext.getDefinedParams());
         Map<String,String> globalParamsMap = taskExecutionContext.getDefinedParams();
         CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
         Date scheduleTime = taskExecutionContext.getScheduleTime();
@@ -87,9 +81,9 @@ public class ParamUtils {
         }
 
         if (StringUtils.isNotBlank(taskExecutionContext.getExecutePath())) {
-            params.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
+            params.put(PARAMETER_TASK_EXECUTE_PATH, taskExecutionContext.getExecutePath());
         }
-        params.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));
+        params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskExecutionContext.getTaskInstanceId()));
 
         if (globalParams != null && localParams != null) {
             globalParams.putAll(localParams);

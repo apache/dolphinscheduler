@@ -15,16 +15,45 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task.parser;
+package org.apache.dolphinscheduler.spi.task.paramparser;
 
-import org.apache.dolphinscheduler.common.Constants;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ADD_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ADD_MONTHS;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ADD_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DIVISION_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.LEFT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.LEFT_BRACE_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MONTH_BEGIN;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MONTH_END;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MULTIPLY_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MULTIPLY_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.N;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.P;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_FORMAT_TIME;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.RIGHT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SUBTRACT_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SUBTRACT_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.TIMESTAMP;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.WEEK_BEGIN;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.WEEK_END;
+import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
+import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMinutes;
+import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMonths;
+
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * time place holder utils
@@ -312,14 +341,14 @@ public class TimePlaceholderUtils {
         String value;
 
         try {
-            if (expression.startsWith(Constants.TIMESTAMP)) {
-                String timeExpression = expression.substring(Constants.TIMESTAMP.length() + 1, expression.length() - 1);
+            if (expression.startsWith(TIMESTAMP)) {
+                String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);
 
                 Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
 
                 String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
 
-                Date timestamp = DateUtils.parse(dateStr, Constants.PARAMETER_FORMAT_TIME);
+                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
 
                 value = String.valueOf(timestamp.getTime() / 1000);
             } else {
@@ -344,15 +373,15 @@ public class TimePlaceholderUtils {
     public static Map.Entry<Date, String> calcTimeExpression(String expression, Date date) {
         Map.Entry<Date, String> resultEntry;
 
-        if (expression.startsWith(Constants.ADD_MONTHS)) {
+        if (expression.startsWith(ADD_MONTHS)) {
             resultEntry = calcMonths(expression, date);
-        } else if (expression.startsWith(Constants.MONTH_BEGIN)) {
+        } else if (expression.startsWith(MONTH_BEGIN)) {
             resultEntry = calcMonthBegin(expression, date);
-        } else if (expression.startsWith(Constants.MONTH_END)) {
+        } else if (expression.startsWith(MONTH_END)) {
             resultEntry = calcMonthEnd(expression, date);
-        } else if (expression.startsWith(Constants.WEEK_BEGIN)) {
+        } else if (expression.startsWith(WEEK_BEGIN)) {
             resultEntry = calcWeekStart(expression, date);
-        } else if (expression.startsWith(Constants.WEEK_END)) {
+        } else if (expression.startsWith(WEEK_END)) {
             resultEntry = calcWeekEnd(expression, date);
         } else {
             resultEntry = calcMinutes(expression, date);
@@ -369,15 +398,15 @@ public class TimePlaceholderUtils {
      * @return first day of month
      */
     public static Map.Entry<Date, String> calcMonthBegin(String expression, Date date) {
-        String addMonthExpr = expression.substring(Constants.MONTH_BEGIN.length() + 1, expression.length() - 1);
-        String[] params = addMonthExpr.split(Constants.COMMA);
+        String addMonthExpr = expression.substring(MONTH_BEGIN.length() + 1, expression.length() - 1);
+        String[] params = addMonthExpr.split(COMMA);
 
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
             Integer day = calculate(dayExpr);
             Date targetDate = DateUtils.getFirstDayOfMonth(date);
-            targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
+            targetDate = addDays(targetDate, day);
 
             return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
         }
@@ -393,15 +422,15 @@ public class TimePlaceholderUtils {
      * @return last day of month
      */
     public static Map.Entry<Date, String> calcMonthEnd(String expression, Date date) {
-        String addMonthExpr = expression.substring(Constants.MONTH_END.length() + 1, expression.length() - 1);
-        String[] params = addMonthExpr.split(Constants.COMMA);
+        String addMonthExpr = expression.substring(MONTH_END.length() + 1, expression.length() - 1);
+        String[] params = addMonthExpr.split(COMMA);
 
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
             Integer day = calculate(dayExpr);
             Date targetDate = DateUtils.getLastDayOfMonth(date);
-            targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
+            targetDate = addDays(targetDate, day);
 
             return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
         }
@@ -417,15 +446,15 @@ public class TimePlaceholderUtils {
      * @return monday
      */
     public static Map.Entry<Date, String> calcWeekStart(String expression, Date date) {
-        String addMonthExpr = expression.substring(Constants.WEEK_BEGIN.length() + 1, expression.length() - 1);
-        String[] params = addMonthExpr.split(Constants.COMMA);
+        String addMonthExpr = expression.substring(WEEK_BEGIN.length() + 1, expression.length() - 1);
+        String[] params = addMonthExpr.split(COMMA);
 
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
             Integer day = calculate(dayExpr);
             Date targetDate = DateUtils.getMonday(date);
-            targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
+            targetDate = addDays(targetDate, day);
             return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
         }
 
@@ -440,15 +469,15 @@ public class TimePlaceholderUtils {
      * @return last day of week
      */
     public static Map.Entry<Date, String> calcWeekEnd(String expression, Date date) {
-        String addMonthExpr = expression.substring(Constants.WEEK_END.length() + 1, expression.length() - 1);
-        String[] params = addMonthExpr.split(Constants.COMMA);
+        String addMonthExpr = expression.substring(WEEK_END.length() + 1, expression.length() - 1);
+        String[] params = addMonthExpr.split(COMMA);
 
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
             Integer day = calculate(dayExpr);
             Date targetDate = DateUtils.getSunday(date);
-            targetDate = org.apache.commons.lang.time.DateUtils.addDays(targetDate, day);
+            targetDate = addDays(targetDate, day);
 
             return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
         }
@@ -464,14 +493,14 @@ public class TimePlaceholderUtils {
      * @return calc months
      */
     public static Map.Entry<Date, String> calcMonths(String expression, Date date) {
-        String addMonthExpr = expression.substring(Constants.ADD_MONTHS.length() + 1, expression.length() - 1);
-        String[] params = addMonthExpr.split(Constants.COMMA);
+        String addMonthExpr = expression.substring(ADD_MONTHS.length() + 1, expression.length() - 1);
+        String[] params = addMonthExpr.split(COMMA);
 
         if (params.length == 2) {
             String dateFormat = params[0];
             String monthExpr = params[1];
             Integer addMonth = calculate(monthExpr);
-            Date targetDate = org.apache.commons.lang.time.DateUtils.addMonths(date, addMonth);
+            Date targetDate = addMonths(date, addMonth);
 
             return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
         }
@@ -492,8 +521,7 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = org.apache.commons.lang.time.DateUtils
-                    .addMinutes(date, calcMinutes(addMinuteExpr));
+                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -503,8 +531,7 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = org.apache.commons.lang.time.DateUtils
-                    .addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);

@@ -15,7 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task.parser;
+package org.apache.dolphinscheduler.spi.task.paramparser;
+
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_DATETIME;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_FORMAT_TIME;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_SHECDULE_TIME;
 
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.spi.enums.DataType;
@@ -23,15 +27,19 @@ import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * parameter parse utils

@@ -17,20 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+public class HttpTaskConstants {
 
-public class HttpTaskChannel implements TaskChannel {
-
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
-
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new HttpTask(taskRequest);
-    }
-
+    public static final String APPLICATION_JSON = "application/json";
 }

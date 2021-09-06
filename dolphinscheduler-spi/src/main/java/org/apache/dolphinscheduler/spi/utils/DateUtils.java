@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
-
-import org.apache.dolphinscheduler.common.Constants;
+package org.apache.dolphinscheduler.spi.utils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
