@@ -20,7 +20,12 @@ package org.apache.dolphinscheduler.server.worker.task.dq;
 import static org.apache.dolphinscheduler.common.Constants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.common.Constants.SRC_FIELD;
 
-import org.apache.dolphinscheduler.common.enums.dq.*;
+import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
+import org.apache.dolphinscheduler.common.enums.dq.FormType;
+import org.apache.dolphinscheduler.common.enums.dq.InputType;
+import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
+import org.apache.dolphinscheduler.common.enums.dq.RuleType;
+import org.apache.dolphinscheduler.common.enums.dq.ValueType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
@@ -29,6 +34,13 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +49,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import java.util.*;
 
 /**
  * DataQualityTaskTest
