@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: `/projects/${projectId}/definition/list/${scope.row.id}` }" tag="a" class="links">
+                <router-link :to="{ path: `/projects/${projectCode}/definition/list/${scope.row.code}` }" tag="a" class="links">
                   <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
@@ -256,7 +256,7 @@
         }
         // remove one
         this.deleteDefinition({
-          processDefinitionId: item.id
+          code: item.code
         }).then(res => {
           this._onUpdate()
           this.$message.success(res.msg)
@@ -268,14 +268,14 @@
        * edit
        */
       _edit (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/list/${item.code}` })
       },
       /**
        * Offline
        */
       _downline (item) {
         this._upProcessState({
-          processId: item.id,
+          ...item,
           releaseState: 'OFFLINE'
         })
       },
@@ -284,7 +284,7 @@
        */
       _poponline (item) {
         this._upProcessState({
-          processId: item.id,
+          ...item,
           releaseState: 'ONLINE'
         })
       },
@@ -520,7 +520,7 @@
     mounted () {
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectId', 'projectCode'])
     },
     components: { mVersions, mStart, mTiming, mRelatedItems }
   }

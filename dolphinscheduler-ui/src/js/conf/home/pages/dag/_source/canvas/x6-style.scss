@@ -14,19 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.dag-chart {
-  width: 100%;
-  height: calc(100vh - 100px);
-  padding: 10px;
-  background: #f2f3f7;
+$STROKE_BLUE: #288FFF;
+$BG_WHITE: #FFFFFF;
 
-  &.full-screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 9999;
+.x6-node[data-shape="dag-task"]{
+  .in-port-body{
+    &.adsorbed,&.available{
+      .circle {
+        stroke: $STROKE_BLUE;
+        stroke-width: 4;
+        fill: $BG_WHITE;
+      }
+    }
   }
 }
