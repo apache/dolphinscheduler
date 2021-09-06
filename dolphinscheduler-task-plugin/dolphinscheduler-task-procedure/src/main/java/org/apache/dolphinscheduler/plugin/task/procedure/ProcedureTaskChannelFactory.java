@@ -15,21 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.python;
+package org.apache.dolphinscheduler.plugin.task.procedure;
 
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-import org.slf4j.Logger;
+import java.util.List;
 
-public class PythonTaskChannel implements TaskChannel {
+public class ProcedureTaskChannelFactory implements TaskChannelFactory {
+
     @Override
-    public void cancelApplication(boolean status) {
-
+    public String getName() {
+        return "PROCEDURE";
     }
 
     @Override
-    public PythonTask createTask(TaskRequest taskRequest) {
-        return new PythonTask(taskRequest);
+    public List<PluginParams> getParams() {
+        return null;
+    }
+
+    @Override
+    public TaskChannel create() {
+        return new ProcedureTaskChannel();
     }
 }

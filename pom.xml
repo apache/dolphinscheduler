@@ -97,7 +97,7 @@
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
-        <checkstyle.version>3.1.2</checkstyle.version>
+        <checkstyle.version>3.1.0</checkstyle.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
