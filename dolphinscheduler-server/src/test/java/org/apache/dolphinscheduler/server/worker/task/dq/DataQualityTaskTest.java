@@ -139,7 +139,7 @@ public class DataQualityTaskTest {
                 + "'2021-08-12 10:15:48' as create_time,'2021-08-12 10:15:48' as update_time from table_count \"}},"
                 + "{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\","
                 + "\"user\":\"test\",\"table\":\"dqc_statistics_value\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\","
-                + "\"sql\":\"select 21 as process_definition_id,287 as task_instance_id,10 as rule_id,'K3ZKUDH//LXSS03RELOCE4QCUW4=' as unique_code,'table_count.total'AS statistics_name,"
+                + "\"sql\":\"select 21 as process_definition_id,287 as task_instance_id,10 as rule_id,'DN/MS5NLTSLVZ/++KEJ9BHPQSEN6/UY/EV5TWI1IRRY=' as unique_code,'table_count.total'AS statistics_name,"
                 + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
                 + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
         Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
@@ -580,7 +580,7 @@ public class DataQualityTaskTest {
                 + "\"org.postgresql.Driver\",\"user\":\"test\",\"table\":\"t_ds_dq_task_statistics_value\",\"url\":"
                 + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding="
                 + "UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as "
-                + "task_instance_id,1 as rule_id,'IECZR4OVEHO3EGXXBMWGKDVLDY8=' as unique_code,'miss'AS statistics_name,miss AS statistics_value,"
+                + "task_instance_id,1 as rule_id,'FNWZLNCPWWF4ZWKO/LYENOPL6JPV1SHPPWQ9YSYLOCU=' as unique_code,'miss'AS statistics_name,miss AS statistics_value,"
                 + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
                 + "as update_time from test_person\"}}]}";
 
@@ -1203,7 +1203,7 @@ public class DataQualityTaskTest {
                 + "\"password\":\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
                 + "\"t_ds_dq_task_statistics_value\",\"url\":\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified"
                 + "&characterEncoding=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as task_instance_id,"
-                + "3 as rule_id,'7BYSHBOW546WGD2XOS3E7+TVDZ0=' as unique_code,'miss_count.miss'AS statistics_name,miss_count.miss AS statistics_value,'2021-08-30 00:00:00' as data_time,"
+                + "3 as rule_id,'T4MB2XTVSL+VA/L6XCU1M/ELHKYOMGVNBBE5KHBXHHI=' as unique_code,'miss_count.miss'AS statistics_name,miss_count.miss AS statistics_value,'2021-08-30 00:00:00' as data_time,"
                 + "'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' as update_time from miss_count\"}},{\"type\":\"hdfs_file\","
                 + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 

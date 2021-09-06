@@ -38,7 +38,7 @@ public class Md5Utils {
     public static String getMd5(String src, boolean isUpper) {
         String md5 = "";
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             Base64.Encoder encoder = Base64.getEncoder();
             md5 = encoder.encodeToString(md.digest(src.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
