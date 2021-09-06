@@ -435,6 +435,8 @@ public final class Constants {
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
+    public static final String COMMON_TASK_TYPE = "common";
+
     public static final String DEFAULT = "Default";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
