@@ -31,6 +31,10 @@ public class Md5Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Md5Utils.class);
 
+    private Md5Utils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String getMd5(String src, boolean isUpper) {
         String md5 = "";
         try {
