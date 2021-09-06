@@ -77,7 +77,7 @@ jobs:
           github token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Interact with the cluster
-        run: kubectl get 
+        run: kubectl get nodes
         
       - name: Check master status
         run: sh $(pwd)/docker/kubernetes/check-node.sh
