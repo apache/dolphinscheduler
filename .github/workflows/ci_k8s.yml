@@ -77,7 +77,10 @@ jobs:
           github token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Interact with the cluster
-        run: kubectl get nodes
+        run: kubectl get 
+        
+      - name: Check master status
+        run: sh $(pwd)/docker/kubernetes/check-node.sh
       
       - name: Helm Repo Add
         run: helm repo add bitnami https://charts.bitnami.com/bitnami
