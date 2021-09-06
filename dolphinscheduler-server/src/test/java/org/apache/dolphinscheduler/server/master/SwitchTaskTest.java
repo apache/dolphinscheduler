@@ -50,13 +50,6 @@ import org.springframework.context.ApplicationContext;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class SwitchTaskTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SwitchTaskTest.class);
-
-    /**
-     * TaskNode.runFlag : task can be run normally
-     */
-    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
-
     private ProcessService processService;
 
     private ProcessInstance processInstance;
