@@ -209,7 +209,6 @@
        * Start
        */
       _start (item) {
-        console.log(item)
         this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionCode: item.code }).then(res => {
           this.startData = item
