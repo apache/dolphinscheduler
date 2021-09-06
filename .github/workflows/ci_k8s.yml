@@ -99,7 +99,6 @@ jobs:
       - name: Interact with the cluster pods
         run: kubectl get pods 
 
-      # TODO: 
 
   #   runs-on: ubuntu-latest
   #     steps:
