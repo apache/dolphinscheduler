@@ -24,17 +24,20 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *  master scheduler thread
+ * master scheduler thread
  */
 @Service
 public class MasterSchedulerService extends Thread {
@@ -77,9 +80,12 @@ public class MasterSchedulerService extends Thread {
     private ProcessAlertManager processAlertManager;
 
     /**
-     *  netty remoting client
+     * netty remoting client
      */
     private NettyRemotingClient nettyRemotingClient;
+
+    @Autowired
+    NettyExecutorManager nettyExecutorManager;
 
     /**
      * master exec service
@@ -87,20 +93,33 @@ public class MasterSchedulerService extends Thread {
     private ThreadPoolExecutor masterExecService;
 
 
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
+    ConcurrentHashMap<Integer, ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
+    ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
+
+    private StateWheelExecuteThread stateWheelExecuteThread;
+
     /**
      * constructor of MasterSchedulerService
      */
-    @PostConstruct
-    public void init() {
-        this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
+        this.processInstanceExecMaps = processInstanceExecMaps;
+        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+
+        stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
+                taskTimeoutCheckList,
+                this.processInstanceExecMaps,
+                masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
+
     }
 
     @Override
     public synchronized void start() {
         super.setName("MasterSchedulerService");
         super.start();
+        this.stateWheelExecuteThread.start();
     }
 
     public void close() {
@@ -131,10 +150,6 @@ public class MasterSchedulerService extends Thread {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                // todo 串行执行 为何还需要判断状态？
-                /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
-                    scheduleProcess();
-                }*/
                 scheduleProcess();
             } catch (Exception e) {
                 logger.error("master scheduler thread error", e);
@@ -142,43 +157,78 @@ public class MasterSchedulerService extends Thread {
         }
     }
 
+    /**
+     * 1. get command by slot
+     * 2. donot handle command if slot is empty
+     *
+     * @throws Exception
+     */
     private void scheduleProcess() throws Exception {
 
-        try {
-            masterRegistryClient.blockAcquireMutex();
+        int activeCount = masterExecService.getActiveCount();
+        // make sure to scan and delete command  table in one transaction
+        Command command = findOneCommand();
+        if (command != null) {
+            logger.info("find one command: id: {}, type: {}", command.getId(), command.getCommandType());
+            try {
+                ProcessInstance processInstance = processService.handleCommand(logger,
+                        getLocalAddress(),
+                        this.masterConfig.getMasterExecThreads() - activeCount, command);
+                if (processInstance != null) {
+                    WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
+                            processInstance
+                            , processService
+                            , nettyExecutorManager
+                            , processAlertManager
+                            , masterConfig
+                            , taskTimeoutCheckList);
 
-            int activeCount = masterExecService.getActiveCount();
-            // make sure to scan and delete command  table in one transaction
-            Command command = processService.findOneCommand();
-            if (command != null) {
-                logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
-
-                try {
-
-                    ProcessInstance processInstance = processService.handleCommand(logger,
-                            getLocalAddress(),
-                            this.masterConfig.getMasterExecThreads() - activeCount, command);
-                    if (processInstance != null) {
-                        logger.info("start master exec thread , split DAG ...");
-                        masterExecService.execute(
-                                new MasterExecThread(
-                                        processInstance
-                                        , processService
-                                        , nettyRemotingClient
-                                        , processAlertManager
-                                        , masterConfig));
+                    this.processInstanceExecMaps.put(processInstance.getId(), workflowExecuteThread);
+                    if (processInstance.getTimeout() > 0) {
+                        this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
                     }
-                } catch (Exception e) {
-                    logger.error("scan command error ", e);
-                    processService.moveToErrorCommand(command, e.toString());
+                    logger.info("command {} process {} start...",
+                            command.getId(), processInstance.getId());
+                    masterExecService.execute(workflowExecuteThread);
                 }
-            } else {
-                //indicate that no command ,sleep for 1s
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+            } catch (Exception e) {
+                logger.error("scan command error ", e);
+                processService.moveToErrorCommand(command, e.toString());
             }
-        } finally {
-            masterRegistryClient.releaseLock();
+        } else {
+            //indicate that no command ,sleep for 1s
+            Thread.sleep(Constants.SLEEP_TIME_MILLIS);
         }
+    }
+
+    private Command findOneCommand() {
+        int pageNumber = 0;
+        Command result = null;
+        while (Stopper.isRunning()) {
+            if (ServerNodeManager.MASTER_SIZE == 0) {
+                return null;
+            }
+            List<Command> commandList = processService.findCommandPage(ServerNodeManager.MASTER_SIZE, pageNumber);
+            if (commandList.size() == 0) {
+                return null;
+            }
+            for (Command command : commandList) {
+                int slot = ServerNodeManager.getSlot();
+                if (ServerNodeManager.MASTER_SIZE != 0
+                        && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
+                    result = command;
+                    break;
+                }
+            }
+            if (result != null) {
+                logger.info("find command {}, slot:{} :",
+                        result.getId(),
+                        ServerNodeManager.getSlot());
+                break;
+            }
+            pageNumber += 1;
+        }
+        return result;
     }
 
     private String getLocalAddress() {

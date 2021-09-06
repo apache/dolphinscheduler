@@ -36,7 +36,6 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(DBTaskResponseProcessor.class);
 
-
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.DB_TASK_RESPONSE == command.getType(),

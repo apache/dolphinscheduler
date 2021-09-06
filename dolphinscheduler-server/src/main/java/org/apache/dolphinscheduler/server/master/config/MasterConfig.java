@@ -45,6 +45,9 @@ public class MasterConfig {
     @Value("${master.heartbeat.interval:10}")
     private int masterHeartbeatInterval;
 
+    @Value("${master.state.wheel.interval:5}")
+    private int stateWheelInterval;
+
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
 
@@ -138,5 +141,13 @@ public class MasterConfig {
 
     public void setMasterDispatchTaskNumber(int masterDispatchTaskNumber) {
         this.masterDispatchTaskNumber = masterDispatchTaskNumber;
+    }
+
+    public int getStateWheelInterval() {
+        return this.stateWheelInterval;
+    }
+
+    public void setStateWheelInterval(int stateWheelInterval) {
+        this.stateWheelInterval = stateWheelInterval;
     }
 }

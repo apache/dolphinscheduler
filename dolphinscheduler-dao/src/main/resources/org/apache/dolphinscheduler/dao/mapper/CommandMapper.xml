@@ -43,4 +43,9 @@
         </if>
         group by cmd.command_type
     </select>
+    <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        order by update_time asc
+    </select>
 </mapper>

@@ -15,76 +15,127 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
+public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
-    /**
-     * complete task map
-     */
-    private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
+    private TaskInstance taskInstance;
+
+    private ProcessInstance processInstance;
+    TaskDefinition taskDefinition;
+
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     /**
      * switch result
      */
     private DependResult conditionResult;
 
-    /**
-     * constructor of MasterBaseTaskExecThread
-     *
-     * @param taskInstance task instance
-     */
-    public SwitchTaskExecThread(TaskInstance taskInstance) {
-        super(taskInstance);
-        taskInstance.setStartTime(new Date());
-    }
-
     @Override
-    public Boolean submitWaitComplete() {
-        try {
-            this.taskInstance = submit();
-            logger.info("taskInstance submit end");
-            Thread.currentThread().setName(getThreadName());
-            initTaskParameters();
-            logger.info("switch task start");
-            waitTaskQuit();
-            updateTaskState();
-        } catch (Exception e) {
-            logger.error("switch task run exception", e);
+    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+
+        this.processInstance = processInstance;
+        this.taskInstance = processService.submitTask(taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+
+        if (this.taskInstance == null) {
+            return false;
         }
+        taskDefinition = processService.findTaskDefinition(
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+        );
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setStartTime(new Date());
+        processService.updateTaskInstance(taskInstance);
         return true;
     }
 
-    private void waitTaskQuit() {
+    @Override
+    public void run() {
+        try {
+            if (!this.taskState().typeIsFinished() && setSwitchResult()) {
+                endTaskState();
+            }
+        } catch (Exception e) {
+            logger.error("update work flow {} switch task {} state error:",
+                    this.processInstance.getId(),
+                    this.taskInstance.getId(),
+                    e);
+        }
+    }
+
+    @Override
+    protected boolean pauseTask() {
+        this.taskInstance.setState(ExecutionStatus.PAUSE);
+        this.taskInstance.setEndTime(new Date());
+        processService.saveTaskInstance(taskInstance);
+        return true;
+    }
+
+    @Override
+    protected boolean killTask() {
+        this.taskInstance.setState(ExecutionStatus.KILL);
+        this.taskInstance.setEndTime(new Date());
+        processService.saveTaskInstance(taskInstance);
+        return true;
+    }
+
+    @Override
+    protected boolean taskTimeout() {
+        return true;
+    }
+
+    @Override
+    public String getType() {
+        return TaskType.SWITCH.getDesc();
+    }
+
+    @Override
+    public ExecutionStatus taskState() {
+        return this.taskInstance.getState();
+    }
+
+    private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
                 taskInstance.getProcessInstanceId()
         );
+        Map<String, ExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
         }
-
         SwitchParameters switchParameters = taskInstance.getSwitchDependency();
         List<SwitchResultVo> switchResultVos = switchParameters.getDependTaskList();
         SwitchResultVo switchResultVo = new SwitchResultVo();
@@ -101,14 +152,13 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                 break;
             }
             String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
-            logger.info("format condition sentence：：{}", content);
+            logger.info("format condition sentence::{}", content);
             Boolean result = null;
             try {
                 result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
                 logger.info("error sentence : {}", content);
                 conditionResult = DependResult.FAILED;
-                //result = false;
                 break;
             }
             logger.info("condition result : {}", result);
@@ -122,41 +172,31 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         switchParameters.setResultConditionLocation(finalConditionLocation);
         taskInstance.setSwitchDependency(switchParameters);
 
-        //conditionResult = DependResult.SUCCESS;
         logger.info("the switch task depend result : {}", conditionResult);
+        return true;
     }
 
     /**
      * update task state
      */
-    private void updateTaskState() {
-        ExecutionStatus status;
-        if (this.cancel) {
-            status = ExecutionStatus.KILL;
-        } else {
-            status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
-        }
+    private void endTaskState() {
+        ExecutionStatus status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
         processService.updateTaskInstance(taskInstance);
     }
 
-    private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
-        this.taskInstance.setStartTime(new Date());
-        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        this.taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        this.processService.saveTaskInstance(taskInstance);
-    }
-
     public String setTaskParams(String content, String rgex) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String, Property> varParams = JSONUtils.toList(taskInstance.getVarPool(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> globalParams = JSONUtils
+                .toList(processInstance.getGlobalParams(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> varParams = JSONUtils
+                .toList(taskInstance.getVarPool(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
         if (varParams.size() > 0) {
             varParams.putAll(globalParams);
             globalParams = varParams;
