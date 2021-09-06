@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 export const X6_NODE_NAME = 'dag-task'
-export const X6_PORT_NAME = 'dag-port'
 export const X6_EDGE_NAME = 'dag-edge'
+export const X6_PORT_OUT_NAME = 'dag-port-out'
+export const X6_PORT_IN_NAME = 'dag-port-in'
 
 const EDGE = '#999999'
 const BG_BLUE = 'rgba(40, 143, 255, 0.1)'
@@ -27,35 +28,39 @@ const STROKE_BLUE = '#288FFF'
 
 export const PORT_PROPS = {
   groups: {
-    [X6_PORT_NAME]: {
+    [X6_PORT_OUT_NAME]: {
       position: {
-        name: 'absolute', // 布局算法名称
+        name: 'absolute',
         args: {
           x: 200,
           y: 24
-        } // 布局算法的默认参数
+        }
       },
       markup: [
         {
           tagName: 'g',
-          selector: 'portBody',
+          selector: 'body',
           children: [
             {
               tagName: 'circle',
-              selector: 'circle'
+              selector: 'circle-outer'
             },
             {
               tagName: 'text',
-              selector: 'plus'
+              selector: 'plus-text'
+            },
+            {
+              tagName: 'circle',
+              selector: 'circle-inner'
             }
           ]
         }
       ],
       attrs: {
-        portBody: {
+        body: {
           magnet: true
         },
-        plus: {
+        'plus-text': {
           fontSize: 12,
           fill: EDGE,
           text: '+',
@@ -63,11 +68,46 @@ export const PORT_PROPS = {
           x: 0,
           y: 3
         },
-        circle: {
+        'circle-outer': {
           stroke: EDGE,
-          r: 6,
           strokeWidth: 1,
+          r: 6,
           fill: BG_WHITE
+        },
+        'circle-inner': {
+          r: 4,
+          fill: 'transparent'
+        }
+      }
+    },
+    [X6_PORT_IN_NAME]: {
+      position: {
+        name: 'absolute',
+        args: {
+          x: 0,
+          y: 24
+        }
+      },
+      markup: [
+        {
+          tagName: 'g',
+          selector: 'body',
+          className: 'in-port-body',
+          children: [{
+            tagName: 'circle',
+            selector: 'circle',
+            className: 'circle'
+          }]
+        }
+      ],
+      attrs: {
+        body: {
+          magnet: true
+        },
+        circle: {
+          r: 4,
+          strokeWidth: 0,
+          fill: 'transparent'
         }
       }
     }
@@ -75,15 +115,21 @@ export const PORT_PROPS = {
 }
 
 export const PORT_HIGHLIGHT_PROPS = {
-  attrs: {
-    circle: {
-      stroke: STROKE_BLUE,
-      fill: BG_BLUE
-    },
-    plus: {
-      fill: STROKE_BLUE
+  [X6_PORT_OUT_NAME]: {
+    attrs: {
+      'circle-outer': {
+        stroke: STROKE_BLUE,
+        fill: BG_BLUE
+      },
+      'plus-text': {
+        fill: STROKE_BLUE
+      },
+      'circle-inner': {
+        fill: STROKE_BLUE
+      }
     }
-  }
+  },
+  [X6_PORT_IN_NAME]: {}
 }
 
 export const NODE_PROPS = {
@@ -96,25 +142,41 @@ export const NODE_PROPS = {
     },
     {
       tagName: 'image',
-      selector: 'icon'
+      selector: 'image'
     },
     {
       tagName: 'text',
       selector: 'title'
     }
+    // {
+    //   tagName: 'foreignObject',
+    //   selector: 'fo',
+    //   children: [
+    //     {
+    //       tagName: 'body',
+    //       selector: 'fo-body',
+    //       ns: 'http://www.w3.org/1999/xhtml',
+    //       children: [{
+    //         tagName: 'i',
+    //         selector: 'state',
+    //         className: 'state-icon el-icon-circle-check'
+    //       }]
+    //     }
+    //   ]
+    // }
   ],
   attrs: {
     body: {
       refWidth: '100%',
       refHeight: '100%',
-      fill: BG_WHITE,
-      stroke: NODE_BORDER,
-      strokeWidth: 1,
       rx: 6,
       ry: 6,
-      pointerEvents: 'visiblePainted'
+      pointerEvents: 'visiblePainted',
+      fill: BG_WHITE,
+      stroke: NODE_BORDER,
+      strokeWidth: 1
     },
-    icon: {
+    image: {
       width: 30,
       height: 30,
       refX: 12,
@@ -128,14 +190,32 @@ export const NODE_PROPS = {
       fontWeight: 'bold',
       fill: TITLE,
       strokeWidth: 0
+    },
+    fo: {
+      refX: '46%',
+      refY: -25,
+      width: 18,
+      height: 18
+    },
+    state: {
+      style: {
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        fontSize: '18px'
+      }
     }
   },
   ports: {
     ...PORT_PROPS,
     items: [
       {
-        id: X6_PORT_NAME,
-        group: X6_PORT_NAME
+        id: X6_PORT_OUT_NAME,
+        group: X6_PORT_OUT_NAME
+      },
+      {
+        id: X6_PORT_IN_NAME,
+        group: X6_PORT_IN_NAME
       }
     ]
   }

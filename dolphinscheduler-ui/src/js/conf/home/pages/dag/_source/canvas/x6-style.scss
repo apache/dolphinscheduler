@@ -1,0 +1,14 @@
+$STROKE_BLUE: #288FFF;
+$BG_WHITE: #FFFFFF;
+
+.x6-node[data-shape="dag-task"]{
+  .in-port-body{
+    &.adsorbed,&.available{
+      .circle {
+        stroke: $STROKE_BLUE;
+        stroke-width: 4;
+        fill: $BG_WHITE;
+      }
+    }
+  }
+}

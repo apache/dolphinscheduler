@@ -45,7 +45,7 @@
 
   export default {
     name: 'dag-context-menu',
-    inject: ['dagChart'],
+    inject: ['dagChart', 'dagCanvas'],
     components: {
       MenuItem
     },
@@ -101,8 +101,7 @@
         this.dagChart.openFormModel(this.currentTask.code, this.currentTask.type)
       },
       onCopy () {
-        const canvas = this.getDagCanvasRef()
-        const nodes = canvas.getNodes()
+        const nodes = this.dagCanvas.getNodes()
         const targetNode = nodes.find(
           (node) => node.id === this.currentTask.code
         )
@@ -123,31 +122,28 @@
               code,
               name: taskName
             }
-            canvas.addNode(code, this.currentTask.type, {
+            this.dagCanvas.addNode(code, this.currentTask.type, {
               x: targetNode.position.x + 100,
               y: targetNode.position.y + 100
             })
             this.addTask(task)
-            canvas.setNodeName(code, taskName)
+            this.dagCanvas.setNodeName(code, taskName)
           })
           .catch((err) => {
             console.error(err)
           })
       },
       onDelete () {
-        const canvas = this.getDagCanvasRef()
-        canvas.removeNode(this.currentTask.code)
+        this.dagCanvas.removeNode(this.currentTask.code)
       },
       show (x = 0, y = 0) {
-        const canvas = this.getDagCanvasRef()
-        canvas.lockScroller()
+        this.dagCanvas.lockScroller()
         this.visible = true
         this.left = x + 10
         this.top = y + 10
       },
       hide () {
-        const canvas = this.getDagCanvasRef()
-        canvas.unlockScroller()
+        this.dagCanvas.unlockScroller()
         this.visible = false
       }
     }

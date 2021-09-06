@@ -97,9 +97,7 @@
     },
     data () {
       return {
-        // full screen mode
         fullScreen: false,
-        // task config drawer
         taskDrawer: false,
         nodeData: { ...DEFAULT_NODE_DATA },
         saveDialog: false,
@@ -389,6 +387,7 @@
             preTaskVersion: preTask ? tasksMap[preTask.sourceId].version : 0,
             postTaskCode: task.code,
             postTaskVersion: tasksMap[task.code].version || 0,
+            // conditionType and conditionParams are reserved
             conditionType: 0,
             conditionParams: {}
           }

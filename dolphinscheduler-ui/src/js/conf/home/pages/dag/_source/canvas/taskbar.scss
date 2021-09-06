@@ -62,47 +62,48 @@
           display: block;
           width: 18px;
           height: 18px;
+          background-size: 100% 100%;
           &.icos-shell {
-            background: url("../images/task-icos/shell.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/shell.png");
           }
           &.icos-sub_process {
-            background: url("../images/task-icos/sub_process.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/sub_process.png");
           }
           &.icos-procedure {
-            background: url("../images/task-icos/procedure.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/procedure.png");
           }
           &.icos-sql {
-            background: url("../images/task-icos/sql.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/sql.png");
           }
           &.icos-flink {
-            background: url("../images/task-icos/flink.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/flink.png");
           }
           &.icos-mr {
-            background: url("../images/task-icos/mr.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/mr.png");
           }
           &.icos-python {
-            background: url("../images/task-icos/python.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/python.png");
           }
           &.icos-dependent {
-            background: url("../images/task-icos/dependent.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/dependent.png");
           }
           &.icos-http {
-            background: url("../images/task-icos/http.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/http.png");
           }
           &.icos-datax {
-            background: url("../images/task-icos/datax.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/datax.png");
           }
           &.icos-sqoop {
-            background: url("../images/task-icos/sqoop.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/sqoop.png");
           }
           &.icos-conditions {
-            background: url("../images/task-icos/conditions.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/conditions.png");
           }
           &.icos-waterdrop {
-            background: url("../images/task-icos/waterdrop.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/waterdrop.png");
           }
           &.icos-spark {
-            background: url("../images/task-icos/spark.svg") no-repeat 50% 50%;
+            background-image: url("../images/task-icos/spark.png");
           }
         }
 
@@ -113,50 +114,50 @@
         &:hover {
           color: #288fff;
           border: 1px dashed #288fff;
-          background: rgba(40, 143, 255, 0.1);
+          background-color: rgba(40, 143, 255, 0.1);
 
           em {
             &.icos-shell {
-              background: url("../images/task-icos/shell_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/shell_hover.png");
             }
             &.icos-sub_process {
-              background: url("../images/task-icos/sub_process_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/sub_process_hover.png");
             }
             &.icos-procedure {
-              background: url("../images/task-icos/procedure_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/procedure_hover.png");
             }
             &.icos-sql {
-              background: url("../images/task-icos/sql_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/sql_hover.png");
             }
             &.icos-flink {
-              background: url("../images/task-icos/flink_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/flink_hover.png");
             }
             &.icos-mr {
-              background: url("../images/task-icos/mr_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/mr_hover.png");
             }
             &.icos-python {
-              background: url("../images/task-icos/python_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/python_hover.png");
             }
             &.icos-dependent {
-              background: url("../images/task-icos/dependent_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/dependent_hover.png");
             }
             &.icos-http {
-              background: url("../images/task-icos/http_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/http_hover.png");
             }
             &.icos-datax {
-              background: url("../images/task-icos/datax_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/datax_hover.png");
             }
             &.icos-sqoop {
-              background: url("../images/task-icos/sqoop_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/sqoop_hover.png");
             }
             &.icos-conditions {
-              background: url("../images/task-icos/conditions_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/conditions_hover.png");
             }
             &.icos-waterdrop {
-              background: url("../images/task-icos/waterdrop_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/waterdrop_hover.png");
             }
             &.icos-spark {
-              background: url("../images/task-icos/spark_hover.svg") no-repeat 50% 50%;
+              background-image: url("../images/task-icos/spark_hover.png");
             }
           }
         }

@@ -27,23 +27,27 @@
     </el-tooltip>
     <textarea ref="textarea" cols="30" rows="10" class="transparent"></textarea>
     <div class="toolbar-left">
-      <el-tooltip :content="$t('View variables')" placement="bottom">
-        <el-button
-          class="toolbar-el-btn"
-          icon="el-icon-set-up"
-          size="mini"
+      <el-tooltip
+        :content="$t('View variables')"
+        placement="bottom"
+        class="toolbar-operation"
+      >
+        <i
+          class="custom-ico view-variables"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleVariableView"
-        ></el-button>
+        ></i>
       </el-tooltip>
-      <el-tooltip :content="$t('Startup parameter')" placement="bottom">
-        <el-button
-          class="toolbar-el-btn"
-          icon="el-icon-caret-right"
-          size="mini"
+      <el-tooltip
+        :content="$t('Startup parameter')"
+        placement="bottom"
+        class="toolbar-operation"
+      >
+        <i
+          class="custom-ico startup-parameters"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleParamView"
-        ></el-button>
+        ></i>
       </el-tooltip>
     </div>
     <div class="toolbar-right">
@@ -66,14 +70,22 @@
         :content="$t('Full Screen')"
         placement="bottom"
       >
-        <i :class="['full-screen-icon', dagChart.fullScreen ? 'active' : '']" @click="toggleFullScreen"></i>
+        <i
+          :class="[
+            'custom-ico',
+            dagChart.fullScreen
+              ? 'full-screen-close'
+              : 'full-screen-open',
+          ]"
+          @click="toggleFullScreen"
+        ></i>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation last"
         :content="$t('Format DAG')"
         placement="bottom"
       >
-        <i class="el-icon-s-operation" @click="chartFormat"></i>
+        <i class="custom-ico graph-format" @click="chartFormat"></i>
       </el-tooltip>
       <el-button
         class="toolbar-el-btn"
@@ -162,7 +174,7 @@
         textarea.value = this.dagChart.name
         textarea.select()
         document.execCommand('copy')
-        this.$message('复制成功')
+        this.$message(this.$t('Copy success'))
       },
       chartFormat () {
         const canvas = this.getDagCanvasRef()

@@ -36,7 +36,7 @@
   }
 
   .toolbar-operation {
-    font-size: 16px;
+    font-size: 18px;
     cursor: pointer;
     margin-left: 20px;
     color: #666666;
@@ -69,21 +69,45 @@
     margin-left: 10px;
   }
 
-  .full-screen-icon{
+  .custom-ico{
     display: block;
-    width: 19px;
-    height: 19px;
-    background-image: url('../images/fullscreen.svg');
+    width: 18px;
+    height: 18px;
     background-size: 100% 100%;
-    &:hover{
-      background-image: url('../images/fullscreen_hover.svg');
-    }
-  }
 
-  .full-screen-icon.active {
-    background-image: url('../images/fullscreen_reset.svg');
-    &:hover{
-      background-image: url('../images/fullscreen_reset_hover.svg');
+    &.view-variables{
+      background-image: url('../images/view-variables.png');
+      &:hover{
+        background-image: url('../images/view-variables_hover.png');
+      }
+    }
+
+    &.startup-parameters{
+      background-image: url('../images/startup-params.png');
+      &:hover{
+        background-image: url('../images/startup-params_hover.png');
+      }
+    }
+
+    &.full-screen-open{
+      background-image: url('../images/full-screen-open.png');
+      &:hover{
+        background-image: url('../images/full-screen-open_hover.png');
+      }
+    }
+
+    &.full-screen-close{
+      background-image: url('../images/full-screen-close.png');
+      &:hover{
+        background-image: url('../images/full-screen-close_hover.png');
+      }
+    }
+
+    &.graph-format{
+      background-image: url('../images/graph-format.png');
+      &:hover{
+        background-image: url('../images/graph-format_hover.png');
+      }
     }
   }
 
