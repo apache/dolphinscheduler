@@ -46,8 +46,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,7 +84,7 @@ public class DataSourceController extends BaseController {
      * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -96,19 +99,23 @@ public class DataSourceController extends BaseController {
      * updateProcessInstance data source
      *
      * @param loginUser login user
+     * @param id datasource id
      * @param dataSourceParam datasource param
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
         @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO"),
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @PathVariable(value = "id") Integer id,
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
+        dataSourceParam.setId(id);
         return dataSourceService.updateDataSource(dataSourceParam.getId(), loginUser, dataSourceParam);
     }
 
@@ -124,12 +131,12 @@ public class DataSourceController extends BaseController {
         @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
-    @PostMapping(value = "/update-ui")
+    @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @RequestParam("id") int id) {
+                                  @PathVariable("id") int id) {
 
         Map<String, Object> result = dataSourceService.queryDataSource(id);
         return returnDataList(result);
@@ -171,7 +178,7 @@ public class DataSourceController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -220,12 +227,12 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/connect-by-id")
+    @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CONNECTION_TEST_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result connectionTest(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestParam("id") int id) {
+                                 @PathVariable("id") int id) {
         return dataSourceService.connectionTest(id);
     }
 
@@ -240,12 +247,12 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result delete(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                         @RequestParam("id") int id) {
+                         @PathVariable("id") int id) {
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -282,7 +289,7 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/unauth-datasource")
+    @GetMapping(value = "/unauth")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UNAUTHORIZED_DATASOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -305,7 +312,7 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/authed-datasource")
+    @GetMapping(value = "/authed")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(AUTHORIZED_DATA_SOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
