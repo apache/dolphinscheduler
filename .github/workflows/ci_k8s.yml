@@ -92,9 +92,9 @@ jobs:
       - name: Run chart-testing (install)
         run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/. 
 
-      # # Check Server Status
-      # - name: Check Server Status
-      #   run: sh $(pwd)/docker/kubernetes/check.sh
+      # Check Server Status
+      - name: Check Server Status
+        run: sh $(pwd)/docker/kubernetes/check.sh
 
       - name: Interact with the cluster pods
         run: kubectl get pods 
