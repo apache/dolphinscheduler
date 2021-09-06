@@ -131,19 +131,20 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return tenant list page
      */
     @Override
-    public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         Page<Tenant> page = new Page<>(pageNo, pageSize);
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) tenantIPage.getTotal());
-        pageInfo.setLists(tenantIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) tenantIPage.getTotal());
+        pageInfo.setTotalList(tenantIPage.getRecords());
+        result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);
 
@@ -154,8 +155,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * updateProcessInstance tenant
      *
      * @param loginUser  login user
-     * @param id         tennat id
-     * @param tenantCode tennat code
+     * @param id         tenant id
+     * @param tenantCode tenant code
      * @param queueId    queue id
      * @param desc       description
      * @return update result code

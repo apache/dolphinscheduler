@@ -64,12 +64,13 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTaskListPaging() {
 
-        Map<String,Object> result = new HashMap<>();
+        Result result = new Result();
         Integer pageNo = 1;
         Integer pageSize = 20;
         PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
-        result.put(Constants.DATA_LIST, pageInfo);
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.setData(pageInfo);
+        result.setCode(Status.SUCCESS.getCode());
+        result.setMsg(Status.SUCCESS.getMsg());
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(""),  eq(1), eq(""), eq(""), eq(""),any(), any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(result);

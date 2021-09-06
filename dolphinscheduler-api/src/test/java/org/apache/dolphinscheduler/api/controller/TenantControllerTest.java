@@ -38,7 +38,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * tenant controller test
  */
-public class TenantControllerTest extends AbstractControllerTest{
+public class TenantControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
@@ -101,7 +101,6 @@ public class TenantControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
-
 
     @Test
     public void testVerifyTenantCode() throws Exception {
