@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,12 +15,28 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+package org.apache.dolphinscheduler.plugin.task.datax;
 
-public interface TaskChannel {
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-    void cancelApplication(boolean status);
+import java.util.List;
 
-    AbstractTask createTask(TaskRequest taskRequest);
+public class DataxTaskChannelFactory implements TaskChannelFactory {
 
+    @Override
+    public String getName() {
+        return "DATAX";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return null;
+    }
+
+    @Override
+    public TaskChannel create() {
+        return new DataxTaskChannel();
+    }
 }

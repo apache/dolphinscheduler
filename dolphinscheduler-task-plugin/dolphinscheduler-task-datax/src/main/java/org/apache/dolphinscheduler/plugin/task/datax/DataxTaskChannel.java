@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,12 +15,22 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.datax;
+
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-public interface TaskChannel {
+public class DataxTaskChannel implements TaskChannel {
 
-    void cancelApplication(boolean status);
+    @Override
+    public void cancelApplication(boolean status) {
 
-    AbstractTask createTask(TaskRequest taskRequest);
+    }
 
+    @Override
+    public AbstractTask createTask(TaskRequest taskRequest) {
+        return new DataxTask((DataxTaskRequest) taskRequest);
+    }
 }

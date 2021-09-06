@@ -682,7 +682,7 @@
                 <plugin>
                     <groupId>ca.vanzyl.maven.plugins</groupId>
                     <artifactId>provisio-maven-plugin</artifactId>
-                    <version>1.0.7</version>
+                    <version>1.0.4</version>
                     <extensions>true</extensions>
                 </plugin>
 

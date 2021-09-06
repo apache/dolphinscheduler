@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
-
-import org.slf4j.Logger;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 /**
  * abstract yarn task

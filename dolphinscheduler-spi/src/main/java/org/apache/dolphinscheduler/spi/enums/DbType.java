@@ -15,25 +15,45 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.spi.enums;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import static java.util.stream.Collectors.toMap;
 
-public class ShellTaskChannel implements TaskChannel {
-    /**
-     * shell parameters
-     */
-    private ShellParameters shellParameters;
+import java.util.Arrays;
+import java.util.Map;
 
-    @Override
-    public void cancelApplication(boolean status) {
+import com.google.common.base.Functions;
 
+public enum DbType {
+
+    MYSQL(0),
+    POSTGRESQL(1),
+    HIVE(2),
+    SPARK(3),
+    CLICKHOUSE(4),
+    ORACLE(5),
+    SQLSERVER(6),
+    DB2(7),
+    PRESTO(8),
+    H2(9);
+
+    DbType(int code) {
+        this.code = code;
     }
 
-    @Override
-    public ShellTask createTask(TaskRequest taskRequest) {
-        return new ShellTask(taskRequest);
+    private final int code;
+
+    public int getCode() {
+        return code;
     }
 
+    private static final Map<Integer, DbType> DB_TYPE_MAP =
+            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
+
+    public static DbType of(int type) {
+        if (DB_TYPE_MAP.containsKey(type)) {
+            return DB_TYPE_MAP.get(type);
+        }
+        return null;
+    }
 }
