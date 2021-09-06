@@ -42,6 +42,54 @@ public class TaskConstants {
     public static final String COMMA = ",";
 
     /**
+     * slash /
+     */
+    public static final String SLASH = "/";
+
+    /**
+     * COLON :
+     */
+    public static final String COLON = ":";
+
+    /**
+     * SPACE " "
+     */
+    public static final String SPACE = " ";
+
+    /**
+     * SINGLE_SLASH /
+     */
+    public static final String SINGLE_SLASH = "/";
+
+    /**
+     * DOUBLE_SLASH //
+     */
+    public static final String DOUBLE_SLASH = "//";
+
+    /**
+     * SINGLE_QUOTES "'"
+     */
+    public static final String SINGLE_QUOTES = "'";
+    /**
+     * DOUBLE_QUOTES "\""
+     */
+    public static final String DOUBLE_QUOTES = "\"";
+
+    /**
+     * SEMICOLON ;
+     */
+    public static final String SEMICOLON = ";";
+
+    /**
+     * EQUAL SIGN
+     */
+    public static final String EQUAL_SIGN = "=";
+    /**
+     * AT SIGN
+     */
+    public static final String AT_SIGN = "@";
+
+    /**
      * sleep time
      */
     public static final int SLEEP_TIME_MILLIS = 1000;
@@ -188,5 +236,37 @@ public class TaskConstants {
      * -D <property>=<value>
      */
     public static final String D = "-D";
+
+    /**
+     * jdbc url
+     */
+    public static final String JDBC_MYSQL = "jdbc:mysql://";
+    public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
+    public static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
+    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
+    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
+    public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
+    public static final String JDBC_DB2 = "jdbc:db2://";
+    public static final String JDBC_PRESTO = "jdbc:presto://";
+
+    /**
+     * driver
+     */
+    public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
+    public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
+    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
+    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+    public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
+    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+
+    /**
+     * datasource encryption salt
+     */
+    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
+    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
+    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
 }

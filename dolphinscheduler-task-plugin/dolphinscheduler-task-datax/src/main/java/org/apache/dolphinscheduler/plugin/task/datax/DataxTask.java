@@ -19,21 +19,20 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.RWXR_XR_X;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.task.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskRequest;
 import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -61,8 +60,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
@@ -251,7 +248,7 @@ public class DataxTask extends AbstractTaskExecutor {
 
         ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
-        readerParam.put("password", CommonUtils.decodePassword(dataSourceCfg.getPassword()));
+        readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
@@ -268,7 +265,7 @@ public class DataxTask extends AbstractTaskExecutor {
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
-        writerParam.put("password", CommonUtils.decodePassword(dataTargetCfg.getPassword()));
+        writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
         String[] columns = parsingSqlColumnNames(DbType.of(taskExecutionContext.getSourcetype()),
                 DbType.of(taskExecutionContext.getTargetType()),

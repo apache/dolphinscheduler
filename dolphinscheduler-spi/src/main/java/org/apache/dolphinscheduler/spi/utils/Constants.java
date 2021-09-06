@@ -53,6 +53,11 @@ public class Constants {
     public static final String STRING_NO = "NO";
 
     /**
+     * common properties path
+     */
+    public static final String COMMON_PROPERTIES_PATH = "/common.properties";
+
+    /**
      * date format of yyyy-MM-dd HH:mm:ss
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
