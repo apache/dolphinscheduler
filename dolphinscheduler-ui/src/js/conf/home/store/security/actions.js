@@ -624,7 +624,7 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`worker-groups/${id}`, payload, res => {
+      io.delete(`worker-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
