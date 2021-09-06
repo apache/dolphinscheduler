@@ -54,7 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "TASK_INSTANCE_TAG")
 @RestController
-@RequestMapping("/projects/{projectCode}/task-instance")
+@RequestMapping("/projects/{projectCode}/task-instances")
 public class TaskInstanceController extends BaseController {
 
     @Autowired
@@ -90,7 +90,7 @@ public class TaskInstanceController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping("/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -123,21 +123,21 @@ public class TaskInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param taskInstanceId task instance id
+     * @param id task instance id
      * @return the result code and msg
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
     })
-    @PostMapping(value = "/force-success")
+    @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> forceTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, taskInstanceId);
+                                           @PathVariable(value = "id") Integer id) {
+        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
         return returnDataList(result);
     }
 

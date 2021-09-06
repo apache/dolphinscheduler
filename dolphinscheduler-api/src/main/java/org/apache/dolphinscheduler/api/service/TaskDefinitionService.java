@@ -157,5 +157,5 @@ public interface TaskDefinitionService {
      */
     Map<String, Object> genTaskCodeList(User loginUser,
                                         Integer genNum);
-}
 
+}
