@@ -19,33 +19,13 @@ import _ from 'lodash'
 import io from '@/module/io'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
-// delete 'definitionList' from tasks
-const deleteDefinitionList = (tasks) => {
-  const newTasks = []
-  tasks.forEach(item => {
-    const newItem = Object.assign({}, item)
-    if (newItem.dependence && newItem.dependence.dependTaskList) {
-      newItem.dependence.dependTaskList.forEach(dependTaskItem => {
-        if (dependTaskItem.dependItemList) {
-          dependTaskItem.dependItemList.forEach(dependItem => {
-            Reflect.deleteProperty(dependItem, 'definitionList')
-          })
-        }
-      })
-    }
-    newTasks.push(newItem)
-  })
-  return newTasks
-}
-
 export default {
   /**
    *  Task status acquisition
    */
   getTaskState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, {
-      }, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, payload, res => {
         const arr = _.map(res.data.taskList, v => {
           return _.cloneDeep(_.assign(tasksState[v.state], {
             name: v.name,
@@ -68,7 +48,8 @@ export default {
    */
   editProcessState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/process-definition/${payload.processId}/release`, {
+      io.post(`projects/${state.projectCode}/process-definition/${payload.code}/release`, {
+        name: payload.name,
         releaseState: payload.releaseState
       }, res => {
         resolve(res)
@@ -83,7 +64,7 @@ export default {
    */
   getProcessDefinitionVersionsPage ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.processDefinitionCode}/versions`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/versions`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -96,7 +77,7 @@ export default {
    */
   switchProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.processDefinitionId}/versions/${payload.version}`, {}, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/versions/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -109,7 +90,7 @@ export default {
    */
   deleteProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-definition/${payload.processDefinitionId}/versiond/${payload.version}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versiond/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -156,32 +137,41 @@ export default {
       io.get(`projects/${state.projectCode}/process-definition/${payload}`, {
       }, res => {
         // process definition code
-        state.code = res.data.code
+        state.code = res.data.processDefinition.code
         // version
-        state.version = res.data.version
+        state.version = res.data.processDefinition.version
         // name
-        state.name = res.data.name
+        state.name = res.data.processDefinition.name
         // description
-        state.description = res.data.description
-        // connects
-        state.connects = JSON.parse(res.data.connects)
+        state.description = res.data.processDefinition.description
+        // taskRelationJson
+        state.connects = res.data.processTaskRelationList
         // locations
-        state.locations = JSON.parse(res.data.locations)
-        // Process definition
-        const processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
-        // tasks info
-        state.tasks = processDefinitionJson.tasks
-        // tasks cache
-        state.cacheTasks = {}
-        processDefinitionJson.tasks.forEach(v => {
-          state.cacheTasks[v.id] = v
-        })
+        state.locations = JSON.parse(res.data.processDefinition.locations)
         // global params
-        state.globalParams = processDefinitionJson.globalParams
+        state.globalParams = res.data.processDefinition.globalParamList
         // timeout
-        state.timeout = processDefinitionJson.timeout
-
-        state.tenantId = processDefinitionJson.tenantId
+        state.timeout = res.data.processDefinition.timeout
+        // tenantId
+        state.tenantCode = res.data.processDefinition.tenantCode
+        // tasks info
+        state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
+          'code',
+          'name',
+          'version',
+          'description',
+          'delayTime',
+          'taskType',
+          'taskParams',
+          'flag',
+          'taskPriority',
+          'workerGroup',
+          'failRetryTimes',
+          'failRetryInterval',
+          'timeoutFlag',
+          'timeoutNotifyStrategy',
+          'timeout'
+        ]))
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -241,34 +231,43 @@ export default {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/process-instances/${payload}`, {
       }, res => {
+        const { processDefinition, processTaskRelationList, taskDefinitionList } = res.data.dagData
         // code
-        state.code = res.data.processDefinitionCode
+        state.code = processDefinition.code
         // version
-        state.version = res.data.processDefinitionVersion
+        state.version = processDefinition.version
         // name
         state.name = res.data.name
         // desc
-        state.description = res.data.description
+        state.description = processDefinition.description
         // connects
-        state.connects = JSON.parse(res.data.connects)
+        state.connects = processTaskRelationList
         // locations
-        state.locations = JSON.parse(res.data.locations)
-        // process instance
-        const processInstanceJson = JSON.parse(res.data.processInstanceJson)
-        // tasks info
-        state.tasks = processInstanceJson.tasks
-        // tasks cache
-        state.cacheTasks = {}
-        processInstanceJson.tasks.forEach(v => {
-          state.cacheTasks[v.id] = v
-        })
+        state.locations = JSON.parse(processDefinition.locations)
         // global params
-        state.globalParams = processInstanceJson.globalParams
+        state.globalParams = processDefinition.globalParamList
         // timeout
-        state.timeout = processInstanceJson.timeout
-
-        state.tenantId = processInstanceJson.tenantId
-
+        state.timeout = processDefinition.timeout
+        // tenantCode
+        state.tenantCode = res.data.tenantCode
+        // tasks info
+        state.tasks = taskDefinitionList.map(task => _.pick(task, [
+          'code',
+          'name',
+          'version',
+          'description',
+          'delayTime',
+          'taskType',
+          'taskParams',
+          'flag',
+          'taskPriority',
+          'workerGroup',
+          'failRetryTimes',
+          'failRetryInterval',
+          'timeoutFlag',
+          'timeoutNotifyStrategy',
+          'timeout'
+        ]))
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
         state.startup.commandParam = JSON.parse(res.data.commandParam)
@@ -284,18 +283,15 @@ export default {
    */
   saveDAGchart ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      const data = {
-        globalParams: state.globalParams,
-        tasks: deleteDefinitionList(state.tasks),
-        tenantId: state.tenantId,
-        timeout: state.timeout
-      }
       io.post(`projects/${state.projectCode}/process-definition`, {
-        processDefinitionJson: JSON.stringify(data),
-        name: _.trim(state.name),
-        description: _.trim(state.description),
         locations: JSON.stringify(state.locations),
-        connects: JSON.stringify(state.connects)
+        name: _.trim(state.name),
+        taskDefinitionJson: JSON.stringify(state.tasks),
+        taskRelationJson: JSON.stringify(state.connects),
+        tenantCode: state.tenantCode,
+        description: _.trim(state.description),
+        globalParams: JSON.stringify(state.globalParams),
+        timeout: state.timeout
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -308,19 +304,16 @@ export default {
    */
   updateDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      const data = {
-        globalParams: state.globalParams,
-        tasks: deleteDefinitionList(state.tasks),
-        tenantId: state.tenantId,
-        timeout: state.timeout
-      }
       io.put(`projects/${state.projectCode}/process-definition/${payload}`, {
-        processDefinitionJson: JSON.stringify(data),
         locations: JSON.stringify(state.locations),
-        connects: JSON.stringify(state.connects),
         name: _.trim(state.name),
+        taskDefinitionJson: JSON.stringify(state.tasks),
+        taskRelationJson: JSON.stringify(state.connects),
+        tenantCode: state.tenantCode,
         description: _.trim(state.description),
-        releaseState: state.releaseState
+        globalParams: JSON.stringify(state.globalParams),
+        timeout: state.timeout,
+        releaseState: state.releaseState,
       }, res => {
         resolve(res)
         state.isEditDag = false
@@ -481,7 +474,7 @@ export default {
    */
   getNotifyGroupList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', res => {
+      io.get('alert-groups/list', res => {
         state.notifyGroupListS = _.map(res.data, v => {
           return {
             id: v.id,
@@ -549,7 +542,7 @@ export default {
    */
   createSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/create`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -561,7 +554,7 @@ export default {
    */
   previewSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/preview`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/preview`, payload, res => {
         resolve(res.data)
         // alert(res.data)
       }).catch(e => {
@@ -574,7 +567,7 @@ export default {
    */
   getScheduleList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/schedule/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/schedules`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -586,7 +579,7 @@ export default {
    */
   scheduleOffline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/offline`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/${payload.id}/offline`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -598,7 +591,7 @@ export default {
    */
   scheduleOnline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/online`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/${payload.id}/online`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -610,7 +603,7 @@ export default {
    */
   updateSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/update`, payload, res => {
+      io.put(`projects/${state.projectCode}/schedules/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -622,7 +615,7 @@ export default {
    */
   deleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-instances/${payload}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-instances/${payload.code}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -646,7 +639,7 @@ export default {
    */
   deleteDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-definition/${payload}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -704,7 +697,7 @@ export default {
    */
   getViewvariables ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload}/view-variables`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-variables`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -740,7 +733,7 @@ export default {
    */
   forceTaskSuccess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/task-instances/${payload}/force-success`, payload, res => {
+      io.post(`projects/${state.projectCode}/task-instances/${payload.code}/force-success`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -776,7 +769,7 @@ export default {
    */
   getViewTree ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.processId}/view-tree`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/view-tree`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -788,7 +781,7 @@ export default {
    */
   getViewGantt ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload}/view-gantt`, {}, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-gantt`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -800,7 +793,7 @@ export default {
    */
   getProcessTasksList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload}/tasks`, {}, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/tasks`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -821,7 +814,7 @@ export default {
    */
   deleteTiming ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/schedule/delete`, payload, res => {
+      io.delete(`projects/${state.projectCode}/schedules/${payload.scheduleId}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -831,6 +824,15 @@ export default {
   getResourceId ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('resources/queryResource', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  genTaskCodeList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task/gen-task-code-list`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

@@ -459,13 +459,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
+            int tenantId = -1;
+            if (!Constants.DEFAULT.equals(tenantCode)) {
+                Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+                if (tenant == null) {
+                    putMsg(result, Status.TENANT_NOT_EXIST);
+                    return result;
+                }
+                tenantId = tenant.getId();
             }
 
-            processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(), globalParams, locations, timeout, tenant.getId());
+            processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(), globalParams, locations, timeout, tenantId);
             processDefinition.setUpdateTime(new Date());
             int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, false);
             if (insertVersion > 0) {

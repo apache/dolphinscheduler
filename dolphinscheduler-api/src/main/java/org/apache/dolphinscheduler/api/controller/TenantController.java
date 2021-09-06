@@ -36,8 +36,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,7 +58,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "TENANT_TAG")
 @RestController
-@RequestMapping("/tenant")
+@RequestMapping("/tenants")
 public class TenantController extends BaseController {
 
     @Autowired
@@ -76,7 +79,7 @@ public class TenantController extends BaseController {
         @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "description", value = "TENANT_DESC", dataType = "String")
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TENANT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -104,7 +107,7 @@ public class TenantController extends BaseController {
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -158,12 +161,12 @@ public class TenantController extends BaseController {
         @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
 
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TENANT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @RequestParam(value = "id") int id,
+                               @PathVariable(value = "id") int id,
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
@@ -184,12 +187,12 @@ public class TenantController extends BaseController {
         @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
 
     })
-    @PostMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "id") int id) throws Exception {
+                                   @PathVariable(value = "id") int id) throws Exception {
         Map<String, Object> result = tenantService.deleteTenantById(loginUser, id);
         return returnDataList(result);
     }
@@ -205,7 +208,7 @@ public class TenantController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String")
     })
-    @GetMapping(value = "/verify-tenant-code")
+    @GetMapping(value = "/verify-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

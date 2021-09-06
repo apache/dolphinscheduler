@@ -39,11 +39,11 @@ export default {
   cacheTasks: {},
   // Timeout alarm
   timeout: 0,
-  // tenant id
-  tenantId: -1,
+  // tenant code
+  tenantCode: '',
   // Node location information
   locations: {},
-  // Node-to-node connection
+  // Node relations
   connects: [],
   // Running sign
   runFlag: '',

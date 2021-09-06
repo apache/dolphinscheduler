@@ -79,6 +79,7 @@
         store,
         router,
         isLog: false,
+        // TODO
         stateId: $(`#${this.item.id}`).attr('data-state-id') || null,
         isScreen: false,
         loadingIndex: 0,
