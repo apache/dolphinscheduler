@@ -44,7 +44,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(getCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
             setProcessId(response.getProcessId());
@@ -80,7 +80,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      * @return String
      * @throws Exception exception
      */
-    protected abstract String getCommand();
+    protected abstract String buildCommand();
 
     /**
      * set main jar name

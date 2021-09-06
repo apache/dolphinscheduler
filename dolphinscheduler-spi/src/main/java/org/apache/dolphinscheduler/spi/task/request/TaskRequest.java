@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
+import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.spi.task.Property;
+
 import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.spi.task.Property;
 
 /**
  * to master/worker task transport

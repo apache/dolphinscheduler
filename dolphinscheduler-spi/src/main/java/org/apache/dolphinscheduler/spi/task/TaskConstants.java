@@ -174,5 +174,19 @@ public class TaskConstants {
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
     public static final int LOG_QUERY_LIMIT = 4096;
 
+    /**
+     * jar
+     */
+    public static final String JAR = "jar";
+
+    /**
+     * hadoop
+     */
+    public static final String HADOOP = "hadoop";
+
+    /**
+     * -D <property>=<value>
+     */
+    public static final String D = "-D";
 
 }
