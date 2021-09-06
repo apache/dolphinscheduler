@@ -1,4 +1,3 @@
-import d3 from 'd3'
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,24 +14,29 @@ import d3 from 'd3'
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+<template>
+  <div class="menu-item" :class="disabled ? 'disabled' : ''" @click="onClick">
+    <slot></slot>
+  </div>
+</template>
 
-const DragZoom = function () {
-  this.element = {}
-  this.zoom = {}
-  this.scale = 1
-}
-
-DragZoom.prototype.init = function () {
-  const $canvas = $('#canvas')
-  this.element = d3.select('#canvas')
-  this.zoom = d3.behavior.zoom()
-    .scaleExtent([0.5, 2])
-    .on('zoom', () => {
-      this.scale = d3.event.scale
-      $canvas.css('transform', 'scale(' + this.scale + ')')
-      $canvas.css('transform-origin', '0 0')
-    })
-  this.element.call(this.zoom).on('dblclick.zoom', null)
-}
-
-export default new DragZoom()
+<script>
+  export default {
+    name: 'dag-context-menu-item',
+    props: {
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    },
+    data () {
+      return {}
+    },
+    methods: {
+      onClick (e) {
+        if (this.disabled) return
+        this.$emit('on-click', e)
+      }
+    }
+  }
+</script>

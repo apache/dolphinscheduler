@@ -14,19 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.dag-chart {
-  width: 100%;
-  height: calc(100vh - 100px);
-  padding: 10px;
-  background: #f2f3f7;
+<template>
+  <div
+    class="draggable-box"
+    ref="draggable"
+    draggable="true"
+    @dragstart="onDragstart"
+    @drag="onDrag"
+    @dragend="onDragend"
+  >
+    <slot></slot>
+  </div>
+</template>
 
-  &.full-screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 9999;
+<script>
+  export default {
+    name: 'draggable-box',
+    data () {
+      return {
+        tmp: null
+      }
+    },
+    methods: {
+      onDragstart (e) {
+        this.$emit('onDragstart', e)
+      },
+      onDrag (e) {
+        this.$emit('onDrag', e)
+      },
+      onDragend (e) {
+        this.$emit('onDragend', e)
+      }
+    }
   }
-}
+</script>

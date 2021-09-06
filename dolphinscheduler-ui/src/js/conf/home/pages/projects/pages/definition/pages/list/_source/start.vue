@@ -265,7 +265,7 @@
           }
         }
         let param = {
-          processDefinitionId: this.startData.id,
+          processDefinitionCode: this.startData.code,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
@@ -319,7 +319,7 @@
         }
       },
       _getGlobalParams () {
-        this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
+        this.store.dispatch('dag/getProcessDetails', this.startData.code).then(res => {
           this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
           this.udpList = _.cloneDeep(this.store.state.dag.globalParams)
         })
