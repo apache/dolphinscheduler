@@ -69,23 +69,15 @@ jobs:
 
       # Install
 
-      - name: Create k8s
-        uses: engineerd/setup-kind@v0.5.0
-        timeout-minutes: 10
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v2.4.2
+        with:
+          minikube version: 'v1.16.0'
+          kubernetes version: 'v1.19.2'
+          github token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Waiting for images to be ready
-        timeout-minutes: 60
-        run: |
-          echo ${{ env.RELEASE_VERSION }}
-      - name: Kubernetes info # 这个step会打印出k8s的信息
-        timeout-minutes: 5
-        run: |
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          cat ~/.kube/config
-          ls -lah ~/.kube/config
-          cd ~/.kube/
-          pwd
+      - name: Interact with the cluster
+        run: kubectl get nodes
       
       - name: Helm Repo Add
         run: helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -93,8 +85,9 @@ jobs:
       - name: Dependency Update
         run: helm dependency update $(pwd)/docker/kubernetes/dolphinscheduler/.
 
+      # Install Charts
       - name: Run chart-testing (install)
-        run: ct install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/.
+        run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/.
 
       # Check Server Status
       - name: Check Server Status
