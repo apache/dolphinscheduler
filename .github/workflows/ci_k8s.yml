@@ -80,7 +80,7 @@ jobs:
         run: helm dependency update $(pwd)/docker/kubernetes/dolphinscheduler/.
 
       - name: Run chart-testing (install)
-        run: helm install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/.
+        run: ct install dolphinscheduler $(pwd)/docker/kubernetes/dolphinscheduler/.
 
       # Check Server Status
       - name: Check Server Status
