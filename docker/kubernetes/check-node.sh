@@ -17,7 +17,7 @@
 #
 
 echo "------- check mini-kube master -------"
-until [ $(kubectl get nodes | grep Ready -c) -eq 1 ]; do
+until [ $(kubectl get nodes | grep NotReady -c) -eq 0 ]; do
   counter=$((counter+1))
   if [ $counter -eq 90 ]; then
     echo "error: master start failed"
