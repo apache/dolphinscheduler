@@ -50,8 +50,8 @@
           <div slot="text">{{$t('Run flag')}}</div>
           <div slot="content">
             <el-radio-group v-model="runFlag" size="small">
-              <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
-              <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
+              <el-radio :label="'YES'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
+              <el-radio :label="'NO'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
             </el-radio-group>
           </div>
         </m-list-box>
@@ -259,11 +259,12 @@
           :pre-node="nodeData.preNode">
         </m-conditions>
         <!-- Pre-tasks in workflow -->
-        <m-pre-tasks
+        <!-- TODO -->
+        <!-- <m-pre-tasks
           v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
           @on-pre-tasks="_onPreTasks"
           ref="PRE_TASK"
-          :backfill-item="backfillItem"></m-pre-tasks>
+          :backfill-item="backfillItem"></m-pre-tasks> -->
       </div>
     </div>
     <div class="bottom-box">
@@ -276,7 +277,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -287,7 +288,6 @@
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
-  import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
@@ -299,10 +299,9 @@
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
-  import mPreTasks from './tasks/pre_tasks'
+  // import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
-  import { isNameExDag, rtBantpl } from './../plugIn/util'
   import mPriority from '@/module/components/priority/priority'
 
   export default {
@@ -337,7 +336,7 @@
         // Current node params data
         params: {},
         // Running sign
-        runFlag: 'NORMAL',
+        runFlag: 'YES',
         // The second echo problem caused by the node data is specifically which node hook caused the unfinished special treatment
         isContentBox: false,
         // Number of failed retries
@@ -380,6 +379,31 @@
     },
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
+      taskToBackfillItem (task) {
+        return {
+          code: task.code,
+          conditionResult: task.taskParams.conditionResult,
+          delayTime: task.delayTime,
+          dependence: task.taskParams.dependence,
+          desc: task.description,
+          id: task.id,
+          maxRetryTimes: task.failRetryTimes,
+          name: task.name,
+          params: _.omit(task.taskParams, ['conditionResult', 'dependence']),
+          preTasks: [],
+          retryInterval: task.failRetryInterval,
+          runFlag: task.flag,
+          taskInstancePriority: task.taskPriority,
+          timeout: {
+            interval: task.timeout,
+            strategy: task.timeoutNotifyStrategy,
+            enable: task.timeoutFlag === 'OPEN'
+          },
+          type: task.taskType,
+          waitStartTimeout: task.waitStartTimeout,
+          workerGroup: task.workerGroup
+        }
+      },
       /**
        * depend
        */
@@ -449,8 +473,10 @@
             this.$message.error(e.msg || '')
           })
         } else {
+          const processDefinitionId = this.backfillItem.params.processDefinitionId
+          const process = this.processListS.find(process => process.processDefinition.id === processDefinitionId)
           this.$emit('onSubProcess', {
-            subProcessId: this.backfillItem.params.processDefinitionId,
+            subProcessCode: process.processDefinition.code,
             fromThis: this
           })
         }
@@ -461,39 +487,7 @@
       _onParams (o) {
         this.params = Object.assign({}, o)
       },
-
-      _onCacheParams (o) {
-        this.params = Object.assign(this.params, {}, o)
-        this._cacheItem()
-      },
-
-      _cacheItem () {
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
-        this.$emit('cacheTaskInfo', {
-          item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
-            name: this.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            dependence: this.cacheDependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            status: this.status,
-            branch: this.branch
-          },
-          fromThis: this
-        })
-      },
+      _onCacheParams (o) {},
       /**
        * verification name
        */
@@ -510,7 +504,9 @@
           return true
         }
         // Name repeat depends on dom backfill dependent store
-        if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
+        const tasks = this.store.state.dag.tasks
+        const task = tasks.find(t => t.name === 'this.name')
+        if (task) {
           this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
         }
@@ -558,66 +554,35 @@
           if (!this.$refs.PRE_TASK._verification()) {
             return
           } else {
-            // Sync data-targetarr
-            $(`#${this.nodeData.id}`).attr(
-              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
+            // TODO sync preTasks to graph
 
-            // Update JSP connections
-            let plumbIns = JSP.JspInstance
-            let targetId = this.nodeData.id
-
-            // Update new connections
-            this.preTasksToAdd.map(sourceId => {
-              plumbIns.connect({
-                source: sourceId,
-                target: targetId,
-                type: 'basic',
-                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
-              })
-            })
-
-            // Update remove connections
-            let currentConnects = plumbIns.getAllConnections()
-            let len = currentConnects.length
-            for (let i = 0; i < len; i++) {
-              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
-                plumbIns.deleteConnection(currentConnects[i])
-                i -= 1
-                len -= 1
-              }
-            }
           }
         }
-
-        $(`#${this.nodeData.id}`).find('span').text(this.name)
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
-        // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
+            code: this.nodeData.id,
             name: this.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            dependence: this.dependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
+            description: this.desc,
+            taskType: this.nodeData.taskType,
+            taskParams: {
+              ...this.params,
+              dependence: this.cacheDependence,
+              conditionResult: this.conditionResult
+            },
+            flag: this.runFlag,
+            taskPriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
-            status: this.status,
-            branch: this.branch
+            failRetryTimes: this.maxRetryTimes,
+            failRetryInterval: this.retryInterval,
+            timeoutFlag: this.timeout.enable ? 'OPEN' : 'CLOSE',
+            timeoutNotifyStrategy: this.timeout.strategy,
+            timeout: this.timeout.interval || 0,
+            delayTime: this.delayTime
           },
           fromThis: this
         })
-
         // set run flag
         this._setRunFlag()
       },
@@ -629,13 +594,10 @@
       },
       /**
        *  set run flag
+       *  TODO
        */
       _setRunFlag () {
-        let dom = $(`#${this.nodeData.id}`).find('.ban-p')
-        dom.html('')
-        if (this.runFlag === 'FORBIDDEN') {
-          dom.append(rtBantpl())
-        }
+
       },
       /**
        * Submit verification
@@ -661,42 +623,25 @@
         })
       }
     },
-    watch: {
-      /**
-       * Watch the item change, cache the value it changes
-       **/
-      _item (val) {
-        // this._cacheItem()
-      }
-    },
     created () {
-      // Unbind copy and paste events
-      JSP.removePaste()
       // Backfill data
       let taskList = this.store.state.dag.tasks
-
-      // fillback use cacheTasks
-      let cacheTasks = this.store.state.dag.cacheTasks
       let o = {}
-      if (cacheTasks[this.nodeData.id]) {
-        o = cacheTasks[this.nodeData.id]
-        this.backfillItem = cacheTasks[this.nodeData.id]
-      } else {
-        if (taskList.length) {
-          taskList.forEach(v => {
-            if (v.id === this.nodeData.id) {
-              o = v
-              this.backfillItem = v
-            }
-          })
-        }
+      if (taskList.length) {
+        taskList.forEach(task => {
+          if (task.code === this.nodeData.id) {
+            const backfillItem = this.taskToBackfillItem(task)
+            o = backfillItem
+            this.backfillItem = backfillItem
+          }
+        })
       }
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.code = o.code
         this.name = o.name
         this.taskInstancePriority = o.taskInstancePriority
-        this.runFlag = o.runFlag || 'NORMAL'
+        this.runFlag = o.runFlag || 'YES'
         this.desc = o.desc
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
@@ -755,33 +700,14 @@
     destroyed () {
     },
     computed: {
+      ...mapState('dag', [
+        'processListS'
+      ]),
       /**
        * Child workflow entry show/hide
        */
       _isGoSubProcess () {
         return this.nodeData.taskType === 'SUB_PROCESS' && this.name
-      },
-
-      // Define the item model
-      _item () {
-        return {
-          type: this.nodeData.taskType,
-          id: this.nodeData.id,
-          code: this.code,
-          name: this.name,
-          desc: this.desc,
-          runFlag: this.runFlag,
-          dependence: this.cacheDependence,
-          maxRetryTimes: this.maxRetryTimes,
-          retryInterval: this.retryInterval,
-          delayTime: this.delayTime,
-          timeout: this.timeout,
-          waitStartTimeout: this.waitStartTimeout,
-          taskInstancePriority: this.taskInstancePriority,
-          workerGroup: this.workerGroup,
-          successBranch: this.successBranch,
-          failedBranch: this.failedBranch
-        }
       }
     },
     components: {
@@ -805,8 +731,8 @@
       mTimeoutAlarm,
       mDependentTimeout,
       mPriority,
-      mWorkerGroups,
-      mPreTasks
+      mWorkerGroups
+      // mPreTasks
     }
   }
 </script>
