@@ -73,8 +73,14 @@ jobs:
         uses: helm/kind-action@v1.2.0
         if: steps.list-changed.outputs.changed == 'true'
       
+      - name: Helm Repo Add
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Dependency Update
+        run: helm dependency update .
+
       - name: Run chart-testing (install)
-        run: ct install
+        run: helm install dolphinscheduler .
 
       # Check Server Status
       - name: Check Server Status
