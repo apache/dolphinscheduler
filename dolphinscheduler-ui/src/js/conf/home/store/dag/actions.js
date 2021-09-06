@@ -549,7 +549,7 @@ export default {
    */
   createSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/create`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -561,7 +561,7 @@ export default {
    */
   previewSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/preview`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/preview`, payload, res => {
         resolve(res.data)
         // alert(res.data)
       }).catch(e => {
@@ -574,7 +574,7 @@ export default {
    */
   getScheduleList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/schedule/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/schedules`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -586,7 +586,7 @@ export default {
    */
   scheduleOffline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/offline`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/${payload.id}/offline`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -598,7 +598,7 @@ export default {
    */
   scheduleOnline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/online`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedules/${payload.id}/online`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -610,7 +610,7 @@ export default {
    */
   updateSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/schedule/update`, payload, res => {
+      io.put(`projects/${state.projectCode}/schedules/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -821,7 +821,7 @@ export default {
    */
   deleteTiming ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/schedule/delete`, payload, res => {
+      io.delete(`projects/${state.projectCode}/schedules/${payload.scheduleId}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
