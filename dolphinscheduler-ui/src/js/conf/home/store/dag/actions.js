@@ -832,7 +832,7 @@ export default {
   },
   genTaskCodeList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/task/gen-task-codes`, payload, res => {
+      io.get(`projects/${state.projectCode}/task-definition/gen-task-codes`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
