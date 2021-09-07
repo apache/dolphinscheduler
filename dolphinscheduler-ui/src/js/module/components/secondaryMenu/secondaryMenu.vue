@@ -56,6 +56,7 @@
 <script>
   import { mapState } from 'vuex'
   import menu from './_source/menu'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'secondary-menu',
@@ -88,6 +89,12 @@
           sessionStorage.setItem('isLeft', 0)
         } else {
           sessionStorage.setItem('isLeft', 1)
+        }
+
+        const routeName = this.$route.name
+        if (routeName === 'projects-instance-details' || routeName === 'projects-instance-details' || routeName === 'definition-create') {
+          const dag = findComponentDownward(this.$root, 'dag-chart')
+          dag && dag.canvasResize()
         }
       }
     },

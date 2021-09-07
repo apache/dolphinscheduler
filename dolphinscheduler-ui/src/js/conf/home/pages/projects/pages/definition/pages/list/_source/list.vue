@@ -337,13 +337,13 @@
         * @param processDefinitionId the process definition id
         * @param fromThis fromThis
       */
-      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionCode, fromThis }) {
         this.switchProcessDefinitionVersion({
           version: version,
-          processDefinitionId: processDefinitionId
+          code: processDefinitionCode
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
+          this.$router.push({ path: `/projects/${this.projectCode}/definition/list/${processDefinitionCode}` })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -360,7 +360,7 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionCode: processDefinitionCode
+          code: processDefinitionCode
         }).then(res => {
           this.versionData.processDefinitionVersions = res.data.totalList
           this.versionData.total = res.data.total
@@ -377,10 +377,10 @@
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
-          processDefinitionId: processDefinitionId
+          code: processDefinitionCode
         }).then(res => {
           this.$message.success(res.msg || '')
           this.mVersionGetProcessDefinitionVersionsPage({
@@ -397,7 +397,7 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionCode: item.code
+          code: item.code
         }).then(res => {
           let processDefinitionVersions = res.data.totalList
           let total = res.data.total

@@ -28,16 +28,15 @@
       <div ref="paper" class="paper"></div>
       <div ref="minimap" class="minimap"></div>
       <context-menu ref="contextMenu" />
-      <status-menu ref="statusMenu" />
     </div>
   </div>
 </template>
 
 <script>
+  import _ from 'lodash'
   import { Graph, DataUri } from '@antv/x6'
   import dagTaskbar from './taskbar.vue'
   import contextMenu from './contextMenu.vue'
-  import statusMenu from './statusMenu.vue'
   import {
     NODE_PROPS,
     EDGE_PROPS,
@@ -48,12 +47,13 @@
     X6_EDGE_NAME,
     NODE_HIGHLIGHT_PROPS,
     PORT_HIGHLIGHT_PROPS,
-    EDGE_HIGHLIGHT_PROPS
+    EDGE_HIGHLIGHT_PROPS,
+    NODE_STATUS_MARKUP
   } from './x6-helper'
   import { DagreLayout } from '@antv/layout'
-  import { tasksType } from '../config'
-  import _ from 'lodash'
+  import { tasksType, tasksState } from '../config'
   import { mapActions, mapMutations } from 'vuex'
+  import nodeStatus from './nodeStatus'
 
   export default {
     name: 'dag-canvas',
@@ -82,8 +82,7 @@
     inject: ['dagChart'],
     components: {
       dagTaskbar,
-      contextMenu,
-      statusMenu
+      contextMenu
     },
     methods: {
       ...mapActions('dag', ['genTaskCodeList']),
@@ -234,20 +233,9 @@
         // nodes and edges hover
         this.graph.on('cell:mouseenter', (data) => {
           const { cell, e } = data
-          const { left: cL, top: cT } =
-            this.$refs.container.getBoundingClientRect()
-          const cX = e.clientX - cL
-          const cY = e.clientY - cT
           const isStatusIcon = (tagName) =>
-            tagName && tagName.toLocaleLowerCase() === 'i'
-          if (isStatusIcon(e.target.tagName)) {
-            this.$refs.statusMenu.show(cX, cY)
-            this.$refs.statusMenu.setCurrentTask({
-              name: cell.data.taskName,
-              type: cell.data.taskType,
-              code: Number(cell.id)
-            })
-          } else {
+            tagName && (tagName.toLocaleLowerCase() === 'em' || tagName.toLocaleLowerCase() === 'body')
+          if (!isStatusIcon(e.target.tagName)) {
             this.setHighlight(cell)
           }
         })
@@ -255,7 +243,6 @@
           if (!this.graph.isSelected(cell)) {
             this.resetHighlight(cell)
           }
-          this.$refs.statusMenu.hide()
         })
         // select
         this.graph.on('cell:selected', ({ cell }) => {
@@ -675,6 +662,27 @@
        */
       unlockScroller () {
         this.graph.unlockScroller()
+      },
+      /**
+       * set node status icon
+       * @param {number} code
+       * @param {string} state
+       */
+      setNodeStatus ({ code, state, taskInstance }) {
+        code += ''
+        const stateProps = tasksState[state]
+        const node = this.graph.getCellById(code)
+        if (node) {
+          // Destroy the previous dom
+          node.removeMarkup()
+          node.setMarkup(NODE_PROPS.markup.concat(NODE_STATUS_MARKUP))
+          const nodeView = this.graph.findViewByCell(node)
+          const el = nodeView.find('div')[0]
+          nodeStatus({
+            stateProps,
+            taskInstance
+          }).$mount(el)
+        }
       },
       /**
        * Drag && Drop Event

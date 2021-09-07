@@ -37,6 +37,11 @@
         releaseState: ''
       }
     },
+    provide () {
+      return {
+        definitionDetails: this
+      }
+    },
     mixins: [disabledState],
     props: {},
     methods: {

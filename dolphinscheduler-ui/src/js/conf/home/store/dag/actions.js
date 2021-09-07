@@ -17,7 +17,6 @@
 
 import _ from 'lodash'
 import io from '@/module/io'
-import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
 export default {
   /**
@@ -25,19 +24,11 @@ export default {
    */
   getTaskState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, payload, res => {
-        const arr = _.map(res.data.taskList, v => {
-          return _.cloneDeep(_.assign(tasksState[v.state], {
-            name: v.name,
-            stateId: v.id,
-            dependentResult: v.dependentResult
-          }))
-        })
-        resolve({
-          list: arr,
-          processInstanceState: res.data.processInstanceState,
-          taskList: res.data.taskList
-        })
+      io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, {
+        processInstanceId: payload
+      }, res => {
+        state.taskInstances = res.data.taskList
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

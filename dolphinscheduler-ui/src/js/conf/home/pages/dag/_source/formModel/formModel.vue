@@ -20,7 +20,7 @@
       <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
-        <m-log :item="backfillItem">
+        <m-log v-if="taskInstance" :item="backfillItem" :task-instance-id="taskInstance.id">
           <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon el-icon-alarm-clock"></em><em>{{$t('View history')}}</em></a></template>
           <template slot="log"><a href="javascript:"><em class="ansicon el-icon-document"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
@@ -459,12 +459,11 @@
           return
         }
         if (this.router.history.current.name === 'projects-instance-details') {
-          let stateId = $(`#${this.nodeData.id}`).attr('data-state-id') || null
-          if (!stateId) {
+          if (!this.taskInstance) {
             this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
             return
           }
-          this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
+          this.store.dispatch('dag/getSubProcessId', { taskId: this.taskInstance.id }).then(res => {
             this.$emit('onSubProcess', {
               subProcessId: res.data.subProcessInstanceId,
               fromThis: this
@@ -701,13 +700,22 @@
     },
     computed: {
       ...mapState('dag', [
-        'processListS'
+        'processListS',
+        'taskInstances'
       ]),
       /**
        * Child workflow entry show/hide
        */
       _isGoSubProcess () {
         return this.nodeData.taskType === 'SUB_PROCESS' && this.name
+      },
+      taskInstance () {
+        if (this.taskInstances.length > 0) {
+          return this.taskInstances.find(
+            (instance) => instance.taskCode === this.nodeData.id
+          )
+        }
+        return null
       }
     },
     components: {
