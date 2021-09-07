@@ -144,6 +144,11 @@ public class TaskNode {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * task time out
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -262,6 +267,7 @@ public class TaskNode {
                 && Objects.equals(runFlag, taskNode.runFlag)
                 && Objects.equals(dependence, taskNode.dependence)
                 && Objects.equals(workerGroup, taskNode.workerGroup)
+                && Objects.equals(environmentCode, taskNode.environmentCode)
                 && Objects.equals(conditionResult, taskNode.conditionResult)
                 && CollectionUtils.equalLists(depList, taskNode.depList);
     }
@@ -422,9 +428,18 @@ public class TaskNode {
                 + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
     }
 
     public String getSwitchResult() {
