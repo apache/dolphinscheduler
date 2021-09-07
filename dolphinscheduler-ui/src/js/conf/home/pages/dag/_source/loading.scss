@@ -15,19 +15,12 @@
  * limitations under the License.
  */
  
-.dag-chart {
-  width: 100%;
-  height: calc(100vh - 100px);
-  padding: 10px;
-  background: #f2f3f7;
-
-  &.full-screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 1000;
+.dag-fullscreen-loading{
+  .el-loading-spinner i {
+      color: #fff;
+      font-size: 18px;
+  }
+  .el-loading-text{
+    color: #fff;
   }
 }
-
