@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.spark;
 
-import org.apache.dolphinscheduler.common.datasource.BaseHdfsConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseHdfsConnectionParam;
 
 public class SparkConnectionParam extends BaseHdfsConnectionParam {
     @Override

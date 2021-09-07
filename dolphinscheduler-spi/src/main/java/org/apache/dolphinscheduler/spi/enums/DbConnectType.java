@@ -15,20 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.tis;
+package org.apache.dolphinscheduler.spi.enums;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+public enum DbConnectType {
 
-public class TISTaskChannel implements TaskChannel {
-    @Override
-    public void cancelApplication(boolean status) {
+    ORACLE_SERVICE_NAME(0, "Oracle Service Name"),
+    ORACLE_SID(1, "Oracle SID");
 
+    DbConnectType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
     }
 
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new TISTask(taskRequest);
+    private final int code;
+
+    private final String descp;
+
+    public int getCode() {
+        return code;
     }
+
+    public String getDescp() {
+        return descp;
+    }
+
 }

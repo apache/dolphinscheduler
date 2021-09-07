@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.hive;
 
-import org.apache.dolphinscheduler.common.datasource.BaseHdfsDatasourceParamDTO;
-import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseHdfsDatasourceParamDTO;
 
 public class HiveDataSourceParamDTO extends BaseHdfsDatasourceParamDTO {
 

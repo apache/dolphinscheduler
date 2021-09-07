@@ -17,23 +17,28 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.clickhouse;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.spi.Constants;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_CLICKHOUSE_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_CLICKHOUSE;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.CommonUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.*;
 
 public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
 
@@ -65,7 +70,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         clickhouseConnectionParam.setAddress(address);
         clickhouseConnectionParam.setJdbcUrl(jdbcUrl);
         clickhouseConnectionParam.setUser(clickHouseParam.getUserName());
-        clickhouseConnectionParam.setPassword(CommonUtils.encodePassword(clickHouseParam.getPassword()));
+        clickhouseConnectionParam.setPassword(encodePassword(clickHouseParam.getPassword()));
         clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
         return clickhouseConnectionParam;
     }
@@ -95,7 +100,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         ClickhouseConnectionParam clickhouseConnectionParam = (ClickhouseConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(clickhouseConnectionParam),
-                clickhouseConnectionParam.getUser(), CommonUtils.decodePassword(clickhouseConnectionParam.getPassword()));
+                clickhouseConnectionParam.getUser(), decodePassword(clickhouseConnectionParam.getPassword()));
     }
 
     @Override

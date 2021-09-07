@@ -17,17 +17,26 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.oracle;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.AT_SIGN;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_ORACLE_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_ORACLE_SERVICE_NAME;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_ORACLE_SID;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,14 +57,14 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
         oracleDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
-        String hostSeperator = Constants.DOUBLE_SLASH;
+        String hostSeperator = DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
-            hostSeperator = Constants.AT_SIGN;
+            hostSeperator = AT_SIGN;
         }
         String[] hostPort = connectionParams.getAddress().split(hostSeperator);
-        String[] hostPortArray = hostPort[hostPort.length - 1].split(Constants.COMMA);
-        oracleDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        oracleDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        String[] hostPortArray = hostPort[hostPort.length - 1].split(COMMA);
+        oracleDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
+        oracleDatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
 
         return oracleDatasourceParamDTO;
     }
@@ -66,16 +75,16 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         String address;
         if (DbConnectType.ORACLE_SID.equals(oracleParam.getConnectType())) {
             address = String.format("%s%s:%s",
-                    Constants.JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
+                    JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
         } else {
             address = String.format("%s%s:%s",
-                    Constants.JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
+                    JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
         }
         String jdbcUrl = address + "/" + oracleParam.getDatabase();
 
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setUser(oracleParam.getUserName());
-        oracleConnectionParam.setPassword(CommonUtils.encodePassword(oracleParam.getPassword()));
+        oracleConnectionParam.setPassword(encodePassword(oracleParam.getPassword()));
         oracleConnectionParam.setAddress(address);
         oracleConnectionParam.setJdbcUrl(jdbcUrl);
         oracleConnectionParam.setDatabase(oracleParam.getDatabase());
@@ -92,7 +101,7 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_ORACLE_JDBC_DRIVER;
+        return COM_ORACLE_JDBC_DRIVER;
     }
 
     @Override
@@ -109,7 +118,7 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         OracleConnectionParam oracleConnectionParam = (OracleConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                oracleConnectionParam.getUser(), CommonUtils.decodePassword(oracleConnectionParam.getPassword()));
+                oracleConnectionParam.getUser(), decodePassword(oracleConnectionParam.getPassword()));
     }
 
     @Override

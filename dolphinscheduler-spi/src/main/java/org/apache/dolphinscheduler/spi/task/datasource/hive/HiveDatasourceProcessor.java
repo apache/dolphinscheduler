@@ -17,17 +17,25 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.hive;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_HIVE_2;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.HiveConfUtils;
+import org.apache.dolphinscheduler.spi.utils.CommonUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -50,15 +58,15 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         hiveDataSourceParamDTO.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
         hiveDataSourceParamDTO.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
 
-        String[] tmpArray = hiveConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
+        String[] tmpArray = hiveConnectionParam.getAddress().split(DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
+        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(COMMA);
         for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
+            hosts.append(hostPort.split(COLON)[0]).append(COMMA);
         }
         hosts.deleteCharAt(hosts.length() - 1);
         hiveDataSourceParamDTO.setHost(hosts.toString());
-        hiveDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        hiveDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
 
         return hiveDataSourceParamDTO;
     }
@@ -67,7 +75,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         HiveDataSourceParamDTO hiveParam = (HiveDataSourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
-        address.append(Constants.JDBC_HIVE_2);
+        address.append(JDBC_HIVE_2);
         for (String zkHost : hiveParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, hiveParam.getPort()));
         }
@@ -82,7 +90,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         hiveConnectionParam.setAddress(address.toString());
         hiveConnectionParam.setJdbcUrl(jdbcUrl);
         hiveConnectionParam.setUser(hiveParam.getUserName());
-        hiveConnectionParam.setPassword(CommonUtils.encodePassword(hiveParam.getPassword()));
+        hiveConnectionParam.setPassword(encodePassword(hiveParam.getPassword()));
 
         if (CommonUtils.getKerberosStartupState()) {
             hiveConnectionParam.setPrincipal(hiveParam.getPrincipal());
@@ -101,7 +109,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
@@ -122,7 +130,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
                 hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                hiveConnectionParam.getUser(), CommonUtils.decodePassword(hiveConnectionParam.getPassword()));
+                hiveConnectionParam.getUser(), decodePassword(hiveConnectionParam.getPassword()));
     }
 
     @Override

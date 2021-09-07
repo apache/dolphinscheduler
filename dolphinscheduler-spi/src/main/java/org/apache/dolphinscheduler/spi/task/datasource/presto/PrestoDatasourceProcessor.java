@@ -17,16 +17,23 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.presto;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_PRESTO_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_PRESTO;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -42,12 +49,12 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) createConnectionParams(connectionJson);
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
+        String[] hostSeperator = connectionParams.getAddress().split(DOUBLE_SLASH);
+        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(COMMA);
 
         PrestoDatasourceParamDTO prestoDatasourceParamDTO = new PrestoDatasourceParamDTO();
-        prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
+        prestoDatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
         prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
         prestoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -58,12 +65,12 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PrestoDatasourceParamDTO prestoParam = (PrestoDatasourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
+        String address = String.format("%s%s:%s", JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
         String jdbcUrl = address + "/" + prestoParam.getDatabase();
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setUser(prestoParam.getUserName());
-        prestoConnectionParam.setPassword(CommonUtils.encodePassword(prestoParam.getPassword()));
+        prestoConnectionParam.setPassword(encodePassword(prestoParam.getPassword()));
         prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
@@ -79,7 +86,7 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_PRESTO_JDBC_DRIVER;
+        return COM_PRESTO_JDBC_DRIVER;
     }
 
     @Override
@@ -96,7 +103,7 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                prestoConnectionParam.getUser(), CommonUtils.decodePassword(prestoConnectionParam.getPassword()));
+                prestoConnectionParam.getUser(), decodePassword(prestoConnectionParam.getPassword()));
     }
 
     @Override

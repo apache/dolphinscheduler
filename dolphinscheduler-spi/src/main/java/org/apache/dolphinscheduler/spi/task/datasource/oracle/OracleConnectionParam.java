@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.oracle;
 
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 
 public class OracleConnectionParam extends BaseConnectionParam {
+
     protected DbConnectType connectType;
 
     public DbConnectType getConnectType() {

@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.oracle;
 
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
-import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
 

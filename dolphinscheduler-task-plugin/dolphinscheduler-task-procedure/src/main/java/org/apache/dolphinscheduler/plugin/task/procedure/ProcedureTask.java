@@ -17,23 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
-import static org.apache.dolphinscheduler.plugin.task.api.utils.Constants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.Constants.EXIT_CODE_SUCCESS;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.Constants.TASK_LOG_INFO_FORMAT;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.TASK_LOG_INFO_FORMAT;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskRequest;
 import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -48,8 +46,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 /**
  * procedure task

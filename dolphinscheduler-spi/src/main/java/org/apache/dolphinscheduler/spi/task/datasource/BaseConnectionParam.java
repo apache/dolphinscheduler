@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.apache.dolphinscheduler.spi.task.datasource.clickhouse.ClickhouseConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.db2.Db2ConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.hive.HiveConnectionParam;
@@ -28,6 +26,9 @@ import org.apache.dolphinscheduler.spi.task.datasource.postgresql.PostgreSqlConn
 import org.apache.dolphinscheduler.spi.task.datasource.presto.PrestoConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.spark.SparkConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.sqlserver.SqlServerConnectionParam;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * The base model of connection param

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.presto;
 
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 
 public class PrestoConnectionParam extends BaseConnectionParam {
     @Override

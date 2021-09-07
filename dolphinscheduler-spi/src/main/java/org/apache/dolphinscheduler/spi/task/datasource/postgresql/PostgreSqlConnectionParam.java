@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.postgresql;
 
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 
 public class PostgreSqlConnectionParam extends BaseConnectionParam {
     @Override

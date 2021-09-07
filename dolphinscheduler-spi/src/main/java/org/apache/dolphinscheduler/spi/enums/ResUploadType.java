@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.tis;
+package org.apache.dolphinscheduler.spi.enums;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-
-public class TISTaskChannel implements TaskChannel {
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
-
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new TISTask(taskRequest);
-    }
+/**
+ * data base types
+ */
+public enum ResUploadType {
+  /**
+   * 0 hdfs
+   * 1 s3
+   * 2 none
+   */
+  HDFS,S3,NONE
 }

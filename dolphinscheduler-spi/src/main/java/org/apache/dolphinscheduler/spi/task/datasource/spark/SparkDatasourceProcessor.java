@@ -17,16 +17,24 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.spark;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_HIVE_2;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.CommonUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -53,13 +61,13 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
         sparkDatasourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
 
         StringBuilder hosts = new StringBuilder();
-        String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        Arrays.stream(hostPortArray).forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
+        String[] tmpArray = connectionParams.getAddress().split(DOUBLE_SLASH);
+        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(COMMA);
+        Arrays.stream(hostPortArray).forEach(hostPort -> hosts.append(hostPort.split(COLON)[0]).append(COMMA));
         hosts.deleteCharAt(hosts.length() - 1);
 
         sparkDatasourceParamDTO.setHost(hosts.toString());
-        sparkDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        sparkDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
 
         return sparkDatasourceParamDTO;
     }
@@ -68,7 +76,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StringBuilder address = new StringBuilder();
         SparkDatasourceParamDTO sparkDatasourceParam = (SparkDatasourceParamDTO) dataSourceParam;
-        address.append(Constants.JDBC_HIVE_2);
+        address.append(JDBC_HIVE_2);
         for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
         }
@@ -80,7 +88,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
         }
 
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
-        sparkConnectionParam.setPassword(CommonUtils.encodePassword(sparkDatasourceParam.getPassword()));
+        sparkConnectionParam.setPassword(encodePassword(sparkDatasourceParam.getPassword()));
         sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
         sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
         sparkConnectionParam.setDatabase(sparkDatasourceParam.getDatabase());
@@ -103,7 +111,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
@@ -122,7 +130,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
                 sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(sparkConnectionParam),
-                sparkConnectionParam.getUser(), CommonUtils.decodePassword(sparkConnectionParam.getPassword()));
+                sparkConnectionParam.getUser(), decodePassword(sparkConnectionParam.getPassword()));
     }
 
     @Override

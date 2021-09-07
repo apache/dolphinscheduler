@@ -17,19 +17,23 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.postgresql;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_POSTGRESQL;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ORG_POSTGRESQL_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,10 +52,10 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
-        String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        postgreSqlDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        postgreSqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        String[] hostSeperator = address.split(DOUBLE_SLASH);
+        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(COMMA);
+        postgreSqlDatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
+        postgreSqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
 
         return postgreSqlDatasourceParamDTO;
     }
@@ -59,7 +63,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PostgreSqlDatasourceParamDTO postgreSqlParam = (PostgreSqlDatasourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, postgreSqlParam.getHost(), postgreSqlParam.getPort());
+        String address = String.format("%s%s:%s", JDBC_POSTGRESQL, postgreSqlParam.getHost(), postgreSqlParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
 
         PostgreSqlConnectionParam postgreSqlConnectionParam = new PostgreSqlConnectionParam();
@@ -67,7 +71,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         postgreSqlConnectionParam.setAddress(address);
         postgreSqlConnectionParam.setDatabase(postgreSqlParam.getDatabase());
         postgreSqlConnectionParam.setUser(postgreSqlParam.getUserName());
-        postgreSqlConnectionParam.setPassword(CommonUtils.encodePassword(postgreSqlParam.getPassword()));
+        postgreSqlConnectionParam.setPassword(encodePassword(postgreSqlParam.getPassword()));
         postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
 
         return postgreSqlConnectionParam;
@@ -80,7 +84,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_POSTGRESQL_DRIVER;
+        return ORG_POSTGRESQL_DRIVER;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         PostgreSqlConnectionParam postgreSqlConnectionParam = (PostgreSqlConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(postgreSqlConnectionParam),
-                postgreSqlConnectionParam.getUser(), CommonUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
+                postgreSqlConnectionParam.getUser(), decodePassword(postgreSqlConnectionParam.getPassword()));
     }
 
     @Override

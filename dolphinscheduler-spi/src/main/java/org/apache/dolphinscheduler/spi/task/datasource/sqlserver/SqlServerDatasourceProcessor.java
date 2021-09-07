@@ -17,16 +17,23 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.sqlserver;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_SQLSERVER_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_SQLSERVER;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,22 +46,22 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         SqlServerConnectionParam connectionParams = (SqlServerConnectionParam) createConnectionParams(connectionJson);
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
+        String[] hostSeperator = connectionParams.getAddress().split(DOUBLE_SLASH);
+        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(COMMA);
 
         SqlServerDatasourceParamDTO sqlServerDatasourceParamDTO = new SqlServerDatasourceParamDTO();
         sqlServerDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         sqlServerDatasourceParamDTO.setUserName(connectionParams.getUser());
         sqlServerDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
-        sqlServerDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        sqlServerDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        sqlServerDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
+        sqlServerDatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
         return sqlServerDatasourceParamDTO;
     }
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         SqlServerDatasourceParamDTO sqlServerParam = (SqlServerDatasourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_SQLSERVER, sqlServerParam.getHost(), sqlServerParam.getPort());
+        String address = String.format("%s%s:%s", JDBC_SQLSERVER, sqlServerParam.getHost(), sqlServerParam.getPort());
         String jdbcUrl = address + ";databaseName=" + sqlServerParam.getDatabase();
 
         SqlServerConnectionParam sqlServerConnectionParam = new SqlServerConnectionParam();
@@ -63,7 +70,7 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
         sqlServerConnectionParam.setJdbcUrl(jdbcUrl);
         sqlServerConnectionParam.setOther(transformOther(sqlServerParam.getOther()));
         sqlServerConnectionParam.setUser(sqlServerParam.getUserName());
-        sqlServerConnectionParam.setPassword(CommonUtils.encodePassword(sqlServerParam.getPassword()));
+        sqlServerConnectionParam.setPassword(encodePassword(sqlServerParam.getPassword()));
         return sqlServerConnectionParam;
     }
 
@@ -74,7 +81,7 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_SQLSERVER_JDBC_DRIVER;
+        return COM_SQLSERVER_JDBC_DRIVER;
     }
 
     @Override
@@ -92,7 +99,7 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
         SqlServerConnectionParam sqlServerConnectionParam = (SqlServerConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam), sqlServerConnectionParam.getUser(),
-                CommonUtils.decodePassword(sqlServerConnectionParam.getPassword()));
+                decodePassword(sqlServerConnectionParam.getPassword()));
     }
 
     @Override

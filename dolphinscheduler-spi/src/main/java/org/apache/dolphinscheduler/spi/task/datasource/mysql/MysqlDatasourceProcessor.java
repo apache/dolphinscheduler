@@ -17,18 +17,23 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.mysql;
 
-import org.apache.commons.collections4.MapUtils;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_MYSQL_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_MYSQL;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
 
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,6 +41,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
@@ -61,10 +69,10 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         mysqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
-        String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        mysqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        mysqlDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        String[] hostSeperator = address.split(DOUBLE_SLASH);
+        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(COMMA);
+        mysqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
+        mysqlDatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
 
         return mysqlDatasourceParamDTO;
     }
@@ -72,7 +80,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         MysqlDatasourceParamDTO mysqlDatasourceParam = (MysqlDatasourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
+        String address = String.format("%s%s:%s", JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 
         MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
@@ -80,7 +88,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
         mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
-        mysqlConnectionParam.setPassword(CommonUtils.encodePassword(mysqlDatasourceParam.getPassword()));
+        mysqlConnectionParam.setPassword(encodePassword(mysqlDatasourceParam.getPassword()));
         mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
 
         return mysqlConnectionParam;
@@ -93,7 +101,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_MYSQL_JDBC_DRIVER;
+        return COM_MYSQL_JDBC_DRIVER;
     }
 
     @Override
@@ -115,7 +123,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
             logger.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
             user = user.replace(AUTO_DESERIALIZE, "");
         }
-        String password = CommonUtils.decodePassword(mysqlConnectionParam.getPassword());
+        String password = decodePassword(mysqlConnectionParam.getPassword());
         if (password.contains(AUTO_DESERIALIZE)) {
             logger.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");

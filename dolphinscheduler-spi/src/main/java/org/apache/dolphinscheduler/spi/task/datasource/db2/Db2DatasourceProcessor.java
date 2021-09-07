@@ -17,19 +17,23 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.db2;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.AbstractDatasourceProcessor;
-import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_DB2_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_DB2;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.spi.task.datasource.PasswordUtils.encodePassword;
+
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,10 +52,10 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        db2DatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        db2DatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        String[] hostSeperator = connectionParams.getAddress().split(DOUBLE_SLASH);
+        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(COMMA);
+        db2DatasourceParamDTO.setHost(hostPortArray[0].split(COLON)[0]);
+        db2DatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(COLON)[1]));
 
         return db2DatasourceParamDTO;
     }
@@ -59,7 +63,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         Db2DatasourceParamDTO db2Param = (Db2DatasourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_DB2, db2Param.getHost(), db2Param.getPort());
+        String address = String.format("%s%s:%s", JDBC_DB2, db2Param.getHost(), db2Param.getPort());
         String jdbcUrl = String.format("%s/%s", address, db2Param.getDatabase());
 
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
@@ -67,7 +71,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         db2ConnectionParam.setDatabase(db2Param.getDatabase());
         db2ConnectionParam.setJdbcUrl(jdbcUrl);
         db2ConnectionParam.setUser(db2Param.getUserName());
-        db2ConnectionParam.setPassword(CommonUtils.encodePassword(db2Param.getPassword()));
+        db2ConnectionParam.setPassword(encodePassword(db2Param.getPassword()));
         db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
 
         return db2ConnectionParam;
@@ -80,7 +84,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_DB2_JDBC_DRIVER;
+        return COM_DB2_JDBC_DRIVER;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(db2ConnectionParam),
-                db2ConnectionParam.getUser(), CommonUtils.decodePassword(db2ConnectionParam.getPassword()));
+                db2ConnectionParam.getUser(), decodePassword(db2ConnectionParam.getPassword()));
     }
 
     @Override

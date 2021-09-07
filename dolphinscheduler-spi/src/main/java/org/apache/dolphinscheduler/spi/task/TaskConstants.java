@@ -269,4 +269,51 @@ public class TaskConstants {
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
+    /**
+     * resource storage type
+     */
+    public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
+
+    /**
+     * kerberos
+     */
+    public static final String KERBEROS = "kerberos";
+
+    /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
+    /**
+     * java.security.krb5.conf
+     */
+    public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
+
+    /**
+     * java.security.krb5.conf.path
+     */
+    public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
+
+    /**
+     * loginUserFromKeytab user
+     */
+    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    /**
+     * loginUserFromKeytab path
+     */
+    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+
+    /**
+     * hadoop.security.authentication
+     */
+    public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
+
+    /**
+     * hadoop.security.authentication
+     */
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+
+
 }

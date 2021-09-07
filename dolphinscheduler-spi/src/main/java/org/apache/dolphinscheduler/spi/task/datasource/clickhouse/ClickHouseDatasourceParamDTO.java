@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource.clickhouse;
 
-import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.task.datasource.BaseDataSourceParamDTO;
 
 public class ClickHouseDatasourceParamDTO extends BaseDataSourceParamDTO {
 
