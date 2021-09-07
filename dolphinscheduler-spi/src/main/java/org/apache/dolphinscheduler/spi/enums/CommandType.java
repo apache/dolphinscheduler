@@ -75,7 +75,6 @@ public enum CommandType {
         }
     }
 
-
     public static CommandType of(Integer status) {
         if (COMMAND_TYPE_MAP.containsKey(status)) {
             return COMMAND_TYPE_MAP.get(status);

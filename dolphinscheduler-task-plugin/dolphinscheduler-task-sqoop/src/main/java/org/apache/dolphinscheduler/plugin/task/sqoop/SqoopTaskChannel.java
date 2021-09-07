@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-import org.slf4j.Logger;
-
 public class SqoopTaskChannel implements TaskChannel {
 
     @Override

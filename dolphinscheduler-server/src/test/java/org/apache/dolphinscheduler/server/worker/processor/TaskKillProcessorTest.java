@@ -28,11 +28,12 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.Collections;
 
@@ -56,7 +57,7 @@ public class TaskKillProcessorTest {
 
     private WorkerManagerThread workerManager;
 
-    private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     private Channel channel;
 
@@ -69,7 +70,7 @@ public class TaskKillProcessorTest {
 
         TaskCallbackService taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
         WorkerConfig workerConfig = PowerMockito.mock(WorkerConfig.class);
-        taskExecutionContextCacheManager = PowerMockito.mock(TaskExecutionContextCacheManagerImpl.class);
+        taskExecutionContextCacheManager = PowerMockito.mock(TaskExecutionContextCacheManager.class);
 
         channel = PowerMockito.mock(Channel.class);
         command = new Command();
@@ -90,7 +91,6 @@ public class TaskKillProcessorTest {
         PowerMockito.when(SpringApplicationContext.getBean(WorkerConfig.class)).thenReturn(workerConfig);
         WorkerManagerThread workerManager = PowerMockito.mock(WorkerManagerThread.class);
         PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class)).thenReturn(workerManager);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class)).thenReturn(taskExecutionContextCacheManager);
         PowerMockito.doNothing().when(taskCallbackService).addRemoteChannel(anyInt(), any());
         PowerMockito.whenNew(NettyRemoteChannel.class).withAnyArguments().thenReturn(null);
         PowerMockito.when(OSUtils.exeCmd(any())).thenReturn(null);
@@ -107,7 +107,8 @@ public class TaskKillProcessorTest {
 
     @Test
     public void testProcess() {
-        PowerMockito.when(taskExecutionContextCacheManager.getByTaskInstanceId(1)).thenReturn(taskExecutionContext);
+        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+        PowerMockito.when(TaskExecutionContextCacheManager.getByTaskInstanceId(1)).thenReturn(taskRequest);
         taskKillProcessor.process(channel, command);
 
         taskExecutionContext.setProcessId(101);

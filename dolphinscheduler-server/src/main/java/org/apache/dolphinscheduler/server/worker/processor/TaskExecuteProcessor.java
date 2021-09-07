@@ -36,14 +36,14 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
-import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.Date;
 import java.util.Optional;
@@ -77,11 +77,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private TaskPluginManager taskPluginManager;
 
-    /**
-     * taskExecutionContextCacheManager
-     */
-    private final TaskExecutionContextCacheManager taskExecutionContextCacheManager;
-
     /*
      * task execute manager
      */
@@ -90,7 +85,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
     }
 
@@ -102,7 +96,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void setTaskCache(TaskExecutionContext taskExecutionContext) {
         TaskExecutionContext preTaskCache = new TaskExecutionContext();
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
+        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
     }
 
     public TaskExecuteProcessor(AlertClientService alertClientService, TaskPluginManager taskPluginManager) {
@@ -153,7 +148,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);
-            taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
         FileUtils.taskLoggerThreadLocal.remove();
 

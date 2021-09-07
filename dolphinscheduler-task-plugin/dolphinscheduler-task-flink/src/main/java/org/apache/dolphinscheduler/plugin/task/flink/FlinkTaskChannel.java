@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-import org.slf4j.Logger;
-
 public class FlinkTaskChannel implements TaskChannel {
     @Override
     public void cancelApplication(boolean status) {

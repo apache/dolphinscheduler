@@ -40,7 +40,6 @@
         <module>dolphinscheduler-task-sql</module>
         <module>dolphinscheduler-task-sqoop</module>
         <module>dolphinscheduler-task-procedure</module>
-        <module>dolphinscheduler-task-tis</module>
     </modules>
 
 
