@@ -18,13 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.shell;
 
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class ShellTaskChannel implements TaskChannel {
-    /**
-     * shell parameters
-     */
-    private ShellParameters shellParameters;
 
     @Override
     public void cancelApplication(boolean status) {

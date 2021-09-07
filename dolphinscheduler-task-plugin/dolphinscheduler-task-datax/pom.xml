@@ -26,6 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-datax</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
         <dependency>
@@ -39,8 +40,15 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+
     </dependencies>
 
-
+    <build>
+        <finalName>dolphinscheduler-task-datax-${project.version}</finalName>
+    </build>
 
 </project>

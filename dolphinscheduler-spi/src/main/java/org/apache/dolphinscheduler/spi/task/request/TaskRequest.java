@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.spi.task.request;
+
+import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.spi.task.Property;
 
 import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+/**
+ * to master/worker task transport
+ */
 public class TaskRequest {
-
-
 
     /**
      * task id
@@ -157,7 +161,7 @@ public class TaskRequest {
     /**
      * task timeout strategy
      */
-    private int taskTimeoutStrategy;
+    private TaskTimeoutStrategy taskTimeoutStrategy;
 
     /**
      * task timeout
@@ -392,11 +396,11 @@ public class TaskRequest {
         this.taskAppId = taskAppId;
     }
 
-    public int getTaskTimeoutStrategy() {
+    public TaskTimeoutStrategy getTaskTimeoutStrategy() {
         return taskTimeoutStrategy;
     }
 
-    public void setTaskTimeoutStrategy(int taskTimeoutStrategy) {
+    public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
         this.taskTimeoutStrategy = taskTimeoutStrategy;
     }
 

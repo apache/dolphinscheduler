@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class FlinkTaskChannel implements TaskChannel {
     @Override

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task;
 
-import org.apache.dolphinscheduler.spi.params.base.DataType;
+import org.apache.dolphinscheduler.spi.enums.DataType;
 
 import java.io.Serializable;
 import java.util.Objects;
