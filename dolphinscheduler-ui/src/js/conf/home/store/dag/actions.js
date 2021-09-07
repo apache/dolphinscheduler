@@ -446,7 +446,7 @@ export default {
         resolve()
         return
       }
-      io.get('resources/list/jar', {
+      io.get('resources/query-by-type', {
         type: 'FILE'
       }, res => {
         state.resourcesListJar = res.data
@@ -823,7 +823,7 @@ export default {
   },
   getResourceId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('resources/queryResource', payload, res => {
+      io.get(`resources/${payload.id}`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -832,7 +832,7 @@ export default {
   },
   genTaskCodeList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/task/gen-task-code-list`, payload, res => {
+      io.get(`projects/${state.projectCode}/task/gen-task-codes`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
