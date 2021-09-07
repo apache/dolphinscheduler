@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.util.Strings;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -97,18 +97,25 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             if (OSUtils.isWindows()) {
                 sb.append("@echo off\n");
                 sb.append("cd /d %~dp0\n");
-                if (taskExecutionContext.getEnvFile() != null) {
-                    sb.append("call ").append(taskExecutionContext.getEnvFile()).append("\n");
+                if (Strings.isNotBlank(taskExecutionContext.getEnvironmentConfig())) {
+                    sb.append(taskExecutionContext.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskExecutionContext.getEnvFile() != null) {
+                        sb.append("call ").append(taskExecutionContext.getEnvFile()).append("\n");
+                    }
                 }
             } else {
                 sb.append("#!/bin/sh\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
-                if (taskExecutionContext.getEnvFile() != null) {
-                    sb.append("source ").append(taskExecutionContext.getEnvFile()).append("\n");
+                if (Strings.isNotBlank(taskExecutionContext.getEnvironmentConfig())) {
+                    sb.append(taskExecutionContext.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskExecutionContext.getEnvFile() != null) {
+                        sb.append("source ").append(taskExecutionContext.getEnvFile()).append("\n");
+                    }
                 }
             }
-
             sb.append(execCommand);
             logger.info("command : {}", sb.toString());
 

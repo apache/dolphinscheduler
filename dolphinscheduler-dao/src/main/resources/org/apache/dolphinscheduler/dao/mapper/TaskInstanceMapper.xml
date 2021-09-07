@@ -21,13 +21,13 @@
     <sql id="baseSql">
         id, name, task_type, process_instance_id, task_code, task_definition_version, state, submit_time,
         start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
-        flag, retry_interval, max_retry_times, task_instance_priority, worker_group, executor_id,
+        flag, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id,
         first_submit_time, delay_time, task_params, var_pool
     </sql>
     <sql id="baseSqlV2">
         ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.task_code, ${alias}.task_definition_version, ${alias}.process_instance_id, ${alias}.state, ${alias}.submit_time,
         ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.execute_path, ${alias}.log_path, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid, ${alias}.app_link,
-        ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group, ${alias}.executor_id,
+        ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group,${alias}.environment_code , ${alias}.executor_id,
         ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.task_params, ${alias}.var_pool
     </sql>
     <update id="setFailoverByHostAndStateArray">

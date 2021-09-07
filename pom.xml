@@ -890,9 +890,12 @@
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
+                        <include>**/api/service/EnvironmentServiceTest.java</include>
+                        <include>**/api/service/EnvironmentWorkerGroupRelationServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
+                        <include>**/api/controller/EnvironmentControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>

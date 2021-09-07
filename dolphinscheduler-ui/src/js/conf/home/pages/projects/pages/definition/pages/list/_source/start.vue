@@ -78,6 +78,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        {{$t('Environment Name')}}
+      </div>
+      <div class="cont">
+        <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Alarm group')}}
       </div>
       <div class="cont">
@@ -189,6 +197,7 @@
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+  import mRelatedEnvironment from '@/conf/home/pages/dag/_source/formModel/_source/relatedEnvironment'
   import mLocalParams from '@/conf/home/pages/dag/_source/formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import { mapMutations } from 'vuex'
@@ -214,6 +223,7 @@
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
         workerGroup: 'default',
+        environmentCode: '',
         // Global custom parameters
         definitionGlobalParams: [],
         udpList: []
@@ -241,6 +251,9 @@
       },
       _datepicker (val) {
         this.scheduleTime = val
+      },
+      _onUpdateEnvironmentCode (o) {
+        this.environmentCode = o
       },
       _verification () {
         if (this.enableCustomParallelism && !this.parallismNumber) {
@@ -276,6 +289,7 @@
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
           workerGroup: this.workerGroup,
+          environmentCode: this.environmentCode,
           startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
           expectedParallelismNumber: this.parallismNumber
         }
@@ -362,7 +376,7 @@
       this.workflowName = this.startData.name
     },
     computed: {},
-    components: { mPriority, mWorkerGroups, mLocalParams }
+    components: { mPriority, mWorkerGroups, mLocalParams, mRelatedEnvironment }
   }
 </script>
 

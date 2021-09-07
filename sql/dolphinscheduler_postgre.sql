@@ -232,6 +232,7 @@ CREATE TABLE t_ds_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   PRIMARY KEY (id)
 ) ;
 
@@ -273,6 +274,7 @@ CREATE TABLE t_ds_error_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   message text ,
   PRIMARY KEY (id)
 );
@@ -348,6 +350,7 @@ CREATE TABLE t_ds_task_definition (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT NULL,
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -377,6 +380,7 @@ CREATE TABLE t_ds_task_definition_log (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT NULL,
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -464,6 +468,7 @@ CREATE TABLE t_ds_process_instance (
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64) ,
+  environment_code bigint DEFAULT NULL,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
@@ -624,6 +629,7 @@ CREATE TABLE t_ds_schedules (
   warning_group_id int DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
@@ -671,6 +677,8 @@ CREATE TABLE t_ds_task_instance (
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT NULL,
+  environment_config text DEFAULT '',
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
@@ -913,4 +921,37 @@ CREATE TABLE t_ds_alert_plugin_instance (
   update_time timestamp NULL,
   instance_name varchar(200) NULL,
   CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+);
+
+--
+-- Table structure for table t_ds_environment
+--
+DROP TABLE IF EXISTS t_ds_environment;
+CREATE TABLE t_ds_environment (
+  id serial NOT NULL,
+  code bigint NOT NULL,
+  name varchar(100) DEFAULT NULL,
+  config text DEFAULT NULL,
+  description text,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT environment_name_unique UNIQUE (name),
+  CONSTRAINT environment_code_unique UNIQUE (code)
+);
+
+--
+-- Table structure for table t_ds_environment_worker_group_relation
+--
+DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
+CREATE TABLE t_ds_environment_worker_group_relation (
+  id serial NOT NULL,
+  environment_code bigint NOT NULL,
+  worker_group varchar(255) NOT NULL,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id) ,
+  CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
 );

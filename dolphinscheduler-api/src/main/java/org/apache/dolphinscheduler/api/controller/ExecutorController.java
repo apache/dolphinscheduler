@@ -99,8 +99,9 @@ public class ExecutorController extends BaseController {
         @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
         @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "default"),
         @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
+        @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8")
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -119,6 +120,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber
@@ -133,7 +135,7 @@ public class ExecutorController extends BaseController {
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
-                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap, expectedParallelismNumber);
+                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber);
         return returnDataList(result);
     }
 
@@ -149,8 +151,8 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "execute", notes = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
     })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
@@ -174,7 +176,7 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "startCheckProcessDefinition", notes = "START_CHECK_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
