@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
