@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-import org.slf4j.Logger;
-
 public class MapReduceTaskChannel implements TaskChannel {
     @Override
     public void cancelApplication(boolean status) {
