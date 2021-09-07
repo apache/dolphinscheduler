@@ -83,6 +83,7 @@ public class ExecutorController extends BaseController {
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
      * @param timeout timeout
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
@@ -98,6 +99,7 @@ public class ExecutorController extends BaseController {
         @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
         @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "default"),
         @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8")
     })
@@ -118,9 +120,10 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
-                                       @RequestParam(value = "timeout", required = false) Integer expectedParallelismNumber) {
+                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -130,7 +133,7 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
-            startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap, expectedParallelismNumber);
+            startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode,timeout, startParamMap, expectedParallelismNumber);
         return returnDataList(result);
     }
 

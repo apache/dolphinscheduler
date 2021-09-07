@@ -336,6 +336,50 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
+
+-- ----------------------------
+-- Table structure for t_ds_environment
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment`;
+CREATE TABLE `t_ds_environment` (
+   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+   `code` bigint(20) DEFAULT NULL COMMENT 'encoding',
+   `name` varchar(100) NOT NULL COMMENT 'environment config name',
+   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+   `description` text NULL DEFAULT NULL COMMENT 'the details',
+   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `environment_name_unique` (`name`),
+   UNIQUE KEY `environment_code_unique` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+
+ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text default '' COMMENT 'environment config' AFTER `environment_code`;
+
+-- ----------------------------
+-- Table structure for t_ds_environment_worker_group_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
+CREATE TABLE `t_ds_environment_worker_group_relation` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
+  `worker_group` varchar(255) NOT NULL COMMENT 'worker group id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

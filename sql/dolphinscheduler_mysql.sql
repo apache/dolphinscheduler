@@ -331,6 +331,7 @@ CREATE TABLE `t_ds_command` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -378,6 +379,7 @@ CREATE TABLE `t_ds_error_command` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `message` text COMMENT 'message',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
@@ -458,6 +460,7 @@ CREATE TABLE `t_ds_task_definition` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -488,6 +491,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -757,6 +761,7 @@ CREATE TABLE `t_ds_schedules` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group id',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
@@ -810,6 +815,8 @@ CREATE TABLE `t_ds_task_instance` (
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
+  `environment_config` text DEFAULT '' COMMENT 'this config contains many environment variables config',
   `executor_id` int(11) DEFAULT NULL,
   `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
   `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
@@ -965,3 +972,36 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_environment
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment`;
+CREATE TABLE `t_ds_environment` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'environment name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_name_unique` (`name`),
+  UNIQUE KEY `environment_code_unique` (`code`),
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_environment_worker_group_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
+CREATE TABLE `t_ds_environment_worker_group_relation` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
+  `worker_group` varchar(255) NOT NULL COMMENT 'worker group id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

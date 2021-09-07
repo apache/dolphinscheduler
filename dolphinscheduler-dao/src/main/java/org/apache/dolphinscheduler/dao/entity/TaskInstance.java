@@ -220,6 +220,15 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
+     * environment config
+     */
+    private String environmentConfig;
 
     /**
      * executor id
@@ -419,6 +428,22 @@ public class TaskInstance implements Serializable {
 
     public void setAppLink(String appLink) {
         this.appLink = appLink;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public String getEnvironmentConfig() {
+        return this.environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String environmentConfig) {
+        this.environmentConfig = environmentConfig;
     }
 
     public DependentParameters getDependency() {
@@ -623,6 +648,8 @@ public class TaskInstance implements Serializable {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", dependentResult='" + dependentResult + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime

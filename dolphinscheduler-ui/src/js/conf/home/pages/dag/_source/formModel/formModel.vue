@@ -77,8 +77,18 @@
             <span class="label-box" style="width: 193px;display: inline-block;">
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
-            <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroup"></m-worker-groups>
+          </div>
+        </m-list-box>
+
+        <!-- Worker group and environment -->
+        <m-list-box>
+          <div slot="text">{{$t('Worker group')}}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <m-worker-groups v-model="workerGroup"></m-worker-groups>
+            </span>
+            <span class="text-b">{{$t('Environment Name')}}</span>
+            <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
           </div>
         </m-list-box>
 
@@ -95,7 +105,7 @@
         </m-list-box>
 
         <!-- Delay execution time -->
-        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'&& nodeData.taskType !== 'SWITCH'">
           <div slot="text">{{$t('Delay execution time')}}</div>
           <div slot="content">
             <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
@@ -258,6 +268,13 @@
           :backfill-item="backfillItem"
           :pre-node="nodeData.preNode">
         </m-conditions>
+        <m-switch
+          v-if="nodeData.taskType === 'SWITCH'"
+          ref="SWITCH"
+          @on-switch-result="_onSwitchResult"
+          :backfill-item="backfillItem"
+          :nodeData="nodeData"
+        ></m-switch>
         <!-- Pre-tasks in workflow -->
         <!-- TODO -->
         <!-- <m-pre-tasks
@@ -270,7 +287,7 @@
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
         <el-button type="text" size="small" id="cancelBtn"> {{$t('Cancel')}} </el-button>
-        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? $t('Loading...') : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>
@@ -293,6 +310,7 @@
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
   import mConditions from './tasks/conditions'
+  import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
@@ -300,6 +318,7 @@
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
   // import mPreTasks from './tasks/pre_tasks'
+  import mRelatedEnvironment from './_source/relatedEnvironment'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
@@ -327,6 +346,7 @@
           successNode: [],
           failedNode: []
         },
+        switchResult: {},
         // dependence
         dependence: {},
         // cache dependence
@@ -353,6 +373,9 @@
         taskInstancePriority: 'MEDIUM',
         // worker group id
         workerGroup: 'default',
+        // selected environment
+        environmentCode: '',
+        selectedWorkerGroup: '',
         stateList: [
           {
             value: 'success',
@@ -409,6 +432,9 @@
        */
       _onDependent (o) {
         this.dependence = Object.assign(this.dependence, {}, o)
+      },
+      _onSwitchResult (o) {
+        this.switchResult = o
       },
       /**
        * Pre-tasks in workflow
@@ -480,13 +506,51 @@
           })
         }
       },
+      _onUpdateWorkerGroup (o) {
+        this.selectedWorkerGroup = o
+      },
       /**
        * return params
        */
       _onParams (o) {
         this.params = Object.assign({}, o)
       },
-      _onCacheParams (o) {},
+      _onCacheParams (o) {
+        this.params = Object.assign(this.params, {}, o)
+        this._cacheItem()
+      },
+      _onUpdateEnvironmentCode (o) {
+        this.environmentCode = o
+      },
+      _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
+        this.$emit('cacheTaskInfo', {
+          item: {
+            type: this.nodeData.taskType,
+            id: this.nodeData.id,
+            name: this.name,
+            code: this.code,
+            params: this.params,
+            desc: this.desc,
+            runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
+            switchResult: this.switchResult,
+            dependence: this.cacheDependence,
+            maxRetryTimes: this.maxRetryTimes,
+            retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
+            timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroup: this.workerGroup,
+            environmentCode: this.environmentCode,
+            status: this.status,
+            branch: this.branch
+          },
+          fromThis: this
+        })
+      },
       /**
        * verification name
        */
@@ -579,6 +643,9 @@
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime
+            environmentCode: this.environmentCode,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -656,6 +723,7 @@
             break
           }
         }
+
         if (o.workerGroup === undefined) {
           this.store.dispatch('dag/getTaskInstanceList', {
             pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
@@ -665,7 +733,7 @@
         } else {
           this.workerGroup = o.workerGroup
         }
-
+        this.environmentCode = o.environmentCode
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
@@ -735,12 +803,14 @@
       mDatax,
       mSqoop,
       mConditions,
+      mSwitch,
       mSelectInput,
       mTimeoutAlarm,
       mDependentTimeout,
       mPriority,
       mWorkerGroups
       // mPreTasks
+      mRelatedEnvironment,
     }
   }
 </script>

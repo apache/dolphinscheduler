@@ -216,7 +216,6 @@ public class ProjectController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * query authorized project
      *
