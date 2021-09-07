@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
@@ -81,6 +78,7 @@ public class TaskAckProcessorTest {
         taskExecuteAckCommand.setLogPath("/temp/worker.log");
         taskExecuteAckCommand.setStartTime(new Date());
         taskExecuteAckCommand.setTaskInstanceId(1);
+        taskExecuteAckCommand.setProcessInstanceId(1);
     }
 
     @Test

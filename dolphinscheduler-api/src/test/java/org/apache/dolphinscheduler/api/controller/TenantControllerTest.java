@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -49,7 +50,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
-        MvcResult mvcResult = mockMvc.perform(post("/tenant/create")
+        MvcResult mvcResult = mockMvc.perform(post("/tenants/")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -69,7 +70,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("searchVal","tenant");
         paramsMap.add("pageSize","30");
 
-        MvcResult mvcResult = mockMvc.perform(get("/tenant/list-paging")
+        MvcResult mvcResult = mockMvc.perform(get("/tenants/")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -89,7 +90,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
-        MvcResult mvcResult = mockMvc.perform(post("/tenant/update")
+        MvcResult mvcResult = mockMvc.perform(post("/tenants/{id}")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -107,7 +108,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode","cxc_test");
 
-        MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
+        MvcResult mvcResult = mockMvc.perform(get("/tenants/verify-code")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -125,7 +126,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode", "hayden");
 
-        MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
+        MvcResult mvcResult = mockMvc.perform(get("/tenants/verify-code")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -141,7 +142,7 @@ public class TenantControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTenantlist() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/tenant/list")
+        MvcResult mvcResult = mockMvc.perform(get("/tenants/list")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -158,7 +159,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","64");
 
-        MvcResult mvcResult = mockMvc.perform(post("/tenant/delete")
+        MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

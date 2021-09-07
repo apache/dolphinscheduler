@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.model;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,7 +33,6 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 
 public class TaskNode {
 
@@ -128,6 +128,10 @@ public class TaskNode {
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String conditionResult;
+
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    private String switchResult;
 
     /**
      * task instance priority
@@ -365,6 +369,10 @@ public class TaskNode {
         return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.getType());
     }
 
+    public boolean isSwitchTask() {
+        return TaskType.SWITCH.toString().equalsIgnoreCase(this.getType());
+    }
+
     public List<PreviousTaskNode> getPreTaskNodeList() {
         return preTaskNodeList;
     }
@@ -380,6 +388,7 @@ public class TaskNode {
         }
         taskParams.put(Constants.CONDITION_RESULT, this.conditionResult);
         taskParams.put(Constants.DEPENDENCE, this.dependence);
+        taskParams.put(Constants.SWITCH_RESULT, this.switchResult);
         return JSONUtils.toJsonString(taskParams);
     }
 
@@ -416,5 +425,13 @@ public class TaskNode {
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public String getSwitchResult() {
+        return switchResult;
+    }
+
+    public void setSwitchResult(String switchResult) {
+        this.switchResult = switchResult;
     }
 }

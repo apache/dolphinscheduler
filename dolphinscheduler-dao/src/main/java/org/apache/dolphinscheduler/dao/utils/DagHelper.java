@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.utils;
 
+package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -281,6 +283,9 @@ public class DagHelper {
         } else if (dag.getNode(preNodeName).isConditionsTask()) {
             List<String> conditionTaskList = parseConditionTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
             startVertexes.addAll(conditionTaskList);
+        } else if (dag.getNode(preNodeName).isSwitchTask()) {
+            List<String> conditionTaskList = parseSwitchTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
+            startVertexes.addAll(conditionTaskList);
         } else {
             startVertexes = dag.getSubsequentNodes(preNodeName);
         }
@@ -353,6 +358,49 @@ public class DagHelper {
             setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
         }
         return conditionTaskList;
+    }
+
+    /**
+     * parse condition task find the branch process
+     * set skip flag for another one.
+     *
+     * @param nodeName
+     * @return
+     */
+    public static List<String> parseSwitchTask(String nodeName,
+                                               Map<String, TaskNode> skipTaskNodeList,
+                                               DAG<String, TaskNode, TaskNodeRelation> dag,
+                                               Map<String, TaskInstance> completeTaskList) {
+        List<String> conditionTaskList = new ArrayList<>();
+        TaskNode taskNode = dag.getNode(nodeName);
+        if (!taskNode.isSwitchTask()) {
+            return conditionTaskList;
+        }
+        if (!completeTaskList.containsKey(nodeName)) {
+            return conditionTaskList;
+        }
+        conditionTaskList = skipTaskNode4Switch(taskNode, skipTaskNodeList, completeTaskList, dag);
+        return conditionTaskList;
+    }
+
+    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList,
+                                                    Map<String, TaskInstance> completeTaskList,
+                                                    DAG<String, TaskNode, TaskNodeRelation> dag) {
+        SwitchParameters switchParameters = completeTaskList.get(taskNode.getName()).getSwitchDependency();
+        int resultConditionLocation = switchParameters.getResultConditionLocation();
+        List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
+        List<String> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
+        if (CollectionUtils.isEmpty(switchTaskList)) {
+            switchTaskList = new ArrayList<>();
+        }
+        conditionResultVoList.remove(resultConditionLocation);
+        for (SwitchResultVo info : conditionResultVoList) {
+            if (CollectionUtils.isEmpty(info.getNextNode())) {
+                continue;
+            }
+            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+        }
+        return switchTaskList;
     }
 
     /**

@@ -33,14 +33,11 @@ import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
 
-/**
- * alert request processor
- */
 public class AlertRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
-    private AlertDao alertDao;
-    private AlertPluginManager alertPluginManager;
+    private final AlertDao alertDao;
+    private final AlertPluginManager alertPluginManager;
 
     public AlertRequestProcessor(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         this.alertDao = alertDao;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.processor;
+package org.apache.dolphinscheduler.remote.processor;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

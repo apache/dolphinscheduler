@@ -30,7 +30,10 @@ import org.apache.dolphinscheduler.server.utils.FlinkArgsUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,12 +84,16 @@ public class FlinkTask extends AbstractYarnTask {
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            if (MapUtils.isEmpty(paramsMap)) {
+                paramsMap = new HashMap<>();
+            }
+            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+                paramsMap.putAll(taskExecutionContext.getParamsMap());
+            }
 
             logger.info("param Map : {}", paramsMap);
-            if (paramsMap != null) {
-                args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
-                logger.info("param args : {}", args);
-            }
+            args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
+            logger.info("param args : {}", args);
             flinkParameters.setMainArgs(args);
         }
     }

@@ -133,7 +133,7 @@ public class SensitiveDataConverterTest {
             }
         });
 
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
     }
 
@@ -145,8 +145,8 @@ public class SensitiveDataConverterTest {
         logger.info("parameter : {}", logMsg);
         logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
 
-        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(logMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
     }
 

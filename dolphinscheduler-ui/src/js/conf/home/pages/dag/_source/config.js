@@ -308,6 +308,10 @@ const tasksType = {
   CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
+  },
+  SWITCH: {
+    desc: 'SWITCH',
+    color: '#E46F13'
   }
 }
 

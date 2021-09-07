@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -173,6 +174,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private DependentParameters dependency;
+
+    /**
+     * switch dependency
+     */
+    @TableField(exist = false)
+    private SwitchParameters switchDependency;
 
     /**
      * duration
@@ -426,6 +433,20 @@ public class TaskInstance implements Serializable {
         this.dependency = dependency;
     }
 
+    public SwitchParameters getSwitchDependency() {
+        if (this.switchDependency == null) {
+            Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
+        }
+        return this.switchDependency;
+    }
+
+    public void setSwitchDependency(SwitchParameters switchDependency) {
+        Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+        taskParamsMap.put(Constants.SWITCH_RESULT,JSONUtils.toJsonString(switchDependency));
+        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
+    }
+
     public Flag getFlag() {
         return flag;
     }
@@ -508,6 +529,10 @@ public class TaskInstance implements Serializable {
 
     public boolean isConditionsTask() {
         return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isSwitchTask() {
+        return TaskType.SWITCH.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**

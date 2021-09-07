@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -82,4 +83,13 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @return
      */
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
+
+    /**
+     * query alertGroupVo page list
+     * @param page page
+     * @param groupName groupName
+     * @return IPage<AlertGroupVo>: include alert group id and group_name
+     */
+    IPage<AlertGroupVo> queryAlertGroupVo(Page<AlertGroupVo> page,
+                                          @Param("groupName") String groupName);
 }

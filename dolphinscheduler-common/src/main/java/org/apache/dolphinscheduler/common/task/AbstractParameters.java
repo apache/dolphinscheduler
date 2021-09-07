@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -152,7 +153,7 @@ public abstract class AbstractParameters implements IParameters {
         ArrayNode paramsByJson = JSONUtils.parseArray(json);
         Iterator<JsonNode> listIterator = paramsByJson.iterator();
         while (listIterator.hasNext()) {
-            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+            Map<String, String> param = JSONUtils.parseObject(listIterator.next().toString(), new TypeReference<Map<String, String>>() {});
             allParams.add(param);
         }
         return allParams;

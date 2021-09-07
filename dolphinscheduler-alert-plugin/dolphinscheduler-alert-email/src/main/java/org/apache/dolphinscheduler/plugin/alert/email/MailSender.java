@@ -80,7 +80,7 @@ public class MailSender {
     private String sslTrust;
     private String showType;
     private AlertTemplate alertTemplate;
-    private String mustNotNull = "must not be null";
+    private String mustNotNull = " must not be null";
 
     public MailSender(Map<String, String> config) {
 

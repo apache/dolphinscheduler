@@ -42,6 +42,7 @@ public class RetryReportTaskStatusThread implements Runnable {
      * every 5 minutes
      */
     private static long RETRY_REPORT_TASK_STATUS_INTERVAL = 5 * 60 * 1000L;
+
     /**
      *  task callback service
      */
@@ -49,6 +50,7 @@ public class RetryReportTaskStatusThread implements Runnable {
 
     public void start(){
         Thread thread = new Thread(this,"RetryReportTaskStatusThread");
+        thread.setDaemon(true);
         thread.start();
     }
 
