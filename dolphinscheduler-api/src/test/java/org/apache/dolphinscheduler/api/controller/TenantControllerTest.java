@@ -90,7 +90,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
-        MvcResult mvcResult = mockMvc.perform(post("/tenants/{id}")
+        MvcResult mvcResult = mockMvc.perform(post("/tenants/{id}", 9)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -159,7 +159,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","64");
 
-        MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}")
+        MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}", 64)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

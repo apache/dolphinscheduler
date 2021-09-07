@@ -103,7 +103,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}",123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -123,7 +123,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online",123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -143,7 +143,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline",123, 28)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -221,7 +221,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.deleteScheduleById(isA(User.class), isA(Long.class), isA(Integer.class)))
                 .thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}",123)
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}}",123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
