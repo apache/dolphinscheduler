@@ -120,6 +120,12 @@ public class Command {
     @TableField("worker_group")
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    @TableField("environment_code")
+    private Long environmentCode;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -138,6 +144,7 @@ public class Command {
             int warningGroupId,
             Date scheduleTime,
             String workerGroup,
+            Long environmentCode,
             Priority processInstancePriority) {
         this.commandType = commandType;
         this.executorId = executorId;
@@ -151,6 +158,7 @@ public class Command {
         this.startTime = new Date();
         this.updateTime = new Date();
         this.workerGroup = workerGroup;
+        this.environmentCode = environmentCode;
         this.processInstancePriority = processInstancePriority;
     }
 
@@ -266,6 +274,14 @@ public class Command {
         this.workerGroup = workerGroup;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -289,6 +305,11 @@ public class Command {
         if (workerGroup != null ? workerGroup.equals(command.workerGroup) : command.workerGroup == null) {
             return false;
         }
+
+        if (environmentCode != null ? environmentCode.equals(command.environmentCode) : command.environmentCode == null) {
+            return false;
+        }
+
         if (commandType != command.commandType) {
             return false;
         }
@@ -336,6 +357,7 @@ public class Command {
         result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
+        result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
         return result;
     }
 
@@ -356,6 +378,7 @@ public class Command {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", updateTime=" + updateTime
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
                 + '}';
     }
 }

@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -83,6 +84,7 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -125,6 +127,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
+import com.cronutils.model.Cron;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -197,6 +201,9 @@ public class ProcessService {
 
     @Autowired
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Autowired
+    private EnvironmentMapper environmentMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -296,6 +303,10 @@ public class ProcessService {
 
     /**
      * get command page
+     *
+     * @param pageSize
+     * @param pageNumber
+     * @return
      */
     public List<Command> findCommandPage(int pageSize, int pageNumber) {
         Page<Command> commandPage = new Page<>(pageNumber, pageSize);
@@ -526,6 +537,8 @@ public class ProcessService {
             }
             return;
         }
+        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD, String.valueOf(processInstance.getId()));
         // process instance quit by "waiting thread" state
@@ -541,6 +554,7 @@ public class ProcessService {
                 processInstance.getWarningGroupId(),
                 processInstance.getScheduleTime(),
                 processInstance.getWorkerGroup(),
+                processInstance.getEnvironmentCode(),
                 processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -631,6 +645,7 @@ public class ProcessService {
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
         String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
         processInstance.setWorkerGroup(workerGroup);
+        processInstance.setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
@@ -686,6 +701,21 @@ public class ProcessService {
             tenant = tenantMapper.queryById(user.getTenantId());
         }
         return tenant;
+    }
+
+    /**
+     * get an environment
+     * use the code of the environment to find a environment.
+     *
+     * @param environmentCode environmentCode
+     * @return Environment
+     */
+    public Environment findEnvironmentByCode(Long environmentCode) {
+        Environment environment = null;
+        if (environmentCode >= 0) {
+            environment = environmentMapper.queryByEnvironmentCode(environmentCode);
+        }
+        return environment;
     }
 
     /**
@@ -1034,6 +1064,11 @@ public class ProcessService {
 
     /**
      * retry submit task to db
+     *
+     * @param taskInstance
+     * @param commitRetryTimes
+     * @param commitInterval
+     * @return
      */
     public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
 
@@ -1084,8 +1119,8 @@ public class ProcessService {
             createSubWorkProcess(processInstance, task);
         }
 
-        logger.info("end submit task to db successfully:{} state:{} complete, instance id:{} state: {}  ",
-            taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
+        logger.info("end submit task to db successfully:{} {} state:{} complete, instance id:{} state: {}  ",
+                taskInstance.getId(), taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
         return task;
     }
 
@@ -1242,6 +1277,7 @@ public class ProcessService {
             parentProcessInstance.getWarningGroupId(),
             parentProcessInstance.getScheduleTime(),
             task.getWorkerGroup(),
+            task.getEnvironmentCode(),
             parentProcessInstance.getProcessInstancePriority()
         );
     }
@@ -2112,6 +2148,44 @@ public class ProcessService {
     }
 
     /**
+     * update task definition
+     */
+    public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
+        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode());
+        Date now = new Date();
+        taskDefinition.setProjectCode(projectCode);
+        taskDefinition.setUserId(operator.getId());
+        taskDefinition.setVersion(version == null || version == 0 ? 1 : version + 1);
+        taskDefinition.setUpdateTime(now);
+        setTaskFromTaskNode(taskNode, taskDefinition);
+        int update = taskDefinitionMapper.updateById(taskDefinition);
+        // save task definition log
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
+        taskDefinitionLog.setOperator(operator.getId());
+        taskDefinitionLog.setOperateTime(now);
+        int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
+        return insert & update;
+    }
+
+    private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
+        taskDefinition.setName(taskNode.getName());
+        taskDefinition.setDescription(taskNode.getDesc());
+        taskDefinition.setTaskType(taskNode.getType().toUpperCase());
+        taskDefinition.setTaskParams(taskNode.getTaskParams());
+        taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
+        taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
+        taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
+        taskDefinition.setEnvironmentCode(Objects.isNull(taskNode.getEnvironmentCode()) ? -1 : taskNode.getEnvironmentCode());
+        taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
+        taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
+        taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
+        taskDefinition.setTimeoutNotifyStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
+        taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
+        taskDefinition.setDelayTime(taskNode.getDelayTime());
+        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
+    }
+
+    /**
      * get resource ids
      *
      * @param taskDefinition taskDefinition
@@ -2357,6 +2431,7 @@ public class ProcessService {
             v.setParams(JSONUtils.toJsonString(taskParamsMap));
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+            v.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                 taskDefinitionLog.getTimeoutNotifyStrategy(),
                 taskDefinitionLog.getTimeout())));

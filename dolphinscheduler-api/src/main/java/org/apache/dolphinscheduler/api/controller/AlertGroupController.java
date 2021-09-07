@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
 
@@ -142,6 +143,7 @@ public class AlertGroupController extends BaseController {
         searchVal = ParameterUtils.handleEscapes(searchVal);
         return alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
     }
+
 
     /**
      * updateProcessInstance alert group

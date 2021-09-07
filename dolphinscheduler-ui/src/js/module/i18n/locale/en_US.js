@@ -693,6 +693,18 @@ export default {
   Info: 'Info',
   'Datasource userName': 'owner',
   'Resource userName': 'owner',
+  'Environment manage': 'Environment manage',
+  'Create environment': 'Create environment',
+  'Edit environment': 'Edit environment',
+  'Environment value': 'Environment value',
+  'Environment Name': 'Environment Name',
+  'Environment Code': 'Environment Code',
+  'Environment Config': 'Environment Config',
+  'Environment Desc': 'Environment Desc',
+  'Environment Worker Group': 'Worker Groups',
+  'Please enter environment config': 'Please enter environment config',
+  'Please enter environment desc': 'Please enter environment desc',
+  'Please select worker groups': 'Please select worker groups',
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty'
 }

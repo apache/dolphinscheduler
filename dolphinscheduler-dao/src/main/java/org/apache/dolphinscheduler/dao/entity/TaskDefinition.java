@@ -135,6 +135,11 @@ public class TaskDefinition {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * fail retry times
      */
     private int failRetryTimes;
@@ -419,6 +424,14 @@ public class TaskDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -461,6 +474,7 @@ public class TaskDefinition {
             + ", projectName='" + projectName + '\''
             + ", workerGroup='" + workerGroup + '\''
             + ", failRetryTimes=" + failRetryTimes
+            + ", environmentCode='" + environmentCode + '\''
             + ", failRetryInterval=" + failRetryInterval
             + ", timeoutFlag=" + timeoutFlag
             + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy

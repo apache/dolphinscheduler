@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
     <sql id="baseSql">
         id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
-        worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
+        worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time
     </sql>
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">

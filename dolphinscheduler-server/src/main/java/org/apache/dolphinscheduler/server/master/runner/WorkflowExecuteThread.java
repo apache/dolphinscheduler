@@ -50,6 +50,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -77,6 +78,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -723,10 +725,23 @@ public class WorkflowExecuteThread implements Runnable {
             String processWorkerGroup = processInstance.getWorkerGroup();
             processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
             String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+
+            Long processEnvironmentCode = Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
+            Long taskEnvironmentCode = Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
+
             if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
                 taskInstance.setWorkerGroup(processWorkerGroup);
+                taskInstance.setEnvironmentCode(processEnvironmentCode);
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
+                taskInstance.setEnvironmentCode(taskEnvironmentCode);
+            }
+
+            if (!taskInstance.getEnvironmentCode().equals(-1L)) {
+                Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
+                if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
+                    taskInstance.setEnvironmentConfig(environment.getConfig());
+                }
             }
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());

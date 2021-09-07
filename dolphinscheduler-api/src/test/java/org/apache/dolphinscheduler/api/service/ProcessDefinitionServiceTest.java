@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -82,24 +83,35 @@ public class ProcessDefinitionServiceTest {
 
     @InjectMocks
     private ProcessDefinitionServiceImpl processDefinitionService;
+
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
+
     @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
     @Mock
     private ProjectMapper projectMapper;
+
     @Mock
     private ProjectServiceImpl projectService;
+
     @Mock
     private ScheduleMapper scheduleMapper;
+
     @Mock
     private ProcessService processService;
+
     @Mock
     private ProcessInstanceService processInstanceService;
+
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
     @Mock
     private TenantMapper tenantMapper;
+
+    @Mock
+    private DataSourceMapper dataSourceMapper;
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -466,7 +478,7 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.SUCCESS, processNotExistRes.get(Constants.STATUS));
 
         //process exist
-        Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(getProcessDefinition());
+        Mockito.when(processDefinitionMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(getProcessDefinition());
         Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
             projectCode, "test_pdf");
         Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));

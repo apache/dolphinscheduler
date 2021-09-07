@@ -187,6 +187,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return checkResult;
     }
 
+    @Override
+    public boolean hasProjectAndPerm(User loginUser, Project project, Result result) {
+        boolean checkResult = false;
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
+        } else if (!checkReadPermission(loginUser, project)) {
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
+        } else {
+            checkResult = true;
+        }
+        return checkResult;
+    }
+
     /**
      * admin can view all projects
      *

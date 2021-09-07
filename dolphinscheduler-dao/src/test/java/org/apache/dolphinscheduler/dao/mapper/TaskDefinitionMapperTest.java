@@ -63,6 +63,8 @@ public class TaskDefinitionMapperTest {
         taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(userId);
         taskDefinition.setResourceIds("1");
+        taskDefinition.setWorkerGroup("default");
+        taskDefinition.setEnvironmentCode(1L);
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());

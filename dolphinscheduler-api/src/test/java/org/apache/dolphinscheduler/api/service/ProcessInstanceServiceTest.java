@@ -186,13 +186,13 @@ public class ProcessInstanceServiceTest {
             "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
 
-
         //executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
         Result executorExistRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", "admin", ExecutionStatus.SUBMITTED_SUCCESS,
             "192.168.xx.xx", 1, 10);
+
         Assert.assertEquals(Status.SUCCESS.getCode(), (int)executorExistRes.getCode());
 
         //executor name empty

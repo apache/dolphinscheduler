@@ -447,6 +447,14 @@ const router = new Router({
           }
         },
         {
+          path: '/security/environments',
+          name: 'environment-manage',
+          component: resolve => require(['../pages/security/pages/environment/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Environment manage')}`
+          }
+        },
+        {
           path: '/security/token',
           name: 'token-manage',
           component: resolve => require(['../pages/security/pages/token/index'], resolve),

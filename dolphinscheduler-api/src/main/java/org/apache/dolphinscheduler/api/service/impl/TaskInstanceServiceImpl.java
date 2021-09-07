@@ -110,7 +110,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result,status);
             return result;
         }
-
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.ordinal()};

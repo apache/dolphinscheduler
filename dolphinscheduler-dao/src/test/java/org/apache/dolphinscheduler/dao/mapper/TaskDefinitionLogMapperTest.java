@@ -65,6 +65,8 @@ public class TaskDefinitionLogMapperTest {
         taskDefinition.setProjectCode(1L);
         taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(userId);
+        taskDefinition.setEnvironmentCode(1L);
+        taskDefinition.setWorkerGroup("default");
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());

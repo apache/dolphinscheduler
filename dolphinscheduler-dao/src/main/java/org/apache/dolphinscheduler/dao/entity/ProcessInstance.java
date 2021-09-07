@@ -220,6 +220,11 @@ public class ProcessInstance {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * process timeout for warning
      */
     private int timeout;
@@ -488,6 +493,14 @@ public class ProcessInstance {
 
     public void setExecutorName(String executorName) {
         this.executorName = executorName;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
     }
 
     /**

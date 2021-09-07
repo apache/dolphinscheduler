@@ -140,6 +140,11 @@ public class Schedule {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
     public int getWarningGroupId() {
         return warningGroupId;
     }
@@ -287,6 +292,14 @@ public class Schedule {
         this.workerGroup = workerGroup;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public String toString() {
         return "Schedule{"
@@ -309,6 +322,7 @@ public class Schedule {
                 + ", warningGroupId=" + warningGroupId
                 + ", processInstancePriority=" + processInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
                 + '}';
     }
 
