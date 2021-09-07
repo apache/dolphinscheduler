@@ -310,6 +310,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @param type data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
+     * @return true if connect successfully, otherwise false
      */
     @Override
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {

@@ -169,5 +169,4 @@ public class DataAnalysisController extends BaseController {
         Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
         return returnDataList(result);
     }
-
 }

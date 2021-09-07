@@ -144,11 +144,11 @@ public class TenantController extends BaseController {
 
 
     /**
-     * udpate tenant
+     * update tenant
      *
      * @param loginUser login user
-     * @param id tennat id
-     * @param tenantCode tennat code
+     * @param id tenant id
+     * @param tenantCode tenant code
      * @param queueId queue id
      * @param description description
      * @return update result code
@@ -159,7 +159,6 @@ public class TenantController extends BaseController {
         @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
         @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
-
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -185,7 +184,6 @@ public class TenantController extends BaseController {
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
-
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
