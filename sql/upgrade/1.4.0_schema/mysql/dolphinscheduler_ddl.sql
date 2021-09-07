@@ -639,7 +639,7 @@ DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
 DROP TABLE IF EXISTS `t_ds_environment`;
 CREATE TABLE `t_ds_environment` (
    `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-   `code` int(11) DEFAULT NULL COMMENT 'encoding',
+   `code` bigint(20) DEFAULT NULL COMMENT 'encoding',
    `name` varchar(100) NOT NULL COMMENT 'environment config name',
    `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
    `description` text NULL DEFAULT NULL COMMENT 'the details',
@@ -651,15 +651,15 @@ CREATE TABLE `t_ds_environment` (
    UNIQUE KEY `environment_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
 
-ALTER TABLE t_ds_command ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` int(11) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` int(11) default '' COMMENT 'environment config' AFTER `environment_code`;
+ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text default '' COMMENT 'environment config' AFTER `environment_code`;
 
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
@@ -667,7 +667,7 @@ ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` int(11) default '
 DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
 CREATE TABLE `t_ds_environment_worker_group_relation` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `environment_code` int(11) NOT NULL COMMENT 'environment code',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `worker_group` varchar(255) NOT NULL COMMENT 'worker group id',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,

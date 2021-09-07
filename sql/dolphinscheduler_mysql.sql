@@ -982,7 +982,7 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
 DROP TABLE IF EXISTS `t_ds_environment`;
 CREATE TABLE `t_ds_environment` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `code` int(11) DEFAULT NULL COMMENT 'encoding',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
   `name` varchar(100) NOT NULL COMMENT 'environment name',
   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
   `description` text NULL DEFAULT NULL COMMENT 'the details',
@@ -1000,7 +1000,7 @@ CREATE TABLE `t_ds_environment` (
 DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
 CREATE TABLE `t_ds_environment_worker_group_relation` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `environment_code` int(11) NOT NULL COMMENT 'environment code',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
   `worker_group` varchar(255) NOT NULL COMMENT 'worker group id',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
