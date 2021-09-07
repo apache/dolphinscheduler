@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.ArgumentMatchers.isA;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -73,7 +74,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -102,7 +103,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/update",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -122,7 +123,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/online",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -142,7 +143,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/offline",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -168,7 +169,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(Integer.class), isA(Integer.class))).thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedule/list-paging",123)
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedules/",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -184,7 +185,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
     public void testQueryScheduleList() throws Exception {
         Mockito.when(schedulerService.queryScheduleList(isA(User.class), isA(Long.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/list",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/list",123)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -200,7 +201,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.previewSchedule(isA(User.class), isA(String.class)))
                 .thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/preview",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/preview",123)
                 .header(SESSION_ID, sessionId)
                 .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"))
                 .andExpect(status().isCreated())
@@ -220,7 +221,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.deleteScheduleById(isA(User.class), isA(Long.class), isA(Integer.class)))
                 .thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedule/delete",123)
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

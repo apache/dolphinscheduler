@@ -26,12 +26,12 @@
     flex: 1;
     overflow: hidden;
     position: relative;
-  
+
     .paper {
       width: 100%;
       height: 100%;
     }
-  
+
     .minimap {
       position: absolute;
       width: 300px;
@@ -47,6 +47,6 @@
       left: 100px;
       top: 100px;
     }
-    
+
   }
 }

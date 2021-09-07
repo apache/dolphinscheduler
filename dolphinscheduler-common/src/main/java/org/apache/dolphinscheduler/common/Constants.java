@@ -435,6 +435,8 @@ public final class Constants {
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
+    public static final String COMMON_TASK_TYPE = "common";
+
     public static final String DEFAULT = "default";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
@@ -781,6 +783,7 @@ public final class Constants {
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
     public static final String CONDITION_RESULT = "conditionResult";
+    public static final String SWITCH_RESULT = "switchResult";
     public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
@@ -1013,7 +1016,7 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group

@@ -15,33 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.utils;
+package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-public class FuncUtils {
+import org.junit.Assert;
+import org.junit.Test;
 
-    private FuncUtils() {
-        throw new IllegalStateException(FuncUtils.class.getName());
-    }
+public class TaskProcessorFactoryTest {
 
-    public static String mkString(Iterable<String> list, String split) {
+    @Test
+    public void testFactory() {
 
-        if (null == list || StringUtils.isEmpty(split)) {
-            return null;
-        }
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskType("shell");
 
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String item : list) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(split);
-            }
-            sb.append(item);
-        }
-        return sb.toString();
+        ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+
+        Assert.assertNotNull(iTaskProcessor);
     }
 
 }
