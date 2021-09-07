@@ -27,6 +27,7 @@ export default {
       io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, {
         processInstanceId: payload
       }, res => {
+        state.taskInstances = res.data.taskList
         resolve(res)
       }).catch(e => {
         reject(e)
