@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -90,7 +91,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
-        MvcResult mvcResult = mockMvc.perform(post("/tenants/{id}", 9)
+        MvcResult mvcResult = mockMvc.perform(put("/tenants/{id}", 9)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

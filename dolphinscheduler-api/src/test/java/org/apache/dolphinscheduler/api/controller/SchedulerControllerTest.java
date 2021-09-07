@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -103,7 +104,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}",123, 37)
+        MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/schedules/{id}",123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
