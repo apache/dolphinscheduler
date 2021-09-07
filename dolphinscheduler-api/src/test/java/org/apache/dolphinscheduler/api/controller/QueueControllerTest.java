@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -104,7 +105,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("queue","queue2");
         paramsMap.add("queueName","root.queue2");
 
-        MvcResult mvcResult = mockMvc.perform(post("/queues/{id}")
+        MvcResult mvcResult = mockMvc.perform(put("/queues/{id}", 1)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
