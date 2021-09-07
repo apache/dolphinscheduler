@@ -222,7 +222,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.deleteScheduleById(isA(User.class), isA(Long.class), isA(Integer.class)))
                 .thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}}",123, 37)
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}",123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
