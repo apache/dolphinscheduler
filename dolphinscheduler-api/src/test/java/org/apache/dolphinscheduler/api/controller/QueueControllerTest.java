@@ -47,7 +47,7 @@ public class QueueControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryList() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/queue/list")
+        MvcResult mvcResult = mockMvc.perform(get("/queues/list")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -66,7 +66,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","20");
 
-        MvcResult mvcResult = mockMvc.perform(get("/queue/list-paging")
+        MvcResult mvcResult = mockMvc.perform(get("/queues")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -85,7 +85,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("queue", QUEUE_CREATE_STRING);
         paramsMap.add("queueName","root.queue1");
 
-        MvcResult mvcResult = mockMvc.perform(post("/queue/create")
+        MvcResult mvcResult = mockMvc.perform(post("/queues")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -104,7 +104,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("queue","queue2");
         paramsMap.add("queueName","root.queue2");
 
-        MvcResult mvcResult = mockMvc.perform(post("/queue/update")
+        MvcResult mvcResult = mockMvc.perform(post("/queues/{id}")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -123,7 +123,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("queue",QUEUE_CREATE_STRING);
         paramsMap.add("queueName","queue.name");
 
-        MvcResult mvcResult = mockMvc.perform(post("/queue/verify-queue")
+        MvcResult mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -137,7 +137,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("queue","ait123");
         paramsMap.add("queueName","aitName");
 
-        mvcResult = mockMvc.perform(post("/queue/verify-queue")
+        mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
