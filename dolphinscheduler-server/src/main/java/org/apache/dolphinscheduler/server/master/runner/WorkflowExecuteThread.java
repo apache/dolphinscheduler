@@ -199,14 +199,12 @@ public class WorkflowExecuteThread implements Runnable {
 
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
-
     /**
      * constructor of WorkflowExecuteThread
      *
      * @param processInstance processInstance
      * @param processService processService
-     * @param nettyExecutorManager  nettyExecutorManager
-     * @param taskTimeoutCheckList
+     * @param nettyExecutorManager nettyExecutorManager
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
@@ -239,7 +237,7 @@ public class WorkflowExecuteThread implements Runnable {
     private void handleEvents() {
         while (this.stateEvents.size() > 0) {
 
-        try {
+            try {
                 StateEvent stateEvent = this.stateEvents.peek();
                 if (stateEventHandler(stateEvent)) {
                     this.stateEvents.remove(stateEvent);
@@ -353,7 +351,7 @@ public class WorkflowExecuteThread implements Runnable {
                 task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 taskFinished(task);
             }
-            } else {
+        } else {
             logger.error("state handler error: {}", stateEvent.toString());
         }
         return true;
@@ -367,20 +365,20 @@ public class WorkflowExecuteThread implements Runnable {
         if (task.taskCanRetry()) {
             addTaskToStandByList(task);
             return;
-    }
+        }
         ProcessInstance processInstance = processService.findProcessInstanceById(this.processInstance.getId());
         completeTaskList.put(task.getName(), task);
         activeTaskProcessorMaps.remove(task.getId());
         taskTimeoutCheckList.remove(task.getId());
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
-        processService.saveProcessInstance(processInstance);
+            processService.saveProcessInstance(processInstance);
             submitPostNode(task.getName());
         } else if (task.getState().typeIsFailure()) {
             if (task.isConditionsTask()
                     || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
                 submitPostNode(task.getName());
-        } else {
+            } else {
                 errorTaskList.put(task.getName(), task);
                 if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                     killAllTasks();
@@ -426,7 +424,7 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         Date scheduleDate = processInstance.getScheduleTime();
-            if (scheduleDate == null) {
+        if (scheduleDate == null) {
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().typeIsFinished()) {
             endProcess();
@@ -434,26 +432,26 @@ public class WorkflowExecuteThread implements Runnable {
             if (index >= complementListDate.size() - 1 || !processInstance.getState().typeIsSuccess()) {
                 // complement data ends || no success
                 return false;
-                }
+            }
             scheduleDate = complementListDate.get(index + 1);
             //the next process complement
             processInstance.setId(0);
-                }
-            processInstance.setScheduleTime(scheduleDate);
+        }
+        processInstance.setScheduleTime(scheduleDate);
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-                cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
-                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            }
+        if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
+            cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+            processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
+        }
 
-            processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-            processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
-                    CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-            processInstance.setStartTime(new Date());
-            processInstance.setEndTime(null);
-            processService.saveProcessInstance(processInstance);
+                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+        processInstance.setStartTime(new Date());
+        processInstance.setEndTime(null);
+        processService.saveProcessInstance(processInstance);
         this.taskInstanceHashMap.clear();
         startProcess();
         return true;
@@ -612,7 +610,7 @@ public class WorkflowExecuteThread implements Runnable {
                     this.stateEvents.add(stateEvent);
                 }
                 return taskInstance;
-        } else {
+            } else {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
                         processInstance.getId(), processInstance.getName(),
                         taskInstance.getId(), taskInstance.getName());
@@ -1000,7 +998,6 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      * generate the latest process instance status by the tasks state
      *
-     * @param instance
      * @return process instance execution status
      */
     private ExecutionStatus getProcessInstanceState(ProcessInstance instance) {
@@ -1288,8 +1285,8 @@ public class WorkflowExecuteThread implements Runnable {
                         if (taskInstance == null) {
                             this.taskFailedSubmit = true;
                         } else {
-                        removeTaskFromStandbyList(task);
-                    }
+                            removeTaskFromStandbyList(task);
+                        }
                     }
                 } else if (DependResult.FAILED == dependResult) {
                     // if the dependency fails, the current node is not submitted and the state changes to failure.
