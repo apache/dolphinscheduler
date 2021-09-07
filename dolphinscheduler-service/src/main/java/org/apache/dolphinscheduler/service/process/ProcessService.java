@@ -65,7 +65,6 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -111,7 +110,6 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -125,8 +123,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -294,6 +292,14 @@ public class ProcessService {
      */
     public Command findOneCommand() {
         return commandMapper.getOneToRun();
+    }
+
+    /**
+     * get command page
+     */
+    public List<Command> findCommandPage(int pageSize, int pageNumber) {
+        Page<Command> commandPage = new Page<>(pageNumber, pageSize);
+        return commandMapper.queryCommandPage(commandPage).getRecords();
     }
 
     /**
@@ -743,6 +749,9 @@ public class ProcessService {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                if (processInstance == null) {
+                    return processInstance;
+                }
                 CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
 
                 // reset global params while repeat running is needed by cmdParam
@@ -1021,6 +1030,35 @@ public class ProcessService {
         }
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         updateTaskInstance(taskInstance);
+    }
+
+    /**
+     * retry submit task to db
+     */
+    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
+
+        int retryTimes = 1;
+        boolean submitDB = false;
+        TaskInstance task = null;
+        while (retryTimes <= commitRetryTimes) {
+            try {
+                if (!submitDB) {
+                    // submit task to db
+                    task = submitTask(taskInstance);
+                    if (task != null && task.getId() != 0) {
+                        submitDB = true;
+                    }
+                }
+                if (!submitDB) {
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                }
+                Thread.sleep(commitInterval);
+            } catch (Exception e) {
+                logger.error("task commit to mysql failed", e);
+            }
+            retryTimes += 1;
+        }
+        return task;
     }
 
     /**
@@ -1627,6 +1665,8 @@ public class ProcessService {
 
     /**
      * for show in page of taskInstance
+     *
+     * @param taskInstance
      */
     public void changeOutParam(TaskInstance taskInstance) {
         if (StringUtils.isEmpty(taskInstance.getVarPool())) {
@@ -2310,6 +2350,7 @@ public class ProcessService {
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
             Map<String, Object> taskParamsMap = v.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
             v.setConditionResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
+            v.setSwitchResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
             v.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
             taskParamsMap.remove(Constants.CONDITION_RESULT);
             taskParamsMap.remove(Constants.DEPENDENCE);
@@ -2414,5 +2455,21 @@ public class ProcessService {
             }
         }
         return taskNodeList;
+    }
+
+    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId, int taskId) {
+        HashMap<ProcessInstance, TaskInstance> processTaskMap = new HashMap<>();
+        //find sub tasks
+        ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryBySubProcessId(processId);
+        if (processInstanceMap == null) {
+            return processTaskMap;
+        }
+        ProcessInstance fatherProcess = this.findProcessInstanceById(processInstanceMap.getParentProcessInstanceId());
+        TaskInstance fatherTask = this.findTaskInstanceById(processInstanceMap.getParentTaskInstanceId());
+
+        if (fatherProcess != null) {
+            processTaskMap.put(fatherProcess, fatherTask);
+        }
+        return processTaskMap;
     }
 }

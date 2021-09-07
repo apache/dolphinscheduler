@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
@@ -64,19 +64,19 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
 /**
- * test for MasterExecThread
+ * test for WorkflowExecuteThread
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MasterExecThread.class})
-public class MasterExecThreadTest {
+@PrepareForTest({WorkflowExecuteThread.class})
+public class WorkflowExecuteThreadTest {
 
-    private MasterExecThread masterExecThread;
+    private WorkflowExecuteThread workflowExecuteThread;
 
     private ProcessInstance processInstance;
 
     private ProcessService processService;
 
-    private long processDefinitionCode = 1L;
+    private int processDefinitionId = 1;
 
     private MasterConfig config;
 
@@ -104,29 +104,29 @@ public class MasterExecThreadTest {
         processDefinition.setGlobalParamMap(Collections.emptyMap());
         processDefinition.setGlobalParamList(Collections.emptyList());
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
-        Mockito.when(processInstance.getProcessDefinitionCode()).thenReturn(processDefinitionCode);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config));
+        ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, taskTimeoutCheckList));
         // prepareProcess init dag
-        Field dag = MasterExecThread.class.getDeclaredField("dag");
+        Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
-        dag.set(masterExecThread, new DAG());
-        PowerMockito.doNothing().when(masterExecThread, "executeProcess");
-        PowerMockito.doNothing().when(masterExecThread, "prepareProcess");
-        PowerMockito.doNothing().when(masterExecThread, "runProcess");
-        PowerMockito.doNothing().when(masterExecThread, "endProcess");
+        dag.set(workflowExecuteThread, new DAG());
+        PowerMockito.doNothing().when(workflowExecuteThread, "executeProcess");
+        PowerMockito.doNothing().when(workflowExecuteThread, "prepareProcess");
+        PowerMockito.doNothing().when(workflowExecuteThread, "runProcess");
+        PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
     }
 
     /**
      * without schedule
      */
     @Test
-    public void testParallelWithOutSchedule() {
+    public void testParallelWithOutSchedule() throws ParseException {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
-            Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Method method = WorkflowExecuteThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
-            method.invoke(masterExecThread);
+            method.invoke(workflowExecuteThread);
             // one create save, and 1-30 for next save, and last day 20 no save
             verify(processService, times(20)).saveProcessInstance(processInstance);
         } catch (Exception e) {
@@ -141,12 +141,12 @@ public class MasterExecThreadTest {
     @Test
     public void testParallelWithSchedule() {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(oneSchedulerList());
-            Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionId)).thenReturn(oneSchedulerList());
+            Method method = WorkflowExecuteThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
-            method.invoke(masterExecThread);
+            method.invoke(workflowExecuteThread);
             // one create save, and 9(1 to 20 step 2) for next save, and last day 31 no save
-            verify(processService, times(9)).saveProcessInstance(processInstance);
+            verify(processService, times(20)).saveProcessInstance(processInstance);
         } catch (Exception e) {
             Assert.fail();
         }
@@ -158,10 +158,10 @@ public class MasterExecThreadTest {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODE_NAMES, "t1,t2,t3");
             Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
-            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
-            List<String> nodeNames = (List<String>) method.invoke(masterExecThread, JSONUtils.toJsonString(cmdParam));
+            List<String> nodeNames = (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(3, nodeNames.size());
         } catch (Exception e) {
             Assert.fail();
@@ -176,10 +176,10 @@ public class MasterExecThreadTest {
             taskInstance.setMaxRetryTimes(0);
             taskInstance.setRetryInterval(0);
             taskInstance.setState(ExecutionStatus.FAILURE);
-            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
             Method method = masterExecThreadClass.getDeclaredMethod("retryTaskIntervalOverTime", TaskInstance.class);
             method.setAccessible(true);
-            Assert.assertTrue((Boolean) method.invoke(masterExecThread, taskInstance));
+            Assert.assertTrue((Boolean) method.invoke(workflowExecuteThread, taskInstance));
         } catch (Exception e) {
             Assert.fail();
         }
@@ -202,10 +202,10 @@ public class MasterExecThreadTest {
             Mockito.when(processService.findTaskInstanceById(2)).thenReturn(taskInstance2);
             Mockito.when(processService.findTaskInstanceById(3)).thenReturn(taskInstance3);
             Mockito.when(processService.findTaskInstanceById(4)).thenReturn(taskInstance4);
-            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getStartTaskInstanceList", String.class);
             method.setAccessible(true);
-            List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(masterExecThread, JSONUtils.toJsonString(cmdParam));
+            List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
         } catch (Exception e) {
             Assert.fail();
@@ -237,19 +237,19 @@ public class MasterExecThreadTest {
             completeTaskList.put("test1", taskInstance1);
             completeTaskList.put("test2", taskInstance2);
 
-            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+            Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
 
             Field field = masterExecThreadClass.getDeclaredField("completeTaskList");
             field.setAccessible(true);
-            field.set(masterExecThread, completeTaskList);
+            field.set(workflowExecuteThread, completeTaskList);
 
-            masterExecThread.getPreVarPool(taskInstance, preTaskName);
+            workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             completeTaskList.put("test2", taskInstance2);
             field.setAccessible(true);
-            field.set(masterExecThread, completeTaskList);
-            masterExecThread.getPreVarPool(taskInstance, preTaskName);
+            field.set(workflowExecuteThread, completeTaskList);
+            workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
             Assert.fail();

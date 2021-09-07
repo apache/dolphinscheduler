@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, ConditionsParameters.class);
             case "SQOOP":
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
+            case "SWITCH":
+                return JSONUtils.parseObject(parameter, SwitchParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);
                 return null;
