@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-<<<<<<< HEAD:dolphinscheduler-ui/src/js/conf/home/pages/dag/_source/canvas/canvas.scss
 .dag-canvas {
   display: flex;
   overflow: hidden;
@@ -27,12 +26,12 @@
     flex: 1;
     overflow: hidden;
     position: relative;
-  
+
     .paper {
       width: 100%;
       height: 100%;
     }
-  
+
     .minimap {
       position: absolute;
       width: 300px;
@@ -47,24 +46,7 @@
       position: absolute;
       left: 100px;
       top: 100px;
-=======
-
-package org.apache.dolphinscheduler.server.master.runner.task;
-
-import org.apache.dolphinscheduler.common.Constants;
-
-public class CommonTaskProcessFactory implements ITaskProcessFactory {
-    @Override
-    public String type() {
-        return Constants.COMMON_TASK_TYPE;
-
     }
 
-    @Override
-    public ITaskProcessor create() {
-        return new CommonTaskProcessor();
->>>>>>> upstream/dev:dolphinscheduler-server/src/main/java/org/apache/dolphinscheduler/server/master/runner/task/CommonTaskProcessFactory.java
-    }
-    
   }
 }
