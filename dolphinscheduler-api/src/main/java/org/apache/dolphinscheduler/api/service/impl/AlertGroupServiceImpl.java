@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -71,6 +72,33 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     }
 
     /**
+     * query alert group by id
+     *
+     * @param loginUser login user
+     * @param id alert group id
+     * @return one alert group
+     */
+    @Override
+    public Map<String, Object> queryAlertGroupById(User loginUser, Integer id) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        //only admin can operate
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        //check if exist
+        AlertGroup alertGroup = alertGroupMapper.selectById(id);
+        if (alertGroup == null) {
+            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
+            return result;
+        }
+        result.put("data", alertGroup);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * paging query alarm group list
      *
      * @param loginUser login user
@@ -88,13 +116,14 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
-                page, searchVal);
-        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) alertGroupIPage.getTotal());
-        pageInfo.setTotalList(alertGroupIPage.getRecords());
+        Page<AlertGroupVo> page = new Page<>(pageNo, pageSize);
+        IPage<AlertGroupVo> alertGroupVoIPage = alertGroupMapper.queryAlertGroupVo(page, searchVal);
+        PageInfo<AlertGroupVo> pageInfo = new PageInfo<>(pageNo, pageSize);
+
+        pageInfo.setTotal((int) alertGroupVoIPage.getTotal());
+        pageInfo.setTotalList(alertGroupVoIPage.getRecords());
         result.setData(pageInfo);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
