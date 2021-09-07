@@ -635,7 +635,7 @@ public class MasterExecThread implements Runnable {
                 return DependResult.NON_EXEC;
             }
             // ignore task state if current task is condition
-            if (taskNode.isConditionsTask()) {
+            if (taskNode.isConditionsTask() || taskNode.isBlockingTask()) {
                 continue;
             }
             if (!dependTaskSuccess(depsNode, taskName)) {
@@ -1019,7 +1019,8 @@ public class MasterExecThread implements Runnable {
                     } else {
                         completeTaskList.put(task.getName(), task);
                         if (task.isConditionsTask()
-                                || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
+                                || DagHelper.haveConditionsAfterNode(task.getName(), dag)
+                                || DagHelper.haveBlockingAfterNode(task.getName(),dag)) {
                             submitPostNode(task.getName());
                         } else {
                             errorTaskList.put(task.getName(), task);
