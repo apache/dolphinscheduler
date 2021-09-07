@@ -691,5 +691,11 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate',
   Info: 'Info',
   'Datasource userName': 'owner',
-  'Resource userName': 'owner'
+  'Resource userName': 'owner',
+  'Alert When Blocking': 'Alert When Blocking',
+  'Blocking Condition': 'Blocking Condition',
+  'Blocking on Failed': 'Blocking on Failed',
+  'Blocking on Success': 'Blocking on Success',
+  Alert: 'Alert',
+  'Do not Alert': 'Do not Alert'
 }
