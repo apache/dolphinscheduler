@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource;
 
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.datasource.clickhouse.ClickHouseDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.db2.Db2DatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.hive.HiveDatasourceProcessor;
@@ -26,11 +27,11 @@ import org.apache.dolphinscheduler.spi.task.datasource.postgresql.PostgreSqlData
 import org.apache.dolphinscheduler.spi.task.datasource.presto.PrestoDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.spark.SparkDatasourceProcessor;
 import org.apache.dolphinscheduler.spi.task.datasource.sqlserver.SqlServerDatasourceProcessor;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatasourceUtil {
 

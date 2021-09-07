@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.task.datasource;
 
-
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.IOException;

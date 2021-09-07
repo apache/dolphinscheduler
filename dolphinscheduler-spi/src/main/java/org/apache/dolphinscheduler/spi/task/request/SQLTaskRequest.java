@@ -45,7 +45,6 @@ public class SQLTaskRequest extends TaskRequest {
     @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
     private Map<UdfFuncBean,String> udfFuncTenantCodeMap;
 
-
     public int getWarningGroupId() {
         return warningGroupId;
     }

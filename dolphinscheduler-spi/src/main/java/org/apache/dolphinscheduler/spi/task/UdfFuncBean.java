@@ -73,8 +73,6 @@ public class UdfFuncBean {
      */
     private String resourceName;
 
-
-
     public int getId() {
         return id;
     }
