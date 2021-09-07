@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -348,11 +349,18 @@ public class MasterExecThreadTest {
         blockingTaskInstance.setTaskDefinitionVersion(1);
         blockingTaskInstance.setTaskType("BLOCKING");
         blockingTaskInstance.setState(ExecutionStatus.SUCCESS);
-        blockingTaskInstance.setAlertWhenBlocking(isAlert);
+        // set blocking node params
+        BlockingParameters blockingParameters = new BlockingParameters();
+        blockingParameters.setAlertWhenBlocking(isAlert);
+        // in this section, we focus on the process when the work flow blocked or non-blocked
+        // so the blockingCondition is NOT necessary
+        // we use isBlocked param to control the work flow
+        blockingParameters.setBlockingCondition("");
+        blockingTaskInstance.setTaskParams(JSONUtils.toJsonString(blockingParameters));
         return blockingTaskInstance;
     }
 
-    private void initEnvForBlockingTest(boolean blockingLogic, TaskInstance blockingTaskInstance, Class<MasterExecThread> masterExecThreadClass){
+    private void initEnvForBlockingTest(boolean isBlocked, TaskInstance blockingTaskInstance, Class<MasterExecThread> masterExecThreadClass){
         try{
             // init Spring Context
             SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -363,7 +371,8 @@ public class MasterExecThreadTest {
             taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
             taskDefinition.setTimeout(0);
             // define mock action
-            if(blockingLogic){
+            // isBlocked stands for blocking result
+            if(isBlocked){
                 Mockito.when(processInstance.getBlockingFlag()).thenReturn(true);
             } else {
                 Mockito.when(processInstance.getBlockingFlag()).thenReturn(false);
@@ -376,7 +385,7 @@ public class MasterExecThreadTest {
             Mockito.when(processService.findProcessInstanceById(processInstance.getId())).thenReturn(processInstance);
             Mockito.when(processService.queryProjectWithUserByProcessInstanceId(blockingTaskInstance.getId())).thenReturn(null);
             Mockito.doNothing().when(alertManager).sendProcessBlockingAlert(processInstance,blockingTaskInstance,null);
-            if(blockingLogic){
+            if(isBlocked){
                 Mockito.when(processInstance.getState())
                         .thenReturn(ExecutionStatus.SUCCESS)
                         .thenReturn(ExecutionStatus.READY_PAUSE);
@@ -396,7 +405,7 @@ public class MasterExecThreadTest {
             // define fake active task node map
             Map<MasterBaseTaskExecThread, Future<Boolean>> activeTaskNode = new ConcurrentHashMap<>();
             activeTaskNode.put(new BlockingTaskExecThread(blockingTaskInstance),
-                    CompletableFuture.completedFuture(blockingLogic));
+                    CompletableFuture.completedFuture(isBlocked));
             Field field = masterExecThreadClass.getDeclaredField("activeTaskNode");
             field.setAccessible(true);
             field.set(masterExecThread,activeTaskNode);
