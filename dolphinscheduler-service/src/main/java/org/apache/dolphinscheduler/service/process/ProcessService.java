@@ -1665,10 +1665,8 @@ public class ProcessService {
 
     /**
      * for show in page of taskInstance
-     * <<<<<<< HEAD
-     * =======
      *
-     * @param taskInstance >>>>>>> upstream/dev
+     * @param taskInstance
      */
     public void changeOutParam(TaskInstance taskInstance) {
         if (StringUtils.isEmpty(taskInstance.getVarPool())) {
