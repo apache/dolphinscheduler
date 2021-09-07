@@ -132,6 +132,22 @@ export const PORT_HIGHLIGHT_PROPS = {
   [X6_PORT_IN_NAME]: {}
 }
 
+export const NODE_STATUS_MARKUP = [{
+  tagName: 'foreignObject',
+  selector: 'fo',
+  children: [
+    {
+      tagName: 'body',
+      selector: 'fo-body',
+      ns: 'http://www.w3.org/1999/xhtml',
+      children: [{
+        tagName: 'div',
+        selector: 'status'
+      }]
+    }
+  ]
+}]
+
 export const NODE_PROPS = {
   width: 220,
   height: 48,
@@ -148,22 +164,6 @@ export const NODE_PROPS = {
       tagName: 'text',
       selector: 'title'
     }
-    // {
-    //   tagName: 'foreignObject',
-    //   selector: 'fo',
-    //   children: [
-    //     {
-    //       tagName: 'body',
-    //       selector: 'fo-body',
-    //       ns: 'http://www.w3.org/1999/xhtml',
-    //       children: [{
-    //         tagName: 'i',
-    //         selector: 'state',
-    //         className: 'state-icon el-icon-circle-check'
-    //       }]
-    //     }
-    //   ]
-    // }
   ],
   attrs: {
     body: {
@@ -196,14 +196,6 @@ export const NODE_PROPS = {
       refY: -25,
       width: 18,
       height: 18
-    },
-    state: {
-      style: {
-        display: 'block',
-        width: '100%',
-        height: '100%',
-        fontSize: '18px'
-      }
     }
   },
   ports: {
