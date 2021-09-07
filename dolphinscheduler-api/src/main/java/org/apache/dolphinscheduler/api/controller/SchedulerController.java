@@ -222,9 +222,8 @@ public class SchedulerController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "100")
-
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
     })
     @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
@@ -263,8 +262,7 @@ public class SchedulerController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                     @RequestParam("id") Integer id
-    ) {
+                                     @PathVariable("id") Integer id) {
         Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, id);
         return returnDataList(result);
     }
@@ -302,8 +300,7 @@ public class SchedulerController extends BaseController {
     @ApiException(PREVIEW_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result previewSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                  @RequestParam(value = "schedule") String schedule
-    ) {
+                                  @RequestParam(value = "schedule") String schedule) {
         Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
         return returnDataList(result);
     }
