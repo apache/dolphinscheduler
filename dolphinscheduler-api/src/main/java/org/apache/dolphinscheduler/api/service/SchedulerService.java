@@ -43,6 +43,7 @@ public interface SchedulerService {
      * @param failureStrategy failure strategy
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
+     * @param environmentCode environment code
      * @return create result code
      */
     Map<String, Object> insertSchedule(User loginUser, String projectName,
@@ -52,7 +53,8 @@ public interface SchedulerService {
                                        int warningGroupId,
                                        FailureStrategy failureStrategy,
                                        Priority processInstancePriority,
-                                       String workerGroup);
+                                       String workerGroup,
+                                       Long environmentCode);
 
     /**
      * updateProcessInstance schedule
@@ -65,6 +67,7 @@ public interface SchedulerService {
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
+     * @param environmentCode environment code
      * @param processInstancePriority process instance priority
      * @param scheduleStatus schedule status
      * @return update result code
@@ -78,7 +81,8 @@ public interface SchedulerService {
                                        FailureStrategy failureStrategy,
                                        ReleaseState scheduleStatus,
                                        Priority processInstancePriority,
-                                       String workerGroup);
+                                       String workerGroup,
+                                       Long environmentCode);
 
 
     /**

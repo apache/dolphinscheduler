@@ -66,6 +66,7 @@ import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -86,6 +87,7 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -206,6 +208,9 @@ public class ProcessService {
 
     @Autowired
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Autowired
+    private EnvironmentMapper environmentMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -495,7 +500,6 @@ public class ProcessService {
     public void recurseFindSubProcessId(int parentId, List<Integer> ids) {
         List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentId);
 
-
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
             for (TaskDefinition taskNode : taskNodeList) {
@@ -546,6 +550,7 @@ public class ProcessService {
                     processInstance.getWarningGroupId(),
                     processInstance.getScheduleTime(),
                     processInstance.getWorkerGroup(),
+                    processInstance.getEnvironmentCode(),
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -637,6 +642,7 @@ public class ProcessService {
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
         String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
         processInstance.setWorkerGroup(workerGroup);
+        processInstance.setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
@@ -692,6 +698,21 @@ public class ProcessService {
             tenant = tenantMapper.queryById(user.getTenantId());
         }
         return tenant;
+    }
+
+    /**
+     * get an environment
+     * use the code of the environment to find a environment.
+     *
+     * @param environmentCode environmentCode
+     * @return Environment
+     */
+    public Environment findEnvironmentByCode(Long environmentCode) {
+        Environment environment = null;
+        if (environmentCode >= 0) {
+            environment = environmentMapper.queryByEnvironmentCode(environmentCode);
+        }
+        return environment;
     }
 
     /**
@@ -1224,6 +1245,7 @@ public class ProcessService {
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
                 task.getWorkerGroup(),
+                task.getEnvironmentCode(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }
@@ -1679,7 +1701,6 @@ public class ProcessService {
         taskParams.put(LOCAL_PARAMS, allParam);
         taskInstance.setTaskParams(JSONUtils.toJsonString(taskParams));
     }
-
 
     /**
      * convert integer list to string list
@@ -2222,6 +2243,7 @@ public class ProcessService {
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
+        taskDefinition.setEnvironmentCode(Objects.isNull(taskNode.getEnvironmentCode()) ? -1 : taskNode.getEnvironmentCode());
         taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
         taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
         taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
@@ -2517,6 +2539,7 @@ public class ProcessService {
             v.setParams(JSONUtils.toJsonString(taskParamsMap));
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+            v.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                     taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));

@@ -429,7 +429,7 @@ public class ProcessServiceTest {
                 + "\"retryInterval\":0,\"params\":{},\"preTasks\":[\"unit-test\"],"
                 + "\"preTaskNodeList\":[{\"code\":2,\"name\":\"unit-test\",\"version\":0}],"
                 + "\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null,\"conditionResult\":null,"
-                + "\"switchResult\":null,\"taskInstancePriority\":null,\"workerGroup\":null,"
+                + "\"switchResult\":null,\"taskInstancePriority\":null,\"workerGroup\":null,\"environmentCode\":null,"
                 + "\"timeout\":{\"enable\":false,\"strategy\":null,\"interval\":0},\"delayTime\":0}],"
                 + "\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
 
