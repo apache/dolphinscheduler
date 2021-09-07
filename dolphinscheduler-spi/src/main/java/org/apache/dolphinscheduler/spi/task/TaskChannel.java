@@ -15,6 +15,8 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+
 public interface TaskChannel {
 
     void cancelApplication(boolean status);

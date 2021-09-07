@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.task;
 
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+
 /**
  * executive task
  */

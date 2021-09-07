@@ -26,6 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-sqoop</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
         <dependency>
@@ -41,4 +42,7 @@
 
     </dependencies>
 
+    <build>
+        <finalName>dolphinscheduler-task-sqoop-${project.version}</finalName>
+    </build>
 </project>

@@ -19,17 +19,18 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
+import java.util.Map;
 
 public class SparkTask extends AbstractYarnTask {
-
 
     /**
      * spark1 command
@@ -51,19 +52,19 @@ public class SparkTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private TaskRequest taskRequest;
+    private TaskRequest taskExecutionContext;
 
-    public SparkTask(TaskRequest taskRequest) {
-        super(taskRequest);
-        this.taskRequest = taskRequest;
+    public SparkTask(TaskRequest taskExecutionContext) {
+        super(taskExecutionContext);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
 
-        logger.info("spark task params {}", taskRequest.getTaskParams());
+        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
 
-        sparkParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SparkParameters.class);
+        sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
             logger.error("Spark params is null");
@@ -73,12 +74,16 @@ public class SparkTask extends AbstractYarnTask {
         if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
-        sparkParameters.setQueue(taskRequest.getQueue());
+        sparkParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
     }
 
+    /**
+     * create command
+     * @return command
+     */
     @Override
-    public String getPreScript() {
+    protected String buildCommand() {
         // spark-submit [options] <app jar | python file> [app arguments]
         List<String> args = new ArrayList<>();
 
@@ -93,24 +98,18 @@ public class SparkTask extends AbstractYarnTask {
 
         // other parameters
         args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
-        return String.join(" ", args);
-    }
 
-    private String command;
+        // replace placeholder, and combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
-    @Override
-    public void setCommand(String command) {
+        String command = null;
+
+        if (null != paramsMap) {
+            command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        }
+
         logger.info("spark task command: {}", command);
-        this.command = command;
-    }
 
-    /**
-     * get command
-     *
-     * @return command
-     */
-    @Override
-    protected String getCommand() {
         return command;
     }
 
@@ -128,7 +127,7 @@ public class SparkTask extends AbstractYarnTask {
         if (resourceId == 0) {
             resourceName = mainJar.getRes();
         } else {
-            //fixme when update resource maybe has error
+            //when update resource maybe has error ,也许也可以交给上层去做控制 需要看资源是否可以抽象为共性 目前来讲我认为是可以的
             resourceName = mainJar.getResourceName().replaceFirst("/", "");
         }
         mainJar.setRes(resourceName);

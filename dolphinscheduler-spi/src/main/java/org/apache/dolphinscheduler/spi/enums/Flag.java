@@ -15,11 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.spi.enums;
 
-public class ShellTaskConstants {
+/**
+ * have_script
+ * have_file
+ * can_retry
+ * have_arr_variables
+ * have_map_variables
+ * have_alert
+ */
+public enum Flag {
+    /**
+     * 0 no
+     * 1 yes
+     */
+    NO(0, "no"),
+    YES(1, "yes");
 
-    private ShellTaskConstants() {
+    Flag(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
+    }
 
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
     }
 }

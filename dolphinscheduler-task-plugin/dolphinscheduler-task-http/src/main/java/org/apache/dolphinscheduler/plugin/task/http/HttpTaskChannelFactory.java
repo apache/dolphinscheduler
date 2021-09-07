@@ -24,9 +24,10 @@ import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 import java.util.List;
 
 public class HttpTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
-        return null;
+        return "HTTP";
     }
 
     @Override
@@ -36,6 +37,6 @@ public class HttpTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public TaskChannel create() {
-        return null;
+        return new HttpTaskChannel();
     }
 }

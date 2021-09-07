@@ -22,7 +22,7 @@ import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
 import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.apache.commons.io.IOUtils;
 

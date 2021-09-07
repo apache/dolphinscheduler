@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.tis;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -177,6 +176,7 @@ public class TISTask extends AbstractTaskExecutor {
                         // WebSocket connection closed
                     }
 
+                    @Override
                     public void onTextFrame(String payload, boolean finalFragment, int rsv) {
                         ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
                         logger.info(execLog.getMsg());
@@ -221,6 +221,7 @@ public class TISTask extends AbstractTaskExecutor {
     private static class BizResult extends AjaxResult<TriggerBuildResult> {
         private TriggerBuildResult bizresult;
 
+        @Override
         public TriggerBuildResult getBizresult() {
             return this.bizresult;
         }
@@ -233,6 +234,7 @@ public class TISTask extends AbstractTaskExecutor {
     private static class StatusResult extends AjaxResult<Map> {
         private Map bizresult;
 
+        @Override
         public Map getBizresult() {
             return this.bizresult;
         }

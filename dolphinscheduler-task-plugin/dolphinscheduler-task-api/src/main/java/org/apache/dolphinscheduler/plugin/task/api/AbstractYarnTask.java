@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
-
-import org.slf4j.Logger;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 /**
  * abstract yarn task
@@ -47,7 +44,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public void handle() throws Exception {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(getCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
             setProcessId(response.getProcessId());
@@ -83,7 +80,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
      * @return String
      * @throws Exception exception
      */
-    protected abstract String getCommand();
+    protected abstract String buildCommand();
 
     /**
      * set main jar name

@@ -26,7 +26,7 @@ import java.util.List;
 public class SparkTaskChannelFactory implements TaskChannelFactory {
     @Override
     public String getName() {
-        return "spark";
+        return "SPARK";
     }
 
     @Override

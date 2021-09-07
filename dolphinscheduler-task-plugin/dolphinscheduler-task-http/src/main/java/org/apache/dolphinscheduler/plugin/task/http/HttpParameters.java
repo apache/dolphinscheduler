@@ -53,18 +53,17 @@ public class HttpParameters extends AbstractParameters {
      */
     private String condition;
 
-
     /**
      * Connect Timeout
      * Unit: ms
      */
-    private int connectTimeout ;
+    private int connectTimeout;
 
     /**
      * Socket Timeout
      * Unit: ms
      */
-    private int socketTimeout ;
+    private int socketTimeout;
 
     @Override
     public boolean checkParameters() {
