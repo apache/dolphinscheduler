@@ -73,12 +73,18 @@
         <i
           :class="[
             'custom-ico',
-            dagChart.fullScreen
-              ? 'full-screen-close'
-              : 'full-screen-open',
+            dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
           ]"
           @click="toggleFullScreen"
         ></i>
+      </el-tooltip>
+      <el-tooltip
+        class="toolbar-operation"
+        :content="$t('Refresh DAG status')"
+        placement="bottom"
+        v-if="dagChart.type === 'instance'"
+      >
+        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation last"
@@ -180,8 +186,9 @@
         const canvas = this.getDagCanvasRef()
         canvas.format()
       },
-      // TODO
-      refreshTaskState () {},
+      refreshTaskStatus () {
+        this.dagChart.refreshTaskStatus()
+      },
       returnToListPage () {
         let $name = this.$route.name
         if ($name && $name.indexOf('definition') !== -1) {

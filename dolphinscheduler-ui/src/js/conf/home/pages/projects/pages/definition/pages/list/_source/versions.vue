@@ -120,6 +120,7 @@
       _mVersionSwitchProcessDefinitionVersion (item) {
         this.$emit('mVersionSwitchProcessDefinitionVersion', {
           version: item.version,
+          processDefinitionCode: this.versionData.processDefinition.code,
           processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
