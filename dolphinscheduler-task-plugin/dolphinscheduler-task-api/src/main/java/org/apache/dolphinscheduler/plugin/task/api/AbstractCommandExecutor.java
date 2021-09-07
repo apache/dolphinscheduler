@@ -158,7 +158,7 @@ public abstract class AbstractCommandExecutor {
         // parse process output
         parseProcessOutput(process);
 
-        int processId = getProcessId(process);
+        Integer processId = getProcessId(process);
 
         result.setProcessId(processId);
 
@@ -167,7 +167,6 @@ public abstract class AbstractCommandExecutor {
         boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
             ProcessUtils.kill(taskRequest);
-            result.setStatus(TaskRunStatus.FAIL_AND_NEED_KILL);
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
@@ -179,10 +178,6 @@ public abstract class AbstractCommandExecutor {
 
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
-        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-                taskRequest.getExecutePath(),
-                processId
-                , result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
@@ -194,12 +189,14 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(process.exitValue());
 
         } else {
-            logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
+            logger.error("process has failure , exitStatusCode:{}, processExitValue:{}, ready to kill ...",
+                    result.getExitStatusCode(), process.exitValue());
             ProcessUtils.kill(taskRequest);
-            result.setStatus(TaskRunStatus.FAIL_AND_NEED_KILL);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
+        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
         return result;
 
     }

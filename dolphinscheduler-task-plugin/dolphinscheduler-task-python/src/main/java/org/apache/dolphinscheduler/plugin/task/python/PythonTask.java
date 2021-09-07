@@ -86,8 +86,7 @@ public class PythonTask extends AbstractTaskExecutor {
         return rawPythonScript;
     }
 
-    @Override
-    public void setCommand(String command) {
+    public void buildCommand(String command) {
         this.command = command;
     }
 
