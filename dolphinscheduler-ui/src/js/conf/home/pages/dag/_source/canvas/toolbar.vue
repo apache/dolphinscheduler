@@ -97,6 +97,15 @@
         class="toolbar-el-btn"
         type="primary"
         size="mini"
+        v-if="dagChart.type === 'definition'"
+        @click="showVersions"
+        icon="el-icon-info"
+        >{{$t('Version Info')}}</el-button
+      >
+      <el-button
+        class="toolbar-el-btn"
+        type="primary"
+        size="mini"
         @click="saveProcess"
         >{{ $t("Save") }}</el-button
       >
@@ -196,6 +205,9 @@
         } else {
           this.$router.push({ name: 'projects-instance-list' })
         }
+      },
+      showVersions () {
+        this.dagChart.showVersions()
       }
     }
   }
