@@ -39,22 +39,22 @@ public interface ProjectService {
     Map<String, Object> createProject(User loginUser, String name, String desc);
 
     /**
-     * query project details by id
+     * query project details by code
      *
-     * @param projectId project id
+     * @param projectCode project code
      * @return project detail information
      */
-    Map<String, Object> queryById(Integer projectId);
+    Map<String, Object> queryByCode(User loginUser, long projectCode);
 
     /**
      * check project and authorization
      *
      * @param loginUser login user
      * @param project project
-     * @param projectName project name
+     * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName);
+    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode);
 
     boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result);
 
@@ -72,25 +72,25 @@ public interface ProjectService {
     Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
 
     /**
-     * delete project by id
+     * delete project by code
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return delete result code
      */
-    Map<String, Object> deleteProject(User loginUser, Integer projectId);
+    Map<String, Object> deleteProject(User loginUser, Long projectCode);
 
     /**
      * updateProcessInstance project
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param projectName project name
      * @param desc description
      * @param userName project owner
      * @return update result code
      */
-    Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName);
+    Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName);
 
     /**
      * query unauthorized project
@@ -127,8 +127,8 @@ public interface ProjectService {
 
     /**
      * query authorized and user create project list by user id
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return project list
      */
     Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser);
 

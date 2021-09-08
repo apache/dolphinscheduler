@@ -106,7 +106,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
@@ -136,7 +135,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -179,7 +177,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -220,7 +217,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -280,7 +276,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
@@ -459,7 +454,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);

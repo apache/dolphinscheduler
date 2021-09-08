@@ -119,12 +119,10 @@ public class TenantMapperTest {
      */
     @Test
     public void testQueryByTenantCode() {
-
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-        List<Tenant> tenantList = tenantMapper.queryByTenantCode("ut code");
-        Assert.assertEquals(1, tenantList.size());
+        Assert.assertNotNull(tenantMapper.queryByTenantCode("ut code"));
     }
 
     /**

@@ -110,7 +110,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(TaskExecuteAckCommand taskAckCommand) {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(taskAckCommand.getTaskInstanceId());
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
         taskInstance.setHost(taskAckCommand.getHost());

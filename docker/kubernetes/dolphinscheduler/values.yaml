@@ -27,7 +27,7 @@ image:
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
-## If not exists external database, the postgresql database will be used by default.
+## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
   postgresqlUsername: "root"
@@ -38,7 +38,8 @@ postgresql:
     size: "20Gi"
     storageClass: "-"
 
-## If exists external database and set postgresql.enable value to false, the external database will be used.
+## If exists external database, and set postgresql.enable value to false.
+## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
   driver: "org.postgresql.Driver"
@@ -49,7 +50,7 @@ externalDatabase:
   database: "dolphinscheduler"
   params: "characterEncoding=utf8"
 
-## If not exists external registry, the zookeeper registry will be used by default.
+## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
   fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
@@ -57,12 +58,13 @@ zookeeper:
     enabled: false
     size: "20Gi"
     storageClass: "-"
+  zookeeperRoot: "/dolphinscheduler"
 
-## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
-externalRegistry:
-  registryPluginDir: "lib/plugin/registry"
-  registryPluginName: "zookeeper"
-  registryServers: "127.0.0.1:2181"
+## If exists external zookeeper, and set zookeeper.enable value to false.
+## If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
+externalZookeeper:
+  zookeeperQuorum: "127.0.0.1:2181"
+  zookeeperRoot: "/dolphinscheduler"
 
 common:
   ## Configmap

@@ -38,9 +38,9 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     /**
      * query tenant by code
      * @param tenantCode tenantCode
-     * @return tenant list
+     * @return tenant
      */
-    List<Tenant> queryByTenantCode(@Param("tenantCode") String tenantCode);
+    Tenant queryByTenantCode(@Param("tenantCode") String tenantCode);
 
     /**
      * tenant page

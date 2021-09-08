@@ -21,7 +21,7 @@
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
         select cmd.command_type as command_type, count(1) as count
         from t_ds_error_command cmd, t_ds_process_definition process
-        where cmd.process_definition_id = process.id
+        where cmd.process_definition_code = process.code
         <if test="projectCodeArray != null and projectCodeArray.length != 0">
             and process.project_code in
             <foreach collection="projectCodeArray" index="index" item="i" open="(" close=")" separator=",">

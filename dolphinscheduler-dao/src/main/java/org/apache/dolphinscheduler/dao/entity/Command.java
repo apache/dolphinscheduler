@@ -49,10 +49,10 @@ public class Command {
     private CommandType commandType;
 
     /**
-     * process definition id
+     * process definition code
      */
-    @TableField("process_definition_id")
-    private int processDefinitionId;
+    @TableField("process_definition_code")
+    private long processDefinitionCode;
 
     /**
      * executor id
@@ -138,7 +138,7 @@ public class Command {
             TaskDependType taskDependType,
             FailureStrategy failureStrategy,
             int executorId,
-            int processDefinitionId,
+            long processDefinitionCode,
             String commandParam,
             WarningType warningType,
             int warningGroupId,
@@ -148,7 +148,7 @@ public class Command {
             Priority processInstancePriority) {
         this.commandType = commandType;
         this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
+        this.processDefinitionCode = processDefinitionCode;
         this.commandParam = commandParam;
         this.warningType = warningType;
         this.warningGroupId = warningGroupId;
@@ -186,12 +186,12 @@ public class Command {
         this.commandType = commandType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
 
     public FailureStrategy getFailureStrategy() {
@@ -296,7 +296,7 @@ public class Command {
         if (id != command.id) {
             return false;
         }
-        if (processDefinitionId != command.processDefinitionId) {
+        if (processDefinitionCode != command.processDefinitionCode) {
             return false;
         }
         if (executorId != command.executorId) {
@@ -345,7 +345,7 @@ public class Command {
     public int hashCode() {
         int result = id;
         result = 31 * result + (commandType != null ? commandType.hashCode() : 0);
-        result = 31 * result + processDefinitionId;
+        result = 31 * result + Long.hashCode(processDefinitionCode);
         result = 31 * result + executorId;
         result = 31 * result + (commandParam != null ? commandParam.hashCode() : 0);
         result = 31 * result + (taskDependType != null ? taskDependType.hashCode() : 0);
@@ -366,7 +366,7 @@ public class Command {
         return "Command{"
                 + "id=" + id
                 + ", commandType=" + commandType
-                + ", processDefinitionId=" + processDefinitionId
+                + ", processDefinitionCode=" + processDefinitionCode
                 + ", executorId=" + executorId
                 + ", commandParam='" + commandParam + '\''
                 + ", taskDependType=" + taskDependType

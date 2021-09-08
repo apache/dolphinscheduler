@@ -173,7 +173,6 @@ public class ProcessInstanceMapperTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
-        processDefinition.setProjectId(1010);
         processDefinition.setProjectCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinition.setUpdateTime(new Date());
@@ -267,7 +266,6 @@ public class ProcessInstanceMapperTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
-        processDefinition.setProjectId(1010);
         processDefinition.setProjectCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinition.setUpdateTime(new Date());

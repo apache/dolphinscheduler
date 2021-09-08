@@ -31,6 +31,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,7 +64,7 @@ public class UiPluginController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
     })
-    @PostMapping(value = "/queryUiPluginsByType")
+    @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -75,14 +77,14 @@ public class UiPluginController extends BaseController {
 
     @ApiOperation(value = "queryUiPluginDetailById", notes = "QUERY_UI_PLUGIN_DETAIL_BY_ID")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pluginId", value = "PLUGIN_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "id", value = "PLUGIN_ID", required = true, dataType = "Int", example = "100"),
     })
-    @PostMapping(value = "/queryUiPluginDetailById")
+    @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUiPluginDetailById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam("pluginId") Integer pluginId) {
+                                          @PathVariable("id") Integer pluginId) {
 
         Map<String, Object> result = uiPluginService.queryUiPluginDetailById(pluginId);
         return returnDataList(result);

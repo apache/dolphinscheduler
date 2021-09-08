@@ -112,7 +112,7 @@ public class WorkFlowLineageMapperTest {
         schedule.setWarningType(WarningType.NONE);
         schedule.setCreateTime(new Date());
         schedule.setUpdateTime(new Date());
-        schedule.setProcessDefinitionId(id);
+        schedule.setProcessDefinitionCode(id);
         scheduleMapper.insert(schedule);
         return schedule;
     }
@@ -131,8 +131,9 @@ public class WorkFlowLineageMapperTest {
     public void testQueryCodeRelation() {
         ProcessTaskRelation processTaskRelation = insertOneProcessTaskRelation();
 
-        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryCodeRelation(processTaskRelation.getPreTaskCode()
-                , processTaskRelation.getPreTaskVersion(), 11L, 1L);
+        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryCodeRelation(
+            processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion(),
+            processTaskRelation.getProcessDefinitionCode(), processTaskRelation.getProjectCode());
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 

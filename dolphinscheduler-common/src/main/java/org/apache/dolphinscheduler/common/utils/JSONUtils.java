@@ -159,7 +159,6 @@ public class JSONUtils {
         }
 
         try {
-
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {

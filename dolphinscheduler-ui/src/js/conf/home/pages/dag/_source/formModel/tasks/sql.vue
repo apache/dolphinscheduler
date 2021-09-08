@@ -43,13 +43,6 @@
         </div>
       </div>
     </m-list-box>
-    <m-list-box v-show="sqlType === '0'">
-        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Max Numbers Return')}}</div>
-        <div slot="content">
-          <el-input type="input" :disabled="isDetails" size="medium" v-model="limit" :placeholder="$t('Max Numbers Return placeholder')">
-          </el-input>
-        </div>
-    </m-list-box>
     <template v-if="sqlType === '0' && sendEmail">
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
@@ -185,8 +178,6 @@
         sendEmail: false,
         // Display rows
         displayRows: 10,
-        // Max returned rows
-        limit: 10000,
         // Email title
         title: '',
         // Sql parameter
@@ -206,13 +197,6 @@
       createNodeId: Number
     },
     methods: {
-      /**
-       * limit should't be empty;limit should be a non-negative number str;
-       * limit should be a number smaller or equal than Integer.MAX_VALUE in java.
-       */
-      isLimitInvalid () {
-        return !this.limit || !/^(0|[1-9]\d*)$/.test(this.limit) || parseInt(this.limit, 10) > 2147483647
-      },
       setEditorVal () {
         this.item = editor.getValue()
         this.scriptBoxDialog = true
@@ -274,10 +258,6 @@
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType === '0' && this.isLimitInvalid()) {
-          this.$message.warning(`${i18n.$t('Max Numbers Return required')}`)
-          return false
-        }
         if (this.sqlType === '0' && this.sendEmail && (this.groupId === '' || this.groupId === null)) {
           this.$message.warning(`${i18n.$t('Alarm group required')}`)
           return false
@@ -313,7 +293,6 @@
           sqlType: this.sqlType,
           sendEmail: this.sendEmail,
           displayRows: this.displayRows,
-          limit: this.limit,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,
@@ -365,7 +344,6 @@
           sqlType: this.sqlType,
           sendEmail: this.sendEmail,
           displayRows: this.displayRows,
-          limit: this.limit,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,
@@ -414,7 +392,6 @@
         this.sqlType = o.params.sqlType
         this.sendEmail = o.params.sendEmail || false
         this.displayRows = o.params.displayRows || 10
-        this.limit = o.params.limit || 10000
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.preStatements = o.params.preStatements || []
@@ -447,7 +424,6 @@
           sqlType: this.sqlType,
           sendEmail: this.sendEmail,
           displayRows: this.displayRows,
-          limit: this.limit,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,

@@ -156,27 +156,27 @@ public class QueueServiceTest {
         //queue null
         Result result = queueService.verifyQueue(null,queueName);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.REQUEST_PARAMS_NOT_VALID_ERROR));
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         //queueName null
         result = queueService.verifyQueue(queueName,null);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.REQUEST_PARAMS_NOT_VALID_ERROR));
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         //exist queueName
         result = queueService.verifyQueue(queueName,queueName);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.QUEUE_NAME_EXIST));
+        Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_NAME_EXIST.getCode());
 
         //exist queue
         result = queueService.verifyQueue(queueName,"test");
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.QUEUE_VALUE_EXIST));
+        Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_VALUE_EXIST.getCode());
 
         // success
         result = queueService.verifyQueue("test","test");
         logger.info(result.toString());
-        Assert.assertTrue(result.isSuccess());
+        Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
 
     }
 

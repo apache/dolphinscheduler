@@ -37,6 +37,11 @@
         releaseState: ''
       }
     },
+    provide () {
+      return {
+        definitionDetails: this
+      }
+    },
     mixins: [disabledState],
     props: {},
     methods: {
@@ -53,7 +58,7 @@
         // Promise Get node needs data
         Promise.all([
           // Node details
-          this.getProcessDetails(this.$route.params.id),
+          this.getProcessDetails(this.$route.params.code),
           // get process definition
           this.getProcessList(),
           // get project
@@ -69,8 +74,8 @@
           this.getTenantList()
         ]).then((data) => {
           let item = data[0]
-          this.setIsDetails(item.releaseState === 'ONLINE')
-          this.releaseState = item.releaseState
+          this.setIsDetails(item.processDefinition.releaseState === 'ONLINE')
+          this.releaseState = item.processDefinition.releaseState
           this.isLoading = false
           // Whether to pop up the box?
           Affirm.init(this.$root)
@@ -82,7 +87,7 @@
        * Redraw (refresh operation)
        */
       _reset () {
-        this.getProcessDetails(this.$route.params.id).then(res => {
+        this.getProcessDetails(this.$route.params.code).then(res => {
           let item = res
           this.setIsDetails(item.releaseState === 'ONLINE')
           this.releaseState = item.releaseState
