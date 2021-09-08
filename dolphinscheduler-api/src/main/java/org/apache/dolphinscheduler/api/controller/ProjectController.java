@@ -206,7 +206,7 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/unauth")
+    @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -227,7 +227,7 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/authed")
+    @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
