@@ -537,8 +537,6 @@ public class ProcessService {
             }
             return;
         }
-        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD, String.valueOf(processInstance.getId()));
         // process instance quit by "waiting thread" state
