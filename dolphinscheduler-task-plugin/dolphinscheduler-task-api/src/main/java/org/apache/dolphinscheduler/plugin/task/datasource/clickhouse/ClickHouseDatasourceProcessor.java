@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.clickhouse;
 
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_CLICKHOUSE_JDBC_DRIVER;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_CLICKHOUSE;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.plugin.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

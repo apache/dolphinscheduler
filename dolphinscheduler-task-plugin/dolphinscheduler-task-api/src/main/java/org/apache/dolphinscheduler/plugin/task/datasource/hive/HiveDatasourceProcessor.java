@@ -17,21 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.hive;
 
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_HIVE_2;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.plugin.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.task.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.HiveConfUtils;
 import org.apache.dolphinscheduler.plugin.task.util.CommonUtils;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 

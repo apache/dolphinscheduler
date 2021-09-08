@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params.inputNumber;
+package org.apache.dolphinscheduler.spi.params.input.number;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 

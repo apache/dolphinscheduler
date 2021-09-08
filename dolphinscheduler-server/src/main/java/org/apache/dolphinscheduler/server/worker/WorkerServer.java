@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -37,14 +35,14 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +51,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
 
 /**
  * worker server

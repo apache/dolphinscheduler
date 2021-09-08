@@ -100,8 +100,6 @@ public abstract class AbstractTask {
         this.cancel = status;
     }
 
-
-
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
