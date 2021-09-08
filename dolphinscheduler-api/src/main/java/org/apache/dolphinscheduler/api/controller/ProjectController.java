@@ -95,7 +95,7 @@ public class ProjectController extends BaseController {
     }
 
     /**
-     * updateProcessInstance project
+     * update project
      *
      * @param loginUser   login user
      * @param projectId   project id
