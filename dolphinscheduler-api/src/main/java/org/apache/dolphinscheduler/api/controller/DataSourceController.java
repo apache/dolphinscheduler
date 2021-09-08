@@ -94,7 +94,6 @@ public class DataSourceController extends BaseController {
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
 
-
     /**
      * updateProcessInstance data source
      *
@@ -277,7 +276,6 @@ public class DataSourceController extends BaseController {
         return dataSourceService.verifyDataSourceName(name);
     }
 
-
     /**
      * unauthorized datasource
      *
@@ -289,7 +287,7 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/unauth")
+    @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UNAUTHORIZED_DATASOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -299,7 +297,6 @@ public class DataSourceController extends BaseController {
         Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
         return returnDataList(result);
     }
-
 
     /**
      * authorized datasource
@@ -312,7 +309,7 @@ public class DataSourceController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/authed")
+    @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(AUTHORIZED_DATA_SOURCE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
