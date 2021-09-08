@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.RandomHostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -220,5 +221,10 @@ public class DependencyConfig {
     @Bean
     public SpringConnectionFactory springConnectionFactory() {
         return Mockito.mock(SpringConnectionFactory.class);
+    }
+
+    @Bean
+    public DataQualityResultOperator dataQualityResultOperator() {
+        return Mockito.mock(DataQualityResultOperator.class);
     }
 }
