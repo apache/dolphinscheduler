@@ -177,5 +177,4 @@ public class SensitiveDataConverterTest {
         return sb.toString();
     }
 
-
 }
