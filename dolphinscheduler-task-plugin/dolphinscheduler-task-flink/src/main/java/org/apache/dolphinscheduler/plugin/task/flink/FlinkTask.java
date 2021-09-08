@@ -28,8 +28,6 @@ import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.MapUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
