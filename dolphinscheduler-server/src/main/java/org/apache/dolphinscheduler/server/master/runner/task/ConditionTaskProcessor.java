@@ -177,7 +177,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         logger.info("the conditions task depend result : {}", conditionResult);
     }
 
-
     /**
      * depend result for depend item
      */

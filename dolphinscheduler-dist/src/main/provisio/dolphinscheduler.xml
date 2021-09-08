@@ -15,6 +15,12 @@
   ~ limitations under the License.
   -->
 <runtime>
+
+    <artifactSet to="/lib">
+        <exclusion>org.slf4j:slf4j-log4j12</exclusion>
+        <exclusion>org.slf4j:slf4j-api</exclusion>
+        <exclusion>ch.qos.logback:logback-classic</exclusion>
+    </artifactSet>
     <!-- Target -->
     <archive name="${project.artifactId}-${project.version}.tar.gz" hardLinkIncludes="**/*.jar"/>
     <!-- Notices -->
@@ -74,4 +80,31 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <!-- Task Plugins -->
+    <artifactSet to="lib/plugin/task/shell">
+        <artifact id="${project.groupId}:dolphinscheduler-task-shell:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/python">
+        <artifact id="${project.groupId}:dolphinscheduler-task-python:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/flink">
+        <artifact id="${project.groupId}:dolphinscheduler-task-flink:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/spark">
+        <artifact id="${project.groupId}:dolphinscheduler-task-spark:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/http">
+        <artifact id="${project.groupId}:dolphinscheduler-task-http:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+
 </runtime>

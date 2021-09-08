@@ -199,13 +199,12 @@ public class WorkflowExecuteThread implements Runnable {
 
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
-
     /**
      * constructor of WorkflowExecuteThread
      *
-     * @param processInstance      processInstance
-     * @param processService       processService
-     * @param nettyExecutorManager  nettyExecutorManager
+     * @param processInstance processInstance
+     * @param processService processService
+     * @param nettyExecutorManager nettyExecutorManager
      * @param taskTimeoutCheckList
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
@@ -445,6 +444,7 @@ public class WorkflowExecuteThread implements Runnable {
             cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
             processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
         }
+
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
@@ -541,7 +541,6 @@ public class WorkflowExecuteThread implements Runnable {
      * init task queue
      */
     private void initTaskQueue() {
-
 
         taskFailedSubmit = false;
         activeTaskProcessorMaps.clear();
@@ -658,7 +657,7 @@ public class WorkflowExecuteThread implements Runnable {
      * find task instance in db.
      * in case submit more than one same name task in the same time.
      *
-     * @param taskCode    task code
+     * @param taskCode task code
      * @param taskVersion task version
      * @return TaskInstance
      */
@@ -667,7 +666,6 @@ public class WorkflowExecuteThread implements Runnable {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == taskVersion) {
                 return taskInstance;
-
             }
         }
         return null;
@@ -677,7 +675,7 @@ public class WorkflowExecuteThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param taskNode        taskNode
+     * @param taskNode taskNode
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
@@ -818,9 +816,11 @@ public class WorkflowExecuteThread implements Runnable {
 
         // if previous node success , post node submit
         for (TaskInstance task : taskInstances) {
+
             if (readyToSubmitTaskQueue.contains(task)) {
                 continue;
             }
+
             if (completeTaskList.containsKey(task.getName())) {
                 logger.info("task {} has already run success", task.getName());
                 continue;
@@ -1388,10 +1388,10 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      * generate flow dag
      *
-     * @param totalTaskNodeList    total task node list
-     * @param startNodeNameList    start node name list
+     * @param totalTaskNodeList total task node list
+     * @param startNodeNameList start node name list
      * @param recoveryNodeNameList recovery node name list
-     * @param depNodeType          depend node type
+     * @param depNodeType depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
