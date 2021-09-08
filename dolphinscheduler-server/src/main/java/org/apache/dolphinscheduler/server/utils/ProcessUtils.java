@@ -298,7 +298,8 @@ public class ProcessUtils {
      * @param tenantCode tenant code
      * @param executePath execute path
      */
-    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+    public static boolean cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+        boolean killResult = true;
         if (CollectionUtils.isNotEmpty(appIds)) {
 
             for (String appId : appIds) {
@@ -306,16 +307,23 @@ public class ProcessUtils {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
 
                     if (!applicationStatus.typeIsFinished()) {
-                        String commandFile = String
-                                .format("%s/%s.kill", executePath, appId);
-                        String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
-                        execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
+                        killYarnJobOperation(executePath, appId, logger, tenantCode);
                     }
                 } catch (Exception e) {
                     logger.error(String.format("Get yarn application app id [%s] status failed: [%s]", appId, e.getMessage()));
+                    killResult = false;
                 }
             }
         }
+
+        return killResult;
+    }
+
+    private static void killYarnJobOperation(String executePath, String appId, Logger logger, String tenantCode) {
+        String commandFile = String
+                .format("%s/%s.kill", executePath, appId);
+        String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
+        execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
     }
 
     /**

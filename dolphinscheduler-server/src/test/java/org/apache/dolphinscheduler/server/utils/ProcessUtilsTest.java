@@ -27,12 +27,14 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -41,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class, PropertyUtils.class})
+@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class, PropertyUtils.class, ProcessUtils.class})
 public class ProcessUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
@@ -124,30 +126,30 @@ public class ProcessUtilsTest {
     }
 
     @Test
-    public void testCancelApplication() {
-        List<String> appIds = new ArrayList<>();
-        appIds.add("application_1585532379175_228491");
-        appIds.add("application_1598885606600_3677");
+    public void testCancelApplication() throws Exception {
+        String appId1 = "application_1585532379175_228491";
+        String appId2 = "application_1598885606600_3677";
+
+        List<String> appIds = Arrays.asList(appId1, appId2);
         String tenantCode = "dev";
         String executePath = "/ds-exec/1/1/1";
         ExecutionStatus running = ExecutionStatus.RUNNING_EXECUTION;
 
+        HadoopUtils hadoop = PowerMockito.spy(HadoopUtils.getInstanceForTest());
         PowerMockito.mockStatic(HadoopUtils.class);
-        HadoopUtils hadoop = HadoopUtils.getInstance();
+        PowerMockito.when(HadoopUtils.class, "getInstance").thenReturn(hadoop);
 
-        try {
-            PowerMockito.whenNew(HadoopUtils.class).withAnyArguments().thenReturn(hadoop);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            when(hadoop.getApplicationStatus("application_1585532379175_228491")).thenReturn(running);
-            when(hadoop.getApplicationStatus("application_1598885606600_3677")).thenReturn(running);
-        } catch (Exception e) {
-            e.printStackTrace();
-            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
-        }
+        Mockito.doReturn(running).when(hadoop).getApplicationStatus("application_1585532379175_228491");
+        Mockito.doReturn(running).when(hadoop).getApplicationStatus("application_1598885606600_3677");
 
-        Assert.assertNotNull(appIds);
+        PowerMockito.mockStatic(ProcessUtils.class);
+        PowerMockito.doCallRealMethod().when(ProcessUtils.class, "cancelApplication", appIds, logger, tenantCode, executePath);
+        PowerMockito.doNothing().when(ProcessUtils.class, "killYarnJobOperation", executePath, appId1, logger, tenantCode);
+        PowerMockito.doNothing().when(ProcessUtils.class, "killYarnJobOperation", executePath, appId2, logger, tenantCode);
+
+        Assert.assertTrue(ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath));
+        
+        Mockito.doThrow(new Exception("Test fake exception.")).when(hadoop).getApplicationStatus("application_1598885606600_3677");
+        Assert.assertFalse(ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath));
     }
 }

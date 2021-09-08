@@ -90,14 +90,25 @@ public class HadoopUtils implements Closeable {
     private Configuration configuration;
     private FileSystem fs;
 
-    private HadoopUtils() {
+    private HadoopUtils(boolean initial) {
+        if (!initial) {
+            return;
+        }
         init();
         initHdfsPath();
+    }
+
+    private HadoopUtils() {
+        this(true);
     }
 
     public static HadoopUtils getInstance() {
 
         return cache.getUnchecked(HADOOP_UTILS_KEY);
+    }
+
+    public static HadoopUtils getInstanceForTest() {
+        return new HadoopUtils(false);
     }
 
     /**
