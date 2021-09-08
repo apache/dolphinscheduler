@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
 
+package org.apache.dolphinscheduler.server.log;
 
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
