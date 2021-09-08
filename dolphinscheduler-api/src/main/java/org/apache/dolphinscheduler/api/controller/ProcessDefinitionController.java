@@ -283,7 +283,6 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
-<<<<<<< HEAD
                                                  @PathVariable(value = "code") long code) {
 
         Result result = checkPageParams(pageNo, pageSize);
@@ -292,16 +291,6 @@ public class ProcessDefinitionController extends BaseController {
         }
         result = processDefinitionService.queryProcessDefinitionVersions(loginUser, projectCode, pageNo, pageSize, code);
 
-=======
-                                                 @RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
-        result = processDefinitionService.queryProcessDefinitionVersions(loginUser
-                , projectName, pageNo, pageSize, processDefinitionCode);
-
->>>>>>> upstream/dev
         return result;
     }
 
@@ -385,11 +374,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-<<<<<<< HEAD
      * query detail of process definition by code
-=======
-     * query detail of process definition by id
->>>>>>> upstream/dev
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -485,13 +470,8 @@ public class ProcessDefinitionController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-<<<<<<< HEAD
 
         return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, userId, pageNo, pageSize);
-=======
-        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
-
->>>>>>> upstream/dev
     }
 
     /**
@@ -574,11 +554,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "deleteByCode", notes = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
-<<<<<<< HEAD
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", dataType = "Int", example = "100")
-=======
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
->>>>>>> upstream/dev
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -601,11 +577,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "batchDeleteByCodes", notes = "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
     @ApiImplicitParams({
-<<<<<<< HEAD
         @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "String")
-=======
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, type = "String")
->>>>>>> upstream/dev
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -673,16 +645,8 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @return process definition list
      */
-<<<<<<< HEAD
     @ApiOperation(value = "queryAllByProjectCode", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_CODE_NOTES")
     @GetMapping(value = "/all")
-=======
-    @ApiOperation(value = "queryProcessDefinitionAllByProjectId", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", required = true, dataType = "Int", example = "100")
-    })
-    @GetMapping(value = "/queryProcessDefinitionAllByProjectId")
->>>>>>> upstream/dev
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

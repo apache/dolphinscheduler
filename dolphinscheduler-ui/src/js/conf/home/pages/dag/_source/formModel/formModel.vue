@@ -642,7 +642,7 @@
             timeoutFlag: this.timeout.enable ? 'OPEN' : 'CLOSE',
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
-            delayTime: this.delayTime
+            delayTime: this.delayTime,
             environmentCode: this.environmentCode,
             status: this.status,
             branch: this.branch
@@ -808,9 +808,9 @@
       mTimeoutAlarm,
       mDependentTimeout,
       mPriority,
-      mWorkerGroups
+      mWorkerGroups,
       // mPreTasks
-      mRelatedEnvironment,
+      mRelatedEnvironment
     }
   }
 </script>
