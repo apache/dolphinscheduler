@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
@@ -254,14 +255,28 @@ public class AlertManager {
 
     /**
      * send data quality task alert
+     * if result is null ,send task failure message
      */
-    public void sendAlterDataQualityTask(DqExecuteResult result,ProcessInstance processInstance) {
+    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result,ProcessInstance processInstance) {
         Alert alert = new Alert();
-
         String ruleName = result.getRuleName();
         String state = result.getState().getDescription();
         alert.setTitle(ruleName + " " + state);
         String content = getDataQualityAlterContent(result);
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db , alert: {}", alert);
+    }
+
+    /**
+     * send data quality task error alert
+     */
+    public void sendTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
+        Alert alert = new Alert();
+        alert.setTitle("Task[" + taskInstance.getName() + "] Failure Warning");
+        String content = getTaskAlterContent(taskInstance);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
@@ -294,6 +309,30 @@ public class AlertManager {
                 .userId(result.getUserId())
                 .userName(result.getUserName())
                 .state(result.getState())
+                .build();
+
+        return JSONUtils.toJsonString(content);
+    }
+
+    /**
+     * getTaskAlterContent
+     * @param taskInstance TaskInstance
+     * @return String String
+     */
+    public String getTaskAlterContent(TaskInstance taskInstance) {
+
+        TaskAlertContent content = TaskAlertContent.newBuilder()
+                .processDefinitionId(taskInstance.getProcessDefinitionId())
+                .processInstanceName(taskInstance.getProcessInstanceName())
+                .processInstanceId(taskInstance.getProcessInstanceId())
+                .taskInstanceId(taskInstance.getId())
+                .taskName(taskInstance.getName())
+                .taskType(taskInstance.getTaskType())
+                .state(taskInstance.getState())
+                .startTime(taskInstance.getStartTime())
+                .endTime(taskInstance.getEndTime())
+                .host(taskInstance.getHost())
+                .logPath(taskInstance.getLogPath())
                 .build();
 
         return JSONUtils.toJsonString(content);
