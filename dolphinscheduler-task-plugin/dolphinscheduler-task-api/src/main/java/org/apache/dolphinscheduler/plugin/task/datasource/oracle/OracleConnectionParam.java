@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.oracle;
 
-import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 
 public class OracleConnectionParam extends BaseConnectionParam {
 
