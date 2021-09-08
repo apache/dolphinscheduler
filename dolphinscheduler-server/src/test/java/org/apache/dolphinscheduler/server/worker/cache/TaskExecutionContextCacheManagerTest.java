@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.cache;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,30 +31,31 @@ import org.junit.Test;
  */
 public class TaskExecutionContextCacheManagerTest {
 
-    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
     private TaskExecutionContext taskExecutionContext;
 
     @Before
     public void before() {
-        taskExecutionContextCacheManager = new TaskExecutionContextCacheManagerImpl();
+
     }
 
     @Test
     public void testGetByTaskInstanceId() {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(2);
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
-        Assert.assertEquals(2, taskExecutionContextCacheManager.getByTaskInstanceId(2).getTaskInstanceId());
+        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
+        Assert.assertEquals(2, TaskExecutionContextCacheManager.getByTaskInstanceId(2).getTaskInstanceId());
     }
 
     @Test
     public void updateTaskExecutionContext() {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
-        Assert.assertTrue(taskExecutionContextCacheManager.updateTaskExecutionContext(taskExecutionContext));
-        taskExecutionContextCacheManager.removeByTaskInstanceId(1);
-        Assert.assertFalse(taskExecutionContextCacheManager.updateTaskExecutionContext(taskExecutionContext));
+        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
+        Assert.assertTrue(TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest));
+        TaskExecutionContextCacheManager.removeByTaskInstanceId(1);
+        Assert.assertFalse(TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest));
     }
 
 }

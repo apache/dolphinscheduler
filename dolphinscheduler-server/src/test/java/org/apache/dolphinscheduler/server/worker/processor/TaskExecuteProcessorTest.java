@@ -30,12 +30,12 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class, TaskCallbackService.class, WorkerConfig.class, FileUtils.class,
-        JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
+    JsonSerializer.class, JSONUtils.class, ThreadUtils.class, ExecutorService.class, ChannelUtils.class})
 public class TaskExecuteProcessorTest {
 
     private TaskExecutionContext taskExecutionContext;
@@ -73,7 +73,7 @@ public class TaskExecuteProcessorTest {
 
     private TaskExecuteRequestCommand taskRequestCommand;
 
-    private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     private AlertClientService alertClientService;
 
@@ -98,7 +98,7 @@ public class TaskExecuteProcessorTest {
         PowerMockito.mockStatic(ChannelUtils.class);
         PowerMockito.when(ChannelUtils.toAddress(null)).thenReturn(null);
 
-        taskExecutionContextCacheManager = PowerMockito.mock(TaskExecutionContextCacheManagerImpl.class);
+        taskExecutionContextCacheManager = PowerMockito.mock(TaskExecutionContextCacheManager.class);
         taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
         PowerMockito.doNothing().when(taskCallbackService).sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
@@ -107,10 +107,6 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskCallbackService);
         PowerMockito.when(SpringApplicationContext.getBean(WorkerConfig.class))
                 .thenReturn(workerConfig);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
-                .thenReturn(null);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
-                .thenReturn(taskExecutionContextCacheManager);
 
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskExecutionContext.getProcessDefineCode(),
