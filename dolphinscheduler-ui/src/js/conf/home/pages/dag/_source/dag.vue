@@ -82,8 +82,6 @@
     id: null,
     taskType: '',
     self: {},
-    preNode: [],
-    rearList: [],
     instanceId: null
   }
 
@@ -419,6 +417,30 @@
         tasks.forEach((task) => {
           tasksMap[task.code] = task
         })
+
+        // return edges.map(edge => {
+        //   return {
+        //     name: edge.label,
+        //     preTaskCode: edge.sourceId,
+        //     preTaskVersion: tasksMap[edge.sourceId].version || 0,
+        //     postTaskCode: edge.targetId,
+        //     postTaskVersion: tasksMap[edge.targetId].version || 0,
+        //     // conditionType and conditionParams are reserved
+        //     conditionType: 0,
+        //     conditionParams: {}
+        //   }
+        // }).concat(tasks.filter(task => !preTaskMap[task.code]).map((task) => {
+        //   return {
+        //     name: '',
+        //     preTaskCode: 0,
+        //     preTaskVersion: 0,
+        //     postTaskCode: task.code,
+        //     postTaskVersion: task.version || 0,
+        //     // conditionType and conditionParams are reserved
+        //     conditionType: 0,
+        //     conditionParams: {}
+        //   }
+        // }))
 
         return tasks.map((task) => {
           const preTask = preTaskMap[task.code]

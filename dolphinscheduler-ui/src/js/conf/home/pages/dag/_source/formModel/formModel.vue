@@ -123,8 +123,8 @@
               </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable>
-              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable :disabled="isDetails">
+              <el-option v-for="item in postTasks" :key="item.code" :value="item.name" :label="item.name"></el-option>
             </el-select>
           </div>
         </m-list-box>
@@ -137,8 +137,8 @@
               </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable>
-              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable :disabled="isDetails">
+              <el-option v-for="item in postTasks" :key="item.code" :value="item.name" :label="item.name"></el-option>
             </el-select>
           </div>
         </m-list-box>
@@ -266,7 +266,7 @@
           @on-dependent="_onDependent"
           @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
-          :pre-node="nodeData.preNode">
+          :prev-tasks="prevTasks">
         </m-conditions>
         <m-switch
           v-if="nodeData.taskType === 'SWITCH'"
@@ -317,6 +317,7 @@
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'form-model',
@@ -380,7 +381,10 @@
             value: 'failed',
             label: `${i18n.$t('Failed')}`
           }
-        ]
+        ],
+        // for CONDITIONS
+        postTasks: [],
+        prevTasks: []
       }
     },
     /**
@@ -391,6 +395,7 @@
     props: {
       nodeData: Object
     },
+    inject: ['dagChart'],
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
       taskToBackfillItem (task) {
@@ -598,6 +603,8 @@
         })
         // set run flag
         this._setRunFlag()
+        // set edge label
+        this._setEdgeLabel()
       },
       /**
        * Sub-workflow selected node echo name
@@ -611,6 +618,21 @@
        */
       _setRunFlag () {
 
+      },
+      /**
+       *
+       */
+      _setEdgeLabel () {
+        if (this.successBranch || this.failedBranch) {
+          const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
+          const edges = canvas.getEdges()
+          const successTask = this.postTasks.find(t => t.name === this.successBranch)
+          const failedTask = this.postTasks.find(t => t.name === this.failedBranch)
+          const sEdge = edges.find(edge => successTask && edge.sourceId === this.code && edge.targetId === successTask.code)
+          const fEdge = edges.find(edge => failedTask && edge.sourceId === this.code && edge.targetId === failedTask.code)
+          sEdge && canvas.setEdgeLabel(sEdge.id, this.$t('Success'))
+          fEdge && canvas.setEdgeLabel(fEdge.id, this.$t('Failed'))
+        }
       },
       /**
        * Submit verification
@@ -690,6 +712,26 @@
       }
       this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
+
+      if (this.dagChart) {
+        const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
+        const postNodes = canvas.getPostNodes(this.code)
+        const prevNodes = canvas.getPrevNodes(this.code)
+        this.postTasks = postNodes.map(node => {
+          return {
+            code: node.id,
+            name: node.data.taskName,
+            type: node.data.taskType
+          }
+        })
+        this.prevTasks = prevNodes.map(node => {
+          return {
+            code: node.id,
+            name: node.data.taskName,
+            type: node.data.taskType
+          }
+        })
+      }
     },
     mounted () {
       let self = this

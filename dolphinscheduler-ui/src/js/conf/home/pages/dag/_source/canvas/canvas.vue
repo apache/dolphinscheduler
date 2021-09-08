@@ -754,12 +754,12 @@
         }
       },
       /**
-       * Get preNodes by code
+       * Get prev nodes by code
        * @param {number} code
        * node1 -> node2 -> node3
-       * getPreNodes(node2.code) => [node1]
+       * getPrevNodes(node2.code) => [node1]
        */
-      getPreNodes (code) {
+      getPrevNodes (code) {
         const nodes = this.getNodes()
         const edges = this.getEdges()
         const nodesMap = {}
@@ -771,7 +771,7 @@
           .map(edge => nodesMap[edge.sourceId])
       },
       /**
-       * set preNodes
+       * set prev nodes
        * @param {number} code
        * @param {number[]} preNodeCodes
        * @param {boolean} override If set to true, setPreNodes will delete all edges that end with the node and rebuild
@@ -791,6 +791,47 @@
         preNodeCodes.forEach(preCode => {
           if (currPreCodes.includes(preCode) || preCode === code) return
           const edge = this.genEdgeJSON(preCode, code)
+          this.graph.addEdge(edge)
+        })
+      },
+      /**
+       * Get post nodes by code
+       * @param {number} code
+       * node1 -> node2 -> node3
+       * getPostNodes(node2.code) => [node3]
+       */
+      getPostNodes (code) {
+        const nodes = this.getNodes()
+        const edges = this.getEdges()
+        const nodesMap = {}
+        nodes.forEach(node => {
+          nodesMap[node.id] = node
+        })
+        return edges
+          .filter(edge => edge.sourceId === code)
+          .map(edge => nodesMap[edge.targetId])
+      },
+      /**
+       * set post nodes
+       * @param {number} code
+       * @param {number[]} postNodeCodes
+       * @param {boolean} override If set to true, setPreNodes will delete all edges that end with the node and rebuild
+       */
+      setPostNodes (code, postNodeCodes, override) {
+        const edges = this.getEdges()
+        const currPostCodes = []
+        edges.forEach((edge) => {
+          if (edge.sourceId === code) {
+            if (override) {
+              this.removeEdge(edge.id)
+            } else {
+              currPostCodes.push(edge.targetId)
+            }
+          }
+        })
+        postNodeCodes.forEach(postCode => {
+          if (currPostCodes.includes(postCode) || postCode === code) return
+          const edge = this.genEdgeJSON(code, postCode)
           this.graph.addEdge(edge)
         })
       }

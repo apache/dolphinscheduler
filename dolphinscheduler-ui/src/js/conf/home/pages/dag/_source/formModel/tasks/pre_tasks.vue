@@ -73,7 +73,7 @@
         }
         return true
       })
-      this.preTasks = canvas.getPreNodes(this.code).map(node => node.id)
+      this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
     },
     computed: {
       ...mapState('dag', ['tasks'])
