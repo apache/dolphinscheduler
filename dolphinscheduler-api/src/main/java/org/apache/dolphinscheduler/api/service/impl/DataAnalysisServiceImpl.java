@@ -90,17 +90,17 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical task instance status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return task state count data
      */
     @Override
-    public Map<String, Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
 
         return countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
             (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectCodes));
@@ -110,16 +110,16 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical process instance status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return process instance state count data
      */
     @Override
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
         Map<String, Object> result =  this.countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
             (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectCodes));
@@ -130,12 +130,16 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
+    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
             , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
         Date start = null;
@@ -149,8 +153,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectCode };
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectCodeArray);
 
@@ -167,18 +171,23 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistics the process definition quantities of certain person
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
+    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
+
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectCode };
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
                 loginUser.getId(), projectCodeArray, isAdmin(loginUser));
 
@@ -193,43 +202,20 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical command status data
      *
      * @param loginUser login user
-     * @param projectId project id
-     * @param startDate start date
-     * @param endDate end date
      * @return command state count data
      */
     @Override
-    public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
-
+    public Map<String, Object> countCommandState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
 
         /**
          * find all the task lists in the project under the user
          * statistics based on task status execution, failure, completion, wait, total
          */
         Date start = null;
-        if (StringUtils.isNotEmpty(startDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            if (Objects.isNull(start)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
         Date end = null;
-        if (StringUtils.isNotEmpty(endDate)) {
-            end = DateUtils.getScheduleDate(endDate);
-            if (Objects.isNull(end)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
+        Long[] projectCodeArray = getProjectCodesArrays(loginUser);
 
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
@@ -267,34 +253,19 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     /**
      * count queue state
      *
-     * @param loginUser login user
-     * @param projectId project id
      * @return queue state count data
      */
     @Override
-    public Map<String, Object> countQueueState(User loginUser, int projectId) {
+    public Map<String, Object> countQueueState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
-
-        //TODO need to add detail data info 
+        //TODO need to add detail data info
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
         result.put(Constants.DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    private boolean checkProject(User loginUser, int projectId, Map<String, Object> result) {
-        if (projectId != 0) {
-            Project project = projectMapper.selectById(projectId);
-            return projectService.hasProjectAndPerm(loginUser, project, result);
-        }
-        return true;
     }
 
 }

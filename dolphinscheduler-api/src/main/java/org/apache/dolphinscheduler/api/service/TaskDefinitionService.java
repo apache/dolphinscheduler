@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -30,59 +31,131 @@ public interface TaskDefinitionService {
      * create task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskDefinitionJson task definition json
      */
     Map<String, Object> createTaskDefinition(User loginUser,
-                                             String projectName,
+                                             long projectCode,
                                              String taskDefinitionJson);
 
     /**
      * query task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskName task name
      */
     Map<String, Object> queryTaskDefinitionByName(User loginUser,
-                                                  String projectName,
+                                                  long projectCode,
                                                   String taskName);
 
     /**
      * delete task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      */
     Map<String, Object> deleteTaskDefinitionByCode(User loginUser,
-                                                   String projectName,
-                                                   Long taskCode);
+                                                   long projectCode,
+                                                   long taskCode);
 
     /**
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
-     * @param taskDefinitionJson task definition json
+     * @param taskDefinitionJsonObj task definition json object
      */
     Map<String, Object> updateTaskDefinition(User loginUser,
-                                             String projectName,
-                                             Long taskCode,
-                                             String taskDefinitionJson);
+                                             long projectCode,
+                                             long taskCode,
+                                             String taskDefinitionJsonObj);
 
     /**
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      * @param version the version user want to switch
      */
     Map<String, Object> switchVersion(User loginUser,
-                                      String projectName,
-                                      Long taskCode,
+                                      long projectCode,
+                                      long taskCode,
                                       int version);
-}
 
+    /**
+     * query the pagination versions info by one certain task definition code
+     *
+     * @param loginUser login user info to check auth
+     * @param projectCode project code
+     * @param taskCode task definition code
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return the pagination task definition versions info of the certain task definition
+     */
+    Result queryTaskDefinitionVersions(User loginUser,
+                                       long projectCode,
+                                       long taskCode,
+                                       int pageNo,
+                                       int pageSize);
+
+    /**
+     * delete the certain task definition version by version and code
+     *
+     * @param loginUser login user info
+     * @param projectCode project code
+     * @param taskCode the task definition code
+     * @param version the task definition version user want to delete
+     * @return delete version result code
+     */
+    Map<String, Object> deleteByCodeAndVersion(User loginUser,
+                                               long projectCode,
+                                               long taskCode,
+                                               int version);
+
+    /**
+     * query detail of task definition by code
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskCode the task definition code
+     * @return task definition detail
+     */
+    Map<String, Object> queryTaskDefinitionDetail(User loginUser,
+                                                  long projectCode,
+                                                  long taskCode);
+
+    /**
+     * query task definition list paging
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskType taskType
+     * @param searchVal search value
+     * @param userId user id
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return task definition page
+     */
+    Result queryTaskDefinitionListPaging(User loginUser,
+                                         long projectCode,
+                                         String taskType,
+                                         String searchVal,
+                                         Integer userId,
+                                         Integer pageNo,
+                                         Integer pageSize);
+
+    /**
+     * gen task code list
+     *
+     * @param loginUser login user
+     * @param genNum gen num
+     * @return task code list
+     */
+    Map<String, Object> genTaskCodeList(User loginUser,
+                                        Integer genNum);
+
+}

@@ -17,220 +17,138 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
-import org.junit.After;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * project controller test
  */
-public class ProjectControllerTest extends AbstractControllerTest {
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class ProjectControllerTest {
 
-    private static Logger logger = LoggerFactory.getLogger(ProjectControllerTest.class);
+    @InjectMocks
+    private ProjectController projectController;
 
-    private String projectId;
+    @Mock
+    private ProjectServiceImpl projectService;
+
+    @Mock
+    private ProjectMapper projectMapper;
+
+    protected User user;
 
     @Before
-    public void before() throws Exception {
-        projectId = testCreateProject("project_test1", "the test project");
-    }
-
-    @After
-    public void after() throws Exception {
-        testDeleteProject(projectId);
-    }
-
-    private String testCreateProject(String projectName, String description) throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectName",projectName);
-        paramsMap.add("description",description);
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/create")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<String>>() {});
-        Assert.assertTrue(result != null && result.isSuccess());
-        Assert.assertNotNull(result.getData());
-        logger.info("create project return result:{}", mvcResult.getResponse().getContentAsString());
-
-        return (String)result.getData();
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        user = loginUser;
     }
 
     @Test
-    public void testUpdateProject() throws Exception {
+    public void testUpdateProject() {
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put("projectId", 1);
 
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId", projectId);
-        paramsMap.add("projectName","project_test_update");
-        paramsMap.add("desc","the test project update");
-        paramsMap.add("userName", "the project owner");
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/update")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.USER_NOT_EXIST));
-        logger.info("update project return result:{}", mvcResult.getResponse().getContentAsString());
-
+        long projectCode = 1L;
+        String projectName = "test";
+        String desc = "";
+        String userName = "jack";
+        Mockito.when(projectService.update(user, projectCode, projectName, desc, userName)).thenReturn(result);
+        Result response = projectController.updateProject(user, projectCode, projectName, desc, userName);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public void testQueryProjectById() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId", projectId);
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/query-by-id")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
-        logger.info("query project by id :{}, return result:{}", projectId, mvcResult.getResponse().getContentAsString());
-
+    public void testQueryProjectByCode() {
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        long projectCode = 1L;
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectService.queryByCode(user, projectCode)).thenReturn(result);
+        Result response = projectController.queryProjectByCode(user, projectCode);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public void testQueryProjectListPaging() throws Exception {
+    public void testQueryProjectListPaging() {
+        int pageNo = 1;
+        int pageSize = 10;
+        String searchVal = "";
 
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("searchVal","test");
-        paramsMap.add("pageSize","2");
-        paramsMap.add("pageNo","2");
+        Result result = Result.success(new PageInfo<Resource>(1, 10));
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/list-paging")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        Mockito.when(projectService.queryProjectListPaging(user, pageSize, pageNo, searchVal)).thenReturn(result);
+        Result response = projectController.queryProjectListPaging(user, searchVal, pageSize, pageNo);
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info("query list-paging project return result:{}", mvcResult.getResponse().getContentAsString());
+        Assert.assertTrue(response != null && response.isSuccess());
     }
 
     @Test
-    public void testQueryUnauthorizedProject() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","2");
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/unauth-project")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info("query unauth project return result:{}", mvcResult.getResponse().getContentAsString());
+    public void testQueryUnauthorizedProject() {
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryUnauthorizedProject(user, 2)).thenReturn(result);
+        Result response = projectController.queryUnauthorizedProject(user, 2);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public void testQueryAuthorizedProject() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId",String.valueOf(user.getId()));
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/authed-project")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info("query authed project return result:{}", mvcResult.getResponse().getContentAsString());
-
+    public void testQueryAuthorizedProject() {
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryAuthorizedProject(user, 2)).thenReturn(result);
+        Result response = projectController.queryAuthorizedProject(user, 2);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public void testQueryAllProjectList() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/query-project-list")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info("query all project return result:{}", mvcResult.getResponse().getContentAsString());
-
+    public void testQueryAllProjectList() {
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryAllProjectList()).thenReturn(result);
+        Result response = projectController.queryAllProjectList(user);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
-    @Ignore
-    @Test
-    public void testImportProcessDefinition() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("file","test");
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/import-definition")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.TEXT_PLAIN))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isStatus(Status.IMPORT_PROCESS_DEFINE_ERROR));
-        logger.info(mvcResult.getResponse().getContentAsString());
+    private Project getProject() {
+        Project project = new Project();
+        project.setCode(1L);
+        project.setId(1);
+        project.setName("test");
+        project.setUserId(1);
+        return project;
     }
 
-    private void testDeleteProject(String projectId) throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId", projectId);
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/delete")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
-        logger.info("delete project return result:{}", mvcResult.getResponse().getContentAsString());
+    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
     }
-
 }

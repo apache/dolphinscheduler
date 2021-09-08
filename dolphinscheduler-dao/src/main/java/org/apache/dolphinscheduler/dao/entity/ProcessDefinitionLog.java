@@ -61,7 +61,6 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setUserName(processDefinition.getUserName());
         this.setProjectName(processDefinition.getProjectName());
         this.setLocations(processDefinition.getLocations());
-        this.setConnects(processDefinition.getConnects());
         this.setScheduleReleaseState(processDefinition.getScheduleReleaseState());
         this.setTimeout(processDefinition.getTimeout());
         this.setTenantId(processDefinition.getTenantId());
@@ -86,4 +85,8 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.operateTime = operateTime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
 }

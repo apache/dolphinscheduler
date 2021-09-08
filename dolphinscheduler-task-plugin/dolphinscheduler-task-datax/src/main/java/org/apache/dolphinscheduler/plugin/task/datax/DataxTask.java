@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

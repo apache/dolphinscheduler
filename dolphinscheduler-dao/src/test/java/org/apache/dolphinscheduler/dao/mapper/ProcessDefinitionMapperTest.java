@@ -90,7 +90,7 @@ public class ProcessDefinitionMapperTest {
     private ProcessDefinition insertTwo() {
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(2L);
+        processDefinition.setCode(1L);
         processDefinition.setName("def 2");
         processDefinition.setProjectCode(1010L);
         processDefinition.setUserId(101);
@@ -366,17 +366,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         List<Map<String, Object>> maps = processDefinitionMapper.listResourcesByUser(processDefinition.getUserId());
         Assert.assertNotNull(maps);
-    }
-
-    @Test
-    public void testUpdateVersionByProcessDefinitionId() {
-        int expectedVersion = 10;
-        ProcessDefinition processDefinition = insertOne();
-        processDefinition.setVersion(expectedVersion);
-        processDefinitionMapper.updateVersionByProcessDefinitionId(
-                processDefinition.getId(), processDefinition.getVersion());
-        ProcessDefinition processDefinition1 = processDefinitionMapper.selectById(processDefinition.getId());
-        Assert.assertEquals(expectedVersion, processDefinition1.getVersion());
     }
 
     @Test

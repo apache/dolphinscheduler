@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: `/projects/${projectId}/instance/list/${scope.row.id}` , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+                <router-link :to="{ path: `/projects/${projectCode}/instance/list/${scope.row.id}` , query:{code: scope.row.processDefinitionCode}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -482,7 +482,7 @@
     mounted () {
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectCode'])
     },
     components: { }
   }

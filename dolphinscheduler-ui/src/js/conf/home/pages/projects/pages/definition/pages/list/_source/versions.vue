@@ -60,7 +60,7 @@
                 icon="el-icon-info"
                 iconColor="red"
                 :title="$t('Delete?')"
-                @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row,scope.row.id)"
+                @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row)"
               >
                 <el-button :disabled="scope.row.version === versionData.processDefinition.version || isInstance" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
@@ -120,7 +120,7 @@
       _mVersionSwitchProcessDefinitionVersion (item) {
         this.$emit('mVersionSwitchProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },
@@ -131,7 +131,6 @@
       _mVersionDeleteProcessDefinitionVersion (item) {
         this.$emit('mVersionDeleteProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
           processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
@@ -143,7 +142,7 @@
       _mVersionGetProcessDefinitionVersionsPage (val) {
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
-          pageSize: this.versionData.pageSize,
+          pageSize: this.pageSize,
           processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })

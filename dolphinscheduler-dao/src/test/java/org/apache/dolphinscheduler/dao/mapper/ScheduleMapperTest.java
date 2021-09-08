@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
+package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -24,8 +24,10 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +37,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -61,7 +63,7 @@ public class ScheduleMapperTest {
      * insert
      * @return Schedule
      */
-    private Schedule insertOne(){
+    private Schedule insertOne() {
         //insertOne
         Schedule schedule = new Schedule();
         schedule.setStartTime(new Date());
@@ -80,7 +82,7 @@ public class ScheduleMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Schedule schedule = insertOne();
         schedule.setCreateTime(new Date());
@@ -93,7 +95,7 @@ public class ScheduleMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Schedule schedule = insertOne();
         int delete = scheduleMapper.deleteById(schedule.getId());
         Assert.assertEquals(delete, 1);
@@ -131,25 +133,21 @@ public class ScheduleMapperTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setProjectCode(project.getCode());
-        processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
         processDefinition.setCreateTime(new Date());
         processDefinition.setUpdateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
-        Schedule schedule= insertOne();
+        Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionId(processDefinition.getId());
+        schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
         Page<Schedule> page = new Page(1,3);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(page,
-                processDefinition.getId(), ""
-        );
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
+                processDefinition.getCode(), "");
         Assert.assertNotEquals(scheduleIPage.getSize(), 0);
-
-
     }
 
     /**
@@ -157,7 +155,6 @@ public class ScheduleMapperTest {
      */
     @Test
     public void testQuerySchedulerListByProjectName() {
-
 
         User user = new User();
         user.setUserName("ut name");
@@ -174,16 +171,15 @@ public class ScheduleMapperTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setProjectCode(project.getCode());
-        processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
         processDefinition.setCreateTime(new Date());
         processDefinition.setUpdateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
-        Schedule schedule= insertOne();
+        Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionId(processDefinition.getId());
+        schedule.setProcessDefinitionCode(processDefinition.getCode());
         scheduleMapper.insert(schedule);
 
         Page<Schedule> page = new Page(1,3);
@@ -201,11 +197,11 @@ public class ScheduleMapperTest {
     public void testSelectAllByProcessDefineArray() {
 
         Schedule schedule = insertOne();
-        schedule.setProcessDefinitionId(12345);
+        schedule.setProcessDefinitionCode(12345);
         schedule.setReleaseState(ReleaseState.ONLINE);
         scheduleMapper.updateById(schedule);
 
-        List<Schedule> schedules= scheduleMapper.selectAllByProcessDefineArray(new int[] {schedule.getProcessDefinitionId()});
+        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new long[] {schedule.getProcessDefinitionCode()});
         Assert.assertNotEquals(schedules.size(), 0);
     }
 
@@ -215,10 +211,10 @@ public class ScheduleMapperTest {
     @Test
     public void queryByProcessDefinitionId() {
         Schedule schedule = insertOne();
-        schedule.setProcessDefinitionId(12345);
+        schedule.setProcessDefinitionCode(12345);
         scheduleMapper.updateById(schedule);
 
-        List<Schedule> schedules= scheduleMapper.queryByProcessDefinitionId(schedule.getProcessDefinitionId());
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(schedule.getProcessDefinitionCode());
         Assert.assertNotEquals(schedules.size(), 0);
     }
 }

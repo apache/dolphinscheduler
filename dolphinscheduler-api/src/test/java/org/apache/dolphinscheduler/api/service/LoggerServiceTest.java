@@ -63,7 +63,7 @@ public class LoggerServiceTest {
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2, 1, 1);
         //TASK_INSTANCE_NOT_FOUND
-        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_FOUND));
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         try {
             //HOST NOT FOUND OR ILLEGAL
@@ -72,14 +72,14 @@ public class LoggerServiceTest {
             Assert.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
         }
-        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_FOUND));
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         //SUCCESS
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(1, 1, 1);
-        Assert.assertTrue(result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test

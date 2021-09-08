@@ -52,7 +52,7 @@ export default {
    */
   getTokenListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('access-token/list-paging', payload, res => {
+      io.get('access-tokens', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -68,7 +68,7 @@ export default {
    */
   createToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('access-token/create', payload, res => {
+      io.post('access-tokens', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -84,7 +84,7 @@ export default {
    */
   updateToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('access-token/update', payload, res => {
+      io.put(`access-tokens/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -99,7 +99,7 @@ export default {
    */
   generateToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('access-token/generate', payload, res => {
+      io.post('access-tokens/generate', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -113,7 +113,7 @@ export default {
    */
   deleteToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('access-token/delete', payload, res => {
+      io.delete(`access-token/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

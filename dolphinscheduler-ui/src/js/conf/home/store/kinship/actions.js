@@ -24,9 +24,9 @@ export default {
    * Get workFlow DAG
    */
   getWorkFlowList ({ state }, payload) {
-    const projectId = localStore.getItem('projectId')
+    const projectCode = localStore.getItem('projectCode')
     return new Promise((resolve, reject) => {
-      const url = `lineages/${projectId}/list-name`
+      const url = `lineages/${projectCode}/list-name`
       io.get(url, {
         searchVal: payload
       }, res => {
@@ -50,9 +50,9 @@ export default {
    * Get workFlow DAG
    */
   getWorkFlowDAG ({ state }, payload) {
-    const projectId = localStore.getItem('projectId')
+    const projectCode = localStore.getItem('projectCode')
     return new Promise((resolve, reject) => {
-      const url = `lineages/${projectId}/list-ids`
+      const url = `lineages/${projectCode}/list-ids`
       io.get(url, {
         ids: payload
       }, res => {

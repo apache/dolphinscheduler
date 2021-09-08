@@ -30,7 +30,7 @@
                 v-for="city in processDefinitionList"
                 :key="city.code"
                 :value="city.id"
-                :label="city.code">
+                :label="city.name">
           </el-option>
         </el-select>
       </div>
@@ -74,14 +74,14 @@
       /**
        * The selected process defines the upper component name padding
        */
-      _handleWdiChanged (o) {
-        this.$emit('on-set-process-name', this._handleName(o))
+      _handleWdiChanged (id) {
+        this.$emit('on-set-process-name', this._handleName(id))
       },
       /**
        * Return the name according to the process definition id
        */
       _handleName (id) {
-        return _.filter(this.processDefinitionList, v => id === v.id)[0].code
+        return _.filter(this.processDefinitionList, v => id === v.id)[0].name
       }
     },
     watch: {
@@ -93,22 +93,20 @@
     },
     created () {
       let processListS = _.cloneDeep(this.store.state.dag.processListS)
-      let id = null
+      let code = null
       if (this.router.history.current.name === 'projects-instance-details') {
-        id = this.router.history.current.query.id || null
+        code = this.router.history.current.query.code || null
       } else {
-        id = this.router.history.current.params.id || null
+        code = this.router.history.current.params.code || null
       }
-      this.processDefinitionList = (() => {
-        let a = _.map(processListS, v => {
-          return {
-            id: v.id,
-            code: v.name,
-            disabled: false
-          }
-        })
-        return _.filter(a, v => +v.id !== +id)
-      })()
+      this.processDefinitionList = processListS.map(v => {
+        return {
+          id: v.processDefinition.id,
+          code: v.processDefinition.code,
+          name: v.processDefinition.name,
+          disabled: false
+        }
+      }).filter(a => (a.code + '') !== code)
 
       let o = this.backfillItem
       // Non-null objects represent backfill

@@ -29,7 +29,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_project
-        where code = #{code}
+        where code = #{projectCode}
     </select>
 
     <select id="queryDetailByCode" resultType="org.apache.dolphinscheduler.dao.entity.Project">
