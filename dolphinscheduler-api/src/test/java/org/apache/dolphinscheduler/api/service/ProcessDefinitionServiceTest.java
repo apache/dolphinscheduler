@@ -269,7 +269,6 @@ public class ProcessDefinitionServiceTest {
         Map<String, Object> map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, StringUtils.EMPTY, 2L);
         Assert.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
 
-
         // project check auth fail
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
