@@ -172,11 +172,11 @@ public class BaseController {
      * @param totalList success object list
      * @param currentPage current page
      * @param total total
-     * @param totalPage  total page
+     * @param totalPage total page
      * @return success result code
      */
     public Result success(Object totalList, Integer currentPage,
-                                                  Integer total, Integer totalPage) {
+                          Integer total, Integer totalPage) {
         Result result = new Result();
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
@@ -240,6 +240,7 @@ public class BaseController {
 
     /**
      * get result
+     *
      * @param msg message
      * @param list object list
      * @return result code

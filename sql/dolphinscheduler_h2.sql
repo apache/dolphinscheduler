@@ -16,7 +16,7 @@
 */
 
 SET
-    FOREIGN_KEY_CHECKS=0;
+FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
 -- Table structure for QRTZ_JOB_DETAILS
@@ -402,7 +402,6 @@ CREATE TABLE t_ds_process_definition
     global_params    text,
     flag             tinyint(4) DEFAULT NULL,
     locations        text,
-    connects         text,
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
     tenant_id        int(11) NOT NULL DEFAULT '-1',
@@ -434,7 +433,6 @@ CREATE TABLE t_ds_process_definition_log
     global_params    text,
     flag             tinyint(4) DEFAULT NULL,
     locations        text,
-    connects         text,
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
     tenant_id        int(11) NOT NULL DEFAULT '-1',

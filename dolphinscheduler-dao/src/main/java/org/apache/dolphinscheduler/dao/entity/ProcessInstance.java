@@ -151,11 +151,10 @@ public class ProcessInstance {
     private String globalParams;
 
     /**
-     * process instance json
-     * TODO delete
+     * dagData
      */
     @TableField(exist = false)
-    private String processInstanceJson;
+    private DagData dagData;
 
     /**
      * executor id
@@ -190,12 +189,6 @@ public class ProcessInstance {
      */
     @TableField(exist = false)
     private String locations;
-
-    /**
-     * task connects for web
-     */
-    @TableField(exist = false)
-    private String connects;
 
     /**
      * history command
@@ -258,12 +251,12 @@ public class ProcessInstance {
     public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
         this.name = processDefinition.getName()
-                + "-"
-                +
-                processDefinition.getVersion()
-                + "-"
-                +
-                DateUtils.getCurrentTimeStamp();
+            + "-"
+            +
+            processDefinition.getVersion()
+            + "-"
+            +
+            DateUtils.getCurrentTimeStamp();
     }
 
     public String getVarPool() {
@@ -430,12 +423,12 @@ public class ProcessInstance {
         this.globalParams = globalParams;
     }
 
-    public String getProcessInstanceJson() {
-        return processInstanceJson;
+    public DagData getDagData() {
+        return dagData;
     }
 
-    public void setProcessInstanceJson(String processInstanceJson) {
-        this.processInstanceJson = processInstanceJson;
+    public void setDagData(DagData dagData) {
+        this.dagData = dagData;
     }
 
     public String getTenantCode() {
@@ -484,14 +477,6 @@ public class ProcessInstance {
 
     public void setLocations(String locations) {
         this.locations = locations;
-    }
-
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
     }
 
     public String getHistoryCmd() {
@@ -615,83 +600,75 @@ public class ProcessInstance {
     @Override
     public String toString() {
         return "ProcessInstance{"
-                + "id=" + id
-                + ", state=" + state
-                + ", recovery=" + recovery
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", runTimes=" + runTimes
-                + ", name='" + name + '\''
-                + ", host='" + host + '\''
-                + ", processDefinition="
-                + processDefinition
-                + ", commandType="
-                + commandType
-                + ", commandParam='"
-                + commandParam
-                + '\''
-                + ", taskDependType="
-                + taskDependType
-                + ", maxTryTimes="
-                + maxTryTimes
-                + ", failureStrategy="
-                + failureStrategy
-                + ", warningType="
-                + warningType
-                + ", warningGroupId="
-                + warningGroupId
-                + ", scheduleTime="
-                + scheduleTime
-                + ", commandStartTime="
-                + commandStartTime
-                + ", globalParams='"
-                + globalParams
-                + '\''
-                + ", processInstanceJson='"
-                + processInstanceJson
-                + '\''
-                + ", executorId="
-                + executorId
-                + ", tenantCode='"
-                + tenantCode
-                + '\''
-                + ", queue='"
-                + queue
-                + '\''
-                + ", isSubProcess="
-                + isSubProcess
-                + ", locations='"
-                + locations
-                + '\''
-                + ", connects='"
-                + connects
-                + '\''
-                + ", historyCmd='"
-                + historyCmd
-                + '\''
-                + ", dependenceScheduleTimes='"
-                + dependenceScheduleTimes
-                + '\''
-                + ", duration="
-                + duration
-                + ", processInstancePriority="
-                + processInstancePriority
-                + ", workerGroup='"
-                + workerGroup
-                + '\''
-                + ", environmentCode="
-                + environmentCode
-                + ", timeout="
-                + timeout
-                + ", tenantId="
-                + tenantId
-                + ", processDefinitionCode='"
-                + processDefinitionCode
-                + '\''
-                + ", processDefinitionVersion='"
-                + processDefinitionVersion
-                + '\''
-                + '}';
+            + "id=" + id
+            + ", state=" + state
+            + ", recovery=" + recovery
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", runTimes=" + runTimes
+            + ", name='" + name + '\''
+            + ", host='" + host + '\''
+            + ", processDefinition="
+            + processDefinition
+            + ", commandType="
+            + commandType
+            + ", commandParam='"
+            + commandParam
+            + '\''
+            + ", taskDependType="
+            + taskDependType
+            + ", maxTryTimes="
+            + maxTryTimes
+            + ", failureStrategy="
+            + failureStrategy
+            + ", warningType="
+            + warningType
+            + ", warningGroupId="
+            + warningGroupId
+            + ", scheduleTime="
+            + scheduleTime
+            + ", commandStartTime="
+            + commandStartTime
+            + ", globalParams='"
+            + globalParams
+            + '\''
+            + ", executorId="
+            + executorId
+            + ", tenantCode='"
+            + tenantCode
+            + '\''
+            + ", queue='"
+            + queue
+            + '\''
+            + ", isSubProcess="
+            + isSubProcess
+            + ", locations='"
+            + locations
+            + '\''
+            + ", historyCmd='"
+            + historyCmd
+            + '\''
+            + ", dependenceScheduleTimes='"
+            + dependenceScheduleTimes
+            + '\''
+            + ", duration="
+            + duration
+            + ", processInstancePriority="
+            + processInstancePriority
+            + ", workerGroup='"
+            + workerGroup
+            + '\''
+            + ", timeout="
+            + timeout
+            + ", tenantId="
+            + tenantId
+            + ", processDefinitionCode='"
+            + processDefinitionCode
+            + '\''
+            + ", processDefinitionVersion='"
+            + processDefinitionVersion
+            + '\''
+            + '}';
     }
 
     @Override

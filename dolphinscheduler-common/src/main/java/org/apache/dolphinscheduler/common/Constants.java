@@ -437,7 +437,7 @@ public final class Constants {
 
     public static final String COMMON_TASK_TYPE = "common";
 
-    public static final String DEFAULT = "Default";
+    public static final String DEFAULT = "default";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
@@ -636,6 +636,11 @@ public final class Constants {
      * process or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
+
+    /**
+     * process or task definition first version
+     */
+    public static final int VERSION_FIRST  = 1;
 
     /**
      * date format of yyyyMMdd
@@ -876,7 +881,6 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
-    public static final String FLINK_PYTHON = "-py";
 
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
