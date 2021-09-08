@@ -1,0 +1,84 @@
+extend type Query {
+    # Schedule Query
+    queryScheduleListPaging(loginUser: InputUser!, projectName: String!,
+        processDefinitionId: Int!, searchVal: String, pageNo: Int!,
+        pageSize: Int!): SchedulePageInfoResultType
+
+    queryScheduleList(loginUser: InputUser!, projectName: String!): ScheduleListResultType
+
+    previewSchedule(loginUser: InputUser!, projectName: String!
+        schedule: String!): NormalResultType
+}
+
+extend type Mutation {
+    # Schedule Mutation
+    createSchedule(loginUser: InputUser!, projectName: String!,
+        processDefinitionId: Int!, schedule: String!, warningType: WarningType = NONE,
+        warningGroupId: Int = 1, failureStrategy: FailureStrategy = CONTINUE,
+        workerGroup: String = "default", processInstancePriority: Priority = MEDIUM): ScheduleResultType
+
+    updateSchedule(loginUser: InputUser!, projectName: String!,
+        id: Int!, schedule: String!, warningType: WarningType = NONE,
+        warningGroupId: Int, failureStrategy: FailureStrategy = END,
+        workerGroup: String = "default", processInstancePriority: Priority): NormalResultType
+
+    online(loginUser: InputUser!, projectName: String!, id: Int!): NormalResultType
+
+    offline(loginUser: InputUser!, projectName: String!, id: Int!): NormalResultType
+
+    deleteScheduleById(loginUser: InputUser!, projectName: String!,
+        scheduleId: Int!): NormalResultType
+}
+
+type Schedule {
+    id: Int
+    processDefinitionId: Int
+    processDefinitionName: String
+    projectName: String
+    definitionDescription: String
+    startTime: String
+    endTime: String
+    timezoneId: String
+    crontab: String
+    failureStrategy: FailureStrategy
+    warningType: WarningType
+    createTime: String
+    updateTime: String
+    userId: Int
+    userName: String
+    releaseState: ReleaseState
+    warningGroupId: Int
+    processInstancePriority: Priority
+    workerGroup: String
+}
+
+type ScheduleResultType {
+    code: Int
+    msg: String
+    data: Schedule
+    success: Boolean
+    failed: Boolean
+}
+
+type SchedulePageInfo {
+    totalList: [Schedule]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type SchedulePageInfoResultType {
+    code: Int
+    msg: String
+    data: SchedulePageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type ScheduleListResultType {
+    code: Int
+    msg: String
+    data: [Schedule]
+    success: Boolean
+    failed: Boolean
+}

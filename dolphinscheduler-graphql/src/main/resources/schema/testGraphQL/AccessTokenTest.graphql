@@ -1,0 +1,81 @@
+query GenerateToken {
+    generateToken(
+        loginUser: { id: "1", userType: GENERAL_USER, sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        userId: 123
+        expireTime: "2021_08_10_00_00_00"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+query QueryAccessTokenList {
+    queryAccessTokenList(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        pageNo: 1
+        pageSize: 10
+        searchVal: "mktb"
+    ) {
+        code
+        msg
+        success
+        failed
+        data {
+            totalList {
+                id
+                userId
+                token
+                expireTime
+                createTime
+                updateTime
+            }
+            totalCount
+            totalPage
+            currentPage
+        }
+    }
+}
+
+mutation CreateToken {
+    createToken(
+        loginUser: { id: "1", userType: GENERAL_USER, sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        userId: 123
+        expireTime: "2021_08_10_00_00_00"
+        token: "56b11bb49a883434b4fab3ce55956945"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+mutation DelAccessTokenById {
+    delAccessTokenById(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, id: 8) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+mutation UpdateToken {
+    updateToken(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        id: 4
+        userId: 2
+        expireTime: ""
+        token: "hhh2"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}

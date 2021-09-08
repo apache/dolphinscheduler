@@ -1,0 +1,26 @@
+type Query {
+    # Logger Query
+    queryLog(loginUser: InputUser!, taskInstanceId: Int!, skipNum: Int!, limit: Int!): NormalResultType
+    downloadTaskLog(loginUser: InputUser!, taskInstanceId: Int!): NormalResultType
+
+    # Login Query
+    login(userName: String!, userPassword: String!, ip: String): NormalResultType
+}
+
+type Mutation {
+    # Login Mutation
+    signOut(loginUser: InputUser!, ip: String): NormalResultType
+}
+
+input InputUser {
+    id: ID!
+    userType: UserType
+    sessionId: String!
+}
+
+enum UserType {
+    ADMIN_USER
+    GENERAL_USER
+}
+
+

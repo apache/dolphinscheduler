@@ -1,0 +1,208 @@
+extend type Query {
+    # Resource Query
+    queryResourceList(loginUser: InputUser!,
+        resourceType: ResourceType!): ResourceComponentListResultType
+
+    queryResourceListPaging(loginUser: InputUser!, resourceType: ResourceType!
+        id: Int!, pageNo: Int!, searchVal: String, pageSize: Int!): ResourcePageInfoResultType
+
+    verifyResourceName(loginUser: InputUser!, fullName: String!,
+        resourceType: ResourceType!): NormalResultType
+
+    queryResourceJarList(loginUser: InputUser!, resourceType: ResourceType!
+        programType: ProgramType): ResourceComponentListResultType
+
+    queryResource(loginUser: InputUser!, fullName: String, id: Int,
+        resourceType: ResourceType): ResourceListResultType
+
+    viewResource(loginUser: InputUser!, resourceId: Int!,
+        skipLineNum: Int!, limit: Int!): ViewResourceResultType
+
+    downloadResource(loginUser: InputUser!, resourceId: Int!): NormalResultType
+
+    viewUIUdfFunction(loginUser: InputUser!, id: Int!): UdfFuncResultType
+
+    queryUdfFuncListPaging(loginUser: InputUser!, pageNo: Int!,
+        searchVal: String, pageSize: Int!): UdfFuncPageInfoResultType
+
+    queryUdfFuncList(loginUser: InputUser!, udfType: UdfType!): UdfTypeListResultType
+
+    verifyUdfFuncName(loginUser: InputUser!, name: String!): NormalResultType
+
+    authorizedFile(loginUser: InputUser!, userId: Int!): ResourceComponentListResultType
+
+    authorizeResourceTree(loginUser: InputUser!, userId: Int!): ResourceComponentListResultType
+
+    unauthUDFFunc(loginUser: InputUser!, userId: Int!): UdfFuncListResultType
+
+    authorizedUDFFunction(loginUser: InputUser!, userId: Int!): UdfFuncListResultType
+
+}
+
+extend type Mutation {
+    # Resources Mutation
+    createDirectory(loginUser: InputUser!, resourceType: ResourceType!,
+        alias: String!, description: String, pid: Int!,
+        currentDir: String!): NormalResultType
+
+    deleteResource(loginUser: InputUser!, resourceId: Int!): NormalResultType
+
+    onlineCreateResource(loginUser: InputUser!, resourceType: ResourceType!,
+        fileName: String!, fileSuffix: String!, description: String,
+        content: String!, pid: Int!, currentDir: String!): NormalResultType
+
+    updateResourceContent(loginUser: InputUser!, resourceId: Int!,
+        content: String!): NormalResultType
+
+    createUdfFunc(loginUser: InputUser!, udfType: UdfType!, funcName: String!,
+        className: String!, argTypes: String, database: String, description: String,
+        resourceId: Int!): NormalResultType
+
+    updateUdfFunc(loginUser: InputUser!, udfFuncId: Int!, udfType: UdfType!
+        funcName: String!, className: String!, argTypes: String,
+        database: String, description: String, resourceId: Int!): NormalResultType
+
+    deleteUdfFunc(loginUser: InputUser!, udfFuncId: Int!): NormalResultType
+}
+
+enum ResourceType {
+    FILE
+    UDF
+}
+
+type Resource {
+    id: Int
+    pid: Int
+    alias: String
+    fullName: String
+    isDirectory: Boolean
+    description: String
+    fileName: String
+    userId: Int
+    type: ResourceType
+    size: String
+    createTime: String
+    updateTime: String
+}
+
+type ResourceListResultType {
+    code: Int
+    msg: String
+    data: [Resource]
+    success: Boolean
+    failed: Boolean
+}
+
+type ResourcePageInfo {
+    totalList: [Resource]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type ResourcePageInfoResultType {
+    code: Int
+    msg: String
+    data: ResourcePageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+enum ProgramType {
+    JAVA
+    SCALA
+    PYTHON
+}
+
+type ResourceComponent {
+    id: Int
+    pid: Int
+    name: String
+    currentDir: String
+    fullName: String
+    description: String
+    isDirctory: Boolean
+    idValue: String
+    type: ResourceType
+    children: [ResourceComponent]
+}
+
+type ResourceComponentListResultType {
+    code: Int
+    msg: String
+    data: [ResourceComponent]
+    success: Boolean
+    failed: Boolean
+}
+
+type ViewResourceResultType {
+    code: Int
+    msg: String
+    data: AliasAndContent
+    success: Boolean
+    failed: Boolean
+}
+
+type AliasAndContent {
+    alias: String
+    content: String
+}
+
+enum UdfType {
+    HIVE
+    SPARK
+}
+
+type UdfFunc {
+    id: Int
+    userId: Int
+    funcName: String
+    className: String
+    argTypes: String
+    database: String
+    description: String
+    resourceId: Int
+    resourceName: String
+    type: UdfType
+    createTime: String
+    updateTime: String
+}
+
+type UdfFuncResultType {
+    code: Int
+    msg: String
+    data: UdfFunc
+    success: Boolean
+    failed: Boolean
+}
+
+type UdfFuncListResultType {
+    code: Int
+    msg: String
+    data: [UdfFunc]
+    success: Boolean
+    failed: Boolean
+}
+
+type UdfFuncPageInfo {
+    totalList: [UdfFunc]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type UdfFuncPageInfoResultType {
+    code: Int
+    msg: String
+    data: UdfFuncPageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type UdfTypeListResultType {
+    code: Int
+    msg: String
+    data: [UdfFunc]
+    success: Boolean
+    failed: Boolean
+}

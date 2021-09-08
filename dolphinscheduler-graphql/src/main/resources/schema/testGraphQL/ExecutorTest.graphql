@@ -1,0 +1,42 @@
+mutation startProcessInstance {
+    startProcessInstance(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        scheduleTime: "2021-08-10 00:00:00"
+        processDefinitionId: 1
+        projectName: "mktb_test"
+        failureStrategy: END
+        warningType: NONE
+        warningGroupId: 100
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+mutation execute {
+    execute(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        projectName: "mktb_test"
+        processInstanceId: 1
+        executeType: NONE
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+query startCheckProcessDefinition {
+    startCheckProcessDefinition(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, processDefinitionId: 1) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}

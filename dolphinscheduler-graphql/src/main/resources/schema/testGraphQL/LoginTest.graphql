@@ -1,0 +1,25 @@
+query login {
+    login(
+        userName: "admin"
+        userPassword: "dolphinscheduler123"
+        ip: "127.0.0.1"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+mutation signOut {
+    signOut(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, ip: "127.0.0.1") {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+

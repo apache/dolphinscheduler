@@ -1,0 +1,39 @@
+extend type Query {
+    # AccessToken Query
+    generateToken(loginUser: InputUser!, userId: Int!, expireTime: String!): NormalResultType
+    queryAccessTokenList(loginUser: InputUser!, pageNo: Int!,
+        searchVal: String, pageSize: Int!): QueryAccessTokenListResultType
+}
+
+extend type Mutation {
+    # AccessToken Mutation
+    createToken(loginUser: InputUser!, userId: Int!,
+        expireTime: String!, token: String!): NormalResultType
+    delAccessTokenById(loginUser: InputUser!, id: Int!): NormalResultType
+    updateToken(loginUser: InputUser!, id: Int!, userId: Int!,
+        expireTime: String!, token: String!): NormalResultType
+}
+
+type AccessToken {
+    id: ID!
+    userId: Int!
+    token: String
+    expireTime: String
+    createTime: String
+    updateTime: String
+}
+
+type AccessTokenPageInfo {
+    totalList: [AccessToken]
+    totalCount: Int
+    totalPage: Int
+    currentPage: Int
+}
+
+type QueryAccessTokenListResultType {
+    code: Int
+    msg: String
+    data: AccessTokenPageInfo
+    success: Boolean
+    failed: Boolean
+}

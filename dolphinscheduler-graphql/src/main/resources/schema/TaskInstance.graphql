@@ -1,0 +1,28 @@
+extend type Query {
+    # TaskInstance Query
+    queryTaskListPaging(loginUser: InputUser!, projectName: String!,
+        processInstanceId: Int=0, processInstanceName: String, searchVal: String
+        taskName: String, executorName: String, stateType: ExecutionStatus, host: String,
+        startTime: String, endTime: String, pageNo: Int!, pageSize: Int!): TaskInstancePageInfoResultType
+}
+
+extend type Mutation {
+    # TaskInstance Mutation
+    forceTaskSuccess(loginUser: InputUser!, projectName: String!,
+        taskInstanceId: Int!): NormalResultType
+}
+
+type TaskInstancePageInfo {
+    totalList: [String]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+
+type TaskInstancePageInfoResultType {
+    code: Int
+    msg: String
+    data: TaskInstancePageInfo
+    success: Boolean
+    failed: Boolean
+}

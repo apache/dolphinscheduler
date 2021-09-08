@@ -1,0 +1,31 @@
+query CountTaskStateByProject {
+    countTaskStateByProject(
+        loginUser: {
+            id: "1",
+            sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9"
+        }
+    ) {
+        code
+        msg
+        data {
+            totalCount
+            taskCountDtos {
+                count
+                taskStateType
+            }
+        }
+        success
+        failed
+    }
+}
+
+query CountQueueState {
+    countQueueState(loginUser: {id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9"}) {
+        code
+        msg
+        data {
+            taskKill
+            taskQueue
+        }
+    }
+}

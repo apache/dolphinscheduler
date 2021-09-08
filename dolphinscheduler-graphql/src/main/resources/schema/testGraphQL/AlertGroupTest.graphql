@@ -1,0 +1,40 @@
+query queryAllGroupList {
+    queryAllGroupList(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }) {
+        code
+        msg
+        data {
+            id
+            groupName
+            description
+            createTime
+            updateTime
+            alertInstanceIds
+            createUserId
+        }
+        success
+        failed
+    }
+}
+
+query queryAlertGroupListPaging {
+    queryAlertGroupListPaging(loginUser: { id: "1",sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, pageNo: 1, pageSize: 5) {
+        code
+        msg
+        data {
+            totalList {
+                id
+                groupName
+                description
+                createTime
+                updateTime
+                alertInstanceIds
+                createUserId
+            }
+            total
+            totalPage
+            currentPage
+        }
+        success
+        failed
+    }
+}
