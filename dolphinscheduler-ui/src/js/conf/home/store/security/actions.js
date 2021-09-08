@@ -639,5 +639,76 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * get environment list pages
+   */
+  getEnvironmentListPaging ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * create environment
+   */
+  createEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/create', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update environment
+   */
+  updateEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/update', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * delete environment
+   */
+  deleteEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/delete', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  verifyEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/verify-environment', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get all environment
+   */
+  getEnvironmentAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/query-environment-list', payload, res => {
+        let list = res.data
+        state.environmentListAll = list
+        resolve(list)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

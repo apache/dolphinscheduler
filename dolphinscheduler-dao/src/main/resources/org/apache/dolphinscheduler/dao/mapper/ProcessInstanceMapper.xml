@@ -23,7 +23,7 @@
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_process, executor_id, history_cmd,
-        process_instance_priority, worker_group, timeout, tenant_id, var_pool
+        process_instance_priority, worker_group,environment_code, timeout, tenant_id, var_pool
     </sql>
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select

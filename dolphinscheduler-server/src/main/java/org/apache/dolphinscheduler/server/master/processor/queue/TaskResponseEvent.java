@@ -92,6 +92,8 @@ public class TaskResponseEvent {
      * channel
      */
     private Channel channel;
+
+    private int processInstanceId;
     
     public static TaskResponseEvent newAck(ExecutionStatus state,
                                            Date startTime,
@@ -99,7 +101,8 @@ public class TaskResponseEvent {
                                            String executePath,
                                            String logPath,
                                            int taskInstanceId,
-                                           Channel channel) {
+                                           Channel channel,
+                                           int processInstanceId) {
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setStartTime(startTime);
@@ -109,6 +112,7 @@ public class TaskResponseEvent {
         event.setTaskInstanceId(taskInstanceId);
         event.setEvent(Event.ACK);
         event.setChannel(channel);
+        event.setProcessInstanceId(processInstanceId);
         return event;
     }
 
@@ -118,7 +122,8 @@ public class TaskResponseEvent {
                                               String appIds,
                                               int taskInstanceId,
                                               String varPool,
-                                              Channel channel) {
+                                              Channel channel,
+                                              int processInstanceId) {
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setEndTime(endTime);
@@ -128,6 +133,7 @@ public class TaskResponseEvent {
         event.setEvent(Event.RESULT);
         event.setVarPool(varPool);
         event.setChannel(channel);
+        event.setProcessInstanceId(processInstanceId);
         return event;
     }
 
@@ -227,4 +233,11 @@ public class TaskResponseEvent {
         this.channel = channel;
     }
 
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 }

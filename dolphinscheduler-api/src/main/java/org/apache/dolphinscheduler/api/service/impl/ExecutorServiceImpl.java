@@ -53,6 +53,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
@@ -98,6 +100,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    StateEventCallbackService stateEventCallbackService;
+
     /**
      * execute process instance
      *
@@ -113,6 +118,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param warningGroupId notify group id
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group name
+     * @param environmentCode environment code
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
@@ -125,7 +131,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
-                                                   Priority processInstancePriority, String workerGroup, Integer timeout,
+                                                   Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber) {
         Map<String, Object> result = new HashMap<>();
         // timeout is invalid
@@ -163,7 +169,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, startParams, expectedParallelismNumber);
+                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -383,6 +389,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // determine whether the process is normal
         if (update > 0) {
+            String host = processInstance.getHost();
+            String address = host.split(":")[0];
+            int port = Integer.parseInt(host.split(":")[1]);
+            StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+                    processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0
+            );
+            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
@@ -483,13 +496,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode runMode
      * @param processInstancePriority processInstancePriority
      * @param workerGroup workerGroup
+     * @param environmentCode environmentCode
      * @return command id
      */
     private int createCommand(CommandType commandType, int processDefineId,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
-                              RunMode runMode, Priority processInstancePriority, String workerGroup,
+                              RunMode runMode, Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber) {
 
         /**
@@ -525,6 +539,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
         command.setWorkerGroup(workerGroup);
+        command.setEnvironmentCode(environmentCode);
 
         Date start = null;
         Date end = null;

@@ -159,7 +159,15 @@
         :visible.sync="nodeDrawer"
         size=""
         :with-header="false">
-        <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+        <m-form-model
+          v-if="nodeDrawer"
+          :nodeData=nodeData
+          @seeHistory="seeHistory"
+          @addTaskInfo="addTaskInfo"
+          @cacheTaskInfo="cacheTaskInfo"
+          @close="close"
+          @onSubProcess="onSubProcess">
+        </m-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"

@@ -27,7 +27,9 @@ import static com.cronutils.model.CronType.QUARTZ;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -49,17 +51,18 @@ import com.cronutils.parser.CronParser;
  * cron utils
  */
 public class CronUtils {
-
     private CronUtils() {
         throw new IllegalStateException("CronUtils class");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtils.class);
 
+
     private static final CronParser QUARTZ_CRON_PARSER = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
 
     /**
      * parse to cron
+     *
      * @param cronExpression cron expression, never null
      * @return Cron instance, corresponding to cron expression received
      */
@@ -69,6 +72,7 @@ public class CronUtils {
 
     /**
      * build a new CronExpression based on the string cronExpression
+     *
      * @param cronExpression String representation of the cron expression the new object should represent
      * @return CronExpression
      * @throws ParseException if the string expression cannot be parsed into a valid
@@ -79,6 +83,7 @@ public class CronUtils {
 
     /**
      * get max cycle
+     *
      * @param cron cron
      * @return CycleEnum
      */
@@ -88,6 +93,7 @@ public class CronUtils {
 
     /**
      * get min cycle
+     *
      * @param cron cron
      * @return CycleEnum
      */
@@ -97,6 +103,7 @@ public class CronUtils {
 
     /**
      * get max cycle
+     *
      * @param crontab crontab
      * @return CycleEnum
      */
@@ -106,6 +113,7 @@ public class CronUtils {
 
     /**
      * gets all scheduled times for a period of time based on not self dependency
+     *
      * @param startTime startTime
      * @param endTime endTime
      * @param cronExpression cronExpression
@@ -127,13 +135,14 @@ public class CronUtils {
 
     /**
      * gets expect scheduled times for a period of time based on self dependency
+     *
      * @param startTime startTime
      * @param endTime endTime
      * @param cronExpression cronExpression
      * @param fireTimes fireTimes
      * @return date list
      */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression,int fireTimes) {
+    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression, int fireTimes) {
         List<Date> dateList = new ArrayList<>();
         while (fireTimes > 0) {
             startTime = cronExpression.getNextValidTimeAfter(startTime);
@@ -143,11 +152,13 @@ public class CronUtils {
             dateList.add(startTime);
             fireTimes--;
         }
+
         return dateList;
     }
 
     /**
      * gets all scheduled times for a period of time based on self dependency
+     *
      * @param startTime startTime
      * @param endTime endTime
      * @param cronExpression cronExpression
@@ -169,6 +180,27 @@ public class CronUtils {
 
     /**
      * gets all scheduled times for a period of time based on self dependency
+     * if schedulers is empty then default scheduler = 1 day
+     */
+    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, List<Schedule> schedules) {
+        List<Date> result = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(schedules)) {
+            for (Schedule schedule : schedules) {
+                result.addAll(CronUtils.getSelfFireDateList(startTime, endTime, schedule.getCrontab()));
+            }
+        } else {
+            Date start = startTime;
+            for (int i = 0; start.before(endTime); i++) {
+                start = DateUtils.getSomeDay(startTime, i);
+                result.add(start);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * gets all scheduled times for a period of time based on self dependency
+     *
      * @param startTime startTime
      * @param endTime endTime
      * @param cron cron
@@ -187,6 +219,7 @@ public class CronUtils {
 
     /**
      * get expiration time
+     *
      * @param startTime startTime
      * @param cycleEnum cycleEnum
      * @return date
@@ -218,23 +251,23 @@ public class CronUtils {
             }
             maxExpirationTime = calendar.getTime();
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return DateUtils.compare(startTimeMax, maxExpirationTime) ? maxExpirationTime : startTimeMax;
     }
 
     /**
      * get the end time of the day by value of date
-     * @param date
+     *
      * @return date
      */
     private static Date getEndTime(Date date) {
         Calendar end = new GregorianCalendar();
         end.setTime(date);
-        end.set(Calendar.HOUR_OF_DAY,23);
-        end.set(Calendar.MINUTE,59);
-        end.set(Calendar.SECOND,59);
-        end.set(Calendar.MILLISECOND,999);
+        end.set(Calendar.HOUR_OF_DAY, 23);
+        end.set(Calendar.MINUTE, 59);
+        end.set(Calendar.SECOND, 59);
+        end.set(Calendar.MILLISECOND, 999);
         return end.getTime();
     }
 
