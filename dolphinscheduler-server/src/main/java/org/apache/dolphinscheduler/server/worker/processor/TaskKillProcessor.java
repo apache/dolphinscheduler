@@ -109,7 +109,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         List<String> appIds = Collections.emptyList();
         int taskInstanceId = killCommand.getTaskInstanceId();
         TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        TaskExecutionContext taskExecutionContext =JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
 
         try {
             Integer processId = taskExecutionContext.getProcessId();
@@ -156,7 +156,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         if (taskRequest == null) {
             return taskKillResponseCommand;
         }
-        TaskExecutionContext taskExecutionContext =JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
         if (taskExecutionContext != null) {
             taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskKillResponseCommand.setHost(taskExecutionContext.getHost());
