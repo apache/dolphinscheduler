@@ -65,6 +65,11 @@ public class PluginParams {
     protected String title;
 
     /**
+     * prompt information
+     */
+    protected String info;
+
+    /**
      * default value or value input by user in the page
      */
     @JsonProperty(STRING_PLUGIN_PARAM_VALUE)
@@ -72,6 +77,16 @@ public class PluginParams {
 
     @JsonProperty(STRING_PLUGIN_PARAM_VALIDATE)
     protected List<Validate> validateList;
+
+    /**
+     * whether to hide, the default value is false
+     */
+    protected Boolean hidden;
+
+    /**
+     * whether to display, the default value is true
+     */
+    protected Boolean display;
 
     protected PluginParams(Builder builder) {
 
@@ -83,6 +98,7 @@ public class PluginParams {
         this.name = builder.name;
         this.formType = builder.formType.getFormType();
         this.title = builder.title;
+
         if (null == builder.props) {
             builder.props = new ParamsProps();
         }
@@ -90,6 +106,9 @@ public class PluginParams {
         this.props = builder.props;
         this.value = builder.value;
         this.validateList = builder.validateList;
+        this.info = builder.info;
+        this.display = builder.display;
+        this.hidden = builder.hidden;
 
     }
 
@@ -109,7 +128,13 @@ public class PluginParams {
 
         protected Object value;
 
+        protected String info;
+
         protected List<Validate> validateList;
+
+        protected Boolean hidden;
+
+        protected Boolean display;
 
         public Builder(String name,
                        FormType formType,
@@ -131,7 +156,10 @@ public class PluginParams {
                        @JsonProperty("props") ParamsProps props,
                        @JsonProperty("value") Object value,
                        @JsonProperty("name") String fieldName,
-                       @JsonProperty("validate") List<Validate> validateList
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
         ) {
             requireNonNull(name, "name is null");
             requireNonNull(formType, "formType is null");
@@ -143,6 +171,9 @@ public class PluginParams {
             this.value = value;
             this.validateList = validateList;
             this.fieldName = fieldName;
+            this.info = info;
+            this.hidden = hidden;
+            this.display = display;
         }
 
         public PluginParams build() {
@@ -177,6 +208,7 @@ public class PluginParams {
     public void setValue(Object value) {
         this.value = value;
     }
+
 }
 
 

@@ -301,6 +301,10 @@ const tasksType = {
     desc: 'DataX',
     color: '#1fc747'
   },
+  TIS: {
+    desc: 'TIS',
+    color: '#1fc747'
+  },
   SQOOP: {
     desc: 'SQOOP',
     color: '#E46F13'

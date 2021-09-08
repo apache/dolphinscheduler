@@ -24,9 +24,9 @@ import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;

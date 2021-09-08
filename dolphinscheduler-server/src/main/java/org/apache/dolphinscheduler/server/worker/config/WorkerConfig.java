@@ -56,6 +56,15 @@ public class WorkerConfig {
     @Value("${alert.listen.host:localhost}")
     private String alertListenHost;
 
+    @Value("${task.plugin.dir:}")
+    private String taskPluginDir;
+
+    @Value("${maven.local.repository:}")
+    private String mavenLocalRepository;
+
+    @Value("${task.plugin.binding:}")
+    private String taskPluginBinding;
+
     public int getListenPort() {
         return listenPort;
     }
@@ -129,5 +138,29 @@ public class WorkerConfig {
 
     public void setAlertListenHost(String alertListenHost) {
         this.alertListenHost = alertListenHost;
+    }
+
+    public String getTaskPluginDir() {
+        return taskPluginDir;
+    }
+
+    public void setTaskPluginDir(String taskPluginDir) {
+        this.taskPluginDir = taskPluginDir;
+    }
+
+    public String getMavenLocalRepository() {
+        return mavenLocalRepository;
+    }
+
+    public void setMavenLocalRepository(String mavenLocalRepository) {
+        this.mavenLocalRepository = mavenLocalRepository;
+    }
+
+    public String getTaskPluginBinding() {
+        return taskPluginBinding;
+    }
+
+    public void setTaskPluginBinding(String taskPluginBinding) {
+        this.taskPluginBinding = taskPluginBinding;
     }
 }

@@ -417,7 +417,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     protostuff-runtime 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
     protostuff-api 1.7.2: https://github.com/protostuff/protostuff/protostuff-api Apache-2.0
     protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
-
+    async-http-client 2.12.3: https://mvnrepository.com/artifact/org.asynchttpclient/async-http-client Apache-2.0
 ========================================================================
 BSD licenses
 ========================================================================

@@ -155,8 +155,6 @@ libfb303-0.9.3.jar
 libthrift-0.9.3.jar
 log4j-1.2-api-2.11.2.jar
 log4j-1.2.17.jar
-log4j-api-2.11.2.jar
-log4j-core-2.11.2.jar
 logback-classic-1.2.3.jar
 logback-core-1.2.3.jar
 lz4-1.3.0.jar

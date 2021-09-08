@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +112,7 @@ public class PluginParamsTransferTest {
         emailShowTypeList.add(new ParamsOptions("attachment", "attachment", false));
         emailShowTypeList.add(new ParamsOptions("tableattachment", "tableattachment", false));
         RadioParam showType = new RadioParam.Builder("showType", "showType")
-                .setParamsOptionsList(emailShowTypeList)
+                .setOptions(emailShowTypeList)
                 .setValue("table")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
@@ -130,39 +132,35 @@ public class PluginParamsTransferTest {
 
         String paramsJson = PluginParamsTransfer.transferParamsToJson(paramsList);
 
-        String paramsJsonAssert = "[{\"field\":\"field1\",\"name\":\"field1\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\","
-                + "\"title\":\"field1\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"m"
-                + "in\":null,\"max\":null}]},{\"field\":\"field2\",\"name\":\"field2\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"inp"
-                + "ut\",\"title\":\"field2\",\"value\":null,\"validate\":null},{\"field\":\"field3\",\"name\":\"field3\",\"props\":{\"placeholder\":nu"
-                + "ll,\"size\":\"small\"},\"type\":\"input\",\"title\":\"field3\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"typ"
-                + "e\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"field4\",\"name\":\"field4\",\"props\":{\"placeholder\":nul"
-                + "l,\"size\":\"small\"},\"type\":\"input\",\"title\":\"field4\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"nu"
-                + "mber\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"field5\",\"name\":\"field5\",\"props\":{\"placeholder\":null,\"size\":\"sma"
-                + "ll\"},\"type\":\"input\",\"title\":\"field5\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"bl"
-                + "ur\",\"min\":null,\"max\":null}]},{\"field\":\"field6\",\"name\":\"field6\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"ti"
-                + "tle\":\"field6\",\"value\":true,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"o"
-                + "ptions\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field7\",\"name\":\"fi"
-                + "eld7\",\"props\":{\"placeholder\":\"if enable use authentication, you need input user\",\"size\":\"small\"},\"type\":\"input\",\"title\":\"field7\",\"v"
-                + "alue\":null,\"validate\":null},{\"field\":\"field8\",\"name\":\"field8\",\"props\":{\"placeholder\":\"if enable use authentication, you need input p"
-                + "assword\",\"size\":\"small\"},\"type\":\"input\",\"title\":\"field8\",\"value\":null,\"validate\":null},{\"field\":\"field9\",\"name\":\"field9\",\"pr"
-                + "ops\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"field9\",\"value\":false,\"validate\":[{\"required\":true,\"mes"
-                + "sage\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disa"
-                + "bled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field10\",\"name\":\"field10\",\"props\":{\"placeh"
-                + "older\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"field10\",\"value\":false,\"validate\":[{\"required\":true,\"mes"
-                + "sage\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"di"
-                + "sabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field11\",\"name\":\"field11\",\"props\":{\"pl"
-                + "aceholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"field11\",\"value\":\"*\",\"validate\":[{\"required\":true,\"me"
-                + "ssage\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"showType\",\"name\":\"showType\",\"p"
-                + "rops\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"showType\",\"value\":\"table\",\"validate\":[{\"requ"
-                + "ired\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"ta"
-                + "ble\",\"value\":\"table\",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\":\"att"
-                + "achment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\",\"value\":\"tableattachment\",\"disabled\":false}]}]";
+        String paramsJsonAssert = "[{\"props\":null,\"field\":\"field1\",\"name\":\"field1\",\"type\":\"input\",\"title\":\"field1\",\"value\":null,\"validate\""
+                + ":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"props\":null,\"field\":"
+                + "\"field2\",\"name\":\"field2\",\"type\":\"input\",\"title\":\"field2\",\"value\":null,\"validate\":null},{\"props\":null,\"field\":\"field3\","
+                + "\"name\":\"field3\",\"type\":\"input\",\"title\":\"field3\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\","
+                + "\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"props\":null,\"field\":\"field4\",\"name\":\"field4\",\"type\":\"input\",\"title\":\"field"
+                + "4\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"number\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"pro"
+                + "ps\":null,\"field\":\"field5\",\"name\":\"field5\",\"type\":\"input\",\"title\":\"field5\",\"value\":null,\"validate\":[{\"required\":true,\"mess"
+                + "age\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"props\":null,\"field\":\"field6\",\"name\":\"field6\",\"typ"
+                + "e\":\"radio\",\"title\":\"field6\",\"value\":true,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"mi"
+                + "n\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}"
+                + "]},{\"props\":null,\"field\":\"field7\",\"name\":\"field7\",\"type\":\"input\",\"title\":\"field7\",\"value\":null,\"validate\":null},{\"field\":\"f"
+                + "ield8\",\"name\":\"field8\",\"props\":{\"disabled\":null,\"placeholder\":\"if enable use authentication, you need input password\",\"size\":\"smal"
+                + "l\"},\"type\":\"input\",\"title\":\"field8\",\"value\":null,\"validate\":null},{\"props\":null,\"field\":\"field9\",\"name\":\"field9\",\"type\":\"ra"
+                + "dio\",\"title\":\"field9\",\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":nul"
+                + "l,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"pro"
+                + "ps\":null,\"field\":\"field10\",\"name\":\"field10\",\"type\":\"radio\",\"title\":\"field10\",\"value\":false,\"validate\":[{\"required\":true,\"mes"
+                + "sage\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":fal"
+                + "se},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"props\":null,\"field\":\"field11\",\"name\":\"field11\",\"type\":\"input\",\"titl"
+                + "e\":\"field11\",\"value\":\"*\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":nul"
+                + "l}]},{\"props\":null,\"field\":\"showType\",\"name\":\"showType\",\"type\":\"radio\",\"title\":\"showType\",\"value\":\"table\",\"validate\":[{\"re"
+                + "quired\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"table\",\"value\":\"tab"
+                + "le\",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\":\"attachment\",\"value\":\"attachment\",\"disabled\":f"
+                + "alse},{\"label\":\"tableattachment\",\"value\":\"tableattachment\",\"disabled\":false}]}]";
         Assert.assertEquals(paramsJsonAssert, paramsJson);
     }
 
     @Test
     public void testGetPluginParams() {
-        String paramsJsonAssert = "[{\"field\":\"field1\",\"props\":null,\"type\":\"input\",\"title\":\"field1\",\"value\":\"v1\",\"validate\":["
+        String paramsJsonAssert = "[{\"props\":null,\"field\":\"field1\",\"props\":null,\"type\":\"input\",\"title\":\"field1\",\"value\":\"v1\",\"validate\":["
                 + "{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},"
                 + "{\"field\":\"field2\",\"props\":null,\"type\":\"input\",\"title\":\"field2\",\"value\":\"v2\",\"validate\":null},"
                 + "{\"field\":\"field3\",\"props\":null,\"type\":\"input\",\"title\":\"field3\",\"value\":\"v3\",\"validate\":["
