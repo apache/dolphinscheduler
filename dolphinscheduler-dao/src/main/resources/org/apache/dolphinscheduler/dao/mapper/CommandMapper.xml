@@ -21,7 +21,7 @@
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select cmd.id, cmd.command_type, cmd.process_definition_id, cmd.command_param, cmd.task_depend_type, cmd.failure_strategy,
         cmd.warning_type, cmd.warning_group_id, cmd.schedule_time, cmd.start_time, cmd.executor_id, cmd.update_time,
-        cmd.process_instance_priority, cmd.worker_group
+        cmd.process_instance_priority, cmd.worker_group, cmd.environment_code
         from t_ds_command cmd
         join t_ds_process_definition definition on cmd.process_definition_id = definition.id
         where definition.release_state = 1 AND definition.flag = 1
@@ -42,5 +42,10 @@
             and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by cmd.command_type
+    </select>
+    <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        order by update_time asc
     </select>
 </mapper>

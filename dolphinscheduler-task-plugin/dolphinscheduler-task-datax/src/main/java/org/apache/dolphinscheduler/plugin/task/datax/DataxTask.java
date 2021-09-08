@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.d
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -55,6 +56,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,6 +149,12 @@ public class DataxTask extends AbstractTaskExecutor {
 
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            if (MapUtils.isEmpty(paramsMap)) {
+                paramsMap = new HashMap<>();
+            }
+            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+                paramsMap.putAll(taskExecutionContext.getParamsMap());
+            }
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);

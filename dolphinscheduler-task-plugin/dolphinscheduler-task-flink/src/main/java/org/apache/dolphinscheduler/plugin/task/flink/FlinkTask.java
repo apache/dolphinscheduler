@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,12 +75,16 @@ public class FlinkTask extends AbstractYarnTask {
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            if (MapUtils.isEmpty(paramsMap)) {
+                paramsMap = new HashMap<>();
+            }
+            if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+                paramsMap.putAll(taskExecutionContext.getParamsMap());
+            }
 
             logger.info("param Map : {}", paramsMap);
-            if (paramsMap != null) {
-                args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
-                logger.info("param args : {}", args);
-            }
+            args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
+            logger.info("param args : {}", args);
             flinkParameters.setMainArgs(args);
         }
     }
