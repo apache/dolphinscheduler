@@ -17,29 +17,30 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.RWXR_XR_X;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,49 +62,47 @@ public class ShellTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private TaskRequest taskRequest;
-
-    private String command;
+    private TaskRequest taskExecutionContext;
 
     /**
      * constructor
      *
-     * @param taskRequest taskRequest
+     * @param taskExecutionContext taskExecutionContext
      */
-    public ShellTask(TaskRequest taskRequest) {
-        super(taskRequest);
+    public ShellTask(TaskRequest taskExecutionContext) {
+        super(taskExecutionContext);
 
-        this.taskRequest = taskRequest;
+        this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
+                taskExecutionContext,
                 logger);
     }
 
     @Override
     public void init() {
-        logger.info("shell task params {}", taskRequest.getTaskParams());
+        logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
-        shellParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ShellParameters.class);
+        shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
 
-        assert shellParameters != null;
         if (!shellParameters.checkParameters()) {
             throw new RuntimeException("shell task params is not valid");
         }
     }
 
     @Override
-    public void handle() {
+    public void handle() throws Exception {
         try {
             // construct process
-            TaskResponse response = shellCommandExecutor.run(command);
-            setExitStatusCode(response.getExitStatusCode());
-            setAppIds(response.getAppIds());
-            setProcessId(response.getProcessId());
-            setResult(shellCommandExecutor.getTaskResultString());
+            String command = buildCommand();
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
+            shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("shell task error", e);
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("shell task error", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw e;
         }
     }
 
@@ -113,36 +112,32 @@ public class ShellTask extends AbstractTaskExecutor {
         shellCommandExecutor.cancelApplication();
     }
 
-    @Override
-    public String getPreScript() {
-        return shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-    }
-
     /**
-     * set command
+     * create command
      *
-     * @throws IOException exception
+     * @return file name
+     * @throws Exception exception
      */
-    @Override
-    public void setCommand(String command) throws IOException {
+    private String buildCommand() throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
-                taskRequest.getExecutePath(),
-                taskRequest.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
-            this.command = fileName;
-            return;
+            return fileName;
         }
-        this.command = command;
-        shellParameters.setRawScript(command);
+
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        script = parseScript(script);
+        shellParameters.setRawScript(script);
 
         logger.info("raw script : {}", shellParameters.getRawScript());
-        logger.info("task execute path : {}", taskRequest.getExecutePath());
+        logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(TaskConstants.RWXR_XR_X);
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
         FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
         if (OSUtils.isWindows()) {
@@ -152,7 +147,8 @@ public class ShellTask extends AbstractTaskExecutor {
         }
 
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-        this.command = fileName;
+
+        return fileName;
     }
 
     @Override
@@ -160,16 +156,15 @@ public class ShellTask extends AbstractTaskExecutor {
         return shellParameters;
     }
 
-    public void setResult(String result) {
-        Map<String, Property> localParams = shellParameters.getLocalParametersMap();
-        List<Map<String, String>> outProperties = new ArrayList<>();
-        Map<String, String> p = new HashMap<>();
-        localParams.forEach((k, v) -> {
-            if (v.getDirect() == Direct.OUT) {
-                p.put(k, result);
-            }
-        });
-        outProperties.add(p);
-        resultString = JSONUtils.toJsonString(outProperties);
+    private String parseScript(String script) {
+        // combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
+        }
+        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
 }
