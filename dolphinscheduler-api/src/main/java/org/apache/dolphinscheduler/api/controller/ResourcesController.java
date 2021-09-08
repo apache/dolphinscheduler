@@ -474,7 +474,6 @@ public class ResourcesController extends BaseController {
      */
     @ApiOperation(value = "createUdfFunc", notes = "CREATE_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
-<<<<<<< HEAD
         @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataType = "UdfType"),
         @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataType = "String"),
         @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataType = "String"),
@@ -482,15 +481,6 @@ public class ResourcesController extends BaseController {
         @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataType = "String"),
         @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType = "String"),
         @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
-=======
-            @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataType = "UdfType"),
-            @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataType = "String"),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
->>>>>>> upstream/dev
 
     })
     @PostMapping(value = "/{resourceId}/udf-func")
@@ -583,15 +573,9 @@ public class ResourcesController extends BaseController {
      */
     @ApiOperation(value = "queryUdfFuncListPaging", notes = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-<<<<<<< HEAD
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
-=======
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
->>>>>>> upstream/dev
     })
     @GetMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.OK)
