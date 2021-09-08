@@ -29,8 +29,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
-import org.apache.logging.log4j.util.Strings;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,10 +75,11 @@ public class ParamUtils {
                         scheduleTime);
 
         if (globalParamsMap != null) {
+
             params.putAll(globalParamsMap);
         }
 
-        if (Strings.isNotBlank(taskExecutionContext.getExecutePath())) {
+        if (StringUtils.isNotBlank(taskExecutionContext.getExecutePath())) {
             params.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
         }
         params.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));
@@ -107,6 +106,7 @@ public class ParamUtils {
                  *  and there are no variables in them.
                  */
                 String val = property.getValue();
+
                 val  = ParameterUtils.convertParameterPlaceholders(val, params);
                 property.setValue(val);
             }
@@ -117,6 +117,7 @@ public class ParamUtils {
 
     /**
      * format convert
+     *
      * @param paramsMap params map
      * @return Map of converted
      */
@@ -125,23 +126,24 @@ public class ParamUtils {
             return null;
         }
 
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
-            map.put(en.getKey(),en.getValue().getValue());
+            map.put(en.getKey(), en.getValue().getValue());
         }
         return map;
     }
 
     /**
      * get parameters map
+     *
      * @param definedParams definedParams
      * @return parameters map
      */
-    public static Map<String,Property> getUserDefParamsMap(Map<String,String> definedParams) {
+    public static Map<String, Property> getUserDefParamsMap(Map<String, String> definedParams) {
         if (definedParams != null) {
-            Map<String,Property> userDefParamsMaps = new HashMap<>();
+            Map<String, Property> userDefParamsMaps = new HashMap<>();
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();

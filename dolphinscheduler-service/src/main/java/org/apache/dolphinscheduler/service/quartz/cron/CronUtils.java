@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.quartz.cron;
 
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
 
-import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
-import com.cronutils.parser.CronParser;
+import static com.cronutils.model.CronType.QUARTZ;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -27,17 +31,21 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
-import java.util.*;
-
-import static com.cronutils.model.CronType.QUARTZ;
-
-import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.*;
-
+import com.cronutils.model.Cron;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.parser.CronParser;
 
 /**
  * cron utils
@@ -106,8 +114,8 @@ public class CronUtils {
     /**
      * gets all scheduled times for a period of time based on not self dependency
      *
-     * @param startTime      startTime
-     * @param endTime        endTime
+     * @param startTime startTime
+     * @param endTime endTime
      * @param cronExpression cronExpression
      * @return date list
      */
@@ -128,10 +136,10 @@ public class CronUtils {
     /**
      * gets expect scheduled times for a period of time based on self dependency
      *
-     * @param startTime      startTime
-     * @param endTime        endTime
+     * @param startTime startTime
+     * @param endTime endTime
      * @param cronExpression cronExpression
-     * @param fireTimes      fireTimes
+     * @param fireTimes fireTimes
      * @return date list
      */
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression, int fireTimes) {
@@ -151,8 +159,8 @@ public class CronUtils {
     /**
      * gets all scheduled times for a period of time based on self dependency
      *
-     * @param startTime      startTime
-     * @param endTime        endTime
+     * @param startTime startTime
+     * @param endTime endTime
      * @param cronExpression cronExpression
      * @return date list
      */
@@ -173,11 +181,6 @@ public class CronUtils {
     /**
      * gets all scheduled times for a period of time based on self dependency
      * if schedulers is empty then default scheduler = 1 day
-     *
-     * @param startTime
-     * @param endTime
-     * @param schedules
-     * @return
      */
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, List<Schedule> schedules) {
         List<Date> result = new ArrayList<>();
@@ -199,8 +202,8 @@ public class CronUtils {
      * gets all scheduled times for a period of time based on self dependency
      *
      * @param startTime startTime
-     * @param endTime   endTime
-     * @param cron      cron
+     * @param endTime endTime
+     * @param cron cron
      * @return date list
      */
     public static List<Date> getSelfFireDateList(Date startTime, Date endTime, String cron) {
@@ -256,7 +259,6 @@ public class CronUtils {
     /**
      * get the end time of the day by value of date
      *
-     * @param date
      * @return date
      */
     private static Date getEndTime(Date date) {
