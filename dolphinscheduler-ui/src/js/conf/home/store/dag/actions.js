@@ -176,8 +176,8 @@ export default {
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/batch-copy`, {
-        processDefinitionIds: payload.processDefinitionIds,
-        targetProjectId: payload.targetProjectId
+        codes: payload.processDefinitionIds,
+        targetProjectCode: payload.targetProjectId
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -192,8 +192,8 @@ export default {
   moveProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/batch-move`, {
-        processDefinitionIds: payload.processDefinitionIds,
-        targetProjectId: payload.targetProjectId
+        codes: payload.processDefinitionIds,
+        targetProjectCode: payload.targetProjectId
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -674,7 +674,7 @@ export default {
       }
     }
 
-    io.post(`projects/${state.projectCode}/process-definition/batch-export`, { processDefinitionIds: payload.processDefinitionIds }, res => {
+    io.post(`projects/${state.projectCode}/process-definition/batch-export`, { codes: payload.processDefinitionIds }, res => {
       downloadBlob(res, payload.fileName)
     }, e => {
 
@@ -772,7 +772,7 @@ export default {
    */
   getViewGantt ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-gantt`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}/view-gantt`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
