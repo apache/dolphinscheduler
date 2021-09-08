@@ -36,56 +36,53 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * query process definition log by name
      *
      * @param projectCode projectCode
-     * @param name process name
+     * @param name process definition name
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
-                                                     @Param("processDefinitionName") String name);
+    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode, @Param("name") String name);
 
     /**
      * query process definition log list
      *
-     * @param processDefinitionCode processDefinitionCode
+     * @param code process definition code
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+    List<ProcessDefinitionLog> queryByDefinitionCode(@Param("code") long code);
 
     /**
      * query max version for definition
      */
-    Integer queryMaxVersionForDefinition(@Param("processDefinitionCode") long processDefinitionCode);
+    Integer queryMaxVersionForDefinition(@Param("code") long code);
 
     /**
      * query max version definition log
      */
-    ProcessDefinitionLog queryMaxVersionDefinitionLog(@Param("processDefinitionCode") long processDefinitionCode);
+    ProcessDefinitionLog queryMaxVersionDefinitionLog(@Param("code") long code);
 
     /**
      * query the certain process definition version info by process definition code and version number
      *
-     * @param processDefinitionCode process definition code
+     * @param code process definition code
      * @param version version number
      * @return the process definition version info
      */
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode,
-                                                         @Param("version") long version);
-    
+    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,  @Param("version") int version);
+
     /**
      * query the paging process definition version list by pagination info
      *
      * @param page pagination info
-     * @param processDefinitionCode process definition code
+     * @param code process definition code
      * @return the paging process definition version list
      */
-    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
-                                                                         @Param("processDefinitionCode") Long processDefinitionCode);
+    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page, @Param("code") long code);
 
     /**
      * delete the certain process definition version by process definition id and version number
      *
-     * @param processDefinitionCode process definition code
+     * @param code process definition code
      * @param version version number
      * @return delete result
      */
-    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode, @Param("version") long version);
+    int deleteByProcessDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 }
