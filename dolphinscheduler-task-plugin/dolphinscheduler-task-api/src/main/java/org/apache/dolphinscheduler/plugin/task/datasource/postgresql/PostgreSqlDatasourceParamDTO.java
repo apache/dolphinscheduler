@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.postgresql;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class PostgreSqlDatasourceParamDTO extends BaseDataSourceParamDTO {
 

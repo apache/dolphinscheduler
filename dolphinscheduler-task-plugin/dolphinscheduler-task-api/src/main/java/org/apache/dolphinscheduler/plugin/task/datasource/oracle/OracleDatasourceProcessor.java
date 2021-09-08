@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.oracle;
 
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.AT_SIGN;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
@@ -24,15 +26,13 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_ORACLE_JDBC
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_ORACLE_SERVICE_NAME;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_ORACLE_SID;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 
-import org.apache.dolphinscheduler.spi.enums.DbConnectType;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.plugin.task.datasource.AbstractDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.task.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
