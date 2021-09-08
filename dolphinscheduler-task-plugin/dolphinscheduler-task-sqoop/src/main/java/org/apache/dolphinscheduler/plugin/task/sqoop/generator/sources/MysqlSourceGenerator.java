@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 
+import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.COLUMNS;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_CONNECT;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_PWD;
@@ -32,16 +33,15 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_QUOTES;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EQUAL_SIGN;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
-import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.decodePassword;
 
+import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;

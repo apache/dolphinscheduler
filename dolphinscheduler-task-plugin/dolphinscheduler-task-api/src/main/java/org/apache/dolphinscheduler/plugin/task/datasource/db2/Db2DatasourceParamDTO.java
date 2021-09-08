@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasource.db2;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class Db2DatasourceParamDTO extends BaseDataSourceParamDTO {
 
