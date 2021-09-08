@@ -355,6 +355,7 @@ public abstract class AbstractCommandExecutor {
                     }
                 }
             } catch (Exception e) {
+                Thread.currentThread().interrupt();
                 logger.error(e.getMessage(), e);
             } finally {
                 clear();

@@ -106,6 +106,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param failureStrategy failure strategy
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
+     * @param environmentCode environment code
      * @return create result code
      */
     @Override
@@ -117,7 +118,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                               int warningGroupId,
                                               FailureStrategy failureStrategy,
                                               Priority processInstancePriority,
-                                              String workerGroup) {
+                                              String workerGroup,
+                                              Long environmentCode) {
 
         Map<String, Object> result = new HashMap<>();
 
@@ -169,6 +171,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
+        scheduleObj.setEnvironmentCode(environmentCode);
         scheduleMapper.insert(scheduleObj);
 
         /**
@@ -196,6 +199,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
+     * @param environmentCode environment code
      * @param processInstancePriority process instance priority
      * @param scheduleStatus schedule status
      * @return update result code
@@ -211,7 +215,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                               FailureStrategy failureStrategy,
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
-                                              String workerGroup) {
+                                              String workerGroup,
+                                              Long environmentCode) {
         Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByName(projectName);
@@ -277,6 +282,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setReleaseState(scheduleStatus);
         }
         schedule.setWorkerGroup(workerGroup);
+        schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.updateById(schedule);
