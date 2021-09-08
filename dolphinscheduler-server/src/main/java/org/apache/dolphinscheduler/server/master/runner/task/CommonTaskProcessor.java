@@ -35,6 +35,8 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -90,6 +92,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     /**
      * common task cannot be paused
+     *
+     * @return
      */
     @Override
     protected boolean pauseTask() {
@@ -147,7 +151,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskInstance.getState().typeIsFinished()) {
                 return true;
             }
-            if (null == taskInstance.getHost() || taskInstance.getHost().isEmpty()) {
+            if (Strings.isBlank(taskInstance.getHost())) {
                 taskInstance.setState(ExecutionStatus.KILL);
                 taskInstance.setEndTime(new Date());
                 processService.updateTaskInstance(taskInstance);
