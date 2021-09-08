@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
 
+package org.apache.dolphinscheduler.server.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,17 +44,18 @@ public class SensitiveDataConverterTest {
      */
     private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
 
-    private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
-            "\"database\":\"carbond\"," +
-            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
-            "\"user\":\"view\"," +
-            "\"password\":\"view1\"}";
+    private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
+            + "\"database\":\"carbond\","
+            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+            + "\"user\":\"view\","
+            + "\"password\":\"view1\"}";
 
-    private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
-            "\"database\":\"carbond\"," +
-            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
-            "\"user\":\"view\"," +
-            "\"password\":\"******\"}";
+    private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
+            + "\"database\":\"carbond\","
+            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+            + "\"user\":\"view\","
+            + "\"password\":\"******\"}";
+
     @Test
     public void convert() {
         SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
@@ -173,7 +176,6 @@ public class SensitiveDataConverterTest {
 
         return sb.toString();
     }
-
 
 
 }
