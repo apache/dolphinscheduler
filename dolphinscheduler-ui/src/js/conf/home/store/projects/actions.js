@@ -23,7 +23,7 @@ export default {
    */
   getProjectsList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('projects/list-paging', payload, res => {
+      io.get('projects', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -35,7 +35,7 @@ export default {
    */
   getProjectById ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('projects/query-by-id', payload, res => {
+      io.get(`projects/${payload}`, {}, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -47,7 +47,7 @@ export default {
    */
   createProjects ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('projects/create', payload, res => {
+      io.post('projects', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -59,7 +59,7 @@ export default {
    */
   deleteProjects ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('projects/delete', payload, res => {
+      io.delete(`projects/${payload}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -71,7 +71,7 @@ export default {
    */
   updateProjects ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('projects/update', payload, res => {
+      io.put(`projects/${payload.projectId}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

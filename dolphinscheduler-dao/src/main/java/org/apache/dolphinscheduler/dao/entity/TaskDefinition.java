@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -36,6 +38,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * task definition
@@ -87,6 +91,8 @@ public class TaskDefinition {
     /**
      * user defined parameters
      */
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String taskParams;
 
     /**
@@ -179,6 +185,12 @@ public class TaskDefinition {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * modify user name
+     */
+    @TableField(exist = false)
+    private String modifyBy;
 
     public TaskDefinition() {
     }
@@ -400,6 +412,18 @@ public class TaskDefinition {
         this.delayTime = delayTime;
     }
 
+    public String getDependence() {
+        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
+    }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
+    }
+
     public Long getEnvironmentCode() {
         return this.environmentCode;
     }
@@ -409,34 +433,56 @@ public class TaskDefinition {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        TaskDefinition that = (TaskDefinition) o;
+        return failRetryTimes == that.failRetryTimes
+            && failRetryInterval == that.failRetryInterval
+            && timeout == that.timeout
+            && delayTime == that.delayTime
+            && Objects.equals(name, that.name)
+            && Objects.equals(description, that.description)
+            && Objects.equals(taskType, that.taskType)
+            && Objects.equals(taskParams, that.taskParams)
+            && flag == that.flag
+            && taskPriority == that.taskPriority
+            && Objects.equals(workerGroup, that.workerGroup)
+            && timeoutFlag == that.timeoutFlag
+            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+            && Objects.equals(resourceIds, that.resourceIds);
+    }
+
+    @Override
     public String toString() {
         return "TaskDefinition{"
-                + "id=" + id
-                + ", code=" + code
-                + ", name='" + name + '\''
-                + ", version=" + version
-                + ", description='" + description + '\''
-                + ", projectCode=" + projectCode
-                + ", userId=" + userId
-                + ", taskType=" + taskType
-                + ", taskParams='" + taskParams + '\''
-                + ", taskParamList=" + taskParamList
-                + ", taskParamMap=" + taskParamMap
-                + ", flag=" + flag
-                + ", taskPriority=" + taskPriority
-                + ", userName='" + userName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", failRetryTimes=" + failRetryTimes
-                + ", failRetryInterval=" + failRetryInterval
-                + ", timeoutFlag=" + timeoutFlag
-                + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
-                + ", timeout=" + timeout
-                + ", delayTime=" + delayTime
-                + ", resourceIds='" + resourceIds + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+            + "id=" + id
+            + ", code=" + code
+            + ", name='" + name + '\''
+            + ", version=" + version
+            + ", description='" + description + '\''
+            + ", projectCode=" + projectCode
+            + ", userId=" + userId
+            + ", taskType=" + taskType
+            + ", taskParams='" + taskParams + '\''
+            + ", taskParamList=" + taskParamList
+            + ", taskParamMap=" + taskParamMap
+            + ", flag=" + flag
+            + ", taskPriority=" + taskPriority
+            + ", userName='" + userName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", failRetryTimes=" + failRetryTimes
+            + ", environmentCode='" + environmentCode + '\''
+            + ", failRetryInterval=" + failRetryInterval
+            + ", timeoutFlag=" + timeoutFlag
+            + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
+            + ", timeout=" + timeout
+            + ", delayTime=" + delayTime
+            + ", resourceIds='" + resourceIds + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }
