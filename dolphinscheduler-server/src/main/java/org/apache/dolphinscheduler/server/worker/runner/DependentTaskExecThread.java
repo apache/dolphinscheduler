@@ -162,6 +162,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
+                Thread.currentThread().interrupt();
                 logger.error("exception", e);
                 if (processInstance != null) {
                     logger.error("wait task quit failed, instance id:{}, task id:{}",
