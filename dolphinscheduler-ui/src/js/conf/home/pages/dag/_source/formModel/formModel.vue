@@ -276,12 +276,7 @@
           :nodeData="nodeData"
         ></m-switch>
         <!-- Pre-tasks in workflow -->
-        <!-- TODO -->
-        <!-- <m-pre-tasks
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
-          @on-pre-tasks="_onPreTasks"
-          ref="PRE_TASK"
-          :backfill-item="backfillItem"></m-pre-tasks> -->
+        <m-pre-tasks ref="preTasks" v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1" :code="code"/>
       </div>
     </div>
     <div class="bottom-box">
@@ -317,8 +312,8 @@
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
-  // import mPreTasks from './tasks/pre_tasks'
   import mRelatedEnvironment from './_source/relatedEnvironment'
+  import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
@@ -352,7 +347,7 @@
         // cache dependence
         cacheDependence: {},
         // task code
-        code: '',
+        code: 0,
         // Current node params data
         params: {},
         // Running sign
@@ -385,11 +380,7 @@
             value: 'failed',
             label: `${i18n.$t('Failed')}`
           }
-        ],
-        // preTasks
-        preTaskIdsInWorkflow: [],
-        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
+        ]
       }
     },
     /**
@@ -413,7 +404,6 @@
           maxRetryTimes: task.failRetryTimes,
           name: task.name,
           params: _.omit(task.taskParams, ['conditionResult', 'dependence']),
-          preTasks: [],
           retryInterval: task.failRetryInterval,
           runFlag: task.flag,
           taskInstancePriority: task.taskPriority,
@@ -435,14 +425,6 @@
       },
       _onSwitchResult (o) {
         this.switchResult = o
-      },
-      /**
-       * Pre-tasks in workflow
-       */
-      _onPreTasks (o) {
-        this.preTaskIdsInWorkflow = o.preTasks
-        this.preTasksToAdd = o.preTasksToAdd
-        this.preTasksToDelete = o.preTasksToDelete
       },
       /**
        * cache dependent
@@ -515,42 +497,13 @@
       _onParams (o) {
         this.params = Object.assign({}, o)
       },
-      _onCacheParams (o) {
-        this.params = Object.assign(this.params, {}, o)
-        this._cacheItem()
-      },
       _onUpdateEnvironmentCode (o) {
         this.environmentCode = o
       },
-      _cacheItem () {
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
-        this.$emit('cacheTaskInfo', {
-          item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
-            name: this.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            switchResult: this.switchResult,
-            dependence: this.cacheDependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            environmentCode: this.environmentCode,
-            status: this.status,
-            branch: this.branch
-          },
-          fromThis: this
-        })
-      },
+      /**
+       * _onCacheParams is reserved
+       */
+      _onCacheParams (o) {},
       /**
        * verification name
        */
@@ -607,19 +560,13 @@
             return
           }
         }
-
         // Verify node parameters
         if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
-        // Verify preTasks and update dag-things
-        if (this.$refs.PRE_TASK) {
-          if (!this.$refs.PRE_TASK._verification()) {
-            return
-          } else {
-            // TODO sync preTasks to graph
-
-          }
+        // set preTask
+        if (this.$refs.preTasks) {
+          this.$refs.preTasks.setPreNodes()
         }
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
@@ -702,6 +649,7 @@
           }
         })
       }
+      this.code = this.nodeData.id
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.code = o.code
@@ -742,16 +690,6 @@
       }
       this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
-
-      // Init value of preTask selector
-      let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
-      if (!_.isEmpty(this.backfillItem)) {
-        if (preTaskIds && preTaskIds.length) {
-          this.backfillItem.preTasks = preTaskIds.split(',')
-        } else {
-          this.backfillItem.preTasks = []
-        }
-      }
     },
     mounted () {
       let self = this
@@ -809,8 +747,8 @@
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
-      // mPreTasks
-      mRelatedEnvironment
+      mRelatedEnvironment,
+      mPreTasks
     }
   }
 </script>

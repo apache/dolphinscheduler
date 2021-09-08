@@ -497,19 +497,6 @@
         this.startDialog = false
       },
       /**
-       * Verify whether edge is valid
-       * The number of edges start with CONDITIONS task cannot be greater than 2
-       */
-      edgeIsValid (edge) {
-        const { sourceId } = edge
-        const sourceTask = this.tasks.find((task) => task.code === sourceId)
-        if (sourceTask.taskType === 'CONDITIONS') {
-          const edges = this.$refs.canvas.getEdges()
-          return edges.filter((e) => e.sourceId === sourceTask.code).length <= 2
-        }
-        return true
-      },
-      /**
        * Task status
        */
       refreshTaskStatus () {
