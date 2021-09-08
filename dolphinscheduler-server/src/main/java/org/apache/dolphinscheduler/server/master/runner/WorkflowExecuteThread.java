@@ -205,6 +205,7 @@ public class WorkflowExecuteThread implements Runnable {
      * @param processInstance processInstance
      * @param processService processService
      * @param nettyExecutorManager nettyExecutorManager
+     * @param taskTimeoutCheckList
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
@@ -568,12 +569,10 @@ public class WorkflowExecuteThread implements Runnable {
                 startDate = endDate;
                 endDate = tmp;
             }
-            ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion());
-            List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinition.getId());
+            List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
             complementListDate.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
-            logger.info(" process definition id:{} complement data: {}",
-                    processDefinition.getId(), complementListDate.toString());
+            logger.info(" process definition code:{} complement data: {}",
+                processInstance.getProcessDefinitionCode(), complementListDate.toString());
         }
 
     }
@@ -998,6 +997,7 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      * generate the latest process instance status by the tasks state
      *
+     * @param instance
      * @return process instance execution status
      */
     private ExecutionStatus getProcessInstanceState(ProcessInstance instance) {
