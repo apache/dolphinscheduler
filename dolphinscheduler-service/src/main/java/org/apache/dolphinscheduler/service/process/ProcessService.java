@@ -103,6 +103,8 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
@@ -202,9 +204,12 @@ public class ProcessService {
     @Autowired
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
-    @Autowired
-    private EnvironmentMapper environmentMapper;
 
+    @Autowired
+    StateEventCallbackService stateEventCallbackService;   
+
+	 @Autowired
+    private EnvironmentMapper environmentMapper;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -229,10 +234,68 @@ public class ProcessService {
         }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
-        saveProcessInstance(processInstance);
+        //if the processDefination is serial
+        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerial()) {
+            saveSerialProcess(processInstance);
+            if (processInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
+                return null;
+            }
+        } else {
+            saveProcessInstance(processInstance);
+        }
         this.setSubProcessParam(processInstance);
         this.commandMapper.deleteById(command.getId());
         return processInstance;
+    }
+
+    private void saveSerialProcess(ProcessInstance processInstance) {
+        processInstance.setState(ExecutionStatus.SERIAL_WAIT);
+        saveProcessInstance(processInstance);
+        //serial wait
+        //when we get the running instance(or waiting instance) only get the priority instance(by id)
+        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialWait()) {
+            while (true) {
+                List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                        Constants.RUNNING_PROCESS_STATE,processInstance.getId());
+                if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
+                    processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+                    saveProcessInstance(processInstance);
+                    return;
+                }
+                ProcessInstance runningProcess = runningProcessInstances.get(0);
+                if (this.processInstanceMapper.updateNextProcessIdById(processInstance.getId(), runningProcess.getId())) {
+                    return;
+                }
+            }
+        } else if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialDiscard()) {
+            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                    Constants.RUNNING_PROCESS_STATE,processInstance.getId());
+            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
+                processInstance.setState(ExecutionStatus.STOP);
+                saveProcessInstance(processInstance);
+            }
+        } else if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialPriority()) {
+            List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
+                    Constants.RUNNING_PROCESS_STATE,processInstance.getId());
+            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
+                for (ProcessInstance info : runningProcessInstances) {
+                    info.setCommandType(CommandType.STOP);
+                    info.addHistoryCmd(CommandType.STOP);
+                    info.setState(ExecutionStatus.READY_STOP);
+                    int update = updateProcessInstance(info);
+                    // determine whether the process is normal
+                    if (update > 0) {
+                        String host = info.getHost();
+                        String address = host.split(":")[0];
+                        int port = Integer.parseInt(host.split(":")[1]);
+                        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+                                info.getId(), 0, info.getState(), info.getId(), 0
+                        );
+                        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -2544,5 +2607,9 @@ public class ProcessService {
             processTaskMap.put(fatherProcess, fatherTask);
         }
         return processTaskMap;
+    }
+
+    public ProcessInstance loadNextProcess4Serial(long code, int state) {
+        return this.processInstanceMapper.loadNextProcess4Serial(code,state);
     }
 }

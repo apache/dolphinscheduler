@@ -218,9 +218,36 @@
         </foreach>
         order by id asc
     </select>
+    <select id="queryByProcessDefineCodeAndStatusAndNextId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code=#{processDefinitionCode}
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+        and next_peocess_instance_id=0
+        and id <![CDATA[ > ]]> #{id}
+        order by id desc
+    </select>
+    <select id="loadNextProcess4Serial" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code=#{processDefinitionCode}
+        and state = #{state}
+        and id <![CDATA[ < ]]> #{id}
+        order by id desc limit 1
+    </select>
     <update id="updateGlobalParamsById">
         update t_ds_process_instance
         set global_params = #{globalParams}
         where id = #{id}
+    </update>
+    <update id="updateNextProcessIdById">
+        update t_ds_process_instance
+        set next_peocess_instance_id = #{thisInstanceId}
+        where id = #{runningInstanceId} and next_peocess_instance_id=0
     </update>
 </mapper>

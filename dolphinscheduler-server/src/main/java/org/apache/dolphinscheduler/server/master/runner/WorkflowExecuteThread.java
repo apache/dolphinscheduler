@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
@@ -50,6 +51,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -495,6 +497,9 @@ public class WorkflowExecuteThread implements Runnable {
     private void endProcess() {
         this.stateEvents.clear();
         processInstance.setEndTime(new Date());
+        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialWait()) {
+            checkSerialProcess();
+        }
         processService.updateProcessInstance(processInstance);
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
@@ -502,6 +507,25 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+    }
+
+    private void checkSerialProcess() {
+        this.processInstance = processService.findProcessInstanceById(processInstance.getId());
+        int nextInstanceId = processInstance.getNextProcessInstanceId();
+        if (nextInstanceId == 0) {
+            ProcessInstance nextProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(),ExecutionStatus.SERIAL_WAIT.getCode());
+            if (nextProcessInstance == null) {
+                return;
+            }
+            nextInstanceId = nextProcessInstance.getId();
+        }
+        Map<String, Object> cmdParam = new HashMap<>();
+        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
+        Command command = new Command();
+        command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
+        command.setProcessDefinitionCode(processInstance.getProcessDefinition().getCode());
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+        processService.createCommand(command);
     }
 
     /**
