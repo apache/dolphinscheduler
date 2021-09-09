@@ -44,7 +44,7 @@ public class RuleManager {
     private final Map<String, String> inputParameterValue;
     private final DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
-    private static final String FIXED_VALUE_COMPARISON_TYPE = "1";
+    private static final String NONE_COMPARISON_TYPE = "0";
     private static final String BASE_SQL =
             "select ${rule_type} as rule_type,"
                     + "${rule_name} as rule_name,"
@@ -102,7 +102,7 @@ public class RuleManager {
                 RuleParserUtils.getInputParameterMapFromEntryList(dataQualityTaskExecutionContext.getRuleInputEntryList());
         inputParameterValueResult.putAll(inputParameterValue);
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
-        inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, FIXED_VALUE_COMPARISON_TYPE);
+        inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, NONE_COMPARISON_TYPE);
         inputParameterValueResult.put(UNIQUE_CODE,
                 StringUtils.wrapperSingleQuotes(RuleParserUtils.generateUniqueCode(inputParameterValueResult)));
 
