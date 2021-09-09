@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.model.JdbcInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 /**
- * SqlUtils
+ * JdbcUrlParser
  */
 public class JdbcUrlParser {
 
