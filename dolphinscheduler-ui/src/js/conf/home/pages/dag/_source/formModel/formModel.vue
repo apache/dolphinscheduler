@@ -418,7 +418,7 @@
             enable: task.timeoutFlag === 'OPEN'
           },
           type: task.taskType,
-          waitStartTimeout: task.waitStartTimeout,
+          waitStartTimeout: task.taskParams.waitStartTimeout,
           workerGroup: task.workerGroup
         }
       },
@@ -508,7 +508,9 @@
       /**
        * _onCacheParams is reserved
        */
-      _onCacheParams (o) {},
+      _onCacheParams (o) {
+        this.params = Object.assign(this.params, {}, o)
+      },
       /**
        * verification name
        */
@@ -584,7 +586,8 @@
             taskParams: {
               ...this.params,
               dependence: this.cacheDependence,
-              conditionResult: this.conditionResult
+              conditionResult: this.conditionResult,
+              waitStartTimeout: this.waitStartTimeout
             },
             flag: this.runFlag,
             taskPriority: this.taskInstancePriority,
@@ -717,20 +720,13 @@
         const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
         const postNodes = canvas.getPostNodes(this.code)
         const prevNodes = canvas.getPrevNodes(this.code)
-        this.postTasks = postNodes.map(node => {
-          return {
-            code: node.id,
-            name: node.data.taskName,
-            type: node.data.taskType
-          }
+        const buildTask = (node) => ({
+          code: node.id,
+          name: node.data.taskName,
+          type: node.data.taskType
         })
-        this.prevTasks = prevNodes.map(node => {
-          return {
-            code: node.id,
-            name: node.data.taskName,
-            type: node.data.taskType
-          }
-        })
+        this.postTasks = postNodes.map(buildTask)
+        this.prevTasks = prevNodes.map(buildTask)
       }
     },
     mounted () {

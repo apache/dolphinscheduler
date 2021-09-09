@@ -216,8 +216,6 @@
             }
           }
         }))
-        // TODO will be deleted
-        window._graph = graph
         this.registerX6Shape()
         this.bindGraphEvent()
         this.originalScrollPosition = graph.getScrollbarPosition()
