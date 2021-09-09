@@ -47,15 +47,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-<<<<<<< HEAD
-=======
-import org.apache.http.entity.ContentType;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
->>>>>>> [Improvement][Dao] SQL optimization - remove unused import
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;

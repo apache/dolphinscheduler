@@ -107,23 +107,10 @@ public class DataSourceServiceTest {
         Result connectFailedResult = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
         Assert.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(), connectFailedResult.getCode().intValue());
 
-<<<<<<< HEAD
-        // data source exits
-        PowerMockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-        connectionResult = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        PowerMockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-        Result notValidError = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), notValidError.getCode().intValue());
-
-        // success
-        PowerMockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-        PowerMockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-=======
         // data source doesn't exist but getConnection return a connection obj, should still return success
         Connection connection = mock(Connection.class);
         PowerMockito.when(dataSourceMapper.existDataSourceByName(dataSourceName.trim())).thenReturn(Boolean.FALSE);
         PowerMockito.when(DatasourceUtil.getConnection(dataSourceType, null)).thenReturn(connection);
->>>>>>> [Improvement][Dao] SQL optimization - fix ut
         Result success = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
         Assert.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
     }
@@ -186,7 +173,7 @@ public class DataSourceServiceTest {
         PowerMockito.when(DatasourceUtil.buildConnectionParams(postgreSqlDatasourceParam)).thenReturn(connectionParam);
         PowerMockito.when(connectionParam.getPassword()).thenReturn(postgreSqlDatasourceParam.getPassword());
         Result connectFailed = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
-        Assert.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(), connectFailed.getCode().intValue());
+        Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), connectFailed.getCode().intValue());
 
         //success
         PowerMockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
