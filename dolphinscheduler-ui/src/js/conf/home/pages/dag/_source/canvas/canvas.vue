@@ -85,9 +85,7 @@
       contextMenu
     },
     computed: {
-      ...mapState('dag', [
-        'tasks'
-      ])
+      ...mapState('dag', ['tasks'])
     },
     methods: {
       ...mapActions('dag', ['genTaskCodeList']),
@@ -237,7 +235,9 @@
         this.graph.on('cell:mouseenter', (data) => {
           const { cell, e } = data
           const isStatusIcon = (tagName) =>
-            tagName && (tagName.toLocaleLowerCase() === 'em' || tagName.toLocaleLowerCase() === 'body')
+            tagName &&
+            (tagName.toLocaleLowerCase() === 'em' ||
+              tagName.toLocaleLowerCase() === 'body')
           if (!isStatusIcon(e.target.tagName)) {
             this.setHighlight(cell)
           }
@@ -381,42 +381,38 @@
        * @param {Edge} edge
        */
       setEdgeHighlight (edge) {
-        edge.setAttrs(EDGE_HIGHLIGHT_PROPS.attrs)
         const labelName = this.getEdgeLabelName(edge)
-        if (labelName) {
-          edge.setLabels([
-            _.merge(EDGE_HIGHLIGHT_PROPS.defaultLabel, {
-              attrs: {
-                label: {
-                  text: labelName
-                }
-              }
-            })
-          ])
-        }
+        edge.setAttrs(EDGE_HIGHLIGHT_PROPS.attrs)
+        edge.setLabels([
+          _.merge(
+            {
+              attrs: _.cloneDeep(EDGE_HIGHLIGHT_PROPS.defaultLabel.attrs)
+            },
+            {
+              attrs: { label: { text: labelName } }
+            }
+          )
+        ])
       },
       /**
        * Reset edge style
        * @param {Edge} edge
        */
       resetEdgeStyle (edge) {
-        edge.setAttrs(EDGE_PROPS.attrs)
         const labelName = this.getEdgeLabelName(edge)
-        if (labelName) {
-          edge.setLabels([
-            {
-              attrs: {
-                label: {
-                  fill: EDGE_PROPS.defaultLabel.attrs.label.fill,
-                  text: labelName
-                },
-                body: {
-                  stroke: EDGE_PROPS.defaultLabel.attrs.body.stroke
-                }
+        edge.setAttrs(EDGE_PROPS.attrs)
+        edge.setLabels([
+          {
+            ..._.merge(
+              {
+                attrs: _.cloneDeep(EDGE_PROPS.defaultLabel.attrs)
+              },
+              {
+                attrs: { label: { text: labelName } }
               }
-            }
-          ])
-        }
+            )
+          }
+        ])
       },
       /**
        * Set cell highlight
@@ -644,7 +640,7 @@
         this.graph.removeCells(cells)
         cells.forEach((cell) => {
           if (cell.isNode()) {
-            this.removeTask(cell.id)
+            this.removeTask(+cell.id)
           }
         })
       },
@@ -761,12 +757,12 @@
         const nodes = this.getNodes()
         const edges = this.getEdges()
         const nodesMap = {}
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
           nodesMap[node.id] = node
         })
         return edges
-          .filter(edge => edge.targetId === code)
-          .map(edge => nodesMap[edge.sourceId])
+          .filter((edge) => edge.targetId === code)
+          .map((edge) => nodesMap[edge.sourceId])
       },
       /**
        * set prev nodes
@@ -786,7 +782,7 @@
             }
           }
         })
-        preNodeCodes.forEach(preCode => {
+        preNodeCodes.forEach((preCode) => {
           if (currPreCodes.includes(preCode) || preCode === code) return
           const edge = this.genEdgeJSON(preCode, code)
           this.graph.addEdge(edge)
@@ -802,12 +798,12 @@
         const nodes = this.getNodes()
         const edges = this.getEdges()
         const nodesMap = {}
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
           nodesMap[node.id] = node
         })
         return edges
-          .filter(edge => edge.sourceId === code)
-          .map(edge => nodesMap[edge.targetId])
+          .filter((edge) => edge.sourceId === code)
+          .map((edge) => nodesMap[edge.targetId])
       },
       /**
        * set post nodes
@@ -827,7 +823,7 @@
             }
           }
         })
-        postNodeCodes.forEach(postCode => {
+        postNodeCodes.forEach((postCode) => {
           if (currPostCodes.includes(postCode) || postCode === code) return
           const edge = this.genEdgeJSON(code, postCode)
           this.graph.addEdge(edge)

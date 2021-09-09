@@ -144,7 +144,7 @@ export default {
         // timeout
         state.timeout = res.data.processDefinition.timeout
         // tenantId
-        state.tenantCode = res.data.processDefinition.tenantCode
+        state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
         state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
           'code',
@@ -240,7 +240,7 @@ export default {
         // timeout
         state.timeout = processDefinition.timeout
         // tenantCode
-        state.tenantCode = res.data.tenantCode
+        state.tenantCode = res.data.tenantCode || 'default'
         // tasks info
         state.tasks = taskDefinitionList.map(task => _.pick(task, [
           'code',
