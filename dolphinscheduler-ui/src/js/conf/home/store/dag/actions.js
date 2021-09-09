@@ -760,7 +760,7 @@ export default {
    */
   getViewTree ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/view-tree`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/view-tree`, { limit: payload.limit }, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
