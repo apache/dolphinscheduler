@@ -772,7 +772,7 @@ export default {
    */
   getViewGantt ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-gantt`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}/view-gantt`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
