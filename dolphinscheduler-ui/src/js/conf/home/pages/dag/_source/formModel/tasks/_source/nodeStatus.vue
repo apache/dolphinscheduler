@@ -18,7 +18,7 @@
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
       <el-select style="width: 150px;" size="small" v-model="el.depTasks" :disabled="isDetails">
-        <el-option v-for="item in preNode" :key="item.value" :value="item.value" :label="item.label">
+        <el-option v-for="item in prevTasks" :key="item.code" :value="item.name" :label="item.name">
         </el-option>
       </el-select>
       <el-select style="width: 116px;" size="small" v-model="el.status" :disabled="isDetails">
@@ -65,7 +65,7 @@
       dependItemList: Array,
       index: Number,
       dependTaskList: Array,
-      preNode: Array
+      prevTasks: Array
     },
     model: {
       prop: 'dependItemList',

@@ -16,14 +16,14 @@
  */
 <template>
   <div class="dag-canvas">
-    <dag-taskbar @on-drag-start="_onDragStart" />
+    <dag-taskbar @on-drag-start="onDragStart" />
     <div
       class="dag-container"
       ref="container"
       @dragenter.prevent
       @dragover.prevent
       @dragleave.prevent
-      @drop.stop.prevent="_onDrop"
+      @drop.stop.prevent="onDrop"
     >
       <div ref="paper" class="paper"></div>
       <div ref="minimap" class="minimap"></div>
@@ -52,7 +52,7 @@
   } from './x6-helper'
   import { DagreLayout } from '@antv/layout'
   import { tasksType, tasksState } from '../config'
-  import { mapActions, mapMutations } from 'vuex'
+  import { mapActions, mapMutations, mapState } from 'vuex'
   import nodeStatus from './nodeStatus'
 
   export default {
@@ -83,6 +83,11 @@
     components: {
       dagTaskbar,
       contextMenu
+    },
+    computed: {
+      ...mapState('dag', [
+        'tasks'
+      ])
     },
     methods: {
       ...mapActions('dag', ['genTaskCodeList']),
@@ -182,7 +187,7 @@
                   sourceId: Number(sourceCell.id),
                   targetId: Number(targetCell.id)
                 }
-                if (!self.dagChart.edgeIsValid(edgeData)) {
+                if (!self.edgeIsValid(edgeData)) {
                   return false
                 }
               }
@@ -211,8 +216,6 @@
             }
           }
         }))
-        // TODO will be deleted
-        window._graph = graph
         this.registerX6Shape()
         this.bindGraphEvent()
         this.originalScrollPosition = graph.getScrollbarPosition()
@@ -476,6 +479,7 @@
        * @return {Edge[]} Edge is inherited from the Cell
        */
       // interface Edge {
+      //   id: string;
       //   label: string;
       //   sourceId: number;
       //   targetId: number;
@@ -485,6 +489,7 @@
         return edges.map((edge) => {
           const labelData = edge.getLabelAt(0)
           return {
+            id: edge.id,
             label: _.get(labelData, ['attrs', 'label', 'text'], ''),
             sourceId: Number(edge.getSourceCellId()),
             targetId: Number(edge.getTargetCellId())
@@ -626,10 +631,9 @@
       },
       /**
        * remove an edge
-       * @param {string|number} id EdgeId
+       * @param {string} id EdgeId
        */
       removeEdge (id) {
-        id += ''
         this.graph.removeEdge(id)
       },
       /**
@@ -643,6 +647,19 @@
             this.removeTask(cell.id)
           }
         })
+      },
+      /**
+       * Verify whether edge is valid
+       * The number of edges start with CONDITIONS task cannot be greater than 2
+       */
+      edgeIsValid (edge) {
+        const { sourceId } = edge
+        const sourceTask = this.tasks.find((task) => task.code === sourceId)
+        if (sourceTask.taskType === 'CONDITIONS') {
+          const edges = this.getEdges()
+          return edges.filter((e) => e.sourceId === sourceTask.code).length <= 2
+        }
+        return true
       },
       /**
        * Gets the current selections
@@ -687,7 +704,7 @@
       /**
        * Drag && Drop Event
        */
-      _onDragStart (e, taskType) {
+      onDragStart (e, taskType) {
         if (!this.editable) {
           e.preventDefault()
           return
@@ -697,6 +714,21 @@
           y: e.offsetY,
           type: taskType.name
         }
+      },
+      onDrop (e) {
+        const { type } = this.dragging
+        const { x, y } = this.calcGraphCoordinate(e.clientX, e.clientY)
+        this.genTaskCodeList({
+          genNum: 1
+        })
+          .then((res) => {
+            const [code] = res
+            this.addNode(code, type, { x, y })
+            this.dagChart.openFormModel(code, type)
+          })
+          .catch((err) => {
+            console.error(err)
+          })
       },
       calcGraphCoordinate (mClientX, mClientY) {
         // Distance from the mouse to the top-left corner of the container;
@@ -719,20 +751,87 @@
           y: mouseY + scrollY - eY
         }
       },
-      _onDrop (e) {
-        const { type } = this.dragging
-        const { x, y } = this.calcGraphCoordinate(e.clientX, e.clientY)
-        this.genTaskCodeList({
-          genNum: 1
+      /**
+       * Get prev nodes by code
+       * @param {number} code
+       * node1 -> node2 -> node3
+       * getPrevNodes(node2.code) => [node1]
+       */
+      getPrevNodes (code) {
+        const nodes = this.getNodes()
+        const edges = this.getEdges()
+        const nodesMap = {}
+        nodes.forEach(node => {
+          nodesMap[node.id] = node
         })
-          .then((res) => {
-            const [code] = res
-            this.addNode(code, type, { x, y })
-            this.dagChart.openFormModel(code, type)
-          })
-          .catch((err) => {
-            console.error(err)
-          })
+        return edges
+          .filter(edge => edge.targetId === code)
+          .map(edge => nodesMap[edge.sourceId])
+      },
+      /**
+       * set prev nodes
+       * @param {number} code
+       * @param {number[]} preNodeCodes
+       * @param {boolean} override If set to true, setPreNodes will delete all edges that end with the node and rebuild
+       */
+      setPreNodes (code, preNodeCodes, override) {
+        const edges = this.getEdges()
+        const currPreCodes = []
+        edges.forEach((edge) => {
+          if (edge.targetId === code) {
+            if (override) {
+              this.removeEdge(edge.id)
+            } else {
+              currPreCodes.push(edge.sourceId)
+            }
+          }
+        })
+        preNodeCodes.forEach(preCode => {
+          if (currPreCodes.includes(preCode) || preCode === code) return
+          const edge = this.genEdgeJSON(preCode, code)
+          this.graph.addEdge(edge)
+        })
+      },
+      /**
+       * Get post nodes by code
+       * @param {number} code
+       * node1 -> node2 -> node3
+       * getPostNodes(node2.code) => [node3]
+       */
+      getPostNodes (code) {
+        const nodes = this.getNodes()
+        const edges = this.getEdges()
+        const nodesMap = {}
+        nodes.forEach(node => {
+          nodesMap[node.id] = node
+        })
+        return edges
+          .filter(edge => edge.sourceId === code)
+          .map(edge => nodesMap[edge.targetId])
+      },
+      /**
+       * set post nodes
+       * @param {number} code
+       * @param {number[]} postNodeCodes
+       * @param {boolean} override If set to true, setPreNodes will delete all edges that end with the node and rebuild
+       */
+      setPostNodes (code, postNodeCodes, override) {
+        const edges = this.getEdges()
+        const currPostCodes = []
+        edges.forEach((edge) => {
+          if (edge.sourceId === code) {
+            if (override) {
+              this.removeEdge(edge.id)
+            } else {
+              currPostCodes.push(edge.targetId)
+            }
+          }
+        })
+        postNodeCodes.forEach(postCode => {
+          if (currPostCodes.includes(postCode) || postCode === code) return
+          const edge = this.genEdgeJSON(code, postCode)
+          this.graph.addEdge(edge)
+        })
       }
     }
   }

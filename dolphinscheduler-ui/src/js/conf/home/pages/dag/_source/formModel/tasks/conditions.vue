@@ -53,8 +53,7 @@
               @on-delete-all="_onDeleteAll"
               @getDependTaskList="getDependTaskList"
               :index="$index"
-              :rear-list = "rearList"
-              :pre-node = "preNode">
+              :prev-tasks="prevTasks">
             </m-node-status>
           </div>
         </div>
@@ -79,8 +78,7 @@
     mixins: [disabledState],
     props: {
       backfillItem: Object,
-      preNode: Array,
-      rearList: Array
+      prevTasks: Array
     },
     methods: {
       _addDep () {

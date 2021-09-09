@@ -123,8 +123,8 @@
               </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable>
-              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable :disabled="isDetails">
+              <el-option v-for="item in postTasks" :key="item.code" :value="item.name" :label="item.name"></el-option>
             </el-select>
           </div>
         </m-list-box>
@@ -137,8 +137,8 @@
               </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable>
-              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable :disabled="isDetails">
+              <el-option v-for="item in postTasks" :key="item.code" :value="item.name" :label="item.name"></el-option>
             </el-select>
           </div>
         </m-list-box>
@@ -266,7 +266,7 @@
           @on-dependent="_onDependent"
           @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
-          :pre-node="nodeData.preNode">
+          :prev-tasks="prevTasks">
         </m-conditions>
         <m-switch
           v-if="nodeData.taskType === 'SWITCH'"
@@ -276,12 +276,7 @@
           :nodeData="nodeData"
         ></m-switch>
         <!-- Pre-tasks in workflow -->
-        <!-- TODO -->
-        <!-- <m-pre-tasks
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
-          @on-pre-tasks="_onPreTasks"
-          ref="PRE_TASK"
-          :backfill-item="backfillItem"></m-pre-tasks> -->
+        <m-pre-tasks ref="preTasks" v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1" :code="code"/>
       </div>
     </div>
     <div class="bottom-box">
@@ -317,11 +312,12 @@
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
-  // import mPreTasks from './tasks/pre_tasks'
   import mRelatedEnvironment from './_source/relatedEnvironment'
+  import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'form-model',
@@ -352,7 +348,7 @@
         // cache dependence
         cacheDependence: {},
         // task code
-        code: '',
+        code: 0,
         // Current node params data
         params: {},
         // Running sign
@@ -386,10 +382,9 @@
             label: `${i18n.$t('Failed')}`
           }
         ],
-        // preTasks
-        preTaskIdsInWorkflow: [],
-        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
+        // for CONDITIONS
+        postTasks: [],
+        prevTasks: []
       }
     },
     /**
@@ -400,6 +395,7 @@
     props: {
       nodeData: Object
     },
+    inject: ['dagChart'],
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
       taskToBackfillItem (task) {
@@ -413,7 +409,6 @@
           maxRetryTimes: task.failRetryTimes,
           name: task.name,
           params: _.omit(task.taskParams, ['conditionResult', 'dependence']),
-          preTasks: [],
           retryInterval: task.failRetryInterval,
           runFlag: task.flag,
           taskInstancePriority: task.taskPriority,
@@ -423,7 +418,7 @@
             enable: task.timeoutFlag === 'OPEN'
           },
           type: task.taskType,
-          waitStartTimeout: task.waitStartTimeout,
+          waitStartTimeout: task.taskParams.waitStartTimeout,
           workerGroup: task.workerGroup
         }
       },
@@ -435,14 +430,6 @@
       },
       _onSwitchResult (o) {
         this.switchResult = o
-      },
-      /**
-       * Pre-tasks in workflow
-       */
-      _onPreTasks (o) {
-        this.preTaskIdsInWorkflow = o.preTasks
-        this.preTasksToAdd = o.preTasksToAdd
-        this.preTasksToDelete = o.preTasksToDelete
       },
       /**
        * cache dependent
@@ -515,41 +502,14 @@
       _onParams (o) {
         this.params = Object.assign({}, o)
       },
-      _onCacheParams (o) {
-        this.params = Object.assign(this.params, {}, o)
-        this._cacheItem()
-      },
       _onUpdateEnvironmentCode (o) {
         this.environmentCode = o
       },
-      _cacheItem () {
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
-        this.$emit('cacheTaskInfo', {
-          item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
-            name: this.name,
-            code: this.code,
-            params: this.params,
-            desc: this.desc,
-            runFlag: this.runFlag,
-            conditionResult: this.conditionResult,
-            switchResult: this.switchResult,
-            dependence: this.cacheDependence,
-            maxRetryTimes: this.maxRetryTimes,
-            retryInterval: this.retryInterval,
-            delayTime: this.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.waitStartTimeout,
-            taskInstancePriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            environmentCode: this.environmentCode,
-            status: this.status,
-            branch: this.branch
-          },
-          fromThis: this
-        })
+      /**
+       * _onCacheParams is reserved
+       */
+      _onCacheParams (o) {
+        this.params = Object.assign(this.params, {}, o)
       },
       /**
        * verification name
@@ -607,19 +567,13 @@
             return
           }
         }
-
         // Verify node parameters
         if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
-        // Verify preTasks and update dag-things
-        if (this.$refs.PRE_TASK) {
-          if (!this.$refs.PRE_TASK._verification()) {
-            return
-          } else {
-            // TODO sync preTasks to graph
-
-          }
+        // set preTask
+        if (this.$refs.preTasks) {
+          this.$refs.preTasks.setPreNodes()
         }
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
@@ -632,7 +586,8 @@
             taskParams: {
               ...this.params,
               dependence: this.cacheDependence,
-              conditionResult: this.conditionResult
+              conditionResult: this.conditionResult,
+              waitStartTimeout: this.waitStartTimeout
             },
             flag: this.runFlag,
             taskPriority: this.taskInstancePriority,
@@ -651,6 +606,8 @@
         })
         // set run flag
         this._setRunFlag()
+        // set edge label
+        this._setEdgeLabel()
       },
       /**
        * Sub-workflow selected node echo name
@@ -664,6 +621,21 @@
        */
       _setRunFlag () {
 
+      },
+      /**
+       *
+       */
+      _setEdgeLabel () {
+        if (this.successBranch || this.failedBranch) {
+          const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
+          const edges = canvas.getEdges()
+          const successTask = this.postTasks.find(t => t.name === this.successBranch)
+          const failedTask = this.postTasks.find(t => t.name === this.failedBranch)
+          const sEdge = edges.find(edge => successTask && edge.sourceId === this.code && edge.targetId === successTask.code)
+          const fEdge = edges.find(edge => failedTask && edge.sourceId === this.code && edge.targetId === failedTask.code)
+          sEdge && canvas.setEdgeLabel(sEdge.id, this.$t('Success'))
+          fEdge && canvas.setEdgeLabel(fEdge.id, this.$t('Failed'))
+        }
       },
       /**
        * Submit verification
@@ -702,6 +674,7 @@
           }
         })
       }
+      this.code = this.nodeData.id
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.code = o.code
@@ -743,14 +716,17 @@
       this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
 
-      // Init value of preTask selector
-      let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
-      if (!_.isEmpty(this.backfillItem)) {
-        if (preTaskIds && preTaskIds.length) {
-          this.backfillItem.preTasks = preTaskIds.split(',')
-        } else {
-          this.backfillItem.preTasks = []
-        }
+      if (this.dagChart) {
+        const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
+        const postNodes = canvas.getPostNodes(this.code)
+        const prevNodes = canvas.getPrevNodes(this.code)
+        const buildTask = (node) => ({
+          code: node.id,
+          name: node.data.taskName,
+          type: node.data.taskType
+        })
+        this.postTasks = postNodes.map(buildTask)
+        this.prevTasks = prevNodes.map(buildTask)
       }
     },
     mounted () {
@@ -809,8 +785,8 @@
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
-      // mPreTasks
-      mRelatedEnvironment
+      mRelatedEnvironment,
+      mPreTasks
     }
   }
 </script>

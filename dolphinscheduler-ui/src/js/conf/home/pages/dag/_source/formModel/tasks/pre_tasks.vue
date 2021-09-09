@@ -17,22 +17,22 @@
 <template>
   <div class="pre_tasks-model">
     <m-list-box>
-      <div slot="text">{{$t('Pre tasks')}}</div>
+      <div slot="text">{{ $t("Pre tasks") }}</div>
       <div slot="content">
         <el-select
-            ref="preTasksSelector"
-            style="width: 100%;"
-            filterable
-            multiple
-            size="small"
-            v-model="preTasks"
-            :disabled="isDetails"
-            :id="preTasksSelectorId">
+          style="width: 100%"
+          filterable
+          multiple
+          size="small"
+          v-model="preTasks"
+          :disabled="isDetails"
+        >
           <el-option
-              v-for="task in preTaskList"
-              :key="task.id"
-              :value="task.id"
-              :label="task.name">
+            v-for="task in options"
+            :key="task.code"
+            :value="task.code"
+            :label="task.name"
+          >
           </el-option>
         </el-select>
       </div>
@@ -42,65 +42,55 @@
 <script>
   import disabledState from '@/module/mixin/disabledState'
   import mListBox from './_source/listBox'
+  import { mapState } from 'vuex'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'pre_tasks',
     mixins: [disabledState],
+    inject: ['dagChart'],
     props: {
-      backfillItem: Object
+      code: {
+        type: Number,
+        default: 0
+      }
     },
     data () {
       return {
-        preTasksSelectorId: '_preTasksSelectorId', // Refresh target vue-component by changing id
-        preTasks: [],
-        preTasksOld: []
+        options: [],
+        preTasks: []
       }
     },
     mounted () {
-      this.preTasks = this.backfillItem.preTasks || this.preTasks
-      this.preTasksOld = this.preTasks
-
-      // Refresh target vue-component by changing id
-      this.$nextTick(() => {
-        this.preTasksSelectorId = 'preTasksSelectorId'
+      const canvas = this.getDagCanvasRef()
+      const edges = canvas.getEdges()
+      this.options = this.tasks.filter((task) => {
+        // The current node cannot be used as the prev node
+        if (task.code === this.code) return false
+        // The number of edges start with CONDITIONS task cannot be greater than 2
+        if (task.taskType === 'CONDITIONS') {
+          return edges.filter((e) => e.sourceId === task.code).length < 2
+        }
+        return true
       })
+      this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
     },
     computed: {
-      preTaskList: function () {
-        let currentTaskId = this.backfillItem.id || this.id
-        let cacheTasks = Object.assign({}, this.store.state.dag.tasks)
-        let keys = Object.keys(cacheTasks)
-        for (let i = 0; i < keys.length; i++) {
-          let key = keys[i]
-          if ((!cacheTasks[key].id || !cacheTasks[key].name) || (currentTaskId && cacheTasks[key].id === currentTaskId)) {
-            // Clean undefined and current task data
-            delete cacheTasks[key]
-          }
-        }
-
-        return cacheTasks
-      },
-      // preTaskIds used to create new connection
-      preTasksToAdd: function () {
-        let toAddTasks = this.preTasks.filter(taskId => {
-          return (this.preTasksOld.indexOf(taskId) === -1)
-        })
-        return toAddTasks
-      },
-      // preTaskIds used to delete connection
-      preTasksToDelete: function () {
-        return this.preTasksOld.filter(taskId => this.preTasks.indexOf(taskId) === -1)
-      }
+      ...mapState('dag', ['tasks'])
     },
     methods: {
-      // Pass data to parent-level to process dag
-      _verification () {
-        this.$emit('on-pre-tasks', {
-          preTasks: this.preTasks,
-          preTasksToAdd: this.preTasksToAdd,
-          preTasksToDelete: this.preTasksToDelete
-        })
-        return true
+      getDagCanvasRef () {
+        if (this.canvasRef) {
+          return this.canvasRef
+        } else {
+          const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
+          this.canvasRef = canvas
+          return canvas
+        }
+      },
+      setPreNodes () {
+        const canvas = this.getDagCanvasRef()
+        canvas.setPreNodes(this.code, this.preTasks, true)
       }
     },
     components: { mListBox }
