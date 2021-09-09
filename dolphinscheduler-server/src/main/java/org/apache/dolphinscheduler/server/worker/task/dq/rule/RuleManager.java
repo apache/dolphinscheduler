@@ -44,7 +44,7 @@ public class RuleManager {
     private final Map<String, String> inputParameterValue;
     private final DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
-    private static final String FIXED_VALUE_COMPARISON_TYPE = "0";
+    private static final String FIXED_VALUE_COMPARISON_TYPE = "1";
     private static final String BASE_SQL =
             "select ${rule_type} as rule_type,"
                     + "${rule_name} as rule_name,"

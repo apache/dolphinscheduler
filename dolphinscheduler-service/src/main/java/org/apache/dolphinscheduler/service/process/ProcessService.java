@@ -2089,7 +2089,7 @@ public class ProcessService {
     }
 
     public DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId) {
-        return dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(Constants.TASK_INSTANCE_ID,taskInstanceId));
+        return dqExecuteResultMapper.getExecuteResultById(taskInstanceId);
     }
 
     public int updateDqExecuteResultUserId(int taskInstanceId) {

@@ -83,7 +83,9 @@ public class DataQualityResultOperator {
         }
     }
 
-    private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent, DqExecuteResult dqExecuteResult, ProcessInstance processInstance) {
+    private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent,
+                                      DqExecuteResult dqExecuteResult,
+                                      ProcessInstance processInstance) {
         if (isFailure(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
@@ -149,11 +151,11 @@ public class DataQualityResultOperator {
         return isFailure;
     }
 
-    private void sendDqTaskResultAlert(DqExecuteResult dqExecuteResult,ProcessInstance processInstance) {
+    private void sendDqTaskResultAlert(DqExecuteResult dqExecuteResult, ProcessInstance processInstance) {
         alertManager.sendDataQualityTaskExecuteResultAlert(dqExecuteResult,processInstance);
     }
 
-    private void sendDqTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
+    private void sendDqTaskErrorAlert(TaskInstance taskInstance, ProcessInstance processInstance) {
         alertManager.sendTaskErrorAlert(taskInstance,processInstance);
     }
 

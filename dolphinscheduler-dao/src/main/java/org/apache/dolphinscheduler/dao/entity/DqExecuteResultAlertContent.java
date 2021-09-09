@@ -116,6 +116,9 @@ public class DqExecuteResultAlertContent implements Serializable {
     @JsonProperty(value = "state")
     private DqTaskState state;
 
+    @JsonProperty(value = "errorDataPath")
+    private String errorDataPath;
+
     public DqExecuteResultAlertContent(Builder builder) {
         this.processDefinitionId = builder.processDefinitionId;
         this.processDefinitionName = builder.processDefinitionName;
@@ -134,6 +137,7 @@ public class DqExecuteResultAlertContent implements Serializable {
         this.userId = builder.userId;
         this.userName = builder.userName;
         this.state = builder.state;
+        this.errorDataPath = builder.errorDataPath;
     }
 
     public static Builder newBuilder() {
@@ -158,6 +162,7 @@ public class DqExecuteResultAlertContent implements Serializable {
         private int userId;
         private String userName;
         private DqTaskState state;
+        private String errorDataPath;
 
         public Builder processDefinitionId(long processDefinitionId) {
             this.processDefinitionId = processDefinitionId;
@@ -241,6 +246,11 @@ public class DqExecuteResultAlertContent implements Serializable {
 
         public Builder state(DqTaskState state) {
             this.state = state;
+            return this;
+        }
+
+        public Builder errorDataPath(String errorDataPath) {
+            this.errorDataPath = errorDataPath;
             return this;
         }
 

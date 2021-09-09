@@ -257,11 +257,10 @@ public class AlertManager {
      * send data quality task alert
      * if result is null ,send task failure message
      */
-    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result,ProcessInstance processInstance) {
+    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, ProcessInstance processInstance) {
         Alert alert = new Alert();
-        String ruleName = result.getRuleName();
         String state = result.getState().getDescription();
-        alert.setTitle(ruleName + " " + state);
+        alert.setTitle("DataQualityResult [" + result.getTaskName() + "] " + state);
         String content = getDataQualityAlterContent(result);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
@@ -275,7 +274,7 @@ public class AlertManager {
      */
     public void sendTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
         Alert alert = new Alert();
-        alert.setTitle("Task[" + taskInstance.getName() + "] Failure Warning");
+        alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
         String content = getTaskAlterContent(taskInstance);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
@@ -309,6 +308,7 @@ public class AlertManager {
                 .userId(result.getUserId())
                 .userName(result.getUserName())
                 .state(result.getState())
+                .errorDataPath(result.getErrorOutputPath())
                 .build();
 
         return JSONUtils.toJsonString(content);

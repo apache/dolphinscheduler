@@ -49,4 +49,11 @@ public interface DqExecuteResultMapper extends BaseMapper<DqExecuteResult> {
                                                  @Param("ruleType") int ruleType,
                                                  @Param("startTime") Date startTime,
                                                  @Param("endTime") Date endTime);
+
+    /**
+     * get execute result by id
+     * @param taskInstanceId taskInstanceId
+     * @return DqExecuteResult
+     */
+    DqExecuteResult getExecuteResultById(@Param("taskInstanceId") int taskInstanceId);
 }
