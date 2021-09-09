@@ -361,7 +361,7 @@ comment on column t_ds_process_instance.environment_code is 'environment code';
 ALTER TABLE t_ds_task_instance ADD COLUMN environment_code bigint DEFAULT NULL;
 comment on column t_ds_task_instance.environment_code is 'environment code';
 
-ALTER TABLE t_ds_task_instance ADD COLUMN environment_config text DEFAULT '';
+ALTER TABLE t_ds_task_instance ADD COLUMN environment_config text;
 comment on column t_ds_task_instance.environment_config is 'environment config';
 
 --

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -147,7 +148,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (taskInstance.getState().typeIsFinished()) {
                 return true;
             }
-            if (null == taskInstance.getHost() || taskInstance.getHost().isEmpty()) {
+            if (StringUtils.isBlank(taskInstance.getHost())) {
                 taskInstance.setState(ExecutionStatus.KILL);
                 taskInstance.setEndTime(new Date());
                 processService.updateTaskInstance(taskInstance);
