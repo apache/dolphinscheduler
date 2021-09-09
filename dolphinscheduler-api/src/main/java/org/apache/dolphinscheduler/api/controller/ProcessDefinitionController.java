@@ -132,7 +132,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * copy  process definition
+     * copy process definition
      *
      * @param loginUser login user
      * @param projectCode project code
