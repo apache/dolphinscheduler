@@ -137,6 +137,8 @@
       }
     },
     mounted () {
+      this.setIsEditDag(false)
+
       if (this.type === 'instance') {
         this.definitionCode = this.$route.query.code
       } else if (this.type === 'definition') {
@@ -163,6 +165,8 @@
       }
     },
     beforeDestroy () {
+      this.resetParams()
+
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -171,7 +175,6 @@
         'tasks',
         'locations',
         'connects',
-        'isEditDag',
         'name',
         'isDetails',
         'projectCode',
@@ -192,7 +195,6 @@
       ]),
       ...mapMutations('dag', [
         'addTask',
-        'setTasks',
         'setConnects',
         'resetParams',
         'setIsEditDag',
@@ -266,6 +268,9 @@
           let tasks = this.tasks || []
           const edges = this.$refs.canvas.getEdges()
           const nodes = this.$refs.canvas.getNodes()
+          if (!nodes.length) {
+            reject(this.$t('Failed to create node to save'))
+          }
           const connects = this.buildConnects(edges, tasks)
           this.setConnects(connects)
           const locations = nodes.map((node) => {
@@ -332,6 +337,9 @@
                 })
             }
           }
+        }).catch((err) => {
+          let msg = typeof err === 'string' ? err : (err.msg || '')
+          this.$message.error(msg)
         })
       },
       verifyConditions (value) {
@@ -578,16 +586,14 @@
         this.versionDrawer = false
       },
       switchProcessVersion ({ version, processDefinitionCode }) {
-        // this.$store.state.dag.isSwitchVersion = true
         this.switchProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
           this.closeVersion()
-          this.definitionDetails._reset()
+          this.definitionDetails.init()
         }).catch(e => {
-          // this.$store.state.dag.isSwitchVersion = false
           this.$message.error(e.msg || '')
         })
       },
