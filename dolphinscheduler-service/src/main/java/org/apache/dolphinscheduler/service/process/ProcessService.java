@@ -129,8 +129,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
-import com.cronutils.model.Cron;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -206,7 +204,7 @@ public class ProcessService {
 
 
     @Autowired
-    StateEventCallbackService stateEventCallbackService;   
+    StateEventCallbackService stateEventCallbackService;
 
 	 @Autowired
     private EnvironmentMapper environmentMapper;
@@ -235,9 +233,12 @@ public class ProcessService {
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         //if the processDefination is serial
-        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerial()) {
-            saveSerialProcess(processInstance);
+        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+        if (processDefinition.getExecutionType().typeIsSerial()) {
+            saveSerialProcess(processInstance,processDefinition);
             if (processInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
+                this.setSubProcessParam(processInstance);
+                this.commandMapper.deleteById(command.getId());
                 return null;
             }
         } else {
@@ -248,16 +249,16 @@ public class ProcessService {
         return processInstance;
     }
 
-    private void saveSerialProcess(ProcessInstance processInstance) {
+    private void saveSerialProcess(ProcessInstance processInstance,ProcessDefinition processDefinition) {
         processInstance.setState(ExecutionStatus.SERIAL_WAIT);
         saveProcessInstance(processInstance);
         //serial wait
         //when we get the running instance(or waiting instance) only get the priority instance(by id)
-        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialWait()) {
+        if (processDefinition.getExecutionType().typeIsSerialWait()) {
             while (true) {
                 List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                         Constants.RUNNING_PROCESS_STATE,processInstance.getId());
-                if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
+                if (CollectionUtils.isEmpty(runningProcessInstances)) {
                     processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
                     saveProcessInstance(processInstance);
                     return;
@@ -267,14 +268,14 @@ public class ProcessService {
                     return;
                 }
             }
-        } else if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialDiscard()) {
+        } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                     Constants.RUNNING_PROCESS_STATE,processInstance.getId());
-            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
+            if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setState(ExecutionStatus.STOP);
                 saveProcessInstance(processInstance);
             }
-        } else if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialPriority()) {
+        } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances = this.processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(processInstance.getProcessDefinitionCode(),
                     Constants.RUNNING_PROCESS_STATE,processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {

@@ -497,8 +497,9 @@ public class WorkflowExecuteThread implements Runnable {
     private void endProcess() {
         this.stateEvents.clear();
         processInstance.setEndTime(new Date());
-        if (processInstance.getProcessDefinition().getExecutionType().typeIsSerialWait()) {
-            checkSerialProcess();
+        ProcessDefinition processDefinition = this.processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),processInstance.getProcessDefinitionVersion());
+        if (processDefinition.getExecutionType().typeIsSerialWait()) {
+            checkSerialProcess(processDefinition);
         }
         processService.updateProcessInstance(processInstance);
         if (processInstance.getState().typeIsWaitingThread()) {
@@ -509,7 +510,7 @@ public class WorkflowExecuteThread implements Runnable {
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
     }
 
-    private void checkSerialProcess() {
+    private void checkSerialProcess(ProcessDefinition processDefinition) {
         this.processInstance = processService.findProcessInstanceById(processInstance.getId());
         int nextInstanceId = processInstance.getNextProcessInstanceId();
         if (nextInstanceId == 0) {
@@ -519,11 +520,15 @@ public class WorkflowExecuteThread implements Runnable {
             }
             nextInstanceId = nextProcessInstance.getId();
         }
+        ProcessInstance nextProcessInstance = this.processService.findProcessInstanceById(nextInstanceId);
+        if (nextProcessInstance.getState().typeIsFinished() || nextProcessInstance.getState().typeIsRunning()) {
+            return;
+        }
         Map<String, Object> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
         Command command = new Command();
         command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
-        command.setProcessDefinitionCode(processInstance.getProcessDefinition().getCode());
+        command.setProcessDefinitionCode(processDefinition.getCode());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         processService.createCommand(command);
     }

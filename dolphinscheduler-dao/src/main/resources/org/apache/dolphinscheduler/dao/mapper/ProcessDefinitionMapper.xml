@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
     <sql id="baseSql">
         id, code, name, version, release_state, project_code, user_id, description,
-        global_params, flag, locations, warning_group_id, create_time, timeout, tenant_id, update_time
+        global_params, flag, locations, warning_group_id, create_time, timeout, tenant_id, update_time,execution_type
     </sql>
 
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">

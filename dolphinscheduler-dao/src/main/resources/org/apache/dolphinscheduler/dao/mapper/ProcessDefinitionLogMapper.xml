@@ -22,7 +22,7 @@
     <sql id="baseSql">
        id, code, name, version, description, project_code,
         release_state, user_id,global_params, flag, locations,
-         warning_group_id, timeout, tenant_id,operator, operate_time, create_time,
+         warning_group_id, timeout, tenant_id,operator,execution_type, operate_time, create_time,
           update_time
     </sql>
     <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">

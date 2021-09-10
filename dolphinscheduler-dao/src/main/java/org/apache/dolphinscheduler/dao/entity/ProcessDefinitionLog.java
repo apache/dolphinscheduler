@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -38,6 +40,11 @@ public class ProcessDefinitionLog extends ProcessDefinition {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
+
+    /**
+     * execution type
+     */
+    private ProcessExecutionTypeEnum executionType;
 
     public ProcessDefinitionLog() {
         super();
@@ -67,6 +74,7 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setModifyBy(processDefinition.getModifyBy());
         this.setResourceIds(processDefinition.getResourceIds());
         this.setWarningGroupId(processDefinition.getWarningGroupId());
+        this.setExecutionType(processDefinition.getExecutionType());
     }
 
     public int getOperator() {
@@ -88,5 +96,15 @@ public class ProcessDefinitionLog extends ProcessDefinition {
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
+    }
+
+    @Override
+    public ProcessExecutionTypeEnum getExecutionType() {
+        return executionType;
+    }
+
+    @Override
+    public void setExecutionType(ProcessExecutionTypeEnum executionType) {
+        this.executionType = executionType;
     }
 }

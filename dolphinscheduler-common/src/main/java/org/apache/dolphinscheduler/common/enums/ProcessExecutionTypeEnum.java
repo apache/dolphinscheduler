@@ -25,8 +25,8 @@ public enum ProcessExecutionTypeEnum {
 
     PARALLEL(0, "parallel"),
     SERIAL_WAIT(1, "serial wait"),
-    SERIAL_DISCARD(2, "ready pause"),
-    SERIAL_PRIORITY(3, "Serial priority");
+    SERIAL_DISCARD(2, "serial discard"),
+    SERIAL_PRIORITY(3, "serial priority");
 
     ProcessExecutionTypeEnum(int code, String descp) {
         this.code = code;
@@ -69,11 +69,11 @@ public enum ProcessExecutionTypeEnum {
         return descp;
     }
 
-    public static ProcessExecutionTypeEnum of(int status) {
-        if (EXECUTION_STATUS_MAP.containsKey(status)) {
-            return EXECUTION_STATUS_MAP.get(status);
+    public static ProcessExecutionTypeEnum of(int executionType) {
+        if (EXECUTION_STATUS_MAP.containsKey(executionType)) {
+            return EXECUTION_STATUS_MAP.get(executionType);
         }
-        throw new IllegalArgumentException("invalid status : " + status);
+        throw new IllegalArgumentException("invalid status : " + executionType);
     }
 
 }

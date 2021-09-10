@@ -227,8 +227,8 @@
         <foreach collection="states" item="i" open="(" close=")" separator=",">
             #{i}
         </foreach>
-        and next_peocess_instance_id=0
-        and id <![CDATA[ > ]]> #{id}
+        and next_process_instance_id=0
+        and id <![CDATA[ < ]]> #{id}
         order by id desc
     </select>
     <select id="loadNextProcess4Serial" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -247,7 +247,7 @@
     </update>
     <update id="updateNextProcessIdById">
         update t_ds_process_instance
-        set next_peocess_instance_id = #{thisInstanceId}
-        where id = #{runningInstanceId} and next_peocess_instance_id=0
+        set next_process_instance_id = #{thisInstanceId}
+        where id = #{runningInstanceId} and next_process_instance_id=0
     </update>
 </mapper>
