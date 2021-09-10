@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
@@ -42,6 +41,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -144,7 +145,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         Date start = null;
         Date end = null;
-        if (StringUtils.isNotEmpty(startDate) && StringUtils.isNotEmpty(endDate)) {
+        if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {

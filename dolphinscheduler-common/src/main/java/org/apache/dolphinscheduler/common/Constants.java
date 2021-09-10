@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -1095,8 +1096,8 @@ public final class Constants {
     /**
      * docker & kubernetes
      */
-    public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
-    public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * task parameter keys

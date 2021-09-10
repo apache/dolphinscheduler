@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -206,7 +208,7 @@ public class OSUtils {
      */
     private static List<String> getUserListFromMac() throws IOException {
         String result = exeCmd("dscl . list /users");
-        if (StringUtils.isNotEmpty(result)) {
+        if (!StringUtils.isEmpty(result)) {
             return Arrays.asList(result.split("\n"));
         }
 
@@ -392,7 +394,7 @@ public class OSUtils {
             }
         } else {
             String result = exeCmd("groups");
-            if (StringUtils.isNotEmpty(result)) {
+            if (!StringUtils.isEmpty(result)) {
                 String[] groupInfo = result.split(" ");
                 return groupInfo[0];
             }

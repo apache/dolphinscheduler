@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.SH;
 
 import org.apache.dolphinscheduler.plugin.task.util.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
-import org.apache.dolphinscheduler.plugin.task.util.ThreadUtils;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -41,12 +40,16 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * abstract command executor
@@ -132,7 +135,6 @@ public abstract class AbstractCommandExecutor {
         processBuilder.command(command);
         process = processBuilder.start();
 
-        // print command
         printCommand(command);
     }
 
@@ -159,7 +161,7 @@ public abstract class AbstractCommandExecutor {
         // parse process output
         parseProcessOutput(process);
 
-        Integer processId = getProcessId(process);
+        int processId = getProcessId(process);
 
         result.setProcessId(processId);
 
@@ -242,7 +244,6 @@ public abstract class AbstractCommandExecutor {
      *
      * @param processId process id
      * @return process is alive
-     * @throws InterruptedException interrupted exception
      */
     private boolean softKill(int processId) {
 
@@ -281,20 +282,8 @@ public abstract class AbstractCommandExecutor {
         }
     }
 
-    /**
-     * print command
-     *
-     * @param commands process builder
-     */
     private void printCommand(List<String> commands) {
-        String cmdStr;
-
-        try {
-            cmdStr = ProcessUtils.buildCommandStr(commands);
-            logger.info("task run command:\n{}", cmdStr);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        logger.info("task run command: {}", String.join(" ", commands));
     }
 
     /**
@@ -320,7 +309,7 @@ public abstract class AbstractCommandExecutor {
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskRequest.getTaskAppId());
-        ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
         getOutputLogService.submit(() -> {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
@@ -343,7 +332,7 @@ public abstract class AbstractCommandExecutor {
 
         getOutputLogService.shutdown();
 
-        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        ExecutorService parseProcessOutputExecutorService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
         parseProcessOutputExecutorService.submit(() -> {
             try {
                 long lastFlushTime = System.currentTimeMillis();
@@ -364,10 +353,6 @@ public abstract class AbstractCommandExecutor {
         parseProcessOutputExecutorService.shutdown();
     }
 
-    public int getProcessId() {
-        return getProcessId(process);
-    }
-
     /**
      * get app links
      *
@@ -378,7 +363,7 @@ public abstract class AbstractCommandExecutor {
         List<String> logs = convertFile2List(logPath);
 
         List<String> appIds = new ArrayList<>();
-        /**
+        /*
          * analysis log?get submited yarn application id
          */
         for (String log : logs) {
@@ -398,7 +383,7 @@ public abstract class AbstractCommandExecutor {
      * @return line list
      */
     private List<String> convertFile2List(String filename) {
-        List lineList = new ArrayList<String>(100);
+        List<String> lineList = new ArrayList<>(100);
         File file = new File(filename);
 
         if (!file.exists()) {
@@ -477,12 +462,11 @@ public abstract class AbstractCommandExecutor {
     private long flush(long lastFlushTime) {
         long now = System.currentTimeMillis();
 
-        /**
+        /*
          * when log buffer siz or flush time reach condition , then flush
          */
         if (logBuffer.size() >= TaskConstants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
-            /** log handle */
             logHandler.accept(logBuffer);
 
             logBuffer.clear();
@@ -490,21 +474,15 @@ public abstract class AbstractCommandExecutor {
         return lastFlushTime;
     }
 
-    protected List<String> commandOptions() {
-        return Collections.emptyList();
-    }
-
     protected abstract String buildCommandFilePath();
-
-    protected abstract String commandInterpreter();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 
-    public String getTaskResultString() {
-        return taskResultString;
-    }
-
-    public void setTaskResultString(String taskResultString) {
-        this.taskResultString = taskResultString;
+    ExecutorService newDaemonSingleThreadExecutor(String threadName) {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setDaemon(true)
+                .setNameFormat(threadName)
+                .build();
+        return Executors.newSingleThreadExecutor(threadFactory);
     }
 }
