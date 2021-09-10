@@ -17,7 +17,10 @@
 import json
 from typing import Optional, List, Dict, Set
 
-from pydolphinscheduler.constants import ProcessDefinitionReleaseState, ProcessDefinitionDefault
+from pydolphinscheduler.constants import (
+    ProcessDefinitionReleaseState,
+    ProcessDefinitionDefault,
+)
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.java_gateway import launch_gateway
 from pydolphinscheduler.side import Tenant, Project, User
@@ -70,17 +73,17 @@ class ProcessDefinition(Base):
     }
 
     def __init__(
-            self,
-            name: str,
-            description: Optional[str] = None,
-            user: Optional[str] = ProcessDefinitionDefault.USER,
-            project: Optional[str] = ProcessDefinitionDefault.PROJECT,
-            tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
-            queue: Optional[str] = ProcessDefinitionDefault.QUEUE,
-            worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
-            timeout: Optional[int] = 0,
-            release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
-            param: Optional[List] = None
+        self,
+        name: str,
+        description: Optional[str] = None,
+        user: Optional[str] = ProcessDefinitionDefault.USER,
+        project: Optional[str] = ProcessDefinitionDefault.PROJECT,
+        tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
+        queue: Optional[str] = ProcessDefinitionDefault.QUEUE,
+        worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
+        timeout: Optional[int] = 0,
+        release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
+        param: Optional[List] = None,
     ):
         super().__init__(name, description)
         self._user = user
@@ -121,13 +124,15 @@ class ProcessDefinition(Base):
 
     @property
     def user(self) -> User:
-        return User(self._user,
-                    ProcessDefinitionDefault.USER_PWD,
-                    ProcessDefinitionDefault.USER_EMAIL,
-                    ProcessDefinitionDefault.USER_PHONE,
-                    ProcessDefinitionDefault.TENANT,
-                    ProcessDefinitionDefault.QUEUE,
-                    ProcessDefinitionDefault.USER_STATE)
+        return User(
+            self._user,
+            ProcessDefinitionDefault.USER_PWD,
+            ProcessDefinitionDefault.USER_EMAIL,
+            ProcessDefinitionDefault.USER_PHONE,
+            ProcessDefinitionDefault.TENANT,
+            ProcessDefinitionDefault.QUEUE,
+            ProcessDefinitionDefault.USER_STATE,
+        )
 
     @property
     def task_definition_json(self) -> List[Dict]:
@@ -158,6 +163,7 @@ class ProcessDefinition(Base):
 
     def _handle_root_relation(self):
         from pydolphinscheduler.core.task import TaskRelation
+
         post_relation_code = set()
         for relation in self._task_relations:
             post_relation_code.add(relation.post_task_code)
@@ -176,7 +182,10 @@ class ProcessDefinition(Base):
 
     def get_task(self, code: str) -> "Task":
         if code not in self.tasks:
-            raise ValueError("Task with code %s can not found in process definition %", (code, self.name))
+            raise ValueError(
+                "Task with code %s can not found in process definition %",
+                (code, self.name),
+            )
         return self.tasks[code]
 
     # TODO which tying should return in this case

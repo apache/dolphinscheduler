@@ -15,10 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+
 class ProcessDefinitionReleaseState:
     """
     ProcessDefinition release state
     """
+
     ONLINE: str = "ONLINE"
     OFFLINE: str = "OFFLINE"
 
@@ -27,6 +29,7 @@ class ProcessDefinitionDefault:
     """
     ProcessDefinition default values
     """
+
     PROJECT: str = "project-pydolphin"
     TENANT: str = "tenant_pydolphin"
     USER: str = "userPythonGateway"

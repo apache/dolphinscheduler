@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+
 def attr2camel(attr: str, include_private=True):
     if include_private:
         attr = attr.lstrip("_")

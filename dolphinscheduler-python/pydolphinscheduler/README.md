@@ -95,6 +95,18 @@ pydolphinscheduler tasks object, we use tasks to define exact job we want Dolphi
 we only support `shell` task to execute shell task. [This link][all-task] list all tasks support in DolphinScheduler
 and would be implemented in the further.
 
+### Code Style
+
+We use [Black][black] for code formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]
+or [IntelliJ IDEA][idea], maybe you could follow [Black-integration][black-editor] to configure them in your environment.
+
+Our Python API CI would automatically run unittest when you submit pull request in GitHub, you could also run
+static check locally.
+
+```shell
+flake8 .
+```
+
 ### Testing
 
 pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
@@ -115,6 +127,9 @@ PYTHONPATH=src/ pytest
 [idea]: https://www.jetbrains.com/idea/
 [all-task]: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/task/shell.html
 [pytest]: https://docs.pytest.org/en/latest/
+[black]: https://black.readthedocs.io/en/stable/index.html
+[flake8]: https://flake8.pycqa.org/en/latest/index.html
+[black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 <!-- badge -->
 [ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions

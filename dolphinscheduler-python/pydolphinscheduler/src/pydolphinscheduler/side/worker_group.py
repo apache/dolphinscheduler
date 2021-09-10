@@ -25,11 +25,6 @@ class WorkerGroup(BaseSide):
     Worker Group
     """
 
-    def __init__(
-            self,
-            name: str,
-            address: str,
-            description: Optional[str] = None
-    ):
+    def __init__(self, name: str, address: str, description: Optional[str] = None):
         super().__init__(name, description)
         self.address = address

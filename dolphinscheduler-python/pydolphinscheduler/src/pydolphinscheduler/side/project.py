@@ -28,9 +28,9 @@ class Project(BaseSide):
     """
 
     def __init__(
-            self,
-            name: str = ProcessDefinitionDefault.PROJECT,
-            description: Optional[str] = None
+        self,
+        name: str = ProcessDefinitionDefault.PROJECT,
+        description: Optional[str] = None,
     ):
         super().__init__(name, description)
 
@@ -42,4 +42,3 @@ class Project(BaseSide):
         result = gateway.entry_point.createProject(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)
-

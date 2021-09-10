@@ -38,15 +38,8 @@ def test_shell_to_dict():
             "localParams": [],
             "rawScript": command,
             "dependence": {},
-            "conditionResult": {
-                "successNode": [
-                    ""
-                ],
-                "failedNode": [
-                    ""
-                ]
-            },
-            "waitStartTimeout": {}
+            "conditionResult": {"successNode": [""], "failedNode": [""]},
+            "waitStartTimeout": {},
         },
         "flag": "YES",
         "taskPriority": "MEDIUM",
@@ -55,7 +48,7 @@ def test_shell_to_dict():
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
         "timeoutNotifyStrategy": None,
-        "timeout": 0
+        "timeout": 0,
     }
     with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
         shell = Shell(name, command)

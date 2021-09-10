@@ -32,12 +32,17 @@ def launch_gateway() -> JavaGateway:
 
 
 def gateway_result_checker(
-        result: JavaMap,
-        msg_check: Optional[str] = JavaGatewayDefault.RESULT_MESSAGE_SUCCESS
+    result: JavaMap,
+    msg_check: Optional[str] = JavaGatewayDefault.RESULT_MESSAGE_SUCCESS,
 ) -> Any:
-    if result[JavaGatewayDefault.RESULT_STATUS_KEYWORD].toString() != \
-            JavaGatewayDefault.RESULT_STATUS_SUCCESS:
+    if (
+        result[JavaGatewayDefault.RESULT_STATUS_KEYWORD].toString()
+        != JavaGatewayDefault.RESULT_STATUS_SUCCESS
+    ):
         raise RuntimeError(f"Failed when try to got result for java gateway")
-    if msg_check is not None and result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != msg_check:
+    if (
+        msg_check is not None
+        and result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != msg_check
+    ):
         raise ValueError(f"Get result state not success.")
     return result

@@ -26,20 +26,13 @@ class Base:
     Base
     """
 
-    _KEY_ATTR: set = {
-        "name",
-        "description"
-    }
+    _KEY_ATTR: set = {"name", "description"}
 
     _TO_DICT_ATTR: set = set()
 
     DEFAULT_ATTR: Dict = {}
 
-    def __init__(
-            self,
-            name: str,
-            description: Optional[str] = None
-    ):
+    def __init__(self, name: str, description: Optional[str] = None):
         self.name = name
         self.description = description
 
@@ -47,8 +40,9 @@ class Base:
         return f'<{type(self).__name__}: name="{self.name}">'
 
     def __eq__(self, other):
-        return type(self) == type(other) and \
-               all(getattr(self, a, None) == getattr(other, a, None) for a in self._KEY_ATTR)
+        return type(self) == type(other) and all(
+            getattr(self, a, None) == getattr(other, a, None) for a in self._KEY_ATTR
+        )
 
     # TODO check how Redash do
     # TODO DRY

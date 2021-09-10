@@ -17,8 +17,14 @@
 
 from typing import Optional, List, Dict, Set, Union, Sequence, Tuple
 
-from pydolphinscheduler.constants import TaskPriority, ProcessDefinitionDefault, TaskFlag, TaskTimeoutFlag, \
-    DefaultTaskCodeNum, JavaGatewayDefault
+from pydolphinscheduler.constants import (
+    TaskPriority,
+    ProcessDefinitionDefault,
+    TaskFlag,
+    TaskTimeoutFlag,
+    DefaultTaskCodeNum,
+    JavaGatewayDefault,
+)
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.process_definition import ProcessDefinitionContext
@@ -35,9 +41,9 @@ class ObjectJsonBase:
     def __str__(self) -> str:
         content = []
         for attribute, value in self.__dict__.items():
-            content.append(f"\"{snake2camel(attribute)}\": {value}")
+            content.append(f'"{snake2camel(attribute)}": {value}')
         content = ",".join(content)
-        return f"\"{class_name2camel(type(self).__name__)}\":{{{content}}}"
+        return f'"{class_name2camel(type(self).__name__)}":{{{content}}}'
 
     # TODO check how Redash do
     # TODO DRY
@@ -48,23 +54,16 @@ class ObjectJsonBase:
 
 
 class TaskParams(ObjectJsonBase):
-    DEFAULT_CONDITION_RESULT = {
-        "successNode": [
-            ""
-        ],
-        "failedNode": [
-            ""
-        ]
-    }
+    DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
     def __init__(
-            self,
-            raw_script: str,
-            local_params: Optional[List] = None,
-            resource_list: Optional[List] = None,
-            dependence: Optional[Dict] = None,
-            wait_start_timeout: Optional[Dict] = None,
-            condition_result: Optional[Dict] = None,
+        self,
+        raw_script: str,
+        local_params: Optional[List] = None,
+        resource_list: Optional[List] = None,
+        dependence: Optional[Dict] = None,
+        wait_start_timeout: Optional[Dict] = None,
+        condition_result: Optional[Dict] = None,
     ):
         super().__init__()
         self.raw_script = raw_script
@@ -82,13 +81,13 @@ class TaskRelation(ObjectJsonBase):
         "preTaskVersion": 1,
         "postTaskVersion": 1,
         "conditionType": 0,
-        "conditionParams": {}
+        "conditionParams": {},
     }
 
     def __init__(
-            self,
-            pre_task_code: int,
-            post_task_code: int,
+        self,
+        pre_task_code: int,
+        post_task_code: int,
     ):
         super().__init__()
         self.pre_task_code = pre_task_code
@@ -105,25 +104,25 @@ class Task(Base):
         "preTaskVersion": 1,
         "postTaskVersion": 1,
         "conditionType": 0,
-        "conditionParams": {}
+        "conditionParams": {},
     }
 
     def __init__(
-            self,
-            name: str,
-            task_type: str,
-            task_params: TaskParams,
-            description: Optional[str] = None,
-            flag: Optional[str] = TaskFlag.YES,
-            task_priority: Optional[str] = TaskPriority.MEDIUM,
-            worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
-            delay_time: Optional[int] = 0,
-            fail_retry_times: Optional[int] = 0,
-            fail_retry_interval: Optional[int] = 1,
-            timeout_flag: Optional[int] = TaskTimeoutFlag.CLOSE,
-            timeout_notify_strategy: Optional = None,
-            timeout: Optional[int] = 0,
-            process_definition: Optional[ProcessDefinition] = None,
+        self,
+        name: str,
+        task_type: str,
+        task_params: TaskParams,
+        description: Optional[str] = None,
+        flag: Optional[str] = TaskFlag.YES,
+        task_priority: Optional[str] = TaskPriority.MEDIUM,
+        worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
+        delay_time: Optional[int] = 0,
+        fail_retry_times: Optional[int] = 0,
+        fail_retry_interval: Optional[int] = 1,
+        timeout_flag: Optional[int] = TaskTimeoutFlag.CLOSE,
+        timeout_notify_strategy: Optional = None,
+        timeout: Optional[int] = 0,
+        process_definition: Optional[ProcessDefinition] = None,
     ):
 
         super().__init__(name, description)
@@ -139,14 +138,19 @@ class Task(Base):
         self.timeout_notify_strategy = timeout_notify_strategy
         self.timeout = timeout
         self._process_definition = None
-        self.process_definition: ProcessDefinition = process_definition or ProcessDefinitionContext.get()
+        self.process_definition: ProcessDefinition = (
+            process_definition or ProcessDefinitionContext.get()
+        )
         self._upstream_task_codes: Set[int] = set()
         self._downstream_task_codes: Set[int] = set()
         self._task_relation: Set[TaskRelation] = set()
         # move attribute code and version after _process_definition and process_definition declare
         self.code, self.version = self.gen_code_and_version()
         # Add task to process definition, maybe we could put into property process_definition latter
-        if self.process_definition is not None and self.code not in self.process_definition.tasks:
+        if (
+            self.process_definition is not None
+            and self.code not in self.process_definition.tasks
+        ):
             self.process_definition.add_task(self)
 
     @property
@@ -180,7 +184,9 @@ class Task(Base):
         self.__rshift__(other)
         return self
 
-    def _set_deps(self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True) -> None:
+    def _set_deps(
+        self, tasks: Union["Task", Sequence["Task"]], upstream: bool = True
+    ) -> None:
         if not isinstance(tasks, Sequence):
             tasks = [tasks]
 
@@ -216,7 +222,9 @@ class Task(Base):
     def gen_code_and_version(self) -> Tuple:
         # TODO get code from specific project process definition and task name
         gateway = launch_gateway()
-        result = gateway.entry_point.getCodeAndVersion(self.process_definition._project, self.name)
+        result = gateway.entry_point.getCodeAndVersion(
+            self.process_definition._project, self.name
+        )
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")

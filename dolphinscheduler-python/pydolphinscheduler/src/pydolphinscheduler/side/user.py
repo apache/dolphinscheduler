@@ -33,14 +33,14 @@ class User(BaseSide):
     }
 
     def __init__(
-            self,
-            name: str,
-            password: str,
-            email: str,
-            phone: str,
-            tenant: str,
-            queue: Optional[str] = None,
-            status: Optional[int] = 1,
+        self,
+        name: str,
+        password: str,
+        email: str,
+        phone: str,
+        tenant: str,
+        queue: Optional[str] = None,
+        status: Optional[int] = 1,
     ):
         super().__init__(name)
         self.password = password
@@ -62,7 +62,7 @@ class User(BaseSide):
             self.phone,
             self.tenant,
             self.queue,
-            self.status
+            self.status,
         )
         # TODO recover result checker
         # gateway_result_checker(result, None)

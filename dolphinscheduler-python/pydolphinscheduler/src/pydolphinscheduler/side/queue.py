@@ -28,9 +28,9 @@ class Queue(BaseSide):
     """
 
     def __init__(
-            self,
-            name: str = ProcessDefinitionDefault.QUEUE,
-            description: Optional[str] = ""
+        self,
+        name: str = ProcessDefinitionDefault.QUEUE,
+        description: Optional[str] = "",
     ):
         super().__init__(name, description)
 

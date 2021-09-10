@@ -29,7 +29,7 @@ def test_task_params_to_dict():
         "rawScript": raw_script,
         "dependence": {},
         "conditionResult": TaskParams.DEFAULT_CONDITION_RESULT,
-        "waitStartTimeout": {}
+        "waitStartTimeout": {},
     }
     task_param = TaskParams(raw_script=raw_script)
     assert task_param.to_dict() == expect
@@ -45,9 +45,11 @@ def test_task_relation_to_dict():
         "preTaskVersion": 1,
         "postTaskVersion": 1,
         "conditionType": 0,
-        "conditionParams": {}
+        "conditionParams": {},
     }
-    task_param = TaskRelation(pre_task_code=pre_task_code, post_task_code=post_task_code)
+    task_param = TaskRelation(
+        pre_task_code=pre_task_code, post_task_code=post_task_code
+    )
     assert task_param.to_dict() == expect
 
 
@@ -69,15 +71,8 @@ def test_task_to_dict():
             "localParams": [],
             "rawScript": raw_script,
             "dependence": {},
-            "conditionResult": {
-                "successNode": [
-                    ""
-                ],
-                "failedNode": [
-                    ""
-                ]
-            },
-            "waitStartTimeout": {}
+            "conditionResult": {"successNode": [""], "failedNode": [""]},
+            "waitStartTimeout": {},
         },
         "flag": "YES",
         "taskPriority": "MEDIUM",
@@ -86,7 +81,7 @@ def test_task_to_dict():
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
         "timeoutNotifyStrategy": None,
-        "timeout": 0
+        "timeout": 0,
     }
     with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
         task = Task(
