@@ -16,10 +16,7 @@
 #
 
 github:
-  description: |
-    Apache DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG
-    visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing
-    various types of jobs available `out of the box`.
+  description: Apache DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available out of box.
   homepage: https://dolphinscheduler.apache.org/
   labels:
     - airflow
@@ -39,9 +36,12 @@ github:
     - data-schedule
   enabled_merge_buttons:
     squash: true
-    merge: false
+    merge: true
     rebase: false
   protected_branches:
     dev:
       required_status_checks:
         strict: true
+      required_pull_request_reviews:
+        dismiss_stale_reviews: true
+        required_approving_review_count: 1

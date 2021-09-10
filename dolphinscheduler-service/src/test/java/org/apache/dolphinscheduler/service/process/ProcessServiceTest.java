@@ -34,13 +34,11 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -126,6 +124,9 @@ public class ProcessServiceTest {
         //father history: start; child null == command type: start
         parentInstance.setHistoryCmd("START_PROCESS");
         parentInstance.setCommandType(CommandType.START_PROCESS);
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
@@ -192,7 +193,6 @@ public class ProcessServiceTest {
 
     @Test
     public void testCreateRecoveryWaitingThreadCommand() {
-
         int id = 123;
         Mockito.when(commandMapper.deleteById(id)).thenReturn(1);
         ProcessInstance subProcessInstance = new ProcessInstance();
@@ -217,7 +217,6 @@ public class ProcessServiceTest {
         subProcessInstance2.setId(111);
         subProcessInstance2.setIsSubProcess(Flag.NO);
         processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance2);
-
     }
 
     @Test
@@ -227,16 +226,15 @@ public class ProcessServiceTest {
         String host = "127.0.0.1";
         int validThreadNum = 1;
         Command command = new Command();
-        command.setProcessDefinitionId(222);
+        command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
-                + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
-        Mockito.when(processDefineMapper.selectById(command.getProcessDefinitionId())).thenReturn(null);
+            + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
         //there is not enough thread for this command
         Command command1 = new Command();
-        command1.setProcessDefinitionId(123);
+        command1.setProcessDefinitionCode(123);
         command1.setCommandParam("{\"ProcessInstanceId\":222}");
         command1.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -244,41 +242,38 @@ public class ProcessServiceTest {
         processDefinition.setName("test");
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
-        processDefinition.setProcessDefinitionJson("{\"globalParams\":[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"tasks\":[{\"conditionResult\":"
-                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
-                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
-                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
-                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
-                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
-                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
-        Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
+        processInstance.setProcessDefinitionCode(11L);
+        processInstance.setProcessDefinitionVersion(1);
+        Mockito.when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode())).thenReturn(processDefinition);
+        Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
         Command command2 = new Command();
         command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command2.setProcessDefinitionId(123);
+        command2.setProcessDefinitionCode(123);
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
 
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
 
         Command command3 = new Command();
-        command3.setProcessDefinitionId(123);
+        command3.setProcessDefinitionCode(123);
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
 
         Command command4 = new Command();
-        command4.setProcessDefinitionId(123);
+        command4.setProcessDefinitionCode(123);
         command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command4.setCommandType(CommandType.REPEAT_RUNNING);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
 
         Command command5 = new Command();
-        command5.setProcessDefinitionId(123);
+        command5.setProcessDefinitionCode(123);
         HashMap<String, String> startParams = new HashMap<>();
         startParams.put("startParam1", "testStartParam1");
         HashMap<String, String> commandParams = new HashMap<>();
@@ -317,48 +312,43 @@ public class ProcessServiceTest {
 
     @Test
     public void testRecurseFindSubProcessId() {
+        int parentProcessDefineId = 1;
+        long parentProcessDefineCode = 1L;
+        int parentProcessDefineVersion = 1;
+
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(10L);
-        int parentId = 111;
-        List<Integer> ids = new ArrayList<>();
-        ProcessDefinition processDefinition2 = new ProcessDefinition();
-        processDefinition2.setCode(11L);
-        Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
+        processDefinition.setCode(parentProcessDefineCode);
+        processDefinition.setVersion(parentProcessDefineVersion);
+        Mockito.when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(processDefinition);
+
+        long postTaskCode = 2L;
+        int postTaskVersion = 2;
+
         List<ProcessTaskRelationLog> relationLogList = new ArrayList<>();
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong()
-                , Mockito.anyInt()))
-                .thenReturn(relationLogList);
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setPostTaskCode(postTaskCode);
+        processTaskRelationLog.setPostTaskVersion(postTaskVersion);
+        relationLogList.add(processTaskRelationLog);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
+            , parentProcessDefineVersion)).thenReturn(relationLogList);
 
-        processService.recurseFindSubProcessId(parentId, ids);
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
+        taskDefinitionLog1.setTaskParams("{\"processDefinitionId\": 123}");
+        taskDefinitionLogs.add(taskDefinitionLog1);
+        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
-    }
+        List<Integer> ids = new ArrayList<>();
+        processService.recurseFindSubProcessId(parentProcessDefineId, ids);
 
-    @Test
-    public void testSaveProcessDefinition() {
-        User user = new User();
-        user.setId(1);
-
-        Project project = new Project();
-        project.setCode(1L);
-
-        ProcessData processData = new ProcessData();
-        processData.setTasks(new ArrayList<>());
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
-        Assert.assertEquals(-1, processService.saveProcessDefinition(user, project, "name",
-                "desc", "locations", "connects", processData,
-                processDefinition, true));
+        Assert.assertEquals(1, ids.size());
     }
 
     @Test
     public void testSwitchVersion() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
+        processDefinition.setProjectCode(1L);
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
@@ -423,85 +413,9 @@ public class ProcessServiceTest {
     }
 
     @Test
-    public void testGenProcessData() {
-        String processDefinitionJson = "{\"tasks\":[{\"id\":null,\"code\":3,\"version\":0,\"name\":\"1-test\","
-                + "\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"FORBIDDEN\",\"loc\":null,\"maxRetryTimes\":0,"
-                + "\"retryInterval\":0,\"params\":{},\"preTasks\":[\"unit-test\"],"
-                + "\"preTaskNodeList\":[{\"code\":2,\"name\":\"unit-test\",\"version\":0}],"
-                + "\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null,\"conditionResult\":null,"
-                + "\"switchResult\":null,\"taskInstancePriority\":null,\"workerGroup\":null,"
-                + "\"timeout\":{\"enable\":false,\"strategy\":null,\"interval\":0},\"delayTime\":0}],"
-                + "\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
-
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-        processTaskRelationLog.setName("def 1");
-        processTaskRelationLog.setProcessDefinitionVersion(1);
-        processTaskRelationLog.setProjectCode(1L);
-        processTaskRelationLog.setProcessDefinitionCode(1L);
-        processTaskRelationLog.setPostTaskCode(3L);
-        processTaskRelationLog.setPreTaskCode(2L);
-        processTaskRelationLog.setUpdateTime(new Date());
-        processTaskRelationLog.setCreateTime(new Date());
-        List<ProcessTaskRelationLog> list = new ArrayList<>();
-        list.add(processTaskRelationLog);
-
-        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-        taskDefinition.setCode(3L);
-        taskDefinition.setName("1-test");
-        taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
-        taskDefinition.setUserId(1);
-        taskDefinition.setVersion(2);
-        taskDefinition.setCreateTime(new Date());
-        taskDefinition.setUpdateTime(new Date());
-
-        TaskDefinitionLog td2 = new TaskDefinitionLog();
-        td2.setCode(2L);
-        td2.setName("unit-test");
-        td2.setProjectCode(1L);
-        td2.setTaskType(TaskType.SHELL.getDesc());
-        td2.setUserId(1);
-        td2.setVersion(1);
-        td2.setCreateTime(new Date());
-        td2.setUpdateTime(new Date());
-
-        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
-        taskDefinitionLogs.add(taskDefinition);
-        taskDefinitionLogs.add(td2);
-
-        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
-        String json = JSONUtils.toJsonString(processService.genProcessData(processDefinition));
-
-        Assert.assertEquals(processDefinitionJson, json);
-    }
-
-    @Test
-    public void locationToMap() {
-        String locations = "{\"tasks-64888\":{\"name\":\"test_a\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":134,\"y\":183},"
-                + "\"tasks-24501\":{\"name\":\"test_b\",\"targetarr\":\"tasks-64888\",\"nodenumber\":\"0\",\"x\":392,\"y\":184},"
-                + "\"tasks-81137\":{\"name\":\"test_c\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":122,\"y\":327},"
-                + "\"tasks-41367\":{\"name\":\"test_d\",\"targetarr\":\"tasks-81137\",\"nodenumber\":\"0\",\"x\":409,\"y\":324}}";
-        Map<String, String> frontTaskIdAndNameMap = new HashMap<>();
-        frontTaskIdAndNameMap.put("test_a", "tasks-64888");
-        frontTaskIdAndNameMap.put("test_b", "tasks-24501");
-        frontTaskIdAndNameMap.put("test_c", "tasks-81137");
-        frontTaskIdAndNameMap.put("test_d", "tasks-41367");
-        Map<String, String> locationToMap = processService.locationToMap(locations);
-        Assert.assertEquals(frontTaskIdAndNameMap, locationToMap);
-    }
-
-    @Test
     public void testCreateCommand() {
         Command command = new Command();
-        command.setProcessDefinitionId(123);
+        command.setProcessDefinitionCode(123);
         command.setCommandParam("{\"ProcessInstanceId\":222}");
         command.setCommandType(CommandType.START_PROCESS);
         int mockResult = 1;
@@ -519,10 +433,10 @@ public class ProcessServiceTest {
         processInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
-                + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
-                + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
-                + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
-                + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
+            + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
+            + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
+            + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
+            + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
         processService.changeOutParam(taskInstance);
     }
 

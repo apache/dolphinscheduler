@@ -483,6 +483,38 @@ public class DateUtils {
                 Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
+    public static Date addYears(Date date, int amount) {
+        return add(date, 1, amount);
+    }
+
+    public static Date addMonths(Date date, int amount) {
+        return add(date, 2, amount);
+    }
+
+    public static Date addWeeks(Date date, int amount) {
+        return add(date, 3, amount);
+    }
+
+    public static Date addDays(Date date, int amount) {
+        return add(date, 5, amount);
+    }
+
+    public static Date addHours(Date date, int amount) {
+        return add(date, 11, amount);
+    }
+
+    public static Date addMinutes(Date date, int amount) {
+        return add(date, 12, amount);
+    }
+
+    public static Date addSeconds(Date date, int amount) {
+        return add(date, 13, amount);
+    }
+
+    public static Date addMilliseconds(Date date, int amount) {
+        return add(date, 14, amount);
+    }
+
     /**
      * get date
      *

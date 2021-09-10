@@ -36,7 +36,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param projectCode projectCode
      * @return project
      */
-    Project queryByCode(@Param("projectCode") Long projectCode);
+    Project queryByCode(@Param("projectCode") long projectCode);
 
     /**
      * TODO: delete
@@ -51,7 +51,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @param projectCode projectCode
      * @return project
      */
-    Project queryDetailByCode(@Param("projectCode") Long projectCode);
+    Project queryDetailByCode(@Param("projectCode") long projectCode);
 
     /**
      * query project by name
@@ -118,5 +118,4 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return projectList
      */
     List<Project> queryAllProject();
-
 }

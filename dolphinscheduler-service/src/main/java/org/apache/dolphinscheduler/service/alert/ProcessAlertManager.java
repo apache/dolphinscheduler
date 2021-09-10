@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
@@ -251,5 +252,10 @@ public class ProcessAlertManager {
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    }
+
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
+        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(),processInstance.getName(),
+                taskInstance.getId(), taskInstance.getName());
     }
 }
