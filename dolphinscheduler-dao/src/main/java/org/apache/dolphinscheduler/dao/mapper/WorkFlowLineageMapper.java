@@ -22,18 +22,34 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Set;
 
 public interface WorkFlowLineageMapper {
 
     /**
      * queryByName
      *
-     * @param searchVal searchVal
      * @param projectCode projectCode
+     * @param workFlowName workFlowName
      * @return WorkFlowLineage list
      */
-    List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectCode") Long projectCode);
+    List<WorkFlowLineage> queryWorkFlowLineageByName(@Param("projectCode") long projectCode, @Param("workFlowName") String workFlowName);
+
+    /**
+     * queryWorkFlowLineageByCode
+     *
+     * @param projectCode projectCode
+     * @param workFlowCode workFlowCode
+     * @return WorkFlowLineage
+     */
+    WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode, @Param("workFlowCode") long workFlowCode);
+
+    /**
+     * queryProcessLineage
+     *
+     * @param projectCode projectCode
+     * @return ProcessLineage list
+     */
+    List<ProcessLineage> queryProcessLineage(@Param("projectCode") long projectCode);
 
     /**
      * queryCodeRelation
@@ -41,28 +57,10 @@ public interface WorkFlowLineageMapper {
      * @param taskCode taskCode
      * @param taskVersion taskVersion
      * @param processDefinitionCode processDefinitionCode
-     * @return ProcessLineage
+     * @return ProcessLineage list
      */
-    List<ProcessLineage> queryCodeRelation(
-            @Param("taskCode") Long taskCode, @Param("taskVersion") int taskVersion,
-            @Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
-
-    /**
-     * queryRelationByIds
-     *
-     * @param ids ids
-     * @param projectCode projectCode
-     * @return ProcessLineage
-     */
-    List<ProcessLineage> queryRelationByIds(@Param("ids") Set<Integer> ids, @Param("projectCode") Long projectCode);
-
-    /**
-     * queryWorkFlowLineageByCode
-     *
-     * @param processDefinitionCode processDefinitionCode
-     * @param projectCode projectCode
-     * @return WorkFlowLineage
-     */
-    WorkFlowLineage queryWorkFlowLineageByCode(@Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
-
+    List<ProcessLineage> queryCodeRelation(@Param("projectCode") long projectCode,
+                                           @Param("processDefinitionCode") long processDefinitionCode,
+                                           @Param("taskCode") long taskCode,
+                                           @Param("taskVersion") int taskVersion);
 }

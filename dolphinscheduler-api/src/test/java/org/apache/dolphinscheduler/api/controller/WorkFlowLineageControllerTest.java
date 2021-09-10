@@ -21,28 +21,53 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * work flow lineage controller test
  */
-public class WorkFlowLineageControllerTest extends AbstractControllerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class WorkFlowLineageControllerTest {
 
     @InjectMocks
     private WorkFlowLineageController workFlowLineageController;
 
     @Mock
     private WorkFlowLineageServiceImpl workFlowLineageService;
+
+    protected User user;
+
+    @Before
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        user = loginUser;
+    }
+
+    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
+    }
 
     @Test
     public void testQueryWorkFlowLineageByName() {
@@ -51,23 +76,20 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, 1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectCode)).thenReturn(result);
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal)).thenReturn(result);
         Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public  void testQueryWorkFlowLineageByIds() {
+    public  void testQueryWorkFlowLineageByCode() {
         long projectCode = 1L;
-        String ids = "1";
+        long code = 1L;
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, 1);
-        Set<Integer> idSet = new HashSet<>();
-        idSet.add(1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByIds(idSet, projectCode)).thenReturn(result);
-        Result response = workFlowLineageController.queryWorkFlowLineageByIds(user, projectCode, ids);
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(result);
+        Result response = workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
-
 }
