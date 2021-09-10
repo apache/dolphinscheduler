@@ -19,42 +19,30 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Objects;
 
 public class WorkFlowRelation {
-    private int sourceWorkFlowId;
-    private int targetWorkFlowId;
+    private long sourceWorkFlowCode;
+    private long targetWorkFlowCode;
 
-    public int getSourceWorkFlowId() {
-        return sourceWorkFlowId;
+    public long getSourceWorkFlowCode() {
+        return sourceWorkFlowCode;
     }
 
-    public void setSourceWorkFlowId(int sourceWorkFlowId) {
-        this.sourceWorkFlowId = sourceWorkFlowId;
+    public void setSourceWorkFlowCode(long sourceWorkFlowCode) {
+        this.sourceWorkFlowCode = sourceWorkFlowCode;
     }
 
-    public int getTargetWorkFlowId() {
-        return targetWorkFlowId;
+    public long getTargetWorkFlowCode() {
+        return targetWorkFlowCode;
     }
 
-    public void setTargetWorkFlowId(int targetWorkFlowId) {
-        this.targetWorkFlowId = targetWorkFlowId;
+    public void setTargetWorkFlowCode(long targetWorkFlowCode) {
+        this.targetWorkFlowCode = targetWorkFlowCode;
     }
 
     public WorkFlowRelation() {
     }
 
-    public WorkFlowRelation(int sourceWorkFlowId, int targetWorkFlowId) {
-        this.sourceWorkFlowId = sourceWorkFlowId;
-        this.targetWorkFlowId = targetWorkFlowId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof WorkFlowRelation
-                && this.sourceWorkFlowId == ((WorkFlowRelation) obj).getSourceWorkFlowId()
-                && this.targetWorkFlowId == ((WorkFlowRelation) obj).getTargetWorkFlowId();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sourceWorkFlowId, targetWorkFlowId);
+    public WorkFlowRelation(long sourceWorkFlowCode, long targetWorkFlowCode) {
+        this.sourceWorkFlowCode = sourceWorkFlowCode;
+        this.targetWorkFlowCode = targetWorkFlowCode;
     }
 }
