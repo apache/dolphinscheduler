@@ -14,3 +14,15 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
+from datetime import datetime
+
+from pydolphinscheduler.core.task import Task as SourceTask
+
+
+class Task(SourceTask):
+    DEFAULT_VERSION = 1
+
+    def gen_code_and_version(self):
+        now_timestamp = int(datetime.now().timestamp() * 1000000)
+        return now_timestamp, self.DEFAULT_VERSION

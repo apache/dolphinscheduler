@@ -1,0 +1,38 @@
+name: Python API Tests
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'dolphinscheduler-python/**'
+  pull_request:
+    paths:
+      - 'dolphinscheduler-python/**'
+
+defaults:
+  run:
+    working-directory: dolphinscheduler-python/pydolphinscheduler
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-18.04, macOS-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies & pydolphinscheduler
+        run: |
+          pip install -r requirements.txt -r requirements_dev.txt
+          pip install -e .
+      - name: Run tests
+        run: |
+          pytest
