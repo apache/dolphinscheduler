@@ -355,6 +355,68 @@ CREATE TABLE `t_ds_environment` (
    UNIQUE KEY `environment_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for t_ds_task_definition
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition`;
+CREATE TABLE `t_ds_task_definition` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` longtext COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`,`code`),
+  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+create index task_definition_index on t_ds_task_definition (project_code,id);
+
+-- ----------------------------
+-- Table structure for t_ds_task_definition_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition_log`;
+CREATE TABLE `t_ds_task_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` text COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
 
