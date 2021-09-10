@@ -139,7 +139,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/:projectCode/definition/tree/:id',
+              path: '/projects/:projectCode/definition/tree/:code',
               name: 'definition-tree-view-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/index'], resolve),
               meta: {

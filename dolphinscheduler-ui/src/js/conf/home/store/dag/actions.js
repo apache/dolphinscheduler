@@ -144,7 +144,7 @@ export default {
         // timeout
         state.timeout = res.data.processDefinition.timeout
         // tenantId
-        state.tenantCode = res.data.processDefinition.tenantCode
+        state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
         state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
           'code',
@@ -240,7 +240,7 @@ export default {
         // timeout
         state.timeout = processDefinition.timeout
         // tenantCode
-        state.tenantCode = res.data.tenantCode
+        state.tenantCode = res.data.tenantCode || 'default'
         // tasks info
         state.tasks = taskDefinitionList.map(task => _.pick(task, [
           'code',
@@ -760,7 +760,7 @@ export default {
    */
   getViewTree ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/view-tree`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/view-tree`, { limit: payload.limit }, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -772,7 +772,7 @@ export default {
    */
   getViewGantt ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-gantt`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}/view-gantt`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

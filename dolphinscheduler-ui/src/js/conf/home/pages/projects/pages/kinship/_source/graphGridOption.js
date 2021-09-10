@@ -17,8 +17,8 @@
 import _ from 'lodash'
 import i18n from '@/module/i18n/index.js'
 
-const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus, id }, sourceWorkFlowId) => {
-  if (id === sourceWorkFlowId) return categoryDic.active
+const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus, code }, sourceWorkFlowCode) => {
+  if (code === sourceWorkFlowCode) return categoryDic.active
   switch (true) {
     case workFlowPublishStatus === '0':
       return categoryDic['0']
@@ -30,7 +30,7 @@ const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus
   }
 }
 
-export default function (locations, links, sourceWorkFlowId, isShowLabel) {
+export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
   const categoryDic = {
     active: { color: '#2D8DF0', category: i18n.$t('KinshipStateActive') },
     1: { color: '#00C800', category: i18n.$t('KinshipState1') },
@@ -38,7 +38,7 @@ export default function (locations, links, sourceWorkFlowId, isShowLabel) {
     10: { color: '#FF8F05', category: i18n.$t('KinshipState10') }
   }
   const newData = _.map(locations, (item) => {
-    const { color, category } = getCategory(categoryDic, item, sourceWorkFlowId)
+    const { color, category } = getCategory(categoryDic, item, sourceWorkFlowCode)
     return {
       ...item,
       emphasis: {

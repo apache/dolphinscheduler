@@ -35,7 +35,7 @@
           </el-select>
           <el-button
                   @click="_rtTasksDag"
-                  v-if="$route.query.subProcessIds"
+                  v-if="$route.query.subProcessCodes"
                   type="primary"
                   size="small"
                   icon="el-icon-d-arrow-left">
@@ -117,7 +117,7 @@
         Tree.reset()
 
         this.getViewTree({
-          processId: this.$route.params.id,
+          code: this.$route.params.code,
           limit: this.limit
         }).then(res => {
           let data = _.cloneDeep(res)
@@ -160,32 +160,32 @@
        * Return to the previous child node
        */
       _rtTasksDag () {
-        let getIds = this.$route.query.subProcessIds
-        let idsArr = getIds.split(',')
-        let ids = idsArr.slice(0, idsArr.length - 1)
-        let id = idsArr[idsArr.length - 1]
+        let subProcessCodes = this.$route.query.subProcessCodes
+        let codeList = subProcessCodes.split(',')
+        let codes = codeList.slice(0, codeList.length - 1)
+        let code = codeList[codeList.length - 1]
         let query = {}
 
-        if (id !== idsArr[0]) {
-          query = { subProcessIds: ids.join(',') }
+        if (code !== codeList[0]) {
+          query = { subProcessCodes: codes.join(',') }
         }
-        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${id}`, query: query })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/tree/${code}`, query: query })
       },
       /**
        * Subprocess processing
-       * @param subProcessId 子流程Id
+       * @param subProcessCode 子流程Code
        */
-      _subProcessHandle (subProcessId) {
-        let subProcessIds = []
-        let getIds = this.$route.query.subProcessIds
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.$route.params.id)
-          subProcessIds = newId
+      _subProcessHandle (subProcessCode) {
+        let subProcessCodes = []
+        let codes = this.$route.query.subProcessCodes
+        if (codes) {
+          let newCode = codes.split(',')
+          newCode.push(this.$route.params.code)
+          subProcessCodes = newCode
         } else {
-          subProcessIds.push(this.$route.params.id)
+          subProcessCodes.push(this.$route.params.code)
         }
-        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/tree/${subProcessCode}`, query: { subProcessCodes: subProcessCodes.join(',') } })
       },
       _onChangeSelect (o) {
         this.limit = o
@@ -193,7 +193,7 @@
       }
     },
     watch: {
-      '$route.params.id' () {
+      '$route.params.code' () {
         this._getViewTree()
       }
     },
@@ -203,7 +203,7 @@
     mounted () {
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectCode'])
     },
     components: { mSpin, mListConstruction, mNoData }
   }

@@ -292,7 +292,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}` })
       },
       /**
        * Rerun
@@ -433,7 +433,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/gantt/${item.id}` })
       },
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
