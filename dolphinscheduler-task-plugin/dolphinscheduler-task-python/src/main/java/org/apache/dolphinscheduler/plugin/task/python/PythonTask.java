@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
 import java.util.Map;
 
 /**
@@ -52,8 +51,6 @@ public class PythonTask extends AbstractTaskExecutor {
 
     private TaskRequest taskRequest;
 
-
-    private String command;
 
     /**
      * constructor
@@ -92,15 +89,10 @@ public class PythonTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    @Override
     public void handle() throws Exception {
         try {
-            //    construct process
-            this.command = buildCommand();
+            // construct process
+            String command = buildCommand();
             TaskResponse taskResponse = pythonCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
