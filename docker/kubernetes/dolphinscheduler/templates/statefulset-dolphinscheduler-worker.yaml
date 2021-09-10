@@ -69,7 +69,7 @@ spec:
             - name: ALERT_LISTEN_HOST
               value: {{ include "dolphinscheduler.fullname" . }}-alert
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
-            {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.zookeeper.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
           envFrom:
             - configMapRef:

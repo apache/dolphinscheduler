@@ -23,7 +23,7 @@ import java.util.Objects;
 
 public class SnowFlakeUtils {
     // start timestamp
-    private static final long START_TIMESTAMP = 1609430400L; //2021-01-01
+    private static final long START_TIMESTAMP = 1609430400000L; //2021-01-01 00:00:00
     // Number of digits
     private static final long SEQUENCE_BIT = 13;
     private static final long MACHINE_BIT = 2;
@@ -67,8 +67,8 @@ public class SnowFlakeUtils {
         }
         lastTimestamp = currStmp;
         return (currStmp - START_TIMESTAMP) << TIMESTAMP_LEFT
-                | machineId << MACHINE_LEFT
-                | sequence;
+            | machineId << MACHINE_LEFT
+            | sequence;
     }
 
     private long getNextMill() {
@@ -80,7 +80,7 @@ public class SnowFlakeUtils {
     }
 
     private long nowTimestamp() {
-        return System.currentTimeMillis() / 1000;
+        return System.currentTimeMillis();
     }
 
     public static class SnowFlakeException extends Exception {

@@ -19,29 +19,21 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 public class WorkFlowLineage {
-    private int workFlowId;
+    private long workFlowCode;
     private String workFlowName;
     private String workFlowPublishStatus;
     private Date scheduleStartTime;
     private Date scheduleEndTime;
     private String crontab;
     private int schedulePublishStatus;
-    private String sourceWorkFlowId;
+    private String sourceWorkFlowCode;
 
-    public String getSourceWorkFlowId() {
-        return sourceWorkFlowId;
+    public long getWorkFlowCode() {
+        return workFlowCode;
     }
 
-    public void setSourceWorkFlowId(String sourceWorkFlowId) {
-        this.sourceWorkFlowId = sourceWorkFlowId;
-    }
-
-    public int getWorkFlowId() {
-        return workFlowId;
-    }
-
-    public void setWorkFlowId(int workFlowId) {
-        this.workFlowId = workFlowId;
+    public void setWorkFlowCode(long workFlowCode) {
+        this.workFlowCode = workFlowCode;
     }
 
     public String getWorkFlowName() {
@@ -90,5 +82,13 @@ public class WorkFlowLineage {
 
     public void setSchedulePublishStatus(int schedulePublishStatus) {
         this.schedulePublishStatus = schedulePublishStatus;
+    }
+
+    public String getSourceWorkFlowCode() {
+        return sourceWorkFlowCode;
+    }
+
+    public void setSourceWorkFlowCode(String sourceWorkFlowCode) {
+        this.sourceWorkFlowCode = sourceWorkFlowCode;
     }
 }

@@ -43,7 +43,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return process definition
      */
-    ProcessDefinition queryByCode(@Param("code") Long code);
+    ProcessDefinition queryByCode(@Param("code") long code);
 
     /**
      * query process definition by code list
@@ -59,8 +59,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return delete result
      */
-    int deleteByCode(@Param("code") Long code);
-    
+    int deleteByCode(@Param("code") long code);
+
     /**
      * verify process definition by name
      *
@@ -68,8 +68,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param name name
      * @return process definition
      */
-    ProcessDefinition verifyByDefineName(@Param("projectCode") Long projectCode,
-                                        @Param("processDefinitionName") String name);
+    ProcessDefinition verifyByDefineName(@Param("projectCode") long projectCode,
+                                         @Param("processDefinitionName") String name);
 
     /**
      * query process definition by name
@@ -78,7 +78,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param name name
      * @return process definition
      */
-    ProcessDefinition queryByDefineName(@Param("projectCode") Long projectCode,
+    ProcessDefinition queryByDefineName(@Param("projectCode") long projectCode,
                                         @Param("processDefinitionName") String name);
 
     /**
@@ -102,7 +102,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
-                                                   @Param("projectCode") Long projectCode,
+                                                   @Param("projectCode") long projectCode,
                                                    @Param("isAdmin") boolean isAdmin);
 
     /**
@@ -111,7 +111,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param projectCode projectCode
      * @return process definition list
      */
-    List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") Long projectCode);
+    List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
 
     /**
      * query process definition by ids
@@ -159,34 +159,9 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
 
     /**
-     * update process definition version by process definitionId
-     *
-     * @param processDefinitionId process definition id
-     * @param version version
-     */
-    void updateVersionByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
-
-    /**
      * list all project ids
+     *
      * @return project ids list
      */
     List<Integer> listProjectIds();
-
-
-    /**
-     * query the paging process definition version list by pagination info
-     *
-     * @param page pagination info
-     * @param processDefinitionCode process definition code
-     * @return the paging process definition version list
-     */
-    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
-                                                                         @Param("processDefinitionCode") Long processDefinitionCode);
-    /**
-     * query has associated definition by id and version
-     * @param processDefinitionId process definition id
-     * @param version version
-     * @return definition id
-     */
-    Integer queryHasAssociatedDefinitionByIdAndVersion(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
 }

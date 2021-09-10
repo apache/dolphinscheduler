@@ -18,13 +18,12 @@
 
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
 <configuration scan="true" scanPeriod="120 seconds"> <!--debug="true" -->
-    <conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.service.log.SensitiveDataConverter">
-    </conversionRule>
+
     <property name="log.base" value="logs"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %message%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -39,13 +38,14 @@
         </rollingPolicy>
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %message%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
     <root level="INFO">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="ALERTLOGFILE"/>
     </root>
 

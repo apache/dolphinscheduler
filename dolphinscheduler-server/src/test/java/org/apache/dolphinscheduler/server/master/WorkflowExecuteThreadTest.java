@@ -123,7 +123,7 @@ public class WorkflowExecuteThreadTest {
     @Test
     public void testParallelWithOutSchedule() throws ParseException {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionId)).thenReturn(zeroSchedulerList());
             Method method = WorkflowExecuteThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(workflowExecuteThread);
@@ -141,7 +141,7 @@ public class WorkflowExecuteThreadTest {
     @Test
     public void testParallelWithSchedule() {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionId)).thenReturn(oneSchedulerList());
             Method method = WorkflowExecuteThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(workflowExecuteThread);

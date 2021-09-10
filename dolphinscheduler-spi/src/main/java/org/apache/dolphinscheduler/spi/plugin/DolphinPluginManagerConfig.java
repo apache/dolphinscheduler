@@ -47,7 +47,7 @@ public class DolphinPluginManagerConfig {
      * Development, When AlertServer is running on IDE, AlertPluginLoad can load Alert Plugin from local Repository.
      */
     private String mavenLocalRepository = System.getProperty("user.home") + "/.m2/repository";
-    private List<String> mavenRemoteRepository = ImmutableList.of("https://repo1.maven.org/maven2/");
+    private List<String> mavenRemoteRepository = ImmutableList.of("http://repo1.maven.org/maven2/");
 
     File getInstalledPluginsDir() {
         return installedPluginsDir;
