@@ -46,6 +46,8 @@ public interface ProjectService {
      */
     Map<String, Object> queryByCode(User loginUser, long projectCode);
 
+    Map<String, Object> queryByName(User loginUser, String projectName);
+
     /**
      * check project and authorization
      *
