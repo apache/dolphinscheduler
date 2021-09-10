@@ -71,7 +71,7 @@ Affirm.paramVerification = (name) => {
     }
   } else {
     // View history direct jump
-    flag = name === 'projects-instance-details' ? true : (dagStore.isSwitchVersion || !dagStore.isEditDag)
+    flag = name === 'projects-instance-details' ? true : !dagStore.isEditDag
   }
   return flag
 }
@@ -85,7 +85,7 @@ Affirm.isPop = (fn) => {
     cancelButtonText: `${i18n.$t('Cancel')}`,
     type: 'warning'
   }).then(() => {
-    findComponentDownward($root, 'dag-chart')._save('affirm').then(() => {
+    findComponentDownward($root, 'dag-chart').onSave('affirm').then(() => {
       fn()
     }).catch(() => {
       fn()
