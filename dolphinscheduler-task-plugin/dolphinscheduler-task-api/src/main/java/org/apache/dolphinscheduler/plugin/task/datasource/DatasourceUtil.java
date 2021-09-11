@@ -50,29 +50,6 @@ public class DatasourceUtil {
     private static final DatasourceProcessor db2PROCESSOR = new Db2DatasourceProcessor();
     private static final DatasourceProcessor prestoPROCESSOR = new PrestoDatasourceProcessor();
 
-    /**
-     * check datasource param
-     *
-     * @param baseDataSourceParamDTO datasource param
-     */
-    public static void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        getDatasourceProcessor(baseDataSourceParamDTO.getType()).checkDatasourceParam(baseDataSourceParamDTO);
-    }
-
-    /**
-     * build connection url
-     *
-     * @param baseDataSourceParamDTO datasourceParam
-     */
-    public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
-                .createConnectionParams(baseDataSourceParamDTO);
-        if (logger.isDebugEnabled()) {
-            logger.info("parameters map:{}", connectionParams);
-        }
-        return connectionParams;
-    }
-
     public static ConnectionParam buildConnectionParams(DbType dbType, String connectionJson) {
         return getDatasourceProcessor(dbType).createConnectionParams(connectionJson);
     }
@@ -87,10 +64,6 @@ public class DatasourceUtil {
 
     public static String getJdbcUrl(DbType dbType, ConnectionParam baseConnectionParam) {
         return getDatasourceProcessor(dbType).getJdbcUrl(baseConnectionParam);
-    }
-
-    public static BaseDataSourceParamDTO buildDatasourceParamDTO(DbType dbType, String connectionParams) {
-        return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
     }
 
     public static DatasourceProcessor getDatasourceProcessor(DbType dbType) {

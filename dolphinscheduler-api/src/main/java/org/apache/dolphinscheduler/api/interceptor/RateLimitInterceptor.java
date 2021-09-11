@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.api.interceptor;
 
 import org.apache.dolphinscheduler.api.configuration.TrafficConfiguration;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -74,7 +74,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         // tenant-level rate limit
         if (trafficConfiguration.isTrafficTenantControlSwitch()) {
             String token = request.getHeader("token");
-            if (StringUtils.isNotEmpty(token)) {
+            if (!StringUtils.isEmpty(token)) {
                 RateLimiter tenantRateLimiter = tenantRateLimiterCache.get(token);
                 if (!tenantRateLimiter.tryAcquire()) {
                     response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());

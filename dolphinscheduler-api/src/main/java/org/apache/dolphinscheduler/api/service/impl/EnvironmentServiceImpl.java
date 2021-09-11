@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -37,6 +36,7 @@ import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapp
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -126,11 +126,11 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         }
 
         if (environmentMapper.insert(env) > 0) {
-            if (StringUtils.isNotEmpty(workerGroups)) {
+            if (!StringUtils.isEmpty(workerGroups)) {
                 List<String> workerGroupList = JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>(){});
                 if (CollectionUtils.isNotEmpty(workerGroupList)) {
                     workerGroupList.stream().forEach(workerGroup -> {
-                        if (StringUtils.isNotEmpty(workerGroup)) {
+                        if (!StringUtils.isEmpty(workerGroup)) {
                             EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                             relation.setEnvironmentCode(env.getCode());
                             relation.setWorkerGroup(workerGroup);
@@ -338,7 +338,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         }
 
         Set<String> workerGroupSet;
-        if (StringUtils.isNotEmpty(workerGroups)) {
+        if (!StringUtils.isEmpty(workerGroups)) {
             workerGroupSet = JSONUtils.parseObject(workerGroups, new TypeReference<Set<String>>() {});
         } else {
             workerGroupSet = new TreeSet<>();
@@ -370,14 +370,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode,code));
         if (update > 0) {
             deleteWorkerGroupSet.stream().forEach(key -> {
-                if (StringUtils.isNotEmpty(key)) {
+                if (!StringUtils.isEmpty(key)) {
                     relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                             .lambda()
                             .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode,code));
                 }
             });
             addWorkerGroupSet.stream().forEach(key -> {
-                if (StringUtils.isNotEmpty(key)) {
+                if (!StringUtils.isEmpty(key)) {
                     EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                     relation.setEnvironmentCode(code);
                     relation.setWorkerGroup(key);
@@ -448,7 +448,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             putMsg(result, Status.ENVIRONMENT_CONFIG_IS_NULL);
             return result;
         }
-        if (StringUtils.isNotEmpty(workerGroups)) {
+        if (!StringUtils.isEmpty(workerGroups)) {
             List<String> workerGroupList = JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>(){});
             if (Objects.isNull(workerGroupList)) {
                 putMsg(result, Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID);

@@ -43,20 +43,6 @@ public class DateUtilsTest {
     }
 
     @Test
-    public void testConvertTimeStampsToString() {
-        TimeZone defaultTimeZone = TimeZone.getDefault();
-        final TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
-        TimeZone.setDefault(timeZone);
-
-        long timeMillis = 1625989249021L;
-        Assert.assertEquals("2021-07-11 15:40:49", DateUtils.formatTimeStamp(timeMillis));
-        DateTimeFormatter testFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        Assert.assertEquals("2021/07/11 15:40:49", DateUtils.formatTimeStamp(timeMillis, testFormatter));
-
-        TimeZone.setDefault(defaultTimeZone);
-    }
-
-    @Test
     public void testWeek() {
         Date curr = DateUtils.stringToDate("2019-02-01 00:00:00");
         Date monday1 = DateUtils.stringToDate("2019-01-28 00:00:00");
@@ -67,18 +53,6 @@ public class DateUtilsTest {
         Assert.assertEquals(monday, monday1);
         Assert.assertEquals(sunday, sunday1);
 
-    }
-
-    @Test
-    public void diffHours() {
-        Date d1 = DateUtils.stringToDate("2019-01-28 00:00:00");
-        Date d2 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d1, d2), 20);
-        Date d3 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d3, d2), 0);
-        Assert.assertEquals(DateUtils.diffHours(d2, d1), 20);
-        Date d4 = null;
-        Assert.assertEquals(DateUtils.diffHours(d2, d4), 0);
     }
 
     @Test
