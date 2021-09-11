@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.common.task.datax;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,10 +218,10 @@ public class DataxParameters extends AbstractParameters {
         if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0
                     && dataTarget != 0
-                    && StringUtils.isNotEmpty(sql)
-                    && StringUtils.isNotEmpty(targetTable);
+                    && !StringUtils.isEmpty(sql)
+                    && !StringUtils.isEmpty(targetTable);
         } else {
-            return StringUtils.isNotEmpty(json);
+            return !StringUtils.isEmpty(json);
         }
     }
 

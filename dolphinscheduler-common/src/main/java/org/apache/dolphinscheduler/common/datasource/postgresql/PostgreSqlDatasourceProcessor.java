@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -84,7 +84,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PostgreSqlConnectionParam postgreSqlConnectionParam = (PostgreSqlConnectionParam) connectionParam;
-        if (StringUtils.isNotEmpty(postgreSqlConnectionParam.getOther())) {
+        if (!StringUtils.isEmpty(postgreSqlConnectionParam.getOther())) {
             return String.format("%s?%s", postgreSqlConnectionParam.getJdbcUrl(), postgreSqlConnectionParam.getOther());
         }
         return postgreSqlConnectionParam.getJdbcUrl();

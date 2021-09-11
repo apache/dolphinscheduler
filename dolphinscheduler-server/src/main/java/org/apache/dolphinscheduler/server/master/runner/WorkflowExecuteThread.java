@@ -47,9 +47,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -69,6 +67,8 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,13 +181,6 @@ public class WorkflowExecuteThread implements Runnable {
      *
      */
     private NettyExecutorManager nettyExecutorManager;
-
-    /**
-     * submit post node
-     *
-     * @param parentNodeName parent node name
-     */
-    private Map<String, Object> propToValue = new ConcurrentHashMap<>();
 
     private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
@@ -472,21 +465,6 @@ public class WorkflowExecuteThread implements Runnable {
             initTaskQueue();
             submitPostNode(null);
         }
-    }
-
-    /**
-     * prepare process parameter
-     *
-     * @throws Exception exception
-     */
-    private void prepareProcess() throws Exception {
-
-        // gen process dag
-        buildFlowDag();
-
-        // init task queue
-        initTaskQueue();
-        logger.info("prepare process :{} end", processInstance.getId());
     }
 
     /**
@@ -1054,23 +1032,6 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     /**
-     * whether standby task list have retry tasks
-     */
-    private boolean retryTaskExists() {
-
-        boolean result = false;
-
-        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
-            TaskInstance task = iter.next();
-            if (task.getState().typeIsFailure()) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
      * whether complement end
      *
      * @return Boolean whether is complement end
@@ -1169,32 +1130,6 @@ public class WorkflowExecuteThread implements Runnable {
             }
         }
         return false;
-    }
-
-    /**
-     * whether check process time out
-     *
-     * @param processInstance task instance
-     * @return true if time out of process instance > running time of process instance
-     */
-    private boolean checkProcessTimeOut(ProcessInstance processInstance) {
-        if (processInstance.getTimeout() == 0) {
-            return false;
-        }
-
-        Date now = new Date();
-        long runningTime = DateUtils.diffMin(now, processInstance.getStartTime());
-
-        return runningTime > processInstance.getTimeout();
-    }
-
-    /**
-     * whether can submit task to queue
-     *
-     * @return boolean
-     */
-    private boolean canSubmitTaskToQueue() {
-        return OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
     }
 
     /**

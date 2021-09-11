@@ -22,7 +22,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +58,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
         String tempLogMsg = oriLogMsg;
 
-        if (StringUtils.isNotEmpty(tempLogMsg)) {
+        if (!StringUtils.isEmpty(tempLogMsg)) {
             tempLogMsg = passwordHandler(pwdPattern, tempLogMsg);
         }
         return tempLogMsg;

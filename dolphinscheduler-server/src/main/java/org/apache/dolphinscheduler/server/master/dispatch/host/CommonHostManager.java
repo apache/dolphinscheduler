@@ -20,12 +20,13 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public abstract class CommonHostManager implements HostManager {
 
     protected int getWorkerHostWeightFromHeartbeat(String heartbeat) {
         int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
-        if (StringUtils.isNotEmpty(heartbeat)) {
+        if (!StringUtils.isEmpty(heartbeat)) {
             String[] parts = heartbeat.split(Constants.COMMA);
             if (ResInfo.isNewHeartbeatWithWeight(parts)) {
                 hostWeight = Integer.parseInt(parts[10]);

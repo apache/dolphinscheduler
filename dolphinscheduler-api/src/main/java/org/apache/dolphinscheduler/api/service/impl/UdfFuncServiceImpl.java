@@ -24,13 +24,14 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -113,10 +114,10 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udf.setUserId(loginUser.getId());
         udf.setFuncName(funcName);
         udf.setClassName(className);
-        if (StringUtils.isNotEmpty(argTypes)) {
+        if (!StringUtils.isEmpty(argTypes)) {
             udf.setArgTypes(argTypes);
         }
-        if (StringUtils.isNotEmpty(database)) {
+        if (!StringUtils.isEmpty(database)) {
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
@@ -221,7 +222,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udf.setFuncName(funcName);
         udf.setClassName(className);
         udf.setArgTypes(argTypes);
-        if (StringUtils.isNotEmpty(database)) {
+        if (!StringUtils.isEmpty(database)) {
             udf.setDatabase(database);
         }
         udf.setDescription(desc);

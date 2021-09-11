@@ -197,7 +197,6 @@
                       ^cc\.concurrent\.mango\.util\.concurrent,
                       ^org\.apache\.curator-test\.shaded,
                       ^com\.sun\.istack,
-                      ^org\.apache\.commons\.lang,
                       ^org\.jetbrains\.annotations,
                       ^jline\.internal,
                       ^com\.cronutils\.utils,

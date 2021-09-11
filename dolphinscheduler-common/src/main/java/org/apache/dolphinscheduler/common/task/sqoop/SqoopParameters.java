@@ -20,7 +20,8 @@ import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
 /**
  * sqoop parameters
  */
-public class SqoopParameters  extends AbstractParameters {
+public class SqoopParameters extends AbstractParameters {
 
     /**
      * sqoop job type:
@@ -180,17 +181,17 @@ public class SqoopParameters  extends AbstractParameters {
         }
 
         if (SqoopJobType.TEMPLATE.getDescp().equals(jobType)) {
-            sqoopParamsCheck = StringUtils.isEmpty(customShell) &&
-                    StringUtils.isNotEmpty(modelType) &&
-                    StringUtils.isNotEmpty(jobName) &&
-                    concurrency != 0 &&
-                    StringUtils.isNotEmpty(sourceType) &&
-                    StringUtils.isNotEmpty(targetType) &&
-                    StringUtils.isNotEmpty(sourceParams) &&
-                    StringUtils.isNotEmpty(targetParams);
+            sqoopParamsCheck = StringUtils.isEmpty(customShell)
+                    && !StringUtils.isEmpty(modelType)
+                    && !StringUtils.isEmpty(jobName)
+                    && concurrency != 0
+                    && !StringUtils.isEmpty(sourceType)
+                    && !StringUtils.isEmpty(targetType)
+                    && !StringUtils.isEmpty(sourceParams)
+                    && !StringUtils.isEmpty(targetParams);
         } else if (SqoopJobType.CUSTOM.getDescp().equals(jobType)) {
-            sqoopParamsCheck = StringUtils.isNotEmpty(customShell) &&
-                    StringUtils.isEmpty(jobName);
+            sqoopParamsCheck = !StringUtils.isEmpty(customShell)
+                    && StringUtils.isEmpty(jobName);
         }
 
         return sqoopParamsCheck;

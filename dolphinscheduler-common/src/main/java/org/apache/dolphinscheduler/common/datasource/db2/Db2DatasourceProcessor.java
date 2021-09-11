@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -84,7 +84,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
-        if (StringUtils.isNotEmpty(db2ConnectionParam.getOther())) {
+        if (!StringUtils.isEmpty(db2ConnectionParam.getOther())) {
             return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(), db2ConnectionParam.getOther());
         }
         return db2ConnectionParam.getJdbcUrl();

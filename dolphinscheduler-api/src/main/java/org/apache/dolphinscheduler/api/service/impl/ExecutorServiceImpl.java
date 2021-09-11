@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -59,6 +58,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -416,7 +416,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         //To add startParams only when repeat running is needed
         Map<String, Object> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId);
-        if (StringUtils.isNotEmpty(startParams)) {
+        if (!StringUtils.isEmpty(startParams)) {
             cmdParam.put(CMD_PARAM_START_PARAMS, startParams);
         }
 
@@ -527,7 +527,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             command.setFailureStrategy(failureStrategy);
         }
 
-        if (StringUtils.isNotEmpty(startNodeList)) {
+        if (!StringUtils.isEmpty(startNodeList)) {
             cmdParam.put(CMD_PARAM_START_NODE_NAMES, startNodeList);
         }
         if (warningType != null) {
@@ -545,7 +545,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         Date start = null;
         Date end = null;
-        if (StringUtils.isNotEmpty(schedule)) {
+        if (!StringUtils.isEmpty(schedule)) {
             String[] interval = schedule.split(",");
             if (interval.length == 2) {
                 start = DateUtils.getScheduleDate(interval[0]);

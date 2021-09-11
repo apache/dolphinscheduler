@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.HashMap;
@@ -99,7 +101,7 @@ public class ParameterUtils {
         String cronTimeStr = parameterMap.get(Constants.PARAMETER_SHECDULE_TIME);
         Date cronTime = null;
 
-        if (StringUtils.isNotEmpty(cronTimeStr)) {
+        if (!StringUtils.isEmpty(cronTimeStr)) {
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
 
         } else {
@@ -209,7 +211,7 @@ public class ParameterUtils {
      */
     public static String handleEscapes(String inputString) {
 
-        if (StringUtils.isNotEmpty(inputString)) {
+        if (!StringUtils.isEmpty(inputString)) {
             return inputString.replace("%", "////%").replaceAll("[\n|\r\t]", "_");
         }
         return inputString;

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * sensitive log Util
  */
@@ -34,7 +36,7 @@ public class SensitiveLogUtils {
      */
     public static String maskDataSourcePwd(String dataSourcePwd) {
 
-        if (StringUtils.isNotEmpty(dataSourcePwd)) {
+        if (!StringUtils.isEmpty(dataSourcePwd)) {
             dataSourcePwd = Constants.PASSWORD_DEFAULT;
         }
         return dataSourcePwd;

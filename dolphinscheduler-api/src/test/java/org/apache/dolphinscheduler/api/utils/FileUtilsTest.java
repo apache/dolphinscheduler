@@ -106,7 +106,7 @@ public class FileUtilsTest {
     @Test
     public void testFile2String() throws IOException {
         String content = "123";
-        org.apache.dolphinscheduler.common.utils.FileUtils.writeStringToFile(new File("/tmp/task.json"),content);
+        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/task.json"),content);
 
         File file = new File("/tmp/task.json");
         FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");

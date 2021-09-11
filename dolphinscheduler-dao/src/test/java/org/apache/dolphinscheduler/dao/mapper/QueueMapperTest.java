@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 
 import java.util.Date;
@@ -133,7 +132,7 @@ public class QueueMapperTest {
         Assert.assertNull(queueMapper.existQueue("queue", null));
         Assert.assertNull(queueMapper.existQueue(null, "queue"));
         Queue queue = insertOne();
-        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(queue.getQueue(), null)));
-        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(null, queue.getQueueName())));
+        Assert.assertTrue(queueMapper.existQueue(queue.getQueue(), null) == Boolean.TRUE);
+        Assert.assertTrue(queueMapper.existQueue(null, queue.getQueueName()) == Boolean.TRUE);
     }
 }

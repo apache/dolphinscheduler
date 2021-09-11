@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -271,7 +271,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return BooleanUtils.isTrue(queueMapper.existQueue(queue, null));
+        return queueMapper.existQueue(queue, null) == Boolean.TRUE;
     }
 
     /**
@@ -282,7 +282,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return BooleanUtils.isTrue(queueMapper.existQueue(null, queueName));
+        return queueMapper.existQueue(null, queueName) == Boolean.TRUE;
     }
 
     /**
@@ -294,7 +294,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if need to update user
      */
     private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && BooleanUtils.isTrue(userMapper.existUser(oldQueue));
+        return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
 
 }
