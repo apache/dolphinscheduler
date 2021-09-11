@@ -59,6 +59,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
+        <el-table-column :label="$t('dryRun Flag')" width="100">
+          <template slot-scope="scope">
+            <span v-if="scope.row.dryRun == 1">YES</span>
+            <span v-else>NO</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('host')" min-width="210">
           <template slot-scope="scope">
             <span>{{scope.row.host | filterNull}}</span>

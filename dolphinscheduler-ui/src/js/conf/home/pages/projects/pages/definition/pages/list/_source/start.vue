@@ -78,14 +78,6 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Environment Name')}}
-      </div>
-      <div class="cont">
-        <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
         {{$t('Alarm group')}}
       </div>
       <div class="cont">
@@ -124,29 +116,10 @@
           {{$t('Mode of execution')}}
         </div>
         <div class="cont">
-          <el-radio-group @change="_updateParallelStatus" style="margin-top: 7px;"
-                          v-model="runMode">
+          <el-radio-group v-model="runMode" style="margin-top: 7px;">
             <el-radio :label="'RUN_MODE_SERIAL'">{{$t('Serial execution')}}</el-radio>
             <el-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</el-radio>
           </el-radio-group>
-        </div>
-      </div>
-      <div class="clearfix list" style="margin:-6px 0 16px 0" v-if="runMode === 'RUN_MODE_PARALLEL'">
-        <div class="text" style="padding-top: 6px;">
-          <em @click="_showParallelismInfo" class="ans el-icon-warning"></em>
-          {{$t('Parallelism')}}
-        </div>
-        <div class="cont" style="padding-top: 8px;">
-          <el-checkbox @change="_updateEnableCustomParallel" size="small"
-                       v-model="enableCustomParallelism">{{$t('Custom Parallelism')}}
-            <el-input :disabled="!enableCustomParallelism"
-                      :placeholder="$t('Please enter Parallelism')"
-                      ref="parallelismInput"
-                      size="mini"
-                      type="input"
-                      v-model="parallismNumber">
-            </el-input>
-          </el-checkbox>
         </div>
       </div>
       <div class="clearfix list">
@@ -183,21 +156,25 @@
         </div>
       </div>
     </div>
+    <div class="clearfix list">
+      <span class="text">{{$t('Whether dryRun')}}</span>
+      <span class="cont" style="padding-top: 5px;">
+          <el-switch v-model="dryRun" size="small" active-value="1" inactive-value="0"></el-switch>
+      </span>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Start')}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </el-button>
     </div>
   </div>
 </template>
 <script>
   import _ from 'lodash'
-  import i18n from '@/module/i18n'
   import dayjs from 'dayjs'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
-  import mRelatedEnvironment from '@/conf/home/pages/dag/_source/formModel/_source/relatedEnvironment'
   import mLocalParams from '@/conf/home/pages/dag/_source/formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import { mapMutations } from 'vuex'
@@ -217,16 +194,14 @@
         scheduleTime: '',
         spinnerLoading: false,
         execType: false,
-        enableCustomParallelism: false,
-        parallismNumber: null,
         taskDependType: 'TASK_POST',
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
         workerGroup: 'default',
-        environmentCode: '',
         // Global custom parameters
         definitionGlobalParams: [],
-        udpList: []
+        udpList: [],
+        dryRun: 0
       }
     },
     mixins: [disabledState],
@@ -240,36 +215,13 @@
     },
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
-      _showParallelismInfo () {
-        this.$message.warning({
-          dangerouslyUseHTMLString: true,
-          message: `<p style='font-size: 14px;'>${i18n.$t('Parallelism tip')}</p>`
-        })
-      },
       _onLocalParams (a) {
         this.udpList = a
       },
       _datepicker (val) {
         this.scheduleTime = val
       },
-      _onUpdateEnvironmentCode (o) {
-        this.environmentCode = o
-      },
-      _verification () {
-        if (this.enableCustomParallelism && !this.parallismNumber) {
-          this.$message.warning(`${i18n.$t('Parallelism number should be positive integer')}`)
-          return false
-        }
-        if (this.parallismNumber && !(/(^[1-9]\d*$)/.test(this.parallismNumber))) {
-          this.$message.warning(`${i18n.$t('Parallelism number should be positive integer')}`)
-          return false
-        }
-        return true
-      },
       _start () {
-        if (!this._verification()) {
-          return
-        }
         this.spinnerLoading = true
         let startParams = {}
         for (const item of this.udpList) {
@@ -278,7 +230,7 @@
           }
         }
         let param = {
-          processDefinitionCode: this.startData.code,
+          processDefinitionId: this.startData.id,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
@@ -289,14 +241,14 @@
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
           workerGroup: this.workerGroup,
-          environmentCode: this.environmentCode,
-          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
-          expectedParallelismNumber: this.parallismNumber
+          dryRun: this.dryRun,
+          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : ''
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
           param.taskDependType = this.taskDependType
         }
+        console.log(param)
         this.store.dispatch('dag/processStart', param).then(res => {
           this.$message.success(res.msg)
           this.$emit('onUpdateStart')
@@ -319,21 +271,8 @@
           })
         })
       },
-      _updateParallelStatus () {
-        this.enableCustomParallelism = false
-        this.parallismNumber = null
-      },
-      _updateEnableCustomParallel () {
-        if (!this.enableCustomParallelism) {
-          this.parallismNumber = null
-        } else {
-          this.$nextTick(() => {
-            this.$refs.parallelismInput.focus()
-          })
-        }
-      },
       _getGlobalParams () {
-        this.store.dispatch('dag/getProcessDetails', this.startData.code).then(res => {
+        this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
           this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
           this.udpList = _.cloneDeep(this.store.state.dag.globalParams)
         })
@@ -376,7 +315,7 @@
       this.workflowName = this.startData.name
     },
     computed: {},
-    components: { mPriority, mWorkerGroups, mLocalParams, mRelatedEnvironment }
+    components: { mPriority, mWorkerGroups, mLocalParams }
   }
 </script>
 
@@ -395,14 +334,6 @@
         display: block;
       }
     }
-
-    .ans {
-      color: #0097e0;
-      font-size: 14px;
-      vertical-align: middle;
-      cursor: pointer;
-    }
-
     .list {
       margin-bottom: 14px;
       .text {
