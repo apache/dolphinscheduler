@@ -21,9 +21,13 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import java.util.Map;
 
 /**
  * python task
@@ -47,8 +51,6 @@ public class PythonTask extends AbstractTaskExecutor {
 
     private TaskRequest taskRequest;
 
-
-    private String command;
 
     /**
      * constructor
@@ -87,16 +89,11 @@ public class PythonTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    @Override
     public void handle() throws Exception {
         try {
-            //    construct process
+            // construct process
+            String command = buildCommand();
             TaskResponse taskResponse = pythonCommandExecutor.run(command);
-
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
@@ -150,5 +147,26 @@ public class PythonTask extends AbstractTaskExecutor {
         }
         return rawScript;
     }
+
+    /**
+     * build command
+     * @return raw python script
+     * @throws Exception exception
+     */
+    private String buildCommand() throws Exception {
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+
+        // replace placeholder
+        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest,pythonParameters);
+        if (paramsMap != null){
+            rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+        }
+
+        logger.info("raw python script : {}", pythonParameters.getRawScript());
+        logger.info("task dir : {}", taskDir);
+
+        return rawPythonScript;
+    }
+
 
 }
