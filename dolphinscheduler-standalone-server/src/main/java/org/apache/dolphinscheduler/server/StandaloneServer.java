@@ -60,7 +60,7 @@ public class StandaloneServer {
 
         startRegistry();
 
-        startAlertServer();
+//        startAlertServer();
 
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
@@ -119,7 +119,6 @@ public class StandaloneServer {
     public static String getCurrentPath(Class<?> cls) {
         String path = cls.getProtectionDomain().getCodeSource().getLocation().getPath();
         path = path.replaceFirst("file:/", "");
-        path = path.replaceAll("!/", "");
         if (path.lastIndexOf(File.separator) >= 0) {
             path = path.substring(0, path.lastIndexOf(File.separator));
         }
