@@ -60,7 +60,7 @@ public class StandaloneServer {
 
         startRegistry();
 
-//        startAlertServer();
+        startAlertServer();
 
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
