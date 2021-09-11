@@ -326,7 +326,7 @@ CREATE TABLE t_ds_command
     update_time               datetime DEFAULT NULL,
     process_instance_priority int(11) DEFAULT NULL,
     worker_group              varchar(64),
-    environment_code          bigint(20) DEFAULT NULL,
+    environment_code          bigint(20) DEFAULT '-1',
     PRIMARY KEY (id)
 );
 
@@ -376,7 +376,7 @@ CREATE TABLE t_ds_error_command
     update_time               datetime DEFAULT NULL,
     process_instance_priority int(11) DEFAULT NULL,
     worker_group              varchar(64),
-    environment_code          bigint(20) DEFAULT NULL,
+    environment_code          bigint(20) DEFAULT '-1',
     message                   text,
     PRIMARY KEY (id)
 );
@@ -461,7 +461,7 @@ CREATE TABLE t_ds_task_definition
     flag                    tinyint(2) DEFAULT NULL,
     task_priority           tinyint(4) DEFAULT NULL,
     worker_group            varchar(200) DEFAULT NULL,
-    environment_code        bigint(20) DEFAULT NULL,
+    environment_code        bigint(20) DEFAULT '-1',
     fail_retry_times        int(11) DEFAULT NULL,
     fail_retry_interval     int(11) DEFAULT NULL,
     timeout_flag            tinyint(2) DEFAULT '0',
@@ -493,7 +493,7 @@ CREATE TABLE t_ds_task_definition_log
     flag                    tinyint(2) DEFAULT NULL,
     task_priority           tinyint(4) DEFAULT NULL,
     worker_group            varchar(200) DEFAULT NULL,
-    environment_code        bigint(20) DEFAULT NULL,
+    environment_code        bigint(20) DEFAULT '-1',
     fail_retry_times        int(11) DEFAULT NULL,
     fail_retry_interval     int(11) DEFAULT NULL,
     timeout_flag            tinyint(2) DEFAULT '0',
@@ -587,7 +587,7 @@ CREATE TABLE t_ds_process_instance
     history_cmd                text,
     process_instance_priority  int(11) DEFAULT NULL,
     worker_group               varchar(64)  DEFAULT NULL,
-    environment_code           bigint(20) DEFAULT NULL,
+    environment_code           bigint(20) DEFAULT '-1',
     timeout                    int(11) DEFAULT '0',
     tenant_id                  int(11) NOT NULL DEFAULT '-1',
     var_pool                   longtext,
@@ -773,7 +773,7 @@ CREATE TABLE t_ds_schedules
     warning_group_id          int(11) DEFAULT NULL,
     process_instance_priority int(11) DEFAULT NULL,
     worker_group              varchar(64) DEFAULT '',
-    environment_code          bigint(20) DEFAULT NULL,
+    environment_code          bigint(20) DEFAULT '-1',
     create_time               datetime     NOT NULL,
     update_time               datetime     NOT NULL,
     PRIMARY KEY (id)
@@ -829,7 +829,7 @@ CREATE TABLE t_ds_task_instance
     max_retry_times         int(2) DEFAULT NULL,
     task_instance_priority  int(11) DEFAULT NULL,
     worker_group            varchar(64)  DEFAULT NULL,
-    environment_code        bigint(20) DEFAULT NULL,
+    environment_code        bigint(20) DEFAULT '-1',
     environment_config      text DEFAULT '',
     executor_id             int(11) DEFAULT NULL,
     first_submit_time       datetime     DEFAULT NULL,
