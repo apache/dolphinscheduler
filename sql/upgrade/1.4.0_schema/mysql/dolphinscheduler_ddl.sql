@@ -372,6 +372,7 @@ CREATE TABLE `t_ds_task_definition` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -403,6 +404,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
   `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
@@ -417,14 +419,11 @@ CREATE TABLE `t_ds_task_definition_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-
-ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default NULL COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text COMMENT 'environment config' AFTER `environment_code`;
 
 -- ----------------------------
