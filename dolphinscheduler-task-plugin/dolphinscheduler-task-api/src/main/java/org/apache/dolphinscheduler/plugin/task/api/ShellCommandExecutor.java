@@ -113,4 +113,9 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         }
     }
 
+    @Override
+    protected String commandInterpreter() {
+        return OSUtils.isWindows() ? CMD : SH;
+    }
+
 }

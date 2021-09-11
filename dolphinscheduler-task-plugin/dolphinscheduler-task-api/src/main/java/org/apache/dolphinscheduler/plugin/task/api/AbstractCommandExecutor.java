@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SH;
 
 import org.apache.dolphinscheduler.plugin.task.util.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
@@ -485,4 +484,6 @@ public abstract class AbstractCommandExecutor {
                 .build();
         return Executors.newSingleThreadExecutor(threadFactory);
     }
+
+    protected abstract String commandInterpreter();
 }
