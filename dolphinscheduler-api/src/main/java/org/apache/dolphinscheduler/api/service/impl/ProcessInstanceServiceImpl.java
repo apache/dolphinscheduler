@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -67,6 +66,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -653,7 +654,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
 
             String localParams = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), LOCAL_PARAMS);
-            if (StringUtils.isNotEmpty(localParams)) {
+            if (!StringUtils.isEmpty(localParams)) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 

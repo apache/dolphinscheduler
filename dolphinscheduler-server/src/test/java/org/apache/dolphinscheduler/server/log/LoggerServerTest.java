@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.service.log.LogClientService;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +48,7 @@ public class LoggerServerTest {
     @Test
     public void testRollViewLog() throws IOException {
         String expectedTmpDemoString = "testRolloViewLog";
-        FileUtils.writeStringToFile(new File("/tmp/demo.txt"), expectedTmpDemoString, Charset.defaultCharset());
+        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/demo.txt"), expectedTmpDemoString, Charset.defaultCharset());
 
         String resultTmpDemoString = this.logClientService.rollViewLog(
                 "localhost", Constants.RPC_PORT,"/tmp/demo.txt", 0, 1000);
@@ -59,7 +61,7 @@ public class LoggerServerTest {
     @Test
     public void testRemoveTaskLog() throws IOException {
         String expectedTmpRemoveString = "testRemoveTaskLog";
-        FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
+        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
 
         Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/tmp/remove.txt");
 

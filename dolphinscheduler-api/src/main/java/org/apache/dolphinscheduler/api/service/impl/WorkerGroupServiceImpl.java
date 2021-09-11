@@ -26,12 +26,13 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -188,7 +189,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (CollectionUtils.isNotEmpty(workerGroups)) {
             List<WorkerGroup> searchValDataList = new ArrayList<>();
 
-            if (StringUtils.isNotEmpty(searchVal)) {
+            if (!StringUtils.isEmpty(searchVal)) {
                 for (WorkerGroup workerGroup : workerGroups) {
                     if (workerGroup.getName().contains(searchVal)) {
                         searchValDataList.add(workerGroup);
