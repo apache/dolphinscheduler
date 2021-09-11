@@ -74,16 +74,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     }
 
     /**
-     * get command type
-     *
-     * @return command type
-     */
-    @Override
-    protected String commandInterpreter() {
-        return OSUtils.isWindows() ? CMD : SH;
-    }
-
-    /**
      * create command file if not exists
      *
      * @param execCommand exec command

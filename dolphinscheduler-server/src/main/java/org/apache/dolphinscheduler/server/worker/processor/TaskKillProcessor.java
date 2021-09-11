@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -39,6 +38,8 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,7 +123,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             }
 
             String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
-            if (StringUtils.isNotEmpty(pidsStr)) {
+            if (!StringUtils.isEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
                 cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
@@ -180,7 +181,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.info("view log host : {},logPath : {}", host, logPath);
             String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
             List<String> appIds = Collections.emptyList();
-            if (StringUtils.isNotEmpty(log)) {
+            if (!StringUtils.isEmpty(log)) {
                 appIds = LoggerUtils.getAppIds(log, logger);
                 if (StringUtils.isEmpty(executePath)) {
                     logger.error("task instance execute path is empty");
