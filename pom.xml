@@ -932,7 +932,6 @@
                         <include>**/common/utils/SchemaUtilsTest.java</include>
                         <include>**/common/utils/ScriptRunnerTest.java</include>
                         <include>**/common/utils/SensitiveLogUtilsTest.java</include>
-                        <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
                         <include>**/common/utils/VarPoolUtilsTest.java</include>

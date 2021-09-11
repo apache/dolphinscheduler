@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,7 @@ public class AccessLogAspect {
 
     @Around("logPointCut()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
 
         // fetch AccessLogAnnotation
         MethodSignature sign =  (MethodSignature) proceedingJoinPoint.getSignature();
@@ -87,7 +88,8 @@ public class AccessLogAspect {
 
         // log response
         if (!annotation.ignoreResponse()) {
-            logger.info("RESPONSE TRANCE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", tranceId, ob, (System.currentTimeMillis() - startTime));
+            logger.info("RESPONSE TRANCE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", tranceId, ob,
+                    TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS));
         }
 
         return ob;
