@@ -239,6 +239,12 @@ public class ProcessInstance {
      */
     private String varPool;
 
+    /**
+     * process blocking flag
+     */
+    @TableField(exist = false)
+    private Flag blockingFlag;
+
     public ProcessInstance() {
 
     }
@@ -595,6 +601,14 @@ public class ProcessInstance {
 
     public void setProcessDefinitionVersion(int processDefinitionVersion) {
         this.processDefinitionVersion = processDefinitionVersion;
+    }
+
+    public Flag getBlockingFlag() {
+        return blockingFlag;
+    }
+
+    public void setBlockingFlag(Flag blockingFlag) {
+        this.blockingFlag = blockingFlag;
     }
 
     @Override

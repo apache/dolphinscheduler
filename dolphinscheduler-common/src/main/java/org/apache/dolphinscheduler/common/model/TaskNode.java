@@ -449,4 +449,8 @@ public class TaskNode {
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
     }
+
+    public boolean isBlockingTask(){
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.getType());
+    }
 }
