@@ -174,6 +174,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      */
     IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
                                                                          @Param("processDefinitionCode") Long processDefinitionCode);
+
     /**
      * query has associated definition by id and version
      * @param processDefinitionId process definition id

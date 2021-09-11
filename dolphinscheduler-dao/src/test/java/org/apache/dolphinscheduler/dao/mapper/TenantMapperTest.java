@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
+package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +32,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -49,7 +51,7 @@ public class TenantMapperTest {
      * insert
      * @return Tenant
      */
-    private Tenant insertOne(){
+    private Tenant insertOne() {
         //insertOne
         Tenant tenant = new Tenant();
         tenant.setCreateTime(new Date());
@@ -63,7 +65,7 @@ public class TenantMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Tenant tenant = insertOne();
         tenant.setUpdateTime(new Date());
@@ -76,7 +78,7 @@ public class TenantMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Tenant tenant = insertOne();
         int delete = tenantMapper.deleteById(tenant.getId());
         Assert.assertEquals(1, delete);
@@ -103,7 +105,6 @@ public class TenantMapperTest {
         queue.setQueueName("ut queue name");
         queue.setQueue("ut queue");
         queueMapper.insert(queue);
-
 
         Tenant tenant = insertOne();
         tenant.setQueueId(queue.getId());
