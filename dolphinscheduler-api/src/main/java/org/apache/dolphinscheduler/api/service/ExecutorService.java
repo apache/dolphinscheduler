@@ -38,8 +38,8 @@ public interface ExecutorService {
      * execute process instance
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process Definition Id
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
      * @param failureStrategy failuer strategy
@@ -49,18 +49,19 @@ public interface ExecutorService {
      * @param warningGroupId notify group id
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group name
+     * @param environmentCode environment code
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return execute process instance code
      */
-    Map<String, Object> execProcessInstance(User loginUser, String projectName,
-                                            int processDefinitionId, String cronTime, CommandType commandType,
+    Map<String, Object> execProcessInstance(User loginUser, long projectCode,
+                                            long processDefinitionCode, String cronTime, CommandType commandType,
                                             FailureStrategy failureStrategy, String startNodeList,
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
-                                            Priority processInstancePriority, String workerGroup, Integer timeout,
+                                            Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber);
 
     /**
@@ -76,18 +77,18 @@ public interface ExecutorService {
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @param executeType execute type
      * @return execute result code
      */
-    Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType);
+    Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType);
 
     /**
      * check if sub processes are offline before starting process definition
      *
-     * @param processDefineId process definition id
+     * @param processDefinitionCode process definition code
      * @return check result code
      */
-    Map<String, Object> startCheckByProcessDefinedId(int processDefineId);
+    Map<String, Object> startCheckByProcessDefinedCode(long processDefinitionCode);
 }

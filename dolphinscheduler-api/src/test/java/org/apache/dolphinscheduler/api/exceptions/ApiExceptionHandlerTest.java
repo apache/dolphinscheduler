@@ -25,10 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.*;
 
 public class ApiExceptionHandlerTest {
 
@@ -39,16 +36,16 @@ public class ApiExceptionHandlerTest {
         Method method = controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertTrue(result.isStatus(Status.CREATE_ACCESS_TOKEN_ERROR));
+        Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(),result.getCode().intValue());
     }
 
     @Test
     public void exceptionHandlerRuntime() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
         ProcessDefinitionController controller = new ProcessDefinitionController();
-        Method method = controller.getClass().getMethod("batchExportProcessDefinitionByIds", User.class, String.class, String.class, HttpServletResponse.class);
+        Method method = controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertTrue(result.isStatus(Status.INTERNAL_SERVER_ERROR_ARGS));
+        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(),result.getCode().intValue());
     }
 }

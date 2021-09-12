@@ -24,7 +24,8 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +145,11 @@ public class TaskNode {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * task time out
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -240,7 +246,7 @@ public class TaskNode {
     }
 
     public Boolean isForbidden() {
-        return (StringUtils.isNotEmpty(this.runFlag)
+        return (!StringUtils.isEmpty(this.runFlag)
                 && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
@@ -262,6 +268,7 @@ public class TaskNode {
                 && Objects.equals(runFlag, taskNode.runFlag)
                 && Objects.equals(dependence, taskNode.dependence)
                 && Objects.equals(workerGroup, taskNode.workerGroup)
+                && Objects.equals(environmentCode, taskNode.environmentCode)
                 && Objects.equals(conditionResult, taskNode.conditionResult)
                 && CollectionUtils.equalLists(depList, taskNode.depList);
     }
@@ -357,7 +364,7 @@ public class TaskNode {
      * @return task time out parameter
      */
     public TaskTimeoutParameter getTaskTimeoutParameter() {
-        if (StringUtils.isNotEmpty(this.getTimeout())) {
+        if (!StringUtils.isEmpty(this.getTimeout())) {
             String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = this.getTimeout().replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
             return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
@@ -422,9 +429,18 @@ public class TaskNode {
                 + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
     }
 
     public String getSwitchResult() {

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
@@ -29,15 +28,20 @@ import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 import io.netty.channel.Channel;
 
 /**
- *  task ack processor
+ * task ack processor
  */
 public class TaskAckProcessor implements NettyRequestProcessor {
 
@@ -53,13 +57,18 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private final TaskInstanceCacheManager taskInstanceCacheManager;
 
-    public TaskAckProcessor(){
+    public TaskAckProcessor() {
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
+        this.taskResponseService.init(processInstanceExecMaps);
+    }
+
     /**
      * task ack process
+     *
      * @param channel channel channel
      * @param command command TaskExecuteAckCommand
      */
@@ -82,7 +91,8 @@ public class TaskAckProcessor implements NettyRequestProcessor {
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
                 taskAckCommand.getTaskInstanceId(),
-                channel);
+                channel,
+                taskAckCommand.getProcessInstanceId());
 
         taskResponseService.addResponse(taskResponseEvent);
     }

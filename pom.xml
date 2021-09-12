@@ -849,6 +849,7 @@
                         <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
+                        <include>**/api/controller/SchedulerControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
@@ -890,9 +891,12 @@
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
+                        <include>**/api/service/EnvironmentServiceTest.java</include>
+                        <include>**/api/service/EnvironmentWorkerGroupRelationServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
+                        <include>**/api/controller/EnvironmentControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
@@ -973,6 +977,7 @@
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
+                        <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <include>**/server/log/LoggerRequestProcessorTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
@@ -1035,7 +1040,6 @@
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
-                        <include>**/service/log/SensitiveDataConverterTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
                         <include>**/service/alert/ProcessAlertManagerTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
@@ -1093,6 +1097,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+                        <include>**/plugin/task/tis/TISTaskTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1203,6 +1208,7 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
+        <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>

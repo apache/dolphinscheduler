@@ -117,106 +117,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_A_var_pool();
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool;
 
--- uc_dolphin_T_t_ds_task_instance_A_add_task_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_add_task_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='task_code')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `task_code` bigint(20) NOT NULL COMMENT 'task definition code';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_add_task_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_code;
-
--- uc_dolphin_T_t_ds_task_instance_A_add_task_definition_version
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_add_task_definition_version;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_definition_version()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='task_definition_version')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `task_definition_version` int(11) DEFAULT NULL COMMENT 'task definition version';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_add_task_definition_version();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_definition_version;
-
--- uc_dolphin_T_t_ds_task_instance_A_add_task_params
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_add_task_params;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_params()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='task_params')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `task_params` text COMMENT 'job custom parameters';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_add_task_params();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_params;
-
--- uc_dolphin_T_t_ds_process_instance_A_process_definition_version
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_version;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_version()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='process_definition_version')
-   THEN
-         ALTER TABLE t_ds_process_instance ADD `process_definition_version` int(11) DEFAULT NULL COMMENT 'process definition version';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_instance_A_process_definition_version();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_version;
-
--- uc_dolphin_T_t_ds_process_instance_A_process_definition_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='process_definition_code')
-   THEN
-         ALTER TABLE t_ds_process_instance ADD `process_definition_code` bigint(20) not NULL COMMENT 'process definition code';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_instance_A_process_definition_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_code;
-
 -- uc_dolphin_T_t_ds_process_instance_A_var_pool
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_var_pool;
 delimiter d//
@@ -267,202 +167,6 @@ d//
 delimiter ;
 CALL ct_dolphin_T_t_ds_process_definition_version;
 DROP PROCEDURE ct_dolphin_T_t_ds_process_definition_version;
-
--- uc_dolphin_T_t_ds_project_instance_A_add_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_project_instance_A_add_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_project'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='code')
-   THEN
-         ALTER TABLE t_ds_project ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_project_instance_A_add_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code;
-
--- uc_dolphin_T_t_ds_process_definition_A_add_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_add_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_definition'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='code')
-   THEN
-         ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
-         ALTER TABLE t_ds_process_definition ADD UNIQUE KEY `code_unique` (`code`);
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_definition_A_add_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code;
-
--- uc_dolphin_T_t_ds_process_definition_A_add_project_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_add_project_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_project_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_definition'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='project_code')
-   THEN
-        ALTER TABLE t_ds_process_definition ADD `project_code` bigint(20) NOT NULL COMMENT 'project code';
-        ALTER TABLE t_ds_process_definition DROP INDEX `process_definition_unique`, ADD UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;
-        ALTER TABLE t_ds_process_definition DROP `project_id`, DROP `process_definition_json`, DROP `receivers`, DROP `receivers_cc`, DROP `modify_by`, DROP `resource_ids`;
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_definition_A_add_project_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_project_code;
-
--- ----------------------------
--- Table structure for t_ds_task_definition
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_definition`;
-CREATE TABLE `t_ds_task_definition` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
-  `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` longtext COMMENT 'job custom parameters',
-  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
-  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
-  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
-  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
-  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
-  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
-  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-create index task_definition_index on t_ds_task_definition (project_code,id);
-
--- ----------------------------
--- Table structure for t_ds_task_definition_log
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_definition_log`;
-CREATE TABLE `t_ds_task_definition_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
-  `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
-  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
-  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
-  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
-  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
-  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
-  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
-  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_process_task_relation
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_task_relation`;
-CREATE TABLE `t_ds_process_task_relation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
-  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
-  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
-  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
-  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
-  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
-  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
-  `condition_params` text COMMENT 'condition params(json)',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_process_definition_log
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_definition_log`;
-CREATE TABLE `t_ds_process_definition_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) DEFAULT NULL COMMENT 'process definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
-  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
-  `global_params` text COMMENT 'global parameters',
-  `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `locations` text COMMENT 'Node location information',
-  `connects` text COMMENT 'Node connection information',
-  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
-  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_process_task_relation_log
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
-CREATE TABLE `t_ds_process_task_relation_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
-  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
-  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
-  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
-  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
-  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
-  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
-  `condition_params` text COMMENT 'condition params(json)',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
@@ -632,6 +336,50 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
+
+-- ----------------------------
+-- Table structure for t_ds_environment
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment`;
+CREATE TABLE `t_ds_environment` (
+   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+   `code` bigint(20) DEFAULT NULL COMMENT 'encoding',
+   `name` varchar(100) NOT NULL COMMENT 'environment config name',
+   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+   `description` text NULL DEFAULT NULL COMMENT 'the details',
+   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `environment_name_unique` (`name`),
+   UNIQUE KEY `environment_code_unique` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+ALTER TABLE t_ds_task_definition ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+
+ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
+ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text COMMENT 'environment config' AFTER `environment_code`;
+
+-- ----------------------------
+-- Table structure for t_ds_environment_worker_group_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
+CREATE TABLE `t_ds_environment_worker_group_relation` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
+  `worker_group` varchar(255) NOT NULL COMMENT 'worker group id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

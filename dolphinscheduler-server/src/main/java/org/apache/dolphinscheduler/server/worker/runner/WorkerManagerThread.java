@@ -21,14 +21,15 @@ import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
-import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
@@ -61,18 +62,12 @@ public class WorkerManagerThread implements Runnable {
     private final ExecutorService workerExecService;
 
     /**
-     * taskExecutionContextCacheManager
-     */
-    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
-
-    /**
      * task callback service
      */
     private final TaskCallbackService taskCallbackService;
 
     public WorkerManagerThread() {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads());
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
@@ -101,11 +96,12 @@ public class WorkerManagerThread implements Runnable {
      * kill task before execute , like delay task
      */
     private void sendTaskKillResponse(Integer taskInstanceId) {
-        TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskExecutionContext == null) {
+        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        if (taskRequest == null) {
             return;
         }
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
+        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId());
         responseCommand.setStatus(ExecutionStatus.KILL.getCode());
         ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
         taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());

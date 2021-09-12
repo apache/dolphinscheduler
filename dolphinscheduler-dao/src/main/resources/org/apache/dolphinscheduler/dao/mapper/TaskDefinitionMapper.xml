@@ -19,16 +19,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
     <sql id="baseSql">
-        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
-        worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
+        id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time
     </sql>
-    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+    <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition
         WHERE project_code = #{projectCode}
-        and name = #{taskDefinitionName}
+        and `name` = #{name}
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
@@ -36,16 +36,6 @@
         from t_ds_task_definition
         where project_code = #{projectCode}
         order by create_time desc
-    </select>
-
-    <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
-        select
-        <include refid="baseSql"/>
-        from t_ds_task_definition
-        where id in
-        <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
-            #{i}
-        </foreach>
     </select>
 
     <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
@@ -61,20 +51,12 @@
         </if>
         group by td.user_id,tu.user_name
     </select>
-    <select id="queryByDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
-        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
-        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
-        td.timeout, td.delay_time, td.resource_ids, td.create_time, td.update_time, u.user_name,p.name as project_name
-        from t_ds_task_definition td
-        JOIN t_ds_user u ON td.user_id = u.id
-        JOIN t_ds_project p ON td.project_code = p.code
-        WHERE td.id = #{taskDefinitionId}
-    </select>
-    <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition
-        where code = #{taskDefinitionCode}
+        where code = #{code}
     </select>
     <select id="listResources" resultType="java.util.HashMap">
         SELECT id,resource_ids
@@ -91,4 +73,36 @@
         delete from t_ds_task_definition
         where code = #{code}
     </delete>
+    <insert id="batchInsert">
+        insert into t_ds_task_definition (code, `name`, version, description, project_code, user_id,
+        task_type, task_params, flag, task_priority, worker_group, fail_retry_times, fail_retry_interval,
+        timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, create_time, update_time)
+        values
+        <foreach collection="taskDefinitions" item="taskDefinition" separator=",">
+            (#{taskDefinition.code},#{taskDefinition.name},#{taskDefinition.version},#{taskDefinition.description},
+            #{taskDefinition.projectCode},#{taskDefinition.userId},#{taskDefinition.taskType},#{taskDefinition.taskParams},
+            #{taskDefinition.flag},#{taskDefinition.taskPriority},#{taskDefinition.workerGroup},#{taskDefinition.failRetryTimes},
+            #{taskDefinition.failRetryInterval},#{taskDefinition.timeoutFlag},#{taskDefinition.timeoutNotifyStrategy},#{taskDefinition.timeout},
+            #{taskDefinition.delayTime},#{taskDefinition.resourceIds},#{taskDefinition.createTime},#{taskDefinition.updateTime})
+        </foreach>
+    </insert>
+    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
+        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
+        td.timeout, td.delay_time, td.resource_ids, td.create_time, td.update_time, u.user_name,p.name as project_name
+        from t_ds_task_definition td
+        JOIN t_ds_user u ON td.user_id = u.id
+        JOIN t_ds_project p ON td.project_code = p.code
+        where td.project_code = #{projectCode}
+        <if test=" taskType != null and taskType != ''">
+            and td.task_type = #{taskType}
+        </if>
+        <if test=" searchVal != null and searchVal != ''">
+            and td.name like concat('%', #{searchVal}, '%')
+        </if>
+        <if test=" userId != 0">
+            and td.user_id = #{userId}
+        </if>
+        order by td.update_time desc
+    </select>
 </mapper>

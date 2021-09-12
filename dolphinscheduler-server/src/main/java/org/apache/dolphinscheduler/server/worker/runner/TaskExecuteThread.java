@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -31,21 +27,21 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
-import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,25 +100,35 @@ public class TaskExecuteThread implements Runnable, Delayed {
      */
     private AlertClientService alertClientService;
 
+    private TaskPluginManager taskPluginManager;
+
     /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
-            , TaskCallbackService taskCallbackService
-            , Logger taskLogger, AlertClientService alertClientService) {
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
+                             TaskCallbackService taskCallbackService,
+                             AlertClientService alertClientService) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
-        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskLogger = taskLogger;
         this.alertClientService = alertClientService;
+    }
+
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
+                             TaskCallbackService taskCallbackService,
+                             AlertClientService alertClientService,
+                             TaskPluginManager taskPluginManager) {
+        this.taskExecutionContext = taskExecutionContext;
+        this.taskCallbackService = taskCallbackService;
+        this.alertClientService = alertClientService;
+        this.taskPluginManager = taskPluginManager;
     }
 
     @Override
     public void run() {
 
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(),taskExecutionContext.getProcessInstanceId());
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // check if the OS user exists
@@ -154,25 +160,30 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            task = TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
+            TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
+
+            //TODO Temporary operation, To be adjusted
+            TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+
+            task = taskChannel.createTask(taskRequest);
             // task init
-            task.init();
-            preBuildBusinessParams();
+            this.task.init();
             //init varPool
-            task.getParameters().setVarPool(taskExecutionContext.getVarPool());
+            this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
             // task handle
-            task.handle();
+            this.task.handle();
 
             // task result process
-            task.after();
+            this.task.after();
 
-            responseCommand.setStatus(task.getExitStatus().getCode());
+            responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
-            responseCommand.setProcessId(task.getProcessId());
-            responseCommand.setAppIds(task.getAppIds());
-            responseCommand.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
-            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
-        } catch (Exception e) {
+            responseCommand.setProcessId(this.task.getProcessId());
+            responseCommand.setAppIds(this.task.getAppIds());
+            responseCommand.setVarPool(JSONUtils.toJsonString(this.task.getParameters().getVarPool()));
+            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), this.task.getExitStatus());
+        } catch (Throwable e) {
+
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
@@ -180,28 +191,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
         } finally {
-            taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             clearTaskExecPath();
         }
-    }
-
-    private void preBuildBusinessParams() {
-        Map<String, Property> paramsMap = new HashMap<>();
-        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-        if (taskExecutionContext.getScheduleTime() != null) {
-            Date date = taskExecutionContext.getScheduleTime();
-            if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
-                date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
-            }
-            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
-            Property p = new Property();
-            p.setValue(dateTime);
-            p.setProp(Constants.PARAMETER_DATETIME);
-            paramsMap.put(Constants.PARAMETER_DATETIME, p);
-        }
-        taskExecutionContext.setParamsMap(paramsMap);
     }
 
     /**

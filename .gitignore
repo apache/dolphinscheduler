@@ -37,6 +37,7 @@ config.gypi
 test/coverage
 /docs/zh_CN/介绍
 /docs/zh_CN/贡献代码.md
+dolphinscheduler-common/src/main/resources/zookeeper.properties
 dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 dolphinscheduler-alert/logs/
 dolphinscheduler-alert/src/main/resources/alert.properties_bak

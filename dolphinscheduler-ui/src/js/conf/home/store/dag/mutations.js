@@ -21,6 +21,9 @@ export default {
   setProjectId (state, payload) {
     state.projectId = payload
   },
+  setProjectCode (state, payload) {
+    state.projectCode = payload
+  },
   setProjectName (state, payload) {
     state.projectName = payload
   },
@@ -61,10 +64,10 @@ export default {
     state.timeout = payload
   },
   /**
-   * set tenantId
+   * set tenantCode
    */
-  setTenantId (state, payload) {
-    state.tenantId = payload
+  setTenantCode (state, payload) {
+    state.tenantCode = payload
   },
   /**
    * set global params
@@ -105,13 +108,12 @@ export default {
    * reset params
    */
   resetParams (state, payload) {
-    $('#canvas').html('')
     state.globalParams = (payload && payload.globalParams) || []
     state.tasks = (payload && payload.tasks) || []
     state.name = (payload && payload.name) || ''
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
-    state.tenantId = (payload && payload.tenantId) || -1
+    state.tenantCode = (payload && payload.tenantCode) || 'default'
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []
     state.resourcesListJar = (payload && payload.resourcesListJar) || []
@@ -123,48 +125,25 @@ export default {
   },
   /**
    * add task
-   * object {}
+   * @param {Task} task
    */
-  addTasks (state, payload) {
-    const i = _.findIndex(state.tasks, v => v.id === payload.id)
+  addTask (state, task) {
+    state.isEditDag = true
+    const i = _.findIndex(state.tasks, v => v.code === task.code)
     if (i !== -1) {
-      state.tasks[i] = Object.assign(state.tasks[i], {}, payload)
+      state.tasks[i] = Object.assign(state.tasks[i], {}, task)
     } else {
-      state.tasks.push(payload)
+      state.tasks.push(task)
     }
-    if (state.cacheTasks[payload.id]) {
-      state.cacheTasks[payload.id] = Object.assign(state.cacheTasks[payload.id], {}, payload)
-    } else {
-      state.cacheTasks[payload.id] = payload
-    }
-    const dom = $(`#${payload.id}`)
-    state.locations[payload.id] = _.assign(state.locations[payload.id], {
-      name: dom.find('.name-p').text(),
-      targetarr: dom.attr('data-targetarr'),
-      nodenumber: dom.attr('data-nodenumber'),
-      x: parseInt(dom.css('left'), 10),
-      y: parseInt(dom.css('top'), 10)
-    })
-  },
-  addConnects (state, payload) {
-    state.connects = _.map(state.connects, v => {
-      if (v.endPointSourceId === payload.sourceId && v.endPointTargetId === payload.targetId) {
-        v.label = payload.labelName
-      }
-      return v
-    })
   },
   /**
-   * Cache the input
-   * @param state
-   * @param payload
+   * remove task
+   * @param {object} state
+   * @param {string} code
    */
-  cacheTasks (state, payload) {
-    if (state.cacheTasks[payload.id]) {
-      state.cacheTasks[payload.id] = Object.assign(state.cacheTasks[payload.id], {}, payload)
-    } else {
-      state.cacheTasks[payload.id] = payload
-    }
+  removeTask (state, code) {
+    state.isEditDag = true
+    state.tasks = state.tasks.filter(task => task.code !== code)
   },
   resetLocalParam (state, payload) {
     const tasks = state.tasks

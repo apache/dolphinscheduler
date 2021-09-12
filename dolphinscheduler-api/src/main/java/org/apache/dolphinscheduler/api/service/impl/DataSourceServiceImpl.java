@@ -28,11 +28,12 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -308,7 +309,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * check connection
      *
      * @param type data source type
-     * @param connectionParam data source parameters
+     * @param connectionParam connectionParam
+     * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
      */
     @Override

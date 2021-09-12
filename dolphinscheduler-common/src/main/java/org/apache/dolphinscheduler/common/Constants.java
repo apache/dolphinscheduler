@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -435,7 +436,9 @@ public final class Constants {
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
-    public static final String DEFAULT = "Default";
+    public static final String COMMON_TASK_TYPE = "common";
+
+    public static final String DEFAULT = "default";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
@@ -634,6 +637,11 @@ public final class Constants {
      * process or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
+
+    /**
+     * process or task definition first version
+     */
+    public static final int VERSION_FIRST  = 1;
 
     /**
      * date format of yyyyMMdd
@@ -874,7 +882,6 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
-    public static final String FLINK_PYTHON = "-py";
 
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
@@ -1089,8 +1096,8 @@ public final class Constants {
     /**
      * docker & kubernetes
      */
-    public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
-    public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * task parameter keys

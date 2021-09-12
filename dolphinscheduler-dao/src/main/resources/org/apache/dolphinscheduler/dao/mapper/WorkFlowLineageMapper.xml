@@ -19,34 +19,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper">
 
-    <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
-        select tepd.id as work_flow_id,tepd.name as work_flow_name
+    <select id="queryWorkFlowLineageByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.code as work_flow_code,tepd.name as work_flow_name
         from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
         where tepd.project_code = #{projectCode}
-        <if test="searchVal != null and searchVal != ''">
-            and tepd.name like concat('%', #{searchVal}, '%')
+        <if test="workFlowName != null and workFlowName != ''">
+            and tepd.name like concat('%', #{workFlowName}, '%')
         </if>
     </select>
 
-    <select id="queryRelationByIds" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
-        select ptr.project_code,
-                ptr.post_task_code,
-                ptr.post_task_version,
-                ptr.pre_task_code,
-                ptr.pre_task_version,
-                ptr.process_definition_code,
-                ptr.process_definition_version
-        from t_ds_process_definition pd
-        join t_ds_process_task_relation ptr on pd.code = ptr.process_definition_code and pd.version =
+    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.code as work_flow_code,tepd.name as work_flow_name,
+               "" as source_work_flow_code,
+                tepd.release_state as work_flow_publish_status,
+                tes.start_time as schedule_start_time,
+                tes.end_time as schedule_end_time,
+                tes.crontab as crontab,
+                tes.release_state as schedule_publish_status
+        from t_ds_process_definition tepd
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
+        where tepd.project_code = #{projectCode} and tepd.code = #{workFlowCode}
+    </select>
+
+    <select id="queryProcessLineage" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
+    select ptr.project_code,
+        ptr.post_task_code,
+        ptr.post_task_version,
+        ptr.pre_task_code,
+        ptr.pre_task_version,
+        ptr.process_definition_code,
         ptr.process_definition_version
+        from t_ds_process_definition pd
+        join t_ds_process_task_relation ptr on pd.code = ptr.process_definition_code
+        and pd.version = ptr.process_definition_version
         where pd.project_code = #{projectCode}
-        <if test="ids != null and ids.size()>0">
-            and pd.id in
-            <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
     </select>
 
     <select id="queryCodeRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
@@ -58,23 +65,9 @@
                process_definition_code,
                process_definition_version
          from t_ds_process_task_relation
-         where post_task_code = #{taskCode}
-                and post_task_version = #{taskVersion}
+         where project_code = #{projectCode}
                 and process_definition_code = #{processDefinitionCode}
-                and project_code = #{projectCode}
+                and post_task_code = #{taskCode}
+                and post_task_version = #{taskVersion}
     </select>
-
-    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
-        select tepd.id as work_flow_id,tepd.name as work_flow_name,
-               "" as source_work_flow_id,
-                tepd.release_state as work_flow_publish_status,
-                tes.start_time as schedule_start_time,
-                tes.end_time as schedule_end_time,
-                tes.crontab as crontab,
-                tes.release_state as schedule_publish_status
-        from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
-        where tepd.project_code = #{projectCode} and tepd.code = #{processDefinitionCode}
-    </select>
-
 </mapper>

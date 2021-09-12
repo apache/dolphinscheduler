@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
@@ -34,6 +35,9 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Set;
 
@@ -47,6 +51,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
 
 /**
  * worker server
@@ -101,6 +107,8 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerManagerThread workerManagerThread;
 
+    private TaskPluginManager taskPluginManager;
+
     /**
      * worker server startup, not use web service
      *
@@ -119,11 +127,13 @@ public class WorkerServer implements IStoppable {
         // alert-server client registry
         alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
 
+        // init task plugin
+        initTaskPlugin();
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService));
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService, taskPluginManager));
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
@@ -155,6 +165,27 @@ public class WorkerServer implements IStoppable {
                 close("shutdownHook");
             }
         }));
+    }
+
+    // todo better
+    private void initTaskPlugin() {
+        taskPluginManager = new TaskPluginManager();
+        DolphinPluginManagerConfig taskPluginManagerConfig = new DolphinPluginManagerConfig();
+        taskPluginManagerConfig.setPlugins(workerConfig.getTaskPluginBinding());
+        if (StringUtils.isNotBlank(workerConfig.getTaskPluginDir())) {
+            taskPluginManagerConfig.setInstalledPluginsDir(workerConfig.getTaskPluginDir().trim());
+        }
+
+        if (StringUtils.isNotBlank(workerConfig.getMavenLocalRepository())) {
+            taskPluginManagerConfig.setMavenLocalRepository(workerConfig.getMavenLocalRepository().trim());
+        }
+
+        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(taskPluginManagerConfig, ImmutableList.of(taskPluginManager));
+        try {
+            alertPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("Load Task Plugin Failed !", e);
+        }
     }
 
     public void close(String cause) {
