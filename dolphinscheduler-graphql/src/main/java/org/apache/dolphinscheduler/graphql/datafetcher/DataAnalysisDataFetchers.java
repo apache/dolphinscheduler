@@ -94,13 +94,9 @@ public class DataAnalysisDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String startDate = dataFetchingEnvironment.getArgument("startDate");
-            String endDate = dataFetchingEnvironment.getArgument("endDate");
-            int projectId = dataFetchingEnvironment.getArgument("projectId");
-
-            logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
-                    loginUser.getUserName(), startDate, endDate, projectId);
-            Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectId, startDate, endDate);
+            logger.info("count command state, user:{}",
+                    loginUser.getUserName());
+            Map<String, Object> result = dataAnalysisService.countCommandState(loginUser);
             return returnDataList(result);
         };
     }
@@ -115,11 +111,9 @@ public class DataAnalysisDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = dataFetchingEnvironment.getArgument("projectId");
-
-            logger.info("count command state, user:{}, project id {}",
-                    loginUser.getUserName(), projectId);
-            Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
+            logger.info("count command state, user:{}",
+                    loginUser.getUserName());
+            Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
             return returnDataList(result);
         };
     }

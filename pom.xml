@@ -1211,6 +1211,7 @@
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
+        <module>dolphinscheduler-graphql</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-dist</module>

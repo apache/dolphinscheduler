@@ -5,9 +5,8 @@ extend type Query {
     countProcessInstanceState(loginUser: InputUser!, startDate: String,
         endDate: String, projectId: Int = 0): TaskCountDtoResultType
     countDefinitionByUser(loginUser: InputUser!, projectId: Int = 0): DefineUserDtoResultType
-    countCommandState(loginUser: InputUser!, startDate: String, endDate:
-    String, projectId: Int = 0): CommandStateCountResultType
-    countQueueState(loginUser: InputUser!, projectId: Int = 0): CountQueueStateResultType
+    countCommandState(loginUser: InputUser!): CommandStateCountResultType
+    countQueueState(loginUser: InputUser!): CountQueueStateResultType
 
 }
 
