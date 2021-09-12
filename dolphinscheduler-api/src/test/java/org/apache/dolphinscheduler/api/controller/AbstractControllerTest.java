@@ -23,9 +23,10 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -97,7 +98,7 @@ public class AbstractControllerTest {
         String session = sessionService.createSession(loginUser, "127.0.0.1");
         sessionId = session;
 
-        Assert.assertTrue(StringUtils.isNotEmpty(session));
+        Assert.assertTrue(!StringUtils.isEmpty(session));
     }
 
     public Map<String, Object> success() {

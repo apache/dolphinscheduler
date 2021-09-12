@@ -44,9 +44,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -71,6 +69,8 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -287,9 +287,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode).collect(Collectors.toSet());
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
                 Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
-                logger.error("the task code is not exit");
-                putMsg(result, Status.TASK_DEFINE_NOT_EXIST, StringUtils.join(codes, Constants.COMMA));
-                return result;
+                if (CollectionUtils.isNotEmpty(codes)) {
+                    logger.error("the task code is not exit");
+                    putMsg(result, Status.TASK_DEFINE_NOT_EXIST, StringUtils.join(codes, Constants.COMMA));
+                    return result;
+                }
             }
             if (graphHasCycle(taskNodeList)) {
                 logger.error("process DAG has cycle");

@@ -203,7 +203,7 @@
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/tree/${item.code}` })
       },
       /**
        * Start

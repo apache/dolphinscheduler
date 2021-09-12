@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *  heartbeat for ZK reigster res info
  */
@@ -113,7 +115,7 @@ public class ResInfo {
      * @return heartbeat info is valid
      */
     public static boolean isValidHeartbeatForRegistryInfo(String heartBeatInfo) {
-        if (StringUtils.isNotEmpty(heartBeatInfo)) {
+        if (!StringUtils.isEmpty(heartBeatInfo)) {
             String[] parts = heartBeatInfo.split(Constants.COMMA);
             return parts.length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
                     || parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH;

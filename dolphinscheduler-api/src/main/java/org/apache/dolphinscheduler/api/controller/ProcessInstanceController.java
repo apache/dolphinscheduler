@@ -37,9 +37,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -395,7 +396,7 @@ public class ProcessInstanceController extends BaseController {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(processInstanceIds)) {
+        if (!StringUtils.isEmpty(processInstanceIds)) {
             String[] processInstanceIdArray = processInstanceIds.split(",");
 
             for (String strProcessInstanceId : processInstanceIdArray) {

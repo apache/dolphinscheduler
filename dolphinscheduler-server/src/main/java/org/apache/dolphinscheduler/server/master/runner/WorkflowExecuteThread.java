@@ -47,9 +47,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -69,6 +67,8 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,13 +182,6 @@ public class WorkflowExecuteThread implements Runnable {
      */
     private NettyExecutorManager nettyExecutorManager;
 
-    /**
-     * submit post node
-     *
-     * @param parentNodeName parent node name
-     */
-    private Map<String, Object> propToValue = new ConcurrentHashMap<>();
-
     private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
     private List<Date> complementListDate = Lists.newLinkedList();
@@ -199,13 +192,12 @@ public class WorkflowExecuteThread implements Runnable {
 
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
-
     /**
      * constructor of WorkflowExecuteThread
      *
-     * @param processInstance      processInstance
-     * @param processService       processService
-     * @param nettyExecutorManager  nettyExecutorManager
+     * @param processInstance processInstance
+     * @param processService processService
+     * @param nettyExecutorManager nettyExecutorManager
      * @param taskTimeoutCheckList
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
@@ -445,6 +437,7 @@ public class WorkflowExecuteThread implements Runnable {
             cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
             processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
         }
+
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
@@ -472,21 +465,6 @@ public class WorkflowExecuteThread implements Runnable {
             initTaskQueue();
             submitPostNode(null);
         }
-    }
-
-    /**
-     * prepare process parameter
-     *
-     * @throws Exception exception
-     */
-    private void prepareProcess() throws Exception {
-
-        // gen process dag
-        buildFlowDag();
-
-        // init task queue
-        initTaskQueue();
-        logger.info("prepare process :{} end", processInstance.getId());
     }
 
     /**
@@ -541,7 +519,6 @@ public class WorkflowExecuteThread implements Runnable {
      * init task queue
      */
     private void initTaskQueue() {
-
 
         taskFailedSubmit = false;
         activeTaskProcessorMaps.clear();
@@ -658,7 +635,7 @@ public class WorkflowExecuteThread implements Runnable {
      * find task instance in db.
      * in case submit more than one same name task in the same time.
      *
-     * @param taskCode    task code
+     * @param taskCode task code
      * @param taskVersion task version
      * @return TaskInstance
      */
@@ -667,7 +644,6 @@ public class WorkflowExecuteThread implements Runnable {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == taskVersion) {
                 return taskInstance;
-
             }
         }
         return null;
@@ -677,7 +653,7 @@ public class WorkflowExecuteThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param taskNode        taskNode
+     * @param taskNode taskNode
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
@@ -818,9 +794,11 @@ public class WorkflowExecuteThread implements Runnable {
 
         // if previous node success , post node submit
         for (TaskInstance task : taskInstances) {
+
             if (readyToSubmitTaskQueue.contains(task)) {
                 continue;
             }
+
             if (completeTaskList.containsKey(task.getName())) {
                 logger.info("task {} has already run success", task.getName());
                 continue;
@@ -1054,23 +1032,6 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     /**
-     * whether standby task list have retry tasks
-     */
-    private boolean retryTaskExists() {
-
-        boolean result = false;
-
-        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
-            TaskInstance task = iter.next();
-            if (task.getState().typeIsFailure()) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
      * whether complement end
      *
      * @return Boolean whether is complement end
@@ -1169,32 +1130,6 @@ public class WorkflowExecuteThread implements Runnable {
             }
         }
         return false;
-    }
-
-    /**
-     * whether check process time out
-     *
-     * @param processInstance task instance
-     * @return true if time out of process instance > running time of process instance
-     */
-    private boolean checkProcessTimeOut(ProcessInstance processInstance) {
-        if (processInstance.getTimeout() == 0) {
-            return false;
-        }
-
-        Date now = new Date();
-        long runningTime = DateUtils.diffMin(now, processInstance.getStartTime());
-
-        return runningTime > processInstance.getTimeout();
-    }
-
-    /**
-     * whether can submit task to queue
-     *
-     * @return boolean
-     */
-    private boolean canSubmitTaskToQueue() {
-        return OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
     }
 
     /**
@@ -1388,10 +1323,10 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      * generate flow dag
      *
-     * @param totalTaskNodeList    total task node list
-     * @param startNodeNameList    start node name list
+     * @param totalTaskNodeList total task node list
+     * @param startNodeNameList start node name list
      * @param recoveryNodeNameList recovery node name list
-     * @param depNodeType          depend node type
+     * @param depNodeType depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */

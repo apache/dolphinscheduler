@@ -60,40 +60,6 @@ public class RegistryCenterUtils {
         return registryClient.getServerList(NodeType.WORKER);
     }
 
-    private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
-        List<ZookeeperRecord> list = new ArrayList<>(5);
-        /*
-        if (StringUtils.isNotBlank(zookeeperServers)) {
-            String[] zookeeperServersArray = zookeeperServers.split(",");
-
-            for (String zookeeperServer : zookeeperServersArray) {
-                ZooKeeperState state = new ZooKeeperState(zookeeperServer);
-                boolean ok = state.ruok();
-                if (ok) {
-                    state.getZookeeperInfo();
-                }
-
-                int connections = state.getConnections();
-                int watches = state.getWatches();
-                long sent = state.getSent();
-                long received = state.getReceived();
-                String mode =  state.getMode();
-                float minLatency =  state.getMinLatency();
-                float avgLatency = state.getAvgLatency();
-                float maxLatency = state.getMaxLatency();
-                int nodeCount = state.getNodeCount();
-                int status = ok ? 1 : 0;
-                Date date = new Date();
-
-                ZookeeperRecord zookeeperRecord = new ZookeeperRecord(zookeeperServer,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
-                list.add(zookeeperRecord);
-
-            }
-        }*/
-
-        return list;
-    }
-
     public static Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         return registryClient.getServerMaps(nodeType, hostOnly);
     }
