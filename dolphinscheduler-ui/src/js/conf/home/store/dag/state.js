@@ -38,7 +38,7 @@ export default {
   // Timeout alarm
   timeout: 0,
   // tenant code
-  tenantCode: '',
+  tenantCode: 'default',
   // Node location information
   locations: {},
   // Node relations

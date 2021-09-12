@@ -113,7 +113,7 @@ export default {
     state.name = (payload && payload.name) || ''
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
-    state.tenantCode = (payload && payload.tenantCode) || ''
+    state.tenantCode = (payload && payload.tenantCode) || 'default'
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []
     state.resourcesListJar = (payload && payload.resourcesListJar) || []
@@ -128,6 +128,7 @@ export default {
    * @param {Task} task
    */
   addTask (state, task) {
+    state.isEditDag = true
     const i = _.findIndex(state.tasks, v => v.code === task.code)
     if (i !== -1) {
       state.tasks[i] = Object.assign(state.tasks[i], {}, task)
@@ -141,6 +142,7 @@ export default {
    * @param {string} code
    */
   removeTask (state, code) {
+    state.isEditDag = true
     state.tasks = state.tasks.filter(task => task.code !== code)
   },
   resetLocalParam (state, payload) {

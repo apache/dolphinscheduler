@@ -1097,6 +1097,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+                        <include>**/plugin/task/tis/TISTaskTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1207,6 +1208,7 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
+        <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
