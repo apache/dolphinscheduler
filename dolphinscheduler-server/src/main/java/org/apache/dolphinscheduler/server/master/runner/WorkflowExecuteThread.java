@@ -510,7 +510,7 @@ public class WorkflowExecuteThread implements Runnable {
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
     }
 
-    private void checkSerialProcess(ProcessDefinition processDefinition) {
+    public void checkSerialProcess(ProcessDefinition processDefinition) {
         this.processInstance = processService.findProcessInstanceById(processInstance.getId());
         int nextInstanceId = processInstance.getNextProcessInstanceId();
         if (nextInstanceId == 0) {

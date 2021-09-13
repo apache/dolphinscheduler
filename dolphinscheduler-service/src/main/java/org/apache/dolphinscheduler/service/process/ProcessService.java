@@ -206,8 +206,9 @@ public class ProcessService {
     @Autowired
     StateEventCallbackService stateEventCallbackService;
 
-	 @Autowired
+    @Autowired
     private EnvironmentMapper environmentMapper;
+
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -292,7 +293,11 @@ public class ProcessService {
                         StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                                 info.getId(), 0, info.getState(), info.getId(), 0
                         );
-                        stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+                        try {
+                            stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
+                        } catch (Exception e) {
+                            logger.error("sendResultError");
+                        }
                     }
                 }
             }
