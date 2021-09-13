@@ -405,6 +405,7 @@ CREATE TABLE t_ds_process_definition
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
     tenant_id        int(11) NOT NULL DEFAULT '-1',
+    execution_type   tinyint(4) DEFAULT '0',
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
     PRIMARY KEY (id),
@@ -436,6 +437,7 @@ CREATE TABLE t_ds_process_definition_log
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
     tenant_id        int(11) NOT NULL DEFAULT '-1',
+    execution_type   tinyint(4) DEFAULT '0',
     operator         int(11) DEFAULT NULL,
     operate_time     datetime     DEFAULT NULL,
     create_time      datetime NOT NULL,
@@ -589,8 +591,10 @@ CREATE TABLE t_ds_process_instance
     worker_group               varchar(64)  DEFAULT NULL,
     environment_code           bigint(20) DEFAULT '-1',
     timeout                    int(11) DEFAULT '0',
+    next_process_instance_id   int(11) DEFAULT '0',
     tenant_id                  int(11) NOT NULL DEFAULT '-1',
     var_pool                   longtext,
+    next_process_instance_id int(11) DEFAULT '0'
     PRIMARY KEY (id)
 );
 

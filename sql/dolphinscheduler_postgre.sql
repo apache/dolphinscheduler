@@ -302,6 +302,7 @@ CREATE TABLE t_ds_process_definition (
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int DEFAULT '-1' ,
+  execution_type int DEFAULT '0',
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id) ,
@@ -326,6 +327,7 @@ CREATE TABLE t_ds_process_definition_log (
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int DEFAULT '-1' ,
+  execution_type int DEFAULT '0',
   operator int DEFAULT NULL ,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -469,6 +471,7 @@ CREATE TABLE t_ds_process_instance (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
+  next_process_instance_id int DEFAULT '0'
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_code,id);
