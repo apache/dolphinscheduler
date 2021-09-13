@@ -471,7 +471,7 @@ CREATE TABLE t_ds_process_instance (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
-  next_process_instance_id int DEFAULT '0'
+  next_process_instance_id int DEFAULT '0',
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_code,id);
