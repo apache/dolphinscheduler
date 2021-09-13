@@ -706,5 +706,7 @@ export default {
   'Please enter environment desc': 'Please enter environment desc',
   'Please select worker groups': 'Please select worker groups',
   condition: 'condition',
-  'The condition content cannot be empty': 'The condition content cannot be empty'
+  'The condition content cannot be empty': 'The condition content cannot be empty',
+  'Copy from': 'Copy from',
+  'No more...': 'No more...'
 }
