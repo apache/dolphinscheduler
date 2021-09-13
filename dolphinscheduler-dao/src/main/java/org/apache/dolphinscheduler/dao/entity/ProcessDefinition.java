@@ -180,7 +180,7 @@ public class ProcessDefinition {
      */
     private ProcessExecutionTypeEnum executionType;
 
-    public ProcessDefinition(){}
+    public ProcessDefinition(){ }
 
     public ProcessDefinition(long projectCode,
                              String name,
