@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -99,11 +100,11 @@ public class AccessLogAspect {
         if (annotation.ignoreRequestArgs().length > 0) {
             String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
             if (parameterNames.length > 0) {
-                List<String> ignoreList = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList());
+                Set<String> ignoreSet = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toSet());
                 HashMap<String, Object> argsMap = new HashMap<>();
 
                 for (int i = 0; i < parameterNames.length; i++) {
-                    if (!ignoreList.contains(parameterNames[i])) {
+                    if (!ignoreSet.contains(parameterNames[i])) {
                         argsMap.put(parameterNames[i], args[i]);
                     }
                 }

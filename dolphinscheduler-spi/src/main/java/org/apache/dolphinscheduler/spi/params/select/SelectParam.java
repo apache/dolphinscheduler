@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -60,7 +60,7 @@ public class SelectParam extends PluginParams {
 
         public Builder addOptions(ParamsOptions paramsOptions) {
             if (this.options == null) {
-                this.options = new ArrayList<>();
+                this.options = new LinkedList<>();
             }
 
             this.options.add(paramsOptions);
@@ -99,7 +99,7 @@ public class SelectParam extends PluginParams {
 
         public Builder addValidate(Validate validate) {
             if (this.validateList == null) {
-                this.validateList = new ArrayList<>();
+                this.validateList = new LinkedList<>();
             }
             this.validateList.add(validate);
             return this;
