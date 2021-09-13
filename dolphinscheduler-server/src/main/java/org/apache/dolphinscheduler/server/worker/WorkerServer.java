@@ -35,9 +35,12 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.Set;
 
@@ -180,11 +183,14 @@ public class WorkerServer implements IStoppable {
             taskPluginManagerConfig.setMavenLocalRepository(workerConfig.getMavenLocalRepository().trim());
         }
 
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(taskPluginManagerConfig, ImmutableList.of(taskPluginManager));
+        DolphinPluginLoader taskPluginLoader = new DolphinPluginLoader(taskPluginManagerConfig, ImmutableList.of(taskPluginManager));
         try {
-            alertPluginLoader.loadPlugins();
+            taskPluginLoader.loadPlugins();
         } catch (Exception e) {
             throw new RuntimeException("Load Task Plugin Failed !", e);
+        }
+        if(MapUtils.isEmpty(taskPluginManager.getTaskChannelMap())){
+            throw new PluginNotFoundException("Task Plugin Not Found,Please Check Config File");
         }
     }
 
