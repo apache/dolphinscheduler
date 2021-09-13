@@ -32,14 +32,14 @@ public class DagData {
     /**
      * processTaskRelationList
      */
-    private List<ProcessTaskRelationLog> processTaskRelationList;
+    private List<ProcessTaskRelation> processTaskRelationList;
 
     /**
      * processTaskRelationList
      */
-    private List<TaskDefinitionLog> taskDefinitionList;
+    private List<TaskDefinition> taskDefinitionList;
 
-    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelationLog> processTaskRelationList, List<TaskDefinitionLog> taskDefinitionList) {
+    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelation> processTaskRelationList, List<TaskDefinition> taskDefinitionList) {
         this.processDefinition = processDefinition;
         this.processTaskRelationList = processTaskRelationList;
         this.taskDefinitionList = taskDefinitionList;
@@ -56,19 +56,19 @@ public class DagData {
         this.processDefinition = processDefinition;
     }
 
-    public List<ProcessTaskRelationLog> getProcessTaskRelationList() {
+    public List<ProcessTaskRelation> getProcessTaskRelationList() {
         return processTaskRelationList;
     }
 
-    public void setProcessTaskRelationList(List<ProcessTaskRelationLog> processTaskRelationList) {
+    public void setProcessTaskRelationList(List<ProcessTaskRelation> processTaskRelationList) {
         this.processTaskRelationList = processTaskRelationList;
     }
 
-    public List<TaskDefinitionLog> getTaskDefinitionList() {
+    public List<TaskDefinition> getTaskDefinitionList() {
         return taskDefinitionList;
     }
 
-    public void setTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionList) {
+    public void setTaskDefinitionList(List<TaskDefinition> taskDefinitionList) {
         this.taskDefinitionList = taskDefinitionList;
     }
 }

@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.treeview;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * Instance
@@ -26,10 +27,16 @@ import java.util.Date;
 public class Instance {
 
     private int id;
+
     /**
      * node name
      */
     private String name;
+
+    /**
+     * node code
+     */
+    private long code;
 
     /**
      * node type
@@ -44,15 +51,14 @@ public class Instance {
     /**
      * node start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * node end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
-
 
 
     /**
@@ -67,18 +73,20 @@ public class Instance {
 
     private int subflowId;
 
+    public Instance() {
+    }
 
-    public Instance(){}
-
-    public Instance(int id,String name, String type){
+    public Instance(int id, String name, long code, String type) {
         this.id = id;
         this.name = name;
+        this.code = code;
         this.type = type;
     }
 
-    public Instance(int id,String name, String type,String state,Date startTime, Date endTime, String host, String duration,int subflowId) {
+    public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration, int subflowId) {
         this.id = id;
         this.name = name;
+        this.code = code;
         this.type = type;
         this.state = state;
         this.startTime = startTime;
@@ -88,10 +96,9 @@ public class Instance {
         this.subflowId = subflowId;
     }
 
-    public Instance(int id,String name, String type,String state,Date startTime, Date endTime, String host, String duration) {
-        this(id, name, type, state, startTime, endTime,host,duration,0);
+    public Instance(int id, String name, long code, String type, String state, Date startTime, Date endTime, String host, String duration) {
+        this(id, name, code, type, state, startTime, endTime, host, duration, 0);
     }
-
 
 
     public int getId() {
@@ -108,6 +115,14 @@ public class Instance {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public long getCode() {
+        return code;
+    }
+
+    public void setCode(long code) {
+        this.code = code;
     }
 
     public String getType() {

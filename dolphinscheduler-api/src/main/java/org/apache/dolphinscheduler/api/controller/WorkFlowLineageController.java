@@ -96,7 +96,7 @@ public class WorkFlowLineageController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+    public Result<Map<String, Object>> queryWorkFlowLineage(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
