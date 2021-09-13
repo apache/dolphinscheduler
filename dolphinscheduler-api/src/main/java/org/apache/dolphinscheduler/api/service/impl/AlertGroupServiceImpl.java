@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -195,7 +195,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
 
         Date now = new Date();
 
-        if (StringUtils.isNotEmpty(groupName)) {
+        if (!StringUtils.isEmpty(groupName)) {
             alertGroup.setGroupName(groupName);
         }
         alertGroup.setDescription(desc);
@@ -248,6 +248,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      */
     @Override
     public boolean existGroupName(String groupName) {
-        return BooleanUtils.isTrue(alertGroupMapper.existGroupName(groupName));
+        return alertGroupMapper.existGroupName(groupName) == Boolean.TRUE;
     }
 }
