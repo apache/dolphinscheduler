@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.api.dto.gantt;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Task
