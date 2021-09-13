@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -65,7 +65,7 @@ public class RadioParam extends PluginParams {
 
         public Builder addParamsOptions(ParamsOptions paramsOptions) {
             if (this.options == null) {
-                this.options = new ArrayList<>();
+                this.options = new LinkedList<>();
             }
 
             this.options.add(paramsOptions);
@@ -104,7 +104,7 @@ public class RadioParam extends PluginParams {
 
         public Builder addValidate(Validate validate) {
             if (this.validateList == null) {
-                this.validateList = new ArrayList<>();
+                this.validateList = new LinkedList<>();
             }
             this.validateList.add(validate);
             return this;
