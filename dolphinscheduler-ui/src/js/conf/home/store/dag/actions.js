@@ -829,5 +829,14 @@ export default {
         reject(e)
       })
     })
+  },
+  getTaskDefinitions ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }
