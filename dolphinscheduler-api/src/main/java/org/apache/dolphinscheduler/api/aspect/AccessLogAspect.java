@@ -101,7 +101,7 @@ public class AccessLogAspect {
         if (annotation.ignoreRequestArgs().length > 0) {
             String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
             if (parameterNames.length > 0) {
-                Set<String> ignoreSet = new HashSet<>(Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList()));
+                Set<String> ignoreSet = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toSet());
                 HashMap<String, Object> argsMap = new HashMap<>();
 
                 for (int i = 0; i < parameterNames.length; i++) {
