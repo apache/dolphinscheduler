@@ -55,7 +55,7 @@ public class SqoopTask extends AbstractYarnTask {
     public void init() {
         logger.info("sqoop task params {}", sqoopTaskExecutionContext.getTaskParams());
         sqoopParameters =
-            JSONUtils.parseObject(sqoopTaskExecutionContext.getTaskParams(), SqoopParameters.class);
+                JSONUtils.parseObject(sqoopTaskExecutionContext.getTaskParams(), SqoopParameters.class);
         //check sqoop task params
         if (null == sqoopParameters) {
             throw new IllegalArgumentException("Sqoop Task params is null");
@@ -75,10 +75,10 @@ public class SqoopTask extends AbstractYarnTask {
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(sqoopTaskExecutionContext, getParameters());
 
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
         }
-        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())){
+        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())) {
             paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
         }
 

@@ -54,7 +54,6 @@ public class PythonTask extends AbstractTaskExecutor {
 
     private TaskRequest taskRequest;
 
-
     /**
      * constructor
      *
@@ -104,7 +103,7 @@ public class PythonTask extends AbstractTaskExecutor {
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("run python task error",e);
+            throw new TaskException("run python task error", e);
         }
     }
 
@@ -153,6 +152,7 @@ public class PythonTask extends AbstractTaskExecutor {
 
     /**
      * build command
+     *
      * @return raw python script
      * @throws Exception exception
      */
@@ -160,11 +160,11 @@ public class PythonTask extends AbstractTaskExecutor {
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest,pythonParameters);
-        if(MapUtils.isEmpty(paramsMap)){
-            paramsMap=new HashMap<>();
+        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, pythonParameters);
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
         }
-        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())){
+        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
             paramsMap.putAll(taskRequest.getParamsMap());
         }
         rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
@@ -174,6 +174,5 @@ public class PythonTask extends AbstractTaskExecutor {
 
         return rawPythonScript;
     }
-
 
 }

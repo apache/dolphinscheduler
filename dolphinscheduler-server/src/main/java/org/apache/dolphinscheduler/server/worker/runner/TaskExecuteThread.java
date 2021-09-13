@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
 import com.github.rholder.retry.RetryException;
 
 /**
- *  task scheduler thread
+ * task scheduler thread
  */
 public class TaskExecuteThread implements Runnable, Delayed {
 
@@ -107,7 +107,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private TaskPluginManager taskPluginManager;
 
     /**
-     *  constructor
+     * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
@@ -132,7 +133,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
     @Override
     public void run() {
 
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(),taskExecutionContext.getProcessInstanceId());
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId());
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // check if the OS user exists
@@ -235,6 +236,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get global paras map
+     *
      * @return map
      */
     private Map<String, String> getGlobalParamsMap() {
@@ -257,7 +259,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             try {
                 task.cancelApplication(true);
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -276,7 +278,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
         Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
 
-        for (Map.Entry<String,String> resource : resEntries) {
+        for (Map.Entry<String, String> resource : resEntries) {
             String fullName = resource.getKey();
             String tenantCode = resource.getValue();
             File resFile = new File(execLocalPath, fullName);
@@ -288,7 +290,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage());
                 }
             } else {
@@ -335,6 +337,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get current TaskExecutionContext
+     *
      * @return TaskExecutionContext
      */
     public TaskExecutionContext getTaskExecutionContext() {
@@ -355,8 +358,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
     }
 
-
-    private void preBuildBusinessParams(){
+    private void preBuildBusinessParams() {
         Map<String, Property> paramsMap = new HashMap<>();
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
         if (taskExecutionContext.getScheduleTime() != null) {
