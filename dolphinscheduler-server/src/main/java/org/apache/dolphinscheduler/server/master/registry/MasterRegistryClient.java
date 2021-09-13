@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
@@ -45,6 +44,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -160,7 +161,7 @@ public class MasterRegistryClient {
             registryClient.getLock(failoverPath);
 
             String serverHost = null;
-            if (StringUtils.isNotEmpty(path)) {
+            if (!StringUtils.isEmpty(path)) {
                 serverHost = registryClient.getHostByEventDataPath(path);
                 if (StringUtils.isEmpty(serverHost)) {
                     logger.error("server down error: unknown path: {}", path);

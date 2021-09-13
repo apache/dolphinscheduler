@@ -23,6 +23,9 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+
+import org.apache.commons.lang.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +147,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
             // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
+            Reader initSqlReader = new FileReader(mysqlSQLFilePath);
             initScriptRunner.runScript(initSqlReader);
 
             conn.commit();
@@ -189,7 +192,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             conn = dataSource.getConnection();
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
+            Reader initSqlReader = new FileReader(mysqlSQLFilePath);
             initScriptRunner.runScript(initSqlReader);
 
         } catch (IOException e) {

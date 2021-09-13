@@ -25,7 +25,8 @@ import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
