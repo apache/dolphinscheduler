@@ -705,5 +705,7 @@ export default {
   'Please enter environment desc': '请输入详细描述',
   'Please select worker groups': '请选择Worker分组',
   condition: '条件',
-  'The condition content cannot be empty': '条件内容不能为空'
+  'The condition content cannot be empty': '条件内容不能为空',
+  'Copy from': '从任务复制',
+  'No more...': '没有更多了...'
 }
