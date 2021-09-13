@@ -27,16 +27,11 @@ on:
      - '.github/workflows/ci_k8s.yml'
      - 'dolphinscheduler/docker/kubernetes/**'
 
-# 后续可能用到的常量
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
 jobs:
-
-# 此处的build是job_id
-# 在此个jobs中，没有设置needs字段，所以执行顺序是没有确定的,四个jobs独立进行
-# 根据老师的要求，改成不独立进行的为好
 
   build:
     name: Build
@@ -66,6 +61,24 @@ jobs:
 
       - name: Run chart-testing (lint)
         run: ct lint
+
+      - name: Set up maven
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven
+
+      - name: build Image
+        run: sh ./docker/build/hooks/build
+
+      - name: Check Image
+        run: docker images
+
+      - name: Chart Version Replace 
+        run: |
+          export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
+          sed -i "s/appVersion:latest/appVersion:${VERSION}/g" $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
+          cat $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
 
       # Install
 
@@ -98,6 +111,7 @@ jobs:
 
       - name: Interact with the cluster pods
         run: kubectl get pods 
+<<<<<<< HEAD
 
       - name: kubectl get services
         run: kubectl get services
@@ -106,8 +120,11 @@ jobs:
         run: kubectl get deployments
 
 
+=======
+>>>>>>> dev
 
-  #   runs-on: ubuntu-latest
-  #     steps:
+      - name: kubectl get services
+        run: kubectl get services
 
-  # TODO:
+      - name: View the Deployment
+        run: kubectl get deployments
