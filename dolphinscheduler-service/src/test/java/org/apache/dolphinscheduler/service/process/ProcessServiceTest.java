@@ -408,7 +408,7 @@ public class ProcessServiceTest {
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
 
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
-        Assert.assertNotEquals(0, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
+        Assert.assertEquals(0, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
 
     }
 
