@@ -189,7 +189,7 @@ public class WorkerServer implements IStoppable {
         } catch (Exception e) {
             throw new RuntimeException("Load Task Plugin Failed !", e);
         }
-        if(MapUtils.isEmpty(taskPluginManager.getTaskChannelMap())){
+        if (MapUtils.isEmpty(taskPluginManager.getTaskChannelMap())) {
             throw new PluginNotFoundException("Task Plugin Not Found,Please Check Config File");
         }
     }

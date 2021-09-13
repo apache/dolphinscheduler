@@ -117,7 +117,7 @@ public class StandaloneServer {
         runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
     }
 
-    private static void setTaskPlugin(){
+    private static void setTaskPlugin() {
         final Path taskPluginPath = Paths.get(
                 StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
                 "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
