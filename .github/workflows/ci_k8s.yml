@@ -111,17 +111,6 @@ jobs:
 
       - name: Interact with the cluster pods
         run: kubectl get pods 
-<<<<<<< HEAD
-
-      - name: kubectl get services
-        run: kubectl get services
-
-      - name: View the Deployment
-        run: kubectl get deployments
-
-
-=======
->>>>>>> dev
 
       - name: kubectl get services
         run: kubectl get services
