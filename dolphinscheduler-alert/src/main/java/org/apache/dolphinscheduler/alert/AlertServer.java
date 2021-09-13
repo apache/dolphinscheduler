@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.alert;
 
 import static org.apache.dolphinscheduler.alert.utils.Constants.ALERT_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PLUGIN_BINDING;
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PLUGIN_DIR;
 import static org.apache.dolphinscheduler.common.Constants.ALERT_RPC_PORT;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
@@ -53,10 +55,6 @@ public class AlertServer {
     private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
     private AlertPluginManager alertPluginManager;
-
-    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
-
-    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
 
     public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 

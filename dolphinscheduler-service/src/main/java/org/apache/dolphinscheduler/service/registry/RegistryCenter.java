@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.service.registry;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_PLUGIN_BINDING;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_PLUGIN_DIR;
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -65,10 +67,6 @@ public class RegistryCenter {
     protected static final String EMPTY = "";
 
     private static final String REGISTRY_PREFIX = "registry";
-
-    private static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
-
-    private static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
 
     private static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 

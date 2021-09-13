@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.server;
 
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PLUGIN_BINDING;
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PLUGIN_DIR;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_PLUGIN_BINDING;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_PLUGIN_DIR;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_SERVERS;
 import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME;
 import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_PASSWORD;
 import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_URL;
@@ -76,23 +81,23 @@ public class StandaloneServer {
                 "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
         ).toAbsolutePath();
         if (Files.exists(alertPluginPath)) {
-            System.setProperty("alert.plugin.binding", alertPluginPath.toString());
-            System.setProperty("alert.plugin.dir", "");
+            System.setProperty(ALERT_PLUGIN_BINDING, alertPluginPath.toString());
+            System.setProperty(ALERT_PLUGIN_DIR, "");
         }
         AlertServer.getInstance().start();
     }
 
     private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
-        System.setProperty("registry.servers", server.getConnectString());
+        System.setProperty(REGISTRY_SERVERS, server.getConnectString());
 
         final Path registryPath = Paths.get(
                 StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
                 "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
         ).toAbsolutePath();
         if (Files.exists(registryPath)) {
-            System.setProperty("registry.plugin.binding", registryPath.toString());
-            System.setProperty("registry.plugin.dir", "");
+            System.setProperty(REGISTRY_PLUGIN_BINDING, registryPath.toString());
+            System.setProperty(REGISTRY_PLUGIN_DIR, "");
         }
     }
 

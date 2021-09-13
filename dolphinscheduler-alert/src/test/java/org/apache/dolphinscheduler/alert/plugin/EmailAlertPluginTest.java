@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.alert.plugin;
 
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PLUGIN_DIR;
+
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
@@ -107,8 +109,8 @@ public class EmailAlertPluginTest {
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
         alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
-        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
-            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
+        if (StringUtils.isNotBlank(PropertyUtils.getString(ALERT_PLUGIN_DIR))) {
+            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
