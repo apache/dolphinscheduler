@@ -45,7 +45,7 @@ public class TaskNode {
     /**
      * task node code
      */
-    private Long code;
+    private long code;
 
     /**
      * task node version
@@ -342,11 +342,11 @@ public class TaskNode {
         this.delayTime = delayTime;
     }
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
