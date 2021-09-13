@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper">
     <sql id="baseSql">
-        id, `name`, process_definition_version, project_code, process_definition_code, pre_task_code, pre_task_version,
+        id, name, process_definition_version, project_code, process_definition_code, pre_task_code, pre_task_version,
         post_task_code, post_task_version, condition_type, condition_params, create_time, update_time
     </sql>
     <select id="queryByProcessCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
@@ -60,7 +60,7 @@
         and process_definition_code = #{processCode}
     </delete>
     <insert id="batchInsert">
-        insert into t_ds_process_task_relation (`name`, process_definition_version, project_code, process_definition_code,
+        insert into t_ds_process_task_relation (name, process_definition_version, project_code, process_definition_code,
         pre_task_code, pre_task_version, post_task_code, post_task_version, condition_type, condition_params, create_time, update_time)
         values
         <foreach collection="taskRelationList" item="relation" separator=",">
