@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -159,6 +163,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setTaskAppId(String.format("%s_%s",
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
+
+            preBuildBusinessParams();
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
 
@@ -347,5 +353,23 @@ public class TaskExecuteThread implements Runnable, Delayed {
             return 1;
         }
         return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
+    }
+
+
+    private void preBuildBusinessParams(){
+        Map<String, Property> paramsMap = new HashMap<>();
+        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+        if (taskExecutionContext.getScheduleTime() != null) {
+            Date date = taskExecutionContext.getScheduleTime();
+            if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+                date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
+            }
+            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
+            Property p = new Property();
+            p.setValue(dateTime);
+            p.setProp(Constants.PARAMETER_DATETIME);
+            paramsMap.put(Constants.PARAMETER_DATETIME, p);
+        }
+        taskExecutionContext.setParamsMap(paramsMap);
     }
 }

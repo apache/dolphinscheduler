@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.python;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
@@ -27,6 +28,8 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -158,9 +161,13 @@ public class PythonTask extends AbstractTaskExecutor {
 
         // replace placeholder
         Map<String, Property> paramsMap = ParamUtils.convert(taskRequest,pythonParameters);
-        if (paramsMap != null){
-            rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+        if(MapUtils.isEmpty(paramsMap)){
+            paramsMap=new HashMap<>();
         }
+        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())){
+            paramsMap.putAll(taskRequest.getParamsMap());
+        }
+        rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
 
         logger.info("raw python script : {}", pythonParameters.getRawScript());
         logger.info("task dir : {}", taskDir);

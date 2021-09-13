@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sqoop;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -73,13 +75,17 @@ public class SqoopTask extends AbstractYarnTask {
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(sqoopTaskExecutionContext, getParameters());
 
-        if (paramsMap != null) {
-            String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-            logger.info("sqoop script: {}", resultScripts);
-            return resultScripts;
+        if(MapUtils.isEmpty(paramsMap)){
+            paramsMap=new HashMap<>();
+        }
+        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())){
+            paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
         }
 
-        return null;
+        String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        logger.info("sqoop script: {}", resultScripts);
+        return resultScripts;
+
     }
 
     @Override
