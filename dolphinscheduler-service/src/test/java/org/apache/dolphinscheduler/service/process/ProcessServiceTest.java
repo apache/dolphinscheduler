@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -368,17 +369,17 @@ public class ProcessServiceTest {
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
 
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-        processTaskRelationLog.setName("def 1");
-        processTaskRelationLog.setProcessDefinitionVersion(1);
-        processTaskRelationLog.setProjectCode(1L);
-        processTaskRelationLog.setProcessDefinitionCode(1L);
-        processTaskRelationLog.setPostTaskCode(3L);
-        processTaskRelationLog.setPreTaskCode(2L);
-        processTaskRelationLog.setUpdateTime(new Date());
-        processTaskRelationLog.setCreateTime(new Date());
-        List<ProcessTaskRelationLog> list = new ArrayList<>();
-        list.add(processTaskRelationLog);
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        processTaskRelation.setName("def 1");
+        processTaskRelation.setProcessDefinitionVersion(1);
+        processTaskRelation.setProjectCode(1L);
+        processTaskRelation.setProcessDefinitionCode(1L);
+        processTaskRelation.setPostTaskCode(3L);
+        processTaskRelation.setPreTaskCode(2L);
+        processTaskRelation.setUpdateTime(new Date());
+        processTaskRelation.setCreateTime(new Date());
+        List<ProcessTaskRelation> list = new ArrayList<>();
+        list.add(processTaskRelation);
 
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setCode(3L);
@@ -405,11 +406,10 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(Mockito.anyLong(), Mockito.anyLong())).thenReturn(list);
 
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
-        Assert.assertEquals(0, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
-
+        Assert.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
     }
 
     @Test
