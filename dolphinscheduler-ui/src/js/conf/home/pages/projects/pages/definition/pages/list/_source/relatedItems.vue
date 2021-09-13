@@ -26,11 +26,11 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <el-select v-model="itemId" size="small">
+            <el-select v-model="selected" size="small">
               <el-option
                       v-for="item in itemList"
-                      :key="item.id"
-                      :value="item.id"
+                      :key="item.code"
+                      :value="item.code"
                       :label="item.name">
               </el-option>
             </el-select>
@@ -52,7 +52,7 @@
       return {
         store,
         itemList: [],
-        itemId: ''
+        selected: ''
       }
     },
     props: {
@@ -65,14 +65,14 @@
       _ok () {
         if (this._verification()) {
           if (this.tmp) {
-            this.$emit('onBatchMove', this.itemId)
+            this.$emit('onBatchMove', this.selected)
           } else {
-            this.$emit('onBatchCopy', this.itemId)
+            this.$emit('onBatchCopy', this.selected)
           }
         }
       },
       _verification () {
-        if (!this.itemId) {
+        if (!this.selected) {
           this.$message.warning(`${i18n.$t('Project name is required')}`)
           return false
         }

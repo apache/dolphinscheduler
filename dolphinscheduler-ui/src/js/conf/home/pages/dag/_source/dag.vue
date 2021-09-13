@@ -31,6 +31,7 @@
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
         @onSubProcess="toSubProcess"
+        :type="type"
       ></m-form-model>
     </el-drawer>
     <el-dialog

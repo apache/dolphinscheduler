@@ -21,7 +21,7 @@
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log
-          v-if="taskInstance"
+          v-if="type === 'instance' && taskInstance"
           :item="backfillItem"
           :task-instance-id="taskInstance.id"
         >
@@ -525,7 +525,11 @@
     directives: { clickoutside },
     mixins: [disabledState],
     props: {
-      nodeData: Object
+      nodeData: Object,
+      type: {
+        type: String,
+        default: ''
+      }
     },
     inject: ['dagChart'],
     methods: {
