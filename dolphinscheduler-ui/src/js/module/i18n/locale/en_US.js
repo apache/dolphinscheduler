@@ -213,6 +213,7 @@ export default {
   Phone: 'Phone',
   'User Type': 'User Type',
   'Please enter phone number': 'Please enter phone number',
+  'Please create a tenant first': 'Please create a tenant first',
   'Please enter email': 'Please enter email',
   'Please enter the correct email format': 'Please enter the correct email format',
   'Please enter the correct mobile phone format': 'Please enter the correct mobile phone format',
