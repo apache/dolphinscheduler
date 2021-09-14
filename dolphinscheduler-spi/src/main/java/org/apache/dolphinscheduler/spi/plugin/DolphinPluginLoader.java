@@ -59,6 +59,7 @@ public class DolphinPluginLoader {
     private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String>builder()
             .add("org.apache.dolphinscheduler.spi.")
             .add("com.fasterxml.jackson.")
+            .add("org.slf4j")
             .build();
 
     private final File installedPluginsDir;
