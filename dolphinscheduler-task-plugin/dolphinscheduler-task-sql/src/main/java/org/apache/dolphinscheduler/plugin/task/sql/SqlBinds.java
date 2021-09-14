@@ -14,28 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.task.sql;
 
-package org.apache.dolphinscheduler.plugin.task.spark;
+import org.apache.dolphinscheduler.spi.task.Property;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+import java.util.Map;
 
-import java.util.List;
+/**
+ * Used to contains both prepared sql string and its to-be-bind parameters
+ */
+public class SqlBinds {
+    private final String sql;
+    private final Map<Integer, Property> paramsMap;
 
-public class SparkTaskChannelFanctory implements TaskChannelFactory {
-    @Override
-    public String getName() {
-        return "SPARK";
+    public SqlBinds(String sql, Map<Integer, Property> paramsMap) {
+        this.sql = sql;
+        this.paramsMap = paramsMap;
     }
 
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
+    public String getSql() {
+        return sql;
     }
 
-    @Override
-    public TaskChannel create() {
-        return new SparkTaskChannel();
+    public Map<Integer, Property> getParamsMap() {
+        return paramsMap;
     }
 }
