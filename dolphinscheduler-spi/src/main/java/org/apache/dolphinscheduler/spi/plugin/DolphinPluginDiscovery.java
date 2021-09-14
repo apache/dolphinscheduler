@@ -32,6 +32,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -62,7 +63,10 @@ final class DolphinPluginDiscovery {
         }
 
         File file = artifact.getFile();
-        if (!file.getPath().endsWith("/target/classes")) {
+        // use Path to judge if the path is ends with '/target/"classes'
+        // because on Windows system, the path might be 'target\classes'
+        Path filePath = file.toPath();
+        if (!filePath.endsWith(Paths.get("target", "classes"))) {
             throw new RuntimeException("Unexpected file for main artifact: " + file);
         }
         if (!file.isDirectory()) {
