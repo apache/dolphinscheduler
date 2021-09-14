@@ -176,8 +176,8 @@ export default {
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/batch-copy`, {
-        processDefinitionIds: payload.processDefinitionIds,
-        targetProjectId: payload.targetProjectId
+        codes: payload.codes,
+        targetProjectCode: payload.targetProjectCode
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -192,8 +192,8 @@ export default {
   moveProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/batch-move`, {
-        processDefinitionIds: payload.processDefinitionIds,
-        targetProjectId: payload.targetProjectId
+        codes: payload.codes,
+        targetProjectCode: payload.targetProjectCode
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -386,7 +386,7 @@ export default {
   /**
    * Get a list of process definitions by project id
    */
-  getProcessByProjectId ({ state }, payload) {
+  getProcessByProjectCode ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/process-definition/all`, payload, res => {
         resolve(res.data)
@@ -674,7 +674,7 @@ export default {
       }
     }
 
-    io.post(`projects/${state.projectCode}/process-definition/batch-export`, { processDefinitionIds: payload.processDefinitionIds }, res => {
+    io.post(`projects/${state.projectCode}/process-definition/batch-export`, { codes: payload.codes }, res => {
       downloadBlob(res, payload.fileName)
     }, e => {
 
@@ -793,7 +793,7 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/tatch-query-tasks`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/batch-query-tasks`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -824,6 +824,15 @@ export default {
   genTaskCodeList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/task-definition/gen-task-codes`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  getTaskDefinitions ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

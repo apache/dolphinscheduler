@@ -533,7 +533,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "getTaskListByDefinitionCodes", notes = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
+        @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
     })
     @GetMapping(value = "/batch-query-tasks")
     @ResponseStatus(HttpStatus.OK)
