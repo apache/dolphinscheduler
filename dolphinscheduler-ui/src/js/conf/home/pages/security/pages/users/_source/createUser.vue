@@ -190,13 +190,11 @@
             return false
           }
         }
-        
         // tenantId
         if (!this.tenantId) {
           this.$message.warning(`${i18n.$t('Please create a tenant first')}`)
           return false
         }
-
         // email
         if (!this.email) {
           this.$message.warning(`${i18n.$t('Please enter email')}`)
