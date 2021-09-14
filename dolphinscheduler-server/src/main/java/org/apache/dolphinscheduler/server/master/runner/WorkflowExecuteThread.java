@@ -183,6 +183,11 @@ public class WorkflowExecuteThread implements Runnable {
     private NettyExecutorManager nettyExecutorManager;
 
     /**
+     * process blocking flag
+     */
+    private Flag isProcessBlocked;
+
+    /**
      * submit post node
      *
      * @param parentNodeName parent node name
@@ -223,6 +228,7 @@ public class WorkflowExecuteThread implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
+        this.isProcessBlocked = Flag.NO;
     }
 
     @Override
@@ -299,6 +305,9 @@ public class WorkflowExecuteThread implements Runnable {
                 break;
             case TASK_TIMEOUT:
                 result = taskTimeout(stateEvent);
+                break;
+            case PROCESS_BLOCKED:
+                result = processBlockedHandler(stateEvent);
                 break;
             default:
                 break;
@@ -377,7 +386,8 @@ public class WorkflowExecuteThread implements Runnable {
             submitPostNode(task.getName());
         } else if (task.getState().typeIsFailure()) {
             if (task.isConditionsTask()
-                    || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
+                    || DagHelper.haveConditionsAfterNode(task.getName(), dag)
+                    ||DagHelper.haveBlockingAfterNode(task.getName(),dag)) {
                 submitPostNode(task.getName());
             } else {
                 errorTaskList.put(task.getName(), task);
@@ -416,6 +426,18 @@ public class WorkflowExecuteThread implements Runnable {
         } catch (Exception e) {
             logger.error("process state change error:", e);
         }
+        return true;
+    }
+
+    private boolean processBlockedHandler(StateEvent stateEvent){
+        TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+        if(task.getAlertWhenBlocking()){
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
+        }
+        taskFinished(task);
+        processService.updateProcessInstanceState(processInstance.getId(),ExecutionStatus.READY_PAUSE);
+        updateProcessInstanceState();
         return true;
     }
 
@@ -605,7 +627,18 @@ public class WorkflowExecuteThread implements Runnable {
                     stateEvent.setProcessInstanceId(this.processInstance.getId());
                     stateEvent.setTaskInstanceId(taskInstance.getId());
                     stateEvent.setExecutionStatus(taskProcessor.taskState());
-                    stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                    if(taskInstance.isBlockingTask()){
+                        boolean isBlocked = (Boolean)taskProcessor.taskExtraInfo();
+                        logger.info("blocking task runs complete, the result:{}",isBlocked);
+                        if(isBlocked){
+                            this.isProcessBlocked = Flag.YES;
+                            stateEvent.setType(StateEventType.PROCESS_BLOCKED);
+                        } else {
+                            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                        }
+                    } else {
+                        stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                    }
                     this.stateEvents.add(stateEvent);
                 }
                 return taskInstance;
@@ -803,6 +836,10 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void submitPostNode(String parentNodeName) {
+        // if process blocked, successor tasks will not be submitted
+        if(this.isProcessBlocked == Flag.YES){
+            return;
+        }
         Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
@@ -865,6 +902,10 @@ public class WorkflowExecuteThread implements Runnable {
             }
             // ignore task state if current task is condition
             if (taskNode.isConditionsTask()) {
+                continue;
+            }
+            // ignore task state if current task is condition
+            if(taskNode.isBlockingTask()){
                 continue;
             }
             if (!dependTaskSuccess(depsNode, taskName)) {
@@ -987,6 +1028,7 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if (CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
+                || this.isProcessBlocked == Flag.YES
                 || readyToSubmitTaskQueue.size() > 0) {
             return ExecutionStatus.PAUSE;
         } else {

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
@@ -85,6 +86,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
             case "SWITCH":
                 return JSONUtils.parseObject(parameter, SwitchParameters.class);
+            case "BLOCKING":
+                return JSONUtils.parseObject(parameter, BlockingParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);
                 return null;

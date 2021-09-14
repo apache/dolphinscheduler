@@ -264,17 +264,10 @@ public class ProcessAlertManager {
      * check node type and process blocking flag, then insert a block record into db
      *
      * @param processInstance process instance
-     * @param taskInstance task instance
      * @param projectUser the project owner
      */
     public void sendProcessBlockingAlert(ProcessInstance processInstance,
-                                         TaskInstance taskInstance,
                                          ProjectUser projectUser){
-
-        if(!taskInstance.isBlockingTask() || Flag.NO.getCode() == processInstance.getBlockingFlag().getCode()){
-            logger.info("not a blocking task or does not be alerted");
-            return;
-        }
         Alert alert = new Alert();
         String cmdName = getCommandCnName(processInstance.getCommandType());
         List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
