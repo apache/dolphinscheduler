@@ -81,7 +81,7 @@ export default {
    */
   deleteProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versiond/${payload.version}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versions/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -384,11 +384,11 @@ export default {
     })
   },
   /**
-   * Get a list of process definitions by project id
+   * Get a list of process definitions by project code
    */
-  getProcessByProjectCode ({ state }, payload) {
+  getProcessByProjectCode ({ state }, code) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/all`, payload, res => {
+      io.get(`projects/${code}/process-definition/all`, res => {
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -606,7 +606,7 @@ export default {
    */
   deleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-instances/${payload.code}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

@@ -64,16 +64,17 @@
     mounted () {
       const canvas = this.getDagCanvasRef()
       const edges = canvas.getEdges()
+      this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
       this.options = this.tasks.filter((task) => {
         // The current node cannot be used as the prev node
         if (task.code === this.code) return false
+        if (this.preTasks.includes(task.code)) return true
         // The number of edges start with CONDITIONS task cannot be greater than 2
         if (task.taskType === 'CONDITIONS') {
           return edges.filter((e) => e.sourceId === task.code).length < 2
         }
         return true
       })
-      this.preTasks = canvas.getPrevNodes(this.code).map(node => node.id)
     },
     computed: {
       ...mapState('dag', ['tasks'])

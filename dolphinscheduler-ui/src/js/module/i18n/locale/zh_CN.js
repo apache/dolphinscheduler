@@ -706,6 +706,6 @@ export default {
   'Please select worker groups': '请选择Worker分组',
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空',
-  'Copy from': '从任务复制',
+  'Reference from': '使用已有任务',
   'No more...': '没有更多了...'
 }

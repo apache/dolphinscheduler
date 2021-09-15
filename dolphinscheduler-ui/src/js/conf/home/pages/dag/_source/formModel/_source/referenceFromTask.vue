@@ -16,7 +16,7 @@
  */
 <template>
   <list-box>
-    <div slot="text">{{ $t("Copy from") }}</div>
+    <div slot="text">{{ $t("Reference from") }}</div>
     <div slot="content" class="copy-from" ref="copyFrom">
       <div class="copy-from-content">
         <el-input
@@ -121,7 +121,7 @@
           this.formModel.backfillRefresh = false
           this.$nextTick(() => {
             this.formModel.backfillItem = backfillItem
-            this.formModel.backfill(backfillItem, true)
+            this.formModel.backfill(backfillItem)
             this.formModel.backfillRefresh = true
           })
         }
