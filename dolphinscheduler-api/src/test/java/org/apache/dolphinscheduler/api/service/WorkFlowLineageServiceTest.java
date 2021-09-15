@@ -23,9 +23,12 @@ import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
 import java.util.ArrayList;
@@ -56,6 +59,9 @@ public class WorkFlowLineageServiceTest {
 
     @Mock
     private ProjectMapper projectMapper;
+
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     /**
      * get mock Project
@@ -97,22 +103,34 @@ public class WorkFlowLineageServiceTest {
         processLineage.setProcessDefinitionVersion(1);
         processLineage.setProjectCode(1111L);
         processLineages.add(processLineage);
-
+        TaskDefinition taskDefinition = new TaskDefinition(1L, 1);
+        taskDefinition.setTaskParams("{\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\","
+            + "\"dependItemList\":[{\"projectCode\":1,\"definitionCode\":2,\"depTasks\":\"q\",\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}");
+        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
+        taskDefinitionList.add(taskDefinition);
+        List<TaskDefinitionLog> taskDefinitions = new ArrayList<>();
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
+        taskDefinitionLog.setProjectCode(1L);
+        taskDefinitions.add(taskDefinitionLog);
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
         workFlowLineage.setSourceWorkFlowCode("");
+        workFlowLineage.setWorkFlowCode(1111L);
+        List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
+        workFlowLineages.add(workFlowLineage);
 
         when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryProcessLineage(project.getCode())).thenReturn(processLineages);
+        when(workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages)).thenReturn(workFlowLineages);
         when(workFlowLineageMapper.queryProcessLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode())).thenReturn(processLineages);
-        when(workFlowLineageMapper.queryWorkFlowLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode()))
-            .thenReturn(workFlowLineage);
+        when(workFlowLineageMapper.queryWorkFlowLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode())).thenReturn(workFlowLineage);
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList)).thenReturn(taskDefinitions);
 
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(1L);
 
         Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
-        Collection<WorkFlowLineage> workFlowLineages = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
+        Collection<WorkFlowLineage> workFlowLineageList = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
         Set<WorkFlowRelation> workFlowRelations = (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
-        Assert.assertTrue(workFlowLineages.size() > 0);
+        Assert.assertTrue(workFlowLineageList.size() > 0);
         Assert.assertTrue(workFlowRelations.size() > 0);
     }
 
