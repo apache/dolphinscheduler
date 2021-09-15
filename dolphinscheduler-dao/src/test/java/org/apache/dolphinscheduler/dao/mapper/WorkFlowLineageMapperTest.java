@@ -125,8 +125,8 @@ public class WorkFlowLineageMapperTest {
     @Test
     public void testQueryCodeRelation() {
         ProcessTaskRelation processTaskRelation = insertOneProcessTaskRelation();
-        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryCodeRelation(processTaskRelation.getProjectCode(),
-            processTaskRelation.getProcessDefinitionCode(), processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
+        List<ProcessLineage> workFlowLineages = workFlowLineageMapper.queryProcessLineageByCode(processTaskRelation.getProjectCode(),
+            processTaskRelation.getProcessDefinitionCode());
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 
