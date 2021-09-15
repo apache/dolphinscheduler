@@ -95,7 +95,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        if (checkTenantExists(tenantCode)) {
+        // check if tenant exists in database or named "default"
+        if (checkTenantExists(tenantCode) || "default".equalsIgnoreCase(tenantCode)) {
             putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
             return result;
         }
