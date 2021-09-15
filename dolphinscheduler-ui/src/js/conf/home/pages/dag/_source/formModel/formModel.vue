@@ -881,7 +881,7 @@
           } else {
             this.workerGroup = o.workerGroup
           }
-          this.environmentCode = o.environmentCode
+          this.environmentCode = o.environmentCode === -1 ? '' : o.environmentCode
           this.params = o.params || {}
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
