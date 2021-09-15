@@ -103,8 +103,7 @@ public class WorkFlowLineageServiceTest {
 
         when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryProcessLineage(project.getCode())).thenReturn(processLineages);
-        when(workFlowLineageMapper.queryCodeRelation(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode(),
-            processLineage.getPostTaskCode(), processLineage.getPreTaskVersion())).thenReturn(processLineages);
+        when(workFlowLineageMapper.queryProcessLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode())).thenReturn(processLineages);
         when(workFlowLineageMapper.queryWorkFlowLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode()))
             .thenReturn(workFlowLineage);
 
