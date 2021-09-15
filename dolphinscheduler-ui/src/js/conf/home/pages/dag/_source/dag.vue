@@ -24,6 +24,10 @@
       :with-header="false"
       :wrapperClosable="false"
     >
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width:0px;height:0px;overflow:hidden;">
+        <el-input type="text" />
+      </div>
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
