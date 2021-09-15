@@ -340,25 +340,25 @@ CREATE TABLE t_ds_environment (
     CONSTRAINT environment_code_unique UNIQUE (code)
 );
 
-ALTER TABLE t_ds_task_definition ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_task_definition ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_task_definition.environment_code is 'environment code';
 
-ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_task_definition_log.environment_code is 'environment code';
 
-ALTER TABLE t_ds_command ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_command ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_command.environment_code is 'environment code';
 
-ALTER TABLE t_ds_error_command ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_error_command ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_error_command.environment_code is 'environment code';
 
-ALTER TABLE t_ds_schedules ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_schedules ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_schedules.environment_code is 'environment code';
 
-ALTER TABLE t_ds_process_instance ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_process_instance ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_process_instance.environment_code is 'environment code';
 
-ALTER TABLE t_ds_task_instance ADD COLUMN environment_code bigint DEFAULT NULL;
+ALTER TABLE t_ds_task_instance ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_task_instance.environment_code is 'environment code';
 
 ALTER TABLE t_ds_task_instance ADD COLUMN environment_config text;
