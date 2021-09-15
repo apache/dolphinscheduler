@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.tis;
 
-import static com.github.dreamhead.moco.Moco.file;
+import static com.github.dreamhead.moco.Moco.pathResource;
 import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
@@ -86,7 +86,7 @@ public class TISTaskTest {
     @Test
     public void testHandle()
             throws Exception {
-        HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
+        HttpServer server = jsonHttpServer(8080, pathResource("org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest"));
 
         running(server, () -> {
             tisTask.handle();

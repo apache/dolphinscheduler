@@ -425,7 +425,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <scope>test</scope>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -1209,7 +1209,7 @@
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-ui</module>
+       <!-- <module>dolphinscheduler-ui</module> -->
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
