@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.tis;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -45,7 +45,6 @@ import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
-import org.slf4j.Logger;
 
 /**
  * TIS DataX Task
@@ -57,6 +56,7 @@ public class TISTask extends AbstractTaskExecutor {
     private final TaskRequest taskExecutionContext;
 
     private TISParameters tisParameters;
+    private BizResult triggerResult;
 
     public TISTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
@@ -79,35 +79,31 @@ public class TISTask extends AbstractTaskExecutor {
         logger.info("start execute TIS task");
         long startTime = System.currentTimeMillis();
         String targetJobName = this.tisParameters.getTargetJobName();
-        final String tisHost = taskExecutionContext.getDefinedParams().get(KEY_POOL_VAR_TIS_HOST);
-        if (StringUtils.isEmpty(tisHost)) {
-            throw new IllegalStateException("global var '" + KEY_POOL_VAR_TIS_HOST + "' can not be empty");
-        }
+        String tisHost = getTisHost();
         try {
-            final String triggerUrl = String.format("http://%s/tjs/coredefine/coredefine.ajax", tisHost);
+            final String triggerUrl = getTriggerUrl();
             final String getStatusUrl = String.format("http://%s/tjs/config/config.ajax?action=collection_action&emethod=get_task_status", tisHost);
             HttpPost post = new HttpPost(triggerUrl);
             post.addHeader("appname", targetJobName);
             addFormUrlencoded(post);
             StringEntity entity = new StringEntity("action=datax_action&emethod=trigger_fullbuild_task", StandardCharsets.UTF_8);
             post.setEntity(entity);
-            BizResult ajaxResult = null;
             ExecResult execState = null;
             int taskId;
             WebSocket webSocket = null;
             try (CloseableHttpClient client = HttpClients.createDefault();
                  // trigger to start TIS dataX task
                  CloseableHttpResponse response = client.execute(post)) {
-                ajaxResult = processResponse(triggerUrl, response, BizResult.class);
-                if (!ajaxResult.isSuccess()) {
-                    List<String> errormsg = ajaxResult.getErrormsg();
+                triggerResult = processResponse(triggerUrl, response, BizResult.class);
+                if (!triggerResult.isSuccess()) {
+                    List<String> errormsg = triggerResult.getErrormsg();
                     StringBuffer errs = new StringBuffer();
                     if (CollectionUtils.isNotEmpty(errormsg)) {
                         errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
                     }
                     throw new Exception("trigger TIS job faild taskName:" + targetJobName + errs.toString());
                 }
-                taskId = ajaxResult.getBizresult().getTaskid();
+                taskId = triggerResult.getBizresult().getTaskid();
 
                 webSocket = receiveRealtimeLog(tisHost, targetJobName, taskId);
 
@@ -134,10 +130,13 @@ public class TISTask extends AbstractTaskExecutor {
                     }
                 }
             } finally {
-                try {
-                    webSocket.sendCloseFrame();
-                } catch (Throwable e) {
-                    logger.warn(e.getMessage(), e);
+                if (webSocket != null) {
+                    Thread.sleep(4000);
+                    try {
+                        webSocket.sendCloseFrame();
+                    } catch (Throwable e) {
+                        logger.warn(e.getMessage(), e);
+                    }
                 }
             }
 
@@ -158,6 +157,42 @@ public class TISTask extends AbstractTaskExecutor {
     @Override
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
+        logger.info("start to cancelApplication");
+        Objects.requireNonNull(triggerResult, "triggerResult can not be null");
+        logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
+        final String triggerUrl = getTriggerUrl();
+        StringEntity entity = new StringEntity("action=core_action&event_submit_do_cancel_task=y&taskid=" + triggerResult.getTaskId(), StandardCharsets.UTF_8);
+
+        CancelResult cancelResult = null;
+        HttpPost post = new HttpPost(triggerUrl);
+        addFormUrlencoded(post);
+        post.setEntity(entity);
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             // trigger to start TIS dataX task
+             CloseableHttpResponse response = client.execute(post)) {
+            cancelResult = processResponse(triggerUrl, response, CancelResult.class);
+            if (!cancelResult.isSuccess()) {
+                List<String> errormsg = triggerResult.getErrormsg();
+                StringBuffer errs = new StringBuffer();
+                if (org.apache.dolphinscheduler.spi.utils.CollectionUtils.isNotEmpty(errormsg)) {
+                    errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
+                }
+                throw new Exception("cancel TIS job faild taskId:" + triggerResult.getTaskId() + errs.toString());
+            }
+        }
+    }
+
+    private String getTriggerUrl() {
+        final String tisHost = getTisHost();
+        return String.format("http://%s/tjs/coredefine/coredefine.ajax", tisHost);
+    }
+
+    private String getTisHost() {
+        final String tisHost = taskExecutionContext.getDefinedParams().get(KEY_POOL_VAR_TIS_HOST);
+        if (StringUtils.isEmpty(tisHost)) {
+            throw new IllegalStateException("global var '" + KEY_POOL_VAR_TIS_HOST + "' can not be empty");
+        }
+        return tisHost;
     }
 
     private WebSocket receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws InterruptedException, java.util.concurrent.ExecutionException {
@@ -218,12 +253,29 @@ public class TISTask extends AbstractTaskExecutor {
         return this.tisParameters;
     }
 
+    private static class CancelResult extends AjaxResult<Object> {
+        private Object bizresult;
+
+        @Override
+        public Object getBizresult() {
+            return this.bizresult;
+        }
+
+        public void setBizresult(Object bizresult) {
+            this.bizresult = bizresult;
+        }
+    }
+
     private static class BizResult extends AjaxResult<TriggerBuildResult> {
         private TriggerBuildResult bizresult;
 
         @Override
         public TriggerBuildResult getBizresult() {
             return this.bizresult;
+        }
+
+        public int getTaskId() {
+            return bizresult.taskid;
         }
 
         public void setBizresult(TriggerBuildResult bizresult) {

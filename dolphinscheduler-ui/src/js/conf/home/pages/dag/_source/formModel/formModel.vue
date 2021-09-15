@@ -360,6 +360,13 @@
             :backfill-item="backfillItem"
           >
           </m-datax>
+        <m-tis
+          v-if="nodeData.taskType === 'TIS'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          :backfill-item="backfillItem"
+          ref="TIS">
+        </m-tis>
           <m-sqoop
             v-if="nodeData.taskType === 'SQOOP'"
             @on-params="_onParams"
@@ -428,6 +435,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mTis from './tasks/tis'
   import mConditions from './tasks/conditions'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
@@ -962,6 +970,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mTis,
       mSqoop,
       mConditions,
       mSwitch,
