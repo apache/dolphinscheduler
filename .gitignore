@@ -22,6 +22,7 @@ third-party-dependencies.txt
 .*.swp
 .vim
 .tmp
+*.properties
 node_modules
 npm-debug.log
 .vscode
