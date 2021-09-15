@@ -46,6 +46,10 @@
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="form-model">
+
+        <!-- Reference from task -->
+        <!-- <reference-from-task :taskType="nodeData.taskType" /> -->
+
         <!-- Node name -->
         <m-list-box>
           <div slot="text">{{ $t("Node name") }}</div>
@@ -62,9 +66,6 @@
             </el-input>
           </div>
         </m-list-box>
-
-        <!-- Copy from task -->
-        <copy-from-task v-if="!isDetails" :taskType="nodeData.taskType" />
 
         <!-- Running sign -->
         <m-list-box>
@@ -442,7 +443,7 @@
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
   import { findComponentDownward } from '@/module/util/'
-  import CopyFromTask from './_source/copyFromTask.vue'
+  // import ReferenceFromTask from './_source/referenceFromTask.vue'
 
   export default {
     name: 'form-model',
@@ -768,7 +769,7 @@
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
-            environmentCode: this.environmentCode,
+            environmentCode: this.environmentCode || -1,
             status: this.status,
             branch: this.branch
           },
@@ -839,12 +840,12 @@
           fromThis: this
         })
       },
-      backfill (backfillItem, copyFromTask) {
+      backfill (backfillItem) {
         const o = backfillItem
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.code = o.code
-          !copyFromTask && (this.name = o.name)
+          this.name = o.name
           this.taskInstancePriority = o.taskInstancePriority
           this.runFlag = o.runFlag || 'YES'
           this.desc = o.desc
@@ -971,8 +972,8 @@
       mPriority,
       mWorkerGroups,
       mRelatedEnvironment,
-      mPreTasks,
-      CopyFromTask
+      mPreTasks
+      // ReferenceFromTask
     }
   }
 </script>
