@@ -124,7 +124,6 @@
             this.formModel.backfill(backfillItem)
             this.formModel.backfillRefresh = true
           })
-          this.formModel.isReference = true
         }
       },
       inputFocus () {
