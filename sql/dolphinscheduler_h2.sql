@@ -315,6 +315,7 @@ CREATE TABLE t_ds_command
     id                        int(11) NOT NULL AUTO_INCREMENT,
     command_type              tinyint(4) DEFAULT NULL,
     process_definition_id     int(11) DEFAULT NULL,
+    process_definition_code   bigint(20) DEFAULT NULL,
     command_param             text,
     task_depend_type          tinyint(4) DEFAULT NULL,
     failure_strategy          tinyint(4) DEFAULT '0',
