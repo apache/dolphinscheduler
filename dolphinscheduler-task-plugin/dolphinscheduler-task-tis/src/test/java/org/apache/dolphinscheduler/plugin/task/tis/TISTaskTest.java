@@ -73,7 +73,6 @@ public class TISTaskTest {
 
     }
 
-
     @Test
     public void testInit()
             throws Exception {
@@ -107,14 +106,14 @@ public class TISTaskTest {
         }
     }
 
-//    @Test
-//    public void testCancelApplication()
-//            throws Exception {
-//        try {
-//            tisTask.cancelApplication(true);
-//        } catch (Exception e) {
-//            Assert.fail(e.getMessage());
-//        }
-//    }
+    //    @Test
+    //    public void testCancelApplication()
+    //            throws Exception {
+    //        try {
+    //            tisTask.cancelApplication(true);
+    //        } catch (Exception e) {
+    //            Assert.fail(e.getMessage());
+    //        }
+    //    }
 
 }
