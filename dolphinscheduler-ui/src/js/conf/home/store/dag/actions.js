@@ -384,11 +384,11 @@ export default {
     })
   },
   /**
-   * Get a list of process definitions by project id
+   * Get a list of process definitions by project code
    */
-  getProcessByProjectCode ({ state }, payload) {
+  getProcessByProjectCode ({ state }, code) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/all`, payload, res => {
+      io.get(`projects/${code}/process-definition/all`, res => {
         resolve(res.data)
       }).catch(res => {
         reject(res)
