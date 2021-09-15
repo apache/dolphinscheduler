@@ -81,7 +81,7 @@ export default {
    */
   deleteProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versiond/${payload.version}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versions/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
