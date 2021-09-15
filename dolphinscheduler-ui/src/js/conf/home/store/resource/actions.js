@@ -150,7 +150,7 @@ export default {
    */
   updateContent ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/${payload.id}/update-content`, payload, res => {
+      io.post(`resources/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
