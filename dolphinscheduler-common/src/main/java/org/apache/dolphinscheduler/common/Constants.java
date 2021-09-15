@@ -755,6 +755,7 @@ public final class Constants {
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
     public static final String CONDITION_RESULT = "conditionResult";
     public static final String SWITCH_RESULT = "switchResult";
+    public static final String WAIT_START_TIMEOUT = "waitStartTimeout";
     public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
