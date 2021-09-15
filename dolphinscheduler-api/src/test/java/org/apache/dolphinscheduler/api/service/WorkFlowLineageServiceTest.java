@@ -103,15 +103,6 @@ public class WorkFlowLineageServiceTest {
         processLineage.setProcessDefinitionVersion(1);
         processLineage.setProjectCode(1111L);
         processLineages.add(processLineage);
-        TaskDefinition taskDefinition = new TaskDefinition(1L, 1);
-        taskDefinition.setTaskParams("{\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\","
-            + "\"dependItemList\":[{\"projectCode\":1,\"definitionCode\":2,\"depTasks\":\"q\",\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}");
-        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
-        taskDefinitionList.add(taskDefinition);
-        List<TaskDefinitionLog> taskDefinitions = new ArrayList<>();
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-        taskDefinitionLog.setProjectCode(1L);
-        taskDefinitions.add(taskDefinitionLog);
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
         workFlowLineage.setSourceWorkFlowCode("");
         workFlowLineage.setWorkFlowCode(1111L);
@@ -121,9 +112,6 @@ public class WorkFlowLineageServiceTest {
         when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryProcessLineage(project.getCode())).thenReturn(processLineages);
         when(workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages)).thenReturn(workFlowLineages);
-        when(workFlowLineageMapper.queryProcessLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode())).thenReturn(processLineages);
-        when(workFlowLineageMapper.queryWorkFlowLineageByCode(processLineage.getProjectCode(), processLineage.getProcessDefinitionCode())).thenReturn(workFlowLineage);
-        when(taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList)).thenReturn(taskDefinitions);
 
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(1L);
 
