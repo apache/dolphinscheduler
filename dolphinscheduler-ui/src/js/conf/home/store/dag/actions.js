@@ -606,7 +606,7 @@ export default {
    */
   deleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-instances/${payload.code}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
