@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-import static org.apache.dolphinscheduler.common.Constants.SLASH;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
@@ -134,7 +134,7 @@ public class WorkerRegistryClient {
         String workerZkPathPrefix = REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
         for (String workGroup : this.workerGroups) {
-            StringJoiner workerPathJoiner = new StringJoiner(SLASH);
+            StringJoiner workerPathJoiner = new StringJoiner(SINGLE_SLASH);
             workerPathJoiner.add(workerZkPathPrefix);
             if (StringUtils.isEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
