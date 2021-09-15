@@ -107,7 +107,6 @@ public class ZookeeperRegistry implements Registry {
     public void init(Map<String, String> registerData) {
 
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-                .zookeeperFactory(new DefaultZookeeperFactory())
                 .connectString(SERVERS.getParameterValue(registerData.get(SERVERS.getName())))
                 .retryPolicy(buildRetryPolicy(registerData))
                 .namespace(NAME_SPACE.getParameterValue(registerData.get(NAME_SPACE.getName())))

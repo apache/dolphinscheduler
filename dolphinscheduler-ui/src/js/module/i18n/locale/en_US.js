@@ -213,6 +213,7 @@ export default {
   Phone: 'Phone',
   'User Type': 'User Type',
   'Please enter phone number': 'Please enter phone number',
+  'Please create a tenant first': 'Please create a tenant first',
   'Please enter email': 'Please enter email',
   'Please enter the correct email format': 'Please enter the correct email format',
   'Please enter the correct mobile phone format': 'Please enter the correct mobile phone format',
@@ -706,5 +707,7 @@ export default {
   'Please enter environment desc': 'Please enter environment desc',
   'Please select worker groups': 'Please select worker groups',
   condition: 'condition',
-  'The condition content cannot be empty': 'The condition content cannot be empty'
+  'The condition content cannot be empty': 'The condition content cannot be empty',
+  'Copy from': 'Copy from',
+  'No more...': 'No more...'
 }

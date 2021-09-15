@@ -212,6 +212,7 @@ export default {
   Phone: '手机',
   'User Type': '用户类型',
   'Please enter phone number': '请输入手机',
+  'Please create a tenant first': '请先创建租户',
   'Please enter email': '请输入邮箱',
   'Please enter the correct email format': '请输入正确的邮箱格式',
   'Please enter the correct mobile phone format': '请输入正确的手机格式',
@@ -705,5 +706,7 @@ export default {
   'Please enter environment desc': '请输入详细描述',
   'Please select worker groups': '请选择Worker分组',
   condition: '条件',
-  'The condition content cannot be empty': '条件内容不能为空'
+  'The condition content cannot be empty': '条件内容不能为空',
+  'Copy from': '从任务复制',
+  'No more...': '没有更多了...'
 }
