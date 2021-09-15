@@ -633,7 +633,7 @@
             .dispatch('dag/getSubProcessId', { taskId: this.taskInstance.id })
             .then((res) => {
               this.$emit('onSubProcess', {
-                subProcessId: res.data.subProcessInstanceId,
+                subInstanceId: res.data.subProcessInstanceId,
                 fromThis: this
               })
             })

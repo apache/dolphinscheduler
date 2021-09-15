@@ -138,13 +138,16 @@
           pageSize: null
         },
         // the task status refresh timer
-        statusTimer: null
+        statusTimer: null,
+        // the process instance id
+        instanceId: -1
       }
     },
     mounted () {
       this.setIsEditDag(false)
 
       if (this.type === 'instance') {
+        this.instanceId = this.$route.params.id
         this.definitionCode = this.$route.query.code
       } else if (this.type === 'definition') {
         this.definitionCode = this.$route.params.code
@@ -467,28 +470,29 @@
        */
       returnToPrevProcess () {
         let $name = this.$route.name.split('-')
-        let subProcessCodes = this.$route.query.subProcessCodes
-        let codes = subProcessCodes.split(',')
-        const last = codes.pop()
+        let subs = this.$route.query.subs
+        let ids = subs.split(',')
+        const last = ids.pop()
         this.$router.push({
-          path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${last}`,
-          query: codes.length > 0 ? { subProcessCodes: codes.join(',') } : null
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${last}`,
+          query: ids.length > 0 ? { subs: ids.join(',') } : null
         })
       },
-      toSubProcess ({ subProcessCode, fromThis }) {
-        let subProcessCodes = []
-        let getIds = this.$route.query.subProcessCodes
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.definitionCode)
-          subProcessCodes = newId
+      toSubProcess ({ subProcessCode, subInstanceId }) {
+        const tarIdentifier = this.type === 'instance' ? subInstanceId : subProcessCode
+        const curIdentifier = this.type === 'instance' ? this.instanceId : this.definitionCode
+        let subs = []
+        let olds = this.$route.query.subs
+        if (olds) {
+          subs = olds.split(',')
+          subs.push(curIdentifier)
         } else {
-          subProcessCodes.push(this.definitionCode)
+          subs.push(curIdentifier)
         }
         let $name = this.$route.name.split('-')
         this.$router.push({
-          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${subProcessCode}`,
-          query: { subProcessCodes: subProcessCodes.join(',') }
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${tarIdentifier}`,
+          query: { subs: subs.join(',') }
         })
       },
       seeHistory (taskName) {
