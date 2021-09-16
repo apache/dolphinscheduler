@@ -108,6 +108,12 @@
           &.icos-spark {
             background-image: url("../images/task-icos/spark.png");
           }
+          &.icos-switch {
+            background-image: url("../images/task-icos/switch.png");
+          }
+          &.icos-tis {
+            background-image: url("../images/task-icos/tis.png");
+          }
         }
 
         span {
@@ -164,6 +170,12 @@
             }
             &.icos-spark {
               background-image: url("../images/task-icos/spark_hover.png");
+            }
+            &.icos-switch {
+              background-image: url("../images/task-icos/switch_hover.png");
+            }
+            &.icos-tis {
+              background-image: url("../images/task-icos/tis_hover.png");
             }
           }
         }
