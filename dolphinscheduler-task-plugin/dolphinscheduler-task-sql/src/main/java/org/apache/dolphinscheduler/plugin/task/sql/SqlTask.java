@@ -1,15 +1,34 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.common.UdfFunc;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
-import org.apache.dolphinscheduler.spi.enums.CommandType;
+import org.apache.dolphinscheduler.spi.common.Constants;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -23,6 +42,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +52,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -40,7 +62,7 @@ public class SqlTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private TaskRequest taskExecutionContext;
+    private SqlTaskRequest taskExecutionContext;
 
     /**
      * sql parameters
@@ -53,13 +75,24 @@ public class SqlTask extends AbstractYarnTask {
     private BaseConnectionParam baseConnectionParam;
 
     /**
+     * create function format
+     */
+    private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+
+    /**
      * Abstract Yarn Task
      *
      * @param taskRequest taskRequest
      */
-    public SqlTask(TaskRequest taskRequest) {
+    public SqlTask(SqlTaskRequest taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
+        this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+
+        assert sqlParameters != null;
+        if (!sqlParameters.checkParameters()) {
+            throw new RuntimeException("sql task params is not valid");
+        }
     }
 
     @Override
@@ -95,7 +128,7 @@ public class SqlTask extends AbstractYarnTask {
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
-            SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
+            SqlTaskRequest sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
 
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
@@ -115,16 +148,16 @@ public class SqlTask extends AbstractYarnTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
+            List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
                     logger);
 
             // execute sql task
             executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
-            setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
+            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
 
         } catch (Exception e) {
-            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             logger.error("sql task error: {}", e.toString());
             throw e;
         }
@@ -221,7 +254,7 @@ public class SqlTask extends AbstractYarnTask {
                 rowCount++;
             }
 
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
             logger.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
@@ -351,19 +384,6 @@ public class SqlTask extends AbstractYarnTask {
     }
 
     /**
-     * send mail as an attachment
-     *
-     * @param title title
-     * @param content content  todo
-     */
-    public void sendAttachment(int groupId, String title, String content) {
-        AlertSendResponseCommand alertSendResponseCommand = alertClientService.sendAlert(groupId, title, content);
-        if (!alertSendResponseCommand.getResStatus()) {
-            throw new RuntimeException("send mail failed!");
-        }
-    }
-
-    /**
      * regular expressions match the contents between two specified strings
      *
      * @param content content
@@ -473,4 +493,41 @@ public class SqlTask extends AbstractYarnTask {
         }
         return content;
     }
+
+    /**
+     * create function list
+     *
+     * @param udfFuncTenantCodeMap key is udf function,value is tenant code
+     * @param logger logger
+     * @return create function list
+     */
+    public static List<String> createFuncs(Map<UdfFunc, String> udfFuncTenantCodeMap, Logger logger) {
+
+        if (MapUtils.isEmpty(udfFuncTenantCodeMap)) {
+            logger.info("can't find udf function resource");
+            return null;
+        }
+        List<String> funcList = new ArrayList<>();
+        // build temp function sql
+        buildTempFuncSql(funcList, new ArrayList<>(udfFuncTenantCodeMap.keySet()));
+
+        return funcList;
+    }
+
+    /**
+     * build temp function sql
+     *
+     * @param sqls sql list
+     * @param udfFuncs udf function list
+     */
+    private static void buildTempFuncSql(List<String> sqls, List<UdfFunc> udfFuncs) {
+        if (CollectionUtils.isNotEmpty(udfFuncs)) {
+            for (UdfFunc udfFunc : udfFuncs) {
+                sqls.add(MessageFormat
+                        .format(CREATE_FUNCTION_FORMAT, udfFunc.getFuncName(), udfFunc.getClassName()));
+            }
+        }
+    }
+
+
 }

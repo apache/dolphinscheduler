@@ -23,4 +23,6 @@ public interface TaskChannel {
 
     AbstractTask createTask(TaskRequest taskRequest);
 
+     Class<? extends TaskRequest> getTaskContext();
+
 }

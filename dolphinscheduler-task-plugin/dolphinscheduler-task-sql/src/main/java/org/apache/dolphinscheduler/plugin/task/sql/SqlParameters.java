@@ -17,17 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-
-
+import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Sql/Hql parameter.
+ * Sql/Hql parameter
  */
 public class SqlParameters extends AbstractParameters {
     /**
@@ -66,7 +71,6 @@ public class SqlParameters extends AbstractParameters {
      * udf list
      */
     private String udfs;
-
     /**
      * show type
      * 0 TABLE
@@ -75,40 +79,28 @@ public class SqlParameters extends AbstractParameters {
      * 3 TABLE+attachment
      */
     private String showType;
-
     /**
      * SQL connection parameters
      */
     private String connParams;
-
     /**
      * Pre Statements
      */
     private List<String> preStatements;
-
     /**
      * Post Statements
      */
     private List<String> postStatements;
 
     /**
+     * groupId
+     */
+    private int groupId;
+    /**
      * title
      */
     private String title;
 
-    /**
-     * receivers
-     */
-    private String receivers;
-
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
-
-    /**
-     * query result limit
-     */
     private int limit;
 
     public int getLimit() {
@@ -199,21 +191,6 @@ public class SqlParameters extends AbstractParameters {
         this.title = title;
     }
 
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
     public List<String> getPreStatements() {
         return preStatements;
     }
@@ -230,6 +207,14 @@ public class SqlParameters extends AbstractParameters {
         this.postStatements = postStatements;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
     @Override
     public boolean checkParameters() {
         return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
@@ -238,6 +223,53 @@ public class SqlParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public void dealOutParam(String result) {
+        if (CollectionUtils.isEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
+            return;
+        }
+        List<Map<String, String>> sqlResult = getListMapByString(result);
+        if (CollectionUtils.isEmpty(sqlResult)) {
+            return;
+        }
+        //if sql return more than one line
+        if (sqlResult.size() > 1) {
+            Map<String, List<String>> sqlResultFormat = new HashMap<>();
+            //init sqlResultFormat
+            Set<String> keySet = sqlResult.get(0).keySet();
+            for (String key : keySet) {
+                sqlResultFormat.put(key, new ArrayList<>());
+            }
+            for (Map<String, String> info : sqlResult) {
+                for (String key : info.keySet()) {
+                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
+                }
+            }
+            for (Property info : outProperty) {
+                if (info.getType() == DataType.LIST) {
+                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    varPool.add(info);
+                }
+            }
+        } else {
+            //result only one line
+            Map<String, String> firstRow = sqlResult.get(0);
+            for (Property info : outProperty) {
+                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                varPool.add(info);
+            }
+        }
+
     }
 
     @Override
@@ -253,9 +285,8 @@ public class SqlParameters extends AbstractParameters {
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
+                + ", groupId='" + groupId + '\''
                 + ", title='" + title + '\''
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
                 + ", preStatements=" + preStatements
                 + ", postStatements=" + postStatements
                 + '}';

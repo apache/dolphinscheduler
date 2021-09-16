@@ -26,6 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-sql</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
         <dependency>
@@ -45,9 +46,9 @@
             <scope>provided</scope>
         </dependency>
 
-
     </dependencies>
 
-
-
+    <build>
+        <finalName>dolphinscheduler-task-sql-${project.version}</finalName>
+    </build>
 </project>

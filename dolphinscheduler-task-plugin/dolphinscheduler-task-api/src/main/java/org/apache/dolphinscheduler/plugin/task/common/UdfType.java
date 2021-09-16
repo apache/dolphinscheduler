@@ -15,21 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.http;
+package org.apache.dolphinscheduler.plugin.task.common;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+/**
+ * UDF type
+ */
+public enum UdfType {
+    /**
+     * 0 hive; 1 spark
+     */
+  HIVE(0, "hive"),
+  SPARK(1, "spark");
 
-public class HttpTaskChannel implements TaskChannel {
-
-    @Override
-    public void cancelApplication(boolean status) {
-
+    UdfType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
     }
 
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new HttpTask(taskRequest);
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
     }
+
+    public String getDescp() {
+        return descp;
+    }
+
+    public static UdfType of(int type){
+        for(UdfType ut : values()){
+            if(ut.getCode() == type){
+                return ut;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
+
+
 }

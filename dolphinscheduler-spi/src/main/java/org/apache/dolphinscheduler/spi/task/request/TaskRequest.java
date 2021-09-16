@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 /**
  * to master/worker task transport
  */
-public class TaskRequest {
+public abstract class TaskRequest {
 
     /**
      * task id

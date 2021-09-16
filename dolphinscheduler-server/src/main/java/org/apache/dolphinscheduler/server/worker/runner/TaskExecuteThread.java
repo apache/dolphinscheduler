@@ -168,7 +168,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             }
 
             //TODO Temporary operation, To be adjusted
-            TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), taskChannel.getTaskContext());
 
             task = taskChannel.createTask(taskRequest);
             // task init

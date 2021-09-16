@@ -15,21 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.http;
+package org.apache.dolphinscheduler.spi.common;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+public class Constants {
 
-public class HttpTaskChannel implements TaskChannel {
-
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
-
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new HttpTask(taskRequest);
-    }
+    /**
+     * task log info format
+     */
+    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 }
