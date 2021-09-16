@@ -73,7 +73,7 @@
     },
     props: {},
     methods: {
-      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG']),
+      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG', 'getWorkFlowDAGAll']),
       /**
        * init
        */
@@ -83,7 +83,7 @@
         Promise.all([
           // get process definition
           this.getWorkFlowList(),
-          this.getWorkFlowDAG()
+          this.getWorkFlowDAGAll()
         ]).then((data) => {
           this.isLoading = false
         }).catch(() => {
@@ -103,7 +103,11 @@
         this.isLoading = true
         this.currentItemName = item
         try {
-          await this.getWorkFlowDAG(item)
+          if (item) {
+            await this.getWorkFlowDAG(item)
+          } else {
+            await this.getWorkFlowDAGAll()
+          }
         } catch (error) {
           this.$message.error(error.msg || '')
         }
