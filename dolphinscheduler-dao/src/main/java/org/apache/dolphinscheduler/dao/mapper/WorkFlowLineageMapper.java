@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
@@ -44,6 +45,14 @@ public interface WorkFlowLineageMapper {
     WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode, @Param("workFlowCode") long workFlowCode);
 
     /**
+     * queryWorkFlowLineageByCode
+     *
+     * @param processLineages processLineages
+     * @return WorkFlowLineage list
+     */
+    List<WorkFlowLineage> queryWorkFlowLineageByLineage(@Param("processLineages") List<ProcessLineage> processLineages);
+
+    /**
      * queryProcessLineage
      *
      * @param projectCode projectCode
@@ -54,13 +63,10 @@ public interface WorkFlowLineageMapper {
     /**
      * queryCodeRelation
      *
-     * @param taskCode taskCode
-     * @param taskVersion taskVersion
+     * @param projectCode projectCode
      * @param processDefinitionCode processDefinitionCode
      * @return ProcessLineage list
      */
-    List<ProcessLineage> queryCodeRelation(@Param("projectCode") long projectCode,
-                                           @Param("processDefinitionCode") long processDefinitionCode,
-                                           @Param("taskCode") long taskCode,
-                                           @Param("taskVersion") int taskVersion);
+    List<ProcessLineage> queryProcessLineageByCode(@Param("projectCode") long projectCode,
+                                                   @Param("processDefinitionCode") long processDefinitionCode);
 }
