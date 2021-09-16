@@ -155,7 +155,7 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new MasterDataListener());
+        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
     }
 
     /**
@@ -210,7 +210,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * worker group node listener
      */
-    class WorkerGroupNodeListener implements SubscribeListener {
+    class WorkerDataListener implements SubscribeListener {
 
         @Override
         public void notify(String path, DataChangeEvent dataChangeEvent) {
@@ -240,7 +240,7 @@ public class ServerNodeManager implements InitializingBean {
 
         private String parseGroup(String path) {
             String[] parts = path.split("/");
-            if (parts.length < 6) {
+            if (parts.length < 5) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
             return parts[parts.length - 2];
