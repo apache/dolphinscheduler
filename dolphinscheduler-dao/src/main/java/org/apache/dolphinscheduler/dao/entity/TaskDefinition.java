@@ -137,7 +137,7 @@ public class TaskDefinition {
     /**
      * environment code
      */
-    private Long environmentCode;
+    private long environmentCode;
 
     /**
      * fail retry times
@@ -424,11 +424,11 @@ public class TaskDefinition {
         this.modifyBy = modifyBy;
     }
 
-    public Long getEnvironmentCode() {
+    public long getEnvironmentCode() {
         return this.environmentCode;
     }
 
-    public void setEnvironmentCode(Long environmentCode) {
+    public void setEnvironmentCode(long environmentCode) {
         this.environmentCode = environmentCode;
     }
 
@@ -451,7 +451,8 @@ public class TaskDefinition {
             && Objects.equals(workerGroup, that.workerGroup)
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
-            && Objects.equals(resourceIds, that.resourceIds);
+            && Objects.equals(resourceIds, that.resourceIds)
+            && environmentCode == that.environmentCode;
     }
 
     @Override
