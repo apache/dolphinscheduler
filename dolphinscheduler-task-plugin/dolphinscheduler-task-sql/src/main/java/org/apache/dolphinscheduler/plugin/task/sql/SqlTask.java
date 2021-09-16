@@ -434,7 +434,7 @@ public class SqlTask extends AbstractYarnTask {
      * @param rgex rgex
      * @param sqlParamsMap sql params map
      */
-    public void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
+    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
@@ -442,7 +442,7 @@ public class SqlTask extends AbstractYarnTask {
             logger.info("printReplacedSql: sqlParamsMap is null.");
         } else {
             for (int i = 1; i <= sqlParamsMap.size(); i++) {
-                logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType()).append(")");
             }
         }
         logger.info("Sql Params are {}", logPrint);

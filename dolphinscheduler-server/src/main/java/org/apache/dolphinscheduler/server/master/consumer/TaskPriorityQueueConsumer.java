@@ -55,7 +55,6 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -350,7 +349,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             UdfFuncRequest udfFuncRequest;
             Map<UdfFuncRequest, String> udfFuncRequestMap = new HashMap<>();
             for (UdfFunc udfFunc : udfFuncList) {
-                udfFuncRequest=  JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncRequest.class);
+                udfFuncRequest = JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncRequest.class);
                 String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
                 udfFuncRequestMap.put(udfFuncRequest, tenantCode);
             }

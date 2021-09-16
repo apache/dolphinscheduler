@@ -83,13 +83,13 @@ public class UdfFuncRequest {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -180,7 +180,6 @@ public class UdfFuncRequest {
         this.createTime = createTime;
     }
 
-
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -219,7 +218,7 @@ public class UdfFuncRequest {
         return JSONUtils.toJsonString(this);
     }
 
-    public static  class UdfFuncDeserializer extends KeyDeserializer {
+    public static class UdfFuncDeserializer extends KeyDeserializer {
 
         @Override
         public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
