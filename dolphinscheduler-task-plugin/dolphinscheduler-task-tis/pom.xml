@@ -46,24 +46,24 @@
         </dependency>
 
         <!--https://github.com/dreamhead/moco/blob/master/moco-doc/usage.md#socket-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.dreamhead</groupId>-->
-<!--            <artifactId>moco-core</artifactId>-->
-<!--            <version>1.2.0</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.dreamhead</groupId>-->
-<!--            <artifactId>moco-runner</artifactId>-->
-<!--            <version>1.2.0</version>-->
-<!--            <scope>test</scope>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>commons-cli</groupId>-->
-<!--                    <artifactId>commons-cli</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.dreamhead</groupId>
+            <artifactId>moco-core</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dreamhead</groupId>
+            <artifactId>moco-runner</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>org.asynchttpclient</groupId>-->
