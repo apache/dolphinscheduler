@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * TIS parameter
  */
-public class TISParameters extends AbstractParameters {
+public class TISCommonParameters extends AbstractParameters {
 
-    private static final Logger logger = LoggerFactory.getLogger(TISParameters.class);
+    private static final Logger logger = LoggerFactory.getLogger(TISCommonParameters.class);
     /**
      * TIS target job name
      */
