@@ -138,7 +138,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
         }
         // check zookeeper
-        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
+        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
         return RegistryCenterUtils.isNodeExisted(workerGroupPath);
     }
 
@@ -266,7 +266,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
+            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
             List<String> childrenNodes = null;
             try {
                 childrenNodes = RegistryCenterUtils.getChildrenNodes(workerGroupPath);
@@ -280,7 +280,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = RegistryCenterUtils.getNodeData(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = RegistryCenterUtils.getNodeData(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);

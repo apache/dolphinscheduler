@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
-import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
@@ -2215,26 +2214,6 @@ public class ProcessService {
         return result;
     }
 
-    /**
-     * update task definition
-     */
-    public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
-        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode());
-        Date now = new Date();
-        taskDefinition.setProjectCode(projectCode);
-        taskDefinition.setUserId(operator.getId());
-        taskDefinition.setVersion(version == null || version == 0 ? 1 : version + 1);
-        taskDefinition.setUpdateTime(now);
-        setTaskFromTaskNode(taskNode, taskDefinition);
-        int update = taskDefinitionMapper.updateById(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-        taskDefinitionLog.setOperator(operator.getId());
-        taskDefinitionLog.setOperateTime(now);
-        int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
-        return insert & update;
-    }
-
     private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
         taskDefinition.setName(taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
@@ -2421,7 +2400,7 @@ public class ProcessService {
      * @return dag graph
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
         List<TaskNode> taskNodeList = transformTask(processTaskRelations, Lists.newArrayList());
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(processTaskRelations));
         // Generate concrete Dag to be executed
@@ -2432,13 +2411,17 @@ public class ProcessService {
      * generate DagData
      */
     public DagData genDagData(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        return new DagData(processDefinition, processTaskRelations, genTaskDefineList(processTaskRelations));
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<TaskDefinitionLog> taskDefinitionLogList = genTaskDefineList(processTaskRelations);
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream()
+            .map(taskDefinitionLog -> JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLog), TaskDefinition.class))
+            .collect(Collectors.toList());
+        return new DagData(processDefinition, processTaskRelations, taskDefinitions);
     }
 
-    private List<TaskDefinitionLog> genTaskDefineList(List<ProcessTaskRelationLog> processTaskRelations) {
+    public List<TaskDefinitionLog> genTaskDefineList(List<ProcessTaskRelation> processTaskRelations) {
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
-        for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
             }
@@ -2447,67 +2430,6 @@ public class ProcessService {
             }
         }
         return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
-    }
-
-    @Deprecated
-    public List<TaskNode> genTaskNodeList(Long processCode, int processVersion, Map<String, String> locationMap) {
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
-        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
-        Map<Long, TaskNode> taskNodeMap = new HashMap<>();
-        for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
-            if (processTaskRelation.getPreTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
-            }
-            if (processTaskRelation.getPostTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
-            }
-            taskNodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
-                if (v == null) {
-                    v = new TaskNode();
-                    v.setCode(processTaskRelation.getPostTaskCode());
-                    v.setVersion(processTaskRelation.getPostTaskVersion());
-                    List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
-                    if (processTaskRelation.getPreTaskCode() > 0) {
-                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
-                    }
-                    v.setPreTaskNodeList(preTaskNodeList);
-                } else {
-                    List<PreviousTaskNode> preTaskDefinitionList = v.getPreTaskNodeList();
-                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
-                }
-                return v;
-            });
-        }
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
-        Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream().collect(Collectors.toMap(TaskDefinitionLog::getCode, log -> log));
-        taskNodeMap.forEach((k, v) -> {
-            TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
-            v.setId(locationMap.get(taskDefinitionLog.getName()));
-            v.setCode(taskDefinitionLog.getCode());
-            v.setName(taskDefinitionLog.getName());
-            v.setDesc(taskDefinitionLog.getDescription());
-            v.setType(taskDefinitionLog.getTaskType().toUpperCase());
-            v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-            v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
-            v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-            Map<String, Object> taskParamsMap = v.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
-            v.setConditionResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
-            v.setSwitchResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
-            v.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
-            taskParamsMap.remove(Constants.CONDITION_RESULT);
-            taskParamsMap.remove(Constants.DEPENDENCE);
-            v.setParams(JSONUtils.toJsonString(taskParamsMap));
-            v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
-            v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
-            v.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
-            v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
-                taskDefinitionLog.getTimeoutNotifyStrategy(),
-                taskDefinitionLog.getTimeout())));
-            v.setDelayTime(taskDefinitionLog.getDelayTime());
-            v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
-            v.setPreTasks(JSONUtils.toJsonString(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList())));
-        });
-        return new ArrayList<>(taskNodeMap.values());
     }
 
     /**
@@ -2518,21 +2440,10 @@ public class ProcessService {
     }
 
     /**
-     * query tasks definition list by process code and process version
+     * find process task relation list by projectCode and processDefinitionCode
      */
-    public List<TaskDefinitionLog> queryTaskDefinitionListByProcess(long processCode, int processVersion) {
-        List<ProcessTaskRelationLog> processTaskRelationLogs =
-            processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
-        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
-        for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogs) {
-            if (processTaskRelationLog.getPreTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelationLog.getPreTaskCode(), processTaskRelationLog.getPreTaskVersion()));
-            }
-            if (processTaskRelationLog.getPostTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelationLog.getPostTaskCode(), processTaskRelationLog.getPostTaskVersion()));
-            }
-        }
-        return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
+    public List<ProcessTaskRelation> findRelationByCode(long projectCode, long processDefinitionCode) {
+        return processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
     }
 
     /**
@@ -2550,9 +2461,9 @@ public class ProcessService {
     /**
      * Use temporarily before refactoring taskNode
      */
-    public List<TaskNode> transformTask(List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
+    public List<TaskNode> transformTask(List<ProcessTaskRelation> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
         Map<Long, List<Long>> taskCodeMap = new HashMap<>();
-        for (ProcessTaskRelationLog processTaskRelation : taskRelationList) {
+        for (ProcessTaskRelation processTaskRelation : taskRelationList) {
             taskCodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
                 if (v == null) {
                     v = new ArrayList<>();
@@ -2583,12 +2494,14 @@ public class ProcessService {
                 taskNode.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
                 Map<String, Object> taskParamsMap = taskNode.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
                 taskNode.setConditionResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
+                taskNode.setSwitchResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
                 taskNode.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
                 taskParamsMap.remove(Constants.CONDITION_RESULT);
                 taskParamsMap.remove(Constants.DEPENDENCE);
                 taskNode.setParams(JSONUtils.toJsonString(taskParamsMap));
                 taskNode.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
                 taskNode.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+                taskNode.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
                 taskNode.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                     taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));

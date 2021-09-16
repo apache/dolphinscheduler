@@ -524,7 +524,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processInstance.getProcessDefinitionVersion());
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
         List<TaskNode> taskNodeList =
-                processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
+            processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
         forbiddenTaskList.clear();
         taskNodeList.forEach(taskNode -> {
             if (taskNode.isForbidden()) {
