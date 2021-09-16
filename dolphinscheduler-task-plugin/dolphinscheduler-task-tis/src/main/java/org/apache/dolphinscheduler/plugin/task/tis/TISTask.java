@@ -35,16 +35,20 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.asynchttpclient.Dsl;
-import org.asynchttpclient.ws.WebSocket;
-import org.asynchttpclient.ws.WebSocketListener;
-import org.asynchttpclient.ws.WebSocketUpgradeHandler;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+//import org.asynchttpclient.Dsl;
+//import org.asynchttpclient.ws.WebSocket;
+//import org.asynchttpclient.ws.WebSocketListener;
+//import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
  * TIS DataX Task
@@ -90,7 +94,7 @@ public class TISTask extends AbstractTaskExecutor {
             post.setEntity(entity);
             ExecResult execState = null;
             int taskId;
-            WebSocket webSocket = null;
+            WebSocketClient webSocket = null;
             try (CloseableHttpClient client = HttpClients.createDefault();
                  // trigger to start TIS dataX task
                  CloseableHttpResponse response = client.execute(post)) {
@@ -133,7 +137,7 @@ public class TISTask extends AbstractTaskExecutor {
                 if (webSocket != null) {
                     Thread.sleep(4000);
                     try {
-                        webSocket.sendCloseFrame();
+                        webSocket.close();
                     } catch (Throwable e) {
                         logger.warn(e.getMessage(), e);
                     }
@@ -195,45 +199,70 @@ public class TISTask extends AbstractTaskExecutor {
         return tisHost;
     }
 
-    private WebSocket receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws InterruptedException, java.util.concurrent.ExecutionException {
+    private WebSocketClient receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws Exception {
+        final String applyURI = String.format("ws://%s" + WS_REQUEST_PATH + "?logtype=full&collection=%s&taskid=%s", tisHost, dataXName, taskId);
+        logger.info("apply ws connection,uri:{}", applyURI);
+        WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {
+                logger.info("start to receive remote execute log");
+            }
 
-        WebSocketUpgradeHandler.Builder upgradeHandlerBuilder
-                = new WebSocketUpgradeHandler.Builder();
-        WebSocketUpgradeHandler wsHandler = upgradeHandlerBuilder
-                .addWebSocketListener(new WebSocketListener() {
-                    @Override
-                    public void onOpen(WebSocket websocket) {
-                        // WebSocket connection opened
-                    }
+            @Override
+            public void onMessage(String message) {
+                ExecLog execLog = JSONUtils.parseObject(message, ExecLog.class);
+                logger.info(execLog.getMsg());
+            }
 
-                    @Override
-                    public void onClose(WebSocket websocket, int code, String reason) {
-                        // WebSocket connection closed
-                    }
+            @Override
+            public void onClose(int code, String reason, boolean remote) {
+                logger.info("stop to receive remote log,reason:{},taskId:{}", reason, taskId);
+            }
 
-                    @Override
-                    public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-                        ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
-                        logger.info(execLog.getMsg());
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-                        // WebSocket connection error
-                        logger.error(t.getMessage(), t);
-                    }
-                }).build();
-        WebSocket webSocketClient = Dsl.asyncHttpClient()
-                .prepareGet(String.format("ws://%s" + WS_REQUEST_PATH, tisHost))
-                // .addHeader("header_name", "header_value")
-                .addQueryParam("logtype", "full")
-                .addQueryParam("collection", dataXName)
-                .addQueryParam("taskid", String.valueOf(taskId))
-                .setRequestTimeout(5000)
-                .execute(wsHandler)
-                .get();
-
+            @Override
+            public void onError(Exception t) {
+                logger.error(t.getMessage(), t);
+            }
+        };
+        webSocketClient.connect();
         return webSocketClient;
+        //        WebSocketUpgradeHandler.Builder upgradeHandlerBuilder
+        //                = new WebSocketUpgradeHandler.Builder();
+        //        WebSocketUpgradeHandler wsHandler = upgradeHandlerBuilder
+        //                .addWebSocketListener(new WebSocketListener() {
+        //                    @Override
+        //                    public void onOpen(WebSocket websocket) {
+        //                        // WebSocket connection opened
+        //                    }
+        //
+        //                    @Override
+        //                    public void onClose(WebSocket websocket, int code, String reason) {
+        //                        // WebSocket connection closed
+        //                    }
+        //
+        //                    @Override
+        //                    public void onTextFrame(String payload, boolean finalFragment, int rsv) {
+        //                        ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
+        //                        logger.info(execLog.getMsg());
+        //                    }
+        //
+        //                    @Override
+        //                    public void onError(Throwable t) {
+        //                        // WebSocket connection error
+        //                        logger.error(t.getMessage(), t);
+        //                    }
+        //                }).build();
+        //        WebSocket webSocketClient = Dsl.asyncHttpClient()
+        //                .prepareGet(String.format("ws://%s" + WS_REQUEST_PATH, tisHost))
+        //                // .addHeader("header_name", "header_value")
+        //                .addQueryParam("logtype", "full")
+        //                .addQueryParam("collection", dataXName)
+        //                .addQueryParam("taskid", String.valueOf(taskId))
+        //                .setRequestTimeout(5000)
+        //                .execute(wsHandler)
+        //                .get();
+        //
+        //return webSocketClient;
     }
 
     private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
