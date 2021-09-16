@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -462,7 +463,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        int timeout,
                                                        String tenantCode,
                                                        String taskRelationJson,
-                                                       String taskDefinitionJson) {
+                                                       String taskDefinitionJson,Integer executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -512,6 +513,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
+        processDefinition.setExecutionType(ProcessExecutionTypeEnum.of(executionType));
         return updateProcessDefine(loginUser, result, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
     }
 

@@ -164,7 +164,8 @@ public interface ProcessDefinitionService {
                                                 int timeout,
                                                 String tenantCode,
                                                 String taskRelationJson,
-                                                String taskDefinitionJson);
+                                                String taskDefinitionJson,
+                                                Integer executionType);
 
     /**
      * verify process definition name unique
