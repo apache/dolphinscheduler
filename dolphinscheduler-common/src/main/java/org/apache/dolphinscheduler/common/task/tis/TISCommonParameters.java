@@ -36,23 +36,19 @@ public class TISCommonParameters extends AbstractParameters {
     /**
      * TIS target job name
      */
-    private String targetJobName;
+    private String jobName;
 
     public String getTargetJobName() {
-        return targetJobName;
+        return jobName;
     }
 
-    public void setTargetJobName(String targetJobName) {
-        this.targetJobName = targetJobName;
+    public void setTargetJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     @Override
     public boolean checkParameters() {
-        if (StringUtils.isBlank(this.targetJobName)) {
-            logger.error("checkParameters faild targetJobName can not be null");
-            return false;
-        }
-        return true;
+        return StringUtils.isNotBlank(this.jobName);
     }
 
     @Override
