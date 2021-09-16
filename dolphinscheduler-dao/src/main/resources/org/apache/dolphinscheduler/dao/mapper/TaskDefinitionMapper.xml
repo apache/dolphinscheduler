@@ -28,7 +28,7 @@
         <include refid="baseSql"/>
         from t_ds_task_definition
         WHERE project_code = #{projectCode}
-        and `name` = #{name}
+        and name = #{name}
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
