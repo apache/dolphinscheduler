@@ -92,7 +92,7 @@
 
         // edit
         if (this.item) {
-          param.projectId = this.item.id
+          param.projectCode = this.item.code
         }
 
         this.$refs.popover.spinnerLoading = true
