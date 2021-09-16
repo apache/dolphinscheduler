@@ -106,6 +106,9 @@ public class ServerNodeManager implements InitializingBean {
      */
     private RegistryClient registryClient = RegistryClient.getInstance();
 
+    /**
+     * eg : /node/worker/group/127.0.0.1:xxx
+     */
     private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
 
     /**
