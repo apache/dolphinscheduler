@@ -172,7 +172,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "5");
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/download")
+        MvcResult mvcResult = mockMvc.perform(get("/resources/5/download")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
