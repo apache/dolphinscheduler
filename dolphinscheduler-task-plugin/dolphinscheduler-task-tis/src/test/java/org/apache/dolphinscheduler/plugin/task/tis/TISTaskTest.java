@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +68,8 @@ public class TISTaskTest {
         Map<String, String> gloabParams = Collections.singletonMap(TISTask.KEY_POOL_VAR_TIS_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
-        //tisTask = PowerMockito.spy(new TISTask(taskExecutionContext));
-        tisTask = new TISTask(taskExecutionContext);
+        tisTask = PowerMockito.spy(new TISTask(taskExecutionContext));
+        //tisTask = new TISTask(taskExecutionContext);
         tisTask.init();
 
     }

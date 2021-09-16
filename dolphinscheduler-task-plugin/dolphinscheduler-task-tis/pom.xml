@@ -70,6 +70,12 @@
 <!--            <artifactId>async-http-client</artifactId>-->
 <!--            <version>2.12.3</version>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.agent</artifactId>
+            <classifier>runtime</classifier>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.java-websocket</groupId>
