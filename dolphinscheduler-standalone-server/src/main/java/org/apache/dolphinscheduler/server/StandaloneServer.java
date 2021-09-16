@@ -62,6 +62,8 @@ public class StandaloneServer {
 
         startAlertServer();
 
+        setTaskPlugin();
+
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
                 MasterServer.class,
@@ -129,6 +131,17 @@ public class StandaloneServer {
             }
         }
         return path;
+    }
+
+    private static void setTaskPlugin() {
+        final Path taskPluginPath = Paths.get(
+                getCurrentPath(StandaloneServer.class),
+                "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
+        ).toAbsolutePath();
+        if (Files.exists(taskPluginPath)) {
+            System.setProperty("task.plugin.binding", taskPluginPath.toString());
+            System.setProperty("task.plugin.dir", "");
+        }
     }
 
 }

@@ -281,8 +281,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.DATA_IS_NOT_VALID, taskRelationJson);
                 return result;
             }
-
-            List<TaskNode> taskNodeList = processService.transformTask(taskRelationList, taskDefinitionLogs);
+            List<ProcessTaskRelation> processTaskRelations = taskRelationList.stream()
+                .map(processTaskRelationLog -> JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class))
+                .collect(Collectors.toList());
+            List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
             if (taskNodeList.size() != taskRelationList.size()) {
                 Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode).collect(Collectors.toSet());
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
@@ -827,10 +829,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
-        List<TaskDefinitionLog> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
+        List<TaskDefinition> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
         Map<Long, Long> taskCodeMap = new HashMap<>();
         Date now = new Date();
-        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionList) {
+        List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
+        for (TaskDefinition taskDefinition : taskDefinitionList) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
             taskDefinitionLog.setName(taskDefinitionLog.getName() + "_import_" + DateUtils.getCurrentTimeStamp());
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUserId(loginUser.getId());
@@ -848,22 +852,26 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
             }
+            taskDefinitionLogList.add(taskDefinitionLog);
         }
-        int insert = taskDefinitionMapper.batchInsert(taskDefinitionList);
-        int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionList);
+        int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
+        int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             return false;
         }
 
-        List<ProcessTaskRelationLog> taskRelationList = dagDataSchedule.getProcessTaskRelationList();
-        taskRelationList.forEach(processTaskRelationLog -> {
+        List<ProcessTaskRelation> taskRelationList = dagDataSchedule.getProcessTaskRelationList();
+        List<ProcessTaskRelationLog> taskRelationLogList = new ArrayList<>();
+        for (ProcessTaskRelation processTaskRelation : taskRelationList) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
             processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
             processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
-        });
-        Map<String, Object> createProcessResult = createProcessDefine(loginUser, result, taskRelationList, processDefinition, null);
+            taskRelationLogList.add(processTaskRelationLog);
+        }
+        Map<String, Object> createProcessResult = createProcessDefine(loginUser, result, taskRelationLogList, processDefinition, null);
         if (Status.SUCCESS.equals(createProcessResult.get(Constants.STATUS))) {
             putMsg(createProcessResult, Status.SUCCESS);
         } else {
@@ -937,7 +945,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
 
-            List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(processTaskRelationJson, ProcessTaskRelationLog.class);
+            List<ProcessTaskRelation> taskRelationList = JSONUtils.toList(processTaskRelationJson, ProcessTaskRelation.class);
             // Check whether the task node is normal
             List<TaskNode> taskNodes = processService.transformTask(taskRelationList, Lists.newArrayList());
 
@@ -1026,7 +1034,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
-        Map<Long, List<TaskDefinitionLog>> taskNodeMap = new HashMap<>();
+        Map<Long, List<TaskDefinition>> taskNodeMap = new HashMap<>();
         for (ProcessDefinition processDefinition : processDefinitionList) {
             DagData dagData = processService.genDagData(processDefinition);
             taskNodeMap.put(processDefinition.getCode(), dagData.getTaskDefinitionList());
@@ -1087,7 +1095,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // List of process instances
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
         processInstanceList.forEach(processInstance -> processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
-        List<TaskDefinitionLog> taskDefinitionList = processService.queryTaskDefinitionListByProcess(code, processDefinition.getVersion());
+        List<TaskDefinitionLog> taskDefinitionList = processService.genTaskDefineList(processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
             .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
@@ -1098,12 +1106,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         TreeViewDto parentTreeViewDto = new TreeViewDto();
         parentTreeViewDto.setName("DAG");
         parentTreeViewDto.setType("");
+        parentTreeViewDto.setCode(0L);
         // Specify the process definition, because it is a TreeView for a process definition
         for (int i = limit - 1; i >= 0; i--) {
             ProcessInstance processInstance = processInstanceList.get(i);
             Date endTime = processInstance.getEndTime() == null ? new Date() : processInstance.getEndTime();
-            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), "",
-                processInstance.getState().toString(), processInstance.getStartTime(), endTime, processInstance.getHost(),
+            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), processInstance.getProcessDefinitionCode(),
+                "", processInstance.getState().toString(), processInstance.getStartTime(), endTime, processInstance.getHost(),
                 DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
         }
 
@@ -1126,13 +1135,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 treeViewDto.setName(nodeName);
                 TaskNode taskNode = dag.getNode(nodeName);
                 treeViewDto.setType(taskNode.getType());
-
+                treeViewDto.setCode(taskNode.getCode());
                 //set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
                     TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), nodeName);
                     if (taskInstance == null) {
-                        treeViewDto.getInstances().add(new Instance(-1, "not running", "null"));
+                        treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
                         Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
                         Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
@@ -1144,9 +1153,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                             subProcessId = Integer.parseInt(JSONUtils.parseObject(
                                 taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
-                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(),
-                            taskInstance.getState().toString(), taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(),
-                            DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
+                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskCode(),
+                            taskInstance.getTaskType(), taskInstance.getState().toString(), taskInstance.getStartTime(), taskInstance.getEndTime(),
+                            taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
                     }
                 }
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
@@ -1333,9 +1342,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-            .queryByDefinitionCodeAndVersion(code, version);
-
+        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
         if (Objects.isNull(processDefinitionLog)) {
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR, processDefinition.getCode(), version);
             return result;
