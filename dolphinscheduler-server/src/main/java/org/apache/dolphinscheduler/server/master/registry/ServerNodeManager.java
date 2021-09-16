@@ -106,6 +106,8 @@ public class ServerNodeManager implements InitializingBean {
      */
     private RegistryClient registryClient = RegistryClient.getInstance();
 
+    private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
+
     /**
      * worker group mapper
      */
@@ -240,7 +242,7 @@ public class ServerNodeManager implements InitializingBean {
 
         private String parseGroup(String path) {
             String[] parts = path.split("/");
-            if (parts.length < 5) {
+            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
             return parts[parts.length - 2];
@@ -306,8 +308,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * sync master nodes
      *
-     * @param nodes       master nodes
-     * @param masterNodes
+     * @param nodes master nodes
      */
     private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
@@ -332,7 +333,7 @@ public class ServerNodeManager implements InitializingBean {
      * sync worker group nodes
      *
      * @param workerGroup worker group
-     * @param nodes       worker nodes
+     * @param nodes worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes) {
         workerGroupLock.lock();
