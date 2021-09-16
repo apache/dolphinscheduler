@@ -160,7 +160,7 @@ public class ProcessDefinitionControllerTest {
                 locations, timeout, tenantCode, relationJson, taskDefinitionJson,0)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectCode, name, code, description, globalParams,
-                locations, timeout, tenantCode, relationJson, taskDefinitionJson ,0, ReleaseState.OFFLINE);
+                locations, timeout, tenantCode, relationJson, taskDefinitionJson, 0, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
