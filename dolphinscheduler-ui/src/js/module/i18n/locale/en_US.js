@@ -708,6 +708,6 @@ export default {
   'Please select worker groups': 'Please select worker groups',
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty',
-  'Copy from': 'Copy from',
+  'Reference from': 'Reference from',
   'No more...': 'No more...'
 }
