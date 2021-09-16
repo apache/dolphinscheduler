@@ -296,7 +296,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
         Project tempProject = projectMapper.queryByName(projectName);
-        if (tempProject != null) {
+        if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
