@@ -315,7 +315,6 @@ CREATE TABLE t_ds_command
     id                        int(11) NOT NULL AUTO_INCREMENT,
     command_type              tinyint(4) DEFAULT NULL,
     process_definition_id     int(11) DEFAULT NULL,
-    process_definition_code   bigint(20) DEFAULT NULL,
     command_param             text,
     task_depend_type          tinyint(4) DEFAULT NULL,
     failure_strategy          tinyint(4) DEFAULT '0',
@@ -763,7 +762,6 @@ CREATE TABLE t_ds_schedules
 (
     id                        int(11) NOT NULL AUTO_INCREMENT,
     process_definition_id     int(11) NOT NULL,
-    process_definition_code   bigint(20) NOT NULL,
     start_time                datetime     NOT NULL,
     end_time                  datetime     NOT NULL,
     timezone_id               varchar(40) DEFAULT NULL,
