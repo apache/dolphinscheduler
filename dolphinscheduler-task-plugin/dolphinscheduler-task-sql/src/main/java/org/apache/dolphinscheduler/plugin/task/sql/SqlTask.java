@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
@@ -378,23 +379,27 @@ public class SqlTask extends AbstractYarnTask {
      * @return PreparedStatement
      * @throws Exception Exception
      */
-    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
+    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
         // is the timeout set
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
-        if (timeoutFlag) {
-            stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
-        }
-        Map<Integer, Property> params = sqlBinds.getParamsMap();
-        if (params != null) {
-            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                Property prop = entry.getValue();
-                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+        try (PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql())) {
+            if (timeoutFlag) {
+                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
+            Map<Integer, Property> params = sqlBinds.getParamsMap();
+            if (params != null) {
+                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                    Property prop = entry.getValue();
+                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                }
+            }
+            logger.info("prepare statement replace sql : {} ", stmt);
+            return stmt;
+        } catch (Exception exception) {
+            throw new TaskException("SQL task prepareStatementAndBind error", exception);
         }
-        logger.info("prepare statement replace sql : {} ", stmt);
-        return stmt;
+
     }
 
     /**
