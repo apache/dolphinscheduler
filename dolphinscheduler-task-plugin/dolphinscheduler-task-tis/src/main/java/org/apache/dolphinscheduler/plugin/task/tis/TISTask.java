@@ -151,6 +151,9 @@ public class TISTask extends AbstractTaskExecutor {
         } catch (Exception e) {
             logger.error("execute TIS dataX faild,TIS task name:" + targetJobName, e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
