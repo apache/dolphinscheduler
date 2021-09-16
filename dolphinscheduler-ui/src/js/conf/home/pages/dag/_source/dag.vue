@@ -16,8 +16,13 @@
  */
 <template>
   <div :class="['dag-chart', fullScreen ? 'full-screen' : '']">
-    <dag-toolbar />
-    <dag-canvas ref="canvas" />
+    <dag-toolbar :source="source" />
+    <template v-if="source === 'process'">
+      <dag-canvas ref="canvas" />
+    </template>
+    <template v-else>
+      <task-table ref="canvas" />
+    </template>
     <el-drawer
       :visible.sync="taskDrawer"
       size=""
@@ -71,6 +76,7 @@
   import { debounce } from 'lodash'
   import dagToolbar from './canvas/toolbar.vue'
   import dagCanvas from './canvas/canvas.vue'
+  import taskTable from './canvas/taskTable.vue'
   import mFormModel from '../_source/formModel/formModel.vue'
   import { mapActions, mapState, mapMutations } from 'vuex'
   import mUdp from '../_source/udp/udp.vue'
@@ -94,7 +100,8 @@
       mUdp,
       mStart,
       edgeEditModel,
-      mVersions
+      mVersions,
+      taskTable
     },
     provide () {
       return {
@@ -104,7 +111,11 @@
     inject: ['definitionDetails'],
     props: {
       type: String,
-      releaseState: String
+      releaseState: String,
+      source: {
+        default: 'process',
+        type: String
+      }
     },
     data () {
       return {
@@ -180,6 +191,7 @@
     },
     methods: {
       ...mapActions('dag', [
+        'saveTask',
         'saveDAGchart',
         'updateInstance',
         'updateDefinition',
@@ -253,11 +265,30 @@
        * Save dialog
        */
       toggleSaveDialog (value) {
-        this.saveDialog = value
-        if (value) {
-          this.$nextTick(() => {
-            this.$refs.mUdp.reloadParam()
+        if (this.source === 'task') {
+          // create task instance
+          const tasks = this.tasks.map(item => {
+            const task = {
+              ...item
+            }
+            delete task.code
+            return task
           })
+          this.saveTask({
+            projectCode: this.projectCode,
+            taskDefinitionJson: JSON.stringify(tasks)
+          }).then(() => {
+            this.$router.push({ name: 'task-instance' })
+          }).catch(() => {
+            this.$message.warning(`${$t('Failed')}`)
+          })
+        } else {
+          this.saveDialog = value
+          if (value) {
+            this.$nextTick(() => {
+              this.$refs.mUdp.reloadParam()
+            })
+          }
         }
       },
       onSave (sourceType) {

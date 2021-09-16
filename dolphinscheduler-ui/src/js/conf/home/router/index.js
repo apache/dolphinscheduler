@@ -206,7 +206,15 @@ const router = new Router({
             title: `${i18n.$t('Task Instance')}`,
             refreshInSwitchedTab: config.refreshInSwitchedTab
           }
-
+        },
+        {
+          path: '/projects/:projectCode/task-instance/create',
+          name: 'task-create',
+          component: resolve => require(['../pages/projects/pages/_source/createTask/createTask.vue'], resolve),
+          meta: {
+            title: `${i18n.$t('Create task')}`,
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
         },
         {
           path: '/projects/:projectCode/task-record',

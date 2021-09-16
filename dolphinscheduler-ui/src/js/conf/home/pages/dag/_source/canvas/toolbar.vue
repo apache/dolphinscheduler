@@ -16,7 +16,7 @@
  */
 <template>
   <div class="dag-toolbar">
-    <h3>{{ dagChart.name || $t("Create process") }}</h3>
+    <h3>{{ source === 'task' ? $t("Create task") : dagChart.name || $t("Create process") }}</h3>
     <el-tooltip
       v-if="dagChart.name"
       class="toolbar-operation"
@@ -51,57 +51,60 @@
       </el-tooltip>
     </div>
     <div class="toolbar-right">
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Delete selected lines or nodes')"
-        placement="bottom"
-      >
-        <i class="el-icon-delete" @click="removeCells"></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Download')"
-        placement="bottom"
-      >
-        <i class="el-icon-download" @click="downloadPNG"></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Full Screen')"
-        placement="bottom"
-      >
-        <i
-          :class="[
-            'custom-ico',
-            dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
-          ]"
-          @click="toggleFullScreen"
-        ></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Refresh DAG status')"
-        placement="bottom"
-        v-if="dagChart.type === 'instance'"
-      >
-        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation last"
-        :content="$t('Format DAG')"
-        placement="bottom"
-      >
-        <i class="custom-ico graph-format" @click="chartFormat"></i>
-      </el-tooltip>
-      <el-button
-        class="toolbar-el-btn"
-        type="primary"
-        size="mini"
-        v-if="dagChart.type === 'definition'"
-        @click="showVersions"
-        icon="el-icon-info"
-        >{{$t('Version Info')}}</el-button
-      >
+      <template v-if="source !== 'task'">
+        <el-tooltip
+          class="toolbar-operation"
+          :content="$t('Delete selected lines or nodes')"
+          placement="bottom"
+        >
+          <i class="el-icon-delete" @click="removeCells"></i>
+        </el-tooltip>
+        <el-tooltip
+          class="toolbar-operation"
+          :content="$t('Download')"
+          placement="bottom"
+        >
+          <i class="el-icon-download" @click="downloadPNG"></i>
+        </el-tooltip>
+        <el-tooltip
+          class="toolbar-operation"
+          :content="$t('Full Screen')"
+          placement="bottom"
+        >
+          <i
+            :class="[
+              'custom-ico',
+              dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
+            ]"
+            @click="toggleFullScreen"
+          ></i>
+        </el-tooltip>
+        <el-tooltip
+          class="toolbar-operation"
+          :content="$t('Refresh DAG status')"
+          placement="bottom"
+          v-if="dagChart.type === 'instance'"
+        >
+          <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
+        </el-tooltip>
+        <el-tooltip
+          class="toolbar-operation last"
+          :content="$t('Format DAG')"
+          placement="bottom"
+        >
+          <i class="custom-ico graph-format" @click="chartFormat"></i>
+        </el-tooltip>
+        <el-button
+          class="toolbar-el-btn"
+          type="primary"
+          size="mini"
+          v-if="dagChart.type === 'definition'"
+          @click="showVersions"
+          icon="el-icon-info"
+          >{{$t('Version Info')}}</el-button
+        >
+      </template>
+
       <el-button
         class="toolbar-el-btn"
         type="primary"
@@ -109,16 +112,18 @@
         @click="saveProcess"
         >{{ $t("Save") }}</el-button
       >
-      <el-button
-        class="toolbar-el-btn"
-        v-if="$route.query.subProcessCodes"
-        type="primary"
-        size="mini"
-        icon="el-icon-back"
-        @click="dagChart.returnToPrevProcess"
-      >
-        {{ $t("Return_1") }}
-      </el-button>
+      <template v-if="source !== 'task'">
+        <el-button
+          class="toolbar-el-btn"
+          v-if="$route.query.subProcessCodes"
+          type="primary"
+          size="mini"
+          icon="el-icon-back"
+          @click="dagChart.returnToPrevProcess"
+        >
+          {{ $t("Return_1") }}
+        </el-button>
+      </template>
       <el-button
         class="toolbar-el-btn"
         type="primary"
@@ -139,6 +144,12 @@
   export default {
     name: 'dag-toolbar',
     inject: ['dagChart'],
+    props: {
+      source: {
+        default: 'process',
+        type: String
+      }
+    },
     data () {
       return {
         canvasRef: null
@@ -200,6 +211,10 @@
       },
       returnToListPage () {
         let $name = this.$route.name
+        if (this.source === 'task') {
+          this.$router.push({ name: 'task-instance' })
+          return
+        }
         if ($name && $name.indexOf('definition') !== -1) {
           this.$router.push({ name: 'projects-definition-list' })
         } else {

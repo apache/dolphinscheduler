@@ -276,7 +276,7 @@
           :nodeData="nodeData"
         ></m-switch>
         <!-- Pre-tasks in workflow -->
-        <m-pre-tasks ref="preTasks" v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1" :code="code"/>
+        <m-pre-tasks ref="preTasks" v-if="modelType !== 'edit' && ['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1" :code="code"/>
       </div>
     </div>
     <div class="bottom-box">
@@ -393,7 +393,11 @@
     directives: { clickoutside },
     mixins: [disabledState],
     props: {
-      nodeData: Object
+      nodeData: Object,
+      modelType: {
+        default: 'create',
+        type: String
+      }
     },
     inject: ['dagChart'],
     methods: {
@@ -675,6 +679,13 @@
         })
       }
       this.code = this.nodeData.id
+      if (this.modelType === 'edit') {
+        o = {
+          ...this.nodeData
+        }
+        this.nodeData.taskParams && (o.params = this.nodeData.taskParams)
+        this.backfillItem = o
+      }
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.code = o.code

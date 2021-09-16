@@ -55,7 +55,6 @@
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
-
   export default {
     name: 'task-instance-list-index',
     data () {
@@ -69,20 +68,20 @@
           // page index
           pageNo: 1,
           // Query name
-          searchVal: '',
+          searchVal: ''
           // Process instance id
-          processInstanceId: '',
+          // processInstanceId: '',
           // host
-          host: '',
+          // host: '',
           // state
-          stateType: '',
+          // stateType: '',
           // start date
-          startDate: '',
+          // startDate: '',
           // end date
-          endDate: '',
+          // endDate: '',
           // Exectuor Name
-          executorName: '',
-          processInstanceName: ''
+          // executorName: '',
+          // processInstanceName: ''
         },
         isLeft: true
       }
@@ -90,7 +89,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('dag', ['getTaskInstanceList']),
+      ...mapActions('dag', ['getTaskDefinitionList']),
       /**
        * click query
        */
@@ -117,7 +116,7 @@
           this.$router.push({ path: `/projects/${this.projectId}/index` })
           return false
         }
-        this.getTaskInstanceList(this.searchParams).then(res => {
+        this.getTaskDefinitionList(this.searchParams).then(res => {
           this.taskInstanceList = []
           this.taskInstanceList = res.totalList
           this.total = res.total
@@ -168,6 +167,11 @@
     },
     computed: {
       ...mapState('dag', ['projectId'])
+    },
+    provide () {
+      return {
+        taskInstance: this
+      }
     },
     beforeDestroy () {
       // Destruction wheel

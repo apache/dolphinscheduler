@@ -15,12 +15,16 @@
  * limitations under the License.
  */
 <template>
+
   <m-conditions>
+    <template slot="button-group">
+      <el-button size="mini"  @click="() => this.$router.push({name: 'task-create'})">{{$t('Create task')}}</el-button>
+    </template>
     <template slot="search-group">
       <div class="list">
         <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
       </div>
-      <div class="list">
+      <!-- <div class="list">
         <el-date-picker
           style="width: 310px"
           v-model="dataTime"
@@ -32,8 +36,8 @@
           :end-placeholder="$t('endDate')"
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
-      </div>
-      <div class="list">
+      </div> -->
+      <!-- <div class="list">
         <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.stateType" :placeholder="$t('State')" size="mini">
           <el-option
                   v-for="city in stateTypeList"
@@ -42,15 +46,15 @@
                   :label="city.label">
           </el-option>
         </el-select>
-      </div>
-      <div class="list">
+      </div> -->
+      <!-- <div class="list">
         <el-input v-model="searchParams.host" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('host')"></el-input>
+      </div> -->
+      <div class="list">
+        <el-input v-model="searchParams.taskType" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Node Type')"></el-input>
       </div>
       <div class="list">
-        <el-input v-model="searchParams.executorName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Executor')"></el-input>
-      </div>
-      <div class="list">
-        <el-input v-model="searchParams.processInstanceName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
+        <el-input v-model="searchParams.userId" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('User')"></el-input>
       </div>
       <div class="list">
         <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Name')"></el-input>
@@ -70,20 +74,28 @@
         stateTypeList: stateType,
         searchParams: {
           // state
-          stateType: '',
+          // stateType: '',
           // start date
-          startDate: '',
+          // startDate: '',
           // end date
-          endDate: '',
+          // endDate: '',
           // search value
           searchVal: '',
           // host
-          host: '',
+          // host: '',
           // executor name
-          executorName: '',
-          processInstanceName: ''
+          // executorName: '',
+          // processInstanceName: '',
+          userId: '',
+          taskType: '',
+          projectCode: ''
         },
         dataTime: []
+      }
+    },
+    provide () {
+      return {
+        taskInstance: this
       }
     },
     props: {},

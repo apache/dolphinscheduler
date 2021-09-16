@@ -829,5 +829,52 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * query task instance
+   */
+  getTaskDefinitionList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * create task instance
+   */
+  saveTask ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      const { projectCode, taskDefinitionJson } = payload
+      io.post(`projects/${state.projectCode}/task-definition?projectCode=${projectCode}&taskDefinitionJson=${taskDefinitionJson}`, payload, res => {
+        resolve(res.data)
+      }, () => {
+        // do nothing
+      }, {
+        emulateJSON: false
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update task instance
+   */
+  updateTask ({ state }, payload) {
+    const { code, projectCode, taskDefinitionJsonObj } = payload
+    return new Promise((resolve, reject) => {
+      io.put(`projects/${state.projectCode}/task-definition/${code}?code=${code}&projectCode=${projectCode}&taskDefinitionJsonObj=${taskDefinitionJsonObj}`, payload, res => {
+        resolve(res.data)
+      }, () => {
+        // do nothing
+      }, {
+        emulateJSON: false
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }
