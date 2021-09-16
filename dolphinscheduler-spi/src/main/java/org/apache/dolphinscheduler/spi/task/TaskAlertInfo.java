@@ -15,42 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.common;
+package org.apache.dolphinscheduler.spi.task;
 
-/**
- * UDF type
- */
-public enum UdfType {
-    /**
-     * 0 hive; 1 spark
-     */
-  HIVE(0, "hive"),
-  SPARK(1, "spark");
+public class TaskAlertInfo {
 
-    UdfType(int code, String descp){
-        this.code = code;
-        this.descp = descp;
+    private String title;
+
+    private String content;
+
+    private Integer alertGroupId;
+
+    public String getTitle() {
+        return title;
     }
 
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getDescp() {
-        return descp;
+    public String getContent() {
+        return content;
     }
 
-    public static UdfType of(int type){
-        for(UdfType ut : values()){
-            if(ut.getCode() == type){
-                return ut;
-            }
-        }
-        throw new IllegalArgumentException("invalid type : " + type);
+    public void setContent(String content) {
+        this.content = content;
     }
 
+    public Integer getAlertGroupId() {
+        return alertGroupId;
+    }
 
+    public void setAlertGroupId(Integer alertGroupId) {
+        this.alertGroupId = alertGroupId;
+    }
 }

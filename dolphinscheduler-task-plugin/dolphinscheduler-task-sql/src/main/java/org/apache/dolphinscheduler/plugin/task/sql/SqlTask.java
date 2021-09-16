@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
-import org.apache.dolphinscheduler.plugin.task.common.UdfFunc;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
@@ -28,10 +27,13 @@ import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
+import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -62,7 +64,7 @@ public class SqlTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private SqlTaskRequest taskExecutionContext;
+    private TaskRequest taskExecutionContext;
 
     /**
      * sql parameters
@@ -84,7 +86,7 @@ public class SqlTask extends AbstractYarnTask {
      *
      * @param taskRequest taskRequest
      */
-    public SqlTask(SqlTaskRequest taskRequest) {
+    public SqlTask(TaskRequest taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
@@ -128,7 +130,7 @@ public class SqlTask extends AbstractYarnTask {
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
-            SqlTaskRequest sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
+            SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
 
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
@@ -214,15 +216,13 @@ public class SqlTask extends AbstractYarnTask {
         }
     }
 
-
-
-    public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
+    private String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
         String result = null;
-        for (Property info :properties) {
+        for (Property info : properties) {
             if (Direct.OUT == info.getDirect()) {
-                List<Map<String,String>> updateRL = new ArrayList<>();
-                Map<String,String> updateRM = new HashMap<>();
-                updateRM.put(info.getProp(),updateResult);
+                List<Map<String, String>> updateRL = new ArrayList<>();
+                Map<String, String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
                 break;
@@ -270,6 +270,20 @@ public class SqlTask extends AbstractYarnTask {
         }
         logger.debug("execute sql result : {}", result);
         return result;
+    }
+
+    /**
+     * send alert as an attachment
+     *
+     * @param title title
+     * @param content content
+     */
+    private void sendAttachment(int groupId, String title, String content) {
+        setNeedAlert(Boolean.TRUE);
+        TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
+        taskAlertInfo.setAlertGroupId(groupId);
+        taskAlertInfo.setContent(content);
+        taskAlertInfo.setTitle(title);
     }
 
     /**
@@ -403,8 +417,7 @@ public class SqlTask extends AbstractYarnTask {
             if (prop == null) {
                 logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
                         + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskExecutionContext.getTaskInstanceId());
-            }
-            else {
+            } else {
                 sqlParamsMap.put(index, prop);
                 index++;
                 logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
@@ -427,8 +440,7 @@ public class SqlTask extends AbstractYarnTask {
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
         if (sqlParamsMap == null) {
             logger.info("printReplacedSql: sqlParamsMap is null.");
-        }
-        else {
+        } else {
             for (int i = 1; i <= sqlParamsMap.size(); i++) {
                 logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
             }
@@ -446,7 +458,7 @@ public class SqlTask extends AbstractYarnTask {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -479,8 +491,7 @@ public class SqlTask extends AbstractYarnTask {
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
-
-    public String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
+    private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
         Pattern pattern = Pattern.compile(rgex);
         while (true) {
             Matcher m = pattern.matcher(content);
@@ -501,7 +512,7 @@ public class SqlTask extends AbstractYarnTask {
      * @param logger logger
      * @return create function list
      */
-    public static List<String> createFuncs(Map<UdfFunc, String> udfFuncTenantCodeMap, Logger logger) {
+    public static List<String> createFuncs(Map<UdfFuncRequest, String> udfFuncTenantCodeMap, Logger logger) {
 
         if (MapUtils.isEmpty(udfFuncTenantCodeMap)) {
             logger.info("can't find udf function resource");
@@ -518,16 +529,15 @@ public class SqlTask extends AbstractYarnTask {
      * build temp function sql
      *
      * @param sqls sql list
-     * @param udfFuncs udf function list
+     * @param udfFuncRequests udf function list
      */
-    private static void buildTempFuncSql(List<String> sqls, List<UdfFunc> udfFuncs) {
-        if (CollectionUtils.isNotEmpty(udfFuncs)) {
-            for (UdfFunc udfFunc : udfFuncs) {
+    private static void buildTempFuncSql(List<String> sqls, List<UdfFuncRequest> udfFuncRequests) {
+        if (CollectionUtils.isNotEmpty(udfFuncRequests)) {
+            for (UdfFuncRequest udfFuncRequest : udfFuncRequests) {
                 sqls.add(MessageFormat
-                        .format(CREATE_FUNCTION_FORMAT, udfFunc.getFuncName(), udfFunc.getClassName()));
+                        .format(CREATE_FUNCTION_FORMAT, udfFuncRequest.getFuncName(), udfFuncRequest.getClassName()));
             }
         }
     }
-
 
 }

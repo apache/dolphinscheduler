@@ -39,7 +39,7 @@ public abstract class AbstractParameters implements IParameters {
     /**
      * local parameters
      */
-    private  List<Property> localParams;
+    protected   List<Property> localParams;
 
     /**
      * var pool

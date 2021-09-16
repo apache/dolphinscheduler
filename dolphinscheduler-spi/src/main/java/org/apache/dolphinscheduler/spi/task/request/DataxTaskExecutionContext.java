@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.entity;
+package org.apache.dolphinscheduler.spi.task.request;
 
 import java.io.Serializable;
 
 /**
  *  master/worker task transport
  */
-public class SqoopTaskExecutionContext implements Serializable{
+public class DataxTaskExecutionContext implements Serializable{
 
     /**
      * dataSourceId
@@ -104,7 +104,7 @@ public class SqoopTaskExecutionContext implements Serializable{
 
     @Override
     public String toString() {
-        return "SqoopTaskExecutionContext{" +
+        return "DataxTaskExecutionContext{" +
                 "dataSourceId=" + dataSourceId +
                 ", sourcetype=" + sourcetype +
                 ", sourceConnectionParams='" + sourceConnectionParams + '\'' +

@@ -2,7 +2,6 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class SqlTaskChannel implements TaskChannel {
@@ -13,11 +12,7 @@ public class SqlTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskRequest taskRequest) {
-        return new SqlTask((SqlTaskRequest)taskRequest);
+        return new SqlTask(taskRequest);
     }
 
-    @Override
-    public Class getTaskContext() {
-        return SqlTaskRequest.class;
-    }
 }

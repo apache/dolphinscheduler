@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.common;
+package org.apache.dolphinscheduler.spi.task.request;
 
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.KeyDeserializer;
 /**
  * udf function
  */
-public class UdfFunc {
+public class UdfFuncRequest {
     /**
      * id
      */
@@ -198,12 +198,12 @@ public class UdfFunc {
             return false;
         }
 
-        UdfFunc udfFunc = (UdfFunc) o;
+        UdfFuncRequest udfFuncRequest = (UdfFuncRequest) o;
 
-        if (id != udfFunc.id) {
+        if (id != udfFuncRequest.id) {
             return false;
         }
-        return !(funcName != null ? !funcName.equals(udfFunc.funcName) : udfFunc.funcName != null);
+        return !(funcName != null ? !funcName.equals(udfFuncRequest.funcName) : udfFuncRequest.funcName != null);
 
     }
 
@@ -226,7 +226,7 @@ public class UdfFunc {
             if (StringUtils.isBlank(key)) {
                 return null;
             }
-            return JSONUtils.parseObject(key, UdfFunc.class);
+            return JSONUtils.parseObject(key, UdfFuncRequest.class);
         }
     }
 }
