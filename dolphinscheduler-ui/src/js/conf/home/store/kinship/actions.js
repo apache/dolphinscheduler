@@ -19,6 +19,31 @@ import _ from 'lodash'
 import io from '@/module/io'
 import localStore from '@/module/util/localStorage'
 
+/**
+ * build locations by workFlowList
+ */
+const buildLocations = (workFlowList) => {
+  return _.uniqBy(workFlowList, 'workFlowCode').map((item) => ({
+    code: `${item.workFlowCode}`,
+    name: item.workFlowName,
+    workFlowPublishStatus: item.workFlowPublishStatus,
+    scheduleStartTime: item.scheduleStartTime,
+    scheduleEndTime: item.scheduleEndTime,
+    crontab: item.crontab,
+    schedulePublishStatus: item.schedulePublishStatus
+  }))
+}
+
+/**
+ * build connects by workFlowRelationList
+ */
+const buildConnects = (workFlowRelationList) => {
+  return _.map(workFlowRelationList, (item) => ({
+    source: `${item.sourceWorkFlowCode}`, // should be string, or connects will not show by echarts
+    target: `${item.targetWorkFlowCode}` // should be string, or connects will not show by echarts
+  }))
+}
+
 export default {
   /**
    * Get workFlow DAG
@@ -49,35 +74,49 @@ export default {
   /**
    * Get workFlow DAG
    */
-  getWorkFlowDAG ({ state }, payload) {
+  getWorkFlowDAG ({ state }, code) {
     const projectCode = localStore.getItem('projectCode')
     return new Promise((resolve, reject) => {
-      const url = `projects/${projectCode}/lineages/list`
-      io.get(url, { code: payload }, res => {
+      const url = `projects/${projectCode}/lineages/${code}`
+      io.get(url, res => {
         let locations = []
         let connects = []
         if (res.data.workFlowList) {
-          locations = _.uniqBy(res.data.workFlowList, 'workFlowCode').map((item) => ({
-            code: `${item.workFlowCode}`,
-            name: item.workFlowName,
-            workFlowPublishStatus: item.workFlowPublishStatus,
-            scheduleStartTime: item.scheduleStartTime,
-            scheduleEndTime: item.scheduleEndTime,
-            crontab: item.crontab,
-            schedulePublishStatus: item.schedulePublishStatus
-          }))
+          locations = buildLocations(res.data.workFlowList)
         }
         if (res.data.workFlowRelationList) {
-          connects = _.map(res.data.workFlowRelationList, (item) => ({
-            source: `${item.sourceWorkFlowCode}`, // should be string, or connects will not show by echarts
-            target: `${item.targetWorkFlowCode}` // should be string, or connects will not show by echarts
-          }))
+          connects = buildConnects(res.data.workFlowRelationList)
         }
-        state.sourceWorkFlowCode = payload || ''
+        state.sourceWorkFlowCode = code || ''
         // locations
         state.locations = locations /* JSON.parse(locations) */
         // connects
         state.connects = connects /* JSON.parse(connects) */
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * Get all workFlow DAG
+   */
+  getWorkFlowDAGAll ({ state }, payload) {
+    const projectCode = localStore.getItem('projectCode')
+    return new Promise((resolve, reject) => {
+      const url = `projects/${projectCode}/lineages/list`
+      io.get(url, res => {
+        let locations = []
+        let connects = []
+        if (res.data.workFlowList) {
+          locations = buildLocations(res.data.workFlowList)
+        }
+        if (res.data.workFlowRelationList) {
+          connects = buildConnects(res.data.workFlowRelationList)
+        }
+        state.sourceWorkFlowCode = ''
+        state.locations = locations
+        state.connects = connects
         resolve(res.data)
       }).catch(res => {
         reject(res)

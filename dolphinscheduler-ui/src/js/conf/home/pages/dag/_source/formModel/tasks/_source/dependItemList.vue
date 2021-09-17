@@ -17,7 +17,7 @@
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index'>
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="v => _onChangeProjectId(v, $index)" size="small">
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectCode" @change="v => _onChangeProjectCode(v, $index)" size="small">
         <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
       <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionCode" @change="v => _onChangeDefinitionCode(v, $index)" size="small">
@@ -84,8 +84,8 @@
         this.isLoading = true
 
         // add task list
-        let projectId = this.projectList[0].value
-        this._getProcessByProjectCode().then(definitionList => {
+        let projectCode = this.projectList[0].value
+        this._getProcessByProjectCode(projectCode).then(definitionList => {
           // dependItemList index
           let is = (value) => _.some(this.dependItemList, { definitionCode: value })
           let noArr = _.filter(definitionList, v => !is(v.value))
@@ -93,7 +93,7 @@
           let val = value || definitionList[0].value
           this._getDependItemList(val).then(depTasksList => {
             this.$nextTick(() => {
-              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, definitionList, depTasksList, projectId)))
+              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, definitionList, depTasksList, projectCode)))
             })
           })
         })
@@ -117,16 +117,16 @@
         return new Promise((resolve, reject) => {
           this.projectList = _.map(_.cloneDeep(this.store.state.dag.projectListS), v => {
             return {
-              value: v.id,
+              value: v.code,
               label: v.name
             }
           })
           resolve()
         })
       },
-      _getProcessByProjectCode () {
+      _getProcessByProjectCode (code) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getProcessByProjectCode').then(res => {
+          this.store.dispatch('dag/getProcessByProjectCode', code).then(res => {
             let definitionList = _.map(_.cloneDeep(res), v => {
               return {
                 value: v.processDefinition.code,
@@ -156,8 +156,8 @@
       /**
        * change process get dependItemList
        */
-      _onChangeProjectId (value, itemIndex) {
-        this._getProcessByProjectCode().then(definitionList => {
+      _onChangeProjectCode (value, itemIndex) {
+        this._getProcessByProjectCode(value).then(definitionList => {
           /* this.$set(this.dependItemList, itemIndex, this._dlOldParams(value, definitionList, item)) */
           let definitionCode = definitionList[0].value
           this._getDependItemList(definitionCode).then(depTasksList => {
@@ -184,9 +184,9 @@
         this.$set(this.dependItemList[itemIndex], 'dateValue', list[0].value)
         this.$set(this.dependItemList[itemIndex], 'dateValueList', list)
       },
-      _rtNewParams (value, definitionList, depTasksList, projectId) {
+      _rtNewParams (value, definitionList, depTasksList, projectCode) {
         return {
-          projectId: projectId,
+          projectCode: projectCode,
           definitionCode: value,
           // dependItem need private definitionList
           definitionList: definitionList,
@@ -200,7 +200,7 @@
       },
       _rtOldParams (value, definitionList, depTasksList, item) {
         return {
-          projectId: item.projectId,
+          projectCode: item.projectCode,
           definitionCode: value,
           // dependItem need private definitionList
           definitionList: definitionList,
@@ -215,7 +215,7 @@
 
       _cpOldParams (value, definitionCode, definitionList, depTasksList, item) {
         return {
-          projectId: value,
+          projectCode: value,
           definitionList: definitionList,
           definitionCode: definitionCode,
           depTasks: item.depTasks || 'ALL',
@@ -244,11 +244,11 @@
       this._getProjectList().then(() => {
         if (!this.dependItemList.length) {
           if (!this.projectList.length) return
-          let projectId = this.projectList[0].value
-          this._getProcessByProjectCode().then(definitionList => {
+          let projectCode = this.projectList[0].value
+          this._getProcessByProjectCode(projectCode).then(definitionList => {
             let value = definitionList[0].value
             this._getDependItemList(value).then(depTasksList => {
-              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(value, definitionList, depTasksList, projectId)))
+              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(value, definitionList, depTasksList, projectCode)))
             })
           })
         } else {
@@ -257,7 +257,7 @@
           // get item list
           this._getDependItemList(codes, false).then(res => {
             _.map(this.dependItemList, (v, i) => {
-              this._getProcessByProjectCode().then(definitionList => {
+              this._getProcessByProjectCode(v.projectCode).then(definitionList => {
                 this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, definitionList, ['ALL'].concat(_.map(res[v.definitionCode] || [], v => v.name)), v))
               })
             })

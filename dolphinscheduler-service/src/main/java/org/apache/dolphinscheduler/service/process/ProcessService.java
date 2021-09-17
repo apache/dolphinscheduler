@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
-import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
@@ -2102,33 +2101,22 @@ public class ProcessService {
     /**
      * switch process definition version to process definition log version
      */
-    public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog, Boolean isFromProcessDefine) {
+    public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
             return Constants.DEFINITION_FAILURE;
         }
-
         processDefinitionLog.setId(processDefinition.getId());
-        processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
+        processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionLog.setFlag(Flag.YES);
 
-        int result;
-        if (0 == processDefinition.getId()) {
-            result = processDefineMapper.insert(processDefinitionLog);
-        } else {
-            result = processDefineMapper.updateById(processDefinitionLog);
+        int result = processDefineMapper.updateById(processDefinitionLog);
+        if (result > 0) {
+            result = switchProcessTaskRelationVersion(processDefinition);
+            if (result <= 0) {
+                return Constants.DEFINITION_FAILURE;
+            }
         }
         return result;
-    }
-
-    /**
-     * switch process definition version to process definition log version
-     */
-    public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
-        int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog, true);
-        if (switchResult != Constants.DEFINITION_FAILURE) {
-            switchResult = switchProcessTaskRelationVersion(processDefinition);
-        }
-        return switchResult;
     }
 
     public int switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
@@ -2136,30 +2124,8 @@ public class ProcessService {
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
-        int result = 0;
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
-            result += processTaskRelationMapper.insert(processTaskRelationLog);
-        }
-        return result;
-    }
-
-    private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
-        taskDefinition.setName(taskNode.getName());
-        taskDefinition.setDescription(taskNode.getDesc());
-        taskDefinition.setTaskType(taskNode.getType().toUpperCase());
-        taskDefinition.setTaskParams(taskNode.getTaskParams());
-        taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
-        taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
-        taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
-        taskDefinition.setEnvironmentCode(Objects.isNull(taskNode.getEnvironmentCode()) ? -1 : taskNode.getEnvironmentCode());
-        taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
-        taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
-        taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
-        taskDefinition.setTimeoutNotifyStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
-        taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
-        taskDefinition.setDelayTime(taskNode.getDelayTime());
-        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
+        return processTaskRelationMapper.batchInsert(processTaskRelationLogList);
     }
 
     /**
