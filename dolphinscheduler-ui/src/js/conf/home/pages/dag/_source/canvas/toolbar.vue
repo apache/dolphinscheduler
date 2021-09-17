@@ -56,6 +56,7 @@
           class="toolbar-operation"
           :content="$t('Delete selected lines or nodes')"
           placement="bottom"
+          v-if="!isDetails"
         >
           <i class="el-icon-delete" @click="removeCells"></i>
         </el-tooltip>
@@ -104,7 +105,6 @@
           >{{$t('Version Info')}}</el-button
         >
       </template>
-
       <el-button
         class="toolbar-el-btn"
         type="primary"
@@ -115,7 +115,7 @@
       <template v-if="source !== 'task'">
         <el-button
           class="toolbar-el-btn"
-          v-if="$route.query.subProcessCodes"
+          v-if="$route.query.subs"
           type="primary"
           size="mini"
           icon="el-icon-back"
@@ -140,6 +140,7 @@
 
 <script>
   import { findComponentDownward } from '@/module/util/'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'dag-toolbar',
@@ -154,6 +155,11 @@
       return {
         canvasRef: null
       }
+    },
+    computed: {
+      ...mapState('dag', [
+        'isDetails'
+      ])
     },
     methods: {
       getDagCanvasRef () {

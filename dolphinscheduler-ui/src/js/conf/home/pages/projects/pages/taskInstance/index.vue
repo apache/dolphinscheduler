@@ -89,7 +89,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('dag', ['getTaskDefinitionList']),
+      ...mapActions('dag', ['getTaskDefinitions']),
       /**
        * click query
        */
@@ -116,7 +116,7 @@
           this.$router.push({ path: `/projects/${this.projectId}/index` })
           return false
         }
-        this.getTaskDefinitionList(this.searchParams).then(res => {
+        this.getTaskDefinitions(this.searchParams).then(res => {
           this.taskInstanceList = []
           this.taskInstanceList = res.totalList
           this.total = res.total

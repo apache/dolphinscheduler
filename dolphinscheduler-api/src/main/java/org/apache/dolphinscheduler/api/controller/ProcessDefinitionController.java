@@ -43,9 +43,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -532,7 +533,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "getTaskListByDefinitionCodes", notes = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
+        @ApiImplicitParam(name = "codes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
     })
     @GetMapping(value = "/batch-query-tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -588,7 +589,7 @@ public class ProcessDefinitionController extends BaseController {
                                                       @RequestParam("codes") String codes) {
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedCodeList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(codes)) {
+        if (!StringUtils.isEmpty(codes)) {
             String[] processDefinitionCodeArray = codes.split(",");
             for (String strProcessDefinitionCode : processDefinitionCodeArray) {
                 long code = Long.parseLong(strProcessDefinitionCode);

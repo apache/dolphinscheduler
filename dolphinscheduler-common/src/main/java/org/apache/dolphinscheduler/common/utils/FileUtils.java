@@ -22,8 +22,8 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,13 +32,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -68,7 +64,7 @@ public class FileUtils {
     public static String suffix(String filename) {
 
         String fileSuffix = "";
-        if (StringUtils.isNotEmpty(filename)) {
+        if (!StringUtils.isEmpty(filename)) {
             int lastIndex = filename.lastIndexOf('.');
             if (lastIndex > 0) {
                 fileSuffix = filename.substring(lastIndex + 1);
@@ -168,7 +164,6 @@ public class FileUtils {
      * @return true if write success
      */
     public static boolean writeContent2File(String content, String filePath) {
-        boolean flag = true;
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = null;
         try {
@@ -189,184 +184,12 @@ public class FileUtils {
             bufferedWriter.close();
         } catch (IOException e) {
             FileUtils.logger.error(e.getMessage(), e);
-            flag = false;
-            return flag;
+            return false;
         } finally {
             IOUtils.closeQuietly(bufferedWriter);
             IOUtils.closeQuietly(bufferedReader);
         }
-        return flag;
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist.
-     * <p>
-     * NOTE: As from v1.3, the parent directories of the file will be created
-     * if they do not exist.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @param encoding the encoding to use, {@code null} means platform default
-     * @throws IOException in case of an I/O error
-     * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
-     * @since 2.4
-     */
-    public static void writeStringToFile(File file, String data, Charset encoding) throws IOException {
-        writeStringToFile(file, data, encoding, false);
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist.
-     * <p>
-     * NOTE: As from v1.3, the parent directories of the file will be created
-     * if they do not exist.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @param encoding the encoding to use, {@code null} means platform default
-     * @throws IOException in case of an I/O error
-     * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
-     */
-    public static void writeStringToFile(File file, String data, String encoding) throws IOException {
-        writeStringToFile(file, data, encoding, false);
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @param encoding the encoding to use, {@code null} means platform default
-     * @param append if {@code true}, then the String will be added to the
-     * end of the file rather than overwriting
-     * @throws IOException in case of an I/O error
-     * @since 2.3
-     */
-    public static void writeStringToFile(File file, String data, Charset encoding, boolean append) throws IOException {
-        OutputStream out = null;
-        try {
-            out = openOutputStream(file, append);
-            IOUtils.write(data, out, encoding);
-            out.close(); // don't swallow close Exception if copy completes normally
-        } finally {
-            IOUtils.closeQuietly(out);
-        }
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @param encoding the encoding to use, {@code null} means platform default
-     * @param append if {@code true}, then the String will be added to the
-     * end of the file rather than overwriting
-     * @throws IOException in case of an I/O error
-     * @throws UnsupportedCharsetException thrown instead of {@link UnsupportedEncodingException} in version 2.2 if the encoding is not
-     * supported by the VM
-     * @since 2.1
-     */
-    public static void writeStringToFile(File file, String data, String encoding, boolean append) throws IOException {
-        writeStringToFile(file, data, Charsets.toCharset(encoding), append);
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist using the default encoding for the VM.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @throws IOException in case of an I/O error
-     */
-    public static void writeStringToFile(File file, String data) throws IOException {
-        writeStringToFile(file, data, Charset.defaultCharset(), false);
-    }
-
-    /**
-     * Writes a String to a file creating the file if it does not exist using the default encoding for the VM.
-     *
-     * @param file the file to write
-     * @param data the content to write to the file
-     * @param append if {@code true}, then the String will be added to the
-     * end of the file rather than overwriting
-     * @throws IOException in case of an I/O error
-     * @since 2.1
-     */
-    public static void writeStringToFile(File file, String data, boolean append) throws IOException {
-        writeStringToFile(file, data, Charset.defaultCharset(), append);
-    }
-
-    /**
-     * Opens a {@link FileOutputStream} for the specified file, checking and
-     * creating the parent directory if it does not exist.
-     * <p>
-     * At the end of the method either the stream will be successfully opened,
-     * or an exception will have been thrown.
-     * <p>
-     * The parent directory will be created if it does not exist.
-     * The file will be created if it does not exist.
-     * An exception is thrown if the file object exists but is a directory.
-     * An exception is thrown if the file exists but cannot be written to.
-     * An exception is thrown if the parent directory cannot be created.
-     *
-     * @param file the file to open for output, must not be {@code null}
-     * @return a new {@link FileOutputStream} for the specified file
-     * @throws IOException if the file object is a directory
-     * @throws IOException if the file cannot be written to
-     * @throws IOException if a parent directory needs creating but that fails
-     * @since 1.3
-     */
-    public static FileOutputStream openOutputStream(File file) throws IOException {
-        return openOutputStream(file, false);
-    }
-
-    /**
-     * Opens a {@link FileOutputStream} for the specified file, checking and
-     * creating the parent directory if it does not exist.
-     * <p>
-     * At the end of the method either the stream will be successfully opened,
-     * or an exception will have been thrown.
-     * <p>
-     * The parent directory will be created if it does not exist.
-     * The file will be created if it does not exist.
-     * An exception is thrown if the file object exists but is a directory.
-     * An exception is thrown if the file exists but cannot be written to.
-     * An exception is thrown if the parent directory cannot be created.
-     *
-     * @param file the file to open for output, must not be {@code null}
-     * @param append if {@code true}, then bytes will be added to the
-     * end of the file rather than overwriting
-     * @return a new {@link FileOutputStream} for the specified file
-     * @throws IOException if the file object is a directory
-     * @throws IOException if the file cannot be written to
-     * @throws IOException if a parent directory needs creating but that fails
-     * @since 2.1
-     */
-    public static FileOutputStream openOutputStream(File file, boolean append) throws IOException {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                throw new IOException("File '" + file + "' exists but is a directory");
-            }
-            if (!file.canWrite()) {
-                throw new IOException("File '" + file + "' cannot be written to");
-            }
-        } else {
-            File parent = file.getParentFile();
-            if (parent != null && !parent.mkdirs() && !parent.isDirectory()) {
-                throw new IOException("Directory '" + parent + "' could not be created");
-            }
-        }
-        return new FileOutputStream(file, append);
-    }
-
-    /**
-     * deletes a directory recursively
-     *
-     * @param dir directory
-     * @throws IOException in case deletion is unsuccessful
-     */
-
-    public static void deleteDir(String dir) throws IOException {
-        org.apache.commons.io.FileUtils.deleteDirectory(new File(dir));
+        return true;
     }
 
     /**

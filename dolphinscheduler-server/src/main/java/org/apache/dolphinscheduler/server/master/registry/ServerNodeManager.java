@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -35,6 +34,7 @@ import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,6 +107,11 @@ public class ServerNodeManager implements InitializingBean {
     private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
+     * eg : /node/worker/group/127.0.0.1:xxx
+     */
+    private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
+
+    /**
      * worker group mapper
      */
     @Autowired
@@ -155,7 +160,7 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new MasterDataListener());
+        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
     }
 
     /**
@@ -210,7 +215,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * worker group node listener
      */
-    class WorkerGroupNodeListener implements SubscribeListener {
+    class WorkerDataListener implements SubscribeListener {
 
         @Override
         public void notify(String path, DataChangeEvent dataChangeEvent) {
@@ -240,7 +245,7 @@ public class ServerNodeManager implements InitializingBean {
 
         private String parseGroup(String path) {
             String[] parts = path.split("/");
-            if (parts.length < 6) {
+            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
             return parts[parts.length - 2];
@@ -306,8 +311,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * sync master nodes
      *
-     * @param nodes       master nodes
-     * @param masterNodes
+     * @param nodes master nodes
      */
     private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
@@ -332,7 +336,7 @@ public class ServerNodeManager implements InitializingBean {
      * sync worker group nodes
      *
      * @param workerGroup worker group
-     * @param nodes       worker nodes
+     * @param nodes worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes) {
         workerGroupLock.lock();
