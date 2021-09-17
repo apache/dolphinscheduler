@@ -78,8 +78,8 @@ public class SqoopTask extends AbstractYarnTask {
         if (MapUtils.isEmpty(paramsMap)) {
             paramsMap = new HashMap<>();
         }
-        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
         }
 
         String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
