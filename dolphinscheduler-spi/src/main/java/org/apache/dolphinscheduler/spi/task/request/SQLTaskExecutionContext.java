@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.entity;
+package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
+import org.apache.dolphinscheduler.spi.task.UdfFuncBean.UdfFuncDeserializer;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class SQLTaskExecutionContext implements Serializable {
      * udf function tenant code map
      */
     @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
-    private Map<UdfFunc,String> udfFuncTenantCodeMap;
+    private Map<UdfFuncRequest,String> udfFuncTenantCodeMap;
 
 
     public int getWarningGroupId() {
@@ -53,11 +53,11 @@ public class SQLTaskExecutionContext implements Serializable {
         this.warningGroupId = warningGroupId;
     }
 
-    public Map<UdfFunc, String> getUdfFuncTenantCodeMap() {
+    public Map<UdfFuncRequest, String> getUdfFuncTenantCodeMap() {
         return udfFuncTenantCodeMap;
     }
 
-    public void setUdfFuncTenantCodeMap(Map<UdfFunc, String> udfFuncTenantCodeMap) {
+    public void setUdfFuncTenantCodeMap(Map<UdfFuncRequest, String> udfFuncTenantCodeMap) {
         this.udfFuncTenantCodeMap = udfFuncTenantCodeMap;
     }
 

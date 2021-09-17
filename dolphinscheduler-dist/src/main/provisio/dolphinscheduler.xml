@@ -106,5 +106,10 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <artifactSet to="lib/plugin/task/sql">
+        <artifact id="${project.groupId}:dolphinscheduler-task-sql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 
 </runtime>

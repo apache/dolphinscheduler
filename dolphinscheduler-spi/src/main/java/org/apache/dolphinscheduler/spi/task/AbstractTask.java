@@ -60,6 +60,10 @@ public abstract class AbstractTask {
      */
     protected volatile int exitStatusCode = -1;
 
+    protected boolean needAlert = false;
+
+    protected TaskAlertInfo taskAlertInfo;
+
     /**
      * constructor
      *
@@ -78,7 +82,6 @@ public abstract class AbstractTask {
     public String getPreScript() {
         return null;
     }
-
 
     /**
      * task handle
@@ -142,19 +145,28 @@ public abstract class AbstractTask {
         this.resultString = resultString;
     }
 
+    public boolean getNeedAlert() {
+        return needAlert;
+    }
+
+    public void setNeedAlert(boolean needAlert) {
+        this.needAlert = needAlert;
+    }
+
+    public TaskAlertInfo getTaskAlertInfo() {
+        return taskAlertInfo;
+    }
+
+    public void setTaskAlertInfo(TaskAlertInfo taskAlertInfo) {
+        this.taskAlertInfo = taskAlertInfo;
+    }
+
     /**
      * get task parameters
      *
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
-
-    /**
-     * result processing maybe
-     */
-    public void after() {
-
-    }
 
     /**
      * get exit status according to exitCode

@@ -15,14 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-public interface TaskChannel {
+public class SqlTaskChannel implements TaskChannel {
+    @Override
+    public void cancelApplication(boolean status) {
 
-    void cancelApplication(boolean status);
+    }
 
-    AbstractTask createTask(TaskRequest taskRequest);
+    @Override
+    public AbstractTask createTask(TaskRequest taskRequest) {
+        return new SqlTask(taskRequest);
+    }
 
 }

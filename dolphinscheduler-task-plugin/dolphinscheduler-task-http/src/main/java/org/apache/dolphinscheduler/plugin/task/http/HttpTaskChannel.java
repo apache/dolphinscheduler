@@ -32,5 +32,4 @@ public class HttpTaskChannel implements TaskChannel {
     public AbstractTask createTask(TaskRequest taskRequest) {
         return new HttpTask(taskRequest);
     }
-
 }

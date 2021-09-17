@@ -15,14 +15,41 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+/**
+ * UDF type
+ */
+public enum UdfType {
+    /**
+     * 0 hive; 1 spark
+     */
+    HIVE(0, "hive"),
+    SPARK(1, "spark");
 
-public interface TaskChannel {
+    UdfType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
+    }
 
-    void cancelApplication(boolean status);
+    private final int code;
+    private final String descp;
 
-    AbstractTask createTask(TaskRequest taskRequest);
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
+
+    public static UdfType of(int type) {
+        for (UdfType ut : values()) {
+            if (ut.getCode() == type) {
+                return ut;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
 
 }
