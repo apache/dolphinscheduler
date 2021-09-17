@@ -15,14 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-public interface TaskChannel {
+import com.google.common.collect.ImmutableList;
 
-    void cancelApplication(boolean status);
+public class SqlTaskPlugin implements DolphinSchedulerPlugin {
 
-    AbstractTask createTask(TaskRequest taskRequest);
-
+    @Override
+    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return ImmutableList.of(new SqlTaskChannelFactory());
+    }
 }
