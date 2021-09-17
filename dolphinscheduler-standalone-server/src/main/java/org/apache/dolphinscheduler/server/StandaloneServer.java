@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_USE
 
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.server.master.MasterServer;
@@ -34,12 +33,9 @@ import org.apache.curator.test.TestingServer;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.CodeSource;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -75,11 +71,10 @@ public class StandaloneServer {
     }
 
     private static void startAlertServer() {
-
-        final String alertPluginRelativePomPath =
-                "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml";
-        final Path alertPluginPath = getPluginPomAbsolutePath(alertPluginRelativePomPath);
-
+        final Path alertPluginPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
+        ).toAbsolutePath();
         if (Files.exists(alertPluginPath)) {
             System.setProperty("alert.plugin.binding", alertPluginPath.toString());
             System.setProperty("alert.plugin.dir", "");
@@ -91,10 +86,10 @@ public class StandaloneServer {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
 
-        final String registryPluginPomRelativePath =
-                "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml";
-        final Path registryPath = getPluginPomAbsolutePath(registryPluginPomRelativePath);
-
+        final Path registryPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
+        ).toAbsolutePath();
         if (Files.exists(registryPath)) {
             System.setProperty("registry.plugin.binding", registryPath.toString());
             System.setProperty("registry.plugin.dir", "");
@@ -123,54 +118,13 @@ public class StandaloneServer {
     }
 
     private static void setTaskPlugin() {
-
-        final String taskPluginPomRelativePath =
-                "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml";
-        final Path taskPluginPath = getPluginPomAbsolutePath(taskPluginPomRelativePath);
-
+        final Path taskPluginPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+                "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
+        ).toAbsolutePath();
         if (Files.exists(taskPluginPath)) {
             System.setProperty("task.plugin.binding", taskPluginPath.toString());
             System.setProperty("task.plugin.dir", "");
         }
-    }
-
-    /**
-     * Get the `pom.xml` file's absolute path of a plugin from root CodeSource.
-     *
-     * <p>
-     *     for example, the compiled class stores in path 'dolphinscheduler/target/classes' <br>
-     *     but the plugin path is 'dolphinscheduler/dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml' <br>
-     *     call this method like this: <br>
-     *     <pre>
-     *      {@code Path pluginPomPath = getPluginRelativePath("../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml");}
-     *     </pre>
-     * </p>
-     *
-     * @param pluginPomPath the relative path of pom.xml
-     * @return absolute path of the pom.xml
-     */
-    private static Path getPluginPomAbsolutePath(String pluginPomPath) {
-        final CodeSource codeSource = StandaloneServer.class.getProtectionDomain().getCodeSource();
-        URL location = codeSource.getLocation();
-        Path codeSourcePath;
-        try {
-            codeSourcePath = Paths.get(location.toURI());
-        } catch (URISyntaxException e) {
-            // if the URL can't be parsed to URI, use URL#getPath() instead
-            String path = location.getPath();
-            LOGGER.error("Location {} can't be parsed to a URI, use {}", location, path);
-            // if the system is Windows
-            if (OSUtils.isWindows()) {
-                int index = 0;
-                if (path.startsWith("!/") || path.startsWith("/")) {
-                    index = path.indexOf('/');
-                } else if (path.startsWith("!\\") || path.startsWith("\\")) {
-                    index = path.indexOf('\\');
-                }
-                path = path.substring(index, path.length());
-            }
-            codeSourcePath = Paths.get(path);
-        }
-        return codeSourcePath.resolve(pluginPomPath).toAbsolutePath();
     }
 }
