@@ -464,7 +464,6 @@ export default {
   'Timeout strategy must be selected': '超时策略必须选一个',
   'Timeout must be a positive integer': '超时时长必须为正整数',
   'Add dependency': '添加依赖',
-  'Keep at least one task': '保留至少一项任务',
   and: '且',
   or: '或',
   month: '月',

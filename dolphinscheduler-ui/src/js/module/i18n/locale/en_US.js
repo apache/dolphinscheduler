@@ -465,7 +465,6 @@ export default {
   'Timeout strategy must be selected': 'Timeout strategy must be selected',
   'Timeout must be a positive integer': 'Timeout must be a positive integer',
   'Add dependency': 'Add dependency',
-  'Keep at least one task': 'Keep at least one task',
   and: 'and',
   or: 'or',
   month: 'month',
