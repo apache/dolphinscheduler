@@ -86,6 +86,10 @@
         // add task list
         let projectCode = this.projectList[0].value
         this._getProcessByProjectCode(projectCode).then(definitionList => {
+          if (!definitionList || definitionList.length === 0) {
+            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams('', [], ['ALL'], projectCode)))
+            return
+          }
           // dependItemList index
           let is = (value) => _.some(this.dependItemList, { definitionCode: value })
           let noArr = _.filter(definitionList, v => !is(v.value))
@@ -158,6 +162,15 @@
        */
       _onChangeProjectCode (value, itemIndex) {
         this._getProcessByProjectCode(value).then(definitionList => {
+          if (!definitionList || definitionList.length === 0) {
+            this.$set(this.dependItemList, itemIndex, this._cpOldParams(value, '', [], ['ALL'], {
+              cycle: 'day',
+              dateValue: 'today',
+              state: '',
+              depTasks: 'ALL'
+            }))
+            return
+          }
           /* this.$set(this.dependItemList, itemIndex, this._dlOldParams(value, definitionList, item)) */
           let definitionCode = definitionList[0].value
           this._getDependItemList(definitionCode).then(depTasksList => {
@@ -246,10 +259,14 @@
           if (!this.projectList.length) return
           let projectCode = this.projectList[0].value
           this._getProcessByProjectCode(projectCode).then(definitionList => {
-            let value = definitionList[0].value
-            this._getDependItemList(value).then(depTasksList => {
-              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(value, definitionList, depTasksList, projectCode)))
-            })
+            if (definitionList && definitionList.length > 0) {
+              let definitionCode = definitionList[0].value
+              this._getDependItemList(definitionCode).then(depTasksList => {
+                this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(definitionCode, definitionList, depTasksList || ['ALL'], projectCode)))
+              })
+            } else {
+              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams('', [], ['ALL'], projectCode)))
+            }
           })
         } else {
           // get definitionCode codes
