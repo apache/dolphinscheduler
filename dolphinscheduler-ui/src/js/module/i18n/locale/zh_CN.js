@@ -693,5 +693,21 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
   Info: '提示',
   'Datasource userName': '所属用户',
-  'Resource userName': '所属用户'
+  'Resource userName': '所属用户',
+  'Environment manage': '环境管理',
+  'Create environment': '创建环境',
+  'Edit environment': '编辑',
+  'Environment value': 'Environment value',
+  'Environment Name': '环境名称',
+  'Environment Code': '环境编码',
+  'Environment Config': '环境配置',
+  'Environment Desc': '详细描述',
+  'Environment Worker Group': 'Worker组',
+  'Please enter environment config': '请输入环境配置信息',
+  'Please enter environment desc': '请输入详细描述',
+  'Please select worker groups': '请选择Worker分组',
+  condition: '条件',
+  'The condition content cannot be empty': '条件内容不能为空',
+  'Reference from': '使用已有任务',
+  'No more...': '没有更多了...'
 }

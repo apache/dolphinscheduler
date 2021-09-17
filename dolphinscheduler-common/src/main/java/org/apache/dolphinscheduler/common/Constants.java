@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -70,6 +71,28 @@ public final class Constants {
      * common properties path
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
+
+    /**
+     * alter properties
+     */
+    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
+    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
+    public static final int ALERT_RPC_PORT = 50052;
+
+    /**
+     * registry properties
+     */
+    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
+    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
+    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+    public static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
+    public static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
+    public static final String REGISTRY_SERVERS = "registry.servers";
 
     /**
      * fs.defaultFS
@@ -183,56 +206,9 @@ public final class Constants {
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
-     * MasterServer directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
-
-    /**
-     * WorkerServer directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-
-    /**
-     * all servers directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
-
-    /**
-     * registry node prefix
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
-
-    /**
-     * MasterServer lock directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
-
-
-    /**
-     * MasterServer failover directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-
-    /**
-     * WorkerServer failover directory registered in zookeeper
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-
-    /**
-     * MasterServer startup  failover runing and fault tolerance process
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
-
-
-    /**
      * comma ,
      */
     public static final String COMMA = ",";
-
-    /**
-     * slash /
-     */
-    public static final String SLASH = "/";
 
     /**
      * COLON :
@@ -414,11 +390,6 @@ public final class Constants {
      * rpc port
      */
     public static final int RPC_PORT = 50051;
-
-    /***
-     * alert rpc port
-     */
-    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -784,6 +755,7 @@ public final class Constants {
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
     public static final String CONDITION_RESULT = "conditionResult";
     public static final String SWITCH_RESULT = "switchResult";
+    public static final String WAIT_START_TIMEOUT = "waitStartTimeout";
     public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
@@ -1095,8 +1067,8 @@ public final class Constants {
     /**
      * docker & kubernetes
      */
-    public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
-    public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+    public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
+    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * task parameter keys

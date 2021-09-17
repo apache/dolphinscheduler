@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -36,12 +35,14 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +62,7 @@ import org.slf4j.LoggerFactory;
 import com.github.rholder.retry.RetryException;
 
 /**
- *  task scheduler thread
+ * task scheduler thread
  */
 public class TaskExecuteThread implements Runnable, Delayed {
 
@@ -103,7 +104,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private TaskPluginManager taskPluginManager;
 
     /**
-     *  constructor
+     * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
@@ -128,7 +130,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
     @Override
     public void run() {
 
-        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(),taskExecutionContext.getProcessInstanceId());
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId());
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // check if the OS user exists
@@ -161,6 +163,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getTaskInstanceId()));
 
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
+            if (null == taskChannel) {
+                throw new PluginNotFoundException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
+            }
 
             //TODO Temporary operation, To be adjusted
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
@@ -229,6 +234,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get global paras map
+     *
      * @return map
      */
     private Map<String, String> getGlobalParamsMap() {
@@ -251,7 +257,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             try {
                 task.cancelApplication(true);
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -270,7 +276,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
         Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
 
-        for (Map.Entry<String,String> resource : resEntries) {
+        for (Map.Entry<String, String> resource : resEntries) {
             String fullName = resource.getKey();
             String tenantCode = resource.getValue();
             File resFile = new File(execLocalPath, fullName);
@@ -282,7 +288,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage());
                 }
             } else {
@@ -329,6 +335,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get current TaskExecutionContext
+     *
      * @return TaskExecutionContext
      */
     public TaskExecutionContext getTaskExecutionContext() {

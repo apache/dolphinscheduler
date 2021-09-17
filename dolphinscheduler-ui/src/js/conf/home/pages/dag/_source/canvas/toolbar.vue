@@ -112,7 +112,7 @@
       >
       <el-button
         class="toolbar-el-btn"
-        v-if="$route.query.subProcessCodes"
+        v-if="$route.query.subs"
         type="primary"
         size="mini"
         icon="el-icon-back"

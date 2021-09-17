@@ -24,7 +24,8 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class TaskNode {
     /**
      * task node code
      */
-    private Long code;
+    private long code;
 
     /**
      * task node version
@@ -132,6 +133,10 @@ public class TaskNode {
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String switchResult;
+
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    private String waitStartTimeout;
 
     /**
      * task instance priority
@@ -245,7 +250,7 @@ public class TaskNode {
     }
 
     public Boolean isForbidden() {
-        return (StringUtils.isNotEmpty(this.runFlag)
+        return (!StringUtils.isEmpty(this.runFlag)
                 && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
@@ -341,11 +346,11 @@ public class TaskNode {
         this.delayTime = delayTime;
     }
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
@@ -363,7 +368,7 @@ public class TaskNode {
      * @return task time out parameter
      */
     public TaskTimeoutParameter getTaskTimeoutParameter() {
-        if (StringUtils.isNotEmpty(this.getTimeout())) {
+        if (!StringUtils.isEmpty(this.getTimeout())) {
             String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = this.getTimeout().replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
             return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
@@ -395,6 +400,7 @@ public class TaskNode {
         taskParams.put(Constants.CONDITION_RESULT, this.conditionResult);
         taskParams.put(Constants.DEPENDENCE, this.dependence);
         taskParams.put(Constants.SWITCH_RESULT, this.switchResult);
+        taskParams.put(Constants.WAIT_START_TIMEOUT, this.waitStartTimeout);
         return JSONUtils.toJsonString(taskParams);
     }
 
@@ -448,5 +454,13 @@ public class TaskNode {
 
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
+    }
+
+    public String getWaitStartTimeout() {
+        return this.waitStartTimeout;
+    }
+
+    public void setWaitStartTimeout(String waitStartTimeout) {
+        this.waitStartTimeout = waitStartTimeout;
     }
 }
