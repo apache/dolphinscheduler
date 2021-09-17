@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
@@ -44,18 +44,18 @@ public class SqoopTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private final SqoopTaskRequest sqoopTaskExecutionContext;
+    private final TaskRequest taskExecutionContext;
 
-    public SqoopTask(SqoopTaskRequest taskExecutionContext) {
+    public SqoopTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
-        this.sqoopTaskExecutionContext = taskExecutionContext;
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
-        logger.info("sqoop task params {}", sqoopTaskExecutionContext.getTaskParams());
+        logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
         sqoopParameters =
-                JSONUtils.parseObject(sqoopTaskExecutionContext.getTaskParams(), SqoopParameters.class);
+            JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
         //check sqoop task params
         if (null == sqoopParameters) {
             throw new IllegalArgumentException("Sqoop Task params is null");
@@ -70,16 +70,16 @@ public class SqoopTask extends AbstractYarnTask {
     protected String buildCommand() {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
+        String script = generator.generateSqoopJob(sqoopParameters, taskExecutionContext);
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(sqoopTaskExecutionContext, getParameters());
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
         if (MapUtils.isEmpty(paramsMap)) {
             paramsMap = new HashMap<>();
         }
-        if (MapUtils.isNotEmpty(sqoopTaskExecutionContext.getParamsMap())) {
-            paramsMap.putAll(sqoopTaskExecutionContext.getParamsMap());
+        if (MapUtils.isNotEmpty(taskExecutionContext.getParamsMap())) {
+            paramsMap.putAll(taskExecutionContext.getParamsMap());
         }
 
         String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
