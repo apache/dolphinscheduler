@@ -375,7 +375,7 @@ export default {
         resolve()
         return
       }
-      io.get('projects/list', payload, res => {
+      io.get('projects/created-and-authed', payload, res => {
         state.projectListS = res.data
         resolve(res.data)
       }).catch(res => {
