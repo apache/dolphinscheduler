@@ -200,6 +200,11 @@ public class TaskRequest {
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
     /**
+     * procedure TaskExecutionContext
+     */
+    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+
+    /**
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
@@ -466,5 +471,13 @@ public class TaskRequest {
 
     public void setSqoopTaskExecutionContext(SqoopTaskExecutionContext sqoopTaskExecutionContext) {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
+    }
+
+    public ProcedureTaskExecutionContext getProcedureTaskExecutionContext() {
+        return procedureTaskExecutionContext;
+    }
+
+    public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
+        this.procedureTaskExecutionContext = procedureTaskExecutionContext;
     }
 }

@@ -29,7 +29,7 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -44,7 +44,7 @@ public class HdfsTargetGenerator implements ITargetGenerator {
     private static final Logger logger = LoggerFactory.getLogger(HdfsTargetGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, SqoopTaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
 
         StringBuilder hdfsTargetSb = new StringBuilder();
 

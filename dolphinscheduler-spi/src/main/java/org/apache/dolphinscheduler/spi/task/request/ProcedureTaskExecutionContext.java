@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
+import java.io.Serializable;
+
 /**
- * Procedure Task ExecutionContext
- * to master/worker task transport
+ *  master/worker task transport
  */
-public class ProcedureTaskRequest extends TaskRequest {
+public class ProcedureTaskExecutionContext implements Serializable{
 
     /**
      * connectionParams
@@ -38,8 +39,8 @@ public class ProcedureTaskRequest extends TaskRequest {
 
     @Override
     public String toString() {
-        return "ProcedureTaskExecutionContext{"
-                + "connectionParams='" + connectionParams + '\''
-                + '}';
+        return "ProcedureTaskExecutionContext{" +
+                "connectionParams='" + connectionParams + '\'' +
+                '}';
     }
 }

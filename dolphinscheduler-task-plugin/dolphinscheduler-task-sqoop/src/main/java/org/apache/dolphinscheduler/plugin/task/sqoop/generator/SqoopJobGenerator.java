@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HdfsTarge
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HiveTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.MysqlTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 /**
  * Sqoop Job Scripts Generator
@@ -64,7 +64,7 @@ public class SqoopJobGenerator {
      * @param sqoopParameters sqoop params
      * @return sqoop scripts
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters, SqoopTaskRequest taskExecutionContext) {
+    public String generateSqoopJob(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
 
         String sqoopScripts = "";
 

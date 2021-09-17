@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class DataxTaskChannel implements TaskChannel {
@@ -31,6 +30,6 @@ public class DataxTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskRequest taskRequest) {
-        return new DataxTask((DataxTaskRequest) taskRequest);
+        return new DataxTask(taskRequest);
     }
 }
