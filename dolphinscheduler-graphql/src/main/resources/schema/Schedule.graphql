@@ -1,33 +1,70 @@
 extend type Query {
     # Schedule Query
-    queryScheduleListPaging(loginUser: InputUser!, projectName: String!,
-        processDefinitionId: Int!, searchVal: String, pageNo: Int!,
-        pageSize: Int!): SchedulePageInfoResultType
+    queryScheduleListPaging(
+        loginUser: InputUser!,
+        projectCode: String!,
+        processDefinitionCode: String!,
+        searchVal: String,
+        pageNo: Int!,
+        pageSize: Int!
+    ): SchedulePageInfoResultType
 
-    queryScheduleList(loginUser: InputUser!, projectName: String!): ScheduleListResultType
+    queryScheduleList(
+        loginUser: InputUser!,
+        projectCode: String!
+    ): ScheduleListResultType
 
-    previewSchedule(loginUser: InputUser!, projectName: String!
-        schedule: String!): NormalResultType
+    previewSchedule(
+        loginUser: InputUser!,
+        schedule: String!
+    ): NormalResultType
 }
 
 extend type Mutation {
     # Schedule Mutation
-    createSchedule(loginUser: InputUser!, projectName: String!,
-        processDefinitionId: Int!, schedule: String!, warningType: WarningType = NONE,
-        warningGroupId: Int = 1, failureStrategy: FailureStrategy = CONTINUE,
-        workerGroup: String = "default", processInstancePriority: Priority = MEDIUM): ScheduleResultType
+    createSchedule(
+        loginUser: InputUser!,
+        projectCode: String!,
+        processDefinitionCode: String!,
+        schedule: String!,
+        warningType: WarningType = NONE,
+        warningGroupId: Int = 1,
+        failureStrategy: FailureStrategy = CONTINUE,
+        workerGroup: String = "default",
+        environmentCode: String = "-1",
+        processInstancePriority: Priority = MEDIUM
+    ): ScheduleResultType
 
-    updateSchedule(loginUser: InputUser!, projectName: String!,
-        id: Int!, schedule: String!, warningType: WarningType = NONE,
-        warningGroupId: Int, failureStrategy: FailureStrategy = END,
-        workerGroup: String = "default", processInstancePriority: Priority): NormalResultType
+    updateSchedule(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!,
+        schedule: String!,
+        warningType: WarningType = NONE,
+        warningGroupId: Int,
+        failureStrategy: FailureStrategy = END,
+        workerGroup: String = "default",
+        environmentCode: String = "-1",
+        processInstancePriority: Priority
+    ): NormalResultType
 
-    online(loginUser: InputUser!, projectName: String!, id: Int!): NormalResultType
+    online(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): NormalResultType
 
-    offline(loginUser: InputUser!, projectName: String!, id: Int!): NormalResultType
+    offline(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): NormalResultType
 
-    deleteScheduleById(loginUser: InputUser!, projectName: String!,
-        scheduleId: Int!): NormalResultType
+    deleteScheduleById(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): NormalResultType
 }
 
 type Schedule {

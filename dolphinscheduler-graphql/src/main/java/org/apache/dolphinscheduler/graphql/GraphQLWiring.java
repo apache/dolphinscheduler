@@ -174,8 +174,8 @@ public class GraphQLWiring {
                 processDefinitionDataFetchers.queryTypeVerifyProcessDefinitionName());
         typeWiring.dataFetcher("queryProcessDefinitionVersions",
                 processDefinitionDataFetchers.queryTypeQueryProcessDefinitionVersions());
-        typeWiring.dataFetcher("queryProcessDefinitionById",
-                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionById());
+        typeWiring.dataFetcher("queryProcessDefinitionByCode",
+                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionByCode());
         typeWiring.dataFetcher("queryProcessDefinitionByName",
                 processDefinitionDataFetchers.queryTypeQueryProcessDefinitionByName());
         typeWiring.dataFetcher("queryProcessDefinitionList",
@@ -186,10 +186,10 @@ public class GraphQLWiring {
                 processDefinitionDataFetchers.queryTypeViewTree());
         typeWiring.dataFetcher("getNodeListByDefinitionCode",
                 processDefinitionDataFetchers.queryTypeGetNodeListByDefinitionCode());
-        typeWiring.dataFetcher("getNodeListByDefinitionCodeList",
-                processDefinitionDataFetchers.queryTypeGetNodeListByDefinitionCodeList());
-        typeWiring.dataFetcher("queryProcessDefinitionAllByProjectId",
-                processDefinitionDataFetchers.queryTypeQueryProcessDefinitionAllByProjectId());
+        typeWiring.dataFetcher("getNodeListMapByDefinitionCodes",
+                processDefinitionDataFetchers.queryTypeGetNodeListMapByDefinitionCodes());
+        typeWiring.dataFetcher("queryAllProcessDefinitionByProjectCode",
+                processDefinitionDataFetchers.queryTypeQueryAllProcessDefinitionByProjectCode());
 
         // ProcessInstance Query
         typeWiring.dataFetcher("queryProcessInstanceList",
@@ -206,12 +206,12 @@ public class GraphQLWiring {
                 processInstanceDataFetchers.queryTypeQueryParentInstanceBySubId());
         typeWiring.dataFetcher("viewVariables",
                 processInstanceDataFetchers.queryTypeViewVariables());
-        typeWiring.dataFetcher("processInstanceViewTree",
-                processInstanceDataFetchers.queryTypeProcessInstanceViewTree());
+        typeWiring.dataFetcher("viewTree",
+                processInstanceDataFetchers.queryTypeViewTree());
 
         // Project Query
-        typeWiring.dataFetcher("queryProjectById",
-                projectDataFetchers.queryTypeQueryProjectById());
+        typeWiring.dataFetcher("queryProjectByCode",
+                projectDataFetchers.queryTypeQueryProjectByCode());
         typeWiring.dataFetcher("queryProjectListPaging",
                 projectDataFetchers.queryTypeQueryProjectListPaging());
         typeWiring.dataFetcher("queryUnauthorizedProject",
@@ -320,6 +320,8 @@ public class GraphQLWiring {
                 workFlowLineageDataFetchers.queryTypeQueryWorkFlowLineageByName());
         typeWiring.dataFetcher("queryWorkFlowLineageByIds",
                 workFlowLineageDataFetchers.queryTypeQueryWorkFlowLineageByIds());
+        typeWiring.dataFetcher("queryWorkFlowLineageByCode",
+                workFlowLineageDataFetchers.queryTypeQueryWorkFlowLineageByCode());
 
         return typeWiring;
     }
@@ -379,10 +381,10 @@ public class GraphQLWiring {
                 processDefinitionDataFetchers.mutationTypeDeleteProcessDefinitionVersion());
         typeWiring.dataFetcher("releaseProcessDefinition",
                 processDefinitionDataFetchers.mutationTypeReleaseProcessDefinition());
-        typeWiring.dataFetcher("deleteProcessDefinitionById",
-                processDefinitionDataFetchers.mutationTypeDeleteProcessDefinitionById());
-        typeWiring.dataFetcher("batchDeleteProcessDefinitionByIds",
-                processDefinitionDataFetchers.mutationTypeBatchDeleteProcessDefinitionByIds());
+        typeWiring.dataFetcher("deleteProcessDefinitionByCode",
+                processDefinitionDataFetchers.mutationTypeDeleteProcessDefinitionByCode());
+        typeWiring.dataFetcher("batchDeleteProcessDefinitionByCodes",
+                processDefinitionDataFetchers.mutationTypeBatchDeleteProcessDefinitionByCodes());
 
         // ProcessInstance Mutation
         typeWiring.dataFetcher("updateProcessInstance",

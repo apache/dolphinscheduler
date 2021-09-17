@@ -8,7 +8,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.graphql.datafetcher.service.UserArgumentService;
 import org.slf4j.Logger;
@@ -39,8 +39,8 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long processDefineCode = Long.parseLong(environment.getArgument("processDefinitionId"));
             String searchVal = environment.getArgument("searchVal");
             String executorName = environment.getArgument("executorName");
 
@@ -59,8 +59,8 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
                 return result;
             }
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = processInstanceService.queryProcessInstanceList(
-                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
+            result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
+                    searchVal, executorName, stateType, host, pageNo, pageSize);
             return result;
         };
     }
@@ -75,10 +75,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processInstanceId = environment.getArgument("processInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
+            Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, id);
             return returnDataList(result);
         };
     }
@@ -93,20 +93,23 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            String processInstanceJson = environment.getArgument("processInstanceJson");
-            int processInstanceId = environment.getArgument("processInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String taskRelationJson = environment.getArgument("taskRelationJson");
+            String taskDefinitionJson = environment.getArgument("taskDefinitionJson");
+            int id = environment.getArgument("id");
             String scheduleTime = environment.getArgument("scheduleTime");
             boolean syncDefine = environment.getArgument("syncDefine");
+            String globalParams = environment.getArgument("globalParams");
             String locations = environment.getArgument("locations");
-            String connects = environment.getArgument("connects");
+            int timeout = environment.getArgument("timeout");
+            String tenantCode = environment.getArgument("tenantCode");
 
             Flag flag = environment.getArgument("flag") == null
                     ? null
                     : Flag.valueOf(environment.getArgument("flag"));
 
-            Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
-                    processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
+            Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
+                    taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout, tenantCode);
             return returnDataList(result);
         };
     }
@@ -121,10 +124,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processInstanceId = environment.getArgument("processInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
+            Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectCode, id);
             return returnDataList(result);
         };
     }
@@ -139,13 +142,12 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int size = environment.getArgument("size");
             String startTime = environment.getArgument("startTime");
             String endTime = environment.getArgument("endTime");
 
-            projectName = ParameterUtils.handleEscapes(projectName);
-            Map<String,Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+            Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, endTime);
             return returnDataList(result);
         };
     }
@@ -160,10 +162,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processInstanceId = environment.getArgument("processInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, id);
             return returnDataList(result);
         };
     }
@@ -178,10 +180,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int taskId = environment.getArgument("taskId");
 
-            Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectName, taskId);
+            Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
             return returnDataList(result);
         };
     }
@@ -196,10 +198,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int subId = environment.getArgument("subId");
 
-            Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectName, subId);
+            Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
             return returnDataList(result);
         };
     }
@@ -214,14 +216,14 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int processInstanceId = environment.getArgument("processInstanceId");
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = processInstanceService.viewVariables(processInstanceId);
+            Map<String, Object> result = processInstanceService.viewVariables(id);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> queryTypeProcessInstanceViewTree() {
+    public DataFetcher<Result> queryTypeViewTree() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -231,9 +233,10 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int processInstanceId = environment.getArgument("processInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = processInstanceService.viewGantt(processInstanceId);
+            Map<String, Object> result = processInstanceService.viewGantt(id);
             return returnDataList(result);
         };
     }
@@ -248,19 +251,19 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             String processInstanceIds = environment.getArgument("processInstanceIds");
 
             // task queue
             Map<String, Object> result = new HashMap<>();
             List<String> deleteFailedIdList = new ArrayList<>();
-            if (StringUtils.isNotEmpty(processInstanceIds)) {
+            if (!StringUtils.isEmpty(processInstanceIds)) {
                 String[] processInstanceIdArray = processInstanceIds.split(",");
 
                 for (String strProcessInstanceId : processInstanceIdArray) {
                     int processInstanceId = Integer.parseInt(strProcessInstanceId);
                     try {
-                        Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+                        Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
                         if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                             deleteFailedIdList.add(strProcessInstanceId);
                             logger.error((String) deleteResult.get(Constants.MSG));
@@ -275,7 +278,6 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             } else {
                 putMsg(result, Status.SUCCESS);
             }
-
             return returnDataList(result);
         };
     }

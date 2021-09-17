@@ -32,7 +32,7 @@ public class TaskInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectName"));
             int processInstanceId = environment.getArgument("processInstanceId");
             String processInstanceName = environment.getArgument("processInstanceName");
             String searchVal = environment.getArgument("searchVal");
@@ -52,8 +52,8 @@ public class TaskInstanceDataFetchers extends BaseDataFetchers {
                 return result;
             }
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = taskInstanceService.queryTaskListPaging(
-                    loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+            result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
+                    taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return result;
         };
     }
@@ -67,10 +67,10 @@ public class TaskInstanceDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int taskInstanceId = environment.getArgument("taskInstanceId");
+            long projectCode = Long.parseLong(environment.getArgument("projectName"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectName, taskInstanceId);
+            Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
             return returnDataList(result);
         };
     }

@@ -35,17 +35,18 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long processDefinitionCode = Long.parseLong(environment.getArgument("processDefinitionCode"));
             String schedule = environment.getArgument("schedule");
             WarningType warningType = WarningType.valueOf(environment.getArgument("warningType"));
             int warningGroupId = environment.getArgument("warningGroupId");
             FailureStrategy failureStrategy = FailureStrategy.valueOf(environment.getArgument("failureStrategy"));
             String workerGroup = environment.getArgument("workerGroup");
+            long environmentCode = Long.parseLong(environment.getArgument("environmentCode"));
             Priority processInstancePriority = Priority.valueOf(environment.getArgument("processInstancePriority"));
 
-            Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                    warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
+            Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectCode, processDefinitionCode, schedule,
+                    warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
 
             return returnDataList(result);
         };
@@ -60,20 +61,21 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int id = environment.getArgument("id");
             String schedule = environment.getArgument("schedule");
             WarningType warningType = WarningType.valueOf(environment.getArgument("warningType"));
             int warningGroupId = environment.getArgument("warningGroupId");
             FailureStrategy failureStrategy = FailureStrategy.valueOf(environment.getArgument("failureStrategy"));
             String workerGroup = environment.getArgument("workerGroup");
+            long environmentCode = Long.parseLong(environment.getArgument("environmentCode"));
             Priority processInstancePriority = environment.getArgument("processInstancePriority") == null
                     ? null
                     : Priority.valueOf(environment.getArgument("processInstancePriority"));
 
 
-            Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                    warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
+            Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectCode, id, schedule,
+                    warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
             return returnDataList(result);
         };
     }
@@ -87,10 +89,10 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int id = environment.getArgument("id");
 
-            Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.ONLINE);
+            Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
             return returnDataList(result);
         };
     }
@@ -104,10 +106,10 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int id = environment.getArgument("id");
 
-            Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.OFFLINE);
+            Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
             return returnDataList(result);
         };
     }
@@ -121,8 +123,8 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long processDefinitionCode = Long.parseLong(environment.getArgument("processDefinitionCode"));
             String searchVal = environment.getArgument("searchVal");
             int pageNo = environment.getArgument("pageNo");
             int pageSize = environment.getArgument("pageSize");
@@ -132,7 +134,7 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
                 return result;
             }
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
+            result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo, pageSize);
             return result;
         };
     }
@@ -146,10 +148,10 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int scheduleId = environment.getArgument("scheduleId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            int id = environment.getArgument("id");
 
-            Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
+            Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, id);
             return returnDataList(result);
         };
     }
@@ -163,9 +165,9 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
 
-            Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectName);
+            Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectCode);
             return returnDataList(result);
         };
     }
@@ -179,10 +181,9 @@ public class ScheduleDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
             String schedule = environment.getArgument("schedule");
 
-            Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
+            Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
             return returnDataList(result);
         };
     }

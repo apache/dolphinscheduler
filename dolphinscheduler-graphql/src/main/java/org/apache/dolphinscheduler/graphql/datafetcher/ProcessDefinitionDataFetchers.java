@@ -7,7 +7,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
+
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.graphql.datafetcher.service.UserArgumentService;
 import org.slf4j.Logger;
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
 
 @Component
 public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
@@ -38,15 +42,19 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = dataFetchingEnvironment.getArgument("projectName");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
             String name = dataFetchingEnvironment.getArgument("name");
-            String json = dataFetchingEnvironment.getArgument("json");
-            String locations = dataFetchingEnvironment.getArgument("locations");
-            String connects = dataFetchingEnvironment.getArgument("connects");
             String description = dataFetchingEnvironment.getArgument("description");
+            String globalParams = dataFetchingEnvironment.getArgument("globalParams");
+            String locations = dataFetchingEnvironment.getArgument("locations");
+            int timeout = dataFetchingEnvironment.getArgument("connects");
+            String tenantCode = dataFetchingEnvironment.getArgument("tenantCode");
+            String taskRelationJson = dataFetchingEnvironment.getArgument("taskRelationJson");
+            String taskDefinitionJson = dataFetchingEnvironment.getArgument("taskDefinitionJson");
 
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
-                    description, locations, connects);
+
+            Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name, description, globalParams,
+                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
             return returnDataList(result);
         };
     }
@@ -61,12 +69,11 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            String processDefinitionIds = environment.getArgument("processDefinitionIds");
-            int targetProjectId = environment.getArgument("targetProjectId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String codes = environment.getArgument("codes");
+            long targetProjectCode = Long.parseLong(environment.getArgument("targetProjectCode"));
 
-            return returnDataList(
-                    processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
+            return returnDataList(processDefinitionService.batchCopyProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
         };
     }
 
@@ -80,12 +87,11 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            String processDefinitionIds = environment.getArgument("processDefinitionIds");
-            int targetProjectId = environment.getArgument("targetProjectId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String codes = environment.getArgument("codes");
+            long targetProjectCode = Long.parseLong(environment.getArgument("targetProjectCode"));
 
-            return returnDataList(
-                    processDefinitionService.batchMoveProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
+            return returnDataList(processDefinitionService.batchMoveProcessDefinition(loginUser, projectCode, codes, targetProjectCode));
         };
     }
 
@@ -99,10 +105,10 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             String name = environment.getArgument("name");
 
-            Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectName, name);
+            Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name);
             return returnDataList(result);
         };
     }
@@ -117,17 +123,20 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             String name = environment.getArgument("name");
-            int id = environment.getArgument("id");
-            String processDefinitionJson = environment.getArgument("processDefinitionJson");
-            String locations = environment.getArgument("locations");
-            String connects = environment.getArgument("connects");
+            long code = Long.parseLong(environment.getArgument("code"));
             String description = environment.getArgument("description");
+            String globalParams = environment.getArgument("globalParams");
+            String locations = environment.getArgument("locations");
+            int timeout = environment.getArgument("timeout");
+            String tenantCode = environment.getArgument("tenantCode");
+            String taskRelationJson = environment.getArgument("taskRelationJson");
+            String taskDefinitionJson = environment.getArgument("taskDefinitionJson");
             ReleaseState releaseState = ReleaseState.valueOf(environment.getArgument("releaseState"));
 
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
-                    processDefinitionJson, description, locations, connects);
+            Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name, code, description, globalParams,
+                    locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
             //  If the update fails, the result will be returned directly
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return returnDataList(result);
@@ -135,7 +144,7 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
 
             //  Judge whether to go online after editing,0 means offline, 1 means online
             if (releaseState == ReleaseState.ONLINE) {
-                result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, id, releaseState);
+                result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
             }
             return returnDataList(result);
         };
@@ -151,17 +160,16 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int pageNo = environment.getArgument("pageNo");
             int pageSize = environment.getArgument("pageSize");
-            long processDefinitionCode = Long.parseLong(environment.getArgument("processDefinitionCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
 
             Result result = checkPageParams(pageNo, pageSize);
             if (!result.checkResult()) {
                 return result;
             }
-            result = processDefinitionService.queryProcessDefinitionVersions(loginUser
-                    , projectName, pageNo, pageSize, processDefinitionCode);
+            result = processDefinitionService.queryProcessDefinitionVersions(loginUser, projectCode, pageNo, pageSize, code);
 
             return result;
         };
@@ -177,12 +185,11 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
-            long version = Long.parseLong(environment.getArgument("version"));
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
+            int version = environment.getArgument("version");
 
-            Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectName
-                    , processDefinitionId, version);
+            Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectCode, code, version);
             return returnDataList(result);
         };
     }
@@ -197,11 +204,11 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
-            long version = Long.parseLong(environment.getArgument("version"));
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
+            int version = environment.getArgument("version");
 
-            Map<String, Object> result = processDefinitionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
+            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionVersion(loginUser, projectCode, code, version);
             return returnDataList(result);
         };
     }
@@ -216,16 +223,16 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processId = environment.getArgument("processId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
             ReleaseState releaseState = ReleaseState.valueOf(environment.getArgument("releaseState"));
 
-            Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, processId, releaseState);
+            Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> queryTypeQueryProcessDefinitionById() {
+    public DataFetcher<Result> queryTypeQueryProcessDefinitionByCode() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -235,10 +242,10 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processId = environment.getArgument("processId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
 
-            Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
+            Map<String, Object> result = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectCode, code);
             return returnDataList(result);
         };
     }
@@ -254,10 +261,10 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            String processDefinitionName = environment.getArgument("processDefinitionName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String name = environment.getArgument("name");
 
-            Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
+            Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectCode, name);
             return returnDataList(result);
         };
     }
@@ -272,9 +279,9 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
 
-            Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectName);
+            Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
             return returnDataList(result);
         };
     }
@@ -289,7 +296,7 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
             int pageNo = environment.getArgument("pageNo");
             String searchVal = environment.getArgument("searchVal");
             int userId = environment.getArgument("userId");
@@ -300,7 +307,7 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
                 return result;
             }
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
+            return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal, userId, pageNo, pageSize);
         };
     }
 
@@ -332,17 +339,15 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            long processDefinitionCode = Long.parseLong(environment.getArgument("processDefinitionCode"));
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
 
-            logger.info("query task node name list by definitionCode, login user:{}, project name:{}, code : {}",
-                    loginUser.getUserName(), projectName, processDefinitionCode);
-            Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(processDefinitionCode);
+            Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> queryTypeGetNodeListByDefinitionCodeList() {
+    public DataFetcher<Result> queryTypeGetNodeListMapByDefinitionCodes() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -352,14 +357,16 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String processDefinitionCodeList = environment.getArgument("processDefinitionCodeList");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String codes = environment.getArgument("codes");
 
-            Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCodeList(processDefinitionCodeList);
+
+            Map<String, Object> result = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, codes);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> mutationTypeDeleteProcessDefinitionById() {
+    public DataFetcher<Result> mutationTypeDeleteProcessDefinitionByCode() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -369,16 +376,16 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            int processDefinitionId = environment.getArgument("processDefinitionId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            long code = Long.parseLong(environment.getArgument("code"));
 
 
-            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> mutationTypeBatchDeleteProcessDefinitionByIds() {
+    public DataFetcher<Result> mutationTypeBatchDeleteProcessDefinitionByCodes() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -388,38 +395,37 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = environment.getArgument("projectName");
-            String processDefinitionIds = environment.getArgument("processDefinitionIds");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
+            String codes = environment.getArgument("codes");
 
             Map<String, Object> result = new HashMap<>();
-            List<String> deleteFailedIdList = new ArrayList<>();
-            if (StringUtils.isNotEmpty(processDefinitionIds)) {
-                String[] processDefinitionIdArray = processDefinitionIds.split(",");
-                for (String strProcessDefinitionId : processDefinitionIdArray) {
-                    int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+            List<String> deleteFailedCodeList = new ArrayList<>();
+            if (!StringUtils.isEmpty(codes)) {
+                String[] processDefinitionCodeArray = codes.split(",");
+                for (String strProcessDefinitionCode : processDefinitionCodeArray) {
+                    long code = Long.parseLong(strProcessDefinitionCode);
                     try {
-                        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+                        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
                         if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                            deleteFailedIdList.add(strProcessDefinitionId);
+                            deleteFailedCodeList.add(strProcessDefinitionCode);
                             logger.error((String) deleteResult.get(Constants.MSG));
                         }
                     } catch (Exception e) {
-                        deleteFailedIdList.add(strProcessDefinitionId);
+                        deleteFailedCodeList.add(strProcessDefinitionCode);
                     }
                 }
             }
 
-            if (!deleteFailedIdList.isEmpty()) {
-                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
+            if (!deleteFailedCodeList.isEmpty()) {
+                putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join(",", deleteFailedCodeList));
             } else {
                 putMsg(result, Status.SUCCESS);
             }
-
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> queryTypeQueryProcessDefinitionAllByProjectId() {
+    public DataFetcher<Result> queryTypeQueryAllProcessDefinitionByProjectCode() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -429,9 +435,9 @@ public class ProcessDefinitionDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
+            long projectCode = Long.parseLong(environment.getArgument("projectCode"));
 
-            Map<String, Object> result = processDefinitionService.queryProcessDefinitionAllByProjectId(projectId);
+            Map<String, Object> result = processDefinitionService.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
             return returnDataList(result);
         };
     }

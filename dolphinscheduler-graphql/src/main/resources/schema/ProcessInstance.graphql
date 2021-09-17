@@ -1,41 +1,91 @@
 extend type Query {
     # ProcessInstance Query
-    queryProcessInstanceList(loginUser: InputUser!, projectName: String!, processDefinitionId: Int = 0,
-        searchVal: String, executorName: String, stateType: ExecutionStatus, host: String,
-        startTime: String, endTime: String, pageNo: Int!, pageSize: Int!): ProcessDefinitionPageInfoResultType
+    queryProcessInstanceList(
+        loginUser: InputUser!,
+        projectCode: String!,
+        processDefineCode: String = "0",
+        searchVal: String,
+        executorName: String,
+        stateType: ExecutionStatus,
+        host: String,
+        startTime: String,
+        endTime: String,
+        pageNo: Int!,
+        pageSize: Int!
+    ): ProcessDefinitionPageInfoResultType
 
-    queryTaskListByProcessId(loginUser: InputUser!, projectName: String!,
-        processInstanceId: Int!): QueryTaskListByProcessIdResultType
+    queryTaskListByProcessId(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): QueryTaskListByProcessIdResultType
 
-    queryProcessInstanceById(loginUser: InputUser!, projectName: String!,
-        processInstanceId: Int!): ProcessDefinitionResultType
+    queryProcessInstanceById(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): ProcessDefinitionResultType
 
-    queryTopNLongestRunningProcessInstance(loginUser: InputUser!, projectName: String!,
-        size: Int!, startTime: String!, endTime: String!): ProcessDefinitionListResultType
+    queryTopNLongestRunningProcessInstance(
+        loginUser: InputUser!,
+        projectCode: String!,
+        size: Int!,
+        startTime: String!,
+        endTime: String!
+    ): ProcessDefinitionListResultType
 
-    querySubProcessInstanceByTaskId(loginUser: InputUser!, projectName: String!,
-        taskId: Int!): QuerySubProcessInstanceByTaskIdResultType
+    querySubProcessInstanceByTaskId(
+        loginUser: InputUser!,
+        projectCode: String!,
+        taskId: Int!
+    ): QuerySubProcessInstanceByTaskIdResultType
 
-    queryParentInstanceBySubId(loginUser: InputUser!, projectName: String!,
-        subId: Int!): QueryParentInstanceBySubIdResultType
+    queryParentInstanceBySubId(
+        loginUser: InputUser!,
+        projectCode: String!,
+        subId: Int!
+    ): QueryParentInstanceBySubIdResultType
 
-    viewVariables(loginUser: InputUser!, processInstanceId: Int!): ViewVariablesResultType
+    viewVariables(
+        loginUser: InputUser!,
+        id: Int!
+    ): ViewVariablesResultType
 
-    processInstanceViewTree(loginUser: InputUser!, projectName: String!,
-        processInstanceId: Int!): GanttDtoResultType
+    viewTree(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): GanttDtoResultType
 }
 
 extend type Mutation {
     # ProcessInstance Mutation
-    updateProcessInstance(loginUser: InputUser!, projectName: String!,
-        processInstanceJson: String, processInstanceId: Int!, scheduleTime: String
-        syncDefine: Boolean!, locations: String, connects: String, flag: Flag): NormalResultType
+    updateProcessInstance(
+        loginUser: InputUser!,
+        projectCode: String!,
+        taskRelationJson: String!,
+        taskDefinitionJson: String!,
+        id: Int!
+        scheduleTime: String
+        syncDefine: Boolean!,
+        globalParams: String = "[]"
+        locations: String,
+        timeout: Int = 0
+        tenantCode: String!,
+        flag: Flag
+    ): NormalResultType
 
-    deleteProcessInstanceById(loginUser: InputUser!, projectName: String!,
-        processInstanceId: Int!): NormalResultType
+    deleteProcessInstanceById(
+        loginUser: InputUser!,
+        projectCode: String!,
+        id: Int!
+    ): NormalResultType
 
-    batchDeleteProcessInstanceByIds(loginUser: InputUser!, projectName: String!,
-        processInstanceIds: String!): NormalResultType
+    batchDeleteProcessInstanceByIds(
+        loginUser: InputUser!,
+        projectCode: String!,
+        processInstanceIds: String!
+    ): NormalResultType
 }
 
 type ProcessInstance {

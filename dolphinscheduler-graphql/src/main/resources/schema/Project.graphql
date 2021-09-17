@@ -1,9 +1,16 @@
 extend type Query {
     # Project Query
-    queryProjectById(loginUser: InputUser!, projectId: Int!): ProjectResultType
+    queryProjectByCode(
+        loginUser: InputUser!,
+        code: String!
+    ): ProjectResultType
 
-    queryProjectListPaging(loginUser: InputUser!, searchVal: String,
-        pageSize: Int!, pageNo: Int!): ProjectPageInfoResultType
+    queryProjectListPaging(
+        loginUser: InputUser!,
+        searchVal: String,
+        pageSize: Int!,
+        pageNo: Int!
+    ): ProjectPageInfoResultType
 
     queryUnauthorizedProject(loginUser: InputUser!, userId: Int!): ProjectListResultType
 
@@ -16,13 +23,24 @@ extend type Query {
 
 extend type Mutation {
     # Project Mutation
-    createProject(loginUser: InputUser!, projectName: String!,
-        description: String): CreateProjectResultType
+    createProject(
+        loginUser: InputUser!,
+        projectName: String!,
+        description: String
+    ): CreateProjectResultType
 
-    updateProject(loginUser: InputUser!, projectId: Int!, projectName: String!,
-        description: String, userName: String!): NormalResultType
+    updateProject(
+        loginUser: InputUser!,
+        code: String!,
+        projectName: String!,
+        description: String,
+        userName: String!
+    ): NormalResultType
 
-    deleteProject(loginUser: InputUser!, projectId: Int!): NormalResultType
+    deleteProject(
+        loginUser: InputUser!,
+        code: String!
+    ): NormalResultType
 }
 
 type CreateProjectResultType {

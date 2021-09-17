@@ -1,10 +1,21 @@
 extend type Query {
     # WorkFlowLineage Query
-    queryWorkFlowLineageByName(loginUser: InputUser!, projectId: Int!,
-        searchVal: String): WorkFlowLineageListResultType
+    queryWorkFlowLineageByName(
+        loginUser: InputUser!,
+        projectCode: String!,
+        workFlowName: String
+    ): WorkFlowLineageListResultType
 
-    queryWorkFlowLineageByIds(loginUser: InputUser!, projectId: Int!,
-        ids: String): NormalResultType
+    queryWorkFlowLineageByIds(
+        loginUser: InputUser!,
+        projectCode: String!,
+    ): NormalResultType
+
+    queryWorkFlowLineageByCode(
+        loginUser: InputUser!,
+        projectCode: String!,
+        workFlowCode: String!
+    ): NormalResultType
 }
 
 type WorkFlowLineageListResultType {

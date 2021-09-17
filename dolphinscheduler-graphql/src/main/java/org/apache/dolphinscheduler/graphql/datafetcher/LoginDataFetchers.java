@@ -1,13 +1,12 @@
 package org.apache.dolphinscheduler.graphql.datafetcher;
 
 import graphql.schema.DataFetcher;
-import org.apache.dolphinscheduler.api.controller.AlertPluginInstanceController;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.graphql.datafetcher.service.UserArgumentService;
 import org.slf4j.Logger;

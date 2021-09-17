@@ -39,8 +39,8 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = dataFetchingEnvironment.getArgument("projectName");
-            int processDefinitionId = dataFetchingEnvironment.getArgument("processDefinitionId");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
+            long processDefinitionCode = Long.parseLong(dataFetchingEnvironment.getArgument("processDefinitionId"));
             String scheduleTime = dataFetchingEnvironment.getArgument("scheduleTime");
             FailureStrategy failureStrategy = FailureStrategy.valueOf(dataFetchingEnvironment.getArgument("failureStrategy"));
             String startNodeList = dataFetchingEnvironment.getArgument("startNodeList");
@@ -55,8 +55,6 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
 
             WarningType warningType = WarningType.valueOf(dataFetchingEnvironment.getArgument("warningType"));
             int warningGroupId = dataFetchingEnvironment.getArgument("warningGroupId");
-            String receivers = dataFetchingEnvironment.getArgument("receivers");
-            String receiversCc = dataFetchingEnvironment.getArgument("receiversCc");
 
             RunMode runMode = dataFetchingEnvironment.getArgument("runMode") == null
                     ? null
@@ -67,15 +65,10 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
                     : Priority.valueOf(dataFetchingEnvironment.getArgument("processInstancePriority"));
 
             String workerGroup = dataFetchingEnvironment.getArgument("workerGroup");
+            long environmentCode = Long.parseLong(dataFetchingEnvironment.getArgument("environmentCode"));
             Integer timeout = dataFetchingEnvironment.getArgument("timeout");
             String startParams = dataFetchingEnvironment.getArgument("startParams");
-
-            logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
-                            + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
-                    loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
-                    failureStrategy, startNodeList, taskDependType, warningType, workerGroup, receivers, receiversCc, runMode, processInstancePriority,
-                    workerGroup, timeout);
+            int expectedParallelismNumber = dataFetchingEnvironment.getArgument("expectedParallelismNumber");
 
             if (timeout == null) {
                 timeout = Constants.MAX_TASK_TIMEOUT;
@@ -84,9 +77,8 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
             if (startParams != null) {
                 startParamMap = JSONUtils.toMap(startParams);
             }
-            Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
-                    startNodeList, taskDependType, warningType,
-                    warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
+            Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
+                    startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber);
             return returnDataList(result);
         };
     }
@@ -101,14 +93,14 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            String projectName = dataFetchingEnvironment.getArgument("projectName");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
             int processInstanceId = dataFetchingEnvironment.getArgument("processInstanceId");
             ExecuteType executeType = ExecuteType.valueOf(dataFetchingEnvironment.getArgument("executeType"));
 
             logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                    loginUser.getUserName(), projectName, processInstanceId, executeType);
+                    loginUser.getUserName(), projectCode, processInstanceId, executeType);
 
-            Map<String, Object> result = executorService.execute(loginUser, projectName, processInstanceId, executeType);
+            Map<String, Object> result = executorService.execute(loginUser, projectCode, processInstanceId, executeType);
             return returnDataList(result);
         };
     }
@@ -123,10 +115,10 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int processDefinitionId = dataFetchingEnvironment.getArgument("processDefinitionId");
+            long processDefinitionCode = Long.parseLong(dataFetchingEnvironment.getArgument("processDefinitionCode"));
 
-            logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionId);
-            Map<String, Object> result = executorService.startCheckByProcessDefinedId(processDefinitionId);
+            logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionCode);
+            Map<String, Object> result = executorService.startCheckByProcessDefinedCode(processDefinitionCode);
             return returnDataList(result);
         };
     }

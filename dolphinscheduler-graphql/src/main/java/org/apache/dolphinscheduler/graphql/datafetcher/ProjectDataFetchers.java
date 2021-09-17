@@ -49,17 +49,17 @@ public class ProjectDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
+            long code = Long.parseLong(environment.getArgument("code"));
             String projectName = environment.getArgument("projectName");
             String description = environment.getArgument("description");
             String userName = environment.getArgument("userName");
 
-            Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description, userName);
+            Map<String, Object> result = projectService.update(loginUser, code, projectName, description, userName);
             return returnDataList(result);
         };
     }
 
-    public DataFetcher<Result> queryTypeQueryProjectById() {
+    public DataFetcher<Result> queryTypeQueryProjectByCode() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
@@ -68,9 +68,9 @@ public class ProjectDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
+            long code = Long.parseLong(environment.getArgument("code"));
 
-            Map<String, Object> result = projectService.queryById(projectId);
+            Map<String, Object> result = projectService.queryByCode(loginUser, code);
             return returnDataList(result);
         };
     }
@@ -107,9 +107,9 @@ public class ProjectDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
+            long code = Long.parseLong(environment.getArgument("code"));
 
-            Map<String, Object> result = projectService.deleteProject(loginUser, projectId);
+            Map<String, Object> result = projectService.deleteProject(loginUser, code);
             return returnDataList(result);
         };
     }

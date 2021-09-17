@@ -39,19 +39,21 @@ public class WorkFlowLineageDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
-            String searchVal = environment.getArgument("searchVal");
+            long projectCode = Long.parseLong(environment.getArgument("projectId"));
+            String workFlowName = environment.getArgument("workFlowName");
 
             try {
-                searchVal = ParameterUtils.handleEscapes(searchVal);
-                Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
+                workFlowName = ParameterUtils.handleEscapes(workFlowName);
+                Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
                 return returnDataList(result);
             } catch (Exception e) {
-                logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+                logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
                 return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
             }
         };
     }
+
+
 
     public DataFetcher<Result> queryTypeQueryWorkFlowLineageByIds() {
         return environment -> {
@@ -62,23 +64,35 @@ public class WorkFlowLineageDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = environment.getArgument("projectId");
-            String ids = environment.getArgument("ids");
+            long projectCode = Long.parseLong(environment.getArgument("projectId"));
 
             try {
-                ids = ParameterUtils.handleEscapes(ids);
-                Set<Integer> idsSet = new HashSet<>();
-                if (ids != null) {
-                    String[] idsStr = ids.split(",");
-                    for (String id : idsStr) {
-                        idsSet.add(Integer.parseInt(id));
-                    }
-                }
-
-                Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(idsSet, projectId);
+                Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
                 return returnDataList(result);
             } catch (Exception e) {
-                logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+                logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
+                return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
+            }
+        };
+    }
+
+    public DataFetcher<Result> queryTypeQueryWorkFlowLineageByCode() {
+        return environment -> {
+            LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
+            Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
+            if (selectUserResult.getCode() != Status.SUCCESS.getCode()) {
+                return selectUserResult;
+            }
+            User loginUser = (User) selectUserResult.getData();
+
+            long projectCode = Long.parseLong(environment.getArgument("projectId"));
+            long workFlowCode = Long.parseLong(environment.getArgument("workFlowCode"));
+
+            try {
+                Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+                return returnDataList(result);
+            } catch (Exception e) {
+                logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
                 return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
             }
         };
