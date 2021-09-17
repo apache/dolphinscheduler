@@ -15,27 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.spark;
+package org.apache.dolphinscheduler.spi.exception;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+public class PluginNotFoundException extends RuntimeException {
 
-import java.util.List;
+    private static final long serialVersionUID = -5487812425126112159L;
 
-public class SparkTaskChannelFanctory implements TaskChannelFactory {
-    @Override
-    public String getName() {
-        return "SPARK";
+    public PluginNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
-
-    @Override
-    public TaskChannel create() {
-        return new SparkTaskChannel();
+    public PluginNotFoundException(String message) {
+        super(message);
     }
 }

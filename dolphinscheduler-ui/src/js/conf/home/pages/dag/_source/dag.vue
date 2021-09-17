@@ -24,6 +24,10 @@
       :with-header="false"
       :wrapperClosable="false"
     >
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width:0px;height:0px;overflow:hidden;">
+        <el-input type="text" />
+      </div>
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
@@ -31,6 +35,7 @@
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
         @onSubProcess="toSubProcess"
+        :type="type"
       ></m-form-model>
     </el-drawer>
     <el-dialog
@@ -133,11 +138,16 @@
           pageSize: null
         },
         // the task status refresh timer
-        statusTimer: null
+        statusTimer: null,
+        // the process instance id
+        instanceId: -1
       }
     },
     mounted () {
+      this.setIsEditDag(false)
+
       if (this.type === 'instance') {
+        this.instanceId = this.$route.params.id
         this.definitionCode = this.$route.query.code
       } else if (this.type === 'definition') {
         this.definitionCode = this.$route.params.code
@@ -163,6 +173,8 @@
       }
     },
     beforeDestroy () {
+      this.resetParams()
+
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -171,7 +183,6 @@
         'tasks',
         'locations',
         'connects',
-        'isEditDag',
         'name',
         'isDetails',
         'projectCode',
@@ -192,7 +203,6 @@
       ]),
       ...mapMutations('dag', [
         'addTask',
-        'setTasks',
         'setConnects',
         'resetParams',
         'setIsEditDag',
@@ -266,6 +276,9 @@
           let tasks = this.tasks || []
           const edges = this.$refs.canvas.getEdges()
           const nodes = this.$refs.canvas.getNodes()
+          if (!nodes.length) {
+            reject(this.$t('Failed to create node to save'))
+          }
           const connects = this.buildConnects(edges, tasks)
           this.setConnects(connects)
           const locations = nodes.map((node) => {
@@ -332,6 +345,9 @@
                 })
             }
           }
+        }).catch((err) => {
+          let msg = typeof err === 'string' ? err : (err.msg || '')
+          this.$message.error(msg)
         })
       },
       verifyConditions (value) {
@@ -454,28 +470,29 @@
        */
       returnToPrevProcess () {
         let $name = this.$route.name.split('-')
-        let subProcessCodes = this.$route.query.subProcessCodes
-        let codes = subProcessCodes.split(',')
-        const last = codes.pop()
+        let subs = this.$route.query.subs
+        let ids = subs.split(',')
+        const last = ids.pop()
         this.$router.push({
-          path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${last}`,
-          query: codes.length > 0 ? { subProcessCodes: codes.join(',') } : null
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${last}`,
+          query: ids.length > 0 ? { subs: ids.join(',') } : null
         })
       },
-      toSubProcess ({ subProcessCode, fromThis }) {
-        let subProcessCodes = []
-        let getIds = this.$route.query.subProcessCodes
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.definitionCode)
-          subProcessCodes = newId
+      toSubProcess ({ subProcessCode, subInstanceId }) {
+        const tarIdentifier = this.type === 'instance' ? subInstanceId : subProcessCode
+        const curIdentifier = this.type === 'instance' ? this.instanceId : this.definitionCode
+        let subs = []
+        let olds = this.$route.query.subs
+        if (olds) {
+          subs = olds.split(',')
+          subs.push(curIdentifier)
         } else {
-          subProcessCodes.push(this.definitionCode)
+          subs.push(curIdentifier)
         }
         let $name = this.$route.name.split('-')
         this.$router.push({
-          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${subProcessCode}`,
-          query: { subProcessCodes: subProcessCodes.join(',') }
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${tarIdentifier}`,
+          query: { subs: subs.join(',') }
         })
       },
       seeHistory (taskName) {
@@ -578,16 +595,14 @@
         this.versionDrawer = false
       },
       switchProcessVersion ({ version, processDefinitionCode }) {
-        // this.$store.state.dag.isSwitchVersion = true
         this.switchProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
           this.closeVersion()
-          this.definitionDetails._reset()
+          this.definitionDetails.init()
         }).catch(e => {
-          // this.$store.state.dag.isSwitchVersion = false
           this.$message.error(e.msg || '')
         })
       },

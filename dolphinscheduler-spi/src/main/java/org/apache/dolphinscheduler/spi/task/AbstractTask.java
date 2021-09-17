@@ -79,9 +79,6 @@ public abstract class AbstractTask {
         return null;
     }
 
-    public void setCommand(String command) throws Exception {
-
-    }
 
     /**
      * task handle
