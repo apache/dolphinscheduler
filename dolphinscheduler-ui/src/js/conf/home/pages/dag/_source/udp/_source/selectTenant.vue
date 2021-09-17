@@ -75,8 +75,18 @@
     },
     created () {
       let stateTenantAllList = this.store.state.security.tenantAllList || []
-      if (stateTenantAllList.length) {
-        this.itemList = stateTenantAllList
+      let stateTenantAllListExceptDefault = null
+      /*
+       * if stateTenantAllList's size is greater than 1
+       * whe should filter out the 'default' tenant who's id is -1.
+       */
+      if (stateTenantAllList.length > 1) {
+        stateTenantAllListExceptDefault = stateTenantAllList.filter(item => item.id !== -1)
+      } else {
+        stateTenantAllListExceptDefault = stateTenantAllList
+      }
+      if (stateTenantAllListExceptDefault.length) {
+        this.itemList = stateTenantAllListExceptDefault
       } else {
         this.store.dispatch('security/getTenantList').then(res => {
           this.$nextTick(() => {
