@@ -230,7 +230,7 @@ public class UdfFuncServiceTest {
     }
 
     /**
-     *  get UdfFunc id
+     *  get UdfFuncRequest id
      */
     private UdfFunc getUdfFunc() {
         UdfFunc udfFunc = new UdfFunc();
