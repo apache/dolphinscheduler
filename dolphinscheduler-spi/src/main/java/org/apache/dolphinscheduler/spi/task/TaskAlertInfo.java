@@ -17,12 +17,35 @@
 
 package org.apache.dolphinscheduler.spi.task;
 
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+public class TaskAlertInfo {
 
-public interface TaskChannel {
+    private String title;
 
-    void cancelApplication(boolean status);
+    private String content;
 
-    AbstractTask createTask(TaskRequest taskRequest);
+    private Integer alertGroupId;
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Integer getAlertGroupId() {
+        return alertGroupId;
+    }
+
+    public void setAlertGroupId(Integer alertGroupId) {
+        this.alertGroupId = alertGroupId;
+    }
 }
