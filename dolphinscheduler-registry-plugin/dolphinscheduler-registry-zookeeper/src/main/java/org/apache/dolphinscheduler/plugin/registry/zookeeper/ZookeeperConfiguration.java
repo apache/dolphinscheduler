@@ -34,11 +34,11 @@ public enum ZookeeperConfiguration {
     MAX_RETRIES("max.retries", 5, Integer::valueOf),
 
 
-    //todo
-    SESSION_TIMEOUT_MS("session.timeout.ms", 1000, Integer::valueOf),
-    CONNECTION_TIMEOUT_MS("connection.timeout.ms", 1000, Integer::valueOf),
+    // Reference Hadoop config
+    SESSION_TIMEOUT_MS("session.timeout.ms", 60000, Integer::valueOf),
+    CONNECTION_TIMEOUT_MS("connection.timeout.ms", 15000, Integer::valueOf),
 
-    BLOCK_UNTIL_CONNECTED_WAIT_MS("block.until.connected.wait", 600, Integer::valueOf),
+    BLOCK_UNTIL_CONNECTED_WAIT_MS("block.until.connected.wait", 15000, Integer::valueOf),
     ;
     private final String name;
 
