@@ -15,21 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.procedure;
+package org.apache.dolphinscheduler.spi.task;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+public class TaskAlertInfo {
 
-public class ProcedureTaskChannel implements TaskChannel {
+    private String title;
 
-    @Override
-    public void cancelApplication(boolean status) {
+    private String content;
 
+    private Integer alertGroupId;
+
+    public String getTitle() {
+        return title;
     }
 
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new ProcedureTask(taskRequest);
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Integer getAlertGroupId() {
+        return alertGroupId;
+    }
+
+    public void setAlertGroupId(Integer alertGroupId) {
+        this.alertGroupId = alertGroupId;
     }
 }

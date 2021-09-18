@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.procedure;
+package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.Property;
 
-public class ProcedureTaskChannel implements TaskChannel {
+import java.util.Map;
 
-    @Override
-    public void cancelApplication(boolean status) {
+/**
+ * Used to contains both prepared sql string and its to-be-bind parameters
+ */
+public class SqlBinds {
+    private final String sql;
+    private final Map<Integer, Property> paramsMap;
 
+    public SqlBinds(String sql, Map<Integer, Property> paramsMap) {
+        this.sql = sql;
+        this.paramsMap = paramsMap;
     }
 
-    @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
-        return new ProcedureTask(taskRequest);
+    public String getSql() {
+        return sql;
+    }
+
+    public Map<Integer, Property> getParamsMap() {
+        return paramsMap;
     }
 }
