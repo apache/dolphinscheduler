@@ -41,6 +41,7 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
     const { color, category } = getCategory(categoryDic, item, sourceWorkFlowCode)
     return {
       ...item,
+      id: item.code,
       emphasis: {
         itemStyle: {
           color
