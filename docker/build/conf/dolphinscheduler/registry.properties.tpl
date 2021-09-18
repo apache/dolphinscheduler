@@ -22,8 +22,8 @@ registry.plugin.name=${REGISTRY_PLUGIN_NAME}
 registry.servers=${REGISTRY_SERVERS}
 
 #registry.session.timeout.ms=60000
-#registry.connection.timeout.ms=60000
-#registry.block.until.connected.wait=60000
+#registry.connection.timeout.ms=15000
+#registry.block.until.connected.wait=15000
 
 #maven.local.repository=/usr/local/localRepository
 
