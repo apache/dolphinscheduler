@@ -708,5 +708,11 @@ export default {
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
-  'No more...': 'No more...'
+  'No more...': 'No more...',
+  'Process execute type': 'Process execute type',
+  parallel: 'parallel',
+  'Serial wait': 'Serial wait',
+  'Serial discard': 'Serial discard',
+  'Serial priority': 'Serial priority',
+  'Recover serial wait': 'Recover serial wait'
 }

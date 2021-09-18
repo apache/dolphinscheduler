@@ -707,5 +707,11 @@ export default {
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空',
   'Reference from': '使用已有任务',
-  'No more...': '没有更多了...'
+  'No more...': '没有更多了...',
+  'Process execute type': '执行策略',
+  parallel: '并行',
+  'Serial wait': '串行等待',
+  'Serial discard': '串行抛弃',
+  'Serial priority': '串行优先',
+  'Recover serial wait': '串行恢复'
 }
