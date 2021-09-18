@@ -443,6 +443,7 @@ public class ProcessDefinition {
             && Objects.equals(description, that.description)
             && Objects.equals(globalParams, that.globalParams)
             && flag == that.flag
+            && executionType == that.executionType
             && Objects.equals(locations, that.locations);
     }
 

@@ -182,7 +182,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        int timeout,
                                                        String tenantCode,
                                                        String taskRelationJson,
-                                                       String taskDefinitionJson) {
+                                                       String taskDefinitionJson,
+                                                       ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -226,6 +227,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
             globalParams, locations, timeout, loginUser.getId(), tenantId);
+        processDefinition.setExecutionType(executionType);
 
         return createProcessDefine(loginUser, result, taskRelationList, processDefinition, taskDefinitionLogs);
     }
@@ -463,7 +465,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        int timeout,
                                                        String tenantCode,
                                                        String taskRelationJson,
-                                                       String taskDefinitionJson,Integer executionType) {
+                                                       String taskDefinitionJson,
+                                                       ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -513,7 +516,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.of(executionType));
+        processDefinition.setExecutionType(executionType);
         return updateProcessDefine(loginUser, result, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
     }
 
