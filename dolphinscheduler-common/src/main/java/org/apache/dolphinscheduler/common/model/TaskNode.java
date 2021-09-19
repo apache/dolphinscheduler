@@ -133,6 +133,10 @@ public class TaskNode {
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String switchResult;
 
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    private String waitStartTimeout;
+
     /**
      * task instance priority
      */
@@ -448,6 +452,14 @@ public class TaskNode {
 
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
+    }
+
+    public String getWaitStartTimeout() {
+        return this.waitStartTimeout;
+    }
+
+    public void setWaitStartTimeout(String waitStartTimeout) {
+        this.waitStartTimeout = waitStartTimeout;
     }
 
     public boolean isBlockingTask(){
