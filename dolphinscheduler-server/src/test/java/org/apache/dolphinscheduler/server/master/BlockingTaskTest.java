@@ -95,7 +95,6 @@ public class BlockingTaskTest {
                 .thenReturn(taskDefinition);
     }
 
-
     private ProcessInstance getProcessInstance() {
         // mock process instance
         ProcessInstance processInstance = new ProcessInstance();
