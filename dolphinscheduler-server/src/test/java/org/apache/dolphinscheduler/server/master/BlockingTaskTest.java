@@ -16,7 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.DependentRelation;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -32,6 +36,11 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +48,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockingTaskTest {
@@ -58,7 +63,7 @@ public class BlockingTaskTest {
     private MasterConfig config;
 
     @Before
-    public void before(){
+    public void before() {
         // init spring context
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -90,7 +95,7 @@ public class BlockingTaskTest {
     }
 
 
-    private ProcessInstance getProcessInstance(){
+    private ProcessInstance getProcessInstance() {
         // mock process instance
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1000);
@@ -99,7 +104,7 @@ public class BlockingTaskTest {
         return processInstance;
     }
 
-    private TaskInstance getTaskInstance(TaskNode taskNode, ProcessInstance processInstance){
+    private TaskInstance getTaskInstance(TaskNode taskNode, ProcessInstance processInstance) {
         // wrap taskNode
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(100);
@@ -113,7 +118,7 @@ public class BlockingTaskTest {
         return taskInstance;
     }
 
-    private TaskNode getTaskNode(String blockingCondition){
+    private TaskNode getTaskNode(String blockingCondition) {
         // mock task nodes
         // 1----\
         // 2-----4(Blocking Node)
@@ -162,7 +167,7 @@ public class BlockingTaskTest {
         return taskNode;
     }
 
-    private TaskInstance testBasicInit(String blockingCondition,ExecutionStatus... expectResults){
+    private TaskInstance testBasicInit(String blockingCondition,ExecutionStatus... expectResults) {
 
         TaskInstance taskInstance = getTaskInstance(getTaskNode(blockingCondition),processInstance);
 
@@ -196,20 +201,20 @@ public class BlockingTaskTest {
     /**
      * mock task instance and its execution result in front of blocking node
      */
-    private List<TaskInstance> getTaskInstanceForValidTaskList(ExecutionStatus... status){
+    private List<TaskInstance> getTaskInstanceForValidTaskList(ExecutionStatus... status) {
         List<TaskInstance> taskInstanceList = new ArrayList<>();
-        for(int i = 1; i <= status.length ; i++){
+        for (int i = 1 ; i <= status.length ; i++) {
             TaskInstance taskInstance = new TaskInstance();
             taskInstance.setId(i);
             taskInstance.setName(String.valueOf(i));
-            taskInstance.setState(status[i-1]);
+            taskInstance.setState(status[i - 1]);
             taskInstanceList.add(taskInstance);
         }
         return taskInstanceList;
     }
 
     @Test
-    public void testBlockingTaskSubmit(){
+    public void testBlockingTaskSubmit() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
                 ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
@@ -219,7 +224,7 @@ public class BlockingTaskTest {
     }
 
     @Test
-    public void testGetTaskStatus(){
+    public void testGetTaskStatus() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
                 ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
@@ -236,7 +241,7 @@ public class BlockingTaskTest {
      */
 
     @Test
-    public void testBlockingLogicFailed(){
+    public void testBlockingLogicFailed() {
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
                 ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
         ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
@@ -248,7 +253,7 @@ public class BlockingTaskTest {
     }
 
     @Test
-    public void testBlockingLogicSuccess(){
+    public void testBlockingLogicSuccess() {
         TaskInstance taskInstance = testBasicInit("BlockingOnSuccess",
                 ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS);
         ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());

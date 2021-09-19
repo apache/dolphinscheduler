@@ -357,7 +357,7 @@ public class WorkflowExecuteThreadTest {
             Mockito.when(processService.updateProcessInstanceState(blockingTaskInstance.getId(),
                     ExecutionStatus.READY_PAUSE))
                     .thenReturn(1);
-            if(isBlocked){
+            if (isBlocked) {
                 Mockito.when(processInstance.getState())
                         .thenReturn(ExecutionStatus.RUNNING_EXECUTION)
                         .thenReturn(ExecutionStatus.READY_PAUSE);
@@ -373,7 +373,7 @@ public class WorkflowExecuteThreadTest {
     }
 
     @Test
-    public void testBlockingWithNoBlocked(){
+    public void testBlockingWithNoBlocked() {
         try {
             initEnvForBlockingTest(false,false);
             // test method
@@ -391,8 +391,8 @@ public class WorkflowExecuteThreadTest {
     }
 
     @Test
-    public void testBlockingWithBlockedWithoutAlert(){
-        try{
+    public void testBlockingWithBlockedWithoutAlert() {
+        try {
             initEnvForBlockingTest(true,false);
             // test method
             Method main = WorkflowExecuteThread.class.getDeclaredMethod("run");
@@ -409,7 +409,7 @@ public class WorkflowExecuteThreadTest {
     }
 
     @Test
-    public void testBlockingWithBlockedWithAlert(){
+    public void testBlockingWithBlockedWithAlert() {
         try {
             initEnvForBlockingTest(true,true);
             // test method
