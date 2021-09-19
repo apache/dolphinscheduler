@@ -20,10 +20,9 @@ package org.apache.dolphinscheduler.server.master;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
@@ -36,8 +35,8 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.task.blocking.BlockingParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -281,7 +280,7 @@ public class WorkflowExecuteThreadTest {
         return schedulerList;
     }
 
-    private DAG<String, TaskNode, TaskNodeRelation> genDagForBlockingTest(){
+    private DAG<String, TaskNode, TaskNodeRelation> genDagForBlockingTest() {
         /**
          * the test dag looks like below
          * 1(blocking)
@@ -299,7 +298,7 @@ public class WorkflowExecuteThreadTest {
         return dag;
     }
 
-    private TaskInstance getBlockingTaskInstance(boolean isAlert){
+    private TaskInstance getBlockingTaskInstance(boolean isAlert) {
         // define fake blocking task instance
         TaskInstance blockingTaskInstance = new TaskInstance();
         blockingTaskInstance.setId(0);
@@ -319,8 +318,8 @@ public class WorkflowExecuteThreadTest {
         return blockingTaskInstance;
     }
 
-    private void initEnvForBlockingTest(boolean isBlocked, boolean isAlert){
-        try{
+    private void initEnvForBlockingTest(boolean isBlocked, boolean isAlert) {
+        try {
             // create dag
             dag.set(workflowExecuteThread,genDagForBlockingTest());
             // create spring context
@@ -366,7 +365,7 @@ public class WorkflowExecuteThreadTest {
                         .thenReturn(ExecutionStatus.RUNNING_EXECUTION)
                         .thenReturn(ExecutionStatus.SUCCESS);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -374,7 +373,7 @@ public class WorkflowExecuteThreadTest {
 
     @Test
     public void testBlockingWithNoBlocked(){
-        try{
+        try {
             initEnvForBlockingTest(false,false);
             // test method
             Method main = WorkflowExecuteThread.class.getDeclaredMethod("run");
@@ -384,7 +383,7 @@ public class WorkflowExecuteThreadTest {
             isProcessBlocked.setAccessible(true);
             Assert.assertEquals(Flag.NO,isProcessBlocked.get(workflowExecuteThread));
             Assert.assertEquals(ExecutionStatus.SUCCESS,processInstance.getState());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -403,14 +402,14 @@ public class WorkflowExecuteThreadTest {
             Assert.assertEquals(Flag.YES,isProcessBlocked.get(workflowExecuteThread));
             Assert.assertEquals(ExecutionStatus.READY_PAUSE,processInstance.getState());
             verify(alertManager,never()).sendProcessBlockingAlert(processInstance,null);
-        }catch (Exception e){
+        } catch (Exception e) {
             Assert.fail();
         }
     }
 
     @Test
     public void testBlockingWithBlockedWithAlert(){
-        try{
+        try {
             initEnvForBlockingTest(true,true);
             // test method
             Method main = WorkflowExecuteThread.class.getDeclaredMethod("run");
@@ -421,7 +420,7 @@ public class WorkflowExecuteThreadTest {
             Assert.assertEquals(Flag.YES,isProcessBlocked.get(workflowExecuteThread));
             Assert.assertEquals(ExecutionStatus.READY_PAUSE,processInstance.getState());
             verify(alertManager,times(1)).sendProcessBlockingAlert(processInstance,null);
-        }catch (Exception e){
+        } catch (Exception e) {
             Assert.fail();
         }
     }
