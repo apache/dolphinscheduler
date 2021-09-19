@@ -615,7 +615,7 @@ public class WorkflowExecuteThread implements Runnable {
                     if (taskInstance.isBlockingTask()) {
                         boolean isBlocked = (Boolean)taskProcessor.taskExtraInfo();
                         logger.info("blocking task runs complete, the result:{}",isBlocked);
-                        if(isBlocked){
+                        if (isBlocked) {
                             this.isProcessBlocked = Flag.YES;
                             stateEvent.setType(StateEventType.PROCESS_BLOCKED);
                         } else {
@@ -822,7 +822,7 @@ public class WorkflowExecuteThread implements Runnable {
 
     private void submitPostNode(String parentNodeName) {
         // if process blocked, successor tasks will not be submitted
-        if(this.isProcessBlocked == Flag.YES){
+        if (this.isProcessBlocked == Flag.YES) {
             return;
         }
         Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
@@ -890,7 +890,7 @@ public class WorkflowExecuteThread implements Runnable {
                 continue;
             }
             // ignore task state if current task is condition
-            if(taskNode.isBlockingTask()){
+            if (taskNode.isBlockingTask()) {
                 continue;
             }
             if (!dependTaskSuccess(depsNode, taskName)) {
