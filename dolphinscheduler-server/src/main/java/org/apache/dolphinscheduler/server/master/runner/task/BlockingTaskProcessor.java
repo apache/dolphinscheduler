@@ -26,12 +26,9 @@ import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.LoggerFactory;
@@ -51,7 +48,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
      */
     private DependentParameters dependentParameters;
 
-    ProcessInstance processInstance;
+    private ProcessInstance processInstance;
 
     /**
      * condition result
@@ -66,7 +63,6 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
-    private TaskDefinition taskDefinition;
 
     private boolean isBlocked;
 
@@ -83,9 +79,6 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
         if (this.taskInstance == null) {
             return false;
         }
-        taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
-        );
 
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 processInstance.getProcessDefinitionCode(),
