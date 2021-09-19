@@ -998,7 +998,8 @@
                         <include>**/server/master/DependentTaskTest.java</include>
                         <include>**/server/master/ConditionsTaskTest.java</include>
                         <include>**/server/master/SwitchTaskTest.java</include>
-                        <include>**/server/master/MasterExecThreadTest.java</include>
+                        <include>**/server/master/WorkflowExecuteThread.java</include>
+                        <include>**/server/master/BlockingTaskTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/master/SubProcessTaskTest.java</include>
                         <include>**/server/master/processor/TaskAckProcessorTest.java</include>

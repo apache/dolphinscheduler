@@ -38,7 +38,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected ProcessInstance processInstance;
 
     /**
-     * pause task, common tasks donot need this.
+     * pause task, common tasks do not need this.
      *
      * @return
      */

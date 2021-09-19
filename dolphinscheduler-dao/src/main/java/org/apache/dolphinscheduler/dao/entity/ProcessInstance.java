@@ -239,6 +239,7 @@ public class ProcessInstance {
      */
     private String varPool;
 
+
     public ProcessInstance() {
 
     }
