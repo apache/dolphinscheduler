@@ -693,12 +693,12 @@ public class TaskInstance implements Serializable {
         return endTime == null;
     }
 
-    public boolean isBlockingTask(){
+    public boolean isBlockingTask() {
         return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public String getBlockingCondition() {
-        if(this.blockingCondition == null){
+        if (this.blockingCondition == null) {
             Map<String, String> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, String.class);
             this.blockingCondition = taskParamsMap.get(Constants.BLOCKING_CONDITION);
         }

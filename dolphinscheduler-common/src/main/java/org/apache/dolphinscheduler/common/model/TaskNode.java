@@ -464,7 +464,7 @@ public class TaskNode {
         this.waitStartTimeout = waitStartTimeout;
     }
 
-    public boolean isBlockingTask(){
+    public boolean isBlockingTask() {
         return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.getType());
     }
 }

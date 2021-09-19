@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 package org.apache.dolphinscheduler.common.task.blocking;
-
-
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,6 @@ public class BlockingParameters extends AbstractParameters {
 
     // if true, alert when blocking, otherwise do nothing
     private boolean isAlertWhenBlocking;
-
 
     @Override
     public boolean checkParameters() {

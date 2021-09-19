@@ -550,9 +550,9 @@ public class DagHelper {
      * is there have blocking node after the parent node
      */
     public static boolean haveBlockingAfterNode(String parentNodeName,
-                                                DAG<String,TaskNode,TaskNodeRelation> dag){
+                                                DAG<String,TaskNode,TaskNodeRelation> dag) {
         Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeName);
-        if(CollectionUtils.isEmpty(subsequentNodes)){
+        if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
         }
         for(String nodeName : subsequentNodes){
