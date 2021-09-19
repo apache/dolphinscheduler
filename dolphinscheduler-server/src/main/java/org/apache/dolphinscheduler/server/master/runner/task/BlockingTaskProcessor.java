@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.LoggerFactory;
 
-
 /**
  * blocking task processor
  */
