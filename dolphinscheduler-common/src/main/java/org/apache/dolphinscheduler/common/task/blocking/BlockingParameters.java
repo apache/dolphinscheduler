@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.task.blocking;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
