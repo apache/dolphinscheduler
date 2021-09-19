@@ -27,6 +27,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.task.BlockingTaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
@@ -36,7 +39,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +55,8 @@ public class BlockingTaskTest {
 
     private ProcessInstance processInstance;
 
+    private MasterConfig config;
+
     @Before
     public void before(){
         // init spring context
@@ -61,7 +65,7 @@ public class BlockingTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
 
         // mock master
-        MasterConfig config = new MasterConfig();
+        config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setMasterTaskCommitRetryTimes(3);
         config.setMasterTaskCommitInterval(1000);
@@ -105,6 +109,7 @@ public class BlockingTaskTest {
         taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setTaskParams(taskNode.getTaskParams());
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         return taskInstance;
     }
 
@@ -158,14 +163,14 @@ public class BlockingTaskTest {
     }
 
     private TaskInstance testBasicInit(String blockingCondition,ExecutionStatus... expectResults){
+
         TaskInstance taskInstance = getTaskInstance(getTaskNode(blockingCondition),processInstance);
 
-        // for MasterBaseTaskExecThread.submit
-        Mockito.when(processService
-                .submitTask(taskInstance))
+        Mockito.when(processService.submitTask(taskInstance,
+                config.getMasterTaskCommitRetryTimes(),
+                config.getMasterTaskCommitInterval()))
                 .thenReturn(taskInstance);
 
-        // for MasterBaseTaskExecThread.call
         Mockito.when(processService
                 .findTaskInstanceById(taskInstance.getId()))
                 .thenReturn(taskInstance);
@@ -203,6 +208,27 @@ public class BlockingTaskTest {
         return taskInstanceList;
     }
 
+    @Test
+    public void testBlockingTaskSubmit(){
+        TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
+                ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
+        BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
+        boolean res = blockingTaskProcessor.submit(taskInstance,
+                processInstance,config.getMasterTaskCommitRetryTimes(),config.getMasterTaskCommitInterval());
+        Assert.assertEquals(true,res);
+    }
+
+    @Test
+    public void testGetTaskStatus(){
+        TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
+                ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
+        BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
+        blockingTaskProcessor.submit(taskInstance,
+                processInstance,config.getMasterTaskCommitRetryTimes(),config.getMasterTaskCommitInterval());
+        ExecutionStatus status = blockingTaskProcessor.taskState();
+        Assert.assertEquals(status,ExecutionStatus.RUNNING_EXECUTION);
+    }
+
     /**
      * Blocking node may be failed when DB or Master Server crashed.
      * The former, execution result will not be written into DB.
@@ -213,8 +239,11 @@ public class BlockingTaskTest {
     public void testBlockingLogicFailed(){
         TaskInstance taskInstance = testBasicInit("BlockingOnFailed",
                 ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE, ExecutionStatus.SUCCESS);
-        BlockingTaskExecThread taskExecThread = new BlockingTaskExecThread(taskInstance);
-        Boolean res = taskExecThread.call();
+        ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+        taskProcessor.submit(taskInstance,
+                processInstance, config.getMasterTaskCommitRetryTimes(), config.getMasterTaskCommitInterval());
+        taskProcessor.run();
+        Boolean res = (Boolean)taskProcessor.taskExtraInfo();
         Assert.assertEquals(true, res);
     }
 
@@ -222,8 +251,11 @@ public class BlockingTaskTest {
     public void testBlockingLogicSuccess(){
         TaskInstance taskInstance = testBasicInit("BlockingOnSuccess",
                 ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS);
-        BlockingTaskExecThread taskExecThread = new BlockingTaskExecThread(taskInstance);
-        Boolean res = taskExecThread.call();
+        ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+        taskProcessor.submit(taskInstance,
+                processInstance, config.getMasterTaskCommitRetryTimes(), config.getMasterTaskCommitInterval());
+        taskProcessor.run();
+        Boolean res = (Boolean)taskProcessor.taskExtraInfo();
         Assert.assertEquals(true, res);
     }
 }
