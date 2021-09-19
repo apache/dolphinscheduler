@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,10 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.LoggerFactory;
+
+
 /**
  * blocking task processor
  */
-public class BlockingTaskProcessor extends BaseTaskProcessor{
+public class BlockingTaskProcessor extends BaseTaskProcessor {
     /**
      * dependent parameters
      */
@@ -129,7 +132,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
     /**
      * init task running parameters
      */
-    private void initTaskParameters(){
+    private void initTaskParameters() {
         this.taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
@@ -147,15 +150,15 @@ public class BlockingTaskProcessor extends BaseTaskProcessor{
      * @param item the dependent item containing depTasks and status
      * @return depend result for depend item. SUCCESS or FAILED
      */
-    private DependResult getDependentResultForItem(DependentItem item){
+    private DependResult getDependentResultForItem(DependentItem item) {
         DependResult dependResult = DependResult.SUCCESS;
-        if(!completeTaskList.containsKey(item.getDepTasks())){
+        if (!completeTaskList.containsKey(item.getDepTasks())) {
             logger.info("depend item: {} have not completed yet.", item.getDepTasks());
             return dependResult;
         }
         // the actual status of task
         ExecutionStatus executionStatus = completeTaskList.get(item.getDepTasks());
-        if(executionStatus != item.getStatus()){
+        if (executionStatus != item.getStatus()) {
             logger.info("depend item: {} expect status: {}, actual status: {}",item.getDepTasks(),
                     item.getStatus(),executionStatus);
             dependResult = DependResult.FAILED;

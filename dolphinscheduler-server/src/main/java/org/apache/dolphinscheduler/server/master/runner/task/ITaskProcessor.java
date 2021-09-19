@@ -36,7 +36,7 @@ public interface ITaskProcessor {
 
     ExecutionStatus taskState();
 
-    default Object taskExtraInfo(){
+    default Object taskExtraInfo() {
         return null;
     }
 
