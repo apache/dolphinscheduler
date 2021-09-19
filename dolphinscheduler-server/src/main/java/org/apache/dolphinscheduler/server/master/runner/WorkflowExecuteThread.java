@@ -387,7 +387,7 @@ public class WorkflowExecuteThread implements Runnable {
         } else if (task.getState().typeIsFailure()) {
             if (task.isConditionsTask()
                     || DagHelper.haveConditionsAfterNode(task.getName(), dag)
-                    ||DagHelper.haveBlockingAfterNode(task.getName(),dag)) {
+                    || DagHelper.haveBlockingAfterNode(task.getName(),dag)) {
                 submitPostNode(task.getName());
             } else {
                 errorTaskList.put(task.getName(), task);
@@ -429,9 +429,9 @@ public class WorkflowExecuteThread implements Runnable {
         return true;
     }
 
-    private boolean processBlockedHandler(StateEvent stateEvent){
+    private boolean processBlockedHandler(StateEvent stateEvent) {
         TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
-        if(task.getAlertWhenBlocking()){
+        if (task.getAlertWhenBlocking()) {
             ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendProcessBlockingAlert(processInstance,projectUser);
         }
@@ -612,7 +612,7 @@ public class WorkflowExecuteThread implements Runnable {
                     stateEvent.setProcessInstanceId(this.processInstance.getId());
                     stateEvent.setTaskInstanceId(taskInstance.getId());
                     stateEvent.setExecutionStatus(taskProcessor.taskState());
-                    if(taskInstance.isBlockingTask()){
+                    if (taskInstance.isBlockingTask()) {
                         boolean isBlocked = (Boolean)taskProcessor.taskExtraInfo();
                         logger.info("blocking task runs complete, the result:{}",isBlocked);
                         if(isBlocked){
