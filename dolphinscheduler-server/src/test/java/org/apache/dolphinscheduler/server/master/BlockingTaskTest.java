@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +56,7 @@ public class BlockingTaskTest {
     /**
      * TaskNode.runFlag : task can be run normally
      */
-    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
+    public static final String FLOW_NODE_RUN_FLAG_NORMAL = "NORMAL";
 
     private ProcessService processService;
 
@@ -91,7 +93,6 @@ public class BlockingTaskTest {
         taskDefinition.setTimeout(0);
         Mockito.when(processService.findTaskDefinition(1L,1))
                 .thenReturn(taskDefinition);
-
     }
 
 
@@ -130,7 +131,7 @@ public class BlockingTaskTest {
         taskNode.setCode(1L);
         taskNode.setVersion(1);
         taskNode.setType(TaskType.BLOCKING.getDesc());
-        taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
+        taskNode.setRunFlag(FLOW_NODE_RUN_FLAG_NORMAL);
 
         DependentItem dependentItemA = new DependentItem();
         dependentItemA.setDepTasks("1");
@@ -203,7 +204,7 @@ public class BlockingTaskTest {
      */
     private List<TaskInstance> getTaskInstanceForValidTaskList(ExecutionStatus... status) {
         List<TaskInstance> taskInstanceList = new ArrayList<>();
-        for (int i = 1 ; i <= status.length ; i++) {
+        for (int i = 1; i <= status.length; i++) {
             TaskInstance taskInstance = new TaskInstance();
             taskInstance.setId(i);
             taskInstance.setName(String.valueOf(i));
