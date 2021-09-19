@@ -555,10 +555,10 @@ public class DagHelper {
         if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
         }
-        for(String nodeName : subsequentNodes){
+        for (String nodeName : subsequentNodes) {
             TaskNode taskNode = dag.getNode(nodeName);
             List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
-            if(preTaskList.contains(parentNodeName) && taskNode.isBlockingTask()){
+            if (preTaskList.contains(parentNodeName) && taskNode.isBlockingTask()) {
                 return true;
             }
         }

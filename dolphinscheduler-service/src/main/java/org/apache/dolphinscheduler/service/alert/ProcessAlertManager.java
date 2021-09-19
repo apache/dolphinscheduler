@@ -267,7 +267,7 @@ public class ProcessAlertManager {
      * @param projectUser the project owner
      */
     public void sendProcessBlockingAlert(ProcessInstance processInstance,
-                                         ProjectUser projectUser){
+                                         ProjectUser projectUser) {
         Alert alert = new Alert();
         String cmdName = getCommandCnName(processInstance.getCommandType());
         List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);

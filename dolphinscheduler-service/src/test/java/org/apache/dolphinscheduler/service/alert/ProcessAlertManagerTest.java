@@ -95,7 +95,7 @@ public class ProcessAlertManagerTest {
      * send blocking alert
      */
     @Test
-    public void sendBlockingAlertTest(){
+    public void sendBlockingAlertTest() {
         // process instance
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
