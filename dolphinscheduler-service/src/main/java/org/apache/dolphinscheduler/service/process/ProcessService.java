@@ -1078,6 +1078,7 @@ public class ProcessService {
                     task = submitTask(taskInstance);
                     if (task != null && task.getId() != 0) {
                         submitDB = true;
+                        break;
                     }
                 }
                 if (!submitDB) {
