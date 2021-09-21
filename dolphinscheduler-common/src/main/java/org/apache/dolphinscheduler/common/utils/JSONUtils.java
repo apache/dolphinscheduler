@@ -247,9 +247,9 @@ public class JSONUtils {
      * @param <V> V
      * @return to map
      */
-    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
-    }
+//    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
+//        return parseObject(json, new TypeReference<Map<K, V>>() {});
+//    }
 
     /**
      * json to object
