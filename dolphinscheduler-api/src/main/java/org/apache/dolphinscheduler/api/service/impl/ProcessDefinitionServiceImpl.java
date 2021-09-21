@@ -644,7 +644,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if ((delete & deleteRelation) == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1324,9 +1324,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
-                result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, Lists.newArrayList()));
+                try {
+                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, Lists.newArrayList()));
+                } catch (Exception e) {
+                    putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
+                    throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
+                }
             } else {
-                result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null, Lists.newArrayList()));
+                try {
+                    result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null, Lists.newArrayList()));
+                } catch (Exception e) {
+                    putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
+                    throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
+                }
             }
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
