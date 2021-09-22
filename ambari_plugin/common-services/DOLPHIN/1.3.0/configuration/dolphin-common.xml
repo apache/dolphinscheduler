@@ -1,0 +1,158 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+    <property>
+        <name>resource.storage.type</name>
+        <display-name>Choose Resource Upload Startup Type</display-name>
+        <description>
+            Resource upload startup type : HDFS,S3,NONE
+        </description>
+        <value>NONE</value>
+        <value-attributes>
+            <type>value-list</type>
+            <entries>
+                <entry>
+                    <value>HDFS</value>
+                    <label>HDFS</label>
+                </entry>
+                <entry>
+                    <value>S3</value>
+                    <label>S3</label>
+                </entry>
+                <entry>
+                    <value>NONE</value>
+                    <label>NONE</label>
+                </entry>
+            </entries>
+            <selection-cardinality>1</selection-cardinality>
+        </value-attributes>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>resource.upload.path</name>
+        <value>/dolphinscheduler</value>
+        <description>
+            resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>data.basedir.path</name>
+        <value>/tmp/dolphinscheduler</value>
+        <description>
+            user data local directory path, please make sure the directory exists and have read write permissions
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+
+    <property>
+        <name>hadoop.security.authentication.startup.state</name>
+        <value>false</value>
+        <value-attributes>
+            <type>value-list</type>
+            <entries>
+                <entry>
+                    <value>true</value>
+                    <label>Enabled</label>
+                </entry>
+                <entry>
+                    <value>false</value>
+                    <label>Disabled</label>
+                </entry>
+            </entries>
+            <selection-cardinality>1</selection-cardinality>
+        </value-attributes>
+        <description>whether kerberos starts</description>
+    </property>
+    <property>
+        <name>java.security.krb5.conf.path</name>
+        <value>/opt/krb5.conf</value>
+        <description>
+            java.security.krb5.conf path
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>login.user.keytab.username</name>
+        <value>hdfs-mycluster@ESZ.COM</value>
+        <description>
+            LoginUserFromKeytab user
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>login.user.keytab.path</name>
+        <value>/opt/hdfs.headless.keytab</value>
+        <description>
+            LoginUserFromKeytab path
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>resource.view.suffixs</name>
+        <value>txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties</value>
+        <description></description>
+    </property>
+    <property>
+        <name>hdfs.root.user</name>
+        <value>hdfs</value>
+        <description>
+            Users who have permission to create directories under the HDFS root path
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://mycluster:8020</value>
+        <description>
+            HA or single namenode,
+            If namenode ha needs to copy core-site.xml and hdfs-site.xml to the conf directory，
+            support s3，for example : s3a://dolphinscheduler
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>http://host:9010</value>
+        <description>
+            s3 need，s3 endpoint
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>A3DXS30FO22544RE</value>
+        <description>
+            s3 need，s3 access key
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>OloCLq3n+8+sdPHUhJ21XrSxTC+JK</value>
+        <description>
+            s3 need，s3 secret key
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>kerberos.expire.time</name>
+        <value>7</value>
+        <description></description>
+    </property>
+
+</configuration>
