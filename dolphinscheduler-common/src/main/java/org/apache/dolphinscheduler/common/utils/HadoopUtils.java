@@ -446,6 +446,7 @@ public class HadoopUtils implements Closeable {
             case Constants.ACCEPTED:
                 return ExecutionStatus.SUBMITTED_SUCCESS;
             case Constants.SUCCEEDED:
+            case Constants.ENDED:
                 return ExecutionStatus.SUCCESS;
             case Constants.NEW:
             case Constants.NEW_SAVING:
