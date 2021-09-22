@@ -298,8 +298,8 @@
           workerGroup: this.workerGroup,
           environmentCode: this.environmentCode,
           startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
-          expectedParallelismNumber: this.parallismNumber
-          dryRun: this.dryRun,
+          expectedParallelismNumber: this.parallismNumber,
+          dryRun: this.dryRun
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
