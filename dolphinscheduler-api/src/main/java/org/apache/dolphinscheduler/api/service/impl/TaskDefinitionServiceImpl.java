@@ -125,15 +125,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 return result;
             }
         }
-        if (processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
-            Map<String, Object> resData = new HashMap<>();
-            resData.put("total", taskDefinitionLogs.size());
-            resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, resData);
-        } else {
+        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
+        if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            return result;
         }
+        Map<String, Object> resData = new HashMap<>();
+        resData.put("total", taskDefinitionLogs.size());
+        resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, resData);
         return result;
     }
 

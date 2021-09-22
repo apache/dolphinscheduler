@@ -118,6 +118,7 @@
             <m-related-environment
               v-model="environmentCode"
               :workerGroup="workerGroup"
+              :isNewCreate="isNewCreate"
               v-on:environmentCodeEvent="_onUpdateEnvironmentCode"
             ></m-related-environment>
           </div>
@@ -512,7 +513,9 @@
         postTasks: [],
         prevTasks: [],
         // refresh part of the formModel, after set backfillItem outside
-        backfillRefresh: true
+        backfillRefresh: true,
+        // whether this is a new Task
+        isNewCreate: true
       }
     },
     provide () {
@@ -560,7 +563,8 @@
           },
           type: task.taskType,
           waitStartTimeout: task.taskParams.waitStartTimeout,
-          workerGroup: task.workerGroup
+          workerGroup: task.workerGroup,
+          environmentCode: task.environmentCode
         }
       },
       /**
@@ -695,7 +699,7 @@
         }
         // Name repeat depends on dom backfill dependent store
         const tasks = this.store.state.dag.tasks
-        const task = tasks.find((t) => t.name === 'this.name')
+        const task = tasks.find((t) => t.name === this.name)
         if (task) {
           this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
@@ -902,6 +906,7 @@
             const backfillItem = this.taskToBackfillItem(task)
             o = backfillItem
             this.backfillItem = backfillItem
+            this.isNewCreate = false
           }
         })
       }

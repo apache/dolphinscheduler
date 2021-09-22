@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -52,7 +52,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MysqlTargetGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, SqoopTaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
 
         StringBuilder mysqlTargetSb = new StringBuilder();
 
@@ -64,8 +64,8 @@ public class MysqlTargetGenerator implements ITargetGenerator {
 
                 // get datasource
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
-                        DbType.of(taskExecutionContext.getTargetType()),
-                        taskExecutionContext.getTargetConnectionParams());
+                        DbType.of(taskExecutionContext.getSqoopTaskExecutionContext().getTargetType()),
+                        taskExecutionContext.getSqoopTaskExecutionContext().getTargetConnectionParams());
 
                 if (null != baseDataSource) {
 

@@ -15,32 +15,41 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.entity;
-
-import java.io.Serializable;
+package org.apache.dolphinscheduler.spi.task.request;
 
 /**
- *  master/worker task transport
+ * UDF type
  */
-public class ProcedureTaskExecutionContext implements Serializable{
-
+public enum UdfType {
     /**
-     * connectionParams
+     * 0 hive; 1 spark
      */
-    private String connectionParams;
+    HIVE(0, "hive"),
+    SPARK(1, "spark");
 
-    public String getConnectionParams() {
-        return connectionParams;
+    UdfType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
     }
 
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
     }
 
-    @Override
-    public String toString() {
-        return "ProcedureTaskExecutionContext{" +
-                "connectionParams='" + connectionParams + '\'' +
-                '}';
+    public String getDescp() {
+        return descp;
     }
+
+    public static UdfType of(int type) {
+        for (UdfType ut : values()) {
+            if (ut.getCode() == type) {
+                return ut;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
+
 }
