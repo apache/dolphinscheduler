@@ -300,7 +300,6 @@
           startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
           expectedParallelismNumber: this.parallismNumber
           dryRun: this.dryRun,
-          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : ''
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
