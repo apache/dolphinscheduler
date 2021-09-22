@@ -142,7 +142,7 @@ public class ResourcesController extends BaseController {
         @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
         @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
-    @PostMapping()
+    @PostMapping("/create")
     @ApiException(CREATE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
