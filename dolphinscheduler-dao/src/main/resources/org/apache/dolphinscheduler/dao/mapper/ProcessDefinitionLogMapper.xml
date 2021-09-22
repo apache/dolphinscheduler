@@ -29,7 +29,7 @@
         select pd.id, pd.code, pd.name, pd.version, pd.description, pd.project_code,
         pd.release_state, pd.user_id,pd.global_params, pd.flag, pd.locations,
         pd.warning_group_id, pd.timeout, pd.tenant_id,pd.operator, pd.operate_time, pd.create_time,
-        pd.update_time, u.user_name,p.name as project_name
+        pd.update_time, u.user_name,p.name as project_name ,pd.execution_type
         from t_ds_process_definition_log pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code

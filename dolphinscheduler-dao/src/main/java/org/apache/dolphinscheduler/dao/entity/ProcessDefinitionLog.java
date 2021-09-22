@@ -41,11 +41,6 @@ public class ProcessDefinitionLog extends ProcessDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
-    /**
-     * execution type
-     */
-    private ProcessExecutionTypeEnum executionType;
-
     public ProcessDefinitionLog() {
         super();
     }
@@ -98,13 +93,4 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         return super.equals(o);
     }
 
-    @Override
-    public ProcessExecutionTypeEnum getExecutionType() {
-        return executionType;
-    }
-
-    @Override
-    public void setExecutionType(ProcessExecutionTypeEnum executionType) {
-        this.executionType = executionType;
-    }
 }

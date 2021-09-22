@@ -234,8 +234,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                             @Param("states") int[] states);
 
     List<ProcessInstance> queryByProcessDefineCodeAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
-                                                            @Param("states") int[] states,
-                                                                     @Param("id") int id);
+                                                            @Param("states") int[] states, @Param("id") int id);
 
     int updateGlobalParamsById(@Param("globalParams") String globalParams,
                                @Param("id") int id);
