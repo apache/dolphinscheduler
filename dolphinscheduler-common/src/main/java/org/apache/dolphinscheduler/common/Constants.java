@@ -658,6 +658,10 @@ public final class Constants {
      */
     public static final String SUCCEEDED = "SUCCEEDED";
     /**
+     * ENDED
+     */
+    public static final String ENDED = "ENDED";
+    /**
      * NEW
      */
     public static final String NEW = "NEW";
