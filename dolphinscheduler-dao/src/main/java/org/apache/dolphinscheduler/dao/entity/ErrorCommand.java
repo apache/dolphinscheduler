@@ -14,16 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.*;
 
-import java.util.Date;
+
 
 /**
  * command
@@ -34,7 +42,7 @@ public class ErrorCommand {
     /**
      * id
      */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private int id;
 
     /**
@@ -80,13 +88,13 @@ public class ErrorCommand {
     /**
      * schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date scheduleTime;
 
     /**
      * start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -97,7 +105,7 @@ public class ErrorCommand {
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date updateTime;
 
     /**
@@ -116,10 +124,9 @@ public class ErrorCommand {
     @TableField("dry_run")
     private Integer dryRun;
 
+    public ErrorCommand() {}
 
-    public ErrorCommand(){}
-
-    public ErrorCommand(Command command, String message){
+    public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
@@ -149,7 +156,7 @@ public class ErrorCommand {
             Date scheduleTime,
             Priority processInstancePriority,
             String message,
-            Integer dryRun){
+            Integer dryRun) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionId = processDefinitionId;
@@ -165,7 +172,6 @@ public class ErrorCommand {
         this.message = message;
         this.dryRun = dryRun;
     }
-
 
     public TaskDependType getTaskDependType() {
         return taskDependType;
@@ -198,7 +204,6 @@ public class ErrorCommand {
     public void setProcessDefinitionId(int processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
-
 
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
@@ -298,23 +303,23 @@ public class ErrorCommand {
 
     @Override
     public String toString() {
-        return "ErrorCommand{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionId=" + processDefinitionId +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", message='" + message + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", dryRun='" + dryRun + '\'' +
-                '}';
+        return "ErrorCommand{"
+                + "id=" + id
+                + ", commandType=" + commandType
+                + ", processDefinitionId=" + processDefinitionId
+                + ", executorId=" + executorId
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", startTime=" + startTime
+                + ", processInstancePriority=" + processInstancePriority
+                + ", updateTime=" + updateTime
+                + ", message='" + message + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", dryRun='" + dryRun + '\''
+                + '}';
     }
 }
