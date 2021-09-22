@@ -248,7 +248,6 @@
         if (this.sourceType === 'contextmenu') {
           param.taskDependType = this.taskDependType
         }
-        console.log(param)
         this.store.dispatch('dag/processStart', param).then(res => {
           this.$message.success(res.msg)
           this.$emit('onUpdateStart')
