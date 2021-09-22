@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
