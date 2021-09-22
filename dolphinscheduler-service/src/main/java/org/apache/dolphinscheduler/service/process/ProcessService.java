@@ -1078,6 +1078,7 @@ public class ProcessService {
                     task = submitTask(taskInstance);
                     if (task != null && task.getId() != 0) {
                         submitDB = true;
+                        break;
                     }
                 }
                 if (!submitDB) {
@@ -2150,7 +2151,7 @@ public class ProcessService {
         return StringUtils.join(resourceIds, ",");
     }
 
-    public boolean saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
+    public int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
         Date now = new Date();
         List<TaskDefinitionLog> newTaskDefinitionLogs = new ArrayList<>();
         List<TaskDefinitionLog> updateTaskDefinitionLogs = new ArrayList<>();
@@ -2182,7 +2183,7 @@ public class ProcessService {
                     taskDefinitionLog.setCode(SnowFlakeUtils.getInstance().nextId());
                 } catch (SnowFlakeException e) {
                     logger.error("Task code get error, ", e);
-                    return false;
+                    return Constants.DEFINITION_FAILURE;
                 }
             }
             newTaskDefinitionLogs.add(taskDefinitionLog);
@@ -2195,17 +2196,15 @@ public class ProcessService {
                 int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
                 taskDefinitionToUpdate.setId(task.getId());
                 int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
-                if ((update & insert) != 1) {
-                    return false;
-                }
+                return update & insert;
             }
         }
         if (!newTaskDefinitionLogs.isEmpty()) {
             int insert = taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
             int logInsert = taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
-            return (logInsert & insert) != 0;
+            return logInsert & insert;
         }
-        return true;
+        return Constants.EXIT_CODE_SUCCESS;
     }
 
     /**
