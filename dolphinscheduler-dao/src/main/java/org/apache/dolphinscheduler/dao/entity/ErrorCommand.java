@@ -26,12 +26,9 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-
 
 /**
  * command
@@ -51,9 +48,9 @@ public class ErrorCommand {
     private CommandType commandType;
 
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private long processDefinitionCode;
 
     /**
      * executor id
@@ -121,8 +118,12 @@ public class ErrorCommand {
     /**
      * dry run state
      */
-    @TableField("dry_run")
     private Integer dryRun;
+
+    /**
+     * environment code
+     */
+    private Long environmentCode;
 
     public ErrorCommand() {}
 
@@ -130,7 +131,7 @@ public class ErrorCommand {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
-        this.processDefinitionId = command.getProcessDefinitionId();
+        this.processDefinitionCode = command.getProcessDefinitionCode();
         this.commandParam = command.getCommandParam();
         this.warningType = command.getWarningType();
         this.warningGroupId = command.getWarningGroupId();
@@ -139,38 +140,10 @@ public class ErrorCommand {
         this.failureStrategy = command.getFailureStrategy();
         this.startTime = command.getStartTime();
         this.updateTime = command.getUpdateTime();
+        this.environmentCode = command.getEnvironmentCode();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
         this.dryRun = command.getDryRun();
-    }
-
-    public ErrorCommand(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            int processDefinitionId,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            Priority processInstancePriority,
-            String message,
-            Integer dryRun) {
-        this.commandType = commandType;
-        this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
-        this.commandParam = commandParam;
-        this.warningType = warningType;
-        this.warningGroupId = warningGroupId;
-        this.scheduleTime = scheduleTime;
-        this.taskDependType = taskDependType;
-        this.failureStrategy = failureStrategy;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-        this.processInstancePriority = processInstancePriority;
-        this.message = message;
-        this.dryRun = dryRun;
     }
 
     public TaskDependType getTaskDependType() {
@@ -197,12 +170,12 @@ public class ErrorCommand {
         this.commandType = commandType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
 
     public FailureStrategy getFailureStrategy() {
@@ -293,6 +266,14 @@ public class ErrorCommand {
         this.message = message;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     public Integer getDryRun() {
         return dryRun;
     }
@@ -306,7 +287,7 @@ public class ErrorCommand {
         return "ErrorCommand{"
                 + "id=" + id
                 + ", commandType=" + commandType
-                + ", processDefinitionId=" + processDefinitionId
+                + ", processDefinitionCode=" + processDefinitionCode
                 + ", executorId=" + executorId
                 + ", commandParam='" + commandParam + '\''
                 + ", taskDependType=" + taskDependType
@@ -319,6 +300,7 @@ public class ErrorCommand {
                 + ", updateTime=" + updateTime
                 + ", message='" + message + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
                 + ", dryRun='" + dryRun + '\''
                 + '}';
     }

@@ -119,7 +119,7 @@
           dependTaskList: _.map(this.dependTaskList, v => {
             return {
               relation: v.relation,
-              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList', 'definitionList']))
             }
           })
         })
@@ -163,7 +163,7 @@
           dependTaskList: _.map(this.dependTaskList, v => {
             return {
               relation: v.relation,
-              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList', 'definitionList']))
             }
           })
         }

@@ -20,14 +20,12 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
     <sql id="baseSql">
         id, code, name, version, release_state, project_code, user_id, description,
-        global_params, flag, locations, connects, warning_group_id, create_time, timeout,
-        tenant_id, update_time
+        global_params, flag, locations, warning_group_id, create_time, timeout, tenant_id, update_time
     </sql>
 
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
-        pd.tenant_id, pd.update_time
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.tenant_id, pd.update_time
         from t_ds_process_definition pd
         WHERE pd.project_code = #{projectCode}
         and pd.name = #{processDefinitionName}
@@ -59,8 +57,7 @@
 
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
-        pd.tenant_id, pd.update_time,
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.tenant_id, pd.update_time,
         u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
@@ -75,8 +72,8 @@
         td.global_params, td.flag, td.warning_group_id, td.timeout, td.tenant_id, td.update_time, td.create_time,
         sc.schedule_release_state, tu.user_name
         FROM t_ds_process_definition td
-        left join (select process_definition_id,release_state as schedule_release_state from t_ds_schedules group by
-        process_definition_id,release_state) sc on sc.process_definition_id = td.id
+        left join (select process_definition_code,release_state as schedule_release_state from t_ds_schedules group by
+        process_definition_code,release_state) sc on sc.process_definition_code = td.code
         left join t_ds_user tu on td.user_id = tu.id
         where td.project_code = #{projectCode}
         <if test=" searchVal != null and searchVal != ''">
@@ -125,11 +122,11 @@
         </if>
         group by td.user_id,tu.user_name
     </select>
-    
+
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT
             pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
-            pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+            pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout,
             pd.tenant_id, pd.update_time, u.user_name,p.name AS project_name
         FROM
             t_ds_process_definition pd,
@@ -167,19 +164,5 @@
     <select id="listProjectIds" resultType="java.lang.Integer">
         SELECT DISTINCT(id) as project_id
         FROM t_ds_project
-    </select>
-
-
-    <update id="updateVersionByProcessDefinitionId">
-        update  t_ds_process_definition
-        set version = #{version}
-        where id = #{processDefinitionId}
-    </update>
-
-    <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
-        select id
-        from t_ds_process_definition
-        where id = #{processDefinitionId}
-        and version = #{version} limit 1
     </select>
 </mapper>

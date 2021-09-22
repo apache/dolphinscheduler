@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task definition log mapper interface
@@ -33,38 +35,51 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
-     * query task definition log by name
-     *
-     * @param projectCode projectCode
-     * @param name name
-     * @return task definition log list
-     */
-    List<TaskDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
-                                                  @Param("taskDefinitionName") String name);
-
-    /**
      * query max version for definition
      *
-     * @param taskDefinitionCode taskDefinitionCode
+     * @param code taskDefinitionCode
      */
-    Integer queryMaxVersionForDefinition(@Param("taskDefinitionCode") long taskDefinitionCode);
+    Integer queryMaxVersionForDefinition(@Param("code") long code);
 
     /**
      * query task definition log
      *
-     * @param taskDefinitionCode taskDefinitionCode
+     * @param code taskDefinitionCode
      * @param version version
      * @return task definition log
      */
-    TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("taskDefinitionCode") long taskDefinitionCode,
+    TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,
                                                       @Param("version") int version);
 
-
     /**
-     *
-     * @param taskDefinitions
-     * @return
+     * @param taskDefinitions taskDefinition list
+     * @return list
      */
     List<TaskDefinitionLog> queryByTaskDefinitions(@Param("taskDefinitions") Collection<TaskDefinition> taskDefinitions);
 
+    /**
+     * batch insert task definition logs
+     *
+     * @param taskDefinitionLogs taskDefinitionLogs
+     * @return int
+     */
+    int batchInsert(@Param("taskDefinitionLogs") List<TaskDefinitionLog> taskDefinitionLogs);
+
+    /**
+     * delete the certain task definition version by task definition code and version
+     *
+     * @param code task definition code
+     * @param version task definition version
+     * @return delete result
+     */
+    int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
+
+    /**
+     * query the paging task definition version list by pagination info
+     *
+     * @param page pagination info
+     * @param code process definition code
+     * @return the paging task definition version list
+     */
+    IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code);
 }

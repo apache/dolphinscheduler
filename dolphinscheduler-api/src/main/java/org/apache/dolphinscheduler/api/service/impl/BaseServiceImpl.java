@@ -24,8 +24,9 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -157,7 +158,7 @@ public class BaseServiceImpl implements BaseService {
     public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
         Map<String, Object> result = new HashMap<>();
         Date start = null;
-        if (StringUtils.isNotEmpty(startDateStr)) {
+        if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.getScheduleDate(startDateStr);
             if (Objects.isNull(start)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
@@ -167,7 +168,7 @@ public class BaseServiceImpl implements BaseService {
         result.put(Constants.START_TIME, start);
 
         Date end = null;
-        if (StringUtils.isNotEmpty(endDateStr)) {
+        if (!StringUtils.isEmpty(endDateStr)) {
             end = DateUtils.getScheduleDate(endDateStr);
             if (Objects.isNull(end)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);

@@ -323,7 +323,6 @@ public class TaskInstanceMapperTest {
         TaskInstance task = insertTaskInstance(processInstance.getId());
         ProcessDefinition definition = new ProcessDefinition();
         definition.setCode(1111L);
-        definition.setProjectId(1111);
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
@@ -348,7 +347,6 @@ public class TaskInstanceMapperTest {
     public void testQueryTaskInstanceListPaging() {
         ProcessDefinition definition = new ProcessDefinition();
         definition.setCode(1L);
-        definition.setProjectId(1111);
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());

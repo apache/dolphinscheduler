@@ -16,7 +16,7 @@
  */
 
 export default {
-  sourceWorkFlowId: '',
+  sourceWorkFlowCode: '',
   workList: [],
   locations: [],
   connects: []

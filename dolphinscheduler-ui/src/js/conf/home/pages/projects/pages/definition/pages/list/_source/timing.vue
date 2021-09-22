@@ -130,6 +130,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        {{$t('Environment Name')}}
+      </div>
+      <div class="cont">
+        <m-related-environment v-model="environmentCode" :workerGroup="workerGroup" v-on:environmentCodeEvent="_onUpdateEnvironmentCode"></m-related-environment>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Alarm group')}}
       </div>
       <div class="cont">
@@ -167,6 +175,7 @@
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+  import mRelatedEnvironment from '@/conf/home/pages/dag/_source/formModel/_source/relatedEnvironment'
 
   export default {
     name: 'timing-process',
@@ -188,6 +197,7 @@
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
         workerGroup: '',
+        environmentCode: '',
         previewTimes: []
       }
     },
@@ -215,6 +225,9 @@
         }
         return true
       },
+      _onUpdateEnvironmentCode (o) {
+        this.environmentCode = o
+      },
       _timing () {
         if (this._verification()) {
           let api = ''
@@ -229,7 +242,8 @@
             warningType: this.warningType,
             processInstancePriority: this.processInstancePriority,
             warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
-            workerGroup: this.workerGroup
+            workerGroup: this.workerGroup,
+            environmentCode: this.environmentCode
           }
           let msg = ''
 
@@ -240,7 +254,7 @@
             msg = `${i18n.$t('Edit')}${i18n.$t('Success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
-            searchParams.processDefinitionId = this.timingData.item.id
+            searchParams.processDefinitionCode = this.timingData.item.code
             msg = `${i18n.$t('Create')}${i18n.$t('Success')}`
           }
 
@@ -360,7 +374,7 @@
         }).catch(() => { this.warningGroupId = '' })
       }
     },
-    components: { vCrontab, mPriority, mWorkerGroups }
+    components: { vCrontab, mPriority, mWorkerGroups, mRelatedEnvironment }
   }
 </script>
 

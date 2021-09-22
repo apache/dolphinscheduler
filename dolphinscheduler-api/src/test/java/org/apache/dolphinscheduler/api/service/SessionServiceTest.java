@@ -21,10 +21,11 @@ import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -109,7 +110,7 @@ public class SessionServiceTest {
         Mockito.when(sessionMapper.queryByUserId(1)).thenReturn(getSessions());
         String sessionId = sessionService.createSession(user, ip);
         logger.info("createSessionId is " + sessionId);
-        Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+        Assert.assertTrue(!StringUtils.isEmpty(sessionId));
     }
 
     /**

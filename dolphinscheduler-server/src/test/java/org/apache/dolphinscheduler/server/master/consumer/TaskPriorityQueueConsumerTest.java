@@ -32,12 +32,12 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,7 +106,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
@@ -136,7 +135,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -179,7 +177,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -220,7 +217,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
@@ -280,7 +276,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
@@ -459,7 +454,6 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);

@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -110,7 +110,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
-        if (StringUtils.isNotEmpty(sparkConnectionParam.getOther())) {
+        if (!StringUtils.isEmpty(sparkConnectionParam.getOther())) {
             return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(), sparkConnectionParam.getOther());
         }
         return sparkConnectionParam.getJdbcUrl();

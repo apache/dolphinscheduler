@@ -36,19 +36,19 @@ export default {
         param: {
           tenantCode: payload.tenantCode
         },
-        api: 'tenant/verify-tenant-code'
+        api: 'tenants/verify-code'
       },
       alertgroup: {
         param: {
           groupName: payload.groupName
         },
-        api: 'alert-group/verify-group-name'
+        api: 'alert-groups/verify-name'
       },
       alarmInstance: {
         param: {
           alertInstanceName: payload.instanceName
         },
-        api: 'alert-plugin-instance/verify-alert-instance-name'
+        api: 'alert-plugin-instances/verify-name'
       }
     }
 
@@ -272,7 +272,7 @@ export default {
    */
   getTenantListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('tenant/list-paging', payload, res => {
+      io.get('tenants', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -284,7 +284,7 @@ export default {
    */
   getTenantList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('tenant/list', payload, res => {
+      io.get('tenants/list', payload, res => {
         const list = res.data
         list.unshift({
           id: -1,
@@ -302,7 +302,7 @@ export default {
    */
   getQueueList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('queue/list', payload, res => {
+      io.get('queues/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -314,7 +314,7 @@ export default {
    */
   createQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/create', payload, res => {
+      io.post('tenants', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -326,7 +326,7 @@ export default {
    */
   updateQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/update', payload, res => {
+      io.put(`tenants/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -338,7 +338,7 @@ export default {
    */
   deleteQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('tenant/delete', payload, res => {
+      io.delete(`tenants/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -350,7 +350,7 @@ export default {
    */
   queryAlertGroupListPaging ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list-paging', payload, res => {
+      io.get('alert-groups', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -362,7 +362,7 @@ export default {
    */
   queryAlertPluginInstanceListPaging ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/list-paging', payload, res => {
+      io.get('alert-plugin-instances', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -374,7 +374,7 @@ export default {
    */
   getPlugins ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('ui-plugins/queryUiPluginsByType', payload, res => {
+      io.get('ui-plugins/query-by-type', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -386,7 +386,7 @@ export default {
    */
   getUiPluginById ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('ui-plugins/queryUiPluginDetailById', payload, res => {
+      io.get(`ui-plugins/${payload.pluginId}`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -398,7 +398,7 @@ export default {
    */
   queryAllAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/queryAll', payload, res => {
+      io.get('alert-plugin-instance/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -410,7 +410,7 @@ export default {
    */
   getAlertgroup ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', payload, res => {
+      io.get('alert-groups/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -422,7 +422,7 @@ export default {
    */
   createAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/create', payload, res => {
+      io.post('alert-groups', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -434,7 +434,7 @@ export default {
    */
   createAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/create', payload, res => {
+      io.post('alert-plugin-instances', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -446,7 +446,7 @@ export default {
    */
   updateAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-plugin-instance/update', payload, res => {
+      io.put(`alert-plugin-instances/${payload.alertPluginInstanceId}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -458,7 +458,7 @@ export default {
    */
   updateAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/update', payload, res => {
+      io.put(`alert-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -470,7 +470,7 @@ export default {
    */
   deleteAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('alert-group/delete', payload, res => {
+      io.delete(`alert-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -482,7 +482,7 @@ export default {
    */
   deletAelertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/delete', payload, res => {
+      io.delete(`alert-plugin-instance/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -518,7 +518,7 @@ export default {
    */
   getQueueListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('queue/list-paging', payload, res => {
+      io.get('queues', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -530,7 +530,7 @@ export default {
    */
   createQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/create', payload, res => {
+      io.post('queues', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -542,7 +542,7 @@ export default {
    */
   updateQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/update', payload, res => {
+      io.put(`queues/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -554,7 +554,7 @@ export default {
    */
   verifyQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('queue/verify-queue', payload, res => {
+      io.post('queues/verify', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -566,7 +566,7 @@ export default {
    */
   getWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/list-paging', payload, res => {
+      io.get('worker-groups', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -578,7 +578,7 @@ export default {
    */
   getWorkerGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/all-groups', payload, res => {
+      io.get('worker-groups/all', payload, res => {
         let list = res.data
         if (list.length > 0) {
           list = list.map(item => {
@@ -605,7 +605,7 @@ export default {
    */
   getAlarmGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-group/list', payload, res => {
+      io.get('alert-groups/list', payload, res => {
         state.alarmGroupsListAll = res.data
         resolve(res)
       }).catch(e => {
@@ -615,7 +615,7 @@ export default {
   },
   saveWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('worker-group/save', payload, res => {
+      io.post('worker-groups', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -624,7 +624,7 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('worker-group/delete-by-id', payload, res => {
+      io.delete(`worker-groups/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -633,8 +633,79 @@ export default {
   },
   getWorkerAddresses ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/worker-address-list', payload, res => {
+      io.get('worker-groups/worker-address-list', payload, res => {
         resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get environment list pages
+   */
+  getEnvironmentListPaging ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * create environment
+   */
+  createEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/create', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update environment
+   */
+  updateEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/update', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * delete environment
+   */
+  deleteEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/delete', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  verifyEnvironment ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('environment/verify-environment', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get all environment
+   */
+  getEnvironmentAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('environment/query-environment-list', payload, res => {
+        let list = res.data
+        state.environmentListAll = list
+        resolve(list)
       }).catch(e => {
         reject(e)
       })

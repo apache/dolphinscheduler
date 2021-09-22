@@ -23,11 +23,9 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -36,6 +34,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -202,7 +202,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Date now = new Date();
 
-        if (StringUtils.isNotEmpty(tenantCode)) {
+        if (!StringUtils.isEmpty(tenantCode)) {
             tenant.setTenantCode(tenantCode);
         }
 
@@ -282,26 +282,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * query tenant list
      *
-     * @param tenantCode tenant code
-     * @return tenant list
-     */
-    public Map<String, Object> queryTenantList(String tenantCode) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
-        if (CollectionUtils.isNotEmpty(resourceList)) {
-            result.put(Constants.DATA_LIST, resourceList);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-        }
-        return result;
-    }
-
-    /**
-     * query tenant list
-     *
      * @param loginUser login user
      * @return tenant list
      */
@@ -342,6 +322,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      */
     private boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
-        return BooleanUtils.isTrue(existTenant);
+        return existTenant == Boolean.TRUE;
     }
 }
