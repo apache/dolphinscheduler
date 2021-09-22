@@ -132,7 +132,6 @@ public class Command {
     @TableField("dry_run")
     private Integer dryRun;
 
-
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;

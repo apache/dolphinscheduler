@@ -265,7 +265,6 @@ public class TaskInstance implements Serializable {
      */
     private Integer dryRun;
 
-
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
