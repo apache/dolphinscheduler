@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -393,7 +394,8 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.toMap(this.params, String.class, Object.class);
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+
         if (taskParams == null) {
             taskParams = new HashMap<>();
         }
@@ -405,7 +407,7 @@ public class TaskNode {
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.toMap(taskParams, String.class, Object.class);
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }

@@ -1779,7 +1779,7 @@ public class ProcessService {
             return;
         }
         //if the result more than one line,just get the first .
-        Map<String, Object> taskParams = JSONUtils.toMap(taskInstance.getTaskParams(), String.class, Object.class);
+        Map<String, Object> taskParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {});
         Object localParams = taskParams.get(LOCAL_PARAMS);
         if (localParams == null) {
             return;
