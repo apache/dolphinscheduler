@@ -393,11 +393,6 @@ public class ProcessServiceTest {
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
         Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
-        Mockito.when(taskDefinitionLogMapper.insert(taskDefinition)).thenReturn(1);
-        taskDefinition.setId(1);
-        Mockito.when(taskDefinitionMapper.updateById(taskDefinition)).thenReturn(1);
-        Mockito.when(taskDefinitionMapper.batchInsert(Lists.newArrayList(taskDefinition))).thenReturn(1);
-        Mockito.when(taskDefinitionLogMapper.batchInsert(Lists.newArrayList(taskDefinition))).thenReturn(1);
         int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs);
         Assert.assertEquals(0, result);
     }
