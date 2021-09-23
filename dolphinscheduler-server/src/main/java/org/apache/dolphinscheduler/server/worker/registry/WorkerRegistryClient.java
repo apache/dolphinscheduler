@@ -19,18 +19,19 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-import static org.apache.dolphinscheduler.common.Constants.SLASH;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.Set;
@@ -130,11 +131,10 @@ public class WorkerRegistryClient {
     public Set<String> getWorkerZkPaths() {
         Set<String> workerPaths = Sets.newHashSet();
         String address = getLocalAddress();
-        String workerZkPathPrefix = REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
         for (String workGroup : this.workerGroups) {
-            StringJoiner workerPathJoiner = new StringJoiner(SLASH);
-            workerPathJoiner.add(workerZkPathPrefix);
+            StringJoiner workerPathJoiner = new StringJoiner(SINGLE_SLASH);
+            workerPathJoiner.add(REGISTRY_DOLPHINSCHEDULER_WORKERS);
             if (StringUtils.isEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
             }

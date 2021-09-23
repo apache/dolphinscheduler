@@ -19,7 +19,12 @@ package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 
@@ -157,6 +162,12 @@ public class TaskExecutionContext implements Serializable {
     private String envFile;
 
     /**
+     * environmentConfig
+     */
+    private String environmentConfig;
+
+
+    /**
      * definedParams
      */
     private Map<String, String> definedParams;
@@ -220,6 +231,19 @@ public class TaskExecutionContext implements Serializable {
      * taskInstance varPool
      */
     private String varPool;
+
+    /**
+     * business param
+     */
+    private Map<String, Property> paramsMap;
+
+    public Map<String, Property> getParamsMap() {
+        return paramsMap;
+    }
+
+    public void setParamsMap(Map<String, Property> paramsMap) {
+        this.paramsMap = paramsMap;
+    }
 
     /**
      * procedure TaskExecutionContext
@@ -410,6 +434,14 @@ public class TaskExecutionContext implements Serializable {
         this.envFile = envFile;
     }
 
+    public String getEnvironmentConfig() {
+        return environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String config) {
+        this.environmentConfig = config;
+    }
+
     public Map<String, String> getDefinedParams() {
         return definedParams;
     }
@@ -552,6 +584,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", taskTimeoutStrategy=" + taskTimeoutStrategy
                 + ", taskTimeout=" + taskTimeout
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", delayTime=" + delayTime
                 + ", resources=" + resources
                 + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext

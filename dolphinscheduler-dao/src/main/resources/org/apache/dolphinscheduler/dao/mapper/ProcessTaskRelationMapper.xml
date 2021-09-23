@@ -59,4 +59,14 @@
         WHERE project_code = #{projectCode}
         and process_definition_code = #{processCode}
     </delete>
+    <insert id="batchInsert">
+        insert into t_ds_process_task_relation (name, process_definition_version, project_code, process_definition_code,
+        pre_task_code, pre_task_version, post_task_code, post_task_version, condition_type, condition_params, create_time, update_time)
+        values
+        <foreach collection="taskRelationList" item="relation" separator=",">
+            (#{relation.name},#{relation.processDefinitionVersion},#{relation.projectCode},#{relation.processDefinitionCode},
+            #{relation.preTaskCode},#{relation.preTaskVersion},#{relation.postTaskCode},#{relation.postTaskVersion},
+            #{relation.conditionType},#{relation.conditionParams},#{relation.createTime},#{relation.updateTime})
+        </foreach>
+    </insert>
 </mapper>

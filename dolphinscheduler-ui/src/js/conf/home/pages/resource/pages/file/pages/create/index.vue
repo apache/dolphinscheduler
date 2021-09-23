@@ -66,7 +66,7 @@
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <div class="submit">
-              <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Create')}} </el-button>
+              <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Create')}} </el-button>
               <el-button type="text" size="small" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </el-button>
             </div>
           </template>

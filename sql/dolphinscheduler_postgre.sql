@@ -27,57 +27,64 @@ DROP TABLE IF EXISTS QRTZ_TRIGGERS;
 DROP TABLE IF EXISTS QRTZ_JOB_DETAILS;
 DROP TABLE IF EXISTS QRTZ_CALENDARS;
 
-CREATE TABLE QRTZ_JOB_DETAILS(
-SCHED_NAME character varying(120) NOT NULL,
-JOB_NAME character varying(200) NOT NULL,
-JOB_GROUP character varying(200) NOT NULL,
-DESCRIPTION character varying(250) NULL,
-JOB_CLASS_NAME character varying(250) NOT NULL,
-IS_DURABLE boolean NOT NULL,
-IS_NONCONCURRENT boolean NOT NULL,
-IS_UPDATE_DATA boolean NOT NULL,
-REQUESTS_RECOVERY boolean NOT NULL,
-JOB_DATA bytea NULL);
+CREATE TABLE QRTZ_JOB_DETAILS (
+  SCHED_NAME character varying(120) NOT NULL,
+  JOB_NAME character varying(200) NOT NULL,
+  JOB_GROUP character varying(200) NOT NULL,
+  DESCRIPTION character varying(250) NULL,
+  JOB_CLASS_NAME character varying(250) NOT NULL,
+  IS_DURABLE boolean NOT NULL,
+  IS_NONCONCURRENT boolean NOT NULL,
+  IS_UPDATE_DATA boolean NOT NULL,
+  REQUESTS_RECOVERY boolean NOT NULL,
+  JOB_DATA bytea NULL
+);
+
 alter table QRTZ_JOB_DETAILS add primary key(SCHED_NAME,JOB_NAME,JOB_GROUP);
 
 CREATE TABLE QRTZ_TRIGGERS (
-SCHED_NAME character varying(120) NOT NULL,
-TRIGGER_NAME character varying(200) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL,
-JOB_NAME character varying(200) NOT NULL,
-JOB_GROUP character varying(200) NOT NULL,
-DESCRIPTION character varying(250) NULL,
-NEXT_FIRE_TIME BIGINT NULL,
-PREV_FIRE_TIME BIGINT NULL,
-PRIORITY INTEGER NULL,
-TRIGGER_STATE character varying(16) NOT NULL,
-TRIGGER_TYPE character varying(8) NOT NULL,
-START_TIME BIGINT NOT NULL,
-END_TIME BIGINT NULL,
-CALENDAR_NAME character varying(200) NULL,
-MISFIRE_INSTR SMALLINT NULL,
-JOB_DATA bytea NULL)  ;
+  SCHED_NAME character varying(120) NOT NULL,
+  TRIGGER_NAME character varying(200) NOT NULL,
+  TRIGGER_GROUP character varying(200) NOT NULL,
+  JOB_NAME character varying(200) NOT NULL,
+  JOB_GROUP character varying(200) NOT NULL,
+  DESCRIPTION character varying(250) NULL,
+  NEXT_FIRE_TIME BIGINT NULL,
+  PREV_FIRE_TIME BIGINT NULL,
+  PRIORITY INTEGER NULL,
+  TRIGGER_STATE character varying(16) NOT NULL,
+  TRIGGER_TYPE character varying(8) NOT NULL,
+  START_TIME BIGINT NOT NULL,
+  END_TIME BIGINT NULL,
+  CALENDAR_NAME character varying(200) NULL,
+  MISFIRE_INSTR SMALLINT NULL,
+  JOB_DATA bytea NULL
+) ;
+
 alter table QRTZ_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_SIMPLE_TRIGGERS (
-SCHED_NAME character varying(120) NOT NULL,
-TRIGGER_NAME character varying(200) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL,
-REPEAT_COUNT BIGINT NOT NULL,
-REPEAT_INTERVAL BIGINT NOT NULL,
-TIMES_TRIGGERED BIGINT NOT NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    TRIGGER_NAME character varying(200) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL,
+    REPEAT_COUNT BIGINT NOT NULL,
+    REPEAT_INTERVAL BIGINT NOT NULL,
+    TIMES_TRIGGERED BIGINT NOT NULL
+) ;
+
 alter table QRTZ_SIMPLE_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_CRON_TRIGGERS (
-SCHED_NAME character varying(120) NOT NULL,
-TRIGGER_NAME character varying(200) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL,
-CRON_EXPRESSION character varying(120) NOT NULL,
-TIME_ZONE_ID character varying(80))  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    TRIGGER_NAME character varying(200) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL,
+    CRON_EXPRESSION character varying(120) NOT NULL,
+    TIME_ZONE_ID character varying(80)
+) ;
+
 alter table QRTZ_CRON_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
-CREATE TABLE QRTZ_SIMPROP_TRIGGERS
-  (
+CREATE TABLE QRTZ_SIMPROP_TRIGGERS (
     SCHED_NAME character varying(120) NOT NULL,
     TRIGGER_NAME character varying(200) NOT NULL,
     TRIGGER_GROUP character varying(200) NOT NULL,
@@ -91,53 +98,67 @@ CREATE TABLE QRTZ_SIMPROP_TRIGGERS
     DEC_PROP_1 NUMERIC(13,4) NULL,
     DEC_PROP_2 NUMERIC(13,4) NULL,
     BOOL_PROP_1 boolean NULL,
-    BOOL_PROP_2 boolean NULL) ;
+    BOOL_PROP_2 boolean NULL
+) ;
+
 alter table QRTZ_SIMPROP_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_BLOB_TRIGGERS (
-SCHED_NAME character varying(120) NOT NULL,
-TRIGGER_NAME character varying(200) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL,
-BLOB_DATA bytea NULL) ;
+    SCHED_NAME character varying(120) NOT NULL,
+    TRIGGER_NAME character varying(200) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL,
+    BLOB_DATA bytea NULL
+) ;
+
 alter table QRTZ_BLOB_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_CALENDARS (
-SCHED_NAME character varying(120) NOT NULL,
-CALENDAR_NAME character varying(200) NOT NULL,
-CALENDAR bytea NOT NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    CALENDAR_NAME character varying(200) NOT NULL,
+    CALENDAR bytea NOT NULL
+) ;
+
 alter table QRTZ_CALENDARS add primary key(SCHED_NAME,CALENDAR_NAME);
 
 CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS (
-SCHED_NAME character varying(120) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL
+) ;
+
 alter table QRTZ_PAUSED_TRIGGER_GRPS add primary key(SCHED_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_FIRED_TRIGGERS (
-SCHED_NAME character varying(120) NOT NULL,
-ENTRY_ID character varying(200) NOT NULL,
-TRIGGER_NAME character varying(200) NOT NULL,
-TRIGGER_GROUP character varying(200) NOT NULL,
-INSTANCE_NAME character varying(200) NOT NULL,
-FIRED_TIME BIGINT NOT NULL,
-SCHED_TIME BIGINT NOT NULL,
-PRIORITY INTEGER NOT NULL,
-STATE character varying(16) NOT NULL,
-JOB_NAME character varying(200) NULL,
-JOB_GROUP character varying(200) NULL,
-IS_NONCONCURRENT boolean NULL,
-REQUESTS_RECOVERY boolean NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    ENTRY_ID character varying(200) NOT NULL,
+    TRIGGER_NAME character varying(200) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL,
+    INSTANCE_NAME character varying(200) NOT NULL,
+    FIRED_TIME BIGINT NOT NULL,
+    SCHED_TIME BIGINT NOT NULL,
+    PRIORITY INTEGER NOT NULL,
+    STATE character varying(16) NOT NULL,
+    JOB_NAME character varying(200) NULL,
+    JOB_GROUP character varying(200) NULL,
+    IS_NONCONCURRENT boolean NULL,
+    REQUESTS_RECOVERY boolean NULL
+) ;
+
 alter table QRTZ_FIRED_TRIGGERS add primary key(SCHED_NAME,ENTRY_ID);
 
 CREATE TABLE QRTZ_SCHEDULER_STATE (
-SCHED_NAME character varying(120) NOT NULL,
-INSTANCE_NAME character varying(200) NOT NULL,
-LAST_CHECKIN_TIME BIGINT NOT NULL,
-CHECKIN_INTERVAL BIGINT NOT NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    INSTANCE_NAME character varying(200) NOT NULL,
+    LAST_CHECKIN_TIME BIGINT NOT NULL,
+    CHECKIN_INTERVAL BIGINT NOT NULL
+) ;
+
 alter table QRTZ_SCHEDULER_STATE add primary key(SCHED_NAME,INSTANCE_NAME);
 
 CREATE TABLE QRTZ_LOCKS (
-SCHED_NAME character varying(120) NOT NULL,
-LOCK_NAME character varying(40) NOT NULL)  ;
+    SCHED_NAME character varying(120) NOT NULL,
+    LOCK_NAME character varying(40) NOT NULL
+) ;
+
 alter table QRTZ_LOCKS add primary key(SCHED_NAME,LOCK_NAME);
 
 CREATE INDEX IDX_QRTZ_J_REQ_RECOVERY ON QRTZ_JOB_DETAILS(SCHED_NAME,REQUESTS_RECOVERY);
@@ -220,7 +241,7 @@ DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
   command_type int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
@@ -232,6 +253,7 @@ CREATE TABLE t_ds_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT '-1',
   PRIMARY KEY (id)
 ) ;
 
@@ -262,7 +284,7 @@ CREATE TABLE t_ds_error_command (
   id int NOT NULL ,
   command_type int DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
@@ -273,6 +295,7 @@ CREATE TABLE t_ds_error_command (
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT '-1',
   message text ,
   PRIMARY KEY (id)
 );
@@ -296,7 +319,6 @@ CREATE TABLE t_ds_process_definition (
   user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
-  connects text ,
   warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
@@ -304,8 +326,7 @@ CREATE TABLE t_ds_process_definition (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id) ,
-  CONSTRAINT process_definition_unique UNIQUE (name, project_code) ,
-  CONSTRAINT code_unique UNIQUE (code)
+  CONSTRAINT process_definition_unique UNIQUE (name, project_code)
 ) ;
 
 create index process_definition_index on t_ds_process_definition (code,id);
@@ -322,7 +343,6 @@ CREATE TABLE t_ds_process_definition_log (
   user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
-  connects text ,
   warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
@@ -348,6 +368,7 @@ CREATE TABLE t_ds_task_definition (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT '-1',
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -377,6 +398,7 @@ CREATE TABLE t_ds_task_definition_log (
   flag int DEFAULT NULL ,
   task_priority int DEFAULT NULL ,
   worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT '-1',
   fail_retry_times int DEFAULT NULL ,
   fail_retry_interval int DEFAULT NULL ,
   timeout_flag int DEFAULT NULL ,
@@ -464,13 +486,15 @@ CREATE TABLE t_ds_process_instance (
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64) ,
+  environment_code bigint DEFAULT '-1',
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
   PRIMARY KEY (id)
 ) ;
-  create index process_instance_index on t_ds_process_instance (process_definition_code,id);
-  create index start_time_index on t_ds_process_instance (start_time);
+
+create index process_instance_index on t_ds_process_instance (process_definition_code,id);
+create index start_time_index on t_ds_process_instance (start_time);
 
 --
 -- Table structure for table t_ds_project
@@ -488,7 +512,8 @@ CREATE TABLE t_ds_project (
   update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (id)
 ) ;
-  create index user_id_index on t_ds_project (user_id);
+
+create index user_id_index on t_ds_project (user_id);
 
 --
 -- Table structure for table t_ds_queue
@@ -611,8 +636,8 @@ CREATE TABLE t_ds_resources (
 
 DROP TABLE IF EXISTS t_ds_schedules;
 CREATE TABLE t_ds_schedules (
-  id int NOT NULL  ,
-  process_definition_id int NOT NULL ,
+  id int NOT NULL ,
+  process_definition_code bigint NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,
@@ -624,6 +649,7 @@ CREATE TABLE t_ds_schedules (
   warning_group_id int DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT '-1',
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
@@ -671,6 +697,8 @@ CREATE TABLE t_ds_task_instance (
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
+  environment_code bigint DEFAULT '-1',
+  environment_config text,
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
@@ -817,9 +845,11 @@ ALTER TABLE t_ds_process_task_relation_log ALTER COLUMN id SET DEFAULT NEXTVAL('
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
+
 DROP SEQUENCE IF EXISTS t_ds_project_id_sequence;
 CREATE SEQUENCE  t_ds_project_id_sequence;
 ALTER TABLE t_ds_project ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_id_sequence');
+
 DROP SEQUENCE IF EXISTS t_ds_queue_id_sequence;
 CREATE SEQUENCE  t_ds_queue_id_sequence;
 ALTER TABLE t_ds_queue ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_queue_id_sequence');
@@ -913,4 +943,37 @@ CREATE TABLE t_ds_alert_plugin_instance (
   update_time timestamp NULL,
   instance_name varchar(200) NULL,
   CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+);
+
+--
+-- Table structure for table t_ds_environment
+--
+DROP TABLE IF EXISTS t_ds_environment;
+CREATE TABLE t_ds_environment (
+  id serial NOT NULL,
+  code bigint NOT NULL,
+  name varchar(100) DEFAULT NULL,
+  config text DEFAULT NULL,
+  description text,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT environment_name_unique UNIQUE (name),
+  CONSTRAINT environment_code_unique UNIQUE (code)
+);
+
+--
+-- Table structure for table t_ds_environment_worker_group_relation
+--
+DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
+CREATE TABLE t_ds_environment_worker_group_relation (
+  id serial NOT NULL,
+  environment_code bigint NOT NULL,
+  worker_group varchar(255) NOT NULL,
+  operator int DEFAULT NULL,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id) ,
+  CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
 );

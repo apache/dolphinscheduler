@@ -29,11 +29,6 @@
         <property name="eachLine" value="true"/>
     </module>
 
-    <module name="SuppressionFilter">
-        <property name="file" value="${checkstyle.suppressions.file}" default="checkstyle-suppressions.xml"/>
-        <property name="optional" value="true"/>
-    </module>
-
     <module name="LineLength">
         <property name="max" value="200"/>
         <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
@@ -202,7 +197,6 @@
                       ^cc\.concurrent\.mango\.util\.concurrent,
                       ^org\.apache\.curator-test\.shaded,
                       ^com\.sun\.istack,
-                      ^org\.apache\.commons\.lang,
                       ^org\.jetbrains\.annotations,
                       ^jline\.internal,
                       ^com\.cronutils\.utils,

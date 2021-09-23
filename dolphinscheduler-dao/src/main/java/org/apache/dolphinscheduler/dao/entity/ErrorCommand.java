@@ -14,15 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.*;
-
-import java.util.Date;
 
 /**
  * command
@@ -33,7 +39,7 @@ public class ErrorCommand {
     /**
      * id
      */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private int id;
 
     /**
@@ -42,9 +48,9 @@ public class ErrorCommand {
     private CommandType commandType;
 
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private long processDefinitionCode;
 
     /**
      * executor id
@@ -79,13 +85,13 @@ public class ErrorCommand {
     /**
      * schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date scheduleTime;
 
     /**
      * start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -96,7 +102,7 @@ public class ErrorCommand {
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date updateTime;
 
     /**
@@ -109,13 +115,18 @@ public class ErrorCommand {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
     public ErrorCommand(){}
 
-    public ErrorCommand(Command command, String message){
+    public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
-        this.processDefinitionId = command.getProcessDefinitionId();
+        this.processDefinitionCode = command.getProcessDefinitionCode();
         this.commandParam = command.getCommandParam();
         this.warningType = command.getWarningType();
         this.warningGroupId = command.getWarningGroupId();
@@ -124,37 +135,10 @@ public class ErrorCommand {
         this.failureStrategy = command.getFailureStrategy();
         this.startTime = command.getStartTime();
         this.updateTime = command.getUpdateTime();
+        this.environmentCode = command.getEnvironmentCode();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
     }
-
-    public ErrorCommand(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            int processDefinitionId,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            Priority processInstancePriority,
-            String message){
-        this.commandType = commandType;
-        this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
-        this.commandParam = commandParam;
-        this.warningType = warningType;
-        this.warningGroupId = warningGroupId;
-        this.scheduleTime = scheduleTime;
-        this.taskDependType = taskDependType;
-        this.failureStrategy = failureStrategy;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-        this.processInstancePriority = processInstancePriority;
-        this.message = message;
-    }
-
 
     public TaskDependType getTaskDependType() {
         return taskDependType;
@@ -180,14 +164,13 @@ public class ErrorCommand {
         this.commandType = commandType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
-
 
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
@@ -277,24 +260,33 @@ public class ErrorCommand {
         this.message = message;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
     @Override
     public String toString() {
-        return "ErrorCommand{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionId=" + processDefinitionId +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", message='" + message + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                '}';
+        return "ErrorCommand{"
+                + "id=" + id
+                + ", commandType=" + commandType
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", executorId=" + executorId
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", startTime=" + startTime
+                + ", processInstancePriority=" + processInstancePriority
+                + ", updateTime=" + updateTime
+                + ", message='" + message + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode='" + environmentCode + '\''
+                + '}';
     }
 }
