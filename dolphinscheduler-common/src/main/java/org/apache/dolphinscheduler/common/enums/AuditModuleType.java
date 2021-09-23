@@ -6,6 +6,7 @@ import java.util.HashMap;
  * Audit Module type
  */
 public enum AuditModuleType {
+    // TODO: add other audit module enums
     DEFAULT(0, "default"),
     USER_MODULE(1, "user module"),
     PROJECT_MODULE(2, "project module");

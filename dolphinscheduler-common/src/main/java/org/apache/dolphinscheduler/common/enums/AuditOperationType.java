@@ -7,6 +7,7 @@ import java.util.HashMap;
  */
 public enum AuditOperationType {
 
+    // TODO: add other audit operation enums
     DEFAULT(0, "default" ),
     CREATE_USER(1, "create user"),
     CREATE_PROJECT(2, "create project");

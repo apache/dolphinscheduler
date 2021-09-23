@@ -23,13 +23,13 @@ import i18n from '@/module/i18n'
 const moduleType = [
   {
     code: '',
-    label: `${i18n.$t('AllModules')}`
+    label: `${i18n.$t('AuditType')}`
   }, {
     code: 'USER_MODULE',
-    label: `${i18n.$t('User Module')}`
+    label: `${i18n.$t('UserAudit')}`
   }, {
     code: 'PROJECT_MODULE',
-    label: `${i18n.$t('Project Module')}`
+    label: `${i18n.$t('ProjectAudit')}`
   }
 ]
 

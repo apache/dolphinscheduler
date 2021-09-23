@@ -33,7 +33,7 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </div>
-      <el-select style="width: 140px;" @change="_onChangeModule" :value="searchParams.moduleType" :placeholder="$t('Module')" size="mini">
+      <el-select style="width: 140px;" @change="_onChangeModule" :value="searchParams.moduleType" :placeholder="$t('AuditType')" size="mini">
         <el-option
           v-for="module in moduleTypeList"
           :key="module.label"

@@ -746,9 +746,9 @@ export default {
   Username: 'Username',
   showType: 'Show Type',
   'Audit Log': 'Audit Log',
-  'Module': 'Module',
+  'AuditType': 'audit type',
   'AllModules': 'all modules',
   'AllOperations': 'all operations',
-  'User Module': 'user module',
-  'Project Module': 'project module',
+  'UserAudit': 'user management audit',
+  'Project Module': 'project management audit',
 }
