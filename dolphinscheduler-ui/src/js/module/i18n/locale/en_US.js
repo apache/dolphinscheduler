@@ -744,5 +744,11 @@ export default {
   agentId: 'AgentId',
   users: 'Users',
   Username: 'Username',
-  showType: 'Show Type'
+  showType: 'Show Type',
+  'Audit Log': 'Audit Log',
+  'Module': 'Module',
+  'AllModules': 'all modules',
+  'AllOperations': 'all operations',
+  'User Module': 'user module',
+  'Project Module': 'project module',
 }
