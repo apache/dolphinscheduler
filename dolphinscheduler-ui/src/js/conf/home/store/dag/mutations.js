@@ -143,7 +143,7 @@ export default {
    */
   removeTask (state, code) {
     state.isEditDag = true
-    state.tasks = state.tasks.filter(task => task.code !== code)
+    state.tasks = state.tasks.filter(task => task.code === code)
   },
   resetLocalParam (state, payload) {
     const tasks = state.tasks
