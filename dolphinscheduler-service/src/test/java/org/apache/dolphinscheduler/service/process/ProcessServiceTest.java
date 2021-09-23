@@ -454,42 +454,42 @@ public class ProcessServiceTest {
     @Test
     public void testUpdateTaskDefinitionResources() throws Exception {
         TaskDefinition taskDefinition = new TaskDefinition();
-        String taskParameters = "{\n" +
-                "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n" +
-                "    \"mainJar\": {\n" +
-                "        \"id\": 1\n" +
-                "    },\n" +
-                "    \"deployMode\": \"cluster\",\n" +
-                "    \"resourceList\": [\n" +
-                "        {\n" +
-                "            \"id\": 3\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 4\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"localParams\": [],\n" +
-                "    \"driverCores\": 1,\n" +
-                "    \"driverMemory\": \"512M\",\n" +
-                "    \"numExecutors\": 2,\n" +
-                "    \"executorMemory\": \"2G\",\n" +
-                "    \"executorCores\": 2,\n" +
-                "    \"appName\": \"\",\n" +
-                "    \"mainArgs\": \"\",\n" +
-                "    \"others\": \"\",\n" +
-                "    \"programType\": \"JAVA\",\n" +
-                "    \"sparkVersion\": \"SPARK2\",\n" +
-                "    \"dependence\": {},\n" +
-                "    \"conditionResult\": {\n" +
-                "        \"successNode\": [\n" +
-                "            \"\"\n" +
-                "        ],\n" +
-                "        \"failedNode\": [\n" +
-                "            \"\"\n" +
-                "        ]\n" +
-                "    },\n" +
-                "    \"waitStartTimeout\": {}\n" +
-                "}";
+        String taskParameters = "{\n"
+                + "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n"
+                + "    \"mainJar\": {\n"
+                + "        \"id\": 1\n"
+                + "    },\n"
+                + "    \"deployMode\": \"cluster\",\n"
+                + "    \"resourceList\": [\n"
+                + "        {\n"
+                + "            \"id\": 3\n"
+                + "        },\n"
+                + "        {\n"
+                + "            \"id\": 4\n"
+                + "        }\n"
+                + "    ],\n"
+                + "    \"localParams\": [],\n"
+                + "    \"driverCores\": 1,\n"
+                + "    \"driverMemory\": \"512M\",\n"
+                + "    \"numExecutors\": 2,\n"
+                + "    \"executorMemory\": \"2G\",\n"
+                + "    \"executorCores\": 2,\n"
+                + "    \"appName\": \"\",\n"
+                + "    \"mainArgs\": \"\",\n"
+                + "    \"others\": \"\",\n"
+                + "    \"programType\": \"JAVA\",\n"
+                + "    \"sparkVersion\": \"SPARK2\",\n"
+                + "    \"dependence\": {},\n"
+                + "    \"conditionResult\": {\n"
+                + "        \"successNode\": [\n"
+                + "            \"\"\n"
+                + "        ],\n"
+                + "        \"failedNode\": [\n"
+                + "            \"\"\n"
+                + "        ]\n"
+                + "    },\n"
+                + "    \"waitStartTimeout\": {}\n"
+                + "}";
         taskDefinition.setTaskParams(taskParameters);
 
         Map<Integer, Resource> resourceMap =
