@@ -17,13 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
-
-import org.apache.dolphinscheduler.plugin.task.util.LoggerUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -45,10 +41,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
      */
     protected AbstractTaskExecutor(TaskRequest taskRequest) {
         super(taskRequest);
-        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskRequest.getProcessDefineId(),
-                taskRequest.getProcessInstanceId(),
-                taskRequest.getTaskInstanceId()));
+        logger = LoggerFactory.getLogger(taskRequest.getLogPath());
     }
 
     /**
