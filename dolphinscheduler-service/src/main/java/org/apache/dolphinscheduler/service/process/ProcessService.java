@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -108,6 +109,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -1527,6 +1529,36 @@ public class ProcessService {
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
             taskInstance.getTaskCode(),
             taskInstance.getTaskDefinitionVersion());
+        // if contains mainJar field, query resource from database
+        // Flink, Spark, MR
+        Map<String, Object> taskParameters = JSONUtils.parseObject(
+                taskDefinition.getTaskParams(),
+                new TypeReference<Map<String, Object>>() { });
+        if (taskParameters != null && taskParameters.containsKey("mainJar")) {
+            Object mainJarObj = taskParameters.get("mainJar");
+            ResourceInfo mainJar = JSONUtils.parseObject(
+                    JSONUtils.toJsonString(mainJarObj),
+                    ResourceInfo.class);
+            // only if mainJar is not null and does not contains "resourceName" field
+            if (mainJar != null && StringUtils.isEmpty(mainJar.getResourceName())) {
+                int resourceId = mainJar.getId();
+                // get resource from database, only one resource should be returned
+                List<Integer> resourceIds = Collections.singletonList(resourceId);
+                List<Resource> resourceList = resourceMapper.queryResourceListById(resourceIds);
+                // update mainJar field
+                if (!resourceList.isEmpty()) {
+                    Resource resource = resourceList.get(0);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("get main jar resource for task {}, {}",
+                                taskInstId, JSONUtils.toJsonString(resource));
+                    }
+                    mainJar.setResourceName(resource.getFullName());
+                    taskParameters.put("mainJar", mainJar);
+                }
+                // set task parameters
+                taskDefinition.setTaskParams(JSONUtils.toJsonString(taskParameters));
+            }
+        }
         taskInstance.setTaskDefine(taskDefinition);
         return taskInstance;
     }
