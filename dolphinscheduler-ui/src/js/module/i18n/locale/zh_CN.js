@@ -707,5 +707,11 @@ export default {
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空',
   'Reference from': '使用已有任务',
-  'No more...': '没有更多了...'
+  'No more...': '没有更多了...',
+  'Audit Log': '审计日志',
+  'Module': '模块',
+  'AllModules': '所有模块',
+  'AllOperations': '所有操作',
+  'User Module': '用户模块',
+  'Project Module': '项目模块'
 }

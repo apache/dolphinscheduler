@@ -583,6 +583,15 @@ const router = new Router({
             title: 'statistics',
             refreshInSwitchedTab: config.refreshInSwitchedTab
           }
+        },
+        {
+          path: '/monitor/audit/log',
+          name: 'audit-log',
+          component: resolve => require(['../pages/monitor/pages/log/index'], resolve),
+          meta: {
+            title: 'audit-log',
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
         }
       ]
     }

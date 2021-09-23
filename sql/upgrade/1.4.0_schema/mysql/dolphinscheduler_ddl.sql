@@ -441,6 +441,21 @@ CREATE TABLE `t_ds_environment_worker_group_relation` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+                                  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+                                  `user_name` varchar(64) NOT NULL COMMENT 'user id',
+                                  `module` int(11) NOT NULL COMMENT 'module',
+                                  `operation` int(11) NOT NULL COMMENT 'operation',
+                                  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+                                  `project_name` text NULL DEFAULT NULL COMMENT 'project name',
+                                  `process_name` text NULL DEFAULT NULL COMMENT 'process name',
+                                  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
 

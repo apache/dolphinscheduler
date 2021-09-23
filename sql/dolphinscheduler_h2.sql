@@ -1029,3 +1029,18 @@ CREATE TABLE t_ds_environment_worker_group_relation
     PRIMARY KEY (id) ,
     UNIQUE KEY environment_worker_group_unique (environment_code,worker_group)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_audit_log;
+CREATE TABLE t_ds_audit_log (
+    id                  int NOT NULL AUTO_INCREMENT,
+    user_name           varchar(64) NOT NULL,
+    module              int NOT NULL,
+    operation           int NOT NULL,
+    time                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    project_name        text DEFAULT NULL,
+    process_name        text DEFAULT NULL,
+    PRIMARY KEY (id)
+);

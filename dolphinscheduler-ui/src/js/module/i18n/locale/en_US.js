@@ -708,5 +708,11 @@ export default {
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
-  'No more...': 'No more...'
+  'No more...': 'No more...',
+  'Audit Log': 'Audit Log',
+  'Module': 'Module',
+  'AllModules': 'all modules',
+  'AllOperations': 'all operations',
+  'User Module': 'user module',
+  'Project Module': 'project module',
 }
