@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.service.process;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
-
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -241,7 +240,7 @@ public class ProcessServiceTest {
         command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
-                + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
+            + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
         //there is not enough thread for this command
@@ -261,7 +260,7 @@ public class ProcessServiceTest {
         processInstance.setProcessDefinitionVersion(1);
         Mockito.when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode())).thenReturn(processDefinition);
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
+            processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
@@ -342,7 +341,7 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
-                , parentProcessDefineVersion)).thenReturn(relationLogList);
+            , parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
@@ -444,10 +443,10 @@ public class ProcessServiceTest {
         processInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
-                + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
-                + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
-                + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
-                + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
+            + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
+            + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
+            + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
+            + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
         processService.changeOutParam(taskInstance);
     }
 
@@ -455,65 +454,65 @@ public class ProcessServiceTest {
     public void testUpdateTaskDefinitionResources() throws Exception {
         TaskDefinition taskDefinition = new TaskDefinition();
         String taskParameters = "{\n"
-                + "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n"
-                + "    \"mainJar\": {\n"
-                + "        \"id\": 1\n"
-                + "    },\n"
-                + "    \"deployMode\": \"cluster\",\n"
-                + "    \"resourceList\": [\n"
-                + "        {\n"
-                + "            \"id\": 3\n"
-                + "        },\n"
-                + "        {\n"
-                + "            \"id\": 4\n"
-                + "        }\n"
-                + "    ],\n"
-                + "    \"localParams\": [],\n"
-                + "    \"driverCores\": 1,\n"
-                + "    \"driverMemory\": \"512M\",\n"
-                + "    \"numExecutors\": 2,\n"
-                + "    \"executorMemory\": \"2G\",\n"
-                + "    \"executorCores\": 2,\n"
-                + "    \"appName\": \"\",\n"
-                + "    \"mainArgs\": \"\",\n"
-                + "    \"others\": \"\",\n"
-                + "    \"programType\": \"JAVA\",\n"
-                + "    \"sparkVersion\": \"SPARK2\",\n"
-                + "    \"dependence\": {},\n"
-                + "    \"conditionResult\": {\n"
-                + "        \"successNode\": [\n"
-                + "            \"\"\n"
-                + "        ],\n"
-                + "        \"failedNode\": [\n"
-                + "            \"\"\n"
-                + "        ]\n"
-                + "    },\n"
-                + "    \"waitStartTimeout\": {}\n"
-                + "}";
+            + "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n"
+            + "    \"mainJar\": {\n"
+            + "        \"id\": 1\n"
+            + "    },\n"
+            + "    \"deployMode\": \"cluster\",\n"
+            + "    \"resourceList\": [\n"
+            + "        {\n"
+            + "            \"id\": 3\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"id\": 4\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"localParams\": [],\n"
+            + "    \"driverCores\": 1,\n"
+            + "    \"driverMemory\": \"512M\",\n"
+            + "    \"numExecutors\": 2,\n"
+            + "    \"executorMemory\": \"2G\",\n"
+            + "    \"executorCores\": 2,\n"
+            + "    \"appName\": \"\",\n"
+            + "    \"mainArgs\": \"\",\n"
+            + "    \"others\": \"\",\n"
+            + "    \"programType\": \"JAVA\",\n"
+            + "    \"sparkVersion\": \"SPARK2\",\n"
+            + "    \"dependence\": {},\n"
+            + "    \"conditionResult\": {\n"
+            + "        \"successNode\": [\n"
+            + "            \"\"\n"
+            + "        ],\n"
+            + "        \"failedNode\": [\n"
+            + "            \"\"\n"
+            + "        ]\n"
+            + "    },\n"
+            + "    \"waitStartTimeout\": {}\n"
+            + "}";
         taskDefinition.setTaskParams(taskParameters);
 
         Map<Integer, Resource> resourceMap =
-                Stream.of(1, 3, 4)
-                        .map(i -> {
-                            Resource resource = new Resource();
-                            resource.setId(i);
-                            resource.setFileName("file" + i);
-                            resource.setFullName("/file" + i);
-                            return resource;
-                        })
-                        .collect(
-                                Collectors.toMap(
-                                        Resource::getId,
-                                        resource -> resource)
-                        );
+            Stream.of(1, 3, 4)
+                .map(i -> {
+                    Resource resource = new Resource();
+                    resource.setId(i);
+                    resource.setFileName("file" + i);
+                    resource.setFullName("/file" + i);
+                    return resource;
+                })
+                .collect(
+                    Collectors.toMap(
+                        Resource::getId,
+                        resource -> resource)
+                );
         for (Integer integer : Arrays.asList(1, 3, 4)) {
             Mockito.when(resourceMapper.selectById(integer))
-                    .thenReturn(resourceMap.get(integer));
+                .thenReturn(resourceMap.get(integer));
         }
 
         Whitebox.invokeMethod(processService,
-                "updateTaskDefinitionResources",
-                taskDefinition);
+            "updateTaskDefinitionResources",
+            taskDefinition);
 
         String taskParams = taskDefinition.getTaskParams();
         SparkParameters sparkParameters = JSONUtils.parseObject(taskParams, SparkParameters.class);
@@ -539,15 +538,15 @@ public class ProcessServiceTest {
         // test if input is null
         ResourceInfo resourceInfoNull = null;
         ResourceInfo updatedResourceInfo1 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoNull);
+            "updateResourceInfo",
+            resourceInfoNull);
         Assert.assertNull(updatedResourceInfo1);
 
         // test if resource id less than 1
         ResourceInfo resourceInfoVoid = new ResourceInfo();
         ResourceInfo updatedResourceInfo2 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoVoid);
+            "updateResourceInfo",
+            resourceInfoVoid);
         Assert.assertNull(updatedResourceInfo2);
 
         // test normal situation
@@ -559,8 +558,8 @@ public class ProcessServiceTest {
         resource.setFullName("/test.txt");
         Mockito.when(resourceMapper.selectById(1)).thenReturn(resource);
         ResourceInfo updatedResourceInfo3 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoNormal);
+            "updateResourceInfo",
+            resourceInfoNormal);
 
         Assert.assertEquals(1, updatedResourceInfo3.getId());
         Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());
