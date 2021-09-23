@@ -33,26 +33,8 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -103,7 +85,11 @@ public class ProcessServiceTest {
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
+    @Mock
+    private TaskGroupMapper taskGroupMapper;
 
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
     @Test
     public void testCreateSubCommand() {
         ProcessInstance parentInstance = new ProcessInstance();
@@ -440,4 +426,43 @@ public class ProcessServiceTest {
         processService.changeOutParam(taskInstance);
     }
 
+    @Test
+    public void testCreateTaskGroupQueue() {
+        Mockito.when(taskGroupQueueMapper.insert(Mockito.any(TaskGroupQueue.class))).thenReturn(1);
+        boolean b = processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, 1);
+        Assert.assertEquals(true, b);
+    }
+
+    @Test
+    public void testDoRelease() {
+
+        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
+
+        Mockito.when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
+        Mockito.when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
+
+        Assert.assertNull(processService.doRelease(1,7));
+
+    }
+    @Test
+    public void testDoAwake() {
+        boolean b = processService.doWakeTask();
+        Assert.assertTrue(b);
+
+    }
+
+
+    private TaskGroupQueue getTaskGroupQueue() {
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+        taskGroupQueue.setTaskName("task name");
+        taskGroupQueue.setId(1);
+        taskGroupQueue.setGroupId(1);
+        taskGroupQueue.setTaskId(1);
+        taskGroupQueue.setPriority(1);
+        taskGroupQueue.setStatus(1);
+        Date date = new Date(System.currentTimeMillis());
+        taskGroupQueue.setUpdateTime(date);
+        taskGroupQueue.setCreateTime(date);
+        return taskGroupQueue;
+    }
 }

@@ -46,8 +46,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryListAll() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
-        paramsMap.add("pageSize","1");
+        paramsMap.add("pageNo","2");
+        paramsMap.add("pageSize","2");
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-all")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -108,7 +108,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         // success
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name", "TGQ8");
+        paramsMap.add("name", "TGQ1");
         paramsMap.add("description","this is a task group queue!");
         paramsMap.add("groupSize","10");
 
@@ -124,7 +124,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         // failed
         // name exists
         paramsMap.clear();
-        paramsMap.add("name", "TGQ4");
+        paramsMap.add("name", "TGQ1");
         paramsMap.add("description","this is a task group queue!");
         paramsMap.add("groupSize","10");
 
