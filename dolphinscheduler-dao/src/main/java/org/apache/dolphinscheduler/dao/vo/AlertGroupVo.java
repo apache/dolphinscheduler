@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.vo;
 
+import java.util.Date;
+
 /**
  * AlertGroupVo
  */
@@ -30,6 +32,18 @@ public class AlertGroupVo {
      * group_name
      */
     private String groupName;
+    /**
+     * description
+     */
+    private String description;
+    /**
+     * create_time
+     */
+    private Date createTime;
+    /**
+     * update_time
+     */
+    private Date updateTime;
 
     public int getId() {
         return id;
@@ -47,4 +61,27 @@ public class AlertGroupVo {
         this.groupName = groupName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }
