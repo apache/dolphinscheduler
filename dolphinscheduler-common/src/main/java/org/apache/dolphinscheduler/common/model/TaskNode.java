@@ -394,7 +394,6 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-//        Map<String, Object> taskParams = JSONUtils.toMap(this.params, String.class, Object.class);
         Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
 
         if (taskParams == null) {

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -37,9 +36,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
 
 public class JSONUtilsTest {
 
@@ -206,6 +202,7 @@ public class JSONUtilsTest {
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);
+        System.out.println(m);
         Assert.assertNotNull(m);
     }
 
