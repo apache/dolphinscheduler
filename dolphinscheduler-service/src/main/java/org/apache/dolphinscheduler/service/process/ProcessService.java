@@ -59,64 +59,17 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -128,6 +81,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.annotation.PostConstruct;
 
 /**
  * process relative dao that some mappers in this.
@@ -203,6 +158,35 @@ public class ProcessService {
     @Autowired
     private EnvironmentMapper environmentMapper;
 
+
+    @Autowired
+    private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private TaskGroupMapper taskGroupMapper;
+
+    private static volatile TreeMap<Integer, Integer> waitingTaskCache = new TreeMap<>(
+            new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    return o2 - o1;
+                }
+            }
+    );
+
+    private static ConcurrentHashMap<Integer, Integer> runningTaskCache = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        List<TaskGroupQueue> waitingTasks = taskGroupQueueMapper.queryByStatus(1);
+        List<TaskGroupQueue> runningTasks = taskGroupQueueMapper.queryByStatus(2);
+        for (TaskGroupQueue waitingTask : waitingTasks) {
+            waitingTaskCache.put(waitingTask.getTaskId(), waitingTask.getPriority());
+        }
+        for (TaskGroupQueue runningTask : runningTasks) {
+            runningTaskCache.put(runningTask.getTaskId(), runningTask.getGroupId());
+        }
+    }
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -2422,5 +2406,168 @@ public class ProcessService {
             processTaskMap.put(fatherProcess, fatherTask);
         }
         return processTaskMap;
+    }
+    /**
+     *
+     * @param taskId task id
+     * @param taskName
+     * @param groupId
+     * @param processId
+     * @param priority
+     * @return
+     */
+    public boolean acquireTaskGroup(Integer taskId,
+                                    String taskName, Integer groupId,
+                                    Integer processId, Integer priority) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(groupId);
+        Integer useSize = taskGroup.getUseSize(), groupSize = taskGroup.getGroupSize(), status = 0;
+        // whether the task group is avialiable and the task has acquried
+        if (taskGroup.getStatus() == 0) {
+            return false;
+        }
+        // whether the task group is full
+        if (useSize >= groupSize) {
+            status = -1;
+        } else {
+            int i = taskGroupMapper.compardAndUpdateUsedStatus(groupId, useSize, useSize + 1);
+            if (i == 1) {
+                status = 1;
+            } else {
+                return false;
+            }
+        }
+        return insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, -1);
+    }
+
+    /**
+     * release the TGQ resource when the corresponding task is finished.
+     *
+     * @param id     TGQ primary key
+     * @param taskId task primary key
+     * @return the result code and msg
+     */
+    public synchronized Integer release(Integer id, Integer taskId, Integer status) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(id);
+        int useSize = taskGroup.getUseSize();
+        int size = waitingTaskCache.size();
+        // update used size in TGQ in CAS
+        int i = taskGroupMapper.compardAndUpdateUsedStatus(id, useSize, useSize - 1);
+        if (i != 1) {
+            return null;
+        }
+        Integer releaseId = doRelease(taskId, status);
+        if (releaseId == null) {
+            return null;
+        }
+        // waitingTaskCache is not empty
+        if (waitingTaskCache.size() > 0) {
+            taskGroup = taskGroupMapper.selectById(id);
+            size = waitingTaskCache.size();
+            // update used size in TGQ in CAS
+            i = taskGroupMapper.compardAndUpdateUsedStatus(id, useSize-1, useSize);
+            boolean wakeTask = doWakeTask();
+            if (!wakeTask) {
+                return null;
+            }
+        }
+        return releaseId;
+    }
+    /**
+     * release the TGQ resource when the corresponding task is finished.
+     * @param taskId task id
+     * @return the result code and msg
+     */
+    public Integer doRelease(Integer taskId, Integer status) {
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
+        taskGroupQueue.setStatus(status);
+        taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
+        // update status of the TGQ
+        int i = 0;
+        i = taskGroupQueueMapper.updateById(taskGroupQueue);
+        Integer releaseId = null;
+        if (i == 1) {
+            releaseId = runningTaskCache.remove(taskId);
+            // submit the waiting task
+//            try {
+//                TaskInstance taskInstance = taskInstanceMapper.selectById(taskId);
+//                TaskInstance submitTask = submitTask(taskInstance);
+//                if (submitTask != null && taskInstance.getId() == submitTask.getId()) {
+//                    return true;
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+        }
+        return releaseId;
+
+    }
+
+    /**
+     * insert into task group queue
+     *
+     * @param taskId    task id
+     * @param taskName  task name
+     * @param groupId   group id
+     * @param processId process id
+     * @param priority  priority
+     * @return result and msg code
+     */
+    public boolean insertIntoTaskGroupQueue(Integer taskId,
+                                            String taskName, Integer groupId,
+                                            Integer processId, Integer priority, Integer status) {
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue(0, taskId, taskName, groupId, processId, priority, status);
+        int insert = taskGroupQueueMapper.insert(taskGroupQueue);
+        if (insert != 1) {
+            return  false;
+        }
+        if (taskGroupQueue.getStatus() == 1) {
+            runningTaskCache.put(taskId, groupId);
+        } else {
+            waitingTaskCache.put(taskId, priority);
+        }
+        logger.info("insert result:{}", insert);
+        return true;
+    }
+
+    /**
+     * wake a task from waiting cache
+     * @return result
+     */
+    public boolean doWakeTask() {
+        Map.Entry<Integer, Integer> entry = waitingTaskCache.pollFirstEntry();
+        if (entry == null) {
+            return true;
+        }
+        Integer taskId = entry.getKey();
+        TaskGroupQueue task = taskGroupQueueMapper.queryByTaskId(taskId);
+        runningTaskCache.put(taskId, task.getGroupId());
+        logger.info("poll first entry:{}", entry);
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(entry.getKey());
+        taskGroupQueue.setStatus(1);
+        taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
+        int i = taskGroupQueueMapper.updateById(taskGroupQueue);
+        logger.info("insert result:{}", i);
+        return i == 1;
+    }
+
+    /**
+     * find the task in caches
+     * @param id
+     * @return
+     */
+    public boolean checkIsExsited(Integer id) {
+        return runningTaskCache.containsKey(id) && waitingTaskCache.containsKey(id);
+    }
+
+    public int updateTaskGroupQueueStatus(Integer taskId, Integer status) {
+        return taskGroupQueueMapper.updateStatusByTaskId(taskId, status);
+    }
+
+    public TreeMap<Integer, Integer> getWaitingTaskCache() {
+        return waitingTaskCache;
+    }
+
+    public ConcurrentHashMap<Integer, Integer> getRunningTaskCache() {
+        return runningTaskCache;
     }
 }

@@ -76,6 +76,7 @@
     <root level="INFO">
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="WORKERLOGFILE"/>
+        <appender-ref ref="STDOUT"/>  <!-- 添加控制台输出 -->
     </root>
 
 </configuration>
