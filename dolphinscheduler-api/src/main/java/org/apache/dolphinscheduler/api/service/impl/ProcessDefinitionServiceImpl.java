@@ -645,6 +645,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(project.getCode(), processDefinition.getCode());
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            taskDefinitionMapper.deleteByCode(processTaskRelation.getPostTaskCode());
+        }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if ((delete & deleteRelation) == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
