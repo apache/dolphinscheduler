@@ -109,7 +109,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -1529,38 +1528,76 @@ public class ProcessService {
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
             taskInstance.getTaskCode(),
             taskInstance.getTaskDefinitionVersion());
-        // if contains mainJar field, query resource from database
-        // Flink, Spark, MR
+        updateTaskDefinitionResources(taskDefinition);
+        taskInstance.setTaskDefine(taskDefinition);
+        return taskInstance;
+    }
+
+    /**
+     * Update {@link ResourceInfo} information in {@link TaskDefinition}
+     *
+     * @param taskDefinition the given {@link TaskDefinition}
+     */
+    private void updateTaskDefinitionResources(TaskDefinition taskDefinition) {
         Map<String, Object> taskParameters = JSONUtils.parseObject(
                 taskDefinition.getTaskParams(),
                 new TypeReference<Map<String, Object>>() { });
-        if (taskParameters != null && taskParameters.containsKey("mainJar")) {
-            Object mainJarObj = taskParameters.get("mainJar");
-            ResourceInfo mainJar = JSONUtils.parseObject(
-                    JSONUtils.toJsonString(mainJarObj),
-                    ResourceInfo.class);
-            // only if mainJar is not null and does not contains "resourceName" field
-            if (mainJar != null && StringUtils.isEmpty(mainJar.getResourceName())) {
-                int resourceId = mainJar.getId();
-                // get resource from database, only one resource should be returned
-                List<Integer> resourceIds = Collections.singletonList(resourceId);
-                List<Resource> resourceList = resourceMapper.queryResourceListById(resourceIds);
-                // update mainJar field
-                if (!resourceList.isEmpty()) {
-                    Resource resource = resourceList.get(0);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("get main jar resource for task {}, {}",
-                                taskInstId, JSONUtils.toJsonString(resource));
-                    }
-                    mainJar.setResourceName(resource.getFullName());
-                    taskParameters.put("mainJar", mainJar);
+        if (taskParameters != null) {
+            // if contains mainJar field, query resource from database
+            // Flink, Spark, MR
+            if (taskParameters.containsKey("mainJar")) {
+                Object mainJarObj = taskParameters.get("mainJar");
+                ResourceInfo mainJar = JSONUtils.parseObject(
+                        JSONUtils.toJsonString(mainJarObj),
+                        ResourceInfo.class);
+                ResourceInfo resourceInfo = updateResourceInfo(mainJar);
+                if (resourceInfo != null) {
+                    taskParameters.put("mainJar", resourceInfo);
                 }
-                // set task parameters
-                taskDefinition.setTaskParams(JSONUtils.toJsonString(taskParameters));
+            }
+            // update resourceList information
+            if (taskParameters.containsKey("resourceList")) {
+                String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
+                List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
+                List<ResourceInfo> updatedResourceInfos = resourceInfos
+                        .stream()
+                        .map(this::updateResourceInfo)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                taskParameters.put("resourceList", updatedResourceInfos);
+            }
+            // set task parameters
+            taskDefinition.setTaskParams(JSONUtils.toJsonString(taskParameters));
+        }
+    }
+
+    /**
+     * update {@link ResourceInfo} by given original ResourceInfo
+     *
+     * @param res origin resource info
+     * @return {@link ResourceInfo}
+     */
+    private ResourceInfo updateResourceInfo(ResourceInfo res) {
+        ResourceInfo resourceInfo = null;
+        // only if mainJar is not null and does not contains "resourceName" field
+        if (res != null) {
+            int resourceId = res.getId();
+            if (resourceId <= 0) {
+                logger.error("invalid resourceId, {}", resourceId);
+                return null;
+            }
+            resourceInfo = new ResourceInfo();
+            // get resource from database, only one resource should be returned
+            Resource resource = getResourceById(resourceId);
+            resourceInfo.setId(resourceId);
+            resourceInfo.setRes(resource.getFileName());
+            resourceInfo.setResourceName(resource.getFullName());
+            if (logger.isInfoEnabled()) {
+                logger.info("updated resource info {}",
+                        JSONUtils.toJsonString(resourceInfo));
             }
         }
-        taskInstance.setTaskDefine(taskDefinition);
-        return taskInstance;
+        return resourceInfo;
     }
 
     /**
