@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -175,6 +176,12 @@ public class TaskInstance implements Serializable {
     private DependentParameters dependency;
 
     /**
+     * switch dependency
+     */
+    @TableField(exist = false)
+    private SwitchParameters switchDependency;
+
+    /**
      * duration
      */
     @TableField(exist = false)
@@ -213,6 +220,15 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
+     * environment config
+     */
+    private String environmentConfig;
 
     /**
      * executor id
@@ -414,6 +430,22 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public String getEnvironmentConfig() {
+        return this.environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String environmentConfig) {
+        this.environmentConfig = environmentConfig;
+    }
+
     public DependentParameters getDependency() {
         if (this.dependency == null) {
             Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
@@ -424,6 +456,20 @@ public class TaskInstance implements Serializable {
 
     public void setDependency(DependentParameters dependency) {
         this.dependency = dependency;
+    }
+
+    public SwitchParameters getSwitchDependency() {
+        if (this.switchDependency == null) {
+            Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
+        }
+        return this.switchDependency;
+    }
+
+    public void setSwitchDependency(SwitchParameters switchDependency) {
+        Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+        taskParamsMap.put(Constants.SWITCH_RESULT,JSONUtils.toJsonString(switchDependency));
+        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
     public Flag getFlag() {
@@ -508,6 +554,10 @@ public class TaskInstance implements Serializable {
 
     public boolean isConditionsTask() {
         return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isSwitchTask() {
+        return TaskType.SWITCH.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**
@@ -598,6 +648,8 @@ public class TaskInstance implements Serializable {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", dependentResult='" + dependentResult + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime

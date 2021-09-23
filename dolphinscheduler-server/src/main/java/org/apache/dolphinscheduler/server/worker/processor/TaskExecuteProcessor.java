@@ -27,28 +27,31 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
-import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.Date;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
@@ -74,10 +77,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private AlertClientService alertClientService;
 
-    /**
-     * taskExecutionContextCacheManager
-     */
-    private final TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+    private TaskPluginManager taskPluginManager;
 
     /*
      * task execute manager
@@ -87,7 +87,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
     }
 
@@ -99,21 +98,23 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private void setTaskCache(TaskExecutionContext taskExecutionContext) {
         TaskExecutionContext preTaskCache = new TaskExecutionContext();
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
+        TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
     }
 
-    public TaskExecuteProcessor(AlertClientService alertClientService) {
+    public TaskExecuteProcessor(AlertClientService alertClientService, TaskPluginManager taskPluginManager) {
         this();
         this.alertClientService = alertClientService;
+        this.taskPluginManager = taskPluginManager;
     }
 
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
-            String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
-            command.getBody(), TaskExecuteRequestCommand.class);
+                command.getBody(), TaskExecuteRequestCommand.class);
 
         logger.info("received command : {}", taskRequestCommand);
 
@@ -131,12 +132,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
 
         setTaskCache(taskExecutionContext);
-        // custom logger
-        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()));
+        // todo custom logger
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
@@ -146,7 +142,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         logger.info("task instance local execute path : {}", execLocalPath);
         taskExecutionContext.setExecutePath(execLocalPath);
 
-        FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirIfAbsent(execLocalPath);
             if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
@@ -155,13 +150,12 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);
-            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
-            taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
         FileUtils.taskLoggerThreadLocal.remove();
 
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
-            new NettyRemoteChannel(channel, command.getOpaque()));
+                new NettyRemoteChannel(channel, command.getOpaque()));
 
         // delay task process
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
@@ -177,7 +171,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task to manager
-        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))) {
+        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager))) {
             logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getQueueSize());
         }
     }
@@ -208,6 +202,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
+        ackCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+
         return ackCommand;
     }
 
@@ -219,9 +215,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
-            taskExecutionContext.getProcessDefineCode(),
-            taskExecutionContext.getProcessDefineVersion(),
-            taskExecutionContext.getProcessInstanceId(),
-            taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId());
     }
 }

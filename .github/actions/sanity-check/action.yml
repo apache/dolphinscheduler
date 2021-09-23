@@ -1,0 +1,53 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: "Sanity Check"
+
+description: |
+  Action to perform some very basic lightweight checks, like code styles, license headers, etc.,
+  and fail fast to avoid wasting resources running heavyweight checks, like unit tests, e2e tests.
+
+inputs:
+  token:
+    description: 'The GitHub API token'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check License Header
+      uses: apache/skywalking-eyes@a63f4afcc287dfb3727ecc45a4afc55a5e69c15f
+
+    - uses: ./.github/actions/reviewdog-setup
+      with:
+        reviewdog_version: v0.10.2
+
+    - shell: bash
+      run: ./mvnw -B -q checkstyle:checkstyle-aggregate
+
+    - shell: bash
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.token }}
+      run: |
+        if [[ -n "${{ inputs.token }}" ]]; then
+          reviewdog -f=checkstyle \
+            -reporter="github-pr-check" \
+            -filter-mode="added" \
+            -fail-on-error="true" < target/checkstyle-result.xml
+        fi

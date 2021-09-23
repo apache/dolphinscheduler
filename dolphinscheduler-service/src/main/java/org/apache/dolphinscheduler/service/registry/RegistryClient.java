@@ -32,7 +32,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,9 +122,9 @@ public class RegistryClient extends RegistryCenter {
         if (nodeType == NodeType.WORKER) {
             List<String> workerList = new ArrayList<>();
             for (String group : serverList) {
-                List<String> groupServers = getChildrenKeys(path + Constants.SLASH + group);
+                List<String> groupServers = getChildrenKeys(path + SINGLE_SLASH + group);
                 for (String groupServer : groupServers) {
-                    workerList.add(group + Constants.SLASH + groupServer);
+                    workerList.add(group + SINGLE_SLASH + groupServer);
                 }
             }
             serverList = workerList;
@@ -146,9 +147,9 @@ public class RegistryClient extends RegistryCenter {
             for (String server : serverList) {
                 String host = server;
                 if (nodeType == NodeType.WORKER && hostOnly) {
-                    host = server.split(Constants.SLASH)[1];
+                    host = server.split(SINGLE_SLASH)[1];
                 }
-                serverMap.putIfAbsent(host, get(path + Constants.SLASH + server));
+                serverMap.putIfAbsent(host, get(path + SINGLE_SLASH + server));
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);
@@ -181,7 +182,7 @@ public class RegistryClient extends RegistryCenter {
             for (String server : serverList) {
                 String host = server;
                 if (nodeType == NodeType.WORKER && hostOnly) {
-                    host = server.split(Constants.SLASH)[1];
+                    host = server.split(SINGLE_SLASH)[1];
                 }
                 serverSet.add(host);
             }

@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -43,10 +42,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -56,6 +52,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -334,7 +336,7 @@ public class TaskPriorityQueueConsumer extends Thread {
 
         // whether udf type
         boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
-                && StringUtils.isNotEmpty(sqlParameters.getUdfs());
+                && !StringUtils.isEmpty(sqlParameters.getUdfs());
 
         if (udfTypeFlag) {
             String[] udfFunIds = sqlParameters.getUdfs().split(",");
@@ -344,13 +346,14 @@ public class TaskPriorityQueueConsumer extends Thread {
             }
 
             List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(udfFunIdsArray);
-            Map<UdfFunc, String> udfFuncMap = new HashMap<>();
+            UdfFuncRequest udfFuncRequest;
+            Map<UdfFuncRequest, String> udfFuncRequestMap = new HashMap<>();
             for (UdfFunc udfFunc : udfFuncList) {
+                udfFuncRequest = JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncRequest.class);
                 String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
-                udfFuncMap.put(udfFunc, tenantCode);
+                udfFuncRequestMap.put(udfFuncRequest, tenantCode);
             }
-
-            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
+            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncRequestMap);
         }
     }
 

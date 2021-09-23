@@ -90,6 +90,7 @@
       width: 130px;
       text-align: right;
       margin-right: 8px;
+      flex-shrink: 0;
       >span {
         font-size: 14px;
         color: #777;
@@ -99,6 +100,7 @@
     }
     .cont-box {
       flex: 1;
+      max-width: calc(100% - 138px);
       .label-box {
         width: 100%;
       }

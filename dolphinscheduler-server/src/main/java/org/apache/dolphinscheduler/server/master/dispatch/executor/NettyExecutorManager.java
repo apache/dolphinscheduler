@@ -150,7 +150,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @param command command
      * @throws ExecuteException if error throws ExecuteException
      */
-    private void doExecute(final Host host, final Command command) throws ExecuteException {
+    public void doExecute(final Host host, final Command command) throws ExecuteException {
         /**
          * retry count，default retry 3
          */
@@ -178,7 +178,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @return nodes
      */
     private Set<String> getAllNodes(ExecutionContext context){
-        Set<String> nodes = Collections.EMPTY_SET;
+        Set<String> nodes = Collections.emptySet();
         /**
          * executor type
          */

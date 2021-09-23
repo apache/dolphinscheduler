@@ -21,7 +21,8 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -152,7 +154,7 @@ public abstract class AbstractParameters implements IParameters {
         ArrayNode paramsByJson = JSONUtils.parseArray(json);
         Iterator<JsonNode> listIterator = paramsByJson.iterator();
         while (listIterator.hasNext()) {
-            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+            Map<String, String> param = JSONUtils.parseObject(listIterator.next().toString(), new TypeReference<Map<String, String>>() {});
             allParams.add(param);
         }
         return allParams;
@@ -167,7 +169,7 @@ public abstract class AbstractParameters implements IParameters {
         String[] formatResult = result.split("\\$VarPool\\$");
         Map<String, String> format = new HashMap<>();
         for (String info : formatResult) {
-            if (StringUtils.isNotEmpty(info) && info.contains("=")) {
+            if (!StringUtils.isEmpty(info) && info.contains("=")) {
                 String[] keyValue = info.split("=");
                 format.put(keyValue[0], keyValue[1]);
             }

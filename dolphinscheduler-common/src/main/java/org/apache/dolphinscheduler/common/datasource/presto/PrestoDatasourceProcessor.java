@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -86,7 +86,7 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
-        if (StringUtils.isNotEmpty(prestoConnectionParam.getOther())) {
+        if (!StringUtils.isEmpty(prestoConnectionParam.getOther())) {
             return String.format("%s?%s", prestoConnectionParam.getJdbcUrl(), prestoConnectionParam.getOther());
         }
         return prestoConnectionParam.getJdbcUrl();

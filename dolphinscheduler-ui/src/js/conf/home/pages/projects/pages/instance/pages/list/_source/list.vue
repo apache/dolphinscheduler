@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: `/projects/${projectId}/instance/list/${scope.row.id}` , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+                <router-link :to="{ path: `/projects/${projectCode}/instance/list/${scope.row.id}` , query:{code: scope.row.processDefinitionCode}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -292,7 +292,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}` })
       },
       /**
        * Rerun
@@ -433,7 +433,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/gantt/${item.id}` })
       },
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
@@ -482,7 +482,7 @@
     mounted () {
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectCode'])
     },
     components: { }
   }

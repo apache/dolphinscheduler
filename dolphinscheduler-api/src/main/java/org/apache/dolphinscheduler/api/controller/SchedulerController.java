@@ -42,9 +42,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,7 +65,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "SCHEDULER_TAG")
 @RestController
-@RequestMapping("/projects/{projectName}/schedule")
+@RequestMapping("/projects/{projectCode}/schedules")
 public class SchedulerController extends BaseController {
 
     public static final String DEFAULT_WARNING_TYPE = "NONE";
@@ -74,13 +76,12 @@ public class SchedulerController extends BaseController {
     @Autowired
     private SchedulerService schedulerService;
 
-
     /**
      * create schedule
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process definition id
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
      * @param schedule scheduler
      * @param warningType warning type
      * @param warningGroupId warning group id
@@ -91,31 +92,32 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "createSchedule", notes = "CREATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", required = true, dataType = "String",
-                    example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}"),
-            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String"),
-            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
+        @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String",
+            example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
+        @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long"),
+        @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
-    @PostMapping("/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                 @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                 @RequestParam(value = "processDefinitionId") Integer processDefinitionId,
+                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                 @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                 @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
+        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectCode, processDefinitionCode, schedule,
+            warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
 
         return returnDataList(result);
     }
@@ -124,7 +126,7 @@ public class SchedulerController extends BaseController {
      * updateProcessInstance schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @param schedule scheduler
      * @param warningType warning type
@@ -136,32 +138,31 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "updateSchedule", notes = "UPDATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", required = true, dataType = "String",
-                    example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00',"
-                            + "'crontab':'0 0 3/6 * * ? *'}"),
-            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String"),
-            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority")
+        @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
+        @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long"),
     })
-    @PostMapping("/update")
+    @PutMapping("/{id}")
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                 @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                 @RequestParam(value = "id") Integer id,
+                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                 @PathVariable(value = "id") Integer id,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                 @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
 
-        Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
+        Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectCode, id, schedule,
+            warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
         return returnDataList(result);
     }
 
@@ -169,21 +170,21 @@ public class SchedulerController extends BaseController {
      * publish schedule setScheduleState
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @return publish result code
      */
     @ApiOperation(value = "online", notes = "ONLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @PostMapping("/online")
+    @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                         @RequestParam("id") Integer id) {
-        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.ONLINE);
+                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                         @PathVariable("id") Integer id) {
+        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
 
@@ -191,22 +192,22 @@ public class SchedulerController extends BaseController {
      * offline schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id schedule id
      * @return operation result code
      */
     @ApiOperation(value = "offline", notes = "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @PostMapping("/offline")
+    @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                          @RequestParam("id") Integer id) {
+                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                          @PathVariable("id") Integer id) {
 
-        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.OFFLINE);
+        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
         return returnDataList(result);
     }
 
@@ -214,8 +215,8 @@ public class SchedulerController extends BaseController {
      * query schedule list paging
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process definition id
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
      * @param pageNo page number
      * @param pageSize page size
      * @param searchVal search value
@@ -223,18 +224,17 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "queryScheduleListPaging", notes = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "100")
-
+        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
     })
-    @GetMapping("/list-paging")
+    @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                          @RequestParam Integer processDefinitionId,
+                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam long processDefinitionCode,
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
@@ -243,32 +243,31 @@ public class SchedulerController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
+        result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo, pageSize);
         return result;
+
     }
 
     /**
      * delete schedule by id
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param scheduleId schedule id
+     * @param projectCode project code
+     * @param id scheule id
      * @return delete result code
      */
     @ApiOperation(value = "deleteScheduleById", notes = "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "scheduleId", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_CRON_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
-                                     @PathVariable String projectName,
-                                     @RequestParam("scheduleId") Integer scheduleId
-    ) {
-        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
+                                     @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                     @PathVariable("id") Integer id) {
+        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
@@ -276,7 +275,7 @@ public class SchedulerController extends BaseController {
      * query schedule list
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @return schedule list
      */
     @ApiOperation(value = "queryScheduleList", notes = "QUERY_SCHEDULE_LIST_NOTES")
@@ -284,8 +283,8 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleList(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName) {
-        Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectName);
+                                    @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectCode);
         return returnDataList(result);
     }
 
@@ -293,25 +292,20 @@ public class SchedulerController extends BaseController {
      * preview schedule
      *
      * @param loginUser login user
-     * @param projectName project name
      * @param schedule schedule expression
      * @return the next five fire time
      */
     @ApiOperation(value = "previewSchedule", notes = "PREVIEW_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", required = true, dataType = "String",
-                    example = "{'startTime':'2019-06-10 00:00:00',"
-                            + "'endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
+        @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
     })
     @PostMapping("/preview")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(PREVIEW_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result previewSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                  @RequestParam(value = "schedule") String schedule
-    ) {
-        Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
+                                  @RequestParam(value = "schedule") String schedule) {
+        Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
         return returnDataList(result);
     }
 }

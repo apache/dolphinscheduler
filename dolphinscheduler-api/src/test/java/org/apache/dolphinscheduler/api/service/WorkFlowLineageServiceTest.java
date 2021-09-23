@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +58,9 @@ public class WorkFlowLineageServiceTest {
     @Mock
     private ProjectMapper projectMapper;
 
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
     /**
      * get mock Project
      *
@@ -76,20 +79,16 @@ public class WorkFlowLineageServiceTest {
     @Test
     public void testQueryWorkFlowLineageByName() {
         Project project = getProject("test");
-        String searchVal = "test";
-        when(projectMapper.selectById(1)).thenReturn(project);
-        when(workFlowLineageMapper.queryByName(Mockito.any(), Mockito.any())).thenReturn(getWorkFlowLineages());
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal, 1);
+        String name = "test";
+        when(projectMapper.queryByCode(1L)).thenReturn(project);
+        when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any())).thenReturn(getWorkFlowLineages());
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(1L, name);
         List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(workFlowLineageList.size() > 0);
     }
 
     @Test
-    public void testQueryWorkFlowLineageByIds() {
-        Set<Integer> ids = new HashSet<>();
-        ids.add(1);
-        ids.add(2);
-
+    public void testQueryWorkFlowLineage() {
         Project project = getProject("test");
 
         List<ProcessLineage> processLineages = new ArrayList<>();
@@ -102,34 +101,29 @@ public class WorkFlowLineageServiceTest {
         processLineage.setProcessDefinitionVersion(1);
         processLineage.setProjectCode(1111L);
         processLineages.add(processLineage);
-
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
-        workFlowLineage.setSourceWorkFlowId("");
+        workFlowLineage.setSourceWorkFlowCode("");
+        workFlowLineage.setWorkFlowCode(1111L);
+        List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
+        workFlowLineages.add(workFlowLineage);
 
-        when(projectMapper.selectById(1)).thenReturn(project);
-        when(workFlowLineageMapper.queryRelationByIds(ids, project.getCode())).thenReturn(processLineages);
-        when(workFlowLineageMapper.queryCodeRelation(processLineage.getPostTaskCode()
-                , processLineage.getPreTaskVersion()
-                , processLineage.getProcessDefinitionCode()
-                , processLineage.getProjectCode()))
-                .thenReturn(processLineages);
-        when(workFlowLineageMapper
-                .queryWorkFlowLineageByCode(processLineage.getProcessDefinitionCode(), processLineage.getProjectCode()))
-                .thenReturn(workFlowLineage);
+        when(projectMapper.queryByCode(1L)).thenReturn(project);
+        when(workFlowLineageMapper.queryProcessLineage(project.getCode())).thenReturn(processLineages);
+        when(workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages)).thenReturn(workFlowLineages);
 
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(ids, 1);
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(1L);
 
         Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
-        Collection<WorkFlowLineage> workFlowLineages = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
+        Collection<WorkFlowLineage> workFlowLineageList = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
         Set<WorkFlowRelation> workFlowRelations = (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
-        Assert.assertTrue(workFlowLineages.size() > 0);
+        Assert.assertTrue(workFlowLineageList.size() > 0);
         Assert.assertTrue(workFlowRelations.size() > 0);
     }
 
     private List<WorkFlowLineage> getWorkFlowLineages() {
         List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
-        workFlowLineage.setWorkFlowId(1);
+        workFlowLineage.setWorkFlowCode(1);
         workFlowLineage.setWorkFlowName("testdag");
         workFlowLineages.add(workFlowLineage);
         return workFlowLineages;
