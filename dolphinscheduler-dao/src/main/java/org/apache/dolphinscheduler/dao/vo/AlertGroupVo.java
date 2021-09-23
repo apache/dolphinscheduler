@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.util.Date;
 
 /**
