@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -51,6 +52,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
@@ -72,6 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 
 /**
  * process service test
@@ -99,6 +102,8 @@ public class ProcessServiceTest {
     private TaskInstanceMapper taskInstanceMapper;
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
     @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
@@ -358,6 +363,43 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assert.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
+    }
+
+    @Test
+    public void testSaveTaskDefine() {
+        User operator = new User();
+        operator.setId(-1);
+        operator.setUserType(UserType.GENERAL_USER);
+        long projectCode = 751485690568704L;
+        String taskJson = "[{\"code\":751500437479424,\"name\":\"aa\",\"version\":1,\"description\":\"\",\"delayTime\":0,"
+            + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"sleep 1s\\necho 11\","
+            + "\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"waitStartTimeout\":{}},"
+            + "\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"yarn\",\"failRetryTimes\":0,\"failRetryInterval\":1,"
+            + "\"timeoutFlag\":\"OPEN\",\"timeoutNotifyStrategy\":\"FAILED\",\"timeout\":1,\"environmentCode\":751496815697920},"
+            + "{\"code\":751516889636864,\"name\":\"bb\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
+            + "\"localParams\":[],\"rawScript\":\"echo 22\",\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},"
+            + "\"waitStartTimeout\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\","
+            + "\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":0,\"delayTime\":\"0\",\"environmentCode\":-1}]";
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskJson, TaskDefinitionLog.class);
+        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
+        taskDefinition.setCode(751500437479424L);
+        taskDefinition.setName("aa");
+        taskDefinition.setProjectCode(751485690568704L);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setUserId(-1);
+        taskDefinition.setVersion(1);
+        taskDefinition.setCreateTime(new Date());
+        taskDefinition.setUpdateTime(new Date());
+        Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionLogMapper.insert(taskDefinition)).thenReturn(1);
+        taskDefinition.setId(1);
+        Mockito.when(taskDefinitionMapper.updateById(taskDefinition)).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.batchInsert(Lists.newArrayList(taskDefinition))).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.batchInsert(Lists.newArrayList(taskDefinition))).thenReturn(1);
+        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs);
+        Assert.assertEquals(0, result);
     }
 
     @Test
