@@ -643,7 +643,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else if (schedules.size() == 1) {
             Schedule schedule = schedules.get(0);
             if (schedule.getReleaseState() == ReleaseState.OFFLINE) {
-                scheduleMapper.deleteById(schedule.getId());
+                int delete = scheduleMapper.deleteById(schedule.getId());
+                if (delete == 0) {
+                    putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+                    throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+                }
             } else if (schedule.getReleaseState() == ReleaseState.ONLINE) {
                 putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, schedule.getId());
                 return result;
@@ -708,16 +712,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);
-                processDefinitionMapper.updateById(processDefinition);
+                int updateProcess = processDefinitionMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
                     new long[]{processDefinition.getCode()}
                 );
-
-                for (Schedule schedule : scheduleList) {
+                if (updateProcess > 0 && scheduleList.size() == 1) {
+                    Schedule schedule = scheduleList.get(0);
                     logger.info("set schedule offline, project id: {}, schedule id: {}, process definition code: {}", project.getId(), schedule.getId(), code);
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
-                    scheduleMapper.updateById(schedule);
+                    int updateSchedule = scheduleMapper.updateById(schedule);
+                    if (updateSchedule == 0) {
+                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
+                        throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                    }
                     schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;

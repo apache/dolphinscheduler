@@ -401,6 +401,7 @@ public class ProcessDefinitionServiceTest {
         schedule.setReleaseState(ReleaseState.OFFLINE);
         schedules.add(schedule);
         Mockito.when(processDefineMapper.deleteById(46)).thenReturn(1);
+        Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode())).thenReturn(1);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedules);
         putMsg(result, Status.SUCCESS, projectCode);

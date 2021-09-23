@@ -26,7 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
@@ -391,7 +391,7 @@ public class ProcessDefinitionController extends BaseController {
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    @ApiException(QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
@@ -414,7 +414,7 @@ public class ProcessDefinitionController extends BaseController {
     })
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    @ApiException(QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessDefinition> queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,

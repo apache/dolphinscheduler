@@ -2259,23 +2259,23 @@ public class ProcessService {
             }
             newTaskDefinitionLogs.add(taskDefinitionLog);
         }
+        int insertResult = 0;
+        int updateResult = 0;
         for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
             TaskDefinition task = taskDefinitionMapper.queryByCode(taskDefinitionToUpdate.getCode());
             if (task == null) {
                 newTaskDefinitionLogs.add(taskDefinitionToUpdate);
             } else {
-                int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
+                insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
                 taskDefinitionToUpdate.setId(task.getId());
-                int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
-                return update & insert;
+                updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
             }
         }
         if (!newTaskDefinitionLogs.isEmpty()) {
-            int insert = taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
-            int logInsert = taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
-            return logInsert & insert;
+            updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
+            insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
         }
-        return Constants.EXIT_CODE_SUCCESS;
+        return (insertResult & updateResult) > 0 ? 1 : Constants.EXIT_CODE_SUCCESS;
     }
 
     /**
