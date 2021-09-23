@@ -202,7 +202,6 @@ public class JSONUtilsTest {
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);
-        System.out.println(m);
         Assert.assertNotNull(m);
     }
 
