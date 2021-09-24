@@ -34,7 +34,8 @@ import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.DataxTaskRequest;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -107,14 +108,14 @@ public class DataxTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private DataxTaskRequest taskExecutionContext;
+    private TaskRequest taskExecutionContext;
 
     /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
      */
-    public DataxTask(DataxTaskRequest taskExecutionContext) {
+    public DataxTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
@@ -232,14 +233,14 @@ public class DataxTask extends AbstractTaskExecutor {
      * @throws SQLException if error throws SQLException
      */
     private List<ObjectNode> buildDataxJobContentJson() {
-
+        DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
-                DbType.of(taskExecutionContext.getSourcetype()),
-                taskExecutionContext.getSourceConnectionParams());
+                DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                dataxTaskExecutionContext.getSourceConnectionParams());
 
         BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
-                DbType.of(taskExecutionContext.getTargetType()),
-                taskExecutionContext.getTargetConnectionParams());
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
         ObjectNode readerConn = JSONUtils.createObjectNode();
@@ -260,7 +261,7 @@ public class DataxTask extends AbstractTaskExecutor {
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
-        reader.put("name", DataxUtils.getReaderPluginName(DbType.of(taskExecutionContext.getSourcetype())));
+        reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
         reader.set("parameter", readerParam);
 
         List<ObjectNode> writerConnArr = new ArrayList<>();
@@ -275,8 +276,8 @@ public class DataxTask extends AbstractTaskExecutor {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
-        String[] columns = parsingSqlColumnNames(DbType.of(taskExecutionContext.getSourcetype()),
-                DbType.of(taskExecutionContext.getTargetType()),
+        String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataSourceCfg, dataXParameters.getSql());
 
         ArrayNode columnArr = writerParam.putArray("column");
@@ -301,7 +302,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         ObjectNode writer = JSONUtils.createObjectNode();
-        writer.put("name", DataxUtils.getWriterPluginName(DbType.of(taskExecutionContext.getTargetType())));
+        writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
         writer.set("parameter", writerParam);
 
         List<ObjectNode> contentList = new ArrayList<>();

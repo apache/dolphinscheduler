@@ -320,5 +320,8 @@ public class TaskConstants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
-
+    /**
+     * Task Logger Thread's name
+     */
+    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 }

@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -270,7 +271,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         //get the startParams user specified at the first starting while repeat running is needed
-        Map<String, Object> commandMap = JSONUtils.toMap(processInstance.getCommandParam(), String.class, Object.class);
+        Map<String, Object> commandMap = JSONUtils.parseObject(processInstance.getCommandParam(), new TypeReference<Map<String, Object>>() {});
         String startParams = null;
         if (MapUtils.isNotEmpty(commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
             Object startParamsJson = commandMap.get(Constants.CMD_PARAM_START_PARAMS);
