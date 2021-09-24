@@ -23,13 +23,13 @@ import i18n from '@/module/i18n'
 const moduleType = [
   {
     code: '',
-    label: `${i18n.$t('AuditType')}`
+    label: `${i18n.$t('Audit Type')}`
   }, {
     code: 'USER_MODULE',
-    label: `${i18n.$t('UserAudit')}`
+    label: `${i18n.$t('User Audit')}`
   }, {
     code: 'PROJECT_MODULE',
-    label: `${i18n.$t('ProjectAudit')}`
+    label: `${i18n.$t('Project Audit')}`
   }
 ]
 
@@ -39,7 +39,7 @@ const moduleType = [
 const operationType = [
   {
     code: '',
-    label: `${i18n.$t('AllOperations')}`
+    label: `${i18n.$t('All Operations')}`
   }, {
     code: 'CREATE_USER',
     label: `${i18n.$t('Create User')}`

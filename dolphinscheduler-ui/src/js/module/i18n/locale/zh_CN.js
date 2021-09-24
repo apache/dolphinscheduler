@@ -747,9 +747,9 @@ export default {
   Username: '用户名',
   showType: '内容展示类型',
   'Audit Log': '审计日志',
-  'AuditType': '审计类型',
-  'AllTypes': '所有类型',
-  'AllOperations': '所有操作',
-  'UserAudit': '用户管理审计',
-  'ProjectAudit': '项目管理审计'
+  'Audit Type': '审计类型',
+  'All Types': '所有类型',
+  'All Operations': '所有操作',
+  'User Audit': '用户管理审计',
+  'Project Audit': '项目管理审计'
 }
