@@ -22,7 +22,6 @@ third-party-dependencies.txt
 .*.swp
 .vim
 .tmp
-*.properties
 node_modules
 npm-debug.log
 .vscode
@@ -47,4 +46,3 @@ dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
 docker/build/apache-dolphinscheduler*
-*.properties
