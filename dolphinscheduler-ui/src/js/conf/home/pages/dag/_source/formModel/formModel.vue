@@ -703,7 +703,7 @@
         }
         // Name repeat depends on dom backfill dependent store
         const tasks = this.store.state.dag.tasks
-        const task = tasks.find((t) => t.name === 'this.name')
+        const task = tasks.find((t) => t.name === this.name)
         if (task) {
           this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false

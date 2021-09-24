@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -166,8 +167,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
             if (null == taskChannel) {
                 throw new PluginNotFoundException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
-
-            //TODO Temporary operation, To be adjusted
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
 
             task = taskChannel.createTask(taskRequest);
@@ -179,8 +178,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
             this.task.handle();
 
             // task result process
-            this.task.after();
-
+            if (this.task.getNeedAlert()) {
+                sendAlert(this.task.getTaskAlertInfo());
+            }
             responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(this.task.getProcessId());
@@ -201,6 +201,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             clearTaskExecPath();
         }
+    }
+
+    private void sendAlert(TaskAlertInfo taskAlertInfo) {
+        alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent());
     }
 
     /**

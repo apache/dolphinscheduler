@@ -108,8 +108,12 @@
     </artifactSet>
     <artifactSet to="lib/plugin/task/tis">
         <artifact id="${project.groupId}:dolphinscheduler-task-tis:zip:${project.version}">
+           <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/sql">
+        <artifact id="${project.groupId}:dolphinscheduler-task-sql:zip:${project.version}">
             <unpack/>
         </artifact>
     </artifactSet>
-
 </runtime>
