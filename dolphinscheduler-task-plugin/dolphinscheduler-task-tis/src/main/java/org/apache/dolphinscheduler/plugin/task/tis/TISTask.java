@@ -45,11 +45,6 @@ import java.util.stream.Collectors;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-//import org.asynchttpclient.Dsl;
-//import org.asynchttpclient.ws.WebSocket;
-//import org.asynchttpclient.ws.WebSocketListener;
-//import org.asynchttpclient.ws.WebSocketUpgradeHandler;
-
 /**
  * TIS DataX Task
  **/
@@ -229,43 +224,6 @@ public class TISTask extends AbstractTaskExecutor {
         };
         webSocketClient.connect();
         return webSocketClient;
-        //        WebSocketUpgradeHandler.Builder upgradeHandlerBuilder
-        //                = new WebSocketUpgradeHandler.Builder();
-        //        WebSocketUpgradeHandler wsHandler = upgradeHandlerBuilder
-        //                .addWebSocketListener(new WebSocketListener() {
-        //                    @Override
-        //                    public void onOpen(WebSocket websocket) {
-        //                        // WebSocket connection opened
-        //                    }
-        //
-        //                    @Override
-        //                    public void onClose(WebSocket websocket, int code, String reason) {
-        //                        // WebSocket connection closed
-        //                    }
-        //
-        //                    @Override
-        //                    public void onTextFrame(String payload, boolean finalFragment, int rsv) {
-        //                        ExecLog execLog = JSONUtils.parseObject(payload, ExecLog.class);
-        //                        logger.info(execLog.getMsg());
-        //                    }
-        //
-        //                    @Override
-        //                    public void onError(Throwable t) {
-        //                        // WebSocket connection error
-        //                        logger.error(t.getMessage(), t);
-        //                    }
-        //                }).build();
-        //        WebSocket webSocketClient = Dsl.asyncHttpClient()
-        //                .prepareGet(String.format("ws://%s" + WS_REQUEST_PATH, tisHost))
-        //                // .addHeader("header_name", "header_value")
-        //                .addQueryParam("logtype", "full")
-        //                .addQueryParam("collection", dataXName)
-        //                .addQueryParam("taskid", String.valueOf(taskId))
-        //                .setRequestTimeout(5000)
-        //                .execute(wsHandler)
-        //                .get();
-        //
-        //return webSocketClient;
     }
 
     private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
