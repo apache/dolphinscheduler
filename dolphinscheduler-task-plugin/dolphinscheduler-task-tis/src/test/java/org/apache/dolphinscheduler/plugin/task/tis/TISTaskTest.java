@@ -75,6 +75,25 @@ public class TISTaskTest {
     }
 
     @Test
+    public void testGetTISConfigParams() {
+        TISConfig cfg = TISConfig.getInstance();
+        String tisHost = "127.0.0.1:8080";
+        Assert.assertEquals("http://127.0.0.1:8080/tjs/coredefine/coredefine.ajax", cfg.getJobTriggerUrl(tisHost));
+        String jobName = "mysql_elastic";
+        int taskId = 123;
+        Assert.assertEquals("ws://" + tisHost + "/tjs/download/logfeedback?logtype=full&collection=mysql_elastic&taskid=" + taskId
+                , cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
+
+        Assert.assertEquals("action=datax_action&emethod=trigger_fullbuild_task", cfg.getJobTriggerPostBody());
+
+        Assert.assertEquals("http://127.0.0.1:8080/tjs/config/config.ajax?action=collection_action&emethod=get_task_status", cfg.getJobStatusUrl(tisHost));
+
+        Assert.assertEquals("{\n taskid: " + taskId + "\n, log: false }", cfg.getJobStatusPostBody(taskId));
+
+        Assert.assertEquals("action=core_action&event_submit_do_cancel_task=y&taskid=" + taskId, cfg.getJobCancelPostBody(taskId));
+    }
+
+    @Test
     public void testInit()
             throws Exception {
         try {

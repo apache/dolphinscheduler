@@ -50,16 +50,17 @@ import org.java_websocket.handshake.ServerHandshake;
  **/
 public class TISTask extends AbstractTaskExecutor {
 
-    public static final String WS_REQUEST_PATH = "/tjs/download/logfeedback";
     public static final String KEY_POOL_VAR_TIS_HOST = "tisHost";
     private final TaskRequest taskExecutionContext;
 
     private TISParameters tisParameters;
     private BizResult triggerResult;
+    private final TISConfig tisConfig;
 
     public TISTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
+        this.tisConfig = TISConfig.getInstance();
     }
 
     @Override
@@ -81,11 +82,11 @@ public class TISTask extends AbstractTaskExecutor {
         String tisHost = getTisHost();
         try {
             final String triggerUrl = getTriggerUrl();
-            final String getStatusUrl = String.format("http://%s/tjs/config/config.ajax?action=collection_action&emethod=get_task_status", tisHost);
+            final String getStatusUrl = tisConfig.getJobStatusUrl(tisHost);
             HttpPost post = new HttpPost(triggerUrl);
             post.addHeader("appname", targetJobName);
             addFormUrlencoded(post);
-            StringEntity entity = new StringEntity("action=datax_action&emethod=trigger_fullbuild_task", StandardCharsets.UTF_8);
+            StringEntity entity = new StringEntity(tisConfig.getJobTriggerPostBody(), StandardCharsets.UTF_8);
             post.setEntity(entity);
             ExecResult execState = null;
             int taskId;
@@ -163,7 +164,8 @@ public class TISTask extends AbstractTaskExecutor {
         Objects.requireNonNull(triggerResult, "triggerResult can not be null");
         logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
         final String triggerUrl = getTriggerUrl();
-        StringEntity entity = new StringEntity("action=core_action&event_submit_do_cancel_task=y&taskid=" + triggerResult.getTaskId(), StandardCharsets.UTF_8);
+
+        StringEntity entity = new StringEntity(tisConfig.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
 
         CancelResult cancelResult = null;
         HttpPost post = new HttpPost(triggerUrl);
@@ -186,7 +188,7 @@ public class TISTask extends AbstractTaskExecutor {
 
     private String getTriggerUrl() {
         final String tisHost = getTisHost();
-        return String.format("http://%s/tjs/coredefine/coredefine.ajax", tisHost);
+        return tisConfig.getJobTriggerUrl(tisHost);
     }
 
     private String getTisHost() {
@@ -198,7 +200,7 @@ public class TISTask extends AbstractTaskExecutor {
     }
 
     private WebSocketClient receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws Exception {
-        final String applyURI = String.format("ws://%s" + WS_REQUEST_PATH + "?logtype=full&collection=%s&taskid=%s", tisHost, dataXName, taskId);
+        final String applyURI = tisConfig.getJobLogsFetchUrl(tisHost, dataXName, taskId);
         logger.info("apply ws connection,uri:{}", applyURI);
         WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
             @Override
