@@ -178,7 +178,18 @@ public class TaskRequest {
      */
     private int delayTime;
 
+    /**
+     *  Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     */
+    private String taskLogName;
 
+    public String getTaskLogName() {
+        return taskLogName;
+    }
+
+    public void setTaskLogName(String taskLogName) {
+        this.taskLogName = taskLogName;
+    }
 
     /**
      * resources full name and tenant code
