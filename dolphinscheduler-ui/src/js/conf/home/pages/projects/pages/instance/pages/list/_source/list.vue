@@ -63,7 +63,7 @@
         </el-table-column>
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
-        <el-table-column :label="$t('dryRun Flag')" width="100">
+        <el-table-column :label="$t('Dry-run flag')" width="100">
           <template slot-scope="scope">
             <span v-if="scope.row.dryRun == 1">YES</span>
             <span v-else>NO</span>
