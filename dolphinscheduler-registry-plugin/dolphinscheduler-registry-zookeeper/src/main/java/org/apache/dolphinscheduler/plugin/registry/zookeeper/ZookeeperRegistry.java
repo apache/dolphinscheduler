@@ -332,5 +332,3 @@ public class ZookeeperRegistry implements Registry {
         }
     }
 }
-
-
