@@ -33,13 +33,9 @@ public class TISConfig {
     private final String jobLogsFetchUrl;
     private final String jobCancelPostBody;
 
-    public static TISConfig getInstance() {
+    public static synchronized TISConfig getInstance() {
         if (cfg == null) {
-            synchronized (TISConfig.class) {
-                if (cfg == null) {
-                    cfg = new TISConfig();
-                }
-            }
+            cfg = new TISConfig();
         }
         return cfg;
     }
