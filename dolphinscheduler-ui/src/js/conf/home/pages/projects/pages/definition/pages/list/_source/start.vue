@@ -184,7 +184,7 @@
       </div>
     </div>
     <div class="clearfix list">
-      <span class="text">{{$t('Whether dryRun')}}</span>
+      <span class="text">{{$t('Whether dry-run')}}</span>
       <span class="cont" style="padding-top: 5px;">
           <el-switch v-model="dryRun" size="small" active-value="1" inactive-value="0"></el-switch>
       </span>
