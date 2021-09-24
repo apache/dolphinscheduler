@@ -23,11 +23,13 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @ServletComponentScan
 @ComponentScan(value = "org.apache.dolphinscheduler",
         excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.apache.dolphinscheduler.server.*"))
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:application-api.properties")
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

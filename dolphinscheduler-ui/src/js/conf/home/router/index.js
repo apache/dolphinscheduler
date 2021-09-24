@@ -122,6 +122,14 @@ const router = new Router({
               }
             },
             {
+              path: '/projects/:projectCode/definition/list/timing-list',
+              name: 'definition-timing-list',
+              component: resolve => require(['../pages/projects/pages/definition/timingList/index'], resolve),
+              meta: {
+                title: `${i18n.$t('Scheduled task list')}`
+              }
+            },
+            {
               path: '/projects/:projectCode/definition/list/:code',
               name: 'projects-definition-details',
               component: resolve => require(['../pages/projects/pages/definition/pages/details/index'], resolve),

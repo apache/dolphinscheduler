@@ -47,6 +47,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -59,6 +60,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
                 "org.apache.dolphinscheduler.server.log.*"
         })
 })
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:master.properties")
 @EnableTransactionManagement
 public class MasterServer implements IStoppable {
 

@@ -53,6 +53,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
@@ -67,6 +68,7 @@ import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
                 "org.apache.dolphinscheduler.server.log.*"
         })
 })
+@PropertySource(ignoreResourceNotFound = false, value = "classpath:worker.properties")
 @EnableTransactionManagement
 public class WorkerServer implements IStoppable {
 

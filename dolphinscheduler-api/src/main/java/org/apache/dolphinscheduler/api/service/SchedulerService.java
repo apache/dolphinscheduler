@@ -113,6 +113,21 @@ public interface SchedulerService {
                                       Integer pageNo, Integer pageSize);
 
     /**
+     * query schedule list page
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param userId user id
+     * @return schedule list page
+     */
+    Result queryScheduleListPage(User loginUser, long projectCode, String searchVal,
+                                                     Integer pageNo, Integer pageSize, Integer userId,
+                                                     ReleaseState stateType, String startDate, String endDate);
+
+    /**
      * query schedule list
      *
      * @param loginUser login user

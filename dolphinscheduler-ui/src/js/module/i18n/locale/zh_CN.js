@@ -403,6 +403,7 @@ export default {
   'Create process': '创建工作流',
   'Import process': '导入工作流',
   'Timing state': '定时状态',
+  'Timing list': '定时列表',
   Timing: '定时',
   Timezone: '时区',
   TreeView: '树形图',

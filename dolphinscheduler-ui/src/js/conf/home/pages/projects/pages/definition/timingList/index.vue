@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 <template>
-  <div class="wrap-definition">
-    <m-list-construction :title="$t('Process definition')">
-      <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
-          <template slot="button-group">
-            <el-button size="mini"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</el-button>
-            <el-button size="mini"  @click="_uploading">{{$t('Import process')}}</el-button>
-            <el-button size="mini"  @click="() => this.$router.push({name: 'definition-timing-list', query:{pagesize:searchParams.pageSize, pageno:searchParams.pageNo}})">{{$t('Timing list')}}</el-button>
-          </template>
-        </m-conditions>
+  <div class="wrap-table">
+    <m-list-construction :title="$t('Timing list')">
+      <template slot="operation">
+      <span style=" float: right; padding-right:50px">
+        <el-tooltip :content="$t('Return')" placement="top">
+          <el-button type="primary" icon="el-icon-back" size="mini" @click="_close()"></el-button>
+        </el-tooltip>
+      </span>
       </template>
+<!--      <template slot="conditions">-->
+<!--        <m-timing-list-conditions class="searchNav" @on-query="_onQuery"></m-timing-list-conditions>-->
+<!--      </template>-->
       <template slot="content">
-        <template v-if="processListP.length || total>0">
-          <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+        <template v-if="scheduleListP.length || total>0">
+          <m-list :process-instance-list="scheduleListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+          </m-list>
           <div class="page-box">
             <el-pagination
               background
@@ -42,7 +44,7 @@
             </el-pagination>
           </div>
         </template>
-        <template v-if="!processListP.length && total<=0">
+        <template v-if="!scheduleListP.length && total<=0">
           <m-no-data></m-no-data>
         </template>
         <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
@@ -56,33 +58,42 @@
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
+  import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  // import mTimingListConditions from '@/conf/home/pages/projects/pages/_source/conditions/timingList/timingList'
   import { findComponentDownward } from '@/module/util/'
-
   export default {
-    name: 'definition-list-index',
+    name: 'timing-list-index',
     data () {
       return {
         total: null,
-        processListP: [],
+        scheduleListP: [],
         isLoading: true,
         searchParams: {
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
-          userId: ''
+          userId: '',
+          stateType: '',
+          startDate: '',
+          endDate: ''
         },
         isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
-    props: {
-    },
+    props: {},
     methods: {
-      ...mapActions('dag', ['getProcessListP']),
+      ...mapActions('dag', ['getScheduleListP']),
+      /**
+       * Query
+       */
+      _close () {
+        this.$router.push({ name: 'projects-definition-list',
+          query: { pageSize: this.$route.query.pagesize, pageNo:this.$route.query.pageno } });
+      },
       /**
        * File Upload
        */
@@ -90,20 +101,28 @@
         findComponentDownward(this.$root, 'roof-nav')._fileUpdate('DEFINITION')
       },
       /**
-       * page
+       * Paging event
        */
       _page (val) {
         this.searchParams.pageNo = val
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       _pageSize (val) {
         this.searchParams.pageSize = val
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       /**
        * conditions
        */
-      _onConditions (o) {
-        this.searchParams.searchVal = o.searchVal
+      _onQuery (o) {
+        // this.searchParams.searchVal = o.searchVal
+        this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
+        setUrlParams(this.searchParams)
+        console.log('searchParams1:', this.searchParams)
+        this._debounceGET()
       },
       /**
        * get data list
@@ -115,21 +134,26 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getProcessListP(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+        this.getScheduleListP(this.searchParams).then(res => {
+          if (this.searchParams.pageNo > 1 && res.data.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
-            this.processListP = []
-            this.processListP = res.totalList
-            this.total = res.total
+            console.log('this.searchParams: ', this.searchParams)
+            console.log('res: ', res)
+            this.scheduleListP = []
+            this.scheduleListP = res.data.totalList
+            this.total = res.data.total
             this.isLoading = false
           }
         }).catch(e => {
           this.isLoading = false
         })
       },
+      /**
+       * update
+       */
       _onUpdate () {
-        this._debounceGET('false')
+        this._debounceGET()
       },
       _updateList () {
         this.searchParams.pageNo = 1
@@ -138,26 +162,35 @@
       }
     },
     watch: {
+      // Routing changes
       '$route' (a) {
         // url no params get instance list
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      },
+      searchParams: {
+        deep: true,
+        handler () {
+          this._debounceGET()
+        }
       }
     },
     created () {
+      // Delete process definition ID
       localStore.removeItem('subProcessId')
     },
     mounted () {
 
     },
     beforeDestroy () {
+      // Destruction wheel
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
+    components: { mList, mSpin, mListConstruction, mNoData }
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .wrap-definition {
+  .wrap-table {
     .table-box {
       overflow-y: scroll;
     }
@@ -165,24 +198,18 @@
       .fixed {
         table-layout: auto;
         tr {
-          th:last-child,td:last-child {
-            background: inherit;
-            width: 300px;
-            height: 40px;
-            line-height: 40px;
-            border-left:1px solid #ecf3ff;
-            position: absolute;
-            right: 0;
-            z-index: 2;
-          }
           td:last-child {
-            border-bottom:1px solid #ecf3ff;
-          }
-          th:nth-last-child(2) {
-            padding-right: 330px;
+            .el-button+.el-button {
+              margin-left: 0;
+            }
           }
         }
       }
+    }
+  }
+  @media screen and (max-width: 1246px) {
+    .searchNav {
+      margin-bottom: 30px;
     }
   }
 </style>
