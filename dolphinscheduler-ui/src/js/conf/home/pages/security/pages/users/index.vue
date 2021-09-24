@@ -114,9 +114,8 @@
         this.item = item
         this.createUserDialog = true
       },
-      onUpdate (param) {
+      onUpdate () {
         this._debounceGET('false')
-        this.setUserInfo(param)
         this.createUserDialog = false
       },
       close () {
