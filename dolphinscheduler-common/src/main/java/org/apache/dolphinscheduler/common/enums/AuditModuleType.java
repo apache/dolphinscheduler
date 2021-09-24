@@ -39,6 +39,6 @@ public enum AuditModuleType {
         if (AUDIT_MODULE_MAP.containsKey(status)) {
             return AUDIT_MODULE_MAP.get(status);
         }
-        throw new IllegalArgumentException("invalid audit module type " + status);
+        throw new IllegalArgumentException("invalid audit module type code " + status);
     }
 }

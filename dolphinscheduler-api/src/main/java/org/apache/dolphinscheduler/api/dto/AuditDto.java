@@ -6,35 +6,17 @@ import java.util.Date;
 
 public class AuditDto {
 
-    /**
-     * operator
-     */
     private String userName;
 
-    /**
-     * operation module
-     */
     private String module;
 
-    /**
-     * operation
-     */
     private String operation;
 
-    /**
-     * operation time
-     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date time;
 
-    /**
-     * project name
-     */
     private String projectName;
 
-    /**
-     * process name
-     */
     private String processName;
 
     public String getUserName() {

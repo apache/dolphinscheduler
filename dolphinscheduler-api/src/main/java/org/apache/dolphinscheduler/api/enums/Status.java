@@ -301,6 +301,9 @@ public enum Status {
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
 
+    // audit log
+    QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
+
     //plugin
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
     QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
@@ -331,10 +334,8 @@ public enum Status {
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(1200012, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(1200013,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
-            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
+            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中");
 
-    // audit log
-    QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误");
 
     private final int code;
     private final String enMsg;

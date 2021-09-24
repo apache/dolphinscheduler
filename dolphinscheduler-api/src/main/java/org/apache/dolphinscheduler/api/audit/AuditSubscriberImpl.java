@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class AuditSubscriberImpl implements AuditSubscriber {
 
     @Autowired
-    AuditLogMapper logMapper;
+    private AuditLogMapper logMapper;
 
     @Override
     public void execute(AuditMessage message) {

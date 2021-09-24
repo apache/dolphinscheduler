@@ -32,7 +32,7 @@ public enum AuditOperationType {
         if (AUDIT_OPERATION_MAP.containsKey(status)) {
             return AUDIT_OPERATION_MAP.get(status);
         }
-        throw new IllegalArgumentException("invalid audit operation type " + status);
+        throw new IllegalArgumentException("invalid audit operation type code " + status);
     }
 
     public int getCode() {

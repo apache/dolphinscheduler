@@ -748,7 +748,7 @@ export default {
   showType: '内容展示类型',
   'Audit Log': '审计日志',
   'Audit Type': '审计类型',
-  'All Types': '所有类型',
+  'All Types': '所有审计类型',
   'All Operations': '所有操作',
   'User Audit': '用户管理审计',
   'Project Audit': '项目管理审计'

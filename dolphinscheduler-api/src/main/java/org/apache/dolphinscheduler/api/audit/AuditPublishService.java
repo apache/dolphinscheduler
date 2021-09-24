@@ -14,14 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 public class AuditPublishService {
 
-    /**
-     * audit message queue
-     */
-    private BlockingQueue<AuditMessage> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<AuditMessage> auditMessageQueue = new LinkedBlockingQueue<>();
 
-    /**
-     * subscribers list
-     */
     @Autowired
     private List<AuditSubscriber> subscribers;
 
@@ -50,7 +44,7 @@ public class AuditPublishService {
      */
     public void publish(AuditMessage message) {
         if (auditConfiguration.isAuditGlobalControlSwitch()) {
-            queue.offer(message);
+            auditMessageQueue.offer(message);
         }
     }
 
@@ -61,17 +55,16 @@ public class AuditPublishService {
         AuditMessage message;
         while (true) {
             try {
-                message = queue.take();
+                message = auditMessageQueue.take();
                 for (AuditSubscriber subscriber : subscribers) {
                     try {
                         subscriber.execute(message);
                     } catch (Exception e) {
-                        logger.error("consume audit message failed {}", message.toString());
-                        e.printStackTrace();
+                        logger.error("consume audit message failed {}", message.toString(), e);
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error("consume audit message failed");
+                logger.error("consume audit message failed", e);
             }
         }
     }
