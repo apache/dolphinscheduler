@@ -41,7 +41,7 @@ public abstract class AbstractTaskExecutor extends AbstractTask {
      */
     protected AbstractTaskExecutor(TaskRequest taskRequest) {
         super(taskRequest);
-        logger = LoggerFactory.getLogger(taskRequest.getLogPath());
+        logger = LoggerFactory.getLogger(taskRequest.getTaskLogName());
     }
 
     /**

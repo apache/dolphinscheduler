@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -185,6 +186,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 throw new PluginNotFoundException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskExecutionContext.getProcessDefineCode(),
+                    taskExecutionContext.getProcessDefineVersion(),
+                    taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            taskRequest.setTaskLogName(taskLogName);
 
             task = taskChannel.createTask(taskRequest);
             // task init
