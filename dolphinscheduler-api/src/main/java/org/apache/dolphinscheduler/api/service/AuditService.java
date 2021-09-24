@@ -13,11 +13,11 @@ public interface AuditService {
     /**
      * add new audit record
      *
-     * @param user login user
-     * @param module module type
-     * @param operation operation type
-     * @param projectName project name
-     * @param processName process name
+     * @param user          login user
+     * @param module        module type
+     * @param operation     operation type
+     * @param projectName   project name
+     * @param processName   process name
      */
     void addAudit(User user, AuditModuleType module, AuditOperationType operation,
                   String projectName, String processName);

@@ -18,7 +18,7 @@
   <router-view></router-view>
 </template>
 <script>
-export default {
-  name: 'monitor-conditions-index'
-}
+  export default {
+    name: 'monitor-conditions-index'
+  }
 </script>
