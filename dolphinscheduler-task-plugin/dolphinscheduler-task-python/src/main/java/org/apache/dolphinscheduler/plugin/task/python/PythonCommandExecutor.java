@@ -31,7 +31,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -62,7 +62,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @param taskRequest TaskRequest
      * @param logger logger
      */
-    public PythonCommandExecutor(Consumer<List<String>> logHandler,
+    public PythonCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                  TaskRequest taskRequest,
                                  Logger logger) {
         super(logHandler, taskRequest, logger);
