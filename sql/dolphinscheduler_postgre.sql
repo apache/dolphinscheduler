@@ -991,7 +991,7 @@ CREATE TABLE t_ds_environment_worker_group_relation (
 );
 
 -- ----------------------------
--- Table structure for t_ds_alert_plugin_instance
+-- Table structure for t_ds_audit_log
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log (
