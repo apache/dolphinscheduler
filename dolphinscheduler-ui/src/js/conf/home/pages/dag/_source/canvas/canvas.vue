@@ -623,7 +623,7 @@
       removeNode (id) {
         id += ''
         this.graph.removeNode(id)
-        this.removeTask(id)
+        this.removeTask(+id)
       },
       /**
        * remove an edge
