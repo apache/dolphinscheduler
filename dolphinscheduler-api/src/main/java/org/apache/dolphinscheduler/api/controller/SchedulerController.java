@@ -230,70 +230,31 @@ public class SchedulerController extends BaseController {
         @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "stateType", value = "RELEASE_STATE", type = "ReleaseState"),
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String")
     })
     @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @RequestParam long processDefinitionCode,
+                                          @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
-                                          @RequestParam("pageSize") Integer pageSize) {
+                                          @RequestParam("pageSize") Integer pageSize,
+                                          @RequestParam(value = "stateType", required = false) ReleaseState stateType,
+                                          @RequestParam(value = "startDate", required = false) String startTime,
+                                          @RequestParam(value = "endDate", required = false) String endTime) {
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo, pageSize);
+        result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo, pageSize, stateType, startTime, endTime);
         return result;
 
-    }
-
-    /**
-     * schedule list page
-     *
-     * @param loginUser           login user
-     * @param projectCode         project code
-     * @param searchVal           search value
-     * @param pageNo              page number
-     * @param pageSize            page size
-     * @param userId              user id
-     * @return schedule list page
-     */
-    @ApiOperation(value = "queryScheduleListPage", notes = "QUERY_SCHEDULE_LIST_PAGE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "stateType", value = "RELEASE_STATE", type = "ReleaseState"),
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String")
-    })
-    @GetMapping("/list-page")
-    @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryScheduleListPage(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
-                                        @RequestParam(value = "searchVal", required = false) String searchVal,
-                                        @RequestParam("pageNo") Integer pageNo,
-                                        @RequestParam("pageSize") Integer pageSize,
-                                        @RequestParam(value = "stateType", required = false) ReleaseState stateType,
-                                        @RequestParam(value = "startDate", required = false) String startTime,
-                                        @RequestParam(value = "endDate", required = false) String endTime) {
-        logger.info("login user {}, query schedule, project code: {}, state type:{}, start time:{}, end time:{}",
-                loginUser.getUserName(), projectCode, stateType, startTime, endTime);
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
-        searchVal = ParameterUtils.handleEscapes(searchVal);
-
-        result = schedulerService.queryScheduleListPage(loginUser, projectCode, searchVal, pageNo, pageSize, userId, stateType, startTime, endTime);
-        return result;
     }
 
     /**

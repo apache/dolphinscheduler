@@ -24,12 +24,12 @@
         </el-tooltip>
       </span>
       </template>
-<!--      <template slot="conditions">-->
-<!--        <m-timing-list-conditions class="searchNav" @on-query="_onQuery"></m-timing-list-conditions>-->
-<!--      </template>-->
+      <template slot="conditions">
+        <m-timing-list-conditions class="searchNav" @on-query="_onQuery"></m-timing-list-conditions>
+      </template>
       <template slot="content">
         <template v-if="scheduleListP.length || total>0">
-          <m-list :process-instance-list="scheduleListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+          <m-list :schedule-list="scheduleListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
             <el-pagination
@@ -62,7 +62,7 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  // import mTimingListConditions from '@/conf/home/pages/projects/pages/_source/conditions/timingList/timingList'
+  import mTimingListConditions from '@/conf/home/pages/projects/pages/_source/conditions/timingList/processTimingList'
   import { findComponentDownward } from '@/module/util/'
   export default {
     name: 'timing-list-index',
@@ -78,7 +78,8 @@
           userId: '',
           stateType: '',
           startDate: '',
-          endDate: ''
+          endDate: '',
+          processDefinitionCode: 0
         },
         isLeft: true
       }
@@ -86,7 +87,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('dag', ['getScheduleListP']),
+      ...mapActions('dag', ['getScheduleList']),
       /**
        * Query
        */
@@ -134,12 +135,10 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getScheduleListP(this.searchParams).then(res => {
+        this.getScheduleList(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.data.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
-            console.log('this.searchParams: ', this.searchParams)
-            console.log('res: ', res)
             this.scheduleListP = []
             this.scheduleListP = res.data.totalList
             this.total = res.data.total
@@ -185,7 +184,7 @@
       // Destruction wheel
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mSpin, mListConstruction, mNoData }
+    components: { mList, mSpin, mListConstruction, mNoData, mTimingListConditions }
   }
 </script>
 

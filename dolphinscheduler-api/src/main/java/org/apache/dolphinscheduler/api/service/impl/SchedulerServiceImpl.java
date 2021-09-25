@@ -420,9 +420,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     public Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                             Integer pageNo, Integer pageSize) {
+                                             Integer pageNo, Integer pageSize,
+                                ReleaseState stateType, String startDate, String endDate) {
         Result result = new Result();
-
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
@@ -430,48 +430,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (!hasProjectAndPerm) {
             return result;
         }
-
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
-            return result;
-        }
-
-        Page<Schedule> page = new Page<>(pageNo, pageSize);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
-            searchVal);
-
-        PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) scheduleIPage.getTotal());
-        pageInfo.setTotalList(scheduleIPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * query schedule list page
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param userId user id
-     * @return schedule list page
-     */
-    public Result queryScheduleListPage(User loginUser, long projectCode, String searchVal,
-                                                     Integer pageNo, Integer pageSize, Integer userId,
-                                                     ReleaseState stateType, String startDate, String endDate) {
-
-        Result result = new Result();
-
-        Project project = projectMapper.queryByCode(projectCode);
-        // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+//        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
+//        if (processDefinition == null) {
+//            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
+//            return result;
+//        }
         int[] statusArray = null;
         // filter by state
         if (stateType != null) {
@@ -485,20 +448,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
         Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
-
-        Page<Schedule> page = new Page(pageNo, pageSize);
-        logger.info("login user {}, query schedule, project code: {}, state type:{}, start time:{}, end time:{}",
-                loginUser.getUserName(), projectCode, stateType, startDate, endDate);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryScheduleListPage(
-                page, searchVal, userId, project.getId(), isAdmin(loginUser), statusArray, start, end
-        );
-
-        PageInfo pageInfo = new PageInfo<Schedule>(pageNo, pageSize);
-        pageInfo.setTotal((int)scheduleIPage.getTotal());
+        Page<Schedule> page = new Page<>(pageNo, pageSize);
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
+            searchVal, project.getId(), statusArray, start, end);
+        PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) scheduleIPage.getTotal());
         pageInfo.setTotalList(scheduleIPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

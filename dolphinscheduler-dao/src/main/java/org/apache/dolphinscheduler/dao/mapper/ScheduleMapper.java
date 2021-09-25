@@ -36,33 +36,21 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @param page page
      * @param processDefinitionCode processDefinitionCode
      * @param searchVal searchVal
+     * @param projectId projectId
+     * @param statusArray statusArray
+     * @param startTime startTime
+     * @param endTime endTime
      * @return scheduler IPage
      */
     IPage<Schedule> queryByProcessDefineCodePaging(IPage<Schedule> page,
                                                    @Param("processDefinitionCode") long processDefinitionCode,
-                                                   @Param("searchVal") String searchVal);
-
-    /**
-     * schedule list page
-     * @param page page
-     * @param searchVal searchVal
-     * @param userId userId
-     * @param projectId projectId
-     * @param isAdmin isAdmin
-     * @return scheduler IPage
-     * @param statusArray statusArray
-     * @param startTime startTime
-     * @param endTime endTime
-     */
-    IPage<Schedule> queryScheduleListPage(IPage<Schedule> page,
-                                          @Param("searchVal") String searchVal,
-                                          @Param("userId") int userId,
-                                          @Param("projectId") int projectId,
-                                          @Param("isAdmin") boolean isAdmin,
-                                          @Param("states") int[] statusArray,
-                                          @Param("startTime") Date startTime,
-                                          @Param("endTime") Date endTime
+                                                   @Param("searchVal") String searchVal,
+                                                   @Param("projectId") int projectId,
+                                                   @Param("states") int[] statusArray,
+                                                   @Param("startTime") Date startTime,
+                                                   @Param("endTime") Date endTime
     );
+
 
     /**
      * query schedule list by project name

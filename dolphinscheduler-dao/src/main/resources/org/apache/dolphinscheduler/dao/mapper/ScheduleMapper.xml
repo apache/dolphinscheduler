@@ -37,19 +37,10 @@
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
-        where 1=1
+        where p.id = #{projectId}
         <if test="processDefinitionCode != 0">
             and s.process_definition_code = #{processDefinitionCode}
         </if>
-        order by s.update_time desc
-    </select>
-    <select id="queryScheduleListPage" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,s.*
-        from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_id = p_f.id
-        join t_ds_project as p on p_f.project_id = p.id
-        join t_ds_user as u on s.user_id = u.id
-        where p.id = #{projectId}
         <if test=" searchVal != null and searchVal != ''">
             and p_f.name like concat('%', #{searchVal}, '%')
         </if>
