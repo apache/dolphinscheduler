@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
+import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
 
     @Autowired
     TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private TaskInstanceMapper taskInstanceMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupQueueServiceImpl.class);
 
@@ -49,12 +55,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param projectId project id
+     * @param processId process id
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByProjectId(User loginUser, Integer pageNo, Integer pageSize, Integer projectId) {
-        return this.doQuery(loginUser, pageNo, pageSize, null, projectId);
+    public Map<String, Object> queryTasksByProcessId(User loginUser, Integer pageNo, Integer pageSize, Integer processId) {
+        return this.doQuery(loginUser, pageNo, pageSize, null, processId);
     }
 
     /**
@@ -78,8 +84,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
             return result;
         }
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
-        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueuePaging(page,groupId,processId);
-
+        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueuePaging(page,groupId);
 
         PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) taskGroupQueue.getTotal());

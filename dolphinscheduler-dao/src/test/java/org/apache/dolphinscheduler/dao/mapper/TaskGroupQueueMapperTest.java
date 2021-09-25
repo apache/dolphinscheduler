@@ -109,7 +109,6 @@ public class TaskGroupQueueMapperTest {
         Page<TaskGroupQueue> page = new Page(1, 3);
         IPage<TaskGroupQueue> taskGroupIPage = taskGroupQueueMapper.queryTaskGroupQueuePaging(
                 page,
-                1,
                 1);
 
         for (TaskGroupQueue record : taskGroupIPage.getRecords()) {
@@ -118,8 +117,7 @@ public class TaskGroupQueueMapperTest {
         Page<TaskGroupQueue> page1 = new Page(1, 3);
         IPage<TaskGroupQueue> taskGroupIPage1 = taskGroupQueueMapper.queryTaskGroupQueuePaging(
                 page1,
-                2,
-                1);
+                2);
         System.out.println("-----------------------");
         for (TaskGroupQueue record : taskGroupIPage1.getRecords()) {
             System.out.println(record);

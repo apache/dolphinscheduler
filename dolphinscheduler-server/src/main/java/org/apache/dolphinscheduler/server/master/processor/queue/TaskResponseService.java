@@ -17,15 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import jdk.net.SocketFlow;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -65,6 +71,12 @@ public class TaskResponseService {
      */
     @Autowired
     private ProcessService processService;
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
 
     /**
      * task response worker
@@ -181,6 +193,9 @@ public class TaskResponseService {
                                 taskResponseEvent.getTaskInstanceId(),
                                 taskResponseEvent.getVarPool()
                         );
+                        if (taskInstance.getTaskGroupId() != -2) {
+                            doSubmit(taskInstance);
+                        }
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
                     DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
@@ -208,4 +223,18 @@ public class TaskResponseService {
     public BlockingQueue<TaskResponseEvent> getEventQueue() {
         return eventQueue;
     }
+
+    public boolean doSubmit(TaskInstance taskInstance) {
+        Integer releaseId = processService.release(taskInstance.getTaskGroupId(), taskInstance.getId(), ExecutionStatus.SUCCESS.getCode());
+        if (releaseId != null) {
+            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+            ProcessInstance processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
+            return taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
+        }
+        return false;
+    }
+
+
+
 }

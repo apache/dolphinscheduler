@@ -100,9 +100,9 @@ public class TaskGroupQueueServiceTest {
         IPage<TaskGroupQueue> page = new Page<>(1, 10);
         page.setRecords(getList());
         User loginUser = getLoginUser();
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class),Mockito.eq(null),Mockito.eq(null))).thenReturn(page);
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class),Mockito.eq(1),Mockito.eq(null))).thenReturn(page);
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class),Mockito.eq(null),Mockito.eq(1))).thenReturn(page);
+        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class),Mockito.eq(null))).thenReturn(page);
+        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class),Mockito.eq(1))).thenReturn(page);
+
 
         // query all
         Map<String, Object> result = taskGroupQueueService.queryAllTasks(loginUser, 1, 10);
@@ -110,7 +110,7 @@ public class TaskGroupQueueServiceTest {
         List<TaskGroupQueue> lists = pageInfo.getTotalList();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
         // by project id
-        result = taskGroupQueueService.queryTasksByProjectId(loginUser, 1, 10,1);
+        result = taskGroupQueueService.queryTasksByProcessId(loginUser, 1, 10,1);
         pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
         lists = pageInfo.getTotalList();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));

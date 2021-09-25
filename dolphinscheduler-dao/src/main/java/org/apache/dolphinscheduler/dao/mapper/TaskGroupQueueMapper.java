@@ -18,12 +18,10 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
      * select task group queues by some conditions
      * @param page page
      * @param groupId group id
-     * @param processId process id
      * @return task group queue list
      */
     IPage<TaskGroupQueue> queryTaskGroupQueuePaging(IPage<TaskGroupQueue> page,
-                                                    @Param("groupId") Integer groupId,
-                                                    @Param("processId") Integer processId
+                                                    @Param("groupId") Integer groupId
                                                     );
 
     TaskGroupQueue queryByTaskId(@Param("task_id") Integer task_id);

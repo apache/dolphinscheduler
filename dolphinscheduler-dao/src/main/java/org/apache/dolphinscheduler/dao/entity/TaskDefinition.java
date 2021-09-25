@@ -192,6 +192,19 @@ public class TaskDefinition {
     @TableField(exist = false)
     private String modifyBy;
 
+    /**
+     * task group id
+     */
+    private int taskGroupId;
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
+    }
+
     public TaskDefinition() {
     }
 

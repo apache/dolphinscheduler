@@ -2555,7 +2555,7 @@ public class ProcessService {
      * @param id
      * @return
      */
-    public boolean checkIsExsited(Integer id) {
+    public boolean checkTaskIsExsited(Integer id) {
         return runningTaskCache.containsKey(id) && waitingTaskCache.containsKey(id);
     }
 

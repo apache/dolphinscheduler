@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected TaskInstance taskInstance = null;
 
     protected ProcessInstance processInstance;
+
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
 
     /**
      * pause task, common tasks donot need this.

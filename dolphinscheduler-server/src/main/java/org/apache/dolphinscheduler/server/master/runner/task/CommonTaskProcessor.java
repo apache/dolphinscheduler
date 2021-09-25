@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,15 +65,30 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
+
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
-
-        if (this.taskInstance == null) {
+        // task group queue
+        int taskGroupId = task.getTaskGroupId();
+        if (processService.checkTaskIsExsited(task.getId())) {
+            this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+        }
+        boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+                task.getName(),
+                taskGroupId,
+                task.getProcessInstanceId(),
+                task.getTaskInstancePriority().getCode());
+        if (!acquireTaskGroup) {
+            logger.info("submit task, but try to acquire task group failed", taskInstance.getName());
             return false;
         }
-        dispatchTask(taskInstance, processInstance);
+        // if the task is running, it should not be dispatched
+        ConcurrentHashMap<Integer, Integer> runningTaskCache = processService.getRunningTaskCache();
+        if (runningTaskCache.contains(task.getId())) {
+            dispatchTask(taskInstance, processInstance);
+        }
+
         return true;
     }
 
@@ -87,6 +103,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean taskTimeout() {
+        processService.release(taskInstance.getTaskGroupId(), taskInstance.getId(), ExecutionStatus.PAUSE.getCode());
         return true;
     }
 
@@ -95,6 +112,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
      */
     @Override
     protected boolean pauseTask() {
+        processService.release(taskInstance.getTaskGroupId(), taskInstance.getId(), ExecutionStatus.PAUSE.getCode());
         return true;
     }
 
@@ -155,7 +173,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 processService.updateTaskInstance(taskInstance);
                 return true;
             }
-
+            // task group release
+            processService.release(taskInstance.getTaskGroupId(), taskInstance.getId(), ExecutionStatus.PAUSE.getCode());
             TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
             killCommand.setTaskInstanceId(taskInstance.getId());
 

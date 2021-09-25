@@ -43,11 +43,11 @@ public interface TaskGroupQueueService {
      * @param loginUser login user
      * @param pageNo page no
      * @param pageSize page size
-     * @param projectId project id
+     * @param processId process id
      * @return tasks list
      */
-    Map<String, Object> queryTasksByProjectId(User loginUser, Integer pageNo,
-                                           Integer pageSize, Integer projectId);
+    Map<String, Object> queryTasksByProcessId(User loginUser, Integer pageNo,
+                                           Integer pageSize, Integer processId);
 
     /**
      * query all tasks in task group queue
