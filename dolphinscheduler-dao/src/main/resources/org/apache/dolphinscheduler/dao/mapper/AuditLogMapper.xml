@@ -42,13 +42,13 @@
             </foreach>
         </if>
         <if test="userName != null and userName != ''">
-            and log.user_name like concat('%', #{userName}, '%')
+            and log.user_name = #{userName}
         </if>
         <if test="projectName != null and projectName != ''">
-            and log.project_name like concat('%', #{projectName}, '%')
+            and log.project_name = #{projectName}
         </if>
         <if test="processName != null and processName != ''">
-            and log.process_name like concat('%', #{processName}, '%')
+            and log.process_name = #{processName}
         </if>
         order by log.time desc
     </select>
