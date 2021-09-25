@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -54,13 +55,13 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      * @param taskRequest taskRequest
      * @param logger logger
      */
-    public ShellCommandExecutor(Consumer<List<String>> logHandler,
+    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                 TaskRequest taskRequest,
                                 Logger logger) {
         super(logHandler, taskRequest, logger);
     }
 
-    public ShellCommandExecutor(List<String> logBuffer) {
+    public ShellCommandExecutor(LinkedBlockingQueue<String> logBuffer) {
         super(logBuffer);
     }
 
@@ -111,6 +112,11 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             // write data to file
             FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
+    }
+
+    @Override
+    protected String commandInterpreter() {
+        return OSUtils.isWindows() ? CMD : SH;
     }
 
 }

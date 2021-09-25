@@ -193,6 +193,12 @@ public class WorkflowExecuteThread implements Runnable {
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
     /**
+     * start flag, true: start nodes submit completely
+     *
+     */
+    private boolean isStart = false;
+
+    /**
      * constructor of WorkflowExecuteThread
      *
      * @param processInstance processInstance
@@ -226,6 +232,14 @@ public class WorkflowExecuteThread implements Runnable {
         } catch (Exception e) {
             logger.error("handler error:", e);
         }
+    }
+
+    /**
+     * the process start nodes are submitted completely.
+     * @return
+     */
+    public boolean isStart() {
+        return this.isStart;
     }
 
     private void handleEvents() {
@@ -460,10 +474,12 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void startProcess() throws Exception {
-        buildFlowDag();
         if (this.taskInstanceHashMap.size() == 0) {
+            isStart = false;
+            buildFlowDag();
             initTaskQueue();
             submitPostNode(null);
+            isStart = true;
         }
     }
 
@@ -495,7 +511,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processInstance.getProcessDefinitionVersion());
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
         List<TaskNode> taskNodeList =
-                processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
+            processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
         forbiddenTaskList.clear();
         taskNodeList.forEach(taskNode -> {
             if (taskNode.isForbidden()) {

@@ -15,31 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task.request;
+package org.apache.dolphinscheduler.spi.exception;
 
-/**
- * Procedure Task ExecutionContext
- * to master/worker task transport
- */
-public class ProcedureTaskRequest extends TaskRequest {
+public class PluginNotFoundException extends RuntimeException {
 
-    /**
-     * connectionParams
-     */
-    private String connectionParams;
+    private static final long serialVersionUID = -5487812425126112159L;
 
-    public String getConnectionParams() {
-        return connectionParams;
+    public PluginNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
-    }
-
-    @Override
-    public String toString() {
-        return "ProcedureTaskExecutionContext{"
-                + "connectionParams='" + connectionParams + '\''
-                + '}';
+    public PluginNotFoundException(String message) {
+        super(message);
     }
 }

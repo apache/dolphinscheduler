@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
     <sql id="baseSql">
-        id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time
     </sql>
@@ -28,7 +28,7 @@
         <include refid="baseSql"/>
         from t_ds_task_definition
         WHERE project_code = #{projectCode}
-        and `name` = #{name}
+        and name = #{name}
     </select>
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
@@ -74,21 +74,21 @@
         where code = #{code}
     </delete>
     <insert id="batchInsert">
-        insert into t_ds_task_definition (code, `name`, version, description, project_code, user_id,
-        task_type, task_params, flag, task_priority, worker_group, fail_retry_times, fail_retry_interval,
+        insert into t_ds_task_definition (code, name, version, description, project_code, user_id,
+        task_type, task_params, flag, task_priority, worker_group, environment_code, fail_retry_times, fail_retry_interval,
         timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, create_time, update_time)
         values
         <foreach collection="taskDefinitions" item="taskDefinition" separator=",">
             (#{taskDefinition.code},#{taskDefinition.name},#{taskDefinition.version},#{taskDefinition.description},
-            #{taskDefinition.projectCode},#{taskDefinition.userId},#{taskDefinition.taskType},#{taskDefinition.taskParams},
-            #{taskDefinition.flag},#{taskDefinition.taskPriority},#{taskDefinition.workerGroup},#{taskDefinition.failRetryTimes},
+            #{taskDefinition.projectCode},#{taskDefinition.userId},#{taskDefinition.taskType},#{taskDefinition.taskParams},#{taskDefinition.flag},
+            #{taskDefinition.taskPriority},#{taskDefinition.workerGroup},#{taskDefinition.environmentCode},#{taskDefinition.failRetryTimes},
             #{taskDefinition.failRetryInterval},#{taskDefinition.timeoutFlag},#{taskDefinition.timeoutNotifyStrategy},#{taskDefinition.timeout},
             #{taskDefinition.delayTime},#{taskDefinition.resourceIds},#{taskDefinition.createTime},#{taskDefinition.updateTime})
         </foreach>
     </insert>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
-        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
-        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
+        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params, td.flag,
+        td.task_priority, td.worker_group, td.environment_code, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
         td.timeout, td.delay_time, td.resource_ids, td.create_time, td.update_time, u.user_name,p.name as project_name
         from t_ds_task_definition td
         JOIN t_ds_user u ON td.user_id = u.id

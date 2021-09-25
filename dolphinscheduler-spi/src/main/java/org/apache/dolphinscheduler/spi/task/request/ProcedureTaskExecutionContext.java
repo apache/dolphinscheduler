@@ -15,27 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.spark;
+package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+import java.io.Serializable;
 
-import java.util.List;
+/**
+ *  master/worker task transport
+ */
+public class ProcedureTaskExecutionContext implements Serializable{
 
-public class SparkTaskChannelFanctory implements TaskChannelFactory {
-    @Override
-    public String getName() {
-        return "SPARK";
+    /**
+     * connectionParams
+     */
+    private String connectionParams;
+
+    public String getConnectionParams() {
+        return connectionParams;
+    }
+
+    public void setConnectionParams(String connectionParams) {
+        this.connectionParams = connectionParams;
     }
 
     @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
-
-    @Override
-    public TaskChannel create() {
-        return new SparkTaskChannel();
+    public String toString() {
+        return "ProcedureTaskExecutionContext{" +
+                "connectionParams='" + connectionParams + '\'' +
+                '}';
     }
 }

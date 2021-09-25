@@ -31,8 +31,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     public static final String PYTHON = "python";
 
+    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
+
     /**
      * constructor
      *
@@ -59,7 +62,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @param taskRequest TaskRequest
      * @param logger logger
      */
-    public PythonCommandExecutor(Consumer<List<String>> logHandler,
+    public PythonCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                  TaskRequest taskRequest,
                                  Logger logger) {
         super(logHandler, taskRequest, logger);
@@ -141,6 +144,36 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
             logger.error("read file failure", e);
         }
         return null;
+    }
+
+    /**
+     * Gets the command path to which Python can execute
+     * @return python command path
+     */
+    @Override
+    protected String commandInterpreter() {
+        String pythonHome = getPythonHome(taskRequest.getEnvFile());
+        return getPythonCommand(pythonHome);
+    }
+
+    /**
+     * get python command
+     *
+     * @param pythonHome python home
+     * @return python command
+     */
+    public static String getPythonCommand(String pythonHome) {
+        if (StringUtils.isEmpty(pythonHome)) {
+            return PYTHON;
+        }
+        File file = new File(pythonHome);
+        if (file.exists() && file.isFile()) {
+            return pythonHome;
+        }
+        if (PYTHON_PATH_PATTERN.matcher(pythonHome).find()) {
+            return pythonHome;
+        }
+        return Paths.get(pythonHome, "/bin/python").toString();
     }
 
 }

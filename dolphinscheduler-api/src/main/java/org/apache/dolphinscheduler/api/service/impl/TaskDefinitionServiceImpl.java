@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -125,15 +126,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 return result;
             }
         }
-        if (processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
-            Map<String, Object> resData = new HashMap<>();
-            resData.put("total", taskDefinitionLogs.size());
-            resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, resData);
-        } else {
+        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
+        if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
+        Map<String, Object> resData = new HashMap<>();
+        resData.put("total", taskDefinitionLogs.size());
+        resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, resData);
         return result;
     }
 
@@ -170,7 +172,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode project code
      * @param taskCode task code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -254,8 +255,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setCreateTime(now);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
         if ((update & insert) != 1) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-            return result;
+            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS, update);
