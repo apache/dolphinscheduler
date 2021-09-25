@@ -29,7 +29,7 @@
         <el-input type="text" />
       </div>
       <m-form-model
-        v-if="taskDrawer"
+        v-if="taskDrawer && nodeData.taskType !== 'SHELL'"
         :nodeData="nodeData"
         @seeHistory="seeHistory"
         @addTaskInfo="addTaskInfo"
@@ -37,6 +37,15 @@
         @onSubProcess="toSubProcess"
         :type="type"
       ></m-form-model>
+      <shell-form-model
+        v-if="taskDrawer && nodeData.taskType === 'SHELL'"
+        :nodeData="nodeData"
+        @seeHistory="seeHistory"
+        @addTaskInfo="addTaskInfo"
+        @close="closeTaskDrawer"
+        @onSubProcess="toSubProcess"
+        :type="type"
+      ></shell-form-model>
     </el-drawer>
     <el-dialog
       :title="$t('Set the DAG diagram name')"
@@ -77,6 +86,7 @@
   import dagToolbar from './canvas/toolbar.vue'
   import dagCanvas from './canvas/canvas.vue'
   import mFormModel from '../_source/formModel/formModel.vue'
+  import shellFormModel from '../_source/formModel/tasks/formCreate/formModel.vue'
   import { mapActions, mapState, mapMutations } from 'vuex'
   import mUdp from '../_source/udp/udp.vue'
   import mStart from '../../projects/pages/definition/pages/list/_source/start.vue'
@@ -96,6 +106,7 @@
       dagCanvas,
       dagToolbar,
       mFormModel,
+      shellFormModel,
       mUdp,
       mStart,
       edgeEditModel,

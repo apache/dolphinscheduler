@@ -21,7 +21,6 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
-  import mLog from '../../log'
   import mListBox from '../_source/listBox'
   import mScriptBox from '../_source/scriptBox'
   import mLocalParams from '../_source/localParams'
@@ -31,29 +30,9 @@
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
   import Clipboard from 'clipboard'
   import { diGuiTree, searchTree } from '../_source/resourceTree'
-  import clickoutside from '@/module/util/clickoutside'
   import formCreate from '@form-create/element-ui'
 
-  import { mapActions } from 'vuex'
-  import JSP from '../../../plugIn/jsPlumbHandle'
-  import mSelectInput from '../../_source/selectInput'
-  import mTimeoutAlarm from '../../_source/timeoutAlarm'
-  import mDependentTimeout from '../../_source/dependentTimeout'
-  import mWorkerGroups from '../../_source/workerGroups'
-  import mPreTasks from '../pre_tasks'
-  import { isNameExDag, rtBantpl } from '../../../plugIn/util'
-  import mPriority from '@/module/components/priority/priority'
-
   let editor
-  formCreate.directive('clickoutside', clickoutside)
-  formCreate.component('mLog', mLog)
-  formCreate.component('mSelectInput', mSelectInput)
-  formCreate.component('mTimeoutAlarm', mTimeoutAlarm)
-  formCreate.component('mDependentTimeout', mDependentTimeout)
-  formCreate.component('mPriority', mPriority)
-  formCreate.component('mWorkerGroups', mWorkerGroups)
-  formCreate.component('mPreTasks', mPreTasks)
-  formCreate.component('mDependentTimeout', mDependentTimeout)
   formCreate.component('treeselect', Treeselect)
   formCreate.component('mListBox', mListBox)
   formCreate.component('mLocalParams', mLocalParams)
@@ -64,65 +43,6 @@
     data () {
       return {
         $f: {},
-        // loading
-        spinnerLoading: false,
-        node: '',
-        // node name
-        name: '',
-        // description
-        desc: '',
-        // Node echo data
-        backfillItem: {},
-        cacheBackfillItem: {},
-        successNode: 'success',
-        failedNode: 'failed',
-        successBranch: '',
-        failedBranch: '',
-        conditionResult: {
-          successNode: [],
-          failedNode: []
-        },
-        // dependence
-        dependence: {},
-        // cache dependence
-        cacheDependence: {},
-        // task code
-        code: '',
-        // Current node params data
-        params: {},
-        // Running sign
-        runFlag: 'NORMAL',
-        // The second echo problem caused by the node data is specifically which node hook caused the unfinished special treatment
-        isContentBox: false,
-        // Number of failed retries
-        maxRetryTimes: '0',
-        // Failure retry interval
-        retryInterval: '1',
-        // Delay execution time
-        delayTime: '0',
-        // Task timeout alarm
-        timeout: {},
-        // (For Dependent nodes) Wait start timeout alarm
-        waitStartTimeout: {},
-        // Task priority
-        taskInstancePriority: 'MEDIUM',
-        // worker group id
-        workerGroup: 'default',
-        stateList: [
-          {
-            value: 'success',
-            label: `${i18n.$t('Success')}`
-          },
-          {
-            value: 'failed',
-            label: `${i18n.$t('Failed')}`
-          }
-        ],
-        // preTasks
-        preTaskIdsInWorkflow: [],
-        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
-
         valueConsistsOf: 'LEAF_PRIORITY',
         // script
         rawScript: '',
@@ -150,291 +70,53 @@
         scriptBoxDialog: false
       }
     },
-    directives: { clickoutside },
     mixins: [disabledState],
     props: {
-      nodeData: Object
+      backfillItem: Object
     },
     methods: {
-      ...mapActions('dag', ['getTaskInstanceList']),
-
-      /**
-       * Pre-tasks in workflow
-       */
-      _onPreTasks (o) {
-        this.preTaskIdsInWorkflow = o.preTasks
-        this.preTasksToAdd = o.preTasksToAdd
-        this.preTasksToDelete = o.preTasksToDelete
-      },
-      /**
-       * Task timeout alarm
-       */
-      _onTimeout (o) {
-        this.timeout = Object.assign(this.timeout, {}, o)
-      },
-      /**
-       * Click external to close the current component
-       */
-      _handleClose () {
-        // this.close()
-      },
-      /**
-       * Jump to task instance
-       */
-      _seeHistory () {
-        this.$emit('seeHistory', this.backfillItem.name)
-      },
-
-      _cacheItem () {
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
-        this.$emit('cacheTaskInfo', {
-          item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
-            name: this.$f.form.name,
-            code: this.$f.form.code,
-            params: this.$f.form.params,
-            desc: this.$f.form.desc,
-            runFlag: this.$f.form.runFlag,
-            conditionResult: this.$f.form.conditionResult,
-            dependence: this.$f.form.cacheDependence,
-            maxRetryTimes: this.$f.form.maxRetryTimes,
-            retryInterval: this.$f.form.retryInterval,
-            delayTime: this.$f.form.delayTime,
-            timeout: this.$f.form.timeout,
-            waitStartTimeout: this.$f.form.waitStartTimeout,
-            taskInstancePriority: this.$f.form.taskInstancePriority,
-            workerGroup: this.$f.form.workerGroup
-          },
-          fromThis: this
-        })
-      },
-      /**
-       * verification name
-       */
-      _verifName () {
-        if (!_.trim(this.$f.form.name)) {
-          this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
-          return false
-        }
-        if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
-          this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
-          return false
-        }
-        if (this.$f.form.name === this.backfillItem.name) {
-          return true
-        }
-        // Name repeat depends on dom backfill dependent store
-        if (isNameExDag(this.$f.form.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
-          this.$message.warning(`${i18n.$t('Name already exists')}`)
-          return false
-        }
-        return true
-      },
-      _verifWorkGroup () {
-        let item = this.store.state.security.workerGroupsListAll.find(item => {
-          return item.id === this.workerGroup
-        })
-        if (item === undefined) {
-          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
-          return false
-        }
-        return true
-      },
-      /**
-       * Global verification procedure
-       */
-      _verification () {
-        // Verify name
-        if (!this._verifName()) {
-          return
-        }
-        // verif workGroup
-        if (!this._verifWorkGroup()) {
-          return
-        }
-        // Verify task alarm parameters
-        if (!this.$f.el('timeout')._verification()) {
-          return
-        }
-
-        // Verify node parameters
-        if (!this._shellVerification()) {
-          return
-        }
-        // Verify preTasks and update dag-things
-        if (this.$f.el('PRE_TASK')) {
-          if (!this.$f.el('PRE_TASK')._verification()) {
-            return
-          } else {
-            // Sync data-targetarr
-            $(`#${this.nodeData.id}`).attr(
-              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
-
-            // Update JSP connections
-            let plumbIns = JSP.JspInstance
-            let targetId = this.nodeData.id
-
-            // Update new connections
-            this.preTasksToAdd.map(sourceId => {
-              plumbIns.connect({
-                source: sourceId,
-                target: targetId,
-                type: 'basic',
-                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
-              })
-            })
-
-            // Update remove connections
-            let currentConnects = plumbIns.getAllConnections()
-            let len = currentConnects.length
-            for (let i = 0; i < len; i++) {
-              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
-                plumbIns.deleteConnection(currentConnects[i])
-                i -= 1
-                len -= 1
-              }
-            }
-          }
-        }
-
-        $(`#${this.nodeData.id}`).find('span').text(this.$f.form.name)
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
-        // Store the corresponding node data structure
-        // $(this.$f.el()).append(form);
-        this.$emit('addTaskInfo', {
-          item: {
-            type: this.nodeData.taskType,
-            id: this.nodeData.id,
-            name: this.$f.form.name,
-            code: this.$f.form.code,
-            params: this.$f.form.params,
-            desc: this.$f.form.desc,
-            runFlag: this.$f.form.runFlag,
-            conditionResult: this.$f.form.conditionResult,
-            dependence: this.$f.form.dependence,
-            maxRetryTimes: this.$f.form.maxRetryTimes,
-            retryInterval: this.$f.form.retryInterval,
-            delayTime: this.$f.form.delayTime,
-            timeout: this.timeout,
-            waitStartTimeout: this.$f.form.waitStartTimeout,
-            taskInstancePriority: this.$f.form.taskInstancePriority,
-            workerGroup: this.$f.form.workerGroup
-          },
-          fromThis: this
-        })
-
-        // set run flag
-        this._setRunFlag()
-      },
-      /**
-       *  set run flag
-       */
-      _setRunFlag () {
-        let dom = $(`#${this.nodeData.id}`).find('.ban-p')
-        dom.html('')
-        if (this.runFlag === 'FORBIDDEN') {
-          dom.append(rtBantpl())
-        }
-      },
-      /**
-       * Submit verification
-       */
-      ok () {
-        this._verification()
-      },
-      /**
-       * Close and destroy component and component internal events
-       */
-      close () {
-        let flag = false
-        // Delete node without storage
-        if (!this.backfillItem.name) {
-          flag = true
-        }
-        this.isContentBox = false
-        // flag Whether to delete a node this.$destroy()
-        this.$emit('close', {
-          item: this.cacheBackfillItem,
-          flag: flag,
-          fromThis: this
-        })
-      },
       _initRule () {
         this.rule = [
           {
             type: 'div',
-            class: 'form-model-wrapper',
-            field: 'formWrapper',
-            directives: [
-              {
-                name: 'clickoutside',
-                value: this._handleClose
-              }
-            ],
+            class: 'shell-model',
+            field: 'shell',
             children: [
               {
-                type: 'div',
-                class: 'title-box',
+                type: 'm-list-box',
                 children: [
                   {
-                    type: 'span',
-                    class: 'name',
-                    children: [$t('Current node settings')]
+                    type: 'div',
+                    slot: 'text',
+                    children: [i18n.$t('Script')]
                   },
                   {
-                    type: 'span',
-                    class: 'go-subtask',
+                    type: 'div',
+                    slot: 'content',
                     children: [
                       {
-                        type: 'm-log',
-                        props: {
-                          item: this.backfillItem
-                        },
+                        type: 'div',
+                        class: 'form-mirror',
                         children: [
                           {
-                            type: 'template',
-                            slot: 'history',
-                            children: [
-                              {
-                                type: 'a',
-                                href: '#',
-                                on: {
-                                  click: this._seeHistory
-                                },
-                                children: [
-                                  {
-                                    type: 'em',
-                                    class: 'ansicon el-icon-alarm-clock'
-                                  },
-                                  {
-                                    type: 'em',
-                                    children: [$t('View history')]
-                                  }
-                                ]
-                              }
-                            ]
+                            type: 'input',
+                            name: 'code-shell-mirror',
+                            field: 'code',
+                            props: {
+                              type: 'textarea',
+                              id: 'code-shell-mirror'
+                            }
                           },
                           {
-                            type: 'template',
-                            slot: 'log',
+                            type: 'a',
+                            class: 'ans-modal-box-max',
                             children: [
                               {
-                                type: 'a',
-                                href: '#',
-                                children: [
-                                  {
-                                    type: 'em',
-                                    class: 'ansicon el-icon-document'
-                                  },
-                                  {
-                                    type: 'em',
-                                    children: [$t('View log')]
-                                  }
-                                ]
+                                type: 'em',
+                                class: 'el-icon-full-screen',
+                                on: {
+                                  click: this.setEditorVal
+                                }
                               }
                             ]
                           }
@@ -445,407 +127,91 @@
                 ]
               },
               {
-                type: 'div',
-                class: 'content-box',
+                type: 'm-list-box',
                 children: [
                   {
                     type: 'div',
-                    class: 'form-model',
+                    slot: 'text',
+                    children: [i18n.$t('Resources')]
+                  },
+                  {
+                    type: 'div',
+                    slot: 'content',
                     children: [
                       {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Node name')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'el-input',
-                                field: 'name',
-                                props: {
-                                  type: 'text',
-                                  size: 'small',
-                                  disabled: this.isDetails,
-                                  placeholder: i18n.$t('Please enter name (required)'),
-                                  maxlength: '100'
-                                },
-                                sync: [{ disabled: this.isDetails }],
-                                on: {
-                                  blur: this._verifName
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Running Sign */
-                      {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Run flag')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'radio',
-                                field: 'runFlag',
-                                props: {
-                                  size: 'small'
-                                },
-                                style: {
-                                  verticalAlign: 'middle',
-                                  paddingTop: '0',
-                                  marginTop: '0'
-                                },
-                                options: [
-                                  {
-                                    value: 'NORMAL',
-                                    label: i18n.$t('Normal'),
-                                    disabled: this.isDetails
-                                  },
-                                  {
-                                    value: 'FORBIDDEN',
-                                    label: i18n.$t('Prohibition execution'),
-                                    disabled: this.isDetails
-                                  }]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* description */
-                      {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Description')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'el-input',
-                                field: 'desc',
-                                props: {
-                                  rows: '2',
-                                  type: 'textarea',
-                                  disabled: this.isDetails,
-                                  placeholder: i18n.$t('Please enter description')
-                                },
-                                sync: [{ disabled: this.isDetails }]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Task priority */
-                      {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Task priority')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'span',
-                                class: 'label-box',
-                                style: 'width: 193px;display: inline-block;',
-                                children: [
-                                  {
-                                    type: 'm-priority',
-                                    field: 'taskInstancePriority'
-                                  }
-                                ]
-                              },
-                              {
-                                type: 'span',
-                                class: 'text-b',
-                                children: [$t('Worker group')]
-                              },
-                              {
-                                type: 'm-worker-groups',
-                                field: 'workerGroup'
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Number of failed retries */
-                      {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Number of failed retries')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'm-select-input',
-                                field: 'maxRetryTimes',
-                                value: this.maxRetryTimes,
-                                props: {
-                                  list: [0, 1, 2, 3, 4]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Times')]
-                              },
-                              {
-                                type: 'span',
-                                class: 'text-b',
-                                children: [$t('Failed retry interval')]
-                              },
-                              {
-                                type: 'm-select-input',
-                                field: 'retryInterval',
-                                value: this.retryInterval,
-                                props: {
-                                  list: [1, 10, 30, 60, 120]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Minute')]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Delay execution time */
-                      {
-                        type: 'm-list-box',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Delay execution time')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'm-select-input',
-                                field: 'delayTime',
-                                value: this.delayTime,
-                                props: {
-                                  list: [0, 1, 5, 10]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Minute')]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Task timeout alarm */
-                      {
-                        type: 'm-timeout-alarm',
-                        field: 'timeout',
+                        type: 'treeselect',
+                        field: 'resourceList',
+                        name: 'treeselect',
+                        value: this.resourceList,
                         props: {
-                          backfillItem: this.backfillItem
+                          placeholder: i18n.$t('Please select resources'),
+                          multiple: 'true',
+                          maxHeight: '200',
+                          options: this.resourceOptions,
+                          normalizer: this.normalizer,
+                          disabled: this.isDetails,
+                          valueConsistsOf: this.valueConsistsOf
                         },
-                        sync: [{ backfillItem: this.backfillItem }],
-                        on: {
-                          onTimeout: this._onTimeout
-                        }
-                      },
-                      /* shell node */
-                      {
-                        type: 'div',
-                        class: 'shell-model',
-                        field: 'shell',
+                        sync: [
+                          { options: this.resourceOptions },
+                          { valueConsistsOf: this.valueConsistsOf },
+                          { disabled: this.isDetails }
+                        ],
                         children: [
                           {
-                            type: 'm-list-box',
+                            type: 'div',
+                            slot: 'value-label',
+                            field: 'node',
                             children: [
                               {
-                                type: 'div',
-                                slot: 'text',
-                                children: [i18n.$t('Script')]
-                              },
-                              {
-                                type: 'div',
-                                slot: 'content',
+                                type: 'span',
+                                class: 'copy-path',
+                                on: {
+                                  mousedown: ($event, node) =>
+                                    this._copyPath($event, node)
+                                },
                                 children: [
                                   {
-                                    type: 'div',
-                                    class: 'form-mirror',
-                                    children: [
-                                      {
-                                        type: 'input',
-                                        name: 'code-shell-mirror',
-                                        field: 'code',
-                                        props: {
-                                          type: 'textarea',
-                                          id: 'code-shell-mirror'
-                                        }
-                                      },
-                                      {
-                                        type: 'a',
-                                        class: 'ans-modal-box-max',
-                                        children: [
-                                          {
-                                            type: 'em',
-                                            class: 'el-icon-full-screen',
-                                            on: {
-                                              click: this.setEditorVal
-                                            }
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            type: 'm-list-box',
-                            children: [
-                              {
-                                type: 'div',
-                                slot: 'text',
-                                children: [i18n.$t('Resources')]
-                              },
-                              {
-                                type: 'div',
-                                slot: 'content',
-                                children: [
-                                  {
-                                    type: 'treeselect',
-                                    field: 'resourceList',
-                                    name: 'treeselect',
-                                    value: this.resourceList,
+                                    type: 'em',
+                                    class: 'el-icon-copy-document',
+                                    title: i18n.$t('Copy path'),
                                     props: {
-                                      placeholder: i18n.$t('Please select resources'),
-                                      multiple: 'true',
-                                      maxHeight: '200',
-                                      options: this.resourceOptions,
-                                      normalizer: this.normalizer,
-                                      disabled: this.isDetails,
-                                      valueConsistsOf: this.valueConsistsOf
-                                    },
-                                    sync: [{ options: this.resourceOptions }, { valueConsistsOf: this.valueConsistsOf }, { disabled: this.isDetails }],
-                                    children: [
-                                      {
-                                        type: 'div',
-                                        slot: 'value-label',
-                                        field: 'node',
-                                        children: [
-                                          {
-                                            type: 'span',
-                                            class: 'copy-path',
-                                            on: {
-                                              mousedown: ($event, node) => this._copyPath($event, node)
-                                            },
-                                            children: [
-                                              {
-                                                type: 'em',
-                                                class: 'el-icon-copy-document',
-                                                title: i18n.$t('Copy path'),
-                                                props: {
-                                                  dataContainer: 'body',
-                                                  dataToggle: 'tooltip'
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            type: 'm-list-box',
-                            children: [
-                              {
-                                type: 'div',
-                                slot: 'text',
-                                children: [i18n.$t('Custom Parameters')]
-                              },
-                              {
-                                type: 'div',
-                                slot: 'content',
-                                children: [
-                                  {
-                                    type: 'm-local-params',
-                                    field: 'refLocalParams',
-                                    props: {
-                                      udpList: this.localParams,
-                                      hide: true
-                                    },
-                                    sync: [{ udpList: this.localParams }],
-                                    on: {
-                                      onLocalParams: this._onLocalParams
+                                      dataContainer: 'body',
+                                      dataToggle: 'tooltip'
                                     }
                                   }
                                 ]
                               }
                             ]
-                          },
-                          {
-                            type: 'el-dialog',
-                            props: {
-                              visible: this.scriptBoxDialog,
-                              appendToBody: true,
-                              width: '80%'
-                            },
-                            sync: ['visible'],
-                            children: [
-                              {
-                                type: 'mScriptBox',
-                                props: {
-                                  item: this.item
-                                },
-                                sync: [{ item: this.item }],
-                                on: {
-                                  getSriptBoxValue: this.getSriptBoxValue,
-                                  closeAble: this.closeAble
-                                }
-                              }
-                            ]
                           }
                         ]
-                      },
-                      /* Pre-tasks in workflow */
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'm-list-box',
+                children: [
+                  {
+                    type: 'div',
+                    slot: 'text',
+                    children: [i18n.$t('Custom Parameters')]
+                  },
+                  {
+                    type: 'div',
+                    slot: 'content',
+                    children: [
                       {
-                        type: 'm-pre-tasks',
-                        field: 'PRE_TASK',
+                        type: 'm-local-params',
+                        field: 'refLocalParams',
                         props: {
-                          backfillItem: this.backfillItem
+                          udpList: this.localParams,
+                          hide: true
                         },
-                        sync: [{ backfillItem: this.backfillItem }],
+                        sync: [{ udpList: this.localParams }],
                         on: {
-                          onPreTasks: this._onPreTasks
+                          onLocalParams: this._onLocalParams
                         }
                       }
                     ]
@@ -853,45 +219,68 @@
                 ]
               },
               {
-                type: 'div',
-                class: 'bottom-box',
+                type: 'el-dialog',
+                props: {
+                  visible: this.scriptBoxDialog,
+                  appendToBody: true,
+                  width: '80%'
+                },
+                sync: ['visible'],
                 children: [
                   {
-                    type: 'div',
-                    class: 'submit',
-                    style: 'background: #fff;',
-                    children: [
-                      {
-                        type: 'el-button',
-                        props: {
-                          type: 'text',
-                          size: 'small',
-                          id: 'cancelBtn'
-                        },
-                        children: [$t('Cancel')]
-                      },
-                      {
-                        type: 'el-button',
-                        props: {
-                          type: 'primary',
-                          size: 'small',
-                          round: true,
-                          loading: this.spinnerLoading,
-                          disabled: this.isDetails
-                        },
-                        sync: [{ backfillItem: this.backfillItem }, { loading: this.spinnerLoading }, { disabled: this.isDetails }],
-                        children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')],
-                        on: {
-                          click: this.ok
-                        }
-                      }
-                    ]
+                    type: 'mScriptBox',
+                    props: {
+                      item: this.item
+                    },
+                    sync: [{ item: this.item }],
+                    on: {
+                      getSriptBoxValue: this.getSriptBoxValue,
+                      closeAble: this.closeAble
+                    }
                   }
                 ]
               }
             ]
           }
         ]
+      },
+      backfill () {
+        let o = this.backfillItem
+
+        // Non-null objects represent backfill
+        if (!_.isEmpty(o)) {
+          this.rawScript = o.params.rawScript || ''
+
+          // backfill resourceList
+          let backResource = o.params.resourceList || []
+          let resourceList = o.params.resourceList || []
+          if (resourceList.length) {
+            _.map(resourceList, v => {
+              if (!v.id) {
+                this.store.dispatch('dag/getResourceId', {
+                  type: 'FILE',
+                  fullName: '/' + v.res
+                }).then(res => {
+                  this.resourceList.push(res.id)
+                  this.dataProcess(backResource)
+                }).catch(e => {
+                  this.resourceList.push(v.res)
+                  this.dataProcess(backResource)
+                })
+              } else {
+                this.resourceList.push(v.id)
+                this.dataProcess(backResource)
+              }
+            })
+            this.cacheResourceList = resourceList
+          }
+
+          // backfill localParams
+          let localParams = o.params.localParams || []
+          if (localParams.length) {
+            this.localParams = localParams
+          }
+        }
       },
       _copyPath (e, node) {
         console.log(e, node)
@@ -901,14 +290,16 @@
             return node.raw.fullName
           }
         })
-        clipboard.on('success', handler => {
+        clipboard.on('success', (handler) => {
           this.$message.success(`${i18n.$t('Copy success')}`)
           // Free memory
           clipboard.destroy()
         })
-        clipboard.on('error', handler => {
+        clipboard.on('error', (handler) => {
           // Copy is not supported
-          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          this.$message.warning(
+            `${i18n.$t('The browser does not support automatic copying')}`
+          )
           // Free memory
           clipboard.destroy()
         })
@@ -925,10 +316,10 @@
       },
       getSriptBoxValue (val) {
         editor.setValue(val)
-        // this.scriptBoxDialog = false
+      // this.scriptBoxDialog = false
       },
       closeAble () {
-        // this.scriptBoxDialog = false
+      // this.scriptBoxDialog = false
       },
       /**
        * return resourceList
@@ -959,11 +350,13 @@
         }
         // noRes
         if (this.noRes.length > 0) {
-          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          this.$message.warning(
+            `${i18n.$t('Please delete all non-existent resources')}`
+          )
           return false
         }
         // Process resourcelist
-        let dataProcessing = _.map(this.$f.form.resourceList, v => {
+        let dataProcessing = _.map(this.$f.form.resourceList, (v) => {
           return {
             id: v
           }
@@ -1004,146 +397,55 @@
         let isResourceId = []
         let resourceIdArr = []
         if (this.$f.form.resourceList.length > 0) {
-          this.$f.form.resourceList.forEach(v => {
-            this.resourceOptions.forEach(v1 => {
+          this.$f.form.resourceList.forEach((v) => {
+            this.resourceOptions.forEach((v1) => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item => {
+          resourceIdArr = isResourceId.map((item) => {
             return item.id
           })
           Array.prototype.diff = function (a) {
-            return this.filter(function (i) { return a.indexOf(i) < 0 })
+            return this.filter(function (i) {
+              return a.indexOf(i) < 0
+            })
           }
           let diffSet = this.$f.form.resourceList.diff(resourceIdArr)
           let optionsCmp = []
           if (diffSet.length > 0) {
-            diffSet.forEach(item => {
-              backResource.forEach(item1 => {
+            diffSet.forEach((item) => {
+              backResource.forEach((item1) => {
                 if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
             })
           }
-          let noResources = [{
-            id: -1,
-            name: $t('Unauthorized or deleted resources'),
-            fullName: '/' + $t('Unauthorized or deleted resources'),
-            children: []
-          }]
+          let noResources = [
+            {
+              id: -1,
+              name: $t('Unauthorized or deleted resources'),
+              fullName: '/' + $t('Unauthorized or deleted resources'),
+              children: []
+            }
+          ]
           if (optionsCmp.length > 0) {
             this.allNoResources = optionsCmp
-            optionsCmp = optionsCmp.map(item => {
+            optionsCmp = optionsCmp.map((item) => {
               return { id: item.id, name: item.name, fullName: item.res }
             })
-            optionsCmp.forEach(item => {
+            optionsCmp.forEach((item) => {
               item.isNew = true
             })
             noResources[0].children = optionsCmp
             this.resourceOptions = this.resourceOptions.concat(noResources)
           }
         }
-      },
-      backfill () {
-        let o = Object.assign({}, this.backfillItem)
-        console.log(o)
-        if (!_.isEmpty(o)) {
-          this.code = o.code
-          this.$f.form.name = o.name
-          this.$f.form.taskInstancePriority = o.taskInstancePriority
-          this.$f.form.runFlag = o.runFlag || 'NORMAL'
-          this.$f.form.desc = o.desc
-          this.$f.form.maxRetryTimes = o.maxRetryTimes
-          this.$f.form.retryInterval = o.retryInterval
-          this.$f.form.delayTime = o.delayTime
-          if (o.conditionResult) {
-            this.successBranch = o.conditionResult.successNode[0]
-            this.failedBranch = o.conditionResult.failedNode[0]
-          }
-          // If the workergroup has been deleted, set the default workergroup
-          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            let workerGroup = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroup === workerGroup) {
-              break
-            }
-          }
-          if (o.workerGroup === undefined) {
-            this.store.dispatch('dag/getTaskInstanceList', {
-              pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
-            }).then(res => {
-              this.$f.form.workerGroup = res.totalList[0].workerGroup
-            })
-          } else {
-            this.$f.form.workerGroup = o.workerGroup
-          }
-
-          this.$f.form.params = o.params || {}
-          this.$f.form.dependence = o.dependence || {}
-          this.$f.form.cacheDependence = o.dependence || {}
-        } else {
-          this.$f.form.workerGroup = this.store.state.security.workerGroupsListAll[0].id
-        }
-
-        this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
-        this.isContentBox = true
-
-        // Init value of preTask selector
-        let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
-        if (!_.isEmpty(this.backfillItem)) {
-          if (preTaskIds && preTaskIds.length) {
-            this.backfillItem.preTasks = preTaskIds.split(',')
-          } else {
-            this.backfillItem.preTasks = []
-          }
-        }
-
-        o = this.backfillItem
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.rawScript = o.params.rawScript || ''
-
-          // backfill resourceList
-          let backResource = o.params.resourceList || []
-          let resourceList = o.params.resourceList || []
-          if (resourceList.length) {
-            _.map(resourceList, v => {
-              if (!v.id) {
-                this.store.dispatch('dag/getResourceId', {
-                  type: 'FILE',
-                  fullName: '/' + v.res
-                }).then(res => {
-                  this.$f.form.resourceList.push(res.id)
-                  this.dataProcess(backResource)
-                }).catch(e => {
-                  this.$f.form.resourceList.push(v.res)
-                  this.dataProcess(backResource)
-                })
-              } else {
-                this.$f.form.resourceList.push(v.id)
-                this.dataProcess(backResource)
-              }
-            })
-            this.cacheResourceList = resourceList
-          }
-
-          // backfill localParams
-          let localParams = o.params.localParams || []
-          if (localParams.length) {
-            this.localParams = localParams
-          }
-        }
       }
     },
     watch: {
-      /**
-       * Watch the item change, cache the value it changes
-       **/
-      _item (val) {
-        // this._cacheItem()
-      },
       // Watch the cacheParams
       cacheParams (val) {
         this.params = Object.assign(this.params, {}, val)
@@ -1151,8 +453,8 @@
       },
       resourceIdArr (arr) {
         let result = []
-        arr.forEach(item => {
-          this.allNoResources.forEach(item1 => {
+        arr.forEach((item) => {
+          this.allNoResources.forEach((item1) => {
             if (item.id === item1.id) {
               // resultBool = true
               result.push(item1)
@@ -1163,42 +465,22 @@
       }
     },
     computed: {
-      // Define the item model
-      _item () {
-        if (!this.$f) {
-          return {}
-        }
-        return {
-          type: this.nodeData.taskType,
-          id: this.nodeData.id,
-          code: this.code,
-          name: this.$f.form.name,
-          desc: this.$f.form.desc,
-          runFlag: this.$f.form.runFlag,
-          dependence: this.$f.form.cacheDependence,
-          maxRetryTimes: this.$f.form.maxRetryTimes,
-          retryInterval: this.$f.form.retryInterval,
-          delayTime: this.$f.form.delayTime,
-          timeout: this.$f.form.timeout,
-          waitStartTimeout: this.$f.form.waitStartTimeout,
-          taskInstancePriority: this.$f.form.taskInstancePriority,
-          workerGroup: this.$f.form.workerGroup,
-          successBranch: this.$f.form.successBranch,
-          failedBranch: this.$f.form.failedBranch
-        }
-      },
       resourceIdArr () {
         let isResourceId = []
         let resourceIdArr = []
-        if (this.$f && this.$f.form.resourceList && this.$f.form.resourceList.length > 0) {
-          this.$f.form.resourceList.forEach(v => {
-            this.resourceOptions.forEach(v1 => {
+        if (
+          this.$f &&
+          this.$f.form.resourceList &&
+          this.$f.form.resourceList.length > 0
+        ) {
+          this.$f.form.resourceList.forEach((v) => {
+            this.resourceOptions.forEach((v1) => {
               if (searchTree(v1, v)) {
                 isResourceId.push(searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item => {
+          resourceIdArr = isResourceId.map((item) => {
             return { id: item.id, name: item.name, res: item.fullName }
           })
         }
@@ -1212,26 +494,9 @@
       }
     },
     created () {
-      // Unbind copy and paste events
-      JSP.removePaste()
-      // Backfill data
-      let taskList = this.store.state.dag.tasks
       let item = this.store.state.dag.resourcesListS
       diGuiTree(item)
       this.resourceOptions = item
-      // fillback use cacheTasks
-      let cacheTasks = this.store.state.dag.cacheTasks
-      if (cacheTasks[this.nodeData.id]) {
-        this.backfillItem = cacheTasks[this.nodeData.id]
-      } else {
-        if (taskList.length) {
-          taskList.forEach(v => {
-            if (v.id === this.nodeData.id) {
-              this.backfillItem = v
-            }
-          })
-        }
-      }
     },
     mounted () {
       let self = this
@@ -1252,36 +517,7 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
-    /* eslint-disable */
-    components: {
-      mSelectInput,
-      mTimeoutAlarm,
-      mDependentTimeout,
-      mPriority,
-      mWorkerGroups,
-      mPreTasks,
-      mLocalParams,
-      mListBox,
-      mScriptBox,
-      Treeselect
-    }
-    /* eslint-enable */
+    // eslint-disable-next-line vue/no-unused-components
+    components: { mLocalParams, mListBox, mScriptBox, Treeselect }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  @import "../../formModel";
-  .ans-radio-disabled {
-    .ans-radio-inner:after {
-      background-color: #6F8391
-    }
-  }
-  .el-form-item {
-    margin-bottom: 0px;
-  }
-  .el-radio-group {
-    vertical-align: middle;
-    padding-top: 0px;
-    margin-top: 0px;
-  }
-</style>

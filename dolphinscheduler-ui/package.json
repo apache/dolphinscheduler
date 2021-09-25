@@ -17,7 +17,7 @@
   "dependencies": {
     "@antv/layout": "^0.1.18",
     "@antv/x6": "^1.25.5",
-    "@form-create/element-ui": "^1.0.18",
+    "@form-create/element-ui": "^2.5.8",
     "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
