@@ -68,7 +68,6 @@ import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
                 "org.apache.dolphinscheduler.server.log.*"
         })
 })
-@PropertySource(ignoreResourceNotFound = false, value = "classpath:worker.properties")
 @EnableTransactionManagement
 public class WorkerServer implements IStoppable {
 

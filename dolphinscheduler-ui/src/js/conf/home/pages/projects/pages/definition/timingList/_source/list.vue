@@ -136,7 +136,6 @@
           this._onUpdate()
           this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.success(res.msg)
-          // this.$router.push({ name: 'projects-definition-list' })
         }).catch(e => {
           this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
@@ -202,7 +201,6 @@
       },
       onUpdateTiming () {
         this.pageNo = 1
-        // this._getScheduleList('false')
         this.timingDialog = false
         this._onUpdate()
       },

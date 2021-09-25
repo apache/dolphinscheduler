@@ -29,7 +29,6 @@ import org.springframework.context.annotation.PropertySource;
 @ServletComponentScan
 @ComponentScan(value = "org.apache.dolphinscheduler",
         excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.apache.dolphinscheduler.server.*"))
-@PropertySource(ignoreResourceNotFound = false, value = "classpath:application-api.properties")
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

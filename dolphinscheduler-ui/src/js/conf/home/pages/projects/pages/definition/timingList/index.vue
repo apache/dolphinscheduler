@@ -118,7 +118,6 @@
        * conditions
        */
       _onQuery (o) {
-        // this.searchParams.searchVal = o.searchVal
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
         setUrlParams(this.searchParams)

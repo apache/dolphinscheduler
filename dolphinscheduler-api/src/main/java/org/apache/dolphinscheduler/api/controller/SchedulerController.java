@@ -59,8 +59,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * scheduler controller
@@ -74,7 +72,6 @@ public class SchedulerController extends BaseController {
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
     public static final String DEFAULT_PROCESS_INSTANCE_PRIORITY = "MEDIUM";
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
 
     @Autowired
     private SchedulerService schedulerService;
