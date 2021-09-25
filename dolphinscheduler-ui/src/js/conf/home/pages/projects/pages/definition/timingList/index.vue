@@ -122,7 +122,6 @@
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
         setUrlParams(this.searchParams)
-        console.log('searchParams1:', this.searchParams)
         this._debounceGET()
       },
       /**
