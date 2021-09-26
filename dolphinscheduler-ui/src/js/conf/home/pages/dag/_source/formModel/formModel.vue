@@ -118,6 +118,7 @@
             <m-related-environment
               v-model="environmentCode"
               :workerGroup="workerGroup"
+              :isNewCreate="isNewCreate"
               v-on:environmentCodeEvent="_onUpdateEnvironmentCode"
             ></m-related-environment>
           </div>
@@ -361,6 +362,13 @@
             :backfill-item="backfillItem"
           >
           </m-datax>
+        <m-tis
+          v-if="nodeData.taskType === 'TIS'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          :backfill-item="backfillItem"
+          ref="TIS">
+        </m-tis>
           <m-sqoop
             v-if="nodeData.taskType === 'SQOOP'"
             @on-params="_onParams"
@@ -429,6 +437,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mTis from './tasks/tis'
   import mConditions from './tasks/conditions'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
@@ -512,7 +521,9 @@
         postTasks: [],
         prevTasks: [],
         // refresh part of the formModel, after set backfillItem outside
-        backfillRefresh: true
+        backfillRefresh: true,
+        // whether this is a new Task
+        isNewCreate: true
       }
     },
     provide () {
@@ -563,7 +574,8 @@
           },
           type: task.taskType,
           waitStartTimeout: task.taskParams.waitStartTimeout,
-          workerGroup: task.workerGroup
+          workerGroup: task.workerGroup,
+          environmentCode: task.environmentCode
         }
       },
       /**
@@ -905,6 +917,7 @@
             const backfillItem = this.taskToBackfillItem(task)
             o = backfillItem
             this.backfillItem = backfillItem
+            this.isNewCreate = false
           }
         })
       }
@@ -973,6 +986,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mTis,
       mSqoop,
       mConditions,
       mSwitch,

@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -25,18 +29,24 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -104,6 +114,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private TaskPluginManager taskPluginManager;
 
     /**
+     * process database access
+     */
+    protected ProcessService processService;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
@@ -115,6 +130,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
@@ -125,6 +141,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
@@ -162,13 +179,19 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
+            preBuildBusinessParams();
+
             TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
             if (null == taskChannel) {
                 throw new PluginNotFoundException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
-
-            //TODO Temporary operation, To be adjusted
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskExecutionContext.getProcessDefineCode(),
+                    taskExecutionContext.getProcessDefineVersion(),
+                    taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            taskRequest.setTaskLogName(taskLogName);
 
             task = taskChannel.createTask(taskRequest);
             // task init
@@ -179,8 +202,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
             this.task.handle();
 
             // task result process
-            this.task.after();
-
+            if (this.task.getNeedAlert()) {
+                sendAlert(this.task.getTaskAlertInfo());
+            }
             responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(this.task.getProcessId());
@@ -201,6 +225,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             clearTaskExecPath();
         }
+    }
+
+    private void sendAlert(TaskAlertInfo taskAlertInfo) {
+        alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(), taskAlertInfo.getContent());
     }
 
     /**
@@ -256,6 +284,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
         if (task != null) {
             try {
                 task.cancelApplication(true);
+                TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+                if (taskInstance != null) {
+                    ProcessUtils.killYarnJob(taskExecutionContext);
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -354,5 +386,22 @@ public class TaskExecuteThread implements Runnable, Delayed {
             return 1;
         }
         return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
+    }
+
+    private void preBuildBusinessParams() {
+        Map<String, Property> paramsMap = new HashMap<>();
+        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+        if (taskExecutionContext.getScheduleTime() != null) {
+            Date date = taskExecutionContext.getScheduleTime();
+            if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+                date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
+            }
+            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
+            Property p = new Property();
+            p.setValue(dateTime);
+            p.setProp(Constants.PARAMETER_DATETIME);
+            paramsMap.put(Constants.PARAMETER_DATETIME, p);
+        }
+        taskExecutionContext.setParamsMap(paramsMap);
     }
 }

@@ -65,13 +65,7 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public void cancelApplication(boolean status) throws Exception {
         cancel = true;
         // cancel process
-
-        //todo 交给上层处理
         shellCommandExecutor.cancelApplication();
-        //  TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
-        // if (status && taskInstance != null){
-        //   ProcessUtils.killYarnJob(taskExecutionContext);
-        //  }
     }
 
     /**

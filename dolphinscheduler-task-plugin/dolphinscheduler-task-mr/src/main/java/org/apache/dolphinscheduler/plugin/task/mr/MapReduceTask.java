@@ -125,7 +125,6 @@ public class MapReduceTask extends AbstractYarnTask {
             if (resourceId == 0) {
                 resourceName = mainJar.getRes();
             } else {
-                //when update resource maybe has error ,也许也可以交给上层去做控制 需要看资源是否可以抽象为共性 目前来讲我认为是可以的
                 resourceName = mainJar.getResourceName().replaceFirst("/", "");
             }
             mainJar.setRes(resourceName);

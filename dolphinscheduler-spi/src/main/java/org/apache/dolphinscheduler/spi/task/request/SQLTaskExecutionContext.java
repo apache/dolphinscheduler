@@ -17,18 +17,17 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.spi.task.UdfFuncBean;
 import org.apache.dolphinscheduler.spi.task.UdfFuncBean.UdfFuncDeserializer;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  *  SQL Task ExecutionContext
- *  to master/worker task transport
  */
-public class SQLTaskRequest extends TaskRequest {
+public class SQLTaskExecutionContext implements Serializable {
+
 
     /**
      * warningGroupId
@@ -43,7 +42,8 @@ public class SQLTaskRequest extends TaskRequest {
      * udf function tenant code map
      */
     @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
-    private Map<UdfFuncBean,String> udfFuncTenantCodeMap;
+    private Map<UdfFuncRequest,String> udfFuncTenantCodeMap;
+
 
     public int getWarningGroupId() {
         return warningGroupId;
@@ -53,11 +53,11 @@ public class SQLTaskRequest extends TaskRequest {
         this.warningGroupId = warningGroupId;
     }
 
-    public Map<UdfFuncBean, String> getUdfFuncTenantCodeMap() {
+    public Map<UdfFuncRequest, String> getUdfFuncTenantCodeMap() {
         return udfFuncTenantCodeMap;
     }
 
-    public void setUdfFuncTenantCodeMap(Map<UdfFuncBean, String> udfFuncTenantCodeMap) {
+    public void setUdfFuncTenantCodeMap(Map<UdfFuncRequest, String> udfFuncTenantCodeMap) {
         this.udfFuncTenantCodeMap = udfFuncTenantCodeMap;
     }
 
@@ -71,10 +71,10 @@ public class SQLTaskRequest extends TaskRequest {
 
     @Override
     public String toString() {
-        return "SQLTaskExecutionContext{"
-                + "warningGroupId=" + warningGroupId
-                + ", connectionParams='" + connectionParams + '\''
-                + ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap
-                + '}';
+        return "SQLTaskExecutionContext{" +
+                "warningGroupId=" + warningGroupId +
+                ", connectionParams='" + connectionParams + '\'' +
+                ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap +
+                '}';
     }
 }

@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
+import java.io.Serializable;
+
 /**
- *  Sqoop Task ExecutionContext
- *  to master/worker task transport
+ *  master/worker task transport
  */
-public class SqoopTaskRequest extends TaskRequest {
+public class DataxTaskExecutionContext implements Serializable{
 
     /**
      * dataSourceId
@@ -103,13 +104,13 @@ public class SqoopTaskRequest extends TaskRequest {
 
     @Override
     public String toString() {
-        return "SqoopTaskExecutionContext{"
-                + "dataSourceId=" + dataSourceId
-                + ", sourcetype=" + sourcetype
-                + ", sourceConnectionParams='" + sourceConnectionParams + '\''
-                + ", dataTargetId=" + dataTargetId
-                + ", targetType=" + targetType
-                + ", targetConnectionParams='" + targetConnectionParams + '\''
-                + '}';
+        return "DataxTaskExecutionContext{" +
+                "dataSourceId=" + dataSourceId +
+                ", sourcetype=" + sourcetype +
+                ", sourceConnectionParams='" + sourceConnectionParams + '\'' +
+                ", dataTargetId=" + dataTargetId +
+                ", targetType=" + targetType +
+                ", targetConnectionParams='" + targetConnectionParams + '\'' +
+                '}';
     }
 }

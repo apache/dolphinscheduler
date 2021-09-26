@@ -204,7 +204,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         // verify udfFuncName is exist
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
-                logger.error("UdfFunc {} has exist, can't create again.", funcName);
+                logger.error("UdfFuncRequest {} has exist, can't create again.", funcName);
                 result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
                 result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
                 return result;

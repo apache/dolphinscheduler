@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.sqoop;
 
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.SqoopTaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class SqoopTaskChannel implements TaskChannel {
@@ -31,6 +30,6 @@ public class SqoopTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskRequest taskRequest) {
-        return new SqoopTask((SqoopTaskRequest) taskRequest);
+        return new SqoopTask(taskRequest);
     }
 }
