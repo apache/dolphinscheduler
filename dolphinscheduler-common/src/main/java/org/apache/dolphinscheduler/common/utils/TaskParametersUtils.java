@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.tis.TISCommonParameters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, SwitchParameters.class);
             case "BLOCKING":
                 return JSONUtils.parseObject(parameter, BlockingParameters.class);
+            case "TIS":
+                return JSONUtils.parseObject(parameter, TISCommonParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);
                 return null;

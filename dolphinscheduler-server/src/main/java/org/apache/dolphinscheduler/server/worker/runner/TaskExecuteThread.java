@@ -29,16 +29,21 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
@@ -109,6 +114,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private TaskPluginManager taskPluginManager;
 
     /**
+     * process database access
+     */
+    protected ProcessService processService;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
@@ -120,6 +130,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext,
@@ -130,6 +141,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         this.taskCallbackService = taskCallbackService;
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
@@ -174,6 +186,12 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 throw new PluginNotFoundException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskExecutionContext.getProcessDefineCode(),
+                    taskExecutionContext.getProcessDefineVersion(),
+                    taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            taskRequest.setTaskLogName(taskLogName);
 
             task = taskChannel.createTask(taskRequest);
             // task init
@@ -266,6 +284,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
         if (task != null) {
             try {
                 task.cancelApplication(true);
+                TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+                if (taskInstance != null) {
+                    ProcessUtils.killYarnJob(taskExecutionContext);
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

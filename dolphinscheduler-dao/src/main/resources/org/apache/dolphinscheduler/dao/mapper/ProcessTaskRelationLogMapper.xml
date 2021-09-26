@@ -41,4 +41,9 @@
             #{relation.createTime},#{relation.updateTime})
         </foreach>
     </insert>
+    <delete id="deleteByCode">
+        delete from t_ds_process_task_relation_log
+        WHERE process_definition_code = #{processCode}
+        and process_definition_version = #{processVersion}
+    </delete>
 </mapper>

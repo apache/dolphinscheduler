@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
@@ -59,7 +59,7 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SqlTask extends AbstractYarnTask {
+public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * taskExecutionContext
@@ -99,17 +99,7 @@ public class SqlTask extends AbstractYarnTask {
 
     @Override
     public AbstractParameters getParameters() {
-        return null;
-    }
-
-    @Override
-    protected String buildCommand() {
-        return null;
-    }
-
-    @Override
-    protected void setMainJarName() {
-
+        return sqlParameters;
     }
 
     @Override
@@ -382,7 +372,8 @@ public class SqlTask extends AbstractYarnTask {
         // is the timeout set
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        try (PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql())) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }

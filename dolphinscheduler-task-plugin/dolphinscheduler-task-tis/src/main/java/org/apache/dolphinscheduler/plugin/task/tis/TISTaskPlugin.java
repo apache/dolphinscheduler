@@ -14,49 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.process;
 
-/**
- * resource info
- */
-public class ResourceInfo {
-    /**
-     * res id of the resource that was uploaded
-     */
-    private int id;
+package org.apache.dolphinscheduler.plugin.task.tis;
 
-    private String res;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-    /**
-     * full name of the resource that was uploaded
-     */
-    private String resourceName;
+import com.google.common.collect.ImmutableList;
 
-    public ResourceInfo() {
-        // do nothing, void constructor
-    }
+public class TISTaskPlugin implements DolphinSchedulerPlugin {
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getRes() {
-        return res;
-    }
-
-    public void setRes(String res) {
-        this.res = res;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
+    @Override
+    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return ImmutableList.of(new TISTaskChannelFactory());
     }
 }
