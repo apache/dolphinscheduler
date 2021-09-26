@@ -51,7 +51,6 @@ public class CommonUtilsTest {
         Assert.assertTrue(true);
     }
 
-
     @Test
     public void getHdfsDataBasePath() {
         logger.info(HadoopUtils.getHdfsDataBasePath());

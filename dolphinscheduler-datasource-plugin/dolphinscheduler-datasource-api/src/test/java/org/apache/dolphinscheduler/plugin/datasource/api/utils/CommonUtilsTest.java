@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
 public class CommonUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
 
     @Test
     public void getKerberosStartupState() {
@@ -82,17 +82,17 @@ public class CommonUtilsTest {
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
 
-        Assert.assertEquals("",PasswordUtils.encodePassword(""));
-        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==",PasswordUtils.encodePassword("123456"));
-        Assert.assertEquals("IUAjJCVeJipJVkZCV2xoVFYwQT0=",PasswordUtils.encodePassword("!QAZXSW@"));
-        Assert.assertEquals("IUAjJCVeJipOV1JtWjJWeUtFQT0=",PasswordUtils.encodePassword("5dfger(@"));
+        Assert.assertEquals("", PasswordUtils.encodePassword(""));
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", PasswordUtils.encodePassword("123456"));
+        Assert.assertEquals("IUAjJCVeJipJVkZCV2xoVFYwQT0=", PasswordUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("IUAjJCVeJipOV1JtWjJWeUtFQT0=", PasswordUtils.encodePassword("5dfger(@"));
 
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
 
-        Assert.assertEquals("",PasswordUtils.encodePassword(""));
-        Assert.assertEquals("123456",PasswordUtils.encodePassword("123456"));
-        Assert.assertEquals("!QAZXSW@",PasswordUtils.encodePassword("!QAZXSW@"));
-        Assert.assertEquals("5dfger(@",PasswordUtils.encodePassword("5dfger(@"));
+        Assert.assertEquals("", PasswordUtils.encodePassword(""));
+        Assert.assertEquals("123456", PasswordUtils.encodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@", PasswordUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@", PasswordUtils.encodePassword("5dfger(@"));
 
     }
 
