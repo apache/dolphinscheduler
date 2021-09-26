@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-
-import java.util.Date;
 
 @TableName("t_ds_audit_log")
 public class AuditLog {
@@ -53,7 +51,7 @@ public class AuditLog {
     /**
      * operation time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date time;
 
     /**

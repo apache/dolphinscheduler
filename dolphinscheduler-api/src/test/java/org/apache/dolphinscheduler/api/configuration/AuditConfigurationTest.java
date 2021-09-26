@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.configuration;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

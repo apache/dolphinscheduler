@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class AuditDto {
 
@@ -29,7 +29,7 @@ public class AuditDto {
 
     private String operation;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date time;
 
     private String projectName;

@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.audit.AuditMessage;
 import org.apache.dolphinscheduler.api.audit.AuditPublishService;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuditModuleType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -42,6 +40,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Service
 public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
@@ -119,15 +119,13 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             return result;
         }
         List<AuditDto> auditDtos = CollectionUtils.transformToList(logList,
-                auditLog -> transformAuditLog(auditLog)
-        );
+            auditLog -> transformAuditLog(auditLog));
         pageInfo.setTotal(auditDtos.size());
         pageInfo.setTotalList(auditDtos);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 
     /**
      * transform AuditLog to AuditDto

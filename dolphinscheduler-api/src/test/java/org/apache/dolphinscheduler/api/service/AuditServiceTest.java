@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
@@ -37,7 +38,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +45,11 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import junit.framework.TestCase;
-
 /**
  * audit service test
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AuditServiceTest extends TestCase {
+public class AuditServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AuditServiceTest.class);
 
@@ -90,5 +88,4 @@ public class AuditServiceTest extends TestCase {
         auditLog.setModule(0);
         return auditLog;
     }
-
 }

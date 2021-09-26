@@ -95,12 +95,12 @@ public class AuditMessage {
 
     @Override
     public String toString() {
-        return "AuditMessage{" +
-                "user=" + user +
-                ", Date=" + auditDate +
-                ", module=" + module +
-                ", operation=" + operation +
-                ", projectName='" + projectName + '\'' +
-                ", processName='" + processName + '\'';
+        return "AuditMessage{"
+                + "user=" + user
+                + ", Date=" + auditDate
+                + ", module=" + module
+                + ", operation=" + operation
+                + ", projectName='" + projectName + '\''
+                + ", processName='" + processName + '\'';
     }
 }
