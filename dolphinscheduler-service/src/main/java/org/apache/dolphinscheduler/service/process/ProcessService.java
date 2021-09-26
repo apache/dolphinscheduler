@@ -2212,7 +2212,7 @@ public class ProcessService {
 
         int result = processDefineMapper.updateById(processDefinitionLog);
         if (result > 0) {
-            result = switchProcessTaskRelationVersion(processDefinition);
+            result = switchProcessTaskRelationVersion(processDefinitionLog);
             if (result <= 0) {
                 return Constants.DEFINITION_FAILURE;
             }
