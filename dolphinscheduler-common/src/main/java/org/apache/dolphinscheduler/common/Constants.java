@@ -937,6 +937,19 @@ public final class Constants {
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
 
+
+    /**
+     * validation Query
+     */
+    public static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
+    public static final String MYSQL_VALIDATION_QUERY = "select 1";
+    public static final String HIVE_VALIDATION_QUERY = "select 1";
+    public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
+    public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
+    public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
+    public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
+    public static final String PRESTO_VALIDATION_QUERY = "select 1";
+
     /**
      * database type
      */

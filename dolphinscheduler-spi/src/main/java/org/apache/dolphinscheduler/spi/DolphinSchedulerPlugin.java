@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.spi;
 import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
@@ -55,6 +56,14 @@ public interface DolphinSchedulerPlugin {
      * @return registry factory
      */
     default Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return emptyList();
+    }
+
+    /**
+     * get datasource plugin factory
+     * @return datasource factory
+     */
+    default Iterable<DataSourceChannelFactory> getDatasourceChannelFactorys() {
         return emptyList();
     }
 

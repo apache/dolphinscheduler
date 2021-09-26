@@ -21,14 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.datasource.hive.HiveDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.oracle.OracleDatasourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.postgresql.PostgreSqlDatasourceParamDTO;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -37,6 +29,16 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -313,7 +315,7 @@ public class DataSourceServiceTest {
 
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(true);
-        PowerMockito.when(CommonUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
         hiveDataSourceParamDTO.setHost("192.168.9.1");
         hiveDataSourceParamDTO.setPort(10000);
@@ -401,7 +403,7 @@ public class DataSourceServiceTest {
         Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.when(DatasourceUtil.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+        PowerMockito.when(DataSourceClientProvider.getInstance().getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
         result = dataSourceService.checkConnection(dataSourceType, connectionParam);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
