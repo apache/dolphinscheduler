@@ -55,7 +55,7 @@
             </el-select>
           </template>
         </m-list-box-f>
-        <div  class="alertForm">
+        <div class="alertForm">
           <template>
             <form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create>
           </template>
@@ -126,6 +126,10 @@
           this.rule.forEach(item => {
             if (item.title.indexOf('$t') !== -1) {
               item.title = this.$t(item.field)
+            }
+            // fix null pointer exception
+            if (!item.props) {
+              item.props = {}
             }
           })
         }).catch(e => {
