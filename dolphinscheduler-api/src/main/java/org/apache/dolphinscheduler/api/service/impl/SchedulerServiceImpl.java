@@ -430,11 +430,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (!hasProjectAndPerm) {
             return result;
         }
-//        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-//        if (processDefinition == null) {
-//            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
-//            return result;
-//        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
+        if (processDefineCode!=0 && processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
+            return result;
+        }
         int[] statusArray = null;
         // filter by state
         if (stateType != null) {
