@@ -2432,11 +2432,16 @@ public class ProcessService {
             int i = taskGroupMapper.compardAndUpdateUsedStatus(groupId, useSize, useSize + 1);
             if (i == 1) {
                 status = 1;
+                this.getRunningTaskCache().put(taskId, priority);
+                insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
             } else {
+                logger.info("aquire failed, enter into waitiing queue");
+                insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+                this.getWaitingTaskCache().put(taskId, priority);
                 return false;
             }
         }
-        return insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+        return true;
     }
 
     /**

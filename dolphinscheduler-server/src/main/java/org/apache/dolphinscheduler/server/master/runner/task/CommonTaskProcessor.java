@@ -71,24 +71,25 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         this.processInstance = processInstance;
         // task group queue
         int taskGroupId = task.getTaskGroupId();
-        if (processService.checkTaskIsExsited(task.getId())) {
+        boolean acquireTaskGroup = false;
+        if (taskGroupId != -2 && !processService.checkTaskIsExsited(task.getId())) {
             this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
-        }
-        boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
-                task.getName(),
-                taskGroupId,
-                task.getProcessInstanceId(),
-                task.getTaskInstancePriority().getCode());
-        if (!acquireTaskGroup) {
-            logger.info("submit task, but try to acquire task group failed", taskInstance.getName());
-            return false;
+            System.out.println("task id "+task.getId());
+           acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+                    task.getName(),
+                    taskGroupId,
+                    task.getProcessInstanceId(),
+                    task.getTaskInstancePriority().getCode());
+            if (!acquireTaskGroup) {
+                logger.info("submit task, but try to acquire task group failed", taskInstance.getName());
+                return false;
+            }
         }
         // if the task is running, it should not be dispatched
         ConcurrentHashMap<Integer, Integer> runningTaskCache = processService.getRunningTaskCache();
-        if (runningTaskCache.contains(task.getId())) {
+        if (!runningTaskCache.contains(task.getId()) && acquireTaskGroup) {
             dispatchTask(taskInstance, processInstance);
         }
-
         return true;
     }
 
