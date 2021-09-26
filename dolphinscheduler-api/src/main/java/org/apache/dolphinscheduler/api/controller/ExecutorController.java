@@ -124,7 +124,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
-                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) Integer dryRun) {
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;

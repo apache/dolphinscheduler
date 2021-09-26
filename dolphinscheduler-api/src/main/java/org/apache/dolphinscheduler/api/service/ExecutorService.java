@@ -63,7 +63,7 @@ public interface ExecutorService {
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
-                                            Integer dryRun);
+                                            int dryRun);
 
     /**
      * check whether the process definition can be executed

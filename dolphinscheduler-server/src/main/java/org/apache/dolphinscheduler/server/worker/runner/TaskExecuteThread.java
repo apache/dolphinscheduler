@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -119,11 +118,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
     protected ProcessService processService;
 
     /**
-     * task instance service
-     */
-    private static TaskInstanceMapper taskInstanceMapper;
-
-    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
@@ -198,11 +192,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
             //init varPool
             this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
 
-            taskInstanceMapper = SpringApplicationContext.getBean(TaskInstanceMapper.class);
-            TaskInstance taskInstance = taskInstanceMapper.selectById(taskExecutionContext.getTaskInstanceId());
-            Integer dryRun = taskInstance.getDryRun();
+            TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+            int dryRun = taskInstance.getDryRun();
 
-            if (!dryRun.equals(Constants.DRY_RUN_STATE)) {
+            if (dryRun != Constants.DRY_RUN_FLAG_YES) {
                 // task handle
                 this.task.handle();
 

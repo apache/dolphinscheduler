@@ -130,7 +130,7 @@ public class Command {
      * if dry run
      */
     @TableField("dry_run")
-    private Integer dryRun;
+    private int dryRun;
 
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
@@ -152,7 +152,7 @@ public class Command {
             String workerGroup,
             Long environmentCode,
             Priority processInstancePriority,
-            Integer dryRun) {
+            int dryRun) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -290,11 +290,11 @@ public class Command {
         this.environmentCode = environmentCode;
     }
 
-    public Integer getDryRun() {
+    public int getDryRun() {
         return dryRun;
     }
 
-    public void setDryRun(Integer dryRun) {
+    public void setDryRun(int dryRun) {
         this.dryRun = dryRun;
     }
 
@@ -373,8 +373,8 @@ public class Command {
         result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
-        result = 31 * result + (dryRun != null ? dryRun.hashCode() : 0);
         result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
+        result = 31 * result + dryRun;
         return result;
     }
 

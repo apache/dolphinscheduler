@@ -1087,7 +1087,7 @@ public final class Constants {
     /**
      * dry run state
      */
-    public static final Integer NORMAL_STATE = 0;
-    public static final Integer DRY_RUN_STATE = 1;
+    public static final int DRY_RUN_FLAG_NO = 0;
+    public static final int DRY_RUN_FLAG_YES = 1;
 
 }

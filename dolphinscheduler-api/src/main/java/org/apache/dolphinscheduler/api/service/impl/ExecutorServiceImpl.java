@@ -133,7 +133,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Long environmentCode,Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
-                                                   Integer dryRun) {
+                                                   int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -507,7 +507,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup, Long environmentCode,
-                              Map<String, String> startParams, Integer expectedParallelismNumber, Integer dryRun) {
+                              Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun) {
 
         /**
          * instantiate command schedule instance

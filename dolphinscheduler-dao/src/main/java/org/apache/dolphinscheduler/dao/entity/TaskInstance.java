@@ -263,7 +263,7 @@ public class TaskInstance implements Serializable {
     /**
      * dry run state
      */
-    private Integer dryRun;
+    private int dryRun;
 
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
@@ -533,11 +533,11 @@ public class TaskInstance implements Serializable {
         this.executorName = executorName;
     }
 
-    public Integer getDryRun() {
+    public int getDryRun() {
         return dryRun;
     }
 
-    public void setDryRun(Integer dryRun) {
+    public void setDryRun(int dryRun) {
         this.dryRun = dryRun;
     }
 

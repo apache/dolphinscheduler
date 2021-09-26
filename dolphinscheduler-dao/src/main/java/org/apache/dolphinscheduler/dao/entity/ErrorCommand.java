@@ -116,14 +116,14 @@ public class ErrorCommand {
     private String workerGroup;
 
     /**
-     * dry run state
-     */
-    private Integer dryRun;
-
-    /**
      * environment code
      */
     private Long environmentCode;
+
+    /**
+     * dry run state
+     */
+    private int dryRun;
 
     public ErrorCommand() {}
 
@@ -274,11 +274,11 @@ public class ErrorCommand {
         this.environmentCode = environmentCode;
     }
 
-    public Integer getDryRun() {
+    public int getDryRun() {
         return dryRun;
     }
 
-    public void setDryRun(Integer dryRun) {
+    public void setDryRun(int dryRun) {
         this.dryRun = dryRun;
     }
 
