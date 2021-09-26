@@ -77,11 +77,11 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
-        logger.info("blocking task has been submitted");
         if (this.taskInstance == null) {
+            logger.error("blocking task submit failed");
             return false;
         }
-
+        logger.info("blocking task has been submitted");
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
