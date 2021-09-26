@@ -187,7 +187,7 @@ public class MasterSchedulerService extends Thread {
                     if (processInstance.getTimeout() > 0) {
                         this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
                     }
-                    logger.info("command {} process {} start...",
+                    logger.info("handle command end, command {} process {} start...",
                             command.getId(), processInstance.getId());
                     masterExecService.execute(workflowExecuteThread);
                 }

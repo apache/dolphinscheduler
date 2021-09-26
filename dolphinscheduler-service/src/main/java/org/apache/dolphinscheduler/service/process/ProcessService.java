@@ -104,6 +104,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -583,8 +584,16 @@ public class ProcessService {
      */
     private Date getScheduleTime(Command command, Map<String, String> cmdParam) {
         Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            scheduleTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+        if (scheduleTime == null
+                && cmdParam != null
+                && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+            List<Date> complementDateList = getComplementDateList(cmdParam, command.getProcessDefinitionCode());
+            if (complementDateList.size() > 0) {
+                scheduleTime = complementDateList.get(0);
+            } else {
+                logger.error("set scheduler time error: complement date list is empty, command: {}",
+                        command.toString());
+            }
         }
         return scheduleTime;
     }
@@ -963,16 +972,38 @@ public class ProcessService {
             return;
         }
 
-        Date startComplementTime = DateUtils.parse(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
-            YYYY_MM_DD_HH_MM_SS);
-        if (Flag.NO == processInstance.getIsSubProcess()) {
-            processInstance.setScheduleTime(startComplementTime);
+        List<Date> complementDate = getComplementDateList(cmdParam, processInstance.getProcessDefinitionCode());
+
+        if (complementDate.size() > 0
+                && Flag.NO == processInstance.getIsSubProcess()) {
+            processInstance.setScheduleTime(complementDate.get(0));
         }
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
 
+    }
+
+    /**
+     *  return complement date list
+     *
+     * @param cmdParam
+     * @param processDefinitionCode
+     * @return
+     */
+    public List<Date> getComplementDateList(Map<String, String> cmdParam, Long processDefinitionCode) {
+        List<Date> result = new ArrayList<>();
+        Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+        Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        if (startDate.after(endDate)) {
+            Date tmp = startDate;
+            startDate = endDate;
+            endDate = tmp;
+        }
+        List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
+        result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
+        return result;
     }
 
     /**
