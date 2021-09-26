@@ -156,31 +156,34 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-//    @Test
-//    public void testQueryScheduleListPaging() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionCode","40");
-//        paramsMap.add("searchVal","test");
-//        paramsMap.add("pageNo","1");
-//        paramsMap.add("pageSize","30");
-//
-//        PageInfo<Resource> pageInfo = new PageInfo<>(1, 10);
-//        Result mockResult = Result.success(pageInfo);
-//
-//        Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),
-//                isA(String.class), isA(Integer.class), isA(Integer.class))).thenReturn(mockResult);
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedules/",123)
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
+    @Test
+    public void testQueryScheduleListPaging() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processDefinitionCode","40");
+        paramsMap.add("searchVal","test");
+        paramsMap.add("pageNo","1");
+        paramsMap.add("pageSize","30");
+        paramsMap.add("stateType", "OFFLINE");
+        paramsMap.add("startTime", "");
+        paramsMap.add("endTime", "");
+        PageInfo<Resource> pageInfo = new PageInfo<>(1, 10);
+        Result mockResult = Result.success(pageInfo);
+
+        Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),
+                isA(String.class), isA(Integer.class), isA(Integer.class), isA(ReleaseState.class),
+                isA(String.class), isA(String.class))).thenReturn(mockResult);
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedules/",123)
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
     @Test
     public void testQueryScheduleList() throws Exception {
