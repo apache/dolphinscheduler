@@ -77,7 +77,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
-
+        logger.info("blocking task has been submitted");
         if (this.taskInstance == null) {
             return false;
         }
@@ -199,6 +199,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
         processService.updateTaskInstance(taskInstance);
+        logger.info("blocking task execute complete, blocking logic:{}",isBlocked);
     }
 
     @Override
