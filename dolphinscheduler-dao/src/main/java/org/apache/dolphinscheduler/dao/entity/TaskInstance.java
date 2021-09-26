@@ -700,7 +700,7 @@ public class TaskInstance implements Serializable {
 
     public String getBlockingCondition() {
         if (this.blockingCondition == null) {
-            Map<String, String> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, String.class);
+            Map<String, String> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(),new TypeReference<Map<String, String>>() {});
             this.blockingCondition = taskParamsMap.get(Constants.BLOCKING_CONDITION);
         }
         return blockingCondition;
@@ -711,7 +711,7 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean getAlertWhenBlocking() {
-        Map<String,Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(),String.class,Object.class);
+        Map<String,Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(),new TypeReference<Map<String, Object>>() {});
         Boolean alertWhenBlocking = (Boolean) taskParamsMap.get(Constants.ALERT_WHEN_BLOCKING);
         this.alertWhenBlocking = alertWhenBlocking == null ? false : alertWhenBlocking;
         return this.alertWhenBlocking;
