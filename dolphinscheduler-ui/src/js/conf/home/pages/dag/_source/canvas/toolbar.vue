@@ -218,7 +218,7 @@
       returnToListPage () {
         let $name = this.$route.name
         if (this.source === 'task') {
-          this.$router.push({ name: 'task-instance' })
+          this.$router.push({ name: 'task-definition' })
           return
         }
         if ($name && $name.indexOf('definition') !== -1) {

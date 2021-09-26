@@ -268,6 +268,7 @@ export default {
   offline: 'offline',
   'Task Status': 'Task Status',
   'Process Instance': 'Process Instance',
+  'Task definition': 'Task definition',
   'Task Instance': 'Task Instance',
   'Create task': 'Create task',
   'Select date range': 'Select date range',

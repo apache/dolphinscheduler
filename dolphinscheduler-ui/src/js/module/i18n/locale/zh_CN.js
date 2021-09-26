@@ -268,6 +268,7 @@ export default {
   'Task Status': '任务状态',
   'Process Instance': '工作流实例',
   'Task Instance': '任务实例',
+  'Task definition': '任务定义',
   'Create task': '创建任务实例',
   'Select date range': '选择日期区间',
   startDate: '开始日期',

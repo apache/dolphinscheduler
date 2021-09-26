@@ -33,9 +33,10 @@
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
         <el-table-column prop="taskType" :label="$t('Node Type')"></el-table-column>
         <el-table-column :label="$t('State')" width="50">
-          <template slot-scope="scope">
+          <!-- <template slot-scope="scope">
             <span v-html="_rtState(scope.row.state)" style="cursor: pointer;"></span>
-          </template>
+          </template> -->
+          <span>-</span>
         </el-table-column>
         <el-table-column :label="$t('Submit Time')" width="135">
           <template slot-scope="scope">
@@ -44,29 +45,38 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('Start Time')" width="135">
-          <template slot-scope="scope">
+          <!-- <template slot-scope="scope">
             <span>{{scope.row.startTime | formatDate}}</span>
-          </template>
+          </template> -->
+          <span>-</span>
         </el-table-column>
         <el-table-column :label="$t('End Time')" width="135">
-          <template slot-scope="scope">
+          <!-- <template slot-scope="scope">
             <span>{{scope.row.endTime | formatDate}}</span>
-          </template>
+          </template> -->
+          <span>-</span>
         </el-table-column>
         <el-table-column :label="$t('Duration')">
-          <template slot-scope="scope">
+          <!-- <template slot-scope="scope">
             <span>{{scope.row.duration | filterNull}}</span>
-          </template>
+          </template> -->
+          <span>-</span>
         </el-table-column>
-        <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
+        <el-table-column prop="retryTimes" :label="$t('Retry Count')">
+          <span>-</span>
+        </el-table-column>
         <el-table-column :label="$t('host')" min-width="210">
-          <template slot-scope="scope">
+          <!-- <template slot-scope="scope">
             <span>{{scope.row.host | filterNull}}</span>
-          </template>
+          </template> -->
+          <span>-</span>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="80" fixed="right">
+        <el-table-column :label="$t('Operation')" align="center" width="120" fixed="right">
           <template slot-scope="scope">
             <div>
+              <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
+                <span><el-button type="primary" size="mini"  icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
+              </el-tooltip>
               <el-tooltip :content="$t('Force success')" placement="top" :enterable="false">
                 <span>
                   <el-button type="primary" size="mini" icon="el-icon-success" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_forceSuccess(scope.row)" circle></el-button>
@@ -86,6 +96,22 @@
       width="auto">
       <m-log :key="logId" :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
+    <el-drawer
+      :visible.sync="taskDrawer"
+      size=""
+      :with-header="false"
+      :wrapperClosable="false"
+    >
+      <m-form-model
+        v-if="taskDrawer"
+        :nodeData="task"
+        @seeHistory="seeHistory"
+        @addTaskInfo="updateTaskInfo"
+        @close="_closeTaskDrawer"
+        @onSubProcess="toSubProcess"
+        modelType="edit"
+      ></m-form-model>
+    </el-drawer>
   </div>
 </template>
 <script>
@@ -93,6 +119,7 @@
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import mFormModel from '@/conf/home/pages/dag/_source/formModel/formModel.vue'
 
   export default {
     name: 'list',
@@ -104,16 +131,20 @@
         logDialog: false,
         item: {},
         source: '',
-        logId: null
+        logId: null,
+        taskDrawer: false,
+        task: null
       }
     },
+    inject: ['taskInstance'],
     props: {
       taskInstanceList: Array,
       pageNo: Number,
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['forceTaskSuccess']),
+      ...mapActions('dag', ['forceTaskSuccess', 'updateTask']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
       _rtState (code) {
         let o = tasksState[code]
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
@@ -145,6 +176,42 @@
       },
       _go (item) {
         this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.processInstanceId}` })
+      },
+      _edit (item) {
+        this.getWorkerGroupsAll().then(() => {
+          this.task = {
+            ...item,
+            id: item.code
+          }
+          this.taskDrawer = true
+        })
+      },
+      _closeTaskDrawer () {
+        this.taskDrawer = false
+      },
+      /**
+       * update task instance
+       */
+      updateTaskInfo ({ item }) {
+        this.updateTask({
+          taskDefinitionJsonObj: JSON.stringify(item),
+          code: item.code,
+          projectCode: this.projectCode
+        }).then(res => {
+          this.taskDrawer = false
+          this.taskInstance._getList(false)
+        }).catch(() => {
+          this.$message.warning(`${$t('Failed')}`)
+        })
+      },
+      seeHistory (taskName) {
+        this.$router.push({
+          name: 'task-instance',
+          query: {
+            processInstanceId: this.$route.params.code,
+            taskName: taskName
+          }
+        })
       }
     },
     watch: {
@@ -161,8 +228,8 @@
       this.list = this.taskInstanceList
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectId', 'projectCode'])
     },
-    components: { mLog }
+    components: { mLog, mFormModel }
   }
 </script>

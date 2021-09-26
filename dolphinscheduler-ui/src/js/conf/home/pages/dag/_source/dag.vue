@@ -288,7 +288,7 @@
             projectCode: this.projectCode,
             taskDefinitionJson: JSON.stringify(tasks)
           }).then(() => {
-            this.$router.push({ name: 'task-instance' })
+            this.$router.push({ name: 'task-definition' })
           }).catch(() => {
             this.$message.warning(`${$t('Failed')}`)
           })
