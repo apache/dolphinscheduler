@@ -1335,6 +1335,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ProcessTaskRelationLog> taskRelationList = processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
+                try {
+                    processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
+                } catch (SnowFlakeException e) {
+                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
+                    throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
+                }
+                processDefinition.setId(0);
+                processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
                 try {
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, Lists.newArrayList()));
