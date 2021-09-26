@@ -568,18 +568,6 @@ export default {
     })
   },
   /**
-   * Timing list page
-   */
-  getScheduleListP ({ state }, payload) {
-    return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/schedule/list-page`, payload, res => {
-        resolve(res)
-      }).catch(e => {
-        reject(e)
-      })
-    })
-  },
-  /**
    * Timing online
    */
   scheduleOffline ({ state }, payload) {
