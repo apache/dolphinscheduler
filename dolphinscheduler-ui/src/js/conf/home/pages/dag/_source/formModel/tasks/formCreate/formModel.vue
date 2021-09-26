@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <form-create v-model="$f" :rule="rule" :option="option"></form-create>
+  <div class="form-model-wrapper" v-clickoutside="_handleClose">
+    <form-create v-model="$f" :rule="rule" :option="option"></form-create>
+  </div>
 </template>
 
 <script>
@@ -463,406 +465,415 @@
         const rule = [
           {
             type: 'div',
-            class: 'form-model-wrapper',
-            field: 'formWrapper',
-            directives: [
+            class: 'title-box',
+            children: [
               {
-                name: 'clickoutside',
-                value: this._handleClose
+                type: 'span',
+                class: 'name',
+                children: [$t('Current node settings')]
+              },
+              {
+                type: 'span',
+                class: 'go-subtask',
+                children: [
+                  (this.type === 'instance' && this.taskInstance) ? {
+                    type: 'm-log',
+                    field: 'log',
+                    native: true,
+                    props: {
+                      item: this.backfillItem,
+                      taskInstanceId: this.taskInstance.id
+                    },
+                    children: [
+                      {
+                        type: 'template',
+                        slot: 'history',
+                        children: [
+                          {
+                            type: 'a',
+                            href: '#',
+                            on: {
+                              click: this._seeHistory
+                            },
+                            children: [
+                              {
+                                type: 'em',
+                                class: 'ansicon el-icon-alarm-clock'
+                              },
+                              {
+                                type: 'em',
+                                children: [$t('View history')]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        type: 'template',
+                        slot: 'log',
+                        children: [
+                          {
+                            type: 'a',
+                            href: '#',
+                            children: [
+                              {
+                                type: 'em',
+                                class: 'ansicon el-icon-document'
+                              },
+                              {
+                                type: 'em',
+                                children: [$t('View log')]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  } : undefined
+                ]
               }
-            ],
+            ]
+          },
+          {
+            type: 'div',
+            class: 'content-box',
             children: [
               {
                 type: 'div',
-                class: 'title-box',
+                class: 'form-model',
                 children: [
                   {
-                    type: 'span',
-                    class: 'name',
-                    children: [$t('Current node settings')]
+                    type: 'm-list-box',
+                    field: 'nodeName',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Node name')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'el-input',
+                            field: 'name',
+                            native: true,
+                            props: {
+                              type: 'text',
+                              size: 'small',
+                              disabled: this.isDetails,
+                              placeholder: i18n.$t('Please enter name (required)'),
+                              maxlength: '100'
+                            },
+                            sync: [{ disabled: this.isDetails }],
+                            on: {
+                              blur: this._verifName
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Running Sign */
+                  {
+                    type: 'm-list-box',
+                    field: 'runningSign',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Run flag')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'radio',
+                            field: 'runFlag',
+                            props: {
+                              size: 'small'
+                            },
+                            style: {
+                              verticalAlign: 'middle',
+                              paddingTop: '0',
+                              marginTop: '0'
+                            },
+                            options: [
+                              {
+                                value: 'NORMAL',
+                                label: i18n.$t('Normal'),
+                                disabled: this.isDetails
+                              },
+                              {
+                                value: 'FORBIDDEN',
+                                label: i18n.$t('Prohibition execution'),
+                                disabled: this.isDetails
+                              }]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* description */
+                  {
+                    type: 'm-list-box',
+                    field: 'description',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Description')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'el-input',
+                            field: 'desc',
+                            native: true,
+                            props: {
+                              rows: '2',
+                              type: 'textarea',
+                              disabled: this.isDetails,
+                              placeholder: i18n.$t('Please enter description')
+                            },
+                            sync: [{ disabled: this.isDetails }]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Task priority */
+                  {
+                    type: 'm-list-box',
+                    field: 'taskPriority',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Task priority')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'span',
+                            class: 'label-box',
+                            style: 'width: 193px;display: inline-block;',
+                            children: [
+                              {
+                                type: 'm-priority',
+                                field: 'taskInstancePriority',
+                                native: true
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Worker group and environment */
+                  {
+                    type: 'm-list-box',
+                    field: '_workerGroup',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Worker group')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'span',
+                            class: 'label-box',
+                            style: 'width: 193px; display: inline-block',
+                            children: [
+                              {
+                                type: 'm-worker-groups',
+                                field: 'workerGroup',
+                                native: true
+                              }
+                            ]
+                          },
+                          {
+                            type: 'span',
+                            class: 'text-b',
+                            children: [$t('Environment Name')]
+                          },
+                          {
+                            type: 'm-related-environment',
+                            field: 'environmentCode',
+                            native: true,
+                            props: {
+                              workerGroup: this.workerGroup,
+                              isNewCreate: this.isNewCreate
+                            },
+                            on: {
+                              environmentCodeEvent: this._onUpdateEnvironmentCode
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Number of failed retries */
+                  {
+                    type: 'm-list-box',
+                    field: 'retryNum',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Number of failed retries')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'm-select-input',
+                            field: 'maxRetryTimes',
+                            native: true,
+                            value: this.maxRetryTimes,
+                            props: {
+                              list: [0, 1, 2, 3, 4]
+                            }
+                          },
+                          {
+                            type: 'span',
+                            children: [$t('Times')]
+                          },
+                          {
+                            type: 'span',
+                            class: 'text-b',
+                            children: [$t('Failed retry interval')]
+                          },
+                          {
+                            type: 'm-select-input',
+                            field: 'retryInterval',
+                            native: true,
+                            value: this.retryInterval,
+                            props: {
+                              list: [1, 10, 30, 60, 120]
+                            }
+                          },
+                          {
+                            type: 'span',
+                            children: [$t('Minute')]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Delay execution time */
+                  {
+                    type: 'm-list-box',
+                    field: 'delayExec',
+                    native: true,
+                    children: [
+                      {
+                        type: 'div',
+                        slot: 'text',
+                        children: [$t('Delay execution time')]
+                      },
+                      {
+                        type: 'div',
+                        slot: 'content',
+                        children: [
+                          {
+                            type: 'm-select-input',
+                            field: 'delayTime',
+                            native: true,
+                            value: this.delayTime,
+                            props: {
+                              list: [0, 1, 5, 10]
+                            }
+                          },
+                          {
+                            type: 'span',
+                            children: [$t('Minute')]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  /* Task timeout alarm */
+                  {
+                    type: 'm-timeout-alarm',
+                    field: 'timeout',
+                    native: true,
+                    props: {
+                      backfillItem: this.backfillItem
+                    },
+                    sync: [{ backfillItem: this.backfillItem }],
+                    on: {
+                      onTimeout: this._onTimeout
+                    }
+                  },
+                  /* Task node */
+                  {
+                    type: 'div',
+                    field: 'nodeContainer',
+                    children: [Object.assign({}, taskNode)]
+                  },
+                  /* Pre-tasks in workflow */
+                  {
+                    type: 'm-pre-tasks',
+                    field: 'preTasks',
+                    native: true,
+                    props: {
+                      code: this.code
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: 'div',
+            class: 'bottom-box',
+            children: [
+              {
+                type: 'div',
+                class: 'submit',
+                style: 'background: #fff;',
+                children: [
+                  {
+                    type: 'el-button',
+                    props: {
+                      type: 'text',
+                      size: 'small',
+                      id: 'cancelBtn'
+                    },
+                    children: [$t('Cancel')]
                   },
                   {
-                    type: 'span',
-                    class: 'go-subtask',
-                    children: [
-                      (this.type === 'instance' && this.taskInstance) ? {
-                        type: 'm-log',
-                        field: 'log',
-                        props: {
-                          item: this.backfillItem,
-                          taskInstanceId: this.taskInstance.id
-                        },
-                        children: [
-                          {
-                            type: 'template',
-                            slot: 'history',
-                            children: [
-                              {
-                                type: 'a',
-                                href: '#',
-                                on: {
-                                  click: this._seeHistory
-                                },
-                                children: [
-                                  {
-                                    type: 'em',
-                                    class: 'ansicon el-icon-alarm-clock'
-                                  },
-                                  {
-                                    type: 'em',
-                                    children: [$t('View history')]
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            type: 'template',
-                            slot: 'log',
-                            children: [
-                              {
-                                type: 'a',
-                                href: '#',
-                                children: [
-                                  {
-                                    type: 'em',
-                                    class: 'ansicon el-icon-document'
-                                  },
-                                  {
-                                    type: 'em',
-                                    children: [$t('View log')]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      } : undefined
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'div',
-                class: 'content-box',
-                children: [
-                  {
-                    type: 'div',
-                    class: 'form-model',
-                    children: [
-                      {
-                        type: 'm-list-box',
-                        field: 'nodeName',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Node name')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'el-input',
-                                field: 'name',
-                                props: {
-                                  type: 'text',
-                                  size: 'small',
-                                  disabled: this.isDetails,
-                                  placeholder: i18n.$t('Please enter name (required)'),
-                                  maxlength: '100'
-                                },
-                                sync: [{ disabled: this.isDetails }],
-                                on: {
-                                  blur: this._verifName
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Running Sign */
-                      {
-                        type: 'm-list-box',
-                        field: 'runningSign',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Run flag')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'radio',
-                                field: 'runFlag',
-                                props: {
-                                  size: 'small'
-                                },
-                                style: {
-                                  verticalAlign: 'middle',
-                                  paddingTop: '0',
-                                  marginTop: '0'
-                                },
-                                options: [
-                                  {
-                                    value: 'NORMAL',
-                                    label: i18n.$t('Normal'),
-                                    disabled: this.isDetails
-                                  },
-                                  {
-                                    value: 'FORBIDDEN',
-                                    label: i18n.$t('Prohibition execution'),
-                                    disabled: this.isDetails
-                                  }]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* description */
-                      {
-                        type: 'm-list-box',
-                        field: 'description',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Description')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'el-input',
-                                field: 'desc',
-                                props: {
-                                  rows: '2',
-                                  type: 'textarea',
-                                  disabled: this.isDetails,
-                                  placeholder: i18n.$t('Please enter description')
-                                },
-                                sync: [{ disabled: this.isDetails }]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Task priority */
-                      {
-                        type: 'm-list-box',
-                        field: 'taskPriority',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Task priority')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'span',
-                                class: 'label-box',
-                                style: 'width: 193px;display: inline-block;',
-                                children: [
-                                  {
-                                    type: 'm-priority',
-                                    field: 'taskInstancePriority'
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Worker group and environment */
-                      {
-                        type: 'm-list-box',
-                        field: 'workerGroup',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Worker group')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'span',
-                                class: 'label-box',
-                                style: 'width: 193px; display: inline-block',
-                                children: [
-                                  {
-                                    type: 'm-worker-groups',
-                                    field: 'workerGroup'
-                                  }
-                                ]
-                              },
-                              {
-                                type: 'span',
-                                class: 'text-b',
-                                children: [$t('Environment Name')]
-                              },
-                              {
-                                type: 'm-related-environment',
-                                field: 'environmentCode',
-                                props: {
-                                  workerGroup: this.workerGroup,
-                                  isNewCreate: this.isNewCreate
-                                },
-                                on: {
-                                  environmentCodeEvent: this._onUpdateEnvironmentCode
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Number of failed retries */
-                      {
-                        type: 'm-list-box',
-                        field: 'retryNum',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Number of failed retries')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'm-select-input',
-                                field: 'maxRetryTimes',
-                                value: this.maxRetryTimes,
-                                props: {
-                                  list: [0, 1, 2, 3, 4]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Times')]
-                              },
-                              {
-                                type: 'span',
-                                class: 'text-b',
-                                children: [$t('Failed retry interval')]
-                              },
-                              {
-                                type: 'm-select-input',
-                                field: 'retryInterval',
-                                value: this.retryInterval,
-                                props: {
-                                  list: [1, 10, 30, 60, 120]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Minute')]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Delay execution time */
-                      {
-                        type: 'm-list-box',
-                        field: 'delayExec',
-                        children: [
-                          {
-                            type: 'div',
-                            slot: 'text',
-                            children: [$t('Delay execution time')]
-                          },
-                          {
-                            type: 'div',
-                            slot: 'content',
-                            children: [
-                              {
-                                type: 'm-select-input',
-                                field: 'delayTime',
-                                value: this.delayTime,
-                                props: {
-                                  list: [0, 1, 5, 10]
-                                }
-                              },
-                              {
-                                type: 'span',
-                                children: [$t('Minute')]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      /* Task timeout alarm */
-                      {
-                        type: 'm-timeout-alarm',
-                        field: 'timeout',
-                        props: {
-                          backfillItem: this.backfillItem
-                        },
-                        sync: [{ backfillItem: this.backfillItem }],
-                        on: {
-                          onTimeout: this._onTimeout
-                        }
-                      },
-                      /* Task node */
-                      Object.assign({}, taskNode),
-                      /* Pre-tasks in workflow */
-                      {
-                        type: 'm-pre-tasks',
-                        field: 'preTasks',
-                        props: {
-                          code: this.code
-                        }
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'div',
-                class: 'bottom-box',
-                children: [
-                  {
-                    type: 'div',
-                    class: 'submit',
-                    style: 'background: #fff;',
-                    children: [
-                      {
-                        type: 'el-button',
-                        props: {
-                          type: 'text',
-                          size: 'small',
-                          id: 'cancelBtn'
-                        },
-                        children: [$t('Cancel')]
-                      },
-                      {
-                        type: 'el-button',
-                        props: {
-                          type: 'primary',
-                          size: 'small',
-                          round: true,
-                          loading: this.spinnerLoading,
-                          disabled: this.isDetails
-                        },
-                        sync: [{ backfillItem: this.backfillItem }, { loading: this.spinnerLoading }, { disabled: this.isDetails }],
-                        children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')],
-                        on: {
-                          click: this.ok
-                        }
-                      }
-                    ]
+                    type: 'el-button',
+                    props: {
+                      type: 'primary',
+                      size: 'small',
+                      round: true,
+                      loading: this.spinnerLoading,
+                      disabled: this.isDetails
+                    },
+                    sync: [{ backfillItem: this.backfillItem }, { loading: this.spinnerLoading }, { disabled: this.isDetails }],
+                    children: [this.spinnerLoading ? 'Loading...' : $t('Confirm add')],
+                    on: {
+                      click: this.ok
+                    }
                   }
                 ]
               }

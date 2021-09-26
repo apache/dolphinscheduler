@@ -84,6 +84,8 @@
             children: [
               {
                 type: 'm-list-box',
+                field: 'script',
+                native: true,
                 children: [
                   {
                     type: 'div',
@@ -128,6 +130,8 @@
               },
               {
                 type: 'm-list-box',
+                field: 'resources',
+                native: true,
                 children: [
                   {
                     type: 'div',
@@ -141,7 +145,7 @@
                       {
                         type: 'treeselect',
                         field: 'resourceList',
-                        name: 'treeselect',
+                        native: true,
                         value: this.resourceList,
                         props: {
                           placeholder: i18n.$t('Please select resources'),
@@ -192,6 +196,8 @@
               },
               {
                 type: 'm-list-box',
+                field: 'cusParams',
+                native: true,
                 children: [
                   {
                     type: 'div',
