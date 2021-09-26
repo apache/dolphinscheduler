@@ -125,10 +125,16 @@
         <protostuff.version>1.7.2</protostuff.version>
         <reflections.version>0.9.12</reflections.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
+        <java-websocket.version>1.5.1</java-websocket.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.java-websocket</groupId>
+                <artifactId>Java-WebSocket</artifactId>
+                <version>${java-websocket.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -1209,7 +1215,7 @@
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-ui</module>
+<!--        <module>dolphinscheduler-ui</module>-->
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>

@@ -417,7 +417,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     protostuff-runtime 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
     protostuff-api 1.7.2: https://github.com/protostuff/protostuff/protostuff-api Apache-2.0
     protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
-    async-http-client 2.12.3: https://mvnrepository.com/artifact/org.asynchttpclient/async-http-client Apache-2.0
 ========================================================================
 BSD licenses
 ========================================================================
@@ -493,6 +492,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
     animal-sniffer-annotations 1.14 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.14, MIT
     checker-compat-qual 2.0.0 https://mvnrepository.com/artifact/org.checkerframework/checker-compat-qual/2.0.0, MIT + GPLv2
+    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
 
 ========================================================================
 MPL 1.1 licenses
