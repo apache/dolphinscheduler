@@ -68,7 +68,7 @@ public class StateEventProcessor implements NettyRequestProcessor {
         StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
         stateEvent.setType(type);
 
-        logger.info("received command : {}", stateEvent.toString());
+        logger.info("received command : {}", stateEvent);
         stateEventResponseService.addResponse(stateEvent);
     }
 
