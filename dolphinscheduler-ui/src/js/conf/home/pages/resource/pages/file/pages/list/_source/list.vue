@@ -124,9 +124,7 @@
         }
       },
       _downloadFile (item) {
-        downloadFile('resources/download', {
-          id: item.id
-        })
+        downloadFile(`resources/${item.id}/download`)
       },
       _rtSize (val) {
         return bytesToSize(parseInt(val))
