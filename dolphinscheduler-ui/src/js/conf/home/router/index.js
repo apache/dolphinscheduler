@@ -461,7 +461,14 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('Token manage')}`
           }
-        }
+        },{
+          path: '/security/tasksQueue',
+          name: 'tasksqueue-manage',
+          component: resolve => require(['../pages/security/pages/tasksQueue/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Tasks queue manage')}`
+          }
+        },
       ]
     },
     {

@@ -153,6 +153,14 @@ const menu = {
       icon: 'el-icon-document',
       children: [],
       enabled: true
+    }, {
+      name: `${i18n.$t('Tasks queue manage')}`,
+      id: 2,
+      path: 'tasksqueue-manage',
+      isOpen: true,
+      icon: 'el-icon-document',
+      children: [],
+      enabled: true
     }
   ],
   resource: [

@@ -23,7 +23,7 @@
           style="width: 180px">
     <el-option
             v-for="item in workerGroupsList"
-            :key="item.id"
+            :key="item.code
             :value="item.id"
             :label="item.name">
     </el-option>

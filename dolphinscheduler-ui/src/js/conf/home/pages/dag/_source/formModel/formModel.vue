@@ -158,6 +158,12 @@
               :list="[0, 1, 5, 10]"
             ></m-select-input>
             <span>({{ $t("Minute") }})</span>
+          <span class="text-b">{{ $t("Assigned Taskgroup") }}</span>
+              <m-assigned-taskgroup
+                v-model="taskGroupId"
+                v-on:askgroupEvent="_onUpdateTeaskgroupCode"
+              ></m-assigned-taskgroup>
+
           </div>
         </m-list-box>
 
@@ -439,6 +445,7 @@
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
   import mRelatedEnvironment from './_source/relatedEnvironment'
+  import mAssignedTaskgroup from './_source/assignedTaskgroup'
   import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
@@ -498,6 +505,7 @@
         workerGroup: 'default',
         // selected environment
         environmentCode: '',
+        taskGroupId:'',
         selectedWorkerGroup: '',
         stateList: [
           {
@@ -564,7 +572,8 @@
           type: task.taskType,
           waitStartTimeout: task.taskParams.waitStartTimeout,
           workerGroup: task.workerGroup,
-          environmentCode: task.environmentCode
+          environmentCode: task.environmentCode,
+          taskGroupId:task.taskGroupId,
         }
       },
       /**
@@ -775,7 +784,8 @@
             delayTime: this.delayTime,
             environmentCode: this.environmentCode || -1,
             status: this.status,
-            branch: this.branch
+            branch: this.branch,
+            taskGroupId:this.taskGroupId||0
           },
           fromThis: this
         })
@@ -886,6 +896,7 @@
             this.workerGroup = o.workerGroup
           }
           this.environmentCode = o.environmentCode === -1 ? '' : o.environmentCode
+          this.taskGroupId=o.taskGroupId === 0 ? '' : o.taskGroupId
           this.params = o.params || {}
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
@@ -977,7 +988,8 @@
       mPriority,
       mWorkerGroups,
       mRelatedEnvironment,
-      mPreTasks
+      mPreTasks,
+      mAssignedTaskgroup
       // ReferenceFromTask
     }
   }
