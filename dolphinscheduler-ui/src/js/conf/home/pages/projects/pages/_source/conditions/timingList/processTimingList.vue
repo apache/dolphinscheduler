@@ -85,7 +85,7 @@
        * change times
        */
       _onChangeStartStop (val) {
-        if(val == null) {
+        if (val == null) {
           this.searchParams.startDate = ''
           this.searchParams.endDate = ''
         }
