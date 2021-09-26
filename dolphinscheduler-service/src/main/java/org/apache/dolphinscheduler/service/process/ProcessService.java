@@ -2436,7 +2436,7 @@ public class ProcessService {
                 return false;
             }
         }
-        return insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, -1);
+        return insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
     }
 
     /**
