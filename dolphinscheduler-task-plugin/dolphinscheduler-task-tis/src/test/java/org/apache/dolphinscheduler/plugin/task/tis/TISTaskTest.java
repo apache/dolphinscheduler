@@ -56,6 +56,7 @@ public class TISTaskTest {
         String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
 
         taskExecutionContext = Mockito.mock(TaskRequest.class);
+        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("tislogger");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
@@ -68,8 +69,7 @@ public class TISTaskTest {
         Map<String, String> gloabParams = Collections.singletonMap(TISTask.KEY_POOL_VAR_TIS_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
-        tisTask = PowerMockito.spy(new TISTask(taskExecutionContext));
-        //tisTask = new TISTask(taskExecutionContext);
+        tisTask = new TISTask(taskExecutionContext);
         tisTask.init();
 
     }
