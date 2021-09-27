@@ -440,9 +440,14 @@ public class WorkflowExecuteThread implements Runnable {
             endProcess();
             int index = complementListDate.indexOf(scheduleDate);
             if (index >= complementListDate.size() - 1 || !processInstance.getState().typeIsSuccess()) {
+                logger.info("process complement end. process id:{}", processInstance.getId());
                 // complement data ends || no success
                 return false;
             }
+            logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
+                    processInstance.getId(),
+                    processInstance.getScheduleTime(),
+                    complementListDate.toString());
             scheduleDate = complementListDate.get(index + 1);
             //the next process complement
             processInstance.setId(0);
@@ -584,16 +589,9 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         if (complementListDate.size() == 0 && needComplementProcess()) {
-            Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-            Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-            if (startDate.after(endDate)) {
-                Date tmp = startDate;
-                startDate = endDate;
-                endDate = tmp;
-            }
-            List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-            complementListDate.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
+            complementListDate = processService.getComplementDateList(
+                    JSONUtils.toMap(processInstance.getCommandParam()),
+                    processInstance.getProcessDefinitionCode());
             logger.info(" process definition code:{} complement data: {}",
                 processInstance.getProcessDefinitionCode(), complementListDate.toString());
         }
