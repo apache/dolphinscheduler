@@ -17,23 +17,24 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import java.util.Map;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Map;
+import springfox.documentation.annotations.ApiIgnore;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
@@ -60,10 +61,10 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "createTaskGroup", notes = "CREATE_TAKS_GROUP_NOTE")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
-            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
-            @ApiImplicitParam(name = "name", value = "name", dataType = "Int")
+        @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
+        @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
+        @ApiImplicitParam(name = "name", value = "name", dataType = "Int")
 
     })
     @PostMapping(value = "/create")
@@ -72,11 +73,9 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
-//                                  @RequestParam("userId") Integer userId,
                                   @RequestParam("description")  String description,
                                   @RequestParam("groupSize") Integer groupSize) {
         User user = new User();
-//        user.setId(userId);
 
         Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, name, description, groupSize);
         return returnDataList(result);
@@ -93,10 +92,10 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "updateTaskGroup", notes = "UPDATE_TAKS_GROUP_NOTE")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
-            @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
-            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
+        @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
+        @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
+        @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
+        @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
 
     })
     @PostMapping(value = "/update")
@@ -122,8 +121,8 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryAllTaskGroup", notes = "QUERY_ALL_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/query-list-all")
     @ResponseStatus(HttpStatus.OK)
@@ -147,9 +146,9 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryTaskGroupByStatus", notes = "QUERY_TASK_GROUP_LIST_BY_STSATUS_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "status", value = "status", required = true, dataType = "Int")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "status", value = "status", required = true, dataType = "Int")
     })
     @GetMapping(value = "/query-list-by-status")
     @ResponseStatus(HttpStatus.OK)
@@ -174,9 +173,9 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryTaskGroupByName", notes = "QUERY_TASK_GROUP_LIST_BY_PROJECT_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "name", value = "PROJECT_ID", required = true, dataType = "String")
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+        @ApiImplicitParam(name = "name", value = "PROJECT_ID", required = true, dataType = "String")
     })
     @GetMapping(value = "/query-list-by-name")
     @ResponseStatus(HttpStatus.OK)
@@ -199,7 +198,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "closeTaskGroup", notes = "CLOSE_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
+        @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/close-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -220,7 +219,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "startTaskGroup", notes = "START_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
+        @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -240,7 +239,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "wakeCompulsively", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskId", value = "TASKID", required = true, dataType = "Int")
+        @ApiImplicitParam(name = "taskId", value = "TASKID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/wake-task-compulsively")
     @ResponseStatus(HttpStatus.CREATED)
