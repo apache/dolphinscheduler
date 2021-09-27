@@ -209,6 +209,9 @@
         this.$message(this.$t('Copy success'))
       },
       chartFormat () {
+        if (this.source === 'task') {
+          return
+        }
         const canvas = this.getDagCanvasRef()
         canvas.format()
       },

@@ -16,14 +16,18 @@
  */
 <template>
   <div :class="['dag-chart', fullScreen ? 'full-screen' : '']">
-    <dag-toolbar />
-    <dag-canvas ref="canvas" />
+    <dag-toolbar :source="source" />
+    <task-table ref="canvas" />
     <el-drawer
       :visible.sync="taskDrawer"
       size=""
       :with-header="false"
       :wrapperClosable="false"
     >
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width:0px;height:0px;overflow:hidden;">
+        <el-input type="text" />
+      </div>
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
@@ -31,15 +35,9 @@
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
         @onSubProcess="toSubProcess"
+        modelType="createTask"
       ></m-form-model>
     </el-drawer>
-    <el-dialog
-      :title="$t('Set the DAG diagram name')"
-      :visible.sync="saveDialog"
-      width="auto"
-    >
-      <m-udp ref="mUdp" @onUdp="onSave" @close="cancelSave"></m-udp>
-    </el-dialog>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
       :visible.sync="startDialog"
@@ -68,35 +66,30 @@
 </template>
 
 <script>
-  import { debounce } from 'lodash'
-  import dagToolbar from './canvas/toolbar.vue'
-  import dagCanvas from './canvas/canvas.vue'
-  import mFormModel from '../_source/formModel/formModel.vue'
+  import dagToolbar from './_source/canvas/toolbar.vue'
+  import taskTable from './_source/canvas/taskTable.vue'
+  import mFormModel from './_source/formModel/formModel.vue'
   import { mapActions, mapState, mapMutations } from 'vuex'
-  import mUdp from '../_source/udp/udp.vue'
-  import mStart from '../../projects/pages/definition/pages/list/_source/start.vue'
-  import edgeEditModel from './canvas/edgeEditModel.vue'
-  import mVersions from '../../projects/pages/definition/pages/list/_source/versions.vue'
+  import mStart from '../projects/pages/definition/pages/list/_source/start.vue'
+  import edgeEditModel from './_source/canvas/edgeEditModel.vue'
+  import mVersions from '../projects/pages/definition/pages/list/_source/versions.vue'
 
   const DEFAULT_NODE_DATA = {
     id: null,
     taskType: '',
     self: {},
-    preNode: [],
-    rearList: [],
     instanceId: null
   }
 
   export default {
     name: 'dag-chart',
     components: {
-      dagCanvas,
       dagToolbar,
       mFormModel,
-      mUdp,
       mStart,
       edgeEditModel,
-      mVersions
+      mVersions,
+      taskTable
     },
     provide () {
       return {
@@ -105,8 +98,11 @@
     },
     inject: ['definitionDetails'],
     props: {
-      type: String,
-      releaseState: String
+      releaseState: String,
+      source: {
+        default: 'process',
+        type: String
+      }
     },
     data () {
       return {
@@ -135,27 +131,22 @@
           pageSize: null
         },
         // the task status refresh timer
-        statusTimer: null
+        statusTimer: null,
+        // the process instance id
+        instanceId: -1
       }
     },
     mounted () {
-      window._debug = this
+      this.setIsEditDag(false)
 
       if (this.type === 'instance') {
+        this.instanceId = this.$route.params.id
         this.definitionCode = this.$route.query.code
       } else if (this.type === 'definition') {
         this.definitionCode = this.$route.params.code
       }
 
-      // auto resize canvas
-      this.resizeDebounceFunc = debounce(this.canvasResize, 200)
       window.addEventListener('resize', this.resizeDebounceFunc)
-
-      // init graph
-      this.$refs.canvas.graphInit(!this.isDetails)
-
-      // backfill graph with tasks, locations and connects
-      this.backfill()
 
       // refresh task status
       if (this.type === 'instance') {
@@ -167,6 +158,8 @@
       }
     },
     beforeDestroy () {
+      this.resetParams()
+
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -175,7 +168,6 @@
         'tasks',
         'locations',
         'connects',
-        'isEditDag',
         'name',
         'isDetails',
         'projectCode',
@@ -184,6 +176,7 @@
     },
     methods: {
       ...mapActions('dag', [
+        'saveTask',
         'saveDAGchart',
         'updateInstance',
         'updateDefinition',
@@ -196,7 +189,6 @@
       ]),
       ...mapMutations('dag', [
         'addTask',
-        'setTasks',
         'setConnects',
         'resetParams',
         'setIsEditDag',
@@ -204,17 +196,6 @@
         'setLocations',
         'resetLocalParam'
       ]),
-      /**
-       * Toggle full screen
-       */
-      canvasResize () {
-        const canvas = this.$refs.canvas
-        canvas && canvas.paperResize()
-      },
-      toggleFullScreen () {
-        this.fullScreen = !this.fullScreen
-        this.$nextTick(this.canvasResize)
-      },
       /**
        * Task Drawer
        * @param {boolean} visible
@@ -257,217 +238,38 @@
        * Save dialog
        */
       toggleSaveDialog (value) {
-        this.saveDialog = value
-        if (value) {
-          this.$nextTick(() => {
-            this.$refs.mUdp.reloadParam()
-          })
-        }
-      },
-      onSave (sourceType) {
-        this.toggleSaveDialog(false)
-        return new Promise((resolve, reject) => {
-          let tasks = this.tasks || []
-          const edges = this.$refs.canvas.getEdges()
-          const nodes = this.$refs.canvas.getNodes()
-          const connects = this.buildConnects(edges, tasks)
-          this.setConnects(connects)
-          const locations = nodes.map((node) => {
-            return {
-              taskCode: node.id,
-              x: node.position.x,
-              y: node.position.y
-            }
-          })
-          this.setLocations(locations)
-          resolve({
-            connects: connects,
-            tasks: tasks,
-            locations: locations
-          })
-        }).then((res) => {
-          if (this.verifyConditions(res.tasks)) {
-            this.loading(true)
-            const definitionCode = this.definitionCode
-            if (definitionCode) {
-              // Edit
-              return this[
-                this.type === 'instance' ? 'updateInstance' : 'updateDefinition'
-              ](definitionCode)
-                .then((res) => {
-                  this.$message({
-                    message: res.msg,
-                    type: 'success',
-                    offset: 80
-                  })
-                  if (this.type === 'instance') {
-                    this.$router.push({
-                      path: `/projects/${this.projectCode}/instance/list`
-                    })
-                  } else {
-                    this.$router.push({
-                      path: `/projects/${this.projectCode}/definition/list`
-                    })
-                  }
-                })
-                .catch((e) => {
-                  this.$message.error(e.msg || '')
-                })
-                .finally((e) => {
-                  this.loading(false)
-                })
-            } else {
-              // Create
-              return this.saveDAGchart()
-                .then((res) => {
-                  this.$message.success(res.msg)
-                  // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
-                  if (sourceType !== 'affirm') {
-                    // Jump process definition
-                    this.$router.push({ name: 'projects-definition-list' })
-                  }
-                })
-                .catch((e) => {
-                  this.setName('')
-                  this.$message.error(e.msg || '')
-                })
-                .finally((e) => {
-                  this.loading(false)
-                })
-            }
+        // create task instance
+        const tasks = this.tasks.map(item => {
+          const task = {
+            ...item
           }
+          delete task.code
+          return task
+        })
+        this.saveTask({
+          projectCode: this.projectCode,
+          taskDefinitionJson: JSON.stringify(tasks)
+        }).then(() => {
+          this.$router.push({ name: 'task-definition' })
+        }).catch(() => {
+          this.$message.warning(`${$t('Failed')}`)
         })
       },
-      verifyConditions (value) {
-        let tasks = value
-        let bool = true
-        tasks.map((v) => {
-          if (
-            v.taskType === 'CONDITIONS' &&
-            (v.taskParams.conditionResult.successNode[0] === '' ||
-              v.taskParams.conditionResult.successNode[0] === null ||
-              v.taskParams.conditionResult.failedNode[0] === '' ||
-              v.taskParams.conditionResult.failedNode[0] === null)
-          ) {
-            bool = false
-            return false
-          }
-        })
-        if (!bool) {
-          this.$message.warning(
-            `${this.$t(
-              'Successful branch flow and failed branch flow are required'
-            )}`
-          )
-          return false
-        }
-        return true
-      },
-      cancelSave () {
-        this.toggleSaveDialog(false)
-      },
-      /**
-       * build graph json
-       */
-      buildGraphJSON (tasks, locations, connects) {
-        const nodes = []
-        const edges = []
-        tasks.forEach((task) => {
-          const location = locations.find((l) => l.taskCode === task.code) || {}
-          const node = this.$refs.canvas.genNodeJSON(
-            task.code,
-            task.taskType,
-            task.name,
-            {
-              x: location.x,
-              y: location.y
-            }
-          )
-          nodes.push(node)
-        })
-        connects
-          .filter((r) => !!r.preTaskCode)
-          .forEach((c) => {
-            const edge = this.$refs.canvas.genEdgeJSON(
-              c.preTaskCode,
-              c.postTaskCode,
-              c.name
-            )
-            edges.push(edge)
-          })
-        return {
-          nodes,
-          edges
-        }
-      },
-      /**
-       * Build connects by edges and tasks
-       * @param {Edge[]} edges
-       * @param {Task[]} tasks
-       * @returns
-       */
-      buildConnects (edges, tasks) {
-        const preTaskMap = {}
-        const tasksMap = {}
-
-        edges.forEach((edge) => {
-          preTaskMap[edge.targetId] = {
-            sourceId: edge.sourceId,
-            edgeLabel: edge.label || ''
-          }
-        })
-        tasks.forEach((task) => {
-          tasksMap[task.code] = task
-        })
-
-        return tasks.map((task) => {
-          const preTask = preTaskMap[task.code]
-          return {
-            name: preTask ? preTask.edgeLabel : '',
-            preTaskCode: preTask ? preTask.sourceId : 0,
-            preTaskVersion: preTask ? tasksMap[preTask.sourceId].version : 0,
-            postTaskCode: task.code,
-            postTaskVersion: tasksMap[task.code].version || 0,
-            // conditionType and conditionParams are reserved
-            conditionType: 0,
-            conditionParams: {}
-          }
-        })
-      },
-      backfill () {
-        const tasks = this.tasks
-        const locations = this.locations
-        const connects = this.connects
-        const json = this.buildGraphJSON(tasks, locations, connects)
-        this.$refs.canvas.fromJSON(json)
-      },
-      /**
-       * Return to the previous process
-       */
-      returnToPrevProcess () {
-        let $name = this.$route.name.split('-')
-        let subProcessCodes = this.$route.query.subProcessCodes
-        let codes = subProcessCodes.split(',')
-        const last = codes.pop()
-        this.$router.push({
-          path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${last}`,
-          query: codes.length > 0 ? { subProcessCodes: codes.join(',') } : null
-        })
-      },
-      toSubProcess ({ subProcessCode, fromThis }) {
-        let subProcessCodes = []
-        let getIds = this.$route.query.subProcessCodes
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.definitionCode)
-          subProcessCodes = newId
+      toSubProcess ({ subProcessCode, subInstanceId }) {
+        const tarIdentifier = this.type === 'instance' ? subInstanceId : subProcessCode
+        const curIdentifier = this.type === 'instance' ? this.instanceId : this.definitionCode
+        let subs = []
+        let olds = this.$route.query.subs
+        if (olds) {
+          subs = olds.split(',')
+          subs.push(curIdentifier)
         } else {
-          subProcessCodes.push(this.definitionCode)
+          subs.push(curIdentifier)
         }
         let $name = this.$route.name.split('-')
         this.$router.push({
-          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${subProcessCode}`,
-          query: { subProcessCodes: subProcessCodes.join(',') }
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${tarIdentifier}`,
+          query: { subs: subs.join(',') }
         })
       },
       seeHistory (taskName) {
@@ -495,19 +297,6 @@
       },
       closeStart () {
         this.startDialog = false
-      },
-      /**
-       * Verify whether edge is valid
-       * The number of edges start with CONDITIONS task cannot be greater than 2
-       */
-      edgeIsValid (edge) {
-        const { sourceId } = edge
-        const sourceTask = this.tasks.find((task) => task.code === sourceId)
-        if (sourceTask.taskType === 'CONDITIONS') {
-          const edges = this.$refs.canvas.getEdges()
-          return edges.filter((e) => e.sourceId === sourceTask.code).length <= 2
-        }
-        return true
       },
       /**
        * Task status
@@ -583,16 +372,14 @@
         this.versionDrawer = false
       },
       switchProcessVersion ({ version, processDefinitionCode }) {
-        // this.$store.state.dag.isSwitchVersion = true
         this.switchProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
           this.closeVersion()
-          this.definitionDetails._reset()
+          this.definitionDetails.init()
         }).catch(e => {
-          // this.$store.state.dag.isSwitchVersion = false
           this.$message.error(e.msg || '')
         })
       },
@@ -630,9 +417,9 @@
 </script>
 
 <style lang="scss" scoped>
-@import "./dag";
+@import "./_source/dag";
 </style>
 
 <style lang="scss">
-@import "./loading";
+@import "./_source/loading";
 </style>

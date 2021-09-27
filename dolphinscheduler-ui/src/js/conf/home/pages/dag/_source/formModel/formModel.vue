@@ -397,7 +397,7 @@
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           ref="preTasks"
-          v-if="modelType !== 'edit' && ['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
+          v-if="modelType === 'create' && ['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
           :code="code"
         />
       </div>
@@ -540,10 +540,7 @@
       nodeData: Object,
       modelType: {
         default: 'create',
-        type: {
-          type: String,
-          default: ''
-        }
+        type: String
       }
     },
     inject: ['dagChart'],
@@ -807,6 +804,9 @@
        */
       _setRunFlag () {},
       _setEdgeLabel () {
+        if (this.modelType === 'createTask') {
+          return
+        }
         if (this.successBranch || this.failedBranch) {
           const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
           const edges = canvas.getEdges()
@@ -930,6 +930,10 @@
         this.backfillItem = o
       }
       this.backfill(o)
+
+      if (this.modelType === 'createTask') {
+        return
+      }
 
       if (this.dagChart) {
         const canvas = findComponentDownward(this.dagChart, 'dag-canvas')

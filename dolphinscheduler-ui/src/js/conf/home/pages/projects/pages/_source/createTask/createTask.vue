@@ -22,7 +22,7 @@
 </template>
 <script>
 
-  import mDag from '@/conf/home/pages/dag/_source/dag.vue'
+  import mDag from '@/conf/home/pages/dag/taskDag.vue'
   import { mapActions, mapMutations } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
   import Affirm from '@/conf/home/pages/dag/_source/jumpAffirm'
