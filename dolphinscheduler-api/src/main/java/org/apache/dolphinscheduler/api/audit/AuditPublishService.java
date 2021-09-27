@@ -63,7 +63,9 @@ public class AuditPublishService {
      */
     public void publish(AuditMessage message) {
         if (auditConfiguration.isAuditGlobalControlSwitch()) {
-            auditMessageQueue.offer(message);
+            if (!auditMessageQueue.offer(message)) {
+                logger.error("add audit message failed {}", message.toString());
+            }
         }
     }
 
@@ -84,6 +86,7 @@ public class AuditPublishService {
                 }
             } catch (InterruptedException e) {
                 logger.error("consume audit message failed", e);
+                Thread.currentThread().interrupt();
             }
         }
     }
