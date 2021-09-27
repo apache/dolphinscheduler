@@ -982,7 +982,6 @@ public class ProcessService {
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-
     }
 
     /**
@@ -1001,8 +1000,13 @@ public class ProcessService {
             startDate = endDate;
             endDate = tmp;
         }
-        List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-        result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
+
+        if (startDate.equals(endDate)) {
+            result.add(startDate);
+        } else {
+            List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
+            result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
+        }
         return result;
     }
 
