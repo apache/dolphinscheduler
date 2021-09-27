@@ -143,7 +143,7 @@ export default {
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
         state.timeout = res.data.processDefinition.timeout
-        // tenantId
+        // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
         state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
@@ -161,7 +161,8 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
         resolve(res.data)
       }).catch(res => {
@@ -257,7 +258,8 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
@@ -375,7 +377,7 @@ export default {
         resolve()
         return
       }
-      io.get('projects/list', payload, res => {
+      io.get('projects/created-and-authed', payload, res => {
         state.projectListS = res.data
         resolve(res.data)
       }).catch(res => {

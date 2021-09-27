@@ -188,6 +188,27 @@ public class TaskRequest {
 
     private Map<String, Property> paramsMap;
 
+
+    /**
+     * sql TaskExecutionContext
+     */
+    private SQLTaskExecutionContext sqlTaskExecutionContext;
+
+    /**
+     * datax TaskExecutionContext
+     */
+    private DataxTaskExecutionContext dataxTaskExecutionContext;
+
+    /**
+     * procedure TaskExecutionContext
+     */
+    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+
+    /**
+     * sqoop TaskExecutionContext
+     */
+    private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
     public Map<String, String> getResources() {
         return resources;
     }
@@ -428,4 +449,35 @@ public class TaskRequest {
         this.delayTime = delayTime;
     }
 
+    public SQLTaskExecutionContext getSqlTaskExecutionContext() {
+        return sqlTaskExecutionContext;
+    }
+
+    public void setSqlTaskExecutionContext(SQLTaskExecutionContext sqlTaskExecutionContext) {
+        this.sqlTaskExecutionContext = sqlTaskExecutionContext;
+    }
+
+    public DataxTaskExecutionContext getDataxTaskExecutionContext() {
+        return dataxTaskExecutionContext;
+    }
+
+    public void setDataxTaskExecutionContext(DataxTaskExecutionContext dataxTaskExecutionContext) {
+        this.dataxTaskExecutionContext = dataxTaskExecutionContext;
+    }
+
+    public SqoopTaskExecutionContext getSqoopTaskExecutionContext() {
+        return sqoopTaskExecutionContext;
+    }
+
+    public void setSqoopTaskExecutionContext(SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+        this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
+    }
+
+    public ProcedureTaskExecutionContext getProcedureTaskExecutionContext() {
+        return procedureTaskExecutionContext;
+    }
+
+    public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
+        this.procedureTaskExecutionContext = procedureTaskExecutionContext;
+    }
 }

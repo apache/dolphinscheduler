@@ -223,6 +223,11 @@ public class TaskConstants {
     public static final int LOG_QUERY_LIMIT = 4096;
 
     /**
+     * default display rows
+     */
+    public static final int DEFAULT_DISPLAY_ROWS = 10;
+
+    /**
      * jar
      */
     public static final String JAR = "jar";
