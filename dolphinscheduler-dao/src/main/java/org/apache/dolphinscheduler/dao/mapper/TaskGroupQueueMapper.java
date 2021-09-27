@@ -3,6 +3,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
                                                     @Param("groupId") Integer groupId
                                                     );
 
-    TaskGroupQueue queryByTaskId(@Param("task_id") Integer task_id);
+    TaskGroupQueue queryByTaskId(@Param("taskId") Integer taskId);
 
 
     /**

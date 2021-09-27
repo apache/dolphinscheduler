@@ -1,24 +1,26 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
-import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+
+
 
 /**
  *
@@ -90,10 +92,10 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         pageInfo.setTotal((int) taskGroupQueue.getTotal());
         pageInfo.setTotalList(taskGroupQueue.getRecords());
 
-
         result.put(Constants.DATA_LIST, pageInfo);
         logger.info("select result:{}", taskGroupQueue);
         putMsg(result, Status.SUCCESS);
+
         return result;
     }
     /**
@@ -102,6 +104,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @param taskId task id
      * @return TaskGroupQueue entity
      */
+
     @Override
     public boolean deleteByTaskId(Integer taskId) {
         return taskGroupQueueMapper.deleteByTaskId(taskId) == 1;

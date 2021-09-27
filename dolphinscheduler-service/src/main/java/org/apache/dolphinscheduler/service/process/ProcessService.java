@@ -2420,7 +2420,9 @@ public class ProcessService {
                                     String taskName, Integer groupId,
                                     Integer processId, Integer priority) {
         TaskGroup taskGroup = taskGroupMapper.selectById(groupId);
-        Integer useSize = taskGroup.getUseSize(), groupSize = taskGroup.getGroupSize(), status = 0;
+        Integer useSize = taskGroup.getUseSize();
+        Integer groupSize = taskGroup.getGroupSize();
+        Integer status = 0;
         // whether the task group is avialiable and the task has acquried
         if (taskGroup.getStatus() == 0) {
             return false;
@@ -2469,7 +2471,7 @@ public class ProcessService {
             taskGroup = taskGroupMapper.selectById(id);
             size = waitingTaskCache.size();
             // update used size in TGQ in CAS
-            i = taskGroupMapper.compardAndUpdateUsedStatus(id, useSize-1, useSize);
+            i = taskGroupMapper.compardAndUpdateUsedStatus(id, useSize - 1, useSize);
             boolean wakeTask = doWakeTask();
             if (!wakeTask) {
                 return null;
@@ -2477,11 +2479,13 @@ public class ProcessService {
         }
         return releaseId;
     }
+
     /**
      * release the TGQ resource when the corresponding task is finished.
      * @param taskId task id
      * @return the result code and msg
      */
+
     public Integer doRelease(Integer taskId, Integer status) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
         taskGroupQueue.setStatus(status);
@@ -2492,19 +2496,8 @@ public class ProcessService {
         Integer releaseId = null;
         if (i == 1) {
             releaseId = runningTaskCache.remove(taskId);
-            // submit the waiting task
-//            try {
-//                TaskInstance taskInstance = taskInstanceMapper.selectById(taskId);
-//                TaskInstance submitTask = submitTask(taskInstance);
-//                if (submitTask != null && taskInstance.getId() == submitTask.getId()) {
-//                    return true;
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
         }
         return releaseId;
-
     }
 
     /**

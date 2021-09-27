@@ -584,7 +584,7 @@ public class WorkflowExecuteThread implements Runnable {
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
-            logger.info(taskInstance.getName()+": aqurie task group "+" success");
+            logger.info(taskInstance.getName() + ": aqurie task group " + " success");
 
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
             if (submit) {
