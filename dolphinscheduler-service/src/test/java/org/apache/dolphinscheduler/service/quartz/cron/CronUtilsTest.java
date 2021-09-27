@@ -179,6 +179,15 @@ public class CronUtilsTest {
         // test other
         Assert.assertEquals(30, CronUtils.getFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? ")).size());
         Assert.assertEquals(5, CronUtils.getSelfFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? "), 5).size());
+        from = DateUtils.stringToDate("2020-01-01 00:02:00");
+        to = DateUtils.stringToDate("2020-01-01 00:02:00");
+        Assert.assertEquals(1, CronUtils.getFireDateList(new Date(from.getTime()-1000), to, CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+
+        to = DateUtils.stringToDate("2020-01-01 00:04:00");
+        Assert.assertEquals(3, CronUtils.getFireDateList(new Date(from.getTime()-1000), to, CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+
+
+
     }
 
     @Test

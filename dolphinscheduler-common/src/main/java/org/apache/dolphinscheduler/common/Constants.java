@@ -449,6 +449,11 @@ public final class Constants {
      */
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
+    /**
+     * complement date default cron string
+     */
+    public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
+
 
     /**
      * data source config
