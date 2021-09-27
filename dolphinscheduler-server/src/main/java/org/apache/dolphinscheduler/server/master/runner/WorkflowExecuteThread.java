@@ -263,7 +263,7 @@ public class WorkflowExecuteThread implements Runnable {
             return key;
         }
 
-        key = String.format("{}_{}_{}",
+        key = String.format("%d_%d_%d",
                 this.processDefinition.getCode(),
                 this.processDefinition.getVersion(),
                 this.processInstance.getId());
