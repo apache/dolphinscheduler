@@ -206,8 +206,8 @@ public class GraphQLWiring {
                 processInstanceDataFetchers.queryTypeQueryParentInstanceBySubId());
         typeWiring.dataFetcher("viewVariables",
                 processInstanceDataFetchers.queryTypeViewVariables());
-        typeWiring.dataFetcher("viewTree",
-                processInstanceDataFetchers.queryTypeViewTree());
+        typeWiring.dataFetcher("processInstanceViewTree",
+                processInstanceDataFetchers.queryTypeProcessInstanceViewTree());
 
         // Project Query
         typeWiring.dataFetcher("queryProjectByCode",

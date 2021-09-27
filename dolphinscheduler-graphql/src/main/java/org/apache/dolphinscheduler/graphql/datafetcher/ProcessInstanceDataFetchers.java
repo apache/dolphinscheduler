@@ -223,7 +223,7 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
         };
     }
 
-    public DataFetcher<Result> queryTypeViewTree() {
+    public DataFetcher<Result> queryTypeProcessInstanceViewTree() {
         return environment -> {
             LinkedHashMap<String, String> loginUserMap = environment.getArgument("loginUser");
             Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);

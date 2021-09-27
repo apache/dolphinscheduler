@@ -94,7 +94,7 @@ extend type Mutation {
         description: String,
         globalParams: String = "[]",
         locations: String,
-        timeout: Int = 0!,
+        timeout: Int = 0,
         tenantCode: String!,
         taskRelationJson: String!,
         taskDefinitionJson: String!

@@ -51,7 +51,7 @@ extend type Query {
         id: Int!
     ): ViewVariablesResultType
 
-    viewTree(
+    processInstanceViewTree(
         loginUser: InputUser!,
         projectCode: String!,
         id: Int!
