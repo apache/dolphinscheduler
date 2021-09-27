@@ -1011,6 +1011,27 @@ public class ProcessService {
     }
 
     /**
+     *  return complement date list
+     *
+     * @param cmdParam
+     * @param processDefinitionCode
+     * @return
+     */
+    public List<Date> getComplementDateList(Map<String, String> cmdParam, Long processDefinitionCode) {
+        List<Date> result = new ArrayList<>();
+        Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+        Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        if (startDate.after(endDate)) {
+            Date tmp = startDate;
+            startDate = endDate;
+            endDate = tmp;
+        }
+        List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
+        result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
+        return result;
+    }
+
+    /**
      * set sub work process parameters.
      * handle sub work process instance, update relation table and command parameters
      * set sub work process flag, extends parent work process command parameters
@@ -2216,7 +2237,7 @@ public class ProcessService {
 
         int result = processDefineMapper.updateById(processDefinitionLog);
         if (result > 0) {
-            result = switchProcessTaskRelationVersion(processDefinition);
+            result = switchProcessTaskRelationVersion(processDefinitionLog);
             if (result <= 0) {
                 return Constants.DEFINITION_FAILURE;
             }

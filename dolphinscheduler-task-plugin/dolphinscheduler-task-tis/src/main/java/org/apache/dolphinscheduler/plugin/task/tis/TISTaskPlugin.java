@@ -15,32 +15,17 @@
  * limitations under the License.
  */
 
-import i18n from '@/module/i18n'
-import { resolveURL } from '@/module/io'
+package org.apache.dolphinscheduler.plugin.task.tis;
 
-/**
- * download file
- */
-const downloadFile = ($url, $obj) => {
-  const param = {
-    url: resolveURL($url),
-    obj: $obj || {}
-  }
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-  if (!param.url) {
-    this.$message.warning(`${i18n.$t('Unable to download without proper url')}`)
-    return
-  }
+import com.google.common.collect.ImmutableList;
 
-  const generatorInput = function (obj) {
-    let result = ''
-    const keyArr = Object.keys(obj)
-    keyArr.forEach(function (key) {
-      result += "<input type='hidden' name = '" + key + "' value='" + obj[key] + "'>"
-    })
-    return result
-  }
-  $(`<form action="${param.url}" method="get">${generatorInput(param.obj)}</form>`).appendTo('body').submit().remove()
+public class TISTaskPlugin implements DolphinSchedulerPlugin {
+
+    @Override
+    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return ImmutableList.of(new TISTaskChannelFactory());
+    }
 }
-
-export { downloadFile }
