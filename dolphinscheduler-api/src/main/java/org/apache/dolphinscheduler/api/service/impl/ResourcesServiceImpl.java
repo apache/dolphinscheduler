@@ -298,8 +298,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/") + 1),name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, loginUser.getId(), type.ordinal())) {
-        if (originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (originResourceName.equals(name) && checkResourceExists(fullName, loginUser.getId(), type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
