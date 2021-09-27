@@ -70,15 +70,15 @@ public class AuditLogController extends BaseController {
      */
     @ApiOperation(value = "queryAuditLogListPaging", notes = "QUERY_AUDIT_LOG")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-            @ApiImplicitParam(name = "moduleType", value = "MODULE_TYPE", type = "String"),
-            @ApiImplicitParam(name = "operationType", value = "OPERATION_TYPE", type = "String"),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", type = "String"),
-            @ApiImplicitParam(name = "processName", value = "PROCESS_NAME", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+        @ApiImplicitParam(name = "moduleType", value = "MODULE_TYPE", type = "String"),
+        @ApiImplicitParam(name = "operationType", value = "OPERATION_TYPE", type = "String"),
+        @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+        @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", type = "String"),
+        @ApiImplicitParam(name = "processName", value = "PROCESS_NAME", type = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)
