@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -55,6 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -592,9 +594,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
             case RUN_MODE_PARALLEL: {
                 LinkedList<Date> listDate = new LinkedList<>();
-                listDate.addAll(processService.getComplementDateList(start, end, command.getProcessDefinitionCode()));
+                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+                listDate.addAll(CronUtils.getSelfFireDateList(start, end, schedules));
+                createCount = listDate.size();
                 if (!CollectionUtils.isEmpty(listDate)) {
-                    createCount = expectedParallelismNumber == null ? listDate.size() : Math.min(listDate.size(), expectedParallelismNumber);
+                    if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
+                        createCount = Math.min(listDate.size(), expectedParallelismNumber);
+                    }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
                     int chunkSize = listDate.size() / createCount;
 

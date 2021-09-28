@@ -591,7 +591,7 @@ public class ProcessService {
             Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
             Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
             List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
-            List<Date> complementDateList = getComplementDateList(start, end, command.getProcessDefinitionCode());
+            List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
 
             if (complementDateList.size() > 0) {
                 scheduleTime = complementDateList.get(0);
@@ -979,7 +979,8 @@ public class ProcessService {
 
         Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        List<Date> complementDate = getComplementDateList(start, end, processInstance.getProcessDefinitionCode());
+        List<Schedule> listSchedules = queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        List<Date> complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
 
         if (complementDate.size() > 0
                 && Flag.NO == processInstance.getIsSubProcess()) {
@@ -989,40 +990,6 @@ public class ProcessService {
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-    }
-
-    /**
-     *  return complement date list
-     *  cron = '0 0 0 * * ? *' if cron is null
-     *  close start and close end
-     *
-     * @param startDate
-     * @param endDate
-     * @param processDefinitionCode
-     * @return
-     */
-    public List<Date> getComplementDateList(Date startDate, Date endDate, Long processDefinitionCode) {
-        List<Date> result = new ArrayList<>();
-        if (startDate.after(endDate)) {
-            Date tmp = startDate;
-            startDate = endDate;
-            endDate = tmp;
-        }
-
-        if (startDate.equals(endDate)) {
-            result.add(startDate);
-        } else {
-            List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-            if (schedules.size() == 0) {
-                Schedule schedule = new Schedule();
-                schedule.setCrontab(Constants.DEFAULT_CRON_STRING);
-                schedules.add(schedule);
-            }
-            result.addAll(CronUtils.getSelfFireDateList(new Date(startDate.getTime() - 1000),
-                    new Date(endDate.getTime() - 1000),
-                    schedules));
-        }
-        return result;
     }
 
     /**

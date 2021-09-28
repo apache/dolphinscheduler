@@ -509,6 +509,11 @@ public final class Constants {
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
+     * one second mils
+     */
+    public static final int SECOND_TIME_MILLIS = 1000;
+
+    /**
      * master task instance cache-database refresh interval
      */
     public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
