@@ -74,10 +74,6 @@
         rule: [],
         // loading
         spinnerLoading: false,
-        // node name
-        name: '',
-        // description
-        desc: '',
         // Node echo data
         backfillItem: {},
         cacheBackfillItem: {},
@@ -100,24 +96,13 @@
         code: 0,
         // Current node params data
         params: {},
-        // Running sign
-        runFlag: 'YES',
         // The second echo problem caused by the node data is specifically which node hook caused the unfinished special treatment
         isContentBox: false,
         // Number of failed retries
-        maxRetryTimes: '0',
-        // Failure retry interval
-        retryInterval: '1',
-        // Delay execution time
-        delayTime: '0',
         // Task timeout alarm
         timeout: {},
         // (For Dependent nodes) Wait start timeout alarm
         waitStartTimeout: {},
-        // Task priority
-        taskInstancePriority: 'MEDIUM',
-        // worker group id
-        workerGroup: 'default',
         // selected environment
         environmentCode: '',
         selectedWorkerGroup: '',
@@ -166,18 +151,18 @@
           conditionResult: task.taskParams.conditionResult,
           delayTime: task.delayTime,
           dependence: task.taskParams.dependence,
-          desc: task.description,
+          description: task.description,
           id: task.id,
-          maxRetryTimes: task.failRetryTimes,
+          failRetryTimes: task.failRetryTimes,
           name: task.name,
           params: _.omit(task.taskParams, [
             'conditionResult',
             'dependence',
             'waitStartTimeout'
           ]),
-          retryInterval: task.failRetryInterval,
-          runFlag: task.flag,
-          taskInstancePriority: task.taskPriority,
+          failRetryInterval: task.failRetryInterval,
+          flag: task.flag,
+          taskPriority: task.taskPriority,
           timeout: {
             interval: task.timeout,
             strategy: task.timeoutNotifyStrategy,
@@ -300,7 +285,8 @@
        * verification name
        */
       _verifName () {
-        if (!_.trim(this.$f.form.name)) {
+        const name = this.$f.form.name
+        if (!_.trim(name)) {
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
@@ -308,12 +294,12 @@
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
-        if (this.$f.form.name === this.backfillItem.name) {
+        if (name === this.backfillItem.name) {
           return true
         }
         // Name repeat depends on dom backfill dependent store
         const tasks = this.store.state.dag.tasks
-        const task = tasks.find((t) => t.name === this.$f.form.name)
+        const task = tasks.find((t) => t.name === name)
         if (task) {
           this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
@@ -322,7 +308,7 @@
       },
       _verifWorkGroup () {
         let item = this.store.state.security.workerGroupsListAll.find(item => {
-          return item.id === this.workerGroup
+          return item.id === this.$f.form.workerGroup
         })
         if (item === undefined) {
           this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
@@ -348,22 +334,23 @@
         }
 
         // Verify node parameters
-        if (!this.$refs[this.nodeData.taskType]._shellVerification()) {
+        if (!this.$f.el(this.nodeData.taskType)._verification()) {
           return
         }
         // Verify preTasks and update dag-things
-        if (this.$refs.preTasks) {
-          this.$refs.preTasks.setPreNodes()
+        if (this.$f.el('preTasks')) {
+          this.$f.el('preTasks').setPreNodes()
         }
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
         // Store the corresponding node data structure
         // $(this.$f.el()).append(form);
+        const { name, description, flag = 'YES', taskPriority, workerGroup, failRetryTimes, failRetryInterval, delayTime, status, branch, environmentCode = -1 } = this.$f.form
         this.$emit('addTaskInfo', {
           item: {
             code: this.nodeData.id,
-            name: this.name,
-            description: this.desc,
+            name,
+            description,
             taskType: this.nodeData.taskType,
             taskParams: {
               ...this.params,
@@ -371,18 +358,18 @@
               conditionResult: this.conditionResult,
               waitStartTimeout: this.waitStartTimeout
             },
-            flag: this.runFlag,
-            taskPriority: this.taskInstancePriority,
-            workerGroup: this.workerGroup,
-            failRetryTimes: this.maxRetryTimes,
-            failRetryInterval: this.retryInterval,
+            flag,
+            taskPriority,
+            workerGroup,
+            failRetryTimes,
+            failRetryInterval,
             timeoutFlag: this.timeout.enable ? 'OPEN' : 'CLOSE',
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
-            delayTime: this.delayTime,
-            environmentCode: this.environmentCode || -1,
-            status: this.status,
-            branch: this.branch
+            delayTime,
+            environmentCode,
+            status,
+            branch
           },
           fromThis: this
         })
@@ -395,7 +382,7 @@
        * Sub-workflow selected node echo name
        */
       _onSetProcessName (name) {
-        this.name = name
+        this.$f.form.name = name
       },
       /**
        *  set run flag
@@ -454,12 +441,13 @@
       _initRule () {
         const taskNode = {
           type: 'mShell',
+          field: 'SHELL',
           props: {
             backfillItem: this.backfillItem
           },
           on: {
-            onParams: this._onParams,
-            onCacheParams: this._onCacheParams
+            'on-params': this._onParams,
+            'on-cache-params': this._onCacheParams
           }
         }
         const rule = [
@@ -593,7 +581,7 @@
                         children: [
                           {
                             type: 'radio',
-                            field: 'runFlag',
+                            field: 'flag',
                             props: {
                               size: 'small'
                             },
@@ -604,12 +592,12 @@
                             },
                             options: [
                               {
-                                value: 'NORMAL',
+                                value: 'YES',
                                 label: i18n.$t('Normal'),
                                 disabled: this.isDetails
                               },
                               {
-                                value: 'FORBIDDEN',
+                                value: 'NO',
                                 label: i18n.$t('Prohibition execution'),
                                 disabled: this.isDetails
                               }]
@@ -621,7 +609,7 @@
                   /* description */
                   {
                     type: 'm-list-box',
-                    field: 'description',
+                    field: 'desc',
                     native: true,
                     children: [
                       {
@@ -635,7 +623,7 @@
                         children: [
                           {
                             type: 'el-input',
-                            field: 'desc',
+                            field: 'description',
                             native: true,
                             props: {
                               rows: '2',
@@ -652,7 +640,7 @@
                   /* Task priority */
                   {
                     type: 'm-list-box',
-                    field: 'taskPriority',
+                    field: 'priority',
                     native: true,
                     children: [
                       {
@@ -671,7 +659,7 @@
                             children: [
                               {
                                 type: 'm-priority',
-                                field: 'taskInstancePriority',
+                                field: 'taskPriority',
                                 native: true
                               }
                             ]
@@ -745,9 +733,8 @@
                         children: [
                           {
                             type: 'm-select-input',
-                            field: 'maxRetryTimes',
+                            field: 'failRetryTimes',
                             native: true,
-                            value: this.maxRetryTimes,
                             props: {
                               list: [0, 1, 2, 3, 4]
                             }
@@ -763,9 +750,8 @@
                           },
                           {
                             type: 'm-select-input',
-                            field: 'retryInterval',
+                            field: 'failRetryInterval',
                             native: true,
-                            value: this.retryInterval,
                             props: {
                               list: [1, 10, 30, 60, 120]
                             }
@@ -797,7 +783,6 @@
                             type: 'm-select-input',
                             field: 'delayTime',
                             native: true,
-                            value: this.delayTime,
                             props: {
                               list: [0, 1, 5, 10]
                             }
@@ -820,7 +805,7 @@
                     },
                     sync: [{ backfillItem: this.backfillItem }],
                     on: {
-                      onTimeout: this._onTimeout
+                      'on-timeout': this._onTimeout
                     }
                   },
                   /* Task node */
@@ -882,17 +867,17 @@
         ]
         this.rule = [...rule]
       },
-      backfill () {
-        let o = Object.assign({}, this.backfillItem)
+      backfill (backfillItem) {
+        let o = Object.assign({}, backfillItem)
+        const form = this.$f.form
         if (!_.isEmpty(o)) {
-          this.code = o.code
-          this.$f.form.name = o.name
-          this.$f.form.taskInstancePriority = o.taskInstancePriority
-          this.$f.form.runFlag = o.runFlag || 'YES'
-          this.$f.form.desc = o.desc
-          this.$f.form.maxRetryTimes = o.maxRetryTimes
-          this.$f.form.retryInterval = o.retryInterval
-          this.$f.form.delayTime = o.delayTime
+          form.name = o.name
+          form.taskPriority = o.taskPriority
+          form.flag = o.flag
+          form.description = o.description
+          form.failRetryTimes = o.failRetryTimes
+          form.failRetryInterval = o.failRetryInterval
+          form.delayTime = o.delayTime
           if (o.conditionResult) {
             this.successBranch = o.conditionResult.successNode[0]
             this.failedBranch = o.conditionResult.failedNode[0]
@@ -908,17 +893,17 @@
             this.store.dispatch('dag/getTaskInstanceList', {
               pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
             }).then(res => {
-              this.$f.form.workerGroup = res.totalList[0].workerGroup
+              form.workerGroup = res.totalList[0].workerGroup
             })
           } else {
-            this.$f.form.workerGroup = o.workerGroup
+            form.workerGroup = o.workerGroup
           }
 
-          this.$f.form.params = o.params || {}
-          this.$f.form.dependence = o.dependence || {}
-          this.$f.form.cacheDependence = o.dependence || {}
+          this.params = o.params || {}
+          this.dependence = o.dependence || {}
+          this.cacheDependence = o.dependence || {}
         } else {
-          this.$f.form.workerGroup = this.store.state.security.workerGroupsListAll[0].id
+          form.workerGroup = this.store.state.security.workerGroupsListAll[0].id
         }
 
         this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
@@ -956,8 +941,8 @@
       let self = this
       this._initRule()
       setTimeout(() => {
+        window.$$ = self
         $('#cancelBtn').mousedown(function (event) {
-          window.$$ = this
           event.preventDefault()
           self.close()
         })

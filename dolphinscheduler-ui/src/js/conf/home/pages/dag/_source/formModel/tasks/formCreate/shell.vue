@@ -343,7 +343,7 @@
       /**
        * verification
        */
-      _shellVerification () {
+      _verification () {
         // rawScript verification
         if (!editor.getValue()) {
           this.$message.warning(`${i18n.$t('Please enter script(required)')}`)
@@ -368,11 +368,11 @@
           }
         })
         // storage
-        this.params = {
+        this.$emit('on-params', {
           resourceList: dataProcessing,
           localParams: this.localParams,
           rawScript: editor.getValue()
-        }
+        })
         return true
       },
       /**
@@ -508,7 +508,6 @@
       let self = this
       this._initRule()
       setTimeout(() => {
-        window.$$ = this
         $('#cancelBtn').mousedown(function (event) {
           event.preventDefault()
           self.close()
