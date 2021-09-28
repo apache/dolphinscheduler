@@ -23,7 +23,7 @@
 	url = https://github.com/xingchun-chen/labeler
 [submodule ".github/actions/translate-on-issue"]
 	path = .github/actions/translate-on-issue
-	url = https://github.com/xingchun-chen/translation-helper.git
+	url = https://github.com/xingchun-chen/translation-helper
 [submodule ".github/actions/reviewdog-setup"]
 	path = .github/actions/reviewdog-setup
 	url = https://github.com/reviewdog/action-setup
