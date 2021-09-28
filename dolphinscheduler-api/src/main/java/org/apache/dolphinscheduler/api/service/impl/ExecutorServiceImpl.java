@@ -549,6 +549,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             if (interval.length == 2) {
                 start = DateUtils.getScheduleDate(interval[0]);
                 end = DateUtils.getScheduleDate(interval[1]);
+                if (start.after(end)) {
+                    logger.info("complement data error, wrong date start:{} and end date:{} ",
+                            start, end
+                    );
+                    return 0;
+                }
             }
         }
         // determine whether to complement
