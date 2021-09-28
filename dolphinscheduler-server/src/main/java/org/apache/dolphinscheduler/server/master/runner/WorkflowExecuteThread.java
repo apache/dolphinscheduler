@@ -564,7 +564,7 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        if(cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
+        if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
             Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
             Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
             if (complementListDate.size() == 0 && needComplementProcess()) {

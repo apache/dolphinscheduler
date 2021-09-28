@@ -556,7 +556,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             if (start == null || end == null) {
                 return 0;
             }
-            return createComplementCommandList(start, end, runMode, command, expectedParallelismNumber );
+            return createComplementCommandList(start, end, runMode, command, expectedParallelismNumber);
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
             return processService.createCommand(command);
@@ -566,6 +566,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement command
      * close left open right
+     *
      * @param start
      * @param end
      * @param runMode
@@ -595,7 +596,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         int rangeStart = i == 0 ? i : (i * chunkSize);
                         int rangeEnd = i == createCount - 1 ? listDate.size() - 1
                                 : rangeStart + chunkSize;
-                        if(rangeEnd == listDate.size()){
+                        if (rangeEnd == listDate.size()) {
                             rangeEnd = listDate.size() - 1;
                         }
                         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
