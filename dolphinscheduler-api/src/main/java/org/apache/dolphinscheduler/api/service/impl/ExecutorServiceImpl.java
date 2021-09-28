@@ -551,66 +551,78 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             if (interval.length == 2) {
                 start = DateUtils.getScheduleDate(interval[0]);
                 end = DateUtils.getScheduleDate(interval[1]);
+                if (start.after(end)) {
+                    logger.info("complement data error, wrong date start:{} and end date:{} ",
+                            start, end
+                    );
+                    return 0;
+                }
             }
         }
         // determine whether to complement
         if (commandType == CommandType.COMPLEMENT_DATA) {
-            runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-            if (null != start && null != end && !start.after(end)) {
-                if (runMode == RunMode.RUN_MODE_SERIAL) {
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
-                    command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                    return processService.createCommand(command);
-                } else if (runMode == RunMode.RUN_MODE_PARALLEL) {
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefineCode);
-                    LinkedList<Date> listDate = new LinkedList<>();
-                    if (!CollectionUtils.isEmpty(schedules)) {
-                        for (Schedule item : schedules) {
-                            listDate.addAll(CronUtils.getSelfFireDateList(start, end, item.getCrontab()));
-                        }
-                    }
-                    if (!CollectionUtils.isEmpty(listDate)) {
-                        int effectThreadsCount = expectedParallelismNumber == null ? listDate.size() : Math.min(listDate.size(), expectedParallelismNumber);
-                        logger.info("In parallel mode, current expectedParallelismNumber:{}", effectThreadsCount);
-
-                        int chunkSize = listDate.size() / effectThreadsCount;
-                        listDate.addFirst(start);
-                        listDate.addLast(end);
-
-                        for (int i = 0; i < effectThreadsCount; i++) {
-                            int rangeStart = i == 0 ? i : (i * chunkSize);
-                            int rangeEnd = i == effectThreadsCount - 1 ? listDate.size() - 1
-                                    : rangeStart + chunkSize + 1;
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(rangeEnd)));
-                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                            processService.createCommand(command);
-                        }
-
-                        return effectThreadsCount;
-                    } else {
-                        // loop by day
-                        int runCunt = 0;
-                        while (!start.after(end)) {
-                            runCunt += 1;
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
-                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                            processService.createCommand(command);
-                            start = DateUtils.getSomeDay(start, 1);
-                        }
-                        return runCunt;
-                    }
-                }
-            } else {
-                logger.error("there is not valid schedule date for the process definition code:{}", processDefineCode);
+            if (start == null || end == null) {
+                return 0;
             }
+            return createComplementCommandList(start, end, runMode, command, expectedParallelismNumber);
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
             return processService.createCommand(command);
         }
+    }
 
-        return 0;
+    /**
+     * create complement command
+     * close left open right
+     *
+     * @param start
+     * @param end
+     * @param runMode
+     * @return
+     */
+    private int createComplementCommandList(Date start, Date end, RunMode runMode, Command command, Integer expectedParallelismNumber) {
+        int createCount = 0;
+        runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
+        Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
+        switch (runMode) {
+            case RUN_MODE_SERIAL: {
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
+                command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                createCount = processService.createCommand(command);
+                break;
+            }
+            case RUN_MODE_PARALLEL: {
+                LinkedList<Date> listDate = new LinkedList<>();
+                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+                listDate.addAll(CronUtils.getSelfFireDateList(start, end, schedules));
+                createCount = listDate.size();
+                if (!CollectionUtils.isEmpty(listDate)) {
+                    if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
+                        createCount = Math.min(listDate.size(), expectedParallelismNumber);
+                    }
+                    logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+                    int chunkSize = listDate.size() / createCount;
+
+                    for (int i = 0; i < createCount; i++) {
+                        int rangeStart = i == 0 ? i : (i * chunkSize);
+                        int rangeEnd = i == createCount - 1 ? listDate.size() - 1
+                                : rangeStart + chunkSize;
+                        if (rangeEnd == listDate.size()) {
+                            rangeEnd = listDate.size() - 1;
+                        }
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(rangeEnd)));
+                        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                        processService.createCommand(command);
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        logger.info("create complement command count: {}", createCount);
+        return createCount;
     }
 }

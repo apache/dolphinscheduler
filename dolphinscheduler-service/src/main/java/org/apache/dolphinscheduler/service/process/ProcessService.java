@@ -587,7 +587,12 @@ public class ProcessService {
         if (scheduleTime == null
                 && cmdParam != null
                 && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            List<Date> complementDateList = getComplementDateList(cmdParam, command.getProcessDefinitionCode());
+
+            Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+            Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+            List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+            List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
+
             if (complementDateList.size() > 0) {
                 scheduleTime = complementDateList.get(0);
             } else {
@@ -972,7 +977,10 @@ public class ProcessService {
             return;
         }
 
-        List<Date> complementDate = getComplementDateList(cmdParam, processInstance.getProcessDefinitionCode());
+        Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+        Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        List<Schedule> listSchedules = queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        List<Date> complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
 
         if (complementDate.size() > 0
                 && Flag.NO == processInstance.getIsSubProcess()) {
@@ -982,28 +990,6 @@ public class ProcessService {
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-
-    }
-
-    /**
-     *  return complement date list
-     *
-     * @param cmdParam
-     * @param processDefinitionCode
-     * @return
-     */
-    public List<Date> getComplementDateList(Map<String, String> cmdParam, Long processDefinitionCode) {
-        List<Date> result = new ArrayList<>();
-        Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-        Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        if (startDate.after(endDate)) {
-            Date tmp = startDate;
-            startDate = endDate;
-            endDate = tmp;
-        }
-        List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-        result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
-        return result;
     }
 
     /**
