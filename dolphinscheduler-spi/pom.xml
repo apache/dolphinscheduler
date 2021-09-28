@@ -49,7 +49,8 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
-            <scope>compile</scope>
+            <version>${mybatis-plus.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
