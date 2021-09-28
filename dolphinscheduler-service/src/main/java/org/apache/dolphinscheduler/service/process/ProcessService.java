@@ -2435,15 +2435,14 @@ public class ProcessService {
             if (i == 1) {
                 status = 1;
                 this.getRunningTaskCache().put(taskId, priority);
-                insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+                logger.info("aquire success, enter into running queue");
             } else {
-                logger.info("aquire failed, enter into waitiing queue");
-                insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+                logger.info("aquire failed, enter into waiting queue");
                 this.getWaitingTaskCache().put(taskId, priority);
-                return false;
             }
         }
-        return true;
+        insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+        return status == 1;
     }
 
     /**
@@ -2554,7 +2553,7 @@ public class ProcessService {
      * @return
      */
     public boolean checkTaskIsExsited(Integer id) {
-        return runningTaskCache.containsKey(id) && waitingTaskCache.containsKey(id);
+        return runningTaskCache.containsKey(id) || waitingTaskCache.containsKey(id);
     }
 
     public int updateTaskGroupQueueStatus(Integer taskId, Integer status) {

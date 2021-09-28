@@ -72,10 +72,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         // task group queue
         int taskGroupId = task.getTaskGroupId();
         boolean acquireTaskGroup = false;
-        if (taskGroupId != -2 && !processService.checkTaskIsExsited(task.getId())) {
+        if (!processService.checkTaskIsExsited(task.getId())) {
             this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
             System.out.println("task id "+task.getId());
-           acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+            acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
                     task.getName(),
                     taskGroupId,
                     task.getProcessInstanceId(),
@@ -89,6 +89,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         ConcurrentHashMap<Integer, Integer> runningTaskCache = processService.getRunningTaskCache();
         if (!runningTaskCache.contains(task.getId()) && acquireTaskGroup) {
             dispatchTask(taskInstance, processInstance);
+        } else {
+            return false;
         }
         return true;
     }

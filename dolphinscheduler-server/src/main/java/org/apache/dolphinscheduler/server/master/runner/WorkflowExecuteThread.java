@@ -584,7 +584,11 @@ public class WorkflowExecuteThread implements Runnable {
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
-            logger.info(taskInstance.getName() + ": aqurie task group " + " success");
+            TaskDefinition taskDefinition = processService.findTaskDefinition(
+                    taskInstance.getTaskCode(),
+                    taskInstance.getTaskDefinitionVersion());
+            taskInstance.setTaskGroupId(taskDefinition.getTaskGroupId());
+            logger.info(taskInstance.getName() + ": trying aqurie task group ");
 
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
             if (submit) {
@@ -592,9 +596,7 @@ public class WorkflowExecuteThread implements Runnable {
                 activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
                 taskProcessor.run();
                 addTimeoutCheck(taskInstance);
-                TaskDefinition taskDefinition = processService.findTaskDefinition(
-                        taskInstance.getTaskCode(),
-                        taskInstance.getTaskDefinitionVersion());
+
                 taskInstance.setTaskDefine(taskDefinition);
                 if (taskProcessor.taskState().typeIsFinished()) {
                     StateEvent stateEvent = new StateEvent();
