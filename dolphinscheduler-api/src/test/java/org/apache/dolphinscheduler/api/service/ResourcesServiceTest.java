@@ -170,7 +170,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.PARENT_RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         //RESOURCE_EXIST
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        Mockito.when(resourcesMapper.existResource("/directoryTest", user.getId(), 0)).thenReturn(true);
+        Mockito.when(resourcesMapper.existResource("/directoryTest", 0, 0)).thenReturn(true);
         result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
@@ -228,7 +228,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
 
         //RESOURCE_EXIST
-        Mockito.when(resourcesMapper.existResource("/ResourcesServiceTest.jar", user.getId(), 0)).thenReturn(true);
+        Mockito.when(resourcesMapper.existResource("/ResourcesServiceTest.jar", 0, 0)).thenReturn(true);
         MultipartFile file = Mockito.mock(MultipartFile.class);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest.jar", "ResourcesServiceTest", ResourceType.FILE, file);
         logger.info(result.toString());
@@ -347,7 +347,7 @@ public class ResourcesServiceTest {
 
         User user = new User();
         user.setId(1);
-        Mockito.when(resourcesMapper.existResource("/ResourcesServiceTest.jar", user.getId(), 0)).thenReturn(true);
+        Mockito.when(resourcesMapper.existResource("/ResourcesServiceTest.jar", 0, 0)).thenReturn(true);
         Result result = resourcesService.verifyResourceName("/ResourcesServiceTest.jar", ResourceType.FILE, user);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
