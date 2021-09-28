@@ -436,11 +436,15 @@ public class WorkflowExecuteThread implements Runnable {
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().typeIsFinished()) {
             endProcess();
+            if (complementListDate.size() <= 0) {
+                logger.info("process complement end. process id:{}", processInstance.getId());
+                return true;
+            }
             int index = complementListDate.indexOf(scheduleDate);
             if (index >= complementListDate.size() - 1 || !processInstance.getState().typeIsSuccess()) {
                 logger.info("process complement end. process id:{}", processInstance.getId());
                 // complement data ends || no success
-                return false;
+                return true;
             }
             logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
                     processInstance.getId(),
@@ -559,14 +563,19 @@ public class WorkflowExecuteThread implements Runnable {
             }
         }
 
-        if (complementListDate.size() == 0 && needComplementProcess()) {
-            complementListDate = processService.getComplementDateList(
-                    JSONUtils.toMap(processInstance.getCommandParam()),
-                    processInstance.getProcessDefinitionCode());
-            logger.info(" process definition code:{} complement data: {}",
-                processInstance.getProcessDefinitionCode(), complementListDate.toString());
+        if (processInstance.isComplementData() && complementListDate.size() == 0) {
+            Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+            if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+                Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+                Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+                if (complementListDate.size() == 0 && needComplementProcess()) {
+                    complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
+                    logger.info(" process definition code:{} complement data: {}",
+                            processInstance.getProcessDefinitionCode(), complementListDate.toString());
+                }
+            }
         }
-
     }
 
     /**
