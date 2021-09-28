@@ -529,6 +529,32 @@ CREATE TABLE t_ds_environment (
     CONSTRAINT environment_code_unique UNIQUE (code)
 );
 
+--
+-- Table structure for table t_ds_process_definition_log
+--
+DROP TABLE IF EXISTS t_ds_process_definition_log;
+CREATE TABLE t_ds_process_definition_log (
+                                             id int NOT NULL  ,
+                                             code bigint NOT NULL,
+                                             name varchar(255) DEFAULT NULL ,
+                                             version int DEFAULT NULL ,
+                                             description text ,
+                                             project_code bigint DEFAULT NULL ,
+                                             release_state int DEFAULT NULL ,
+                                             user_id int DEFAULT NULL ,
+                                             global_params text ,
+                                             locations text ,
+                                             warning_group_id int DEFAULT NULL ,
+                                             flag int DEFAULT NULL ,
+                                             timeout int DEFAULT '0' ,
+                                             tenant_id int DEFAULT '-1' ,
+                                             operator int DEFAULT NULL ,
+                                             operate_time timestamp DEFAULT NULL ,
+                                             create_time timestamp DEFAULT NULL ,
+                                             update_time timestamp DEFAULT NULL ,
+                                             PRIMARY KEY (id)
+) ;
+
 
 ALTER TABLE t_ds_command ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_command.environment_code is 'environment code';
