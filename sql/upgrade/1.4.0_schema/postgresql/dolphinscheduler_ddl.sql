@@ -94,6 +94,195 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_delay_time();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_delay_time();
 
+-- uc_dolphin_T_t_ds_project_A_code
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_project_A_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_project'
+                            AND COLUMN_NAME ='code')
+      THEN
+ALTER TABLE t_ds_project ADD COLUMN code bigint NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_project_A_code();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_project_A_code();
+
+-- uc_dolphin_T_t_ds_process_definition_A_code
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='code')
+      THEN
+ALTER TABLE t_ds_process_definition ADD COLUMN code bigint NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_code();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_code();
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_version
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_instance_A_process_definition_version() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_instance'
+                            AND COLUMN_NAME ='process_definition_version')
+      THEN
+ALTER TABLE t_ds_process_instance ADD COLUMN process_definition_version int DEFAULT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_instance_A_process_definition_version();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_version();
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_code
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_instance_A_process_definition_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_instance'
+                            AND COLUMN_NAME ='process_definition_code')
+      THEN
+ALTER TABLE t_ds_process_instance ADD COLUMN process_definition_code bigint NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_instance_A_process_definition_code();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_code();
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_process_instance_A_process_definition_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='process_definition_id')
+      THEN
+ALTER TABLE t_ds_process_instance DROP COLUMN "process_definition_id";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_process_instance_A_process_definition_id();
+DROP FUNCTION uc_dolphin_T_t_ds_process_instance_A_process_definition_id();
+
+-- uc_dolphin_T_t_ds_process_definition_A_project_code
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_project_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='project_code')
+      THEN
+ALTER TABLE t_ds_process_definition ADD COLUMN project_code bigint NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_project_code();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_project_code();
+
+-- uc_dolphin_T_t_ds_process_definition_A_project_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_project_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_process_definition_A_project_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_definition'
+          AND COLUMN_NAME ='project_id')
+      THEN
+ALTER TABLE t_ds_process_definition DROP COLUMN "project_id";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_process_definition_A_project_id();
+DROP FUNCTION uc_dolphin_T_t_ds_process_definition_A_project_id();
+
+-- uc_dolphin_T_t_ds_task_instance_A_task_code
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_task_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_task_instance'
+                            AND COLUMN_NAME ='task_code')
+      THEN
+ALTER TABLE t_ds_task_instance ADD COLUMN task_code bigint NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_instance_A_task_code();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_task_code();
+
+-- uc_dolphin_T_t_ds_task_instance_A_process_definition_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_process_definition_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_task_instance_A_process_definition_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='process_definition_id')
+      THEN
+ALTER TABLE t_ds_task_instance DROP COLUMN "process_definition_id";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_task_instance_A_process_definition_id();
+DROP FUNCTION uc_dolphin_T_t_ds_task_instance_A_process_definition_id();
+
+-- uc_dolphin_T_t_ds_task_instance_A_task_definition_version
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_task_definition_version() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_task_instance'
+                            AND COLUMN_NAME ='task_definition_version')
+      THEN
+ALTER TABLE t_ds_task_instance ADD COLUMN task_definition_version int DEFAULT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_instance_A_task_definition_version();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_task_definition_version();
+
 -- uc_dolphin_T_t_ds_task_instance_A_var_pool
 delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_var_pool() RETURNS void AS $$
@@ -340,11 +529,6 @@ CREATE TABLE t_ds_environment (
     CONSTRAINT environment_code_unique UNIQUE (code)
 );
 
-ALTER TABLE t_ds_task_definition ADD COLUMN environment_code bigint DEFAULT '-1';
-comment on column t_ds_task_definition.environment_code is 'environment code';
-
-ALTER TABLE t_ds_task_definition_log ADD COLUMN environment_code bigint DEFAULT '-1';
-comment on column t_ds_task_definition_log.environment_code is 'environment code';
 
 ALTER TABLE t_ds_command ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_command.environment_code is 'environment code';
@@ -363,6 +547,71 @@ comment on column t_ds_task_instance.environment_code is 'environment code';
 
 ALTER TABLE t_ds_task_instance ADD COLUMN environment_config text;
 comment on column t_ds_task_instance.environment_config is 'environment config';
+
+--
+-- Table structure for table t_ds_task_definition
+--
+DROP TABLE IF EXISTS t_ds_task_definition;
+CREATE TABLE t_ds_task_definition (
+  id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
+  version int DEFAULT NULL ,
+  description text ,
+  project_code bigint DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  task_type varchar(50) DEFAULT NULL ,
+  task_params text ,
+  flag int DEFAULT NULL ,
+  task_priority int DEFAULT NULL ,
+  worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT '-1',
+  fail_retry_times int DEFAULT NULL ,
+  fail_retry_interval int DEFAULT NULL ,
+  timeout_flag int DEFAULT NULL ,
+  timeout_notify_strategy int DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
+  resource_ids varchar(255) DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id) ,
+  CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+);
+
+create index task_definition_index on t_ds_task_definition (project_code,id);
+
+--
+-- Table structure for table t_ds_task_definition_log
+--
+DROP TABLE IF EXISTS t_ds_task_definition_log;
+CREATE TABLE t_ds_task_definition_log (
+  id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
+  version int DEFAULT NULL ,
+  description text ,
+  project_code bigint DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  task_type varchar(50) DEFAULT NULL ,
+  task_params text ,
+  flag int DEFAULT NULL ,
+  task_priority int DEFAULT NULL ,
+  worker_group varchar(255) DEFAULT NULL ,
+  environment_code bigint DEFAULT '-1',
+  fail_retry_times int DEFAULT NULL ,
+  fail_retry_interval int DEFAULT NULL ,
+  timeout_flag int DEFAULT NULL ,
+  timeout_notify_strategy int DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
+  resource_ids varchar(255) DEFAULT NULL ,
+  operator int DEFAULT NULL ,
+  operate_time timestamp DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id)
+);
 
 --
 -- Table structure for table t_ds_environment_worker_group_relation

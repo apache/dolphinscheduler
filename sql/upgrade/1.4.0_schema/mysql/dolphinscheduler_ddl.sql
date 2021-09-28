@@ -37,6 +37,208 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_user_A_state;
 DROP PROCEDURE uc_dolphin_T_t_ds_user_A_state;
 
+-- uc_dolphin_T_t_ds_project_A_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_project_A_code;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_project_A_code()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_project'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='code')
+   THEN
+ALTER TABLE t_ds_project ADD `code` bigint(20) NOT NULL COMMENT 'encoding' after `name`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_project_A_code;
+DROP PROCEDURE uc_dolphin_T_t_ds_project_A_code;
+
+-- uc_dolphin_T_t_ds_process_definition_A_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_code;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_code()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='code')
+   THEN
+ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding' after `id`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_code;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_code;
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_version
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_version;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_version()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='process_definition_version')
+   THEN
+ALTER TABLE t_ds_process_instance ADD `process_definition_version` int(11) DEFAULT NULL COMMENT 'process definition version' after `name`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_A_process_definition_version;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_version;
+
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_code;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_code()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='process_definition_code')
+   THEN
+ALTER TABLE t_ds_process_instance ADD `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code' after `process_definition_version`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_A_process_definition_code;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_code;
+
+-- uc_dolphin_T_t_ds_process_instance_A_process_definition_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_process_definition_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_id()
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='process_definition_id')
+   THEN
+ALTER TABLE t_ds_process_instance DROP `process_definition_id`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_A_process_definition_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_process_definition_id;
+
+
+-- uc_dolphin_T_t_ds_process_definition_A_project_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_project_code;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_project_code()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='project_code')
+   THEN
+ALTER TABLE t_ds_process_definition ADD `project_code` bigint(20) NOT NULL COMMENT 'project code' after `version`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_project_code;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_project_code;
+
+-- uc_dolphin_T_t_ds_process_definition_A_project_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_project_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_project_id()
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='project_id')
+   THEN
+ALTER TABLE t_ds_process_definition DROP `project_id`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_project_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_project_id;
+
+-- uc_dolphin_T_t_ds_task_instance_A_task_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_task_code;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_task_code()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='task_code')
+   THEN
+ALTER TABLE t_ds_task_instance ADD `task_code` bigint(20) NOT NULL COMMENT 'task definition code' after `task_type`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_A_task_code;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_task_code;
+
+-- uc_dolphin_T_t_ds_task_instance_A_process_definition_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_process_definition_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_process_definition_id()
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='process_definition_id')
+   THEN
+ALTER TABLE t_ds_task_instance DROP `process_definition_id`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_A_process_definition_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_process_definition_id;
+
+-- uc_dolphin_T_t_ds_task_instance_A_task_definition_version
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_task_definition_version;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_task_definition_version()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='task_definition_version')
+   THEN
+ALTER TABLE t_ds_task_instance ADD `task_definition_version` int(11) DEFAULT NULL COMMENT 'task definition version' after `task_code`;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_A_task_definition_version;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_task_definition_version;
+
 -- uc_dolphin_T_t_ds_tenant_A_tenant_name
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_tenant_A_tenant_name;
 delimiter d//
@@ -182,6 +384,32 @@ CREATE TABLE `t_ds_plugin_define` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_process_definition_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_log`;
+CREATE TABLE `t_ds_process_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
+  `version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
+  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
+  `global_params` text COMMENT 'global parameters',
+  `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `locations` text COMMENT 'Node location information',
+  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
+  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_ds_alert_plugin_instance
