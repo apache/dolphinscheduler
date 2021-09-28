@@ -1018,7 +1018,9 @@ public class ProcessService {
                 schedule.setCrontab(Constants.DEFAULT_CRON_STRING);
                 schedules.add(schedule);
             }
-            result.addAll(CronUtils.getSelfFireDateList(new Date(startDate.getTime() - 1000), endDate, schedules));
+            result.addAll(CronUtils.getSelfFireDateList(new Date(startDate.getTime() - 1000),
+                    new Date(endDate.getTime() - 1000),
+                    schedules));
         }
         return result;
     }
