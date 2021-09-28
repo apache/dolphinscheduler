@@ -76,13 +76,13 @@ const menu = {
           path: 'history-task-record',
           id: 4,
           enabled: config.recordSwitch
-        },
-        {
-          name: `${i18n.$t('Task definition')}`,
-          path: 'task-definition',
-          id: 5,
-          enabled: true
         }
+        // {
+        //   name: `${i18n.$t('Task definition')}`,
+        //   path: 'task-definition',
+        //   id: 5,
+        //   enabled: true
+        // }
       ]
     }
   ],

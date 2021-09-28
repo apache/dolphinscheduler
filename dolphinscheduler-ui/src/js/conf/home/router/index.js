@@ -207,24 +207,24 @@ const router = new Router({
             refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
-        {
-          path: '/projects/:projectCode/task-definition/create',
-          name: 'task-create',
-          component: resolve => require(['../pages/projects/pages/_source/createTask/createTask.vue'], resolve),
-          meta: {
-            title: `${i18n.$t('Create task')}`,
-            refreshInSwitchedTab: config.refreshInSwitchedTab
-          }
-        },
-        {
-          path: '/projects/:projectCode/task-definition',
-          name: 'task-definition',
-          component: resolve => require(['../pages/projects/pages/taskDefinition'], resolve),
-          meta: {
-            title: `${i18n.$t('Task definition')}`,
-            refreshInSwitchedTab: config.refreshInSwitchedTab
-          }
-        },
+        // {
+        //   path: '/projects/:projectCode/task-definition/create',
+        //   name: 'task-create ',
+        //   component: resolve => require(['../pages/projects/pages/_source/createTask/createTask.vue'], resolve),
+        //   meta: {
+        //     title: `${i18n.$t('Create task')}`,
+        //     refreshInSwitchedTab: config.refreshInSwitchedTab
+        //   }
+        // },
+        // {
+        //   path: '/projects/:projectCode/task-definition',
+        //   name: 'task-definition',
+        //   component: resolve => require(['../pages/projects/pages/taskDefinition'], resolve),
+        //   meta: {
+        //     title: `${i18n.$t('Task definition')}`,
+        //     refreshInSwitchedTab: config.refreshInSwitchedTab
+        //   }
+        // },
         {
           path: '/projects/:projectCode/task-record',
           name: 'task-record',
