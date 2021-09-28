@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import jdk.net.SocketFlow;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
@@ -234,7 +232,5 @@ public class TaskResponseService {
         }
         return false;
     }
-
-
 
 }

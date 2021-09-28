@@ -893,10 +893,14 @@
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
                         <include>**/api/service/EnvironmentServiceTest.java</include>
                         <include>**/api/service/EnvironmentWorkerGroupRelationServiceTest.java</include>
+                        <include>**/api/service/TaskGroupServiceTest.java</include>
+                        <include>**/api/service/TaskGroupQueueServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
                         <include>**/api/controller/EnvironmentControllerTest.java</include>
+                        <include>**/api/controller/TaskGroupControllerTest.java</include>
+                        <include>**/api/controller/TaskGroupQueueControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
@@ -1068,6 +1072,8 @@
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
+                        <include>**/dao/upgrade/TaskGroupQueueMapperTest.java.java</include>
+                        <include>**/dao/upgrade/TaskGroupMapperTest.java.java</include>
                         <include>**/plugin/alert/email/EmailAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/email/EmailAlertChannelTest.java</include>
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
