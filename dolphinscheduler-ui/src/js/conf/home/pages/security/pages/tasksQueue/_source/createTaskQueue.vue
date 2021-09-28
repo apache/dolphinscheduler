@@ -114,7 +114,7 @@
               this.updateTaskGroup(params).then(res => {
                     this.$message.success(res.msg)
                     this.$refs.popover.spinnerLoading = false
-                    //this.$emit('onUpdate', params)
+                    this.$emit('onUpdate', params)
                     }).catch(e => {
                       this.$message.error(e.msg || '')
                       this.$refs.popover.spinnerLoading = false

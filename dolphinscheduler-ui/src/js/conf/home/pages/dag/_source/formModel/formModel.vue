@@ -161,7 +161,7 @@
           <span class="text-b">{{ $t("Assigned Taskgroup") }}</span>
               <m-assigned-taskgroup
                 v-model="taskGroupId"
-                v-on:askgroupEvent="_onUpdateTeaskgroupCode"
+                v-on:taskgroupEvent="_onUpdateTaskgroupCode"
               ></m-assigned-taskgroup>
 
           </div>
@@ -677,6 +677,10 @@
       _onUpdateEnvironmentCode (o) {
         this.environmentCode = o
       },
+      _onUpdateTaskgroupCode(o) {
+
+       this.taskGroupId = o
+     },
       /**
        * _onCacheParams is reserved
        */
@@ -923,7 +927,8 @@
       }
       this.code = this.nodeData.id
       this.backfill(o)
-
+      this._onUpdateEnvironmentCode (o)
+      this. _onUpdateTaskgroupCode(o)
       if (this.dagChart) {
         const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
         const postNodes = canvas.getPostNodes(this.code)

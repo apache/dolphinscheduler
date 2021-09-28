@@ -73,6 +73,7 @@
           if (this.taskgroupList.length === 1 && this.selectedValue === '') {
             this.selectedValue = this.taskgroupList[0].id
           }
+          console.log("33333",this.selectedValue)
           this.$emit('taskgroupEvent', this.selectedValue)
         } else {
           this.selectedValue = ''
@@ -95,6 +96,8 @@
             this.listAllTaskGroupByStatus(this.searchParams).then(res => {
               this.taskgroupList = res.data.totalList;
               this.selectedValue=res.data.totalList[0].id;
+              this.$emit('taskgroupEvent', this.selectedValue)
+
               }).catch(e => {
                 this.isLoading = false
               })
