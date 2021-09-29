@@ -18,43 +18,27 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
-import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
-import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
-import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Date;
 
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
