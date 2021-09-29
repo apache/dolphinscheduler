@@ -92,8 +92,12 @@
        * Query
        */
       _close () {
-        this.$router.push({ name: 'projects-definition-list',
-          query: { pageSize: this.$route.query.pagesize, pageNo:this.$route.query.pageno } });
+        this.$router.push(
+          {
+            name: 'projects-definition-list',
+            query: { pageSize: this.$route.query.pagesize, pageNo: this.$route.query.pageno }
+          }
+        );
       },
       /**
        * File Upload

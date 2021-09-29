@@ -26,6 +26,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
     @Value("${worker.listen.port:1234}")

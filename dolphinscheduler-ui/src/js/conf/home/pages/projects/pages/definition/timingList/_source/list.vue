@@ -200,7 +200,6 @@
         this.timingDialog = true
       },
       onUpdateTiming () {
-        this.pageNo = 1
         this.timingDialog = false
         this._onUpdate()
       },
