@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

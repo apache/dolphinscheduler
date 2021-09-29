@@ -73,7 +73,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     ProcessInstance processInstance;
     TaskDefinition taskDefinition;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     boolean allDependentItemFinished;
