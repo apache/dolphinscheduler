@@ -117,3 +117,6 @@ jobs:
 
       - name: View the Deployment
         run: kubectl get deployments
+
+      - name: Curl test 1
+        run:  curl -X POST -u admin:dolphinscheduler123 http://127.0.0.1:12345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
