@@ -20,7 +20,7 @@ query queryTaskListByProcessId {
 query queryProcessInstanceList {
     queryProcessInstanceList(
         loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
-        projectName: "mktb_test"
+        projectCode: "1"
         pageNo: 1
         pageSize: 3
     ) {
@@ -71,8 +71,8 @@ query queryProcessInstanceList {
 query queryTaskListByProcessId {
     queryTaskListByProcessId(
         loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
-        projectName: "mktb_test"
-        processInstanceId: 2
+        projectCode: "1"
+        id: 2
     ) {
         code
         msg

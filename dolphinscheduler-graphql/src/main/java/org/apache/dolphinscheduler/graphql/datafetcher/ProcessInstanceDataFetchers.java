@@ -40,7 +40,7 @@ public class ProcessInstanceDataFetchers extends BaseDataFetchers {
             User loginUser = (User) selectUserResult.getData();
 
             long projectCode = Long.parseLong(environment.getArgument("projectCode"));
-            long processDefineCode = Long.parseLong(environment.getArgument("processDefinitionId"));
+            long processDefineCode = Long.parseLong(environment.getArgument("processDefineCode"));
             String searchVal = environment.getArgument("searchVal");
             String executorName = environment.getArgument("executorName");
 
