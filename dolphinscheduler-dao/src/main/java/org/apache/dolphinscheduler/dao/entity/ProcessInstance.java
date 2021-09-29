@@ -240,7 +240,7 @@ public class ProcessInstance {
     private String varPool;
 
     /**
-     * dry run state
+     * dry run flag
      */
     private int dryRun;
 

@@ -121,7 +121,7 @@ public class ErrorCommand {
     private Long environmentCode;
 
     /**
-     * dry run state
+     * dry run flag
      */
     private int dryRun;
 

@@ -127,7 +127,7 @@ public class Command {
     private Long environmentCode;
 
     /**
-     * if dry run
+     * dry run flag
      */
     @TableField("dry_run")
     private int dryRun;

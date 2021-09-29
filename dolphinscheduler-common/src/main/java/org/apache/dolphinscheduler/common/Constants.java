@@ -1095,7 +1095,7 @@ public final class Constants {
     public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
 
     /**
-     * dry run state
+     * dry run flag
      */
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;

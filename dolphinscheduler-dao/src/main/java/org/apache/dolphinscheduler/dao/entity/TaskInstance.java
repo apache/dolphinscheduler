@@ -262,7 +262,7 @@ public class TaskInstance implements Serializable {
     private String taskParams;
 
     /**
-     * dry run state
+     * dry run flag
      */
     private int dryRun;
 
