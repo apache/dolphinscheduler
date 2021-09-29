@@ -449,6 +449,11 @@ public final class Constants {
      */
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
+    /**
+     * complement date default cron string
+     */
+    public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
+
 
     /**
      * data source config
@@ -502,6 +507,11 @@ public final class Constants {
      * sleep time
      */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * one second mils
+     */
+    public static final int SECOND_TIME_MILLIS = 1000;
 
     /**
      * master task instance cache-database refresh interval
