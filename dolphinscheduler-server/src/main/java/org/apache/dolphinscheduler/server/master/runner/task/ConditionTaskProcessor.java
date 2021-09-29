@@ -66,7 +66,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     private TaskDefinition taskDefinition;

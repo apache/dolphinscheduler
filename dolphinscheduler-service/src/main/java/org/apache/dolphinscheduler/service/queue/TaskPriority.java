@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -44,6 +51,11 @@ public class TaskPriority implements Comparable<TaskPriority> {
      * taskId
      */
     private int taskId;
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * groupName
@@ -114,6 +126,14 @@ public class TaskPriority implements Comparable<TaskPriority> {
 
     public void setContext(Map<String, String> context) {
         this.context = context;
+    }
+
+    public TaskExecutionContext getTaskExecutionContext() {
+        return taskExecutionContext;
+    }
+
+    public void setTaskExecutionContext(TaskExecutionContext taskExecutionContext) {
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override

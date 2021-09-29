@@ -53,7 +53,6 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private ProcessInstance processInstance;
     TaskDefinition taskDefinition;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     /**

@@ -18,12 +18,24 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
+import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -37,8 +49,12 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +77,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
      * logger of MasterBaseTaskExecThread
      */
     protected Logger logger = LoggerFactory.getLogger(getClass());
-
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
@@ -124,12 +138,16 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+
+            TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
+            taskPriority.setTaskExecutionContext(taskExecutionContext);
+
             taskUpdateQueue.put(taskPriority);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
             return true;
         } catch (Exception e) {
             logger.error("submit task  Exception: ", e);
-            logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
+            logger.error("task error : {}", JSONUtils.toJsonString(taskInstance));
             return false;
         }
     }
