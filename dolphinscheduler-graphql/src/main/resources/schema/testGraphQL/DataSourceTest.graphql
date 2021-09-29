@@ -63,7 +63,10 @@ query QueryDataSource {
 }
 
 query QueryDataSourceList {
-    queryDataSourceList(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, dbType: MYSQL) {
+    queryDataSourceList(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, 
+        dbType: MYSQL
+    ) {
         code
         msg
         data {
@@ -81,7 +84,11 @@ query QueryDataSourceList {
 }
 
 query QueryDataSourceListPaging {
-    queryDataSourceListPaging(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, pageNo: 1, pageSize: 2) {
+    queryDataSourceListPaging(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, 
+        pageNo: 1, 
+        pageSize: 2
+    ) {
         code
         msg
         data {
@@ -146,7 +153,10 @@ mutation DeleteDataSource {
 }
 
 query verifyDataSourceName {
-    verifyDataSourceName(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, name: "testData") {
+    verifyDataSourceName(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, 
+        name: "testData"
+    ) {
         code
         msg
         data
@@ -154,7 +164,10 @@ query verifyDataSourceName {
 }
 
 query unauthDatasource {
-    unauthDatasource(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, userId: 1) {
+    unauthDatasource(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, 
+        userId: 1
+    ) {
         code
         msg
         data {
@@ -174,7 +187,10 @@ query unauthDatasource {
 }
 
 query authedDatasource {
-    authedDatasource(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, userId: 1) {
+    authedDatasource(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, 
+        userId: 1
+    ) {
         code
         msg
         data {
@@ -194,7 +210,9 @@ query authedDatasource {
 }
 
 query getKerberosStartupState {
-    getKerberosStartupState(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }) {
+    getKerberosStartupState(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+    ) {
         code
         msg
         data

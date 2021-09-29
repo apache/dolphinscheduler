@@ -100,7 +100,7 @@ public class GraphQLWiring {
                 accessTokenDataFetchers.queryTypeQueryAccessTokenList());
 
         // DataAnalysis GraphQL Query
-        typeWiring.dataFetcher("countTaskStateByProject",
+        typeWiring.dataFetcher("countTaskState",
                 dataAnalysisDataFetchers.queryTypeCountTaskState());
         typeWiring.dataFetcher("countProcessInstanceState",
                 dataAnalysisDataFetchers.queryTypeCountProcessInstanceState());

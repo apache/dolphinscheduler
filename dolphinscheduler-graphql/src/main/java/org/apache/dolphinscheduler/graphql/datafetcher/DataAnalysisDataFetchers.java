@@ -37,9 +37,9 @@ public class DataAnalysisDataFetchers extends BaseDataFetchers {
 
             String startDate = dataFetchingEnvironment.getArgument("startDate");
             String endDate = dataFetchingEnvironment.getArgument("endDate");
-            int projectId = dataFetchingEnvironment.getArgument("projectId");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
 
-            Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, projectId, startDate, endDate);
+            Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, projectCode, startDate, endDate);
             return returnDataList(result);
         };
     }
@@ -56,11 +56,11 @@ public class DataAnalysisDataFetchers extends BaseDataFetchers {
 
             String startDate = dataFetchingEnvironment.getArgument("startDate");
             String endDate = dataFetchingEnvironment.getArgument("endDate");
-            int projectId = dataFetchingEnvironment.getArgument("projectId");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
 
             logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id:{}",
-                    loginUser.getUserName(), startDate, endDate, projectId);
-            Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectId, startDate, endDate);
+                    loginUser.getUserName(), startDate, endDate, projectCode);
+            Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectCode, startDate, endDate);
             return returnDataList(result);
         };
     }
@@ -75,11 +75,11 @@ public class DataAnalysisDataFetchers extends BaseDataFetchers {
             }
             User loginUser = (User) selectUserResult.getData();
 
-            int projectId = dataFetchingEnvironment.getArgument("projectId");
+            long projectCode = Long.parseLong(dataFetchingEnvironment.getArgument("projectCode"));
 
             logger.info("count process definition , user:{}, project id:{}",
-                    loginUser.getUserName(), projectId);
-            Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectId);
+                    loginUser.getUserName(), projectCode);
+            Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectCode);
             return returnDataList(result);
         };
     }

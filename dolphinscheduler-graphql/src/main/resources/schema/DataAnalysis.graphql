@@ -1,10 +1,24 @@
 extend type Query {
     # DataAnalysis Query
-    countTaskStateByProject(loginUser: InputUser!, startDate: String,
-        endDate: String, projectId: Int = 0): TaskCountDtoResultType
-    countProcessInstanceState(loginUser: InputUser!, startDate: String,
-        endDate: String, projectId: Int = 0): TaskCountDtoResultType
-    countDefinitionByUser(loginUser: InputUser!, projectId: Int = 0): DefineUserDtoResultType
+    countTaskState(
+        loginUser: InputUser!,
+        startDate: String,
+        endDate: String,
+        projectCode: String = "0"
+    ): TaskCountDtoResultType
+
+    countProcessInstanceState(
+        loginUser: InputUser!,
+        startDate: String,
+        endDate: String,
+        projectCode: String = "0"
+    ): TaskCountDtoResultType
+
+    countDefinitionByUser(
+        loginUser: InputUser!,
+        projectCode: String = "0"
+    ): DefineUserDtoResultType
+
     countCommandState(loginUser: InputUser!): CommandStateCountResultType
     countQueueState(loginUser: InputUser!): CountQueueStateResultType
 
