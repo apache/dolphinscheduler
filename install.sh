@@ -61,6 +61,8 @@ sed -i ${txt} "s@^sudo.enable=.*@sudo.enable=${sudoEnable}@g" conf/common.proper
 # the following configurations may be commented, so ddd #\? to ensure successful sed
 sed -i ${txt} "s@^#\?worker.tenant.auto.create=.*@worker.tenant.auto.create=${workerTenantAutoCreate}@g" conf/worker.properties
 sed -i ${txt} "s@^#\?alert.listen.host=.*@alert.listen.host=${alertServer}@g" conf/worker.properties
+sed -i ${txt} "s@^#\?task.plugin.dir=.*@task.plugin.dir=${taskPluginDir}@g" conf/worker.properties
+
 sed -i ${txt} "s@^#\?alert.plugin.dir=.*@alert.plugin.dir=${alertPluginDir}@g" conf/alert.properties
 sed -i ${txt} "s@^#\?server.port=.*@server.port=${apiServerPort}@g" conf/application-api.properties
 
