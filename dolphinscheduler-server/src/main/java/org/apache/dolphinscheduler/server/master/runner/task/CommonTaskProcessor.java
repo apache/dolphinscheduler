@@ -72,9 +72,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         // task group queue
         int taskGroupId = task.getTaskGroupId();
         boolean acquireTaskGroup = false;
-        if (!processService.checkTaskIsExsited(task.getId())) {
+        // a task instance that has never applied for a tgq or configuring a tgq should be submitted to DB
+        if (taskGroupId == 0 || !processService.checkTaskIsExsited(task.getId())) {
             this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
-            System.out.println("task id "+task.getId());
+            logger.info("task id " + task.getId());
             acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
                     task.getName(),
                     taskGroupId,
@@ -85,11 +86,14 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 return false;
             }
         }
-        // if the task is running, it should not be dispatched
+        // if the task is running, it should not be dispatched again
         ConcurrentHashMap<Integer, Integer> runningTaskCache = processService.getRunningTaskCache();
+        // if the task is not running and has acquired a tgq successfully, it should be dispatched again
         if (!runningTaskCache.contains(task.getId()) && acquireTaskGroup) {
+            logger.info("submit task, dispatch the task instance successfully", taskInstance.getName());
             dispatchTask(taskInstance, processInstance);
         } else {
+            logger.info("submit task, but try to dispatchTask task instance failed", taskInstance.getName());
             return false;
         }
         return true;

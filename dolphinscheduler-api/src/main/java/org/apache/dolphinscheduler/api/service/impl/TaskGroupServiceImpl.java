@@ -104,13 +104,16 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
             return result;
         }
-        TaskGroup taskGroup1 = new TaskGroup(id, name, description, groupSize, loginUser.getId());
-
-        if (taskGroupMapper.queryByName(loginUser.getId(), name) != null) {
+        TaskGroup taskGroup2 = taskGroupMapper.queryByName(loginUser.getId(), name);
+        if (taskGroup2 != null && !taskGroup2.getName().equals(name)) {
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        int i = taskGroupMapper.updateById(taskGroup1);
+        taskGroup.setGroupSize(groupSize);
+        taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
+        taskGroup.setDescription(description);
+        taskGroup.setName(name);
+        int i = taskGroupMapper.updateById(taskGroup);
         logger.info("update result:{}",i);
         putMsg(result, Status.SUCCESS);
         return result;

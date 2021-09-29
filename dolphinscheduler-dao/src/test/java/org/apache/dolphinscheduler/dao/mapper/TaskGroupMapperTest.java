@@ -73,7 +73,7 @@ public class TaskGroupMapperTest {
     @Test
     public void testUpdate() {
         TaskGroup taskGroup = new TaskGroup();
-        taskGroup.setId(7);
+        taskGroup.setId(1);
         taskGroup.setGroupSize(100);
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int i = taskGroupMapper.updateById(taskGroup);
