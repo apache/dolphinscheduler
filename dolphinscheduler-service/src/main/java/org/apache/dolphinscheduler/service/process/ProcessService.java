@@ -26,11 +26,9 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -129,6 +127,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -1535,19 +1534,29 @@ public class ProcessService {
         if (taskInstance == null) {
             return null;
         }
+        setTaskInstanceDetail(taskInstance);
+        return taskInstance;
+    }
+
+    /**
+     * package task instance，associate processInstance and processDefine
+     *
+     * @param taskInstance taskInstance
+     * @return task instance
+     */
+    public void setTaskInstanceDetail(TaskInstance taskInstance) {
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
         ProcessDefinition processDefine = findProcessDefinition(processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion());
+                processInstance.getProcessDefinitionVersion());
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processDefine);
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-            taskInstance.getTaskCode(),
-            taskInstance.getTaskDefinitionVersion());
+                taskInstance.getTaskCode(),
+                taskInstance.getTaskDefinitionVersion());
         updateTaskDefinitionResources(taskDefinition);
         taskInstance.setTaskDefine(taskDefinition);
-        return taskInstance;
     }
 
     /**
