@@ -151,11 +151,9 @@ public interface TaskDefinitionService {
     /**
      * gen task code list
      *
-     * @param loginUser login user
      * @param genNum gen num
      * @return task code list
      */
-    Map<String, Object> genTaskCodeList(User loginUser,
-                                        Integer genNum);
+    Map<String, Object> genTaskCodeList(Integer genNum);
 
 }

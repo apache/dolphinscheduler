@@ -307,7 +307,7 @@ public class TaskDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result genTaskCodeList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("genNum") Integer genNum) {
-        Map<String, Object> result = taskDefinitionService.genTaskCodeList(loginUser, genNum);
+        Map<String, Object> result = taskDefinitionService.genTaskCodeList(genNum);
         return returnDataList(result);
     }
 }

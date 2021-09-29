@@ -411,7 +411,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> genTaskCodeList(User loginUser, Integer genNum) {
+    public Map<String, Object> genTaskCodeList(Integer genNum) {
         Map<String, Object> result = new HashMap<>();
         if (genNum == null || genNum < 1 || genNum > 100) {
             logger.error("the genNum must be great than 1 and less than 100");
