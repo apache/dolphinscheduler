@@ -23,7 +23,7 @@
           type="input"
           size="small"
           v-model="targetJobName"
-          :placeholder="$t('Please enter PIGEON DataX job name')">
+          :placeholder="$t('Please enter Pigeon job name')">
         </el-input>
       </div>
     </m-list-box>
