@@ -333,7 +333,8 @@ CREATE TABLE `t_ds_command` (
   `worker_group` varchar(64)  COMMENT 'worker group',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run` int NULL DEFAULT 0 COMMENT 'dry run flag：0 normal, 1 dry run',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
