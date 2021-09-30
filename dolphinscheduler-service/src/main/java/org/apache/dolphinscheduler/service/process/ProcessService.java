@@ -552,7 +552,8 @@ public class ProcessService {
                 processInstance.getScheduleTime(),
                 processInstance.getWorkerGroup(),
                 processInstance.getEnvironmentCode(),
-                processInstance.getProcessInstancePriority()
+                processInstance.getProcessInstancePriority(),
+                processInstance.getDryRun()
             );
             saveCommand(command);
             return;
@@ -632,6 +633,7 @@ public class ProcessService {
         processInstance.setWarningType(warningType);
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
         processInstance.setWarningGroupId(warningGroupId);
+        processInstance.setDryRun(command.getDryRun());
 
         // schedule time
         Date scheduleTime = getScheduleTime(command, cmdParam);
@@ -1292,7 +1294,8 @@ public class ProcessService {
             parentProcessInstance.getScheduleTime(),
             task.getWorkerGroup(),
             task.getEnvironmentCode(),
-            parentProcessInstance.getProcessInstancePriority()
+            parentProcessInstance.getProcessInstancePriority(),
+            parentProcessInstance.getDryRun()
         );
     }
 

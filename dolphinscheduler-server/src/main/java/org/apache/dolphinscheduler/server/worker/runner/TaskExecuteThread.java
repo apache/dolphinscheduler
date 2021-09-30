@@ -167,10 +167,14 @@ public class TaskExecuteThread implements Runnable, Delayed {
             }
             logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
 
+            TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+            int dryRun = taskInstance.getDryRun();
             // copy hdfs/minio file to local
-            downloadResource(taskExecutionContext.getExecutePath(),
-                    taskExecutionContext.getResources(),
-                    logger);
+            if (dryRun == Constants.DRY_RUN_FLAG_NO) {
+                downloadResource(taskExecutionContext.getExecutePath(),
+                        taskExecutionContext.getResources(),
+                        logger);
+            }
 
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
@@ -198,14 +202,20 @@ public class TaskExecuteThread implements Runnable, Delayed {
             this.task.init();
             //init varPool
             this.task.getParameters().setVarPool(taskExecutionContext.getVarPool());
-            // task handle
-            this.task.handle();
 
-            // task result process
-            if (this.task.getNeedAlert()) {
-                sendAlert(this.task.getTaskAlertInfo());
+            if (dryRun == Constants.DRY_RUN_FLAG_NO) {
+                // task handle
+                this.task.handle();
+
+                // task result process
+                if (this.task.getNeedAlert()) {
+                    sendAlert(this.task.getTaskAlertInfo());
+                }
+                responseCommand.setStatus(this.task.getExitStatus().getCode());
+            } else {
+                responseCommand.setStatus(ExecutionStatus.SUCCESS.getCode());
+                task.setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
             }
-            responseCommand.setStatus(this.task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(this.task.getProcessId());
             responseCommand.setAppIds(this.task.getAppIds());
