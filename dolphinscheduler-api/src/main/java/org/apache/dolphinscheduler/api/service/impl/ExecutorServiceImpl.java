@@ -133,7 +133,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Long environmentCode,Integer timeout,
-                                                   Map<String, String> startParams, Integer expectedParallelismNumber) {
+                                                   Map<String, String> startParams, Integer expectedParallelismNumber,
+                                                   int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -170,7 +171,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          */
         int create = this.createCommand(commandType, processDefinition.getCode(),
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber);
+                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -507,7 +508,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup, Long environmentCode,
-                              Map<String, String> startParams, Integer expectedParallelismNumber) {
+                              Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun) {
 
         /**
          * instantiate command schedule instance
@@ -543,6 +544,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessInstancePriority(processInstancePriority);
         command.setWorkerGroup(workerGroup);
         command.setEnvironmentCode(environmentCode);
+        command.setDryRun(dryRun);
 
         Date start = null;
         Date end = null;
