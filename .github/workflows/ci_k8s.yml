@@ -122,6 +122,6 @@ jobs:
         run: kubectl get deployments
 
       - name: Access DolphinScheduler UI URL
-        run: curl -X POST -u admin:dolphinscheduler123 http://localhost:32345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
+        run: kubectl exec -it dolphinscheduler curl -X POST -u admin:dolphinscheduler123 http://localhost:32345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
 
           
