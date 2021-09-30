@@ -62,7 +62,8 @@ public interface ExecutorService {
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
-                                            Map<String, String> startParams, Integer expectedParallelismNumber);
+                                            Map<String, String> startParams, Integer expectedParallelismNumber,
+                                            int dryRun);
 
     /**
      * check whether the process definition can be executed

@@ -702,6 +702,9 @@ public class WorkflowExecuteThread implements Runnable {
             // task instance flag
             taskInstance.setFlag(Flag.YES);
 
+            // task dry run flag
+            taskInstance.setDryRun(processInstance.getDryRun());
+
             // task instance retry times
             taskInstance.setRetryTimes(0);
 

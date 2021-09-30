@@ -254,6 +254,7 @@ CREATE TABLE t_ds_command (
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   environment_code bigint DEFAULT '-1',
+  dry_run int DEFAULT '0' ,
   PRIMARY KEY (id)
 ) ;
 
@@ -297,6 +298,7 @@ CREATE TABLE t_ds_error_command (
   worker_group varchar(64),
   environment_code bigint DEFAULT '-1',
   message text ,
+  dry_ru int DEFAULT '0' ,
   PRIMARY KEY (id)
 );
 --
@@ -490,6 +492,7 @@ CREATE TABLE t_ds_process_instance (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
+  dry_run int DEFAULT '0' ,
   PRIMARY KEY (id)
 ) ;
 
@@ -703,6 +706,7 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
+  dry_run int DEFAULT '0' ,
   PRIMARY KEY (id),
   CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;

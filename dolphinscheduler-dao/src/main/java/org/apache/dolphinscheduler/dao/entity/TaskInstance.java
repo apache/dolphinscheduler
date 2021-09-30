@@ -261,6 +261,11 @@ public class TaskInstance implements Serializable {
      */
     private String taskParams;
 
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -529,6 +534,14 @@ public class TaskInstance implements Serializable {
         this.executorName = executorName;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
@@ -654,6 +667,7 @@ public class TaskInstance implements Serializable {
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
+                + ", dryRun=" + dryRun
                 + '}';
     }
 
