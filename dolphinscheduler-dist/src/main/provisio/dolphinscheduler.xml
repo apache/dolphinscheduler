@@ -116,4 +116,10 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <!-- datasource Plugins -->
+    <artifactSet to="lib/plugin/datasource/sqlserver">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-sqlserver:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>
