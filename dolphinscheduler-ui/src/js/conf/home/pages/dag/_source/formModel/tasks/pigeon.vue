@@ -23,7 +23,7 @@
           type="input"
           size="small"
           v-model="targetJobName"
-          :placeholder="$t('Please enter TIS DataX job name')">
+          :placeholder="$t('Please enter PIGEON DataX job name')">
         </el-input>
       </div>
     </m-list-box>
@@ -35,7 +35,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'tis',
+    name: 'pigeon',
 
     data () {
       return {
