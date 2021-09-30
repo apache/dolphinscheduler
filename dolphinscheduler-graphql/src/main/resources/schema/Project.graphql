@@ -12,9 +12,15 @@ extend type Query {
         pageNo: Int!
     ): ProjectPageInfoResultType
 
-    queryUnauthorizedProject(loginUser: InputUser!, userId: Int!): ProjectListResultType
+    queryUnauthorizedProject(
+        loginUser: InputUser!,
+        userId: Int!
+    ): ProjectListResultType
 
-    queryAuthorizedProject(loginUser: InputUser!, userId: Int!): ProjectListResultType
+    queryAuthorizedProject(
+        loginUser: InputUser!,
+        userId: Int!
+    ): ProjectListResultType
 
     queryProjectCreatedAndAuthorizedByUser(loginUser: InputUser!): ProjectListResultType
 
