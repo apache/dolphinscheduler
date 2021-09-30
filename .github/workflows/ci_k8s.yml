@@ -123,3 +123,4 @@ jobs:
             apipod=$(kubectl get pod | grep dolphinscheduler-api | awk '{print $1}')
             kubectl exec -it $apipod -- bash -c 'apt-get update && apt-get install -y --no-install-recommends curl'
             kubectl exec $apipod -- /opt/dolphinscheduler/docker/kubernetes/sumbit_shell_task.sh
+            
