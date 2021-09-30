@@ -253,3 +253,4 @@ xmlbeans-3.1.0.jar
 xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
+Java-WebSocket-1.5.1.jar

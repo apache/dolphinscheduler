@@ -1395,7 +1395,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         int switchVersion = processService.switchVersion(processDefinition, processDefinitionLog);
-        if (switchVersion > 0) {
+        if (switchVersion <= 0) {
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
             throw new ServiceException(Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
         }

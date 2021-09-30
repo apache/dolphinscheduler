@@ -83,6 +83,11 @@ public class SqlTask extends AbstractTaskExecutor {
     private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
     /**
+     * default query sql limit
+     */
+    private static final int LIMIT = 10000;
+
+    /**
      * Abstract Yarn Task
      *
      * @param taskRequest taskRequest
@@ -235,8 +240,9 @@ public class SqlTask extends AbstractTaskExecutor {
             int num = md.getColumnCount();
 
             int rowCount = 0;
+            int limit = sqlParameters.getLimit() == 0 ? LIMIT : sqlParameters.getLimit();
 
-            while (rowCount < sqlParameters.getLimit() && resultSet.next()) {
+            while (rowCount < limit && resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
