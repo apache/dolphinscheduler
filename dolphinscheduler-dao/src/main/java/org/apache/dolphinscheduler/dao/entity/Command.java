@@ -126,6 +126,12 @@ public class Command {
     @TableField("environment_code")
     private Long environmentCode;
 
+    /**
+     * dry run flag
+     */
+    @TableField("dry_run")
+    private int dryRun;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -145,7 +151,8 @@ public class Command {
             Date scheduleTime,
             String workerGroup,
             Long environmentCode,
-            Priority processInstancePriority) {
+            Priority processInstancePriority,
+            int dryRun) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -160,6 +167,7 @@ public class Command {
         this.workerGroup = workerGroup;
         this.environmentCode = environmentCode;
         this.processInstancePriority = processInstancePriority;
+        this.dryRun = dryRun;
     }
 
     public TaskDependType getTaskDependType() {
@@ -282,6 +290,14 @@ public class Command {
         this.environmentCode = environmentCode;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -358,6 +374,7 @@ public class Command {
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
         result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
+        result = 31 * result + dryRun;
         return result;
     }
 
@@ -379,6 +396,7 @@ public class Command {
                 + ", updateTime=" + updateTime
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode='" + environmentCode + '\''
+                + ", dryRun='" + dryRun + '\''
                 + '}';
     }
 }
