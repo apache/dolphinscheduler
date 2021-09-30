@@ -90,7 +90,7 @@
       :show-close="false"
       :visible.sync="logDialog"
       width="auto">
-      <m-log :key="logId" :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
+      <m-log :key="taskInstanceId" :item="item" :source="source" :taskInstanceId="taskInstanceId" @close="close"></m-log>
     </el-dialog>
   </div>
 </template>
@@ -110,7 +110,7 @@
         logDialog: false,
         item: {},
         source: '',
-        logId: null
+        taskInstanceId: null
       }
     },
     props: {
@@ -127,10 +127,9 @@
       _refreshLog (item) {
         this.item = item
         this.source = 'list'
-        this.logId = item.id
+        this.taskInstanceId = item.id
         this.logDialog = true
       },
-      ok () {},
       close () {
         this.logDialog = false
       },
