@@ -308,8 +308,7 @@ public class ProcessService {
      * @return
      */
     public List<Command> findCommandPage(int pageSize, int pageNumber) {
-        Page<Command> commandPage = new Page<>(pageNumber, pageSize);
-        return commandMapper.queryCommandPage(commandPage).getRecords();
+        return commandMapper.queryCommandPage(pageSize, pageNumber * pageSize);
     }
 
     /**
