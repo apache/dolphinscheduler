@@ -522,16 +522,18 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskNode> taskNodeList =
             processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
         forbiddenTaskList.clear();
+
         taskNodeList.forEach(taskNode -> {
             if (taskNode.isForbidden()) {
-                forbiddenTaskList.put(taskNode.getName(), taskNode);
+                forbiddenTaskList.put(Long.toString(taskNode.getCode()), taskNode);
             }
         });
+
         // generate process to get DAG info
-        List<String> recoveryNameList = getRecoveryNodeNameList();
+        List<String> recoveryNodeCodeList = getRecoveryNodeCodeList();
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
         ProcessDag processDag = generateFlowDag(taskNodeList,
-                startNodeNameList, recoveryNameList, processInstance.getTaskDependType());
+                startNodeNameList, recoveryNodeCodeList, processInstance.getTaskDependType());
         if (processDag == null) {
             logger.error("processDag is null");
             return;
@@ -1328,19 +1330,19 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     /**
-     * generate start node name list from parsing command param;
+     * generate start node code list from parsing command param;
      * if "StartNodeIdList" exists in command param, return StartNodeIdList
      *
-     * @return recovery node name list
+     * @return recovery node code list
      */
-    private List<String> getRecoveryNodeNameList() {
-        List<String> recoveryNodeNameList = new ArrayList<>();
+    private List<String> getRecoveryNodeCodeList() {
+        List<String> recoveryNodeCodeList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(recoverNodeIdList)) {
             for (TaskInstance task : recoverNodeIdList) {
-                recoveryNodeNameList.add(task.getName());
+                recoveryNodeCodeList.add(Long.toString(task.getTaskCode()));
             }
         }
-        return recoveryNodeNameList;
+        return recoveryNodeCodeList;
     }
 
     /**
@@ -1348,15 +1350,15 @@ public class WorkflowExecuteThread implements Runnable {
      *
      * @param totalTaskNodeList total task node list
      * @param startNodeNameList start node name list
-     * @param recoveryNodeNameList recovery node name list
+     * @param recoveryNodeCodeList recovery node code list
      * @param depNodeType depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
     public ProcessDag generateFlowDag(List<TaskNode> totalTaskNodeList,
                                       List<String> startNodeNameList,
-                                      List<String> recoveryNodeNameList,
+                                      List<String> recoveryNodeCodeList,
                                       TaskDependType depNodeType) throws Exception {
-        return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
+        return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeCodeList, depNodeType);
     }
 }
