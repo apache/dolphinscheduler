@@ -264,15 +264,6 @@
             :backfill-item="backfillItem"
           >
           </m-shell>
-          <!-- waterdrop node -->
-          <m-waterdrop
-            v-if="nodeData.taskType === 'WATERDROP'"
-            @on-params="_onParams"
-            @on-cache-params="_onCacheParams"
-            ref="WATERDROP"
-            :backfill-item="backfillItem"
-          >
-          </m-waterdrop>
           <!-- sub_process node -->
           <m-sub-process
             v-if="nodeData.taskType === 'SUB_PROCESS'"
@@ -393,6 +384,15 @@
             :backfill-item="backfillItem"
             :nodeData="nodeData"
           ></m-switch>
+          <!-- waterdrop node -->
+          <m-waterdrop
+            v-if="nodeData.taskType === 'WATERDROP'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="WATERDROP"
+            :backfill-item="backfillItem"
+          >
+          </m-waterdrop>
         </div>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
