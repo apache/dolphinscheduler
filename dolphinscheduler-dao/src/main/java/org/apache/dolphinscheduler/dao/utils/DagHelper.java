@@ -247,7 +247,7 @@ public class DagHelper {
      */
     public static TaskNode findNodeByCode(List<TaskNode> nodeDetails, String nodeCode) {
         for (TaskNode taskNode : nodeDetails) {
-            if (taskNode.getCode()==Long.parseLong(nodeCode)) {
+            if (Long.toString(taskNode.getCode()).equals(nodeCode)) {
                 return taskNode;
             }
         }
