@@ -122,4 +122,4 @@ jobs:
         run: |
             apipod=$(kubectl get pod | grep dolphinscheduler-api | awk '{print $1}')
             kubectl exec -it $apipod -- bash -c 'apt-get update && apt-get install -y --no-install-recommends curl'
-            kubectl exec -it $apipod -- curl -X POST -u admin:dolphinscheduler123 http://localhost:12345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
+            kubectl exec $apipod -- curl -X POST -u admin:dolphinscheduler123 http://localhost:12345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
