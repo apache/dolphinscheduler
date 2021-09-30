@@ -297,8 +297,8 @@ const tasksType = {
     desc: 'DataX',
     color: '#1fc747'
   },
-  TIS: {
-    desc: 'TIS',
+  PIGEON: {
+    desc: 'PIGEON',
     color: '#1fc747'
   },
   SQOOP: {
