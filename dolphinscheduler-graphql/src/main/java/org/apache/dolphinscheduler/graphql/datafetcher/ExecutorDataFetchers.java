@@ -69,6 +69,7 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
             Integer timeout = dataFetchingEnvironment.getArgument("timeout");
             String startParams = dataFetchingEnvironment.getArgument("startParams");
             int expectedParallelismNumber = dataFetchingEnvironment.getArgument("expectedParallelismNumber");
+            int dryRun = dataFetchingEnvironment.getArgument("dryRun");
 
             if (timeout == null) {
                 timeout = Constants.MAX_TASK_TIMEOUT;
@@ -78,7 +79,7 @@ public class ExecutorDataFetchers extends BaseDataFetchers {
                 startParamMap = JSONUtils.toMap(startParams);
             }
             Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
-                    startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber);
+                    startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun);
             return returnDataList(result);
         };
     }

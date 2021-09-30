@@ -26,6 +26,7 @@ extend type Mutation {
         timeout: Int,
         startParams: String,
         expectedParallelismNumber: Int
+        dryRun: Int = 0
     ): NormalResultType
 
     execute(
