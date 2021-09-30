@@ -375,19 +375,19 @@ public class WorkflowExecuteThread implements Runnable {
             return;
         }
         ProcessInstance processInstance = processService.findProcessInstanceById(this.processInstance.getId());
-        completeTaskList.put(task.getName(), task);
+        completeTaskList.put(Long.toString(task.getTaskCode()), task);
         activeTaskProcessorMaps.remove(task.getId());
         taskTimeoutCheckList.remove(task.getId());
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
             processService.saveProcessInstance(processInstance);
-            submitPostNode(task.getName());
+            submitPostNode(Long.toString(task.getTaskCode()));
         } else if (task.getState().typeIsFailure()) {
             if (task.isConditionsTask()
-                    || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
-                submitPostNode(task.getName());
+                    || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
+                submitPostNode(Long.toString(task.getTaskCode()));
             } else {
-                errorTaskList.put(task.getName(), task);
+                errorTaskList.put(Long.toString(task.getTaskCode()), task);
                 if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                     killAllTasks();
                 }
@@ -555,13 +555,13 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
         for (TaskInstance task : taskInstanceList) {
             if (task.isTaskComplete()) {
-                completeTaskList.put(task.getName(), task);
+                completeTaskList.put(Long.toString(task.getTaskCode()), task);
             }
-            if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
+            if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
                 continue;
             }
             if (task.getState().typeIsFailure() && !task.taskCanRetry()) {
-                errorTaskList.put(task.getName(), task);
+                errorTaskList.put(Long.toString(task.getTaskCode()), task);
             }
         }
 
@@ -805,8 +805,8 @@ public class WorkflowExecuteThread implements Runnable {
         }
     }
 
-    private void submitPostNode(String parentNodeName) {
-        Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
+    private void submitPostNode(String parentNodeCode) {
+        Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeCode, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
             TaskNode taskNodeObject = dag.getNode(taskNode);
@@ -824,7 +824,7 @@ public class WorkflowExecuteThread implements Runnable {
                 continue;
             }
 
-            if (completeTaskList.containsKey(task.getName())) {
+            if (completeTaskList.containsKey(Long.toString(task.getTaskCode()))) {
                 logger.info("task {} has already run success", task.getName());
                 continue;
             }
@@ -843,16 +843,16 @@ public class WorkflowExecuteThread implements Runnable {
      *
      * @return DependResult
      */
-    private DependResult isTaskDepsComplete(String taskName) {
+    private DependResult isTaskDepsComplete(String taskCode) {
 
         Collection<String> startNodes = dag.getBeginNode();
         // if vertex,returns true directly
-        if (startNodes.contains(taskName)) {
+        if (startNodes.contains(taskCode)) {
             return DependResult.SUCCESS;
         }
-        TaskNode taskNode = dag.getNode(taskName);
-        List<String> depNameList = taskNode.getDepList();
-        for (String depsNode : depNameList) {
+        TaskNode taskNode = dag.getNode(taskCode);
+        List<String> depCodeList = taskNode.getDepList();
+        for (String depsNode : depCodeList) {
             if (!dag.containsNode(depsNode)
                     || forbiddenTaskList.containsKey(depsNode)
                     || skipTaskNodeList.containsKey(depsNode)) {
@@ -870,11 +870,11 @@ public class WorkflowExecuteThread implements Runnable {
             if (taskNode.isConditionsTask()) {
                 continue;
             }
-            if (!dependTaskSuccess(depsNode, taskName)) {
+            if (!dependTaskSuccess(depsNode, taskCode)) {
                 return DependResult.FAILED;
             }
         }
-        logger.info("taskName: {} completeDependTaskList: {}", taskName, Arrays.toString(completeTaskList.keySet().toArray()));
+        logger.info("taskCode: {} completeDependTaskList: {}", taskCode, Arrays.toString(completeTaskList.keySet().toArray()));
         return DependResult.SUCCESS;
     }
 
@@ -1108,7 +1108,7 @@ public class WorkflowExecuteThread implements Runnable {
      * @return DependResult
      */
     private DependResult getDependResultForTask(TaskInstance taskInstance) {
-        return isTaskDepsComplete(taskInstance.getName());
+        return isTaskDepsComplete(Long.toString(taskInstance.getTaskCode()));
     }
 
     /**
@@ -1227,15 +1227,15 @@ public class WorkflowExecuteThread implements Runnable {
                         task.setState(retryTask.getState());
                         logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
                         removeTaskFromStandbyList(task);
-                        completeTaskList.put(task.getName(), task);
-                        submitPostNode(task.getName());
+                        completeTaskList.put(Long.toString(task.getTaskCode()), task);
+                        submitPostNode(Long.toString(task.getTaskCode()));
                         continue;
                     }
                 }
                 //init varPool only this task is the first time running
                 if (task.isFirstRun()) {
                     //get pre task ,get all the task varPool to this task
-                    Set<String> preTask = dag.getPreviousNodes(task.getName());
+                    Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
                     getPreVarPool(task, preTask);
                 }
                 DependResult dependResult = getDependResultForTask(task);
@@ -1250,7 +1250,7 @@ public class WorkflowExecuteThread implements Runnable {
                     }
                 } else if (DependResult.FAILED == dependResult) {
                     // if the dependency fails, the current node is not submitted and the state changes to failure.
-                    dependFailedTask.put(task.getName(), task);
+                    dependFailedTask.put(Long.toString(task.getTaskCode()), task);
                     removeTaskFromStandbyList(task);
                     logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
                 } else if (DependResult.NON_EXEC == dependResult) {
