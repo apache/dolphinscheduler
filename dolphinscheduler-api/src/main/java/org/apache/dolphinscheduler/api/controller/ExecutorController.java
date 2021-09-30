@@ -117,7 +117,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "execType", required = false) CommandType execType,
                                        @RequestParam(value = "warningType", required = true) WarningType warningType,
                                        @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
-                                       @RequestParam (value = "runMode", required = false) RunMode runMode,
+                                       @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
