@@ -1103,7 +1103,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
-                        <include>**/plugin/task/tis/TISTaskTest.java</include>
+                        <include>**/plugin/task/pigeon/PigeonTaskTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
