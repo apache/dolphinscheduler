@@ -378,8 +378,7 @@ CREATE TABLE t_ds_task_definition (
   resource_ids varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id) ,
-  CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+  PRIMARY KEY (id)
 ) ;
 
 create index task_definition_index on t_ds_task_definition (project_code,id);

@@ -470,8 +470,7 @@ CREATE TABLE `t_ds_task_definition` (
   `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
+  PRIMARY KEY (`id`,`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
