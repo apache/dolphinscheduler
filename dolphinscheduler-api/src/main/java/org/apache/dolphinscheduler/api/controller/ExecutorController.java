@@ -123,7 +123,8 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
-                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber) {
+                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -133,7 +134,7 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
-            startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode,timeout, startParamMap, expectedParallelismNumber);
+            startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode,timeout, startParamMap, expectedParallelismNumber, dryRun);
         return returnDataList(result);
     }
 

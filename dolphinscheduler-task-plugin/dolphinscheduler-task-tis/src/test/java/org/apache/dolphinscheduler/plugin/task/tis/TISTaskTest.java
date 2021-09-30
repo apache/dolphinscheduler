@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.tis;
 
-import static com.github.dreamhead.moco.Moco.pathResource;
+import static com.github.dreamhead.moco.Moco.file;
 import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
@@ -28,11 +28,17 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,19 +52,12 @@ public class TISTaskTest {
 
     @Before
     public void before() throws Exception {
-    /*
-        TaskProps props = new TaskProps();
-        props.setExecutePath("/tmp");
-        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstanceId(1);
-        props.setTenantCode("1");
-        props.setEnvFile(".dolphinscheduler_env.sh");
-        props.setTaskStartTime(new Date());
-        props.setTaskTimeout(0);
-        props.setTaskParams("{\"targetJobName\":\"mysql_elastic\"}");
+
+        String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
 
         taskExecutionContext = Mockito.mock(TaskRequest.class);
-        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
+        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("tislogger");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
@@ -70,23 +69,28 @@ public class TISTaskTest {
         Map<String, String> gloabParams = Collections.singletonMap(TISTask.KEY_POOL_VAR_TIS_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
-        tisTask = PowerMockito.spy(new TISTask(taskExecutionContext));
-        tisTask.init();*/
+        tisTask = new TISTask(taskExecutionContext);
+        tisTask.init();
 
     }
 
-    /**
-     * Method: DataxTask()
-     */
     @Test
-    public void testDataxTask() {
-       /*     throws Exception {
-        TaskProps props = new TaskProps();
-        props.setExecutePath("/tmp");
-        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstanceId(1);
-        props.setTenantCode("1");
-        Assert.assertNotNull(new TISTask(null, logger));*/
+    public void testGetTISConfigParams() {
+        TISConfig cfg = TISConfig.getInstance();
+        String tisHost = "127.0.0.1:8080";
+        Assert.assertEquals("http://127.0.0.1:8080/tjs/coredefine/coredefine.ajax", cfg.getJobTriggerUrl(tisHost));
+        String jobName = "mysql_elastic";
+        int taskId = 123;
+        Assert.assertEquals("ws://" + tisHost + "/tjs/download/logfeedback?logtype=full&collection=mysql_elastic&taskid=" + taskId
+                , cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
+
+        Assert.assertEquals("action=datax_action&emethod=trigger_fullbuild_task", cfg.getJobTriggerPostBody());
+
+        Assert.assertEquals("http://127.0.0.1:8080/tjs/config/config.ajax?action=collection_action&emethod=get_task_status", cfg.getJobStatusUrl(tisHost));
+
+        Assert.assertEquals("{\n taskid: " + taskId + "\n, log: false }", cfg.getJobStatusPostBody(taskId));
+
+        Assert.assertEquals("action=core_action&event_submit_do_cancel_task=y&taskid=" + taskId, cfg.getJobCancelPostBody(taskId));
     }
 
     @Test
@@ -102,7 +106,7 @@ public class TISTaskTest {
     @Test
     public void testHandle()
             throws Exception {
-        HttpServer server = jsonHttpServer(8080, pathResource("org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
+        HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
 
         running(server, () -> {
             tisTask.handle();
@@ -122,14 +126,14 @@ public class TISTaskTest {
         }
     }
 
-    @Test
-    public void testCancelApplication()
-            throws Exception {
-        try {
-            tisTask.cancelApplication(true);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
-    }
+    //    @Test
+    //    public void testCancelApplication()
+    //            throws Exception {
+    //        try {
+    //            tisTask.cancelApplication(true);
+    //        } catch (Exception e) {
+    //            Assert.fail(e.getMessage());
+    //        }
+    //    }
 
 }

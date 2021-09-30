@@ -15,29 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.entity;
+package org.apache.dolphinscheduler.plugin.task.tis;
 
-import java.io.Serializable;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-/**
- *  master/worker task transport
- */
-public class DependenceTaskExecutionContext implements Serializable{
+import com.google.common.collect.ImmutableList;
 
-    private String dependence;
-
-    public String getDependence() {
-        return dependence;
-    }
-
-    public void setDependence(String dependence) {
-        this.dependence = dependence;
-    }
+public class TISTaskPlugin implements DolphinSchedulerPlugin {
 
     @Override
-    public String toString() {
-        return "DependenceTaskExecutionContext{" +
-                "dependence='" + dependence + '\'' +
-                '}';
+    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return ImmutableList.of(new TISTaskChannelFactory());
     }
 }

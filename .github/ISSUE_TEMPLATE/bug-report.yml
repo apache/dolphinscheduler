@@ -23,6 +23,11 @@ body:
   - type: markdown
     attributes:
       value: |
+        Please make sure what you are reporting is indeed a bug with reproducible steps, if you want to ask questions
+        or share ideas, please [subscribe to our mailing list](mailto:dev-subscribe@dolphinscheduler.apache.org) and sent
+        emails to [our mailing list](mailto:dev@dolphinscheduler.apache.org), you can also head to our
+        [Discussion](https://github.com/apache/dolphinscheduler/discussions) tab.
+
         For better global communication, Please write in English.
 
         If you feel the description in English is not clear, then you can append description in Chinese, thanks!

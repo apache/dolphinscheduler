@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -128,7 +129,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-            return result;
+            throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
         Map<String, Object> resData = new HashMap<>();
         resData.put("total", taskDefinitionLogs.size());
@@ -171,7 +172,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode project code
      * @param taskCode task code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -255,8 +255,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setCreateTime(now);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
         if ((update & insert) != 1) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-            return result;
+            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS, update);
@@ -411,7 +411,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> genTaskCodeList(User loginUser, Integer genNum) {
+    public Map<String, Object> genTaskCodeList(Integer genNum) {
         Map<String, Object> result = new HashMap<>();
         if (genNum == null || genNum < 1 || genNum > 100) {
             logger.error("the genNum must be great than 1 and less than 100");

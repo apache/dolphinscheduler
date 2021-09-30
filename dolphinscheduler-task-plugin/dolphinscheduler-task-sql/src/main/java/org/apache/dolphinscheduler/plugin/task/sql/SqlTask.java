@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
@@ -59,7 +59,7 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SqlTask extends AbstractYarnTask {
+public class SqlTask extends AbstractTaskExecutor {
 
     /**
      * taskExecutionContext
@@ -82,6 +82,11 @@ public class SqlTask extends AbstractYarnTask {
     private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
     /**
+     * default query sql limit
+     */
+    private static final int LIMIT = 10000;
+
+    /**
      * Abstract Yarn Task
      *
      * @param taskRequest taskRequest
@@ -99,17 +104,7 @@ public class SqlTask extends AbstractYarnTask {
 
     @Override
     public AbstractParameters getParameters() {
-        return null;
-    }
-
-    @Override
-    protected String buildCommand() {
-        return null;
-    }
-
-    @Override
-    protected void setMainJarName() {
-
+        return sqlParameters;
     }
 
     @Override
@@ -244,8 +239,9 @@ public class SqlTask extends AbstractYarnTask {
             int num = md.getColumnCount();
 
             int rowCount = 0;
+            int limit = sqlParameters.getLimit() == 0 ? LIMIT : sqlParameters.getLimit();
 
-            while (rowCount < sqlParameters.getLimit() && resultSet.next()) {
+            while (rowCount < limit && resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
@@ -382,7 +378,8 @@ public class SqlTask extends AbstractYarnTask {
         // is the timeout set
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        try (PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql())) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
