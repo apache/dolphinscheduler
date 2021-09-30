@@ -1,13 +1,7 @@
 package org.apache.dolphinscheduler.graphql.datafetcher;
 
-import org.apache.dolphinscheduler.api.controller.ProjectController;
-import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -18,67 +12,26 @@ import java.util.HashMap;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ProjectDataFetchersTest extends AbstractDataFetchersTest {
+public class QueueDataFetchersTest extends AbstractDataFetchersTest {
 
-    private static Logger logger = LoggerFactory.getLogger(ProjectDataFetchersTest.class);
-
-    @Test
-    public void testUpdateProject() throws Exception {
-        HashMap<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("query",
-                "mutation updateProject {\n" +
-                        "    updateProject(\n" +
-                        "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
-                        "        code: \"2\"\n" +
-                        "        projectName: \"new_test1\"\n" +
-                        "        description: \"createProject Mutation test\"\n" +
-                        "        userName: \"admin\"\n" +
-                        "    ) {\n" +
-                        "        code\n" +
-                        "        msg\n" +
-                        "        data\n" +
-                        "        success\n" +
-                        "        failed\n" +
-                        "    }\n" +
-                        "}");
-        paramsMap.put("variables",
-                "{}");
-
-        MvcResult mvcResult = mockMvc.perform(post("/graphql")
-                        .accept(MediaType.parseMediaType("*/*"))
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(toJson(paramsMap)))
-                .andExpect(status().isOk())
-                .andReturn();
-        System.out.println(mvcResult.getAsyncResult());
-        Assert.assertEquals("{data={updateProject={code=10018, msg=project  not found , data=null, success=false, failed=true}}}",
-                mvcResult.getAsyncResult().toString());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
+    private static Logger logger = LoggerFactory.getLogger(QueueDataFetchersTest.class);
 
     @Test
-    public void testQueryProjectByCode() throws Exception {
+    public void testQueryList() throws Exception {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("query",
-                "query queryProjectByCode {\n" +
-                        "    queryProjectByCode(\n" +
+                "query queryQueueList {\n" +
+                        "    queryQueueList(\n" +
                         "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
-                        "        code: \"2\"\n" +
                         "    ) {\n" +
                         "        code\n" +
                         "        msg\n" +
                         "        data {\n" +
                         "            id\n" +
-                        "            userId\n" +
-                        "            userName\n" +
-                        "            code\n" +
-                        "            name\n" +
-                        "            defCount\n" +
+                        "            queue\n" +
+                        "            queueName\n" +
                         "            createTime\n" +
                         "            updateTime\n" +
-                        "            perm\n" +
-                        "            defCount\n" +
-                        "            instRunningCount\n" +
                         "        }\n" +
                         "        success\n" +
                         "        failed\n" +
@@ -94,37 +47,29 @@ public class ProjectDataFetchersTest extends AbstractDataFetchersTest {
                 .andExpect(status().isOk())
                 .andReturn();
         System.out.println(mvcResult.getAsyncResult());
-        Assert.assertEquals("{data={queryProjectByCode={code=10018, msg=project  not found , data=null, success=false, failed=true}}}",
-                mvcResult.getAsyncResult().toString());
+        Assert.assertTrue(mvcResult.getAsyncResult().toString().contains("success=true"));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testQueryProjectListPaging() throws Exception {
+    public void testQueryQueueListPaging() throws Exception {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("query",
-                "query queryProjectListPaging {\n" +
-                        "    queryProjectListPaging(\n" +
+                "query queryQueueListPaging {\n" +
+                        "    queryQueueListPaging(\n" +
                         "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
-                        "        searchVal: \"\"\n" +
                         "        pageNo: 1\n" +
-                        "        pageSize: 2\n" +
+                        "        pageSize: 1\n" +
                         "    ) {\n" +
                         "        code\n" +
                         "        msg\n" +
                         "        data {\n" +
                         "            totalList {\n" +
                         "                id\n" +
-                        "                userId\n" +
-                        "                userName\n" +
-                        "                code\n" +
-                        "                name\n" +
-                        "                defCount\n" +
+                        "                queue\n" +
+                        "                queueName\n" +
                         "                createTime\n" +
                         "                updateTime\n" +
-                        "                perm\n" +
-                        "                defCount\n" +
-                        "                instRunningCount\n" +
                         "            }\n" +
                         "            total\n" +
                         "            totalPage\n" +
@@ -149,29 +94,18 @@ public class ProjectDataFetchersTest extends AbstractDataFetchersTest {
     }
 
     @Test
-    public void testQueryUnauthorizedProject() throws Exception {
+    public void testCreateQueue() throws Exception {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("query",
-                "query queryUnauthorizedProject {\n" +
-                        "    queryUnauthorizedProject(\n" +
+                "mutation createQueue {\n" +
+                        "    createQueue(\n" +
                         "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
-                        "        userId: 2\n" +
+                        "        queue: \"test\"\n" +
+                        "        queueName: \"testName\"\n" +
                         "    ) {\n" +
                         "        code\n" +
                         "        msg\n" +
-                        "        data {\n" +
-                        "            id\n" +
-                        "            userId\n" +
-                        "            userName\n" +
-                        "            code\n" +
-                        "            name\n" +
-                        "            defCount\n" +
-                        "            createTime\n" +
-                        "            updateTime\n" +
-                        "            perm\n" +
-                        "            defCount\n" +
-                        "            instRunningCount\n" +
-                        "        }\n" +
+                        "        data\n" +
                         "        success\n" +
                         "        failed\n" +
                         "    }\n" +
@@ -191,29 +125,19 @@ public class ProjectDataFetchersTest extends AbstractDataFetchersTest {
     }
 
     @Test
-    public void testQueryAuthorizedProject() throws Exception {
+    public void testUpdateQueue() throws Exception {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("query",
-                "query queryAuthorizedProject {\n" +
-                        "    queryAuthorizedProject(\n" +
+                "mutation updateQueue {\n" +
+                        "    updateQueue(\n" +
                         "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
-                        "        userId: 2\n" +
+                        "        id: 2\n" +
+                        "        queue: \"change1\"\n" +
+                        "        queueName: \"changeName\"\n" +
                         "    ) {\n" +
                         "        code\n" +
                         "        msg\n" +
-                        "        data {\n" +
-                        "            id\n" +
-                        "            userId\n" +
-                        "            userName\n" +
-                        "            code\n" +
-                        "            name\n" +
-                        "            defCount\n" +
-                        "            createTime\n" +
-                        "            updateTime\n" +
-                        "            perm\n" +
-                        "            defCount\n" +
-                        "            instRunningCount\n" +
-                        "        }\n" +
+                        "        data\n" +
                         "        success\n" +
                         "        failed\n" +
                         "    }\n" +
@@ -233,28 +157,18 @@ public class ProjectDataFetchersTest extends AbstractDataFetchersTest {
     }
 
     @Test
-    public void testQueryAllProjectList() throws Exception {
+    public void testVerifyQueue() throws Exception {
         HashMap<String, String> paramsMap = new HashMap<>();
         paramsMap.put("query",
-                "query queryAllProjectList {\n" +
-                        "    queryAllProjectList(\n" +
+                "query verifyQueue {\n" +
+                        "    verifyQueue(\n" +
                         "        loginUser: { id: \"1\", sessionId: \"" + sessionId + "\" }\n" +
+                        "        queue: \"change123\"\n" +
+                        "        queueName: \"changeName1\"\n" +
                         "    ) {\n" +
                         "        code\n" +
                         "        msg\n" +
-                        "        data {\n" +
-                        "            id\n" +
-                        "            userId\n" +
-                        "            userName\n" +
-                        "            code\n" +
-                        "            name\n" +
-                        "            defCount\n" +
-                        "            createTime\n" +
-                        "            updateTime\n" +
-                        "            perm\n" +
-                        "            defCount\n" +
-                        "            instRunningCount\n" +
-                        "        }\n" +
+                        "        data\n" +
                         "        success\n" +
                         "        failed\n" +
                         "    }\n" +
