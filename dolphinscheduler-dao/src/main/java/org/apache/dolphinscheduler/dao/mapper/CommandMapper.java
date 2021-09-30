@@ -56,6 +56,6 @@ public interface CommandMapper extends BaseMapper<Command> {
      * query command page
      * @return
      */
-    IPage<Command> queryCommandPage(IPage<Command> page);
+    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
 
 }
