@@ -79,7 +79,7 @@ jobs:
           export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
           sed -i "s/appVersion:latest/appVersion:${VERSION}/g" $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
           sed -i 's/type: "ClusterIP"/type: "NodePort"/' $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
-          sed -i 's/nodePort: ""/nodePort: "12345"/' $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
+          sed -i 's/nodePort: ""/nodePort: "30001"/' $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
           cat $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
           cat $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
 
