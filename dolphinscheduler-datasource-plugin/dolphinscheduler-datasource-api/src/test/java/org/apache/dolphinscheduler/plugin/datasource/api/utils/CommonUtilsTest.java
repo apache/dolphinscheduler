@@ -76,7 +76,6 @@ public class CommonUtilsTest {
         }
     }
 
-
     @Test
     public void encodePassword() {
 
