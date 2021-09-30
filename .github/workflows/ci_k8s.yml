@@ -78,10 +78,7 @@ jobs:
         run: |
           export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
           sed -i "s/appVersion:latest/appVersion:${VERSION}/g" $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
-          sed -i 's/type: "ClusterIP"/type: "NodePort"/' $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
-          sed -i 's/nodePort: ""/nodePort: "32345"/' $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
           cat $(pwd)/docker/kubernetes/dolphinscheduler/Chart.yaml
-          cat $(pwd)/docker/kubernetes/dolphinscheduler/values.yaml
 
       # Install
 
@@ -122,6 +119,6 @@ jobs:
         run: kubectl get deployments
 
       - name: Access DolphinScheduler UI URL
-        run: apipod=$(kubectl get pod -n test | grep dolphinscheduler-api | awk '{print $1}')
-             kubectl exec -it $apipod bash -c 'apt-get update && apt-get install -y --no-install-recommends'
-             kubectl exec -it $apipod curl -X POST -u admin:dolphinscheduler123 http://localhost:32345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
+        run: apipod=$(kubectl get pod | grep dolphinscheduler-api | awk '{print $1}')
+             kubectl exec -it $apipod -- bash -c 'apt-get update && apt-get install -y --no-install-recommends'
+             kubectl exec -it $apipod -- curl -X POST -u admin:dolphinscheduler123 http://localhost:12345/dolphinscheduler/tenant/create -d 'tenantCode=ds&tenantName=ds&queueId=1&description='
