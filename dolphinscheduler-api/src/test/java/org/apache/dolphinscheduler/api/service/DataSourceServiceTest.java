@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -33,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlD
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -62,7 +62,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
-@PrepareForTest({DatasourceUtil.class, CommonUtils.class})
+@PrepareForTest({DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class DataSourceServiceTest {
 
     @InjectMocks
@@ -309,11 +309,12 @@ public class DataSourceServiceTest {
         oracleDatasourceParamDTO.setConnectType(DbConnectType.ORACLE_SERVICE_NAME);
 
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(oracleDatasourceParamDTO);
-        String expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\","
-                + "\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
+        String expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\","
+                + "\"driverClassName\":\"oracle.jdbc.OracleDriver\",\"validationQuery\":\"select 1 from dual\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
         PowerMockito.mockStatic(CommonUtils.class);
+        PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(true);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
@@ -327,8 +328,8 @@ public class DataSourceServiceTest {
         hiveDataSourceParamDTO.setLoginUserKeytabPath("/opt/hdfs.headless.keytab");
         hiveDataSourceParamDTO.setLoginUserKeytabUsername("test2/hdfs-mycluster@ESZ.COM");
         connectionParam = DatasourceUtil.buildConnectionParams(hiveDataSourceParamDTO);
-        expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:hive2://192.168.9.1:10000\","
-                + "\"database\":\"im\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im;principal=hive/hdfs-mycluster@ESZ.COM\",\"principal\":\"hive/hdfs-mycluster@ESZ.COM\","
+        expected = "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im;"
+                + "principal=hive/hdfs-mycluster@ESZ.COM\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"validationQuery\":\"select 1\",\"principal\":\"hive/hdfs-mycluster@ESZ.COM\","
                 + "\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\",\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\",\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
@@ -398,12 +399,15 @@ public class DataSourceServiceTest {
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(postgreSqlDatasourceParam);
 
         PowerMockito.mockStatic(DatasourceUtil.class);
+        PowerMockito.mockStatic(DataSourceClientProvider.class);
+        DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
+        PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
 
         Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
         Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.when(DataSourceClientProvider.getInstance().getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+        PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
         result = dataSourceService.checkConnection(dataSourceType, connectionParam);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 

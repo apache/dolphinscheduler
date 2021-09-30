@@ -81,7 +81,7 @@ public class DataSourceClientProvider {
         return dataSourceClient.getConnection();
     }
 
-    public void initDataSourcePlugin() {
+    private void initDataSourcePlugin() {
         dataSourcePluginManager = new DataSourcePluginManager();
         DolphinPluginManagerConfig datasourcePluginManagerConfig = new DolphinPluginManagerConfig();
         datasourcePluginManagerConfig.setPlugins(PropertyUtils.getString(Constants.DATASOURCE_PLUGIN_BINDING));
