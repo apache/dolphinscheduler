@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class PigeonTaskChannelFactory implements TaskChannelFactory {
 
     @Override
