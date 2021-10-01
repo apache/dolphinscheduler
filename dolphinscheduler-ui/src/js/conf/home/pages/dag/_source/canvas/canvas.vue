@@ -572,7 +572,6 @@
        */
       genNodeJSON (id, taskType, taskName, coordinate = { x: 100, y: 100 }) {
         id += ''
-        console.log(taskType)
         const url = require(`../images/task-icos/${taskType.toLocaleLowerCase()}.png`)
         const truncation = taskName ? this.truncateText(taskName, 18) : id
         return {
