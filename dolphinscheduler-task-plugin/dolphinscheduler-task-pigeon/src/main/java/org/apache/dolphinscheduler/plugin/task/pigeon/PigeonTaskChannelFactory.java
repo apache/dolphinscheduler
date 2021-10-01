@@ -36,12 +36,13 @@ public class PigeonTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "TIS";
+        return "PIGEON";
     }
 
     @Override
     public List<PluginParams> getParams() {
-        InputParam webHookParam = InputParam.newBuilder(PigeonParamsConstants.NAME_TARGET_JOB_NAME, PigeonParamsConstants.TARGET_JOB_NAME)
+        InputParam webHookParam
+                = InputParam.newBuilder(PigeonParamsConstants.NAME_TARGET_JOB_NAME, PigeonParamsConstants.TARGET_JOB_NAME)
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
         return Arrays.asList(webHookParam);

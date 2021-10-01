@@ -45,7 +45,7 @@ import com.github.dreamhead.moco.HttpServer;
 
 public class PigeonTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(PigeonTaskTest.class);
-    private PigeonTask tisTask;
+    private PigeonTask pigeonTask;
 
     private TaskRequest taskExecutionContext;
 
@@ -55,7 +55,7 @@ public class PigeonTaskTest {
         String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
 
         taskExecutionContext = Mockito.mock(TaskRequest.class);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("tislogger");
+        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("pigeonlogger");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
@@ -65,11 +65,11 @@ public class PigeonTaskTest {
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         //        Mockito.when(taskExecutionContext.getVarPool())
         //                .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST + "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
-        Map<String, String> gloabParams = Collections.singletonMap(PigeonTask.KEY_POOL_VAR_TIS_HOST, "127.0.0.1:8080");
+        Map<String, String> gloabParams = Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
-        tisTask = new PigeonTask(taskExecutionContext);
-        tisTask.init();
+        pigeonTask = new PigeonTask(taskExecutionContext);
+        pigeonTask.init();
 
     }
 
@@ -96,7 +96,7 @@ public class PigeonTaskTest {
     public void testInit()
             throws Exception {
         try {
-            tisTask.init();
+            pigeonTask.init();
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
@@ -105,12 +105,12 @@ public class PigeonTaskTest {
     @Test
     public void testHandle()
             throws Exception {
-        HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/tis/TISTaskTest.json"));
+        HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/pigeon/PigeonTaskTest.json"));
 
         running(server, () -> {
-            tisTask.handle();
+            pigeonTask.handle();
 
-            Assert.assertEquals("TIS execute be success", ExecutionStatus.SUCCESS, tisTask.getExitStatus());
+            Assert.assertEquals("PIGEON execute be success", ExecutionStatus.SUCCESS, pigeonTask.getExitStatus());
         });
     }
 

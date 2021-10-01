@@ -21,10 +21,15 @@ import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PigeonTaskChannel implements TaskChannel {
+    private static final Logger logger = LoggerFactory.getLogger(PigeonTaskChannel.class);
+
     @Override
     public void cancelApplication(boolean status) {
-
+        logger.info("pigeon task cancel");
     }
 
     @Override

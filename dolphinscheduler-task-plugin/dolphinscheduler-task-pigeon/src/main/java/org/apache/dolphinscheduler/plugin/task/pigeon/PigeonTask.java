@@ -50,49 +50,49 @@ import org.java_websocket.handshake.ServerHandshake;
  **/
 public class PigeonTask extends AbstractTaskExecutor {
 
-    public static final String KEY_POOL_VAR_TIS_HOST = "tisHost";
+    public static final String KEY_POOL_VAR_PIGEON_HOST = "p_host";
     private final TaskRequest taskExecutionContext;
 
-    private PigeonParameters tisParameters;
+    private PigeonParameters parameters;
     private BizResult triggerResult;
-    private final PigeonConfig tisConfig;
+    private final PigeonConfig config;
 
     public PigeonTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
-        this.tisConfig = PigeonConfig.getInstance();
+        this.config = PigeonConfig.getInstance();
     }
 
     @Override
     public void init() {
         super.init();
-        logger.info("tis task params {}", taskExecutionContext.getTaskParams());
-        tisParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
-        if (!tisParameters.checkParameters()) {
+        logger.info("PIGEON task params {}", taskExecutionContext.getTaskParams());
+        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
+        if (!parameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
     }
 
     @Override
     public void handle() throws Exception {
-        // Trigger TIS DataX pipeline
-        logger.info("start execute TIS task");
+        // Trigger PIGEON DataX pipeline
+        logger.info("start execute PIGEON task");
         long startTime = System.currentTimeMillis();
-        String targetJobName = this.tisParameters.getTargetJobName();
-        String tisHost = getTisHost();
+        String targetJobName = this.parameters.getTargetJobName();
+        String host = getHost();
         try {
             final String triggerUrl = getTriggerUrl();
-            final String getStatusUrl = tisConfig.getJobStatusUrl(tisHost);
+            final String getStatusUrl = config.getJobStatusUrl(host);
             HttpPost post = new HttpPost(triggerUrl);
             post.addHeader("appname", targetJobName);
             addFormUrlencoded(post);
-            StringEntity entity = new StringEntity(tisConfig.getJobTriggerPostBody(), StandardCharsets.UTF_8);
+            StringEntity entity = new StringEntity(config.getJobTriggerPostBody(), StandardCharsets.UTF_8);
             post.setEntity(entity);
             ExecResult execState = null;
             int taskId;
             WebSocketClient webSocket = null;
             try (CloseableHttpClient client = HttpClients.createDefault();
-                 // trigger to start TIS dataX task
+                 // trigger to start PIGEON dataX task
                  CloseableHttpResponse response = client.execute(post)) {
                 triggerResult = processResponse(triggerUrl, response, BizResult.class);
                 if (!triggerResult.isSuccess()) {
@@ -101,11 +101,11 @@ public class PigeonTask extends AbstractTaskExecutor {
                     if (CollectionUtils.isNotEmpty(errormsg)) {
                         errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
                     }
-                    throw new Exception("trigger TIS job faild taskName:" + targetJobName + errs.toString());
+                    throw new Exception("trigger PIGEON job faild taskName:" + targetJobName + errs.toString());
                 }
                 taskId = triggerResult.getBizresult().getTaskid();
 
-                webSocket = receiveRealtimeLog(tisHost, targetJobName, taskId);
+                webSocket = receiveRealtimeLog(host, targetJobName, taskId);
 
                 setAppIds(String.valueOf(taskId));
 
@@ -141,11 +141,11 @@ public class PigeonTask extends AbstractTaskExecutor {
             }
 
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("TIS task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
+            logger.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
                     targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
             setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS : TaskConstants.EXIT_CODE_FAILURE);
         } catch (Exception e) {
-            logger.error("execute TIS dataX faild,TIS task name:" + targetJobName, e);
+            logger.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -165,7 +165,7 @@ public class PigeonTask extends AbstractTaskExecutor {
         logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
         final String triggerUrl = getTriggerUrl();
 
-        StringEntity entity = new StringEntity(tisConfig.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
+        StringEntity entity = new StringEntity(config.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
 
         CancelResult cancelResult = null;
         HttpPost post = new HttpPost(triggerUrl);
@@ -181,26 +181,26 @@ public class PigeonTask extends AbstractTaskExecutor {
                 if (org.apache.dolphinscheduler.spi.utils.CollectionUtils.isNotEmpty(errormsg)) {
                     errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
                 }
-                throw new Exception("cancel TIS job faild taskId:" + triggerResult.getTaskId() + errs.toString());
+                throw new Exception("cancel PIGEON job faild taskId:" + triggerResult.getTaskId() + errs.toString());
             }
         }
     }
 
     private String getTriggerUrl() {
-        final String tisHost = getTisHost();
-        return tisConfig.getJobTriggerUrl(tisHost);
+        final String tisHost = getHost();
+        return config.getJobTriggerUrl(tisHost);
     }
 
-    private String getTisHost() {
-        final String tisHost = taskExecutionContext.getDefinedParams().get(KEY_POOL_VAR_TIS_HOST);
-        if (StringUtils.isEmpty(tisHost)) {
-            throw new IllegalStateException("global var '" + KEY_POOL_VAR_TIS_HOST + "' can not be empty");
+    private String getHost() {
+        final String host = taskExecutionContext.getDefinedParams().get(KEY_POOL_VAR_PIGEON_HOST);
+        if (StringUtils.isEmpty(host)) {
+            throw new IllegalStateException("global var '" + KEY_POOL_VAR_PIGEON_HOST + "' can not be empty");
         }
-        return tisHost;
+        return host;
     }
 
     private WebSocketClient receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws Exception {
-        final String applyURI = tisConfig.getJobLogsFetchUrl(tisHost, dataXName, taskId);
+        final String applyURI = config.getJobLogsFetchUrl(tisHost, dataXName, taskId);
         logger.info("apply ws connection,uri:{}", applyURI);
         WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
             @Override
@@ -241,8 +241,8 @@ public class PigeonTask extends AbstractTaskExecutor {
 
     @Override
     public AbstractParameters getParameters() {
-        Objects.requireNonNull(this.tisParameters, "tisParameters can not be null");
-        return this.tisParameters;
+        Objects.requireNonNull(this.parameters, "tisParameters can not be null");
+        return this.parameters;
     }
 
     private static class CancelResult extends AjaxResult<Object> {

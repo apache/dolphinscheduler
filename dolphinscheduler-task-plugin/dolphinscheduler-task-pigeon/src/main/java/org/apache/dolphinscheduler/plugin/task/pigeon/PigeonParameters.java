@@ -34,7 +34,7 @@ public class PigeonParameters extends AbstractParameters {
 
     private static final Logger logger = LoggerFactory.getLogger(PigeonParameters.class);
     /**
-     * TIS target job name
+     * Pigeon target job name
      */
     private String targetJobName;
 

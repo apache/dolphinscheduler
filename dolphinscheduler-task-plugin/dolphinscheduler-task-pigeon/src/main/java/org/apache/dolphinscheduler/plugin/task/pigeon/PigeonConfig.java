@@ -67,9 +67,9 @@ public class PigeonConfig {
         return String.format(jobStatusPostBody, taskId);
     }
 
-    public String getJobLogsFetchUrl(String tisHost, String jobName, int taskId) {
-        checkHost(tisHost);
-        return String.format(jobLogsFetchUrl, tisHost, jobName, taskId);
+    public String getJobLogsFetchUrl(String host, String jobName, int taskId) {
+        checkHost(host);
+        return String.format(jobLogsFetchUrl, host, jobName, taskId);
     }
 
     public String getJobStatusUrl(String tisHost) {
