@@ -449,6 +449,11 @@ public final class Constants {
      */
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
 
+    /**
+     * complement date default cron string
+     */
+    public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
+
 
     /**
      * data source config
@@ -502,6 +507,11 @@ public final class Constants {
      * sleep time
      */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * one second mils
+     */
+    public static final int SECOND_TIME_MILLIS = 1000;
 
     /**
      * master task instance cache-database refresh interval
@@ -1083,4 +1093,11 @@ public final class Constants {
     public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
     public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
     public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
+
+    /**
+     * dry run flag
+     */
+    public static final int DRY_RUN_FLAG_NO = 0;
+    public static final int DRY_RUN_FLAG_YES = 1;
+
 }

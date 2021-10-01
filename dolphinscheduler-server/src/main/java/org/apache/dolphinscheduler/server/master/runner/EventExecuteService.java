@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
@@ -36,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +105,8 @@ public class EventExecuteService extends Thread {
         while (Stopper.isRunning()) {
             try {
                 eventHandler();
+
+                TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
 
             } catch (Exception e) {
                 logger.error("Event service thread error", e);

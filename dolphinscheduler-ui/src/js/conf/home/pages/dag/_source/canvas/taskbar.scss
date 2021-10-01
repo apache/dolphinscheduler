@@ -93,6 +93,9 @@
           &.icos-datax {
             background-image: url("../images/task-icos/datax.png");
           }
+          &.icos-pigeon {
+            background-image: url("../images/task-icos/pigeon.png");
+          }
           &.icos-sqoop {
             background-image: url("../images/task-icos/sqoop.png");
           }
@@ -107,9 +110,6 @@
           }
           &.icos-switch {
             background-image: url("../images/task-icos/switch.png");
-          }
-          &.icos-tis {
-            background-image: url("../images/task-icos/tis.png");
           }
         }
 
@@ -153,6 +153,9 @@
             &.icos-datax {
               background-image: url("../images/task-icos/datax_hover.png");
             }
+            &.icos-pigeon {
+              background-image: url("../images/task-icos/pigeon_hover.png");
+            }
             &.icos-sqoop {
               background-image: url("../images/task-icos/sqoop_hover.png");
             }
@@ -167,9 +170,6 @@
             }
             &.icos-switch {
               background-image: url("../images/task-icos/switch_hover.png");
-            }
-            &.icos-tis {
-              background-image: url("../images/task-icos/tis_hover.png");
             }
           }
         }

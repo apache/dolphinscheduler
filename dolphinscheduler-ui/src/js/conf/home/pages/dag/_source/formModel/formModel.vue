@@ -264,15 +264,6 @@
             :backfill-item="backfillItem"
           >
           </m-shell>
-          <!-- waterdrop node -->
-          <m-waterdrop
-            v-if="nodeData.taskType === 'WATERDROP'"
-            @on-params="_onParams"
-            @on-cache-params="_onCacheParams"
-            ref="WATERDROP"
-            :backfill-item="backfillItem"
-          >
-          </m-waterdrop>
           <!-- sub_process node -->
           <m-sub-process
             v-if="nodeData.taskType === 'SUB_PROCESS'"
@@ -362,6 +353,13 @@
             :backfill-item="backfillItem"
           >
           </m-datax>
+        <m-pigeon
+          v-if="nodeData.taskType === 'PIGEON'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          :backfill-item="backfillItem"
+          ref="PIGEON">
+        </m-pigeon>
           <m-sqoop
             v-if="nodeData.taskType === 'SQOOP'"
             @on-params="_onParams"
@@ -386,6 +384,15 @@
             :backfill-item="backfillItem"
             :nodeData="nodeData"
           ></m-switch>
+          <!-- waterdrop node -->
+          <m-waterdrop
+            v-if="nodeData.taskType === 'WATERDROP'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="WATERDROP"
+            :backfill-item="backfillItem"
+          >
+          </m-waterdrop>
         </div>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
@@ -430,6 +437,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mPigeon from './tasks/pigeon'
   import mConditions from './tasks/conditions'
   import mSwitch from './tasks/switch.vue'
   import mSqoop from './tasks/sqoop'
@@ -968,6 +976,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mPigeon,
       mSqoop,
       mConditions,
       mSwitch,
