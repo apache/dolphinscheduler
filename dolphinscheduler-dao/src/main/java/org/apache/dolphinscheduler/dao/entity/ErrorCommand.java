@@ -120,7 +120,12 @@ public class ErrorCommand {
      */
     private Long environmentCode;
 
-    public ErrorCommand(){}
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+
+    public ErrorCommand() {}
 
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
@@ -138,6 +143,7 @@ public class ErrorCommand {
         this.environmentCode = command.getEnvironmentCode();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
+        this.dryRun = command.getDryRun();
     }
 
     public TaskDependType getTaskDependType() {
@@ -268,6 +274,14 @@ public class ErrorCommand {
         this.environmentCode = environmentCode;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     @Override
     public String toString() {
         return "ErrorCommand{"
@@ -287,6 +301,7 @@ public class ErrorCommand {
                 + ", message='" + message + '\''
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode='" + environmentCode + '\''
+                + ", dryRun='" + dryRun + '\''
                 + '}';
     }
 }
