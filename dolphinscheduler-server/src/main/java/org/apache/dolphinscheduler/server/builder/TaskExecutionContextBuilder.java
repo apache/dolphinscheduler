@@ -61,6 +61,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setResources(taskInstance.getResources());
         taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
         taskExecutionContext.setVarPool(taskInstance.getVarPool());
+        taskExecutionContext.setDryRun(taskInstance.getDryRun());
         return this;
     }
 
