@@ -233,6 +233,11 @@ public class TaskExecutionContext implements Serializable {
     private String varPool;
 
     /**
+     * dry run flag
+     */
+    private int dryRun;
+
+    /**
      * business param
      */
     private Map<String, Property> paramsMap;
@@ -552,6 +557,14 @@ public class TaskExecutionContext implements Serializable {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{"
@@ -579,6 +592,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", projectCode=" + projectCode
                 + ", taskParams='" + taskParams + '\''
                 + ", envFile='" + envFile + '\''
+                + ", dryRun='" + dryRun + '\''
                 + ", definedParams=" + definedParams
                 + ", taskAppId='" + taskAppId + '\''
                 + ", taskTimeoutStrategy=" + taskTimeoutStrategy
