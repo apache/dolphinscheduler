@@ -43,7 +43,6 @@ type AlertGroup {
     createUserId: Int
 }
 
-# dev 版本建表无alert_type
 enum AlertType {
     EMAIL
     SMS
