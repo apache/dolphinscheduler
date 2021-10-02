@@ -29,56 +29,7 @@ public class GraphQLProvider {
     @Value("classpath:schema/AccessToken.graphql")
     Resource accessTokenResource;
 
-    @Value("classpath:schema/DataAnalysis.graphql")
-    Resource dataAnalysisResource;
 
-    @Value("classpath:schema/DataSource.graphql")
-    Resource dataSourceResource;
-
-    @Value("classpath:schema/Executor.graphql")
-    Resource executorResource;
-
-    @Value("classpath:schema/AlertPluginInstance.graphql")
-    Resource alertPluginInstanceResource;
-
-    @Value("classpath:schema/Monitor.graphql")
-    Resource monitorResource;
-
-    @Value("classpath:schema/ProcessDefinition.graphql")
-    Resource processDefinitionResource;
-
-    @Value("classpath:schema/ProcessInstance.graphql")
-    Resource processInstanceResource;
-
-    @Value("classpath:schema/Project.graphql")
-    Resource projectResource;
-
-    @Value("classpath:schema/Queue.graphql")
-    Resource queueResource;
-
-    @Value("classpath:schema/Resources.graphql")
-    Resource resourcesResource;
-
-    @Value("classpath:schema/Schedule.graphql")
-    Resource scheduleResource;
-
-    @Value("classpath:schema/TaskInstance.graphql")
-    Resource taskInstanceResource;
-
-    @Value("classpath:schema/Tenant.graphql")
-    Resource tenantResource;
-
-    @Value("classpath:schema/UiPlugin.graphql")
-    Resource uiPluginResource;
-
-    @Value("classpath:schema/User.graphql")
-    Resource userResource;
-
-    @Value("classpath:schema/WorkGroup.graphql")
-    Resource workGroupResource;
-
-    @Value("classpath:schema/WorkFlowLineage.graphql")
-    Resource workFlowLineageResource;
 
     private GraphQL graphQL;
 
@@ -99,23 +50,6 @@ public class GraphQLProvider {
         File schemaFile = schemaResource.getFile();
         File alertGroupFile = alertGroupResource.getFile();
         File accessTokenFile = accessTokenResource.getFile();
-        File dataAnalysisFile = dataAnalysisResource.getFile();
-        File dataSourceFile = dataSourceResource.getFile();
-        File executorFile = executorResource.getFile();
-        File alertPluginInstanceFile = alertPluginInstanceResource.getFile();
-        File monitorFile = monitorResource.getFile();
-        File processDefinitionFile = processDefinitionResource.getFile();
-        File processInstanceFile = processInstanceResource.getFile();
-        File projectFile = projectResource.getFile();
-        File queueFile = queueResource.getFile();
-        File resourcesFile = resourcesResource.getFile();
-        File scheduleFile = scheduleResource.getFile();
-        File taskInstanceFile = taskInstanceResource.getFile();
-        File tenantFile = tenantResource.getFile();
-        File uiPluginFile = uiPluginResource.getFile();
-        File userFile = userResource.getFile();
-        File workGroupFIle = workGroupResource.getFile();
-        File workFlowLineageFile = workFlowLineageResource.getFile();
 
         // parse schema
         TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
@@ -123,23 +57,6 @@ public class GraphQLProvider {
         typeRegistry.merge(schemaParser.parse(schemaFile));
         typeRegistry.merge(schemaParser.parse(alertGroupFile));
         typeRegistry.merge(schemaParser.parse(accessTokenFile));
-        typeRegistry.merge(schemaParser.parse(dataAnalysisFile));
-        typeRegistry.merge(schemaParser.parse(dataSourceFile));
-        typeRegistry.merge(schemaParser.parse(executorFile));
-        typeRegistry.merge(schemaParser.parse(alertPluginInstanceFile));
-        typeRegistry.merge(schemaParser.parse(monitorFile));
-        typeRegistry.merge(schemaParser.parse(processDefinitionFile));
-        typeRegistry.merge(schemaParser.parse(processInstanceFile));
-        typeRegistry.merge(schemaParser.parse(projectFile));
-        typeRegistry.merge(schemaParser.parse(queueFile));
-        typeRegistry.merge(schemaParser.parse(resourcesFile));
-        typeRegistry.merge(schemaParser.parse(scheduleFile));
-        typeRegistry.merge(schemaParser.parse(taskInstanceFile));
-        typeRegistry.merge(schemaParser.parse(tenantFile));
-        typeRegistry.merge(schemaParser.parse(uiPluginFile));
-        typeRegistry.merge(schemaParser.parse(userFile));
-        typeRegistry.merge(schemaParser.parse(workGroupFIle));
-        typeRegistry.merge(schemaParser.parse(workFlowLineageFile));
 
         RuntimeWiring wiring = graphQLWiring.buildWiring();
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
