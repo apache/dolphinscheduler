@@ -258,6 +258,8 @@ CREATE TABLE t_ds_command (
   PRIMARY KEY (id)
 ) ;
 
+create index priority_id_index on t_ds_command (process_instance_priority,id);
+
 --
 -- Table structure for table t_ds_datasource
 --

@@ -327,7 +327,8 @@ CREATE TABLE t_ds_command
     process_instance_priority int(11) DEFAULT NULL,
     worker_group              varchar(64),
     environment_code          bigint(20) DEFAULT '-1',
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    KEY priority_id_index (process_instance_priority, id)
 );
 
 -- ----------------------------

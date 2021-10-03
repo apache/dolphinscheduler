@@ -257,10 +257,6 @@ const tasksType = {
     desc: 'SHELL',
     color: '#646464'
   },
-  WATERDROP: {
-    desc: 'WATERDROP',
-    color: '#646465'
-  },
   SUB_PROCESS: {
     desc: 'SUB_PROCESS',
     color: '#0097e0'
@@ -301,8 +297,8 @@ const tasksType = {
     desc: 'DataX',
     color: '#1fc747'
   },
-  TIS: {
-    desc: 'TIS',
+  PIGEON: {
+    desc: 'PIGEON',
     color: '#1fc747'
   },
   SQOOP: {
@@ -316,6 +312,10 @@ const tasksType = {
   SWITCH: {
     desc: 'SWITCH',
     color: '#E46F13'
+  },
+  WATERDROP: {
+    desc: 'WATERDROP',
+    color: '#646465'
   }
 }
 
