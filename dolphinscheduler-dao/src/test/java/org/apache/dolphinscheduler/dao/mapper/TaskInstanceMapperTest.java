@@ -66,6 +66,7 @@ public class TaskInstanceMapperTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningGroupId(0);
         processInstance.setCommandParam("");
+        processInstance.setProcessDefinitionCode(1L);
         processInstanceMapper.insert(processInstance);
         processInstanceId = processInstance.getId();
     }
