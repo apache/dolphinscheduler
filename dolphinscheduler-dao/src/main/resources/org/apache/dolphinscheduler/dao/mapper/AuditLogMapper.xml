@@ -35,7 +35,7 @@
                 #{i}
             </foreach>
         </if>
-        <if test="operationType != null and operationType != ''">
+        <if test="operationType != null and operationType.length > 0">
             and log.operation in
             <foreach collection="operationType" index="index" item="j" open="(" separator="," close=")">
                 #{j}
