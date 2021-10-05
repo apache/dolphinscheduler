@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.dolphinscheduler.spi.task.TaskKillListener;
 
 /**
  * to master/worker task transport
@@ -219,6 +220,30 @@ public class TaskRequest {
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+
+    /**
+     * task kill listener
+     */
+    private transient TaskKillListener taskKillListener;
+
+
+    /**
+     * kill non-shell process
+     */
+    public void killTask() {
+        if (taskKillListener != null) {
+            taskKillListener.kill();
+        }
+    }
+
+    /**
+     * register a listener to kill task
+     * @param listener
+     */
+    public void registerListener(TaskKillListener listener) {
+        this.taskKillListener = listener;
+    }
 
     public Map<String, String> getResources() {
         return resources;

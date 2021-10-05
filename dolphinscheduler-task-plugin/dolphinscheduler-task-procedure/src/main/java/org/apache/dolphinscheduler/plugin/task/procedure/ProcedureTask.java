@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.TaskKillListener;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -62,12 +63,19 @@ public class ProcedureTask extends AbstractTaskExecutor {
     private TaskRequest taskExecutionContext;
 
     /**
+     * statement
+     */
+    private CallableStatement stmt = null;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
      */
     public ProcedureTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
+
+        taskExecutionContext.registerListener(new ProcedureTaskKillListener());
 
         this.taskExecutionContext = taskExecutionContext;
 
@@ -94,7 +102,6 @@ public class ProcedureTask extends AbstractTaskExecutor {
                 procedureParameters.getLocalParams());
 
         Connection connection = null;
-        CallableStatement stmt = null;
         try {
             // load class
             DbType dbType = DbType.valueOf(procedureParameters.getType());
@@ -321,6 +328,28 @@ public class ProcedureTask extends AbstractTaskExecutor {
             stmt.registerOutParameter(index, sqlType);
         } else {
             stmt.registerOutParameter(index, sqlType, value);
+        }
+    }
+
+    class ProcedureTaskKillListener implements TaskKillListener {
+
+        @Override
+        public void kill() {
+            try {
+                if (stmt != null && !stmt.isClosed()) {
+                    stmt.cancel();
+                }
+            } catch (SQLException e) {
+                logger.error("cancel procedure occur an error", e);
+            } finally {
+                try {
+                    if (stmt != null && !stmt.isClosed()) {
+                        stmt.close();
+                    }
+                } catch (SQLException e) {
+                    logger.error("close db connection error", e);
+                }
+            }
         }
     }
 }
