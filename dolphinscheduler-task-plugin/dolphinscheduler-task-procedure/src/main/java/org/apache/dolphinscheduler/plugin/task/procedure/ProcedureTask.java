@@ -63,6 +63,11 @@ public class ProcedureTask extends AbstractTaskExecutor {
     private TaskRequest taskExecutionContext;
 
     /**
+     * connection
+     */
+    private Connection connection = null;
+
+    /**
      * statement
      */
     private CallableStatement stmt = null;
@@ -101,7 +106,6 @@ public class ProcedureTask extends AbstractTaskExecutor {
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        Connection connection = null;
         try {
             // load class
             DbType dbType = DbType.valueOf(procedureParameters.getType());
@@ -113,7 +117,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
             connection = DatasourceUtil.getConnection(dbType, connectionParam);
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
             // call method
             stmt = connection.prepareCall(procedureParameters.getMethod());
@@ -219,19 +223,19 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @param connection connection
      */
     private void close(PreparedStatement stmt, Connection connection) {
-        if (stmt != null) {
-            try {
+        try {
+            if (stmt != null && !stmt.isClosed()) {
                 stmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
             }
+        } catch (SQLException e) {
+            logger.error("close prepared statement error : {}", e.getMessage(), e);
         }
-        if (connection != null) {
-            try {
+        try {
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
-            } catch (SQLException e) {
-                logger.error("close connection error : {}", e.getMessage(), e);
             }
+        } catch (SQLException e) {
+            logger.error("close connection error : {}", e.getMessage(), e);
         }
     }
 
@@ -342,13 +346,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
             } catch (SQLException e) {
                 logger.error("cancel procedure occur an error", e);
             } finally {
-                try {
-                    if (stmt != null && !stmt.isClosed()) {
-                        stmt.close();
-                    }
-                } catch (SQLException e) {
-                    logger.error("close db connection error", e);
-                }
+                close(stmt, connection);
             }
         }
     }
