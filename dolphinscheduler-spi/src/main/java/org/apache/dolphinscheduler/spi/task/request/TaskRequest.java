@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.spi.task.request;
 
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.spi.task.TaskKillListener;
 
 import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.spi.task.TaskKillListener;
 
 /**
  * to master/worker task transport
@@ -221,12 +221,10 @@ public class TaskRequest {
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
-
     /**
      * task kill listener
      */
-    private transient TaskKillListener taskKillListener;
-
+    private TaskKillListener taskKillListener;
 
     /**
      * kill non-shell process
