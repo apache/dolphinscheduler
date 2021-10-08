@@ -478,8 +478,7 @@ CREATE TABLE t_ds_task_definition
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
-    PRIMARY KEY (id, code),
-    UNIQUE KEY task_unique (name,project_code) USING BTREE
+    PRIMARY KEY (id, code)
 );
 
 -- ----------------------------

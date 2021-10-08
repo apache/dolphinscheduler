@@ -382,6 +382,23 @@ CREATE TABLE t_ds_environment_worker_group_relation (
 ALTER TABLE t_ds_task_definition ALTER COLUMN resource_ids TYPE text;
 ALTER TABLE t_ds_task_definition_log ALTER COLUMN resource_ids TYPE text;
 
+-- uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName() RETURNS void AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_stat_all_indexes
+          WHERE relname='t_ds_task_definition'
+                            AND indexrelname ='task_definition_unique')
+        ALTER TABLE t_ds_task_definition drop CONSTRAINT task_definition_unique;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
