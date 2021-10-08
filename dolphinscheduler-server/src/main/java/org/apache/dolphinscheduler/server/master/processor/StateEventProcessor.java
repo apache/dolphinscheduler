@@ -61,8 +61,12 @@ public class StateEventProcessor implements NettyRequestProcessor {
 
         StateEventChangeCommand stateEventChangeCommand = JSONUtils.parseObject(command.getBody(), StateEventChangeCommand.class);
         StateEvent stateEvent = new StateEvent();
-        stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         stateEvent.setKey(stateEventChangeCommand.getKey());
+        if (stateEventChangeCommand.getSourceProcessInstanceId() != stateEventChangeCommand.getDestProcessInstanceId()) {
+            stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        } else {
+            stateEvent.setExecutionStatus(stateEventChangeCommand.getSourceStatus());
+        }
         stateEvent.setProcessInstanceId(stateEventChangeCommand.getDestProcessInstanceId());
         stateEvent.setTaskInstanceId(stateEventChangeCommand.getDestTaskInstanceId());
         StateEventType type = stateEvent.getTaskInstanceId() == 0 ? StateEventType.PROCESS_STATE_CHANGE : StateEventType.TASK_STATE_CHANGE;
