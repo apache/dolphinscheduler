@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
@@ -246,7 +247,7 @@ public class FileUtils {
             while ((length = inputStream.read(buffer)) != -1) {
                 output.write(buffer, 0, length);
             }
-            return output.toString();
+            return output.toString(UTF_8);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
