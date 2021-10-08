@@ -416,7 +416,7 @@ public class WorkflowExecuteThread implements Runnable {
             if (stateEvent.getExecutionStatus().typeIsFinished()) {
                 endProcess();
             }
-            if (stateEvent.getExecutionStatus() == ExecutionStatus.READY_STOP) {
+            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
                 killAllTasks();
             }
             return true;

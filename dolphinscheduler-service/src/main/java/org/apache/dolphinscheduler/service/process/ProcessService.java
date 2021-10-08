@@ -222,10 +222,6 @@ public class ProcessService {
             moveToErrorCommand(command, "process instance is null");
             return null;
         }
-        if (!checkThreadNum(command, validThreadNum)) {
-            logger.info("there is not enough thread for this command: {}", command);
-            return setWaitingThreadProcess(command, processInstance);
-        }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
