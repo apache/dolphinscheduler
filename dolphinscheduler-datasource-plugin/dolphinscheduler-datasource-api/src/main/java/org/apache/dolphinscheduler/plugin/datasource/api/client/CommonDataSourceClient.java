@@ -41,7 +41,6 @@ public class CommonDataSourceClient implements DataSourceClient {
     public static final String COMMON_USER = "root";
     public static final String COMMON_PASSWORD = "123456";
     public static final String COMMON_VALIDATION_QUERY = "select 1";
-    private String quote;
 
     protected final BaseConnectionParam baseConnectionParam;
     protected DruidDataSource druidDataSource;
