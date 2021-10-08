@@ -346,6 +346,7 @@ BEGIN
                    WHERE TABLE_NAME='t_ds_task_definition'
                      AND TABLE_SCHEMA=(SELECT DATABASE())
                      AND INDEX_NAME ='task_unique')
+    THEN
         ALTER TABLE t_ds_task_definition drop INDEX `task_unique`;
     END IF;
 END;
