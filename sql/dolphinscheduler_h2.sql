@@ -469,7 +469,7 @@ CREATE TABLE t_ds_task_definition
     timeout_notify_strategy tinyint(4) DEFAULT NULL,
     timeout                 int(11) DEFAULT '0',
     delay_time              int(11) DEFAULT '0',
-    resource_ids            varchar(255) DEFAULT NULL,
+    resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
     PRIMARY KEY (id, code)
@@ -500,7 +500,7 @@ CREATE TABLE t_ds_task_definition_log
     timeout_notify_strategy tinyint(4) DEFAULT NULL,
     timeout                 int(11) DEFAULT '0',
     delay_time              int(11) DEFAULT '0',
-    resource_ids            varchar(255) DEFAULT NULL,
+    resource_ids            text,
     operator                int(11) DEFAULT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,

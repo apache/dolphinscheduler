@@ -443,6 +443,9 @@ ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) defau
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text COMMENT 'environment config' AFTER `environment_code`;
 
+ALTER TABLE t_ds_task_definition MODIFY COLUMN `resource_ids` text;
+ALTER TABLE t_ds_task_definition_log MODIFY COLUMN `resource_ids` text;
+
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
 -- ----------------------------
