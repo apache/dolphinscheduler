@@ -1155,18 +1155,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, List<TreeViewDto>> en = iter.next();
-                String nodeName = en.getKey();
+                String nodeCode = en.getKey();
                 parentTreeViewDtoList = en.getValue();
 
                 TreeViewDto treeViewDto = new TreeViewDto();
-                treeViewDto.setName(nodeName);
-                TaskNode taskNode = dag.getNode(nodeName);
+                TaskNode taskNode = dag.getNode(nodeCode);
                 treeViewDto.setType(taskNode.getType());
                 treeViewDto.setCode(taskNode.getCode());
+                treeViewDto.setName(taskNode.getName());
                 //set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
-                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), nodeName);
+                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(), Long.parseLong(nodeCode));
                     if (taskInstance == null) {
                         treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
@@ -1188,18 +1188,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
                     pTreeViewDto.getChildren().add(treeViewDto);
                 }
-                postNodeList = dag.getSubsequentNodes(nodeName);
+                postNodeList = dag.getSubsequentNodes(nodeCode);
                 if (CollectionUtils.isNotEmpty(postNodeList)) {
-                    for (String nextNodeName : postNodeList) {
-                        List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeName);
+                    for (String nextNodeCode : postNodeList) {
+                        List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeCode);
                         if (CollectionUtils.isEmpty(treeViewDtoList)) {
                             treeViewDtoList = new ArrayList<>();
                         }
                         treeViewDtoList.add(treeViewDto);
-                        waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
+                        waitingRunningNodeMap.put(nextNodeCode, treeViewDtoList);
                     }
                 }
-                runningNodeMap.remove(nodeName);
+                runningNodeMap.remove(nodeCode);
             }
             if (waitingRunningNodeMap.size() == 0) {
                 break;
@@ -1224,14 +1224,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         DAG<String, TaskNode, String> graph = new DAG<>();
         // Fill the vertices
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            graph.addNode(taskNodeResponse.getName(), taskNodeResponse);
+            graph.addNode(Long.toString(taskNodeResponse.getCode()), taskNodeResponse);
         }
         // Fill edge relations
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
             List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
             if (CollectionUtils.isNotEmpty(preTasks)) {
                 for (String preTask : preTasks) {
-                    if (!graph.addEdge(preTask, taskNodeResponse.getName())) {
+                    if (!graph.addEdge(preTask, Long.toString(taskNodeResponse.getCode()))) {
                         return true;
                     }
                 }

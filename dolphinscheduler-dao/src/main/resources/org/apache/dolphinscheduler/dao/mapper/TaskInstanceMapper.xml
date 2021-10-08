@@ -95,6 +95,15 @@
         and flag = 1
         limit 1
     </select>
+    <select id="queryByInstanceIdAndCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where process_instance_id = #{processInstanceId}
+        and task_code = #{taskCode}
+        and flag = 1
+        limit 1
+    </select>
     <select id="countTask" resultType="java.lang.Integer">
         select count(1) as count
         from t_ds_task_instance task,t_ds_task_definition_log define
