@@ -55,7 +55,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     MasterConfig masterConfig;
 
     @Autowired
-    NettyExecutorManager nettyExecutorManager;
+    NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
     /**
      * logger of MasterBaseTaskExecThread
