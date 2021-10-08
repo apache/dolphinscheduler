@@ -291,12 +291,14 @@ public class DagHelperTest {
         TaskNode node1 = new TaskNode();
         node1.setId("1");
         node1.setName("1");
+        node1.setCode(1);
         node1.setType(TaskType.SHELL.getDesc());
         taskNodeList.add(node1);
 
         TaskNode node2 = new TaskNode();
         node2.setId("2");
         node2.setName("2");
+        node2.setCode(2);
         node2.setType(TaskType.SHELL.getDesc());
         List<String> dep2 = new ArrayList<>();
         dep2.add("1");
@@ -306,12 +308,14 @@ public class DagHelperTest {
         TaskNode node4 = new TaskNode();
         node4.setId("4");
         node4.setName("4");
+        node4.setCode(4);
         node4.setType(TaskType.SHELL.getDesc());
         taskNodeList.add(node4);
 
         TaskNode node3 = new TaskNode();
         node3.setId("3");
         node3.setName("3");
+        node3.setCode(3);
         node3.setType(TaskType.SHELL.getDesc());
         List<String> dep3 = new ArrayList<>();
         dep3.add("2");
@@ -322,6 +326,7 @@ public class DagHelperTest {
         TaskNode node5 = new TaskNode();
         node5.setId("5");
         node5.setName("5");
+        node5.setCode(5);
         node5.setType(TaskType.SHELL.getDesc());
         List<String> dep5 = new ArrayList<>();
         dep5.add("3");
@@ -332,6 +337,7 @@ public class DagHelperTest {
         TaskNode node6 = new TaskNode();
         node6.setId("6");
         node6.setName("6");
+        node6.setCode(6);
         node6.setType(TaskType.SHELL.getDesc());
         List<String> dep6 = new ArrayList<>();
         dep6.add("3");
@@ -341,6 +347,7 @@ public class DagHelperTest {
         TaskNode node7 = new TaskNode();
         node7.setId("7");
         node7.setName("7");
+        node7.setCode(7);
         node7.setType(TaskType.SHELL.getDesc());
         List<String> dep7 = new ArrayList<>();
         dep7.add("5");
@@ -350,6 +357,7 @@ public class DagHelperTest {
         TaskNode node8 = new TaskNode();
         node8.setId("8");
         node8.setName("8");
+        node8.setCode(8);
         node8.setType(TaskType.SHELL.getDesc());
         List<String> dep8 = new ArrayList<>();
         dep8.add("2");
@@ -381,12 +389,14 @@ public class DagHelperTest {
         TaskNode node = new TaskNode();
         node.setId("0");
         node.setName("0");
+        node.setCode(0);
         node.setType("SHELL");
         taskNodeList.add(node);
 
         TaskNode node1 = new TaskNode();
         node1.setId("1");
         node1.setName("1");
+        node1.setCode(1);
         node1.setType("switch");
         node1.setDependence(JSONUtils.toJsonString(getSwitchNode()));
         taskNodeList.add(node1);
@@ -394,6 +404,7 @@ public class DagHelperTest {
         TaskNode node2 = new TaskNode();
         node2.setId("2");
         node2.setName("2");
+        node2.setCode(2);
         node2.setType("SHELL");
         List<String> dep2 = new ArrayList<>();
         dep2.add("1");
@@ -403,6 +414,7 @@ public class DagHelperTest {
         TaskNode node4 = new TaskNode();
         node4.setId("4");
         node4.setName("4");
+        node4.setCode(4);
         node4.setType("SHELL");
         List<String> dep4 = new ArrayList<>();
         dep4.add("1");
@@ -412,6 +424,7 @@ public class DagHelperTest {
         TaskNode node5 = new TaskNode();
         node5.setId("4");
         node5.setName("4");
+        node5.setCode(4);
         node5.setType("SHELL");
         List<String> dep5 = new ArrayList<>();
         dep5.add("1");
