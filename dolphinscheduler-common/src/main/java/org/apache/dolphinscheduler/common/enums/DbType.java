@@ -39,7 +39,8 @@ public enum DbType {
     CLICKHOUSE(4, "clickhouse"),
     ORACLE(5, "oracle"),
     SQLSERVER(6, "sqlserver"),
-    DB2(7, "db2");
+    DB2(7, "db2"),
+    H2(9,"h2");;
 
     DbType(int code, String descp) {
         this.code = code;

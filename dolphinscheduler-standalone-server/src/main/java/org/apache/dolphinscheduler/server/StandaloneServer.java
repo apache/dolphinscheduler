@@ -35,7 +35,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -59,9 +58,7 @@ public class StandaloneServer {
 
         startRegistry();
 
-        startAlertServer();
-
-        setTaskPlugin();
+       // startAlertServer();
 
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
@@ -71,29 +68,14 @@ public class StandaloneServer {
     }
 
     private static void startAlertServer() {
-        final Path alertPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(alertPluginPath)) {
-            System.setProperty("alert.plugin.binding", alertPluginPath.toString());
-            System.setProperty("alert.plugin.dir", "");
-        }
         AlertServer.getInstance().start();
     }
 
     private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
-        System.setProperty("registry.servers", server.getConnectString());
+        System.setProperty("zookeeper.quorum", server.getConnectString());
 
-        final Path registryPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(registryPath)) {
-            System.setProperty("registry.plugin.binding", registryPath.toString());
-            System.setProperty("registry.plugin.dir", "");
-        }
+        System.out.println(server.getConnectString());
     }
 
     private static void startDatabase() throws IOException, SQLException {
@@ -115,16 +97,5 @@ public class StandaloneServer {
         final DataSource ds = ConnectionFactory.getInstance().getDataSource();
         final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
         runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
-    }
-
-    private static void setTaskPlugin() {
-        final Path taskPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(taskPluginPath)) {
-            System.setProperty("task.plugin.binding", taskPluginPath.toString());
-            System.setProperty("task.plugin.dir", "");
-        }
     }
 }

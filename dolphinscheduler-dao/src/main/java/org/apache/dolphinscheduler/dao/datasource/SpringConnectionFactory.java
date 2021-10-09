@@ -26,9 +26,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.utils.PropertyUtils;
+
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
+
+import java.util.Properties;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
@@ -129,6 +135,7 @@ public class SpringConnectionFactory {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
+        sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();
     }
 
@@ -140,6 +147,17 @@ public class SpringConnectionFactory {
     @Bean
     public SqlSession sqlSession() throws Exception{
         return new SqlSessionTemplate(sqlSessionFactory());
+    }
+
+    @Bean
+    public DatabaseIdProvider databaseIdProvider() {
+        DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
+        Properties properties = new Properties();
+        properties.setProperty("MySQL", "mysql");
+        properties.setProperty("PostgreSQL", "pg");
+        properties.setProperty("h2", "h2");
+        databaseIdProvider.setProperties(properties);
+        return databaseIdProvider;
     }
 
 }

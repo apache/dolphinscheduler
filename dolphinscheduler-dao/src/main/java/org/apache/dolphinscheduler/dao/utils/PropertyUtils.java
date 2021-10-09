@@ -41,14 +41,10 @@ public class PropertyUtils {
 
     private static final PropertyUtils propertyUtils = new PropertyUtils();
 
-    private PropertyUtils(){
-        init();
-    }
-
     /**
      * init
      */
-    private void init(){
+    static{
         String[] propertyFiles = new String[]{Constants.DATASOURCE_PROPERTIES};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
@@ -66,6 +62,13 @@ public class PropertyUtils {
                 IOUtils.closeQuietly(fis);
             }
         }
+        // Override from system properties
+        System.getProperties().forEach((k, v) -> {
+            final String key = String.valueOf(k);
+            logger.info("Overriding property from system property: {}", key);
+
+            properties.setProperty(key, String.valueOf(v));
+        });
     }
 
     /**
