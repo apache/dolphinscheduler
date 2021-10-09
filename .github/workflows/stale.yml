@@ -33,7 +33,7 @@ jobs:
           days-before-issue-stale: 14
           days-before-issue-close: 3
           # We do not stale Issues with label `Waiting for reply`
-          exempt-issue-labels: 'Waiting for reply'
+          exempt-issue-labels: 'Waiting for reply,new feature,'
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had recent activity
             for 14 days. It will be closed in next 3 days if no further activity occurs.
