@@ -125,7 +125,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -630,10 +629,8 @@ public class ProcessService {
         processInstance.setWarningGroupId(warningGroupId);
         processInstance.setDryRun(command.getDryRun());
 
-        // schedule time
-        Date scheduleTime = getScheduleTime(command, cmdParam);
-        if (scheduleTime != null) {
-            processInstance.setScheduleTime(scheduleTime);
+        if (command.getScheduleTime() != null) {
+            processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setCommandStartTime(command.getStartTime());
         processInstance.setLocations(processDefinition.getLocations());
@@ -878,13 +875,6 @@ public class ProcessService {
                 runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
-                // delete all the valid tasks when complement data
-                List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
-                for (TaskInstance taskInstance : taskInstanceList) {
-                    taskInstance.setFlag(Flag.NO);
-                    this.updateTaskInstance(taskInstance);
-                }
-                initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
