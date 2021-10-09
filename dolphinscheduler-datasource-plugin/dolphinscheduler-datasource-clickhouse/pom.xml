@@ -27,6 +27,8 @@
 
     <artifactId>dolphinscheduler-datasource-clickhouse</artifactId>
     <name>${project.artifactId}</name>
+    <!-- can be load as a datasource Plugin when development and run server in IDE -->
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
 
@@ -58,6 +60,14 @@
                     <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
             </exclusions>
             <version>${clickhouse.jdbc.version}</version>
         </dependency>
@@ -66,25 +76,5 @@
 
     <build>
         <finalName>dolphinscheduler-datasource-clickhouse-${project.version}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib/</outputDirectory>
-                            <includeArtifactIds>clickhouse-jdbc</includeArtifactIds>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
-
 </project>

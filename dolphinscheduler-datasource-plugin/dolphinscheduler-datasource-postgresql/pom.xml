@@ -27,6 +27,8 @@
 
     <artifactId>dolphinscheduler-datasource-postgresql</artifactId>
     <name>${project.artifactId}</name>
+    <!-- can be load as a datasource Plugin when development and run server in IDE -->
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
 

@@ -188,7 +188,6 @@
                     <groupId>com.google.protobuf</groupId>
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
-
                 <exclusion>
                     <groupId>org.json</groupId>
                     <artifactId>json</artifactId>
@@ -312,6 +311,14 @@
                 <exclusion>
                     <artifactId>jasper-compiler</artifactId>
                     <groupId>tomcat</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
