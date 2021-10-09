@@ -74,8 +74,6 @@ public class StandaloneServer {
     private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("zookeeper.quorum", server.getConnectString());
-
-        System.out.println(server.getConnectString());
     }
 
     private static void startDatabase() throws IOException, SQLException {
