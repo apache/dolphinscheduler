@@ -286,15 +286,6 @@ public class ProcessService {
     }
 
     /**
-     * find one command from queue list
-     *
-     * @return command
-     */
-    public Command findOneCommand() {
-        return commandMapper.getOneToRun();
-    }
-
-    /**
      * get command page
      *
      * @param pageSize
@@ -761,6 +752,9 @@ public class ProcessService {
             processDefinition = processDefinitionCacheMaps.get(key);
         } else {
             processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
+            if (processDefinition != null) {
+                processDefinitionCacheMaps.put(key, processDefinition);
+            }
         }
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
