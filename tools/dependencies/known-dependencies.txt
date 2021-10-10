@@ -56,7 +56,7 @@ datanucleus-core-4.1.6.jar
 datanucleus-rdbms-4.1.7.jar
 derby-10.14.2.0.jar
 error_prone_annotations-2.1.3.jar
-druid-1.1.22.jar
+druid-1.2.4.jar
 gson-2.8.6.jar
 guava-24.1-jre.jar
 guava-retrying-2.0.0.jar
@@ -178,6 +178,7 @@ mybatis-plus-boot-starter-3.2.0.jar
 mybatis-plus-core-3.2.0.jar
 mybatis-plus-extension-3.2.0.jar
 mybatis-spring-2.0.2.jar
+mysql-connector-java-8.0.24.jar
 netty-3.6.2.Final.jar
 netty-all-4.1.53.Final.jar
 opencsv-2.3.jar
