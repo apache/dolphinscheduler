@@ -178,7 +178,6 @@ mybatis-plus-boot-starter-3.2.0.jar
 mybatis-plus-core-3.2.0.jar
 mybatis-plus-extension-3.2.0.jar
 mybatis-spring-2.0.2.jar
-mysql-connector-java-8.0.24.jar
 netty-3.6.2.Final.jar
 netty-all-4.1.53.Final.jar
 opencsv-2.3.jar
