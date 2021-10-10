@@ -332,7 +332,9 @@ CREATE TABLE `t_ds_command` (
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
-  PRIMARY KEY (`id`)
+  `dry_run` int NULL DEFAULT 0 COMMENT 'dry run flag：0 normal, 1 dry run',
+  PRIMARY KEY (`id`),
+  KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -381,6 +383,7 @@ CREATE TABLE `t_ds_error_command` (
   `worker_group` varchar(64)  COMMENT 'worker group',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `message` text COMMENT 'message',
+  `dry_run` int NULL DEFAULT NULL COMMENT 'dry run flag: 0 normal, 1 dry run',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
@@ -470,8 +473,7 @@ CREATE TABLE `t_ds_task_definition` (
   `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
+  PRIMARY KEY (`id`,`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -586,6 +588,7 @@ CREATE TABLE `t_ds_process_instance` (
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `var_pool` longtext COMMENT 'var_pool',
+  `dry_run` int NULL DEFAULT 0 COMMENT 'dry run flag: 0 normal, 1 dry run ',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
@@ -822,6 +825,7 @@ CREATE TABLE `t_ds_task_instance` (
   `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
   `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
   `var_pool` longtext COMMENT 'var_pool',
+  `dry_run` int NULL DEFAULT NULL COMMENT 'dry run flag: 0 normal, 1 dry run',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE

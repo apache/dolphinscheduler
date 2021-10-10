@@ -327,7 +327,9 @@ CREATE TABLE t_ds_command
     process_instance_priority int(11) DEFAULT NULL,
     worker_group              varchar(64),
     environment_code          bigint(20) DEFAULT '-1',
-    PRIMARY KEY (id)
+    dry_run                   int NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    KEY                       priority_id_index (process_instance_priority, id)
 );
 
 -- ----------------------------
@@ -378,6 +380,7 @@ CREATE TABLE t_ds_error_command
     worker_group              varchar(64),
     environment_code          bigint(20) DEFAULT '-1',
     message                   text,
+    dry_run                   int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -471,8 +474,7 @@ CREATE TABLE t_ds_task_definition
     resource_ids            varchar(255) DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
-    PRIMARY KEY (id, code),
-    UNIQUE KEY task_unique (name,project_code) USING BTREE
+    PRIMARY KEY (id, code)
 );
 
 -- ----------------------------
@@ -591,6 +593,7 @@ CREATE TABLE t_ds_process_instance
     timeout                    int(11) DEFAULT '0',
     tenant_id                  int(11) NOT NULL DEFAULT '-1',
     var_pool                   longtext,
+    dry_run                    int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -830,11 +833,12 @@ CREATE TABLE t_ds_task_instance
     task_instance_priority  int(11) DEFAULT NULL,
     worker_group            varchar(64)  DEFAULT NULL,
     environment_code        bigint(20) DEFAULT '-1',
-    environment_config      text DEFAULT '',
+    environment_config      text         DEFAULT '',
     executor_id             int(11) DEFAULT NULL,
     first_submit_time       datetime     DEFAULT NULL,
     delay_time              int(4) DEFAULT '0',
     var_pool                longtext,
+    dry_run                 int NULL DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
 );
@@ -1001,17 +1005,17 @@ CREATE TABLE t_ds_alert_plugin_instance
 DROP TABLE IF EXISTS t_ds_environment;
 CREATE TABLE t_ds_environment
 (
-  id            int NOT NULL AUTO_INCREMENT,
-  code          bigint(20) NOT NULL,
-  name          varchar(100) DEFAULT NULL,
-  config        text DEFAULT NULL,
-  description   text,
-  operator      int DEFAULT NULL,
-  create_time   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  update_time   timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE KEY environment_name_unique (name),
-  UNIQUE KEY environment_code_unique (code)
+    id          int       NOT NULL AUTO_INCREMENT,
+    code        bigint(20) NOT NULL,
+    name        varchar(100)       DEFAULT NULL,
+    config      text               DEFAULT NULL,
+    description text,
+    operator    int                DEFAULT NULL,
+    create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY environment_name_unique (name),
+    UNIQUE KEY environment_code_unique (code)
 );
 
 --
@@ -1020,12 +1024,12 @@ CREATE TABLE t_ds_environment
 DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
 CREATE TABLE t_ds_environment_worker_group_relation
 (
-    id                  int NOT NULL AUTO_INCREMENT,
-    environment_code    bigint(20) NOT NULL,
-    worker_group        varchar(255) NOT NULL,
-    operator            int DEFAULT NULL,
-    create_time         timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time         timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id) ,
+    id               int          NOT NULL AUTO_INCREMENT,
+    environment_code bigint(20) NOT NULL,
+    worker_group     varchar(255) NOT NULL,
+    operator         int                   DEFAULT NULL,
+    create_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
     UNIQUE KEY environment_worker_group_unique (environment_code,worker_group)
 );

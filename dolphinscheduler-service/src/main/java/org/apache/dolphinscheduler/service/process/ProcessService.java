@@ -26,11 +26,9 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -129,6 +127,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.facebook.presto.jdbc.internal.guava.collect.Lists;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -223,10 +222,6 @@ public class ProcessService {
             moveToErrorCommand(command, "process instance is null");
             return null;
         }
-        if (!checkThreadNum(command, validThreadNum)) {
-            logger.info("there is not enough thread for this command: {}", command);
-            return setWaitingThreadProcess(command, processInstance);
-        }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
@@ -309,8 +304,7 @@ public class ProcessService {
      * @return
      */
     public List<Command> findCommandPage(int pageSize, int pageNumber) {
-        Page<Command> commandPage = new Page<>(pageNumber, pageSize);
-        return commandMapper.queryCommandPage(commandPage).getRecords();
+        return commandMapper.queryCommandPage(pageSize, pageNumber * pageSize);
     }
 
     /**
@@ -553,7 +547,8 @@ public class ProcessService {
                 processInstance.getScheduleTime(),
                 processInstance.getWorkerGroup(),
                 processInstance.getEnvironmentCode(),
-                processInstance.getProcessInstancePriority()
+                processInstance.getProcessInstancePriority(),
+                processInstance.getDryRun()
             );
             saveCommand(command);
             return;
@@ -587,7 +582,12 @@ public class ProcessService {
         if (scheduleTime == null
                 && cmdParam != null
                 && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            List<Date> complementDateList = getComplementDateList(cmdParam, command.getProcessDefinitionCode());
+
+            Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+            Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+            List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+            List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
+
             if (complementDateList.size() > 0) {
                 scheduleTime = complementDateList.get(0);
             } else {
@@ -628,6 +628,7 @@ public class ProcessService {
         processInstance.setWarningType(warningType);
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
         processInstance.setWarningGroupId(warningGroupId);
+        processInstance.setDryRun(command.getDryRun());
 
         // schedule time
         Date scheduleTime = getScheduleTime(command, cmdParam);
@@ -972,7 +973,10 @@ public class ProcessService {
             return;
         }
 
-        List<Date> complementDate = getComplementDateList(cmdParam, processInstance.getProcessDefinitionCode());
+        Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+        Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        List<Schedule> listSchedules = queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        List<Date> complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
 
         if (complementDate.size() > 0
                 && Flag.NO == processInstance.getIsSubProcess()) {
@@ -982,28 +986,6 @@ public class ProcessService {
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-
-    }
-
-    /**
-     *  return complement date list
-     *
-     * @param cmdParam
-     * @param processDefinitionCode
-     * @return
-     */
-    public List<Date> getComplementDateList(Map<String, String> cmdParam, Long processDefinitionCode) {
-        List<Date> result = new ArrayList<>();
-        Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-        Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        if (startDate.after(endDate)) {
-            Date tmp = startDate;
-            startDate = endDate;
-            endDate = tmp;
-        }
-        List<Schedule> schedules = queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-        result.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedules));
-        return result;
     }
 
     /**
@@ -1307,7 +1289,8 @@ public class ProcessService {
             parentProcessInstance.getScheduleTime(),
             task.getWorkerGroup(),
             task.getEnvironmentCode(),
-            parentProcessInstance.getProcessInstancePriority()
+            parentProcessInstance.getProcessInstancePriority(),
+            parentProcessInstance.getDryRun()
         );
     }
 
@@ -1549,19 +1532,29 @@ public class ProcessService {
         if (taskInstance == null) {
             return null;
         }
+        setTaskInstanceDetail(taskInstance);
+        return taskInstance;
+    }
+
+    /**
+     * package task instance，associate processInstance and processDefine
+     *
+     * @param taskInstance taskInstance
+     * @return task instance
+     */
+    public void setTaskInstanceDetail(TaskInstance taskInstance) {
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
         ProcessDefinition processDefine = findProcessDefinition(processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion());
+                processInstance.getProcessDefinitionVersion());
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processDefine);
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-            taskInstance.getTaskCode(),
-            taskInstance.getTaskDefinitionVersion());
+                taskInstance.getTaskCode(),
+                taskInstance.getTaskDefinitionVersion());
         updateTaskDefinitionResources(taskDefinition);
         taskInstance.setTaskDefine(taskDefinition);
-        return taskInstance;
     }
 
     /**
@@ -2501,7 +2494,7 @@ public class ProcessService {
                     taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
-                taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getName).collect(Collectors.toList())));
+                taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
                 taskNodeList.add(taskNode);
             }
         }
