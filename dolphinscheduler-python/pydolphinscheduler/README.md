@@ -19,4 +19,5 @@
 
 # pydolphinscheduler
 
-pydolphinscheduler is python SDK allow you define your DolphinScheduler job by python code.
+pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
+your workflow by python code, aka workflow-as-codes.
