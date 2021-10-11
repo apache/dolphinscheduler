@@ -161,7 +161,8 @@
       window._debug = this
 
       if (this.type === 'instance') {
-        this.definitionCode = this.$route.query.code
+        this.instanceId = this.$route.params.id
+        this.definitionCode = this.$route.query.code || this.code
       } else if (this.type === 'definition') {
         this.definitionCode = this.$route.params.code
       }
@@ -198,7 +199,8 @@
         'name',
         'isDetails',
         'projectCode',
-        'version'
+        'version',
+        'code'
       ])
     },
     methods: {
@@ -308,12 +310,12 @@
           .then((res) => {
             if (this.verifyConditions(res.tasks)) {
               this.loading(true)
-              const definitionCode = this.definitionCode
-              if (definitionCode) {
+              const isEdit = !!this.definitionCode
+              if (isEdit) {
+                const methodName = this.type === 'instance' ? 'updateInstance' : 'updateDefinition'
+                const methodParam = this.type === 'instance' ? this.instanceId : this.definitionCode
                 // Edit
-                return this[
-                  this.type === 'instance' ? 'updateInstance' : 'updateDefinition'
-                ](definitionCode)
+                return this[methodName](methodParam)
                   .then((res) => {
                     this.$message({
                       message: res.msg,
