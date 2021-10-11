@@ -876,7 +876,7 @@ public class ProcessService {
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data if id is not null
-                if(processInstance.getId() != 0) {
+                if (processInstance.getId() != 0) {
                     List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
