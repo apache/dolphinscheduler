@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+package org.apache.dolphinscheduler.common.enums;
 
-@SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler")
-public class Application {
+public enum ProfileType {
+    ;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class);
+    /**
+     * This profile used for Unit test
+     */
+    public static final String UNIT_TEST = "unit_test";
 
-    }
+    /**
+     * This profile used for UnUnit test
+     */
+    public static final String UN_UNIT_TEST = "!unit_test";
 }

@@ -85,8 +85,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
      */
     private DataSource buildDataSource() throws SQLException {
 
-        DruidDataSource druidDataSource = dataSource();
-        return druidDataSource;
+        return dataSource();
     }
 
     /**

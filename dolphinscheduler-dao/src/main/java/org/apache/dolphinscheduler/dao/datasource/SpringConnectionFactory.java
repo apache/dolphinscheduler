@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.datasource;
 import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -31,15 +32,22 @@ import org.apache.ibatis.type.JdbcType;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -77,8 +85,9 @@ public class SpringConnectionFactory {
      *
      * @return druid dataSource
      */
-    @Bean(destroyMethod = "")
-    public DruidDataSource dataSource() throws SQLException {
+    @Bean(destroyMethod = "", name = "datasource")
+    @Profile(value = {ProfileType.UN_UNIT_TEST})
+    public DataSource dataSource() throws SQLException {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
@@ -106,7 +115,20 @@ public class SpringConnectionFactory {
         //auto commit
         druidDataSource.setDefaultAutoCommit(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT, true));
         druidDataSource.init();
+        logger.info("Initialize Druid DataSource success");
         return druidDataSource;
+    }
+
+    @Bean(name = "datasource")
+    @Profile(value = {ProfileType.UNIT_TEST})
+    public DataSource h2DataSource() {
+        EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder(new FileSystemResourceLoader());
+        EmbeddedDatabase datasource = embeddedDatabaseBuilder.setType(EmbeddedDatabaseType.H2)
+                .setName("DolphinSchedulerUT;MODE=MySQL")
+                .addScript("file:../sql/dolphinscheduler_h2.sql")
+                .build();
+        logger.info("Initialize H2 DataSource success");
+        return datasource;
     }
 
     /**
@@ -115,8 +137,8 @@ public class SpringConnectionFactory {
      * @return DataSourceTransactionManager
      */
     @Bean
-    public DataSourceTransactionManager transactionManager() throws SQLException {
-        return new DataSourceTransactionManager(dataSource());
+    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     /**
@@ -126,7 +148,7 @@ public class SpringConnectionFactory {
      * @throws Exception sqlSessionFactory exception
      */
     @Bean
-    public SqlSessionFactory sqlSessionFactory() throws Exception {
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.setCacheEnabled(false);
@@ -135,7 +157,7 @@ public class SpringConnectionFactory {
         configuration.addInterceptor(paginationInterceptor());
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
-        sqlSessionFactoryBean.setDataSource(dataSource());
+        sqlSessionFactoryBean.setDataSource(dataSource);
 
         GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
         dbConfig.setIdType(IdType.AUTO);
@@ -156,8 +178,8 @@ public class SpringConnectionFactory {
      * @return SqlSession
      */
     @Bean
-    public SqlSession sqlSession() throws Exception {
-        return new SqlSessionTemplate(sqlSessionFactory());
+    public SqlSession sqlSession(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
