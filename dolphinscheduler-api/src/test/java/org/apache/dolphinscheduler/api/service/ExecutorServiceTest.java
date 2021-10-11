@@ -58,12 +58,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * executor service 2 test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorServiceTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
 
     @InjectMocks
     private ExecutorServiceImpl executorService;
@@ -325,5 +328,33 @@ public class ExecutorServiceTest {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, Status.SUCCESS);
         return result;
+    }
+
+    @Test
+    public void testCreateComplementToParallel() {
+        List<String> result = new ArrayList<>();
+        int expectedParallelismNumber = 3;
+        LinkedList<Integer> listDate = new LinkedList<>();
+        listDate.add(0);
+        listDate.add(1);
+        listDate.add(2);
+        listDate.add(3);
+
+        int createCount = Math.min(listDate.size(), expectedParallelismNumber);
+        logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+
+        listDate.addLast(4);
+        int chunkSize = listDate.size() / createCount;
+        for (int i = 0; i < createCount; i++) {
+            int rangeStart = i == 0 ? i : (i * chunkSize);
+            int rangeEnd = i == createCount - 1 ? listDate.size() - 1 : rangeStart + chunkSize;
+            logger.info("rangeStart:{}, rangeEnd:{}",rangeStart, rangeEnd);
+            result.add(listDate.get(rangeStart) + "," + listDate.get(rangeEnd));
+        }
+
+        Assert.assertEquals("0,1", result.get(0));
+        Assert.assertEquals("1,2", result.get(1));
+        Assert.assertEquals("2,4", result.get(2));
+
     }
 }
