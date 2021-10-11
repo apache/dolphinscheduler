@@ -60,6 +60,9 @@ public class MasterConfig {
     @Value("${master.reserved.memory:0.3}")
     private double masterReservedMemory;
 
+    @Value("${master.cache.process.definition:true}")
+    private boolean masterCacheProcessDefinition;
+
     public int getListenPort() {
         return listenPort;
     }
@@ -150,4 +153,13 @@ public class MasterConfig {
     public void setStateWheelInterval(int stateWheelInterval) {
         this.stateWheelInterval = stateWheelInterval;
     }
+
+    public boolean getMasterCacheProcessDefinition() {
+        return masterCacheProcessDefinition;
+    }
+
+    public void setMasterCacheProcessDefinition(boolean masterCacheProcessDefinition) {
+        this.masterCacheProcessDefinition = masterCacheProcessDefinition;
+    }
+
 }

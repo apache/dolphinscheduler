@@ -283,13 +283,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         switch (executeType) {
             case REPEAT_RUNNING:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.REPEAT_RUNNING, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams);
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
                 break;
             case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
                 break;
             case STOP:
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
@@ -409,10 +409,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param loginUser           login user
      * @param instanceId          instance id
      * @param processDefinitionCode process definition code
+     * @param version
      * @param commandType         command type
      * @return insert result code
      */
-    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode, CommandType commandType, String startParams) {
+    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode, int processVersion, CommandType commandType, String startParams) {
         Map<String, Object> result = new HashMap<>();
 
         //To add startParams only when repeat running is needed
@@ -427,6 +428,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
+        command.setProcessDefinitionVersion(processVersion);
+        command.setProcessInstanceId(instanceId);
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
             putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionCode);
@@ -545,6 +548,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setWorkerGroup(workerGroup);
         command.setEnvironmentCode(environmentCode);
         command.setDryRun(dryRun);
+        ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(processDefineCode);
+        if (processDefinition != null) {
+            command.setProcessDefinitionVersion(processDefinition.getVersion());
+        }
+        command.setProcessInstanceId(0);
 
         Date start = null;
         Date end = null;

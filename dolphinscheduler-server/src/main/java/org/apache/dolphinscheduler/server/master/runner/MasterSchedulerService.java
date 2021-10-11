@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -92,10 +94,25 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
-
+    /**
+     * process instance execution list
+     */
     private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
+    /**
+     * process timeout check list
+     */
     ConcurrentHashMap<Integer, ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
+
+    /**
+     * task time out checkout list
+     */
     ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
+
+    /**
+     * key:code-version
+     * value: processDefinition
+     */
+    HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
@@ -112,7 +129,6 @@ public class MasterSchedulerService extends Thread {
                 taskTimeoutCheckList,
                 this.processInstanceExecMaps,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
-
     }
 
     @Override
@@ -165,7 +181,6 @@ public class MasterSchedulerService extends Thread {
      */
     private void scheduleProcess() throws Exception {
 
-        int activeCount = masterExecService.getActiveCount();
         // make sure to scan and delete command  table in one transaction
         Command command = findOneCommand();
         if (command != null) {
@@ -173,7 +188,12 @@ public class MasterSchedulerService extends Thread {
             try {
                 ProcessInstance processInstance = processService.handleCommand(logger,
                         getLocalAddress(),
-                        this.masterConfig.getMasterExecThreads() - activeCount, command);
+                        command,
+                        processDefinitionCacheMaps);
+                if (!masterConfig.getMasterCacheProcessDefinition()
+                        && processDefinitionCacheMaps.size() > 0) {
+                    processDefinitionCacheMaps.clear();
+                }
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
