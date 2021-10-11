@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,12 +59,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * executor service 2 test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorServiceTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
 
     @InjectMocks
     private ExecutorServiceImpl executorService;
@@ -325,5 +329,30 @@ public class ExecutorServiceTest {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, Status.SUCCESS);
         return result;
+    }
+
+    @Test
+    public void testCreateComplementToParallel() {
+
+        int expectedParallelismNumber = 3;
+        LinkedList<Integer> listDate = new LinkedList<>();
+        listDate.add(0);
+        listDate.add(1);
+        listDate.add(2);
+        listDate.add(3);
+
+        int createCount = Math.min(listDate.size(), expectedParallelismNumber);
+        listDate.addLast(4);
+        logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+        int chunkSize = listDate.size() / createCount;
+        for (int i = 0; i < createCount; i++) {
+            int rangeStart = i == 0 ? i : (i * chunkSize);
+            int rangeEnd = i == createCount - 1 ? listDate.size() - 1
+                    : rangeStart + chunkSize;
+            if (rangeEnd == listDate.size()) {
+                rangeEnd = listDate.size() - 1;
+            }
+            logger.info("rangeStart:{},rangeEnd:{}",rangeStart, rangeEnd);
+        }
     }
 }
