@@ -604,8 +604,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         createCount = Math.min(listDate.size(), expectedParallelismNumber);
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+
                     listDate.addLast(end);
                     int chunkSize = listDate.size() / createCount;
+
                     for (int i = 0; i < createCount; i++) {
                         int rangeStart = i == 0 ? i : (i * chunkSize);
                         int rangeEnd = i == createCount - 1 ? listDate.size() - 1
