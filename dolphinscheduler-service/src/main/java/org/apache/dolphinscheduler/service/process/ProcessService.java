@@ -875,6 +875,14 @@ public class ProcessService {
                 runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
+                // delete all the valid tasks when complement data if id is not null
+                if(processInstance.getId() != 0) {
+                    List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
+                    for (TaskInstance taskInstance : taskInstanceList) {
+                        taskInstance.setFlag(Flag.NO);
+                        this.updateTaskInstance(taskInstance);
+                    }
+                }
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
