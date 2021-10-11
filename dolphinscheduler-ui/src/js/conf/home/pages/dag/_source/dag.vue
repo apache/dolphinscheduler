@@ -35,6 +35,7 @@
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
         @onSubProcess="toSubProcess"
+        :type="type"
       ></m-form-model>
     </el-drawer>
     <el-dialog
@@ -94,8 +95,6 @@
     id: null,
     taskType: '',
     self: {},
-    preNode: [],
-    rearList: [],
     instanceId: null
   }
 
@@ -158,7 +157,7 @@
       }
     },
     mounted () {
-      window._debug = this
+      this.setIsEditDag(false)
 
       if (this.type === 'instance') {
         this.instanceId = this.$route.params.id
@@ -187,6 +186,8 @@
       }
     },
     beforeDestroy () {
+      this.resetParams()
+
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -195,7 +196,6 @@
         'tasks',
         'locations',
         'connects',
-        'isEditDag',
         'name',
         'isDetails',
         'projectCode',
@@ -217,7 +217,6 @@
       ]),
       ...mapMutations('dag', [
         'addTask',
-        'setTasks',
         'setConnects',
         'resetParams',
         'setIsEditDag',
@@ -291,6 +290,9 @@
           let tasks = this.tasks || []
           const edges = this.$refs.canvas.getEdges()
           const nodes = this.$refs.canvas.getNodes()
+          if (!nodes.length) {
+            reject(this.$t('Failed to create node to save'))
+          }
           const connects = this.buildConnects(edges, tasks)
           this.setConnects(connects)
           const locations = nodes.map((node) => {
@@ -488,12 +490,12 @@
        */
       returnToPrevProcess () {
         let $name = this.$route.name.split('-')
-        let subProcessCodes = this.$route.query.subProcessCodes
-        let codes = subProcessCodes.split(',')
-        const last = codes.pop()
+        let subs = this.$route.query.subs
+        let ids = subs.split(',')
+        const last = ids.pop()
         this.$router.push({
-          path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${last}`,
-          query: codes.length > 0 ? { subProcessCodes: codes.join(',') } : null
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${last}`,
+          query: ids.length > 0 ? { subs: ids.join(',') } : null
         })
       },
       toSubProcess ({ subProcessCode, subInstanceId }) {
@@ -507,12 +509,12 @@
           subs = olds.split(',')
           subs.push(curIdentifier)
         } else {
-          subProcessCodes.push(this.definitionCode)
+          subs.push(curIdentifier)
         }
         let $name = this.$route.name.split('-')
         this.$router.push({
-          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${subProcessCode}`,
-          query: { subProcessCodes: subProcessCodes.join(',') }
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${tarIdentifier}`,
+          query: { subs: subs.join(',') }
         })
       },
       seeHistory (taskName) {
@@ -540,19 +542,6 @@
       },
       closeStart () {
         this.startDialog = false
-      },
-      /**
-       * Verify whether edge is valid
-       * The number of edges start with CONDITIONS task cannot be greater than 2
-       */
-      edgeIsValid (edge) {
-        const { sourceId } = edge
-        const sourceTask = this.tasks.find((task) => task.code === sourceId)
-        if (sourceTask.taskType === 'CONDITIONS') {
-          const edges = this.$refs.canvas.getEdges()
-          return edges.filter((e) => e.sourceId === sourceTask.code).length <= 2
-        }
-        return true
       },
       /**
        * Task status
@@ -629,7 +618,6 @@
         this.versionDrawer = false
       },
       switchProcessVersion ({ version, processDefinitionCode }) {
-        // this.$store.state.dag.isSwitchVersion = true
         this.switchProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
