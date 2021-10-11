@@ -249,7 +249,7 @@ public class ProcessServiceTest {
         Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
 
         int definitionVersion = 1;
-        long definitionCode= 123;
+        long definitionCode = 123;
         int processInstanceId = 222;
         //there is not enough thread for this command
         Command command1 = new Command();
@@ -272,7 +272,6 @@ public class ProcessServiceTest {
             processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Assert.assertNotNull(processService.handleCommand(logger, host, command1, processDefinitionCacheMaps));
-
 
         Command command2 = new Command();
         command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
