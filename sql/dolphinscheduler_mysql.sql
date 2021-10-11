@@ -334,7 +334,7 @@ CREATE TABLE `t_ds_command` (
   `environment_code`          bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run`                   int NULL DEFAULT 0 COMMENT 'dry run flag：0 normal, 1 dry run',
   `process_instance_id`       int(11) DEFAULT 0 COMMENT 'process instance id',
-  `process_defintion_version` int(11) DEFAULT 0 COMMENT 'process defintion version',
+  `process_definition_version` int(11) DEFAULT 0 COMMENT 'process definition version',
   PRIMARY KEY (`id`),
   KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -387,7 +387,7 @@ CREATE TABLE `t_ds_error_command` (
   `message` text COMMENT 'message',
   `dry_run` int NULL DEFAULT NULL COMMENT 'dry run flag: 0 normal, 1 dry run',
   `process_instance_id` int(11) DEFAULT 0 COMMENT 'process instance id: 0',
-  `process_defintion_version` int(11) DEFAULT 0 COMMENT 'process defintion version',
+  `process_definition_version` int(11) DEFAULT 0 COMMENT 'process definition version',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 

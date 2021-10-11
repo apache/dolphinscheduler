@@ -256,7 +256,7 @@ CREATE TABLE t_ds_command (
   environment_code          bigint DEFAULT '-1',
   dry_run                   int DEFAULT '0' ,
   process_instance_id       int DEFAULT 0,
-  process_defintion_version int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 ) ;
 
@@ -303,7 +303,7 @@ CREATE TABLE t_ds_error_command (
   environment_code          bigint DEFAULT '-1',
   dry_run                   int DEFAULT '0' ,
   process_instance_id       int DEFAULT 0,
-  process_defintion_version int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 );
 --
