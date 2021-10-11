@@ -31,13 +31,6 @@ import java.util.List;
  */
 public interface CommandMapper extends BaseMapper<Command> {
 
-
-    /**
-     * get one command
-     * @return command
-     */
-    Command getOneToRun();
-
     /**
      * count command state
      * @param userId userId
