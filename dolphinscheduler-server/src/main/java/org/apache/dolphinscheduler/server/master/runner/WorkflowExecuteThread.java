@@ -575,6 +575,15 @@ public class WorkflowExecuteThread implements Runnable {
                     complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
                     logger.info(" process definition code:{} complement data: {}",
                             processInstance.getProcessDefinitionCode(), complementListDate.toString());
+
+                    if (complementListDate.size() > 0 && Flag.NO == processInstance.getIsSubProcess()) {
+                        processInstance.setScheduleTime(complementListDate.get(0));
+                        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                                processDefinition.getGlobalParamMap(),
+                                processDefinition.getGlobalParamList(),
+                                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+                        processService.updateProcessInstance(processInstance);
+                    }
                 }
             }
         }
