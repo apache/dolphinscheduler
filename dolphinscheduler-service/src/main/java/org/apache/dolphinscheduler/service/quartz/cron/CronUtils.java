@@ -190,6 +190,7 @@ public class CronUtils {
             return result;
         }
 
+        // support left closed and right open time interval (startDate <= N < endDate)
         Date from = new Date(startTime.getTime() - Constants.SECOND_TIME_MILLIS);
         Date to = new Date(endTime.getTime() - Constants.SECOND_TIME_MILLIS);
 
