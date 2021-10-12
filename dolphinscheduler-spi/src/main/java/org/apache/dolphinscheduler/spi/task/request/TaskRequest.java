@@ -149,6 +149,11 @@ public class TaskRequest {
     private String envFile;
 
     /**
+     * environmentConfig
+     */
+    private String environmentConfig;
+
+    /**
      * definedParams
      */
     private Map<String, String> definedParams;
@@ -410,6 +415,14 @@ public class TaskRequest {
 
     public void setEnvFile(String envFile) {
         this.envFile = envFile;
+    }
+
+    public String getEnvironmentConfig() {
+        return environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String config) {
+        this.environmentConfig = config;
     }
 
     public Map<String, String> getDefinedParams() {
