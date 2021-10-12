@@ -132,6 +132,12 @@ public class Command {
     @TableField("dry_run")
     private int dryRun;
 
+    @TableField("process_instance_id")
+    private int processInstanceId;
+
+    @TableField("process_definition_version")
+    private int processDefinitionVersion;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -152,7 +158,10 @@ public class Command {
             String workerGroup,
             Long environmentCode,
             Priority processInstancePriority,
-            int dryRun) {
+            int dryRun,
+            int processInstanceId,
+            int processDefinitionVersion
+    ) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -168,6 +177,8 @@ public class Command {
         this.environmentCode = environmentCode;
         this.processInstancePriority = processInstancePriority;
         this.dryRun = dryRun;
+        this.processInstanceId = processInstanceId;
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public TaskDependType getTaskDependType() {
@@ -298,6 +309,22 @@ public class Command {
         this.dryRun = dryRun;
     }
 
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -353,8 +380,13 @@ public class Command {
         if (processInstancePriority != command.processInstancePriority) {
             return false;
         }
+        if (processInstanceId != command.processInstanceId) {
+            return false;
+        }
+        if (processDefinitionVersion != command.getProcessDefinitionVersion()) {
+            return false;
+        }
         return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
-
     }
 
     @Override
@@ -375,6 +407,8 @@ public class Command {
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
         result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
         result = 31 * result + dryRun;
+        result = 31 * result + processInstanceId;
+        result = 31 * result + processDefinitionVersion;
         return result;
     }
 
@@ -397,7 +431,10 @@ public class Command {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode='" + environmentCode + '\''
                 + ", dryRun='" + dryRun + '\''
+                + ", processInstanceId='" + processInstanceId + '\''
+                + ", processDefinitionVersion='" + processDefinitionVersion + '\''
                 + '}';
     }
+
 }
 
