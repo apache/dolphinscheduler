@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.registry;
 
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
@@ -34,6 +35,7 @@ public class HeartBeatTask implements Runnable {
 
     private Set<String> heartBeatPaths;
     private RegistryClient registryClient;
+    private WorkerManagerThread workerManagerThread;
     private String serverType;
     private HeartBeat heartBeat;
 
@@ -56,13 +58,14 @@ public class HeartBeatTask implements Runnable {
                          Set<String> heartBeatPaths,
                          String serverType,
                          RegistryClient registryClient,
-                         int taskCount,
-                         int execThreadCount
+                         int workerThreadCount,
+                         WorkerManagerThread workerManagerThread
     ) {
         this.heartBeatPaths = heartBeatPaths;
         this.registryClient = registryClient;
+        this.workerManagerThread = workerManagerThread;
         this.serverType = serverType;
-        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, taskCount, execThreadCount);
+        this.heartBeat = new HeartBeat(startupTime, maxCpuloadAvg, reservedMemory, hostWeight, workerThreadCount);
     }
 
     public String getHeartBeatInfo() {
@@ -78,6 +81,11 @@ public class HeartBeatTask implements Runnable {
                     registryClient.getStoppable().stop("i was judged to death, release resources and stop myself");
                     return;
                 }
+            }
+
+            if (workerManagerThread != null) {
+                // update waiting task count
+                heartBeat.setWorkerWaitingTaskCount(workerManagerThread.getThreadPoolQueueSize());
             }
 
             for (String heartBeatPath : heartBeatPaths) {

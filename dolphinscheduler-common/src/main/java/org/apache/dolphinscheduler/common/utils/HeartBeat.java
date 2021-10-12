@@ -159,15 +159,14 @@ public class HeartBeat {
         this.reservedMemory = reservedMemory;
     }
 
-    public HeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory, int hostWeight, int taskCount, int execThreadCount) {
+    public HeartBeat(long startupTime, double maxCpuloadAvg, double reservedMemory, int hostWeight, int workerExecThreadCount) {
         this.reportTime = System.currentTimeMillis();
         this.serverStatus = Constants.NORMAL_NODE_STATUS;
         this.startupTime = startupTime;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
         this.workerHostWeight = hostWeight;
-        this.workerWaitingTaskCount = taskCount;
-        this.workerExecThreadCount = execThreadCount;
+        this.workerExecThreadCount = workerExecThreadCount;
     }
 
     /**

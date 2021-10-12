@@ -53,7 +53,9 @@ public class HeartBeatTest {
         int hostWeight = 1;
         int taskCount = 200;
         int workerThreadCount = 199;
-        HeartBeat heartBeat = new HeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, taskCount, workerThreadCount);
+        HeartBeat heartBeat = new HeartBeat(startupTime, loadAverage, reservedMemory, hostWeight, workerThreadCount);
+
+        heartBeat.setWorkerWaitingTaskCount(taskCount);
         heartBeat.updateServerState();
         assertEquals(Constants.BUSY_NODE_STATUE, heartBeat.getServerStatus());
     }

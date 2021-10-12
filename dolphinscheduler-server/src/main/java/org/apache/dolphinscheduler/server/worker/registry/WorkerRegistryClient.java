@@ -110,8 +110,8 @@ public class WorkerRegistryClient {
                 workerZkPaths,
                 Constants.WORKER_TYPE,
                 registryClient,
-                workerManagerThread.getThreadPoolQueueSize(),
-                workerConfig.getWorkerExecThreads()
+                workerConfig.getWorkerExecThreads(),
+                workerManagerThread
         );
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
