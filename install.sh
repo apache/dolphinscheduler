@@ -68,16 +68,16 @@ sed -i ${txt} "s@^sudo.enable=.*@sudo.enable=${sudoEnable}@g" conf/common.proper
 # Change configuration in conf/worker.properties
 sed -i ${txt} "s@^#*worker.tenant.auto.create=.*@worker.tenant.auto.create=${workerTenantAutoCreate}@g" conf/worker.properties
 sed -i ${txt} "s@^#*alert.listen.host=.*@alert.listen.host=${alertServer}@g" conf/worker.properties
-sed -i ${txt} "s@^#*task.plugin.dir=.*@task.plugin.dir=${taskPluginDir}@g" conf/worker.properties
+sed -i ${txt} "s@^#*task.plugin.dir=.*@task.plugin.dir=${installPath}/${taskPluginDir}@g" conf/worker.properties
 
 # Change configuration in conf/alert.properties
-sed -i ${txt} "s@^#*alert.plugin.dir=.*@alert.plugin.dir=${alertPluginDir}@g" conf/alert.properties
+sed -i ${txt} "s@^#*alert.plugin.dir=.*@alert.plugin.dir=${installPath}/${alertPluginDir}@g" conf/alert.properties
 
 # Change configuration in conf/application-api.properties
 sed -i ${txt} "s@^#*server.port=.*@server.port=${apiServerPort}@g" conf/application-api.properties
 
 # Change configuration in conf/registry.properties
-sed -i ${txt} "s@^#*registry.plugin.dir=.*@registry.plugin.dir=${registryPluginDir}@g" conf/registry.properties
+sed -i ${txt} "s@^#*registry.plugin.dir=.*@registry.plugin.dir=${installPath}/${registryPluginDir}@g" conf/registry.properties
 sed -i ${txt} "s@^#*registry.plugin.name=.*@registry.plugin.name=${registryPluginName}@g" conf/registry.properties
 sed -i ${txt} "s@^#*registry.servers=.*@registry.servers=${registryServers}@g" conf/registry.properties
 
