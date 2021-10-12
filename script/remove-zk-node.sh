@@ -32,6 +32,7 @@ BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
 source ${BIN_DIR}/../conf/config/install_config.conf
+source ${BIN_DIR}/../conf/env/dolphinscheduler_env.sh
 
 export JAVA_HOME=$JAVA_HOME
 
