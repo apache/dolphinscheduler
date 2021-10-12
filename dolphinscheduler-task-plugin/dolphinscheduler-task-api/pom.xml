@@ -276,6 +276,10 @@
                     <artifactId>jasper-compiler</artifactId>
                     <groupId>tomcat</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
