@@ -58,7 +58,7 @@ public class ZookeeperConfig {
     private int maxWaitTime;
 
     public String getServerList() {
-        if(StringUtils.isNotBlank(System.getProperty("zookeeper.quorum"))){
+        if (StringUtils.isNotBlank(System.getProperty("zookeeper.quorum"))) {
             return System.getProperty("zookeeper.quorum");
         }
         return serverList;
