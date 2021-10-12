@@ -39,7 +39,7 @@ public class HeartBeat {
     private int processId;
 
     private int workerHostWeight; // worker host weight
-    private int workerTaskCount; // worker task count
+    private int workerWaitingTaskCount; // worker waiting task count
     private int workerExecThreadCount; // worker thread pool thread count
 
     public long getStartupTime() {
@@ -130,12 +130,12 @@ public class HeartBeat {
         this.workerHostWeight = workerHostWeight;
     }
 
-    public int getWorkerTaskCount() {
-        return workerTaskCount;
+    public int getWorkerWaitingTaskCount() {
+        return workerWaitingTaskCount;
     }
 
-    public void setWorkerTaskCount(int workerTaskCount) {
-        this.workerTaskCount = workerTaskCount;
+    public void setWorkerWaitingTaskCount(int workerWaitingTaskCount) {
+        this.workerWaitingTaskCount = workerWaitingTaskCount;
     }
 
     public int getWorkerExecThreadCount() {
@@ -166,7 +166,7 @@ public class HeartBeat {
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
         this.workerHostWeight = hostWeight;
-        this.workerTaskCount = taskCount;
+        this.workerWaitingTaskCount = taskCount;
         this.workerExecThreadCount = execThreadCount;
     }
 
@@ -189,8 +189,8 @@ public class HeartBeat {
             logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
                     loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
             this.serverStatus = Constants.ABNORMAL_NODE_STATUS;
-        } else if (workerTaskCount > workerExecThreadCount) {
-            logger.warn("current task count {} is large than worker thread count {}, worker is busy", workerTaskCount, workerExecThreadCount);
+        } else if (workerWaitingTaskCount > workerExecThreadCount) {
+            logger.warn("current waiting task count {} is large than worker thread count {}, worker is busy", workerWaitingTaskCount, workerExecThreadCount);
             this.serverStatus = Constants.BUSY_NODE_STATUE;
         } else {
             this.serverStatus = Constants.NORMAL_NODE_STATUS;
@@ -217,7 +217,7 @@ public class HeartBeat {
         builder.append(processId).append(COMMA);
         builder.append(workerHostWeight).append(COMMA);
         builder.append(workerExecThreadCount).append(COMMA);
-        builder.append(workerTaskCount);
+        builder.append(workerWaitingTaskCount);
 
         return builder.toString();
     }
@@ -243,7 +243,7 @@ public class HeartBeat {
         heartBeat.processId = Integer.parseInt(parts[9]);
         heartBeat.workerHostWeight = Integer.parseInt(parts[10]);
         heartBeat.workerExecThreadCount = Integer.parseInt(parts[11]);
-        heartBeat.workerTaskCount = Integer.parseInt(parts[12]);
+        heartBeat.workerWaitingTaskCount = Integer.parseInt(parts[12]);
         return heartBeat;
     }
 }

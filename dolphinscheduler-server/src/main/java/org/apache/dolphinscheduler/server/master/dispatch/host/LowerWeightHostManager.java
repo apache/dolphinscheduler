@@ -164,8 +164,8 @@ public class LowerWeightHostManager extends CommonHostManager {
                 return null;
             }
             if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
-                logger.warn("worker {} is busy, current task count {} is large than worker thread count {}",
-                        addr, heartBeat.getWorkerTaskCount(), heartBeat.getWorkerExecThreadCount());
+                logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
+                        addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
                 return null;
             }
             return new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
