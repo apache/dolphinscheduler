@@ -34,11 +34,14 @@ datasourceDriverClassname="com.mysql.jdbc.Driver"
 if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
+
+# Change configuration in conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.driver-class-name=.*@spring.datasource.driver-class-name=${datasourceDriverClassname}@g" conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.url=.*@spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true@g" conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.username=.*@spring.datasource.username=${username}@g" conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.password=.*@spring.datasource.password=${password}@g" conf/datasource.properties
 
+# Change configuration in conf/common.properties
 sed -i ${txt} "s@^data.basedir.path=.*@data.basedir.path=${dataBasedirPath}@g" conf/common.properties
 sed -i ${txt} "s@^resource.storage.type=.*@resource.storage.type=${resourceStorageType}@g" conf/common.properties
 sed -i ${txt} "s@^resource.upload.path=.*@resource.upload.path=${resourceUploadPath}@g" conf/common.properties
