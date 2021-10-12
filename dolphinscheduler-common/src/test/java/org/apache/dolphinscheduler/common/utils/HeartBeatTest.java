@@ -75,7 +75,7 @@ public class HeartBeatTest {
         assertEquals(1, heartBeat.getServerStatus());
         assertEquals(29732, heartBeat.getProcessId());
         assertEquals(199, heartBeat.getWorkerExecThreadCount());
-        assertEquals(200, heartBeat.getWorkerTaskCount());
+        assertEquals(200, heartBeat.getWorkerWaitingTaskCount());
     }
 
 }
