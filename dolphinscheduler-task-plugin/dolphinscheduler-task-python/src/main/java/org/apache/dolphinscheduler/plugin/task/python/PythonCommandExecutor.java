@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
+import java.util.Arrays;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -153,6 +154,11 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String commandInterpreter() {
         String pythonHome = getPythonHome(taskRequest.getEnvFile());
+
+        if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+            pythonHome = getPythonHomeFromEnvironmentConfig(taskRequest.getEnvironmentConfig());
+        }
+
         return getPythonCommand(pythonHome);
     }
 
@@ -176,4 +182,24 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         return Paths.get(pythonHome, "/bin/python").toString();
     }
 
+    /**
+     * get python home from the environment config
+     *
+     * @param environmentConfig env config
+     * @return python home
+     */
+    public static String getPythonHomeFromEnvironmentConfig(String environmentConfig) {
+        String[] lines = environmentConfig.split("\n");
+
+        String pythonHomeConfig = Arrays.stream(lines).filter(line -> line.contains(PythonConstants.PYTHON_HOME)).findFirst().get();
+
+        if (StringUtils.isEmpty(pythonHomeConfig)) {
+            return null;
+        }
+        String[] arrs = pythonHomeConfig.split(PythonConstants.EQUAL_SIGN);
+        if (arrs.length == 2) {
+            return arrs[1];
+        }
+        return null;
+    }
 }
