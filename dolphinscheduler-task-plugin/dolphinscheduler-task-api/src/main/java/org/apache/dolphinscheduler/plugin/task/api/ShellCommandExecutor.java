@@ -27,11 +27,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
+
+import com.google.common.base.Strings;
 
 /**
  * shell command executor
@@ -94,18 +95,25 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             if (OSUtils.isWindows()) {
                 sb.append("@echo off\n");
                 sb.append("cd /d %~dp0\n");
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
+                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
+                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskRequest.getEnvFile() != null) {
+                        sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
+                    }
                 }
             } else {
                 sb.append("#!/bin/sh\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
+                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskRequest.getEnvFile() != null) {
+                        sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                    }
                 }
             }
-
             sb.append(execCommand);
             logger.info("command : {}", sb);
 
