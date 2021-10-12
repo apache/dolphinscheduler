@@ -35,6 +35,9 @@ if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
 
+# Change configuration in conf/config/dolphinscheduler_env.sh
+sed -i ${txt} "s@^export JAVA_HOME=.*@export JAVA_HOME=${javaHome}@g" conf/env/dolphinscheduler_env.sh
+
 # Change configuration in conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.driver-class-name=.*@spring.datasource.driver-class-name=${datasourceDriverClassname}@g" conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.url=.*@spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true@g" conf/datasource.properties
