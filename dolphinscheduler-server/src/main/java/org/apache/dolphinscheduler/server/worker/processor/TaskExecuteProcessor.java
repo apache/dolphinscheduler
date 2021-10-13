@@ -172,7 +172,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         // submit task to manager
         if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService, taskPluginManager))) {
-            logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getQueueSize());
+            logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getDelayQueueSize());
         }
     }
 
