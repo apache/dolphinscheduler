@@ -218,7 +218,7 @@ export default {
 
     // Authorized project
     const p1 = new Promise((resolve, reject) => {
-      io.get(`${o.category}/authorize-resource-tree`, param, res => {
+      io.get(`${o.category}/authed-resource-tree`, param, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
