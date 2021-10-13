@@ -1237,7 +1237,7 @@ public class ProcessService {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
         Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
         int childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(childDefineId);
+        ProcessDefinition subProcessDefinition = processDefineMapper.queryByDefineId(childDefineId);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -1255,7 +1255,7 @@ public class ProcessService {
             TaskDependType.TASK_POST,
             parentProcessInstance.getFailureStrategy(),
             parentProcessInstance.getExecutorId(),
-            processDefinition.getCode(),
+            subProcessDefinition.getCode(),
             processParam,
             parentProcessInstance.getWarningType(),
             parentProcessInstance.getWarningGroupId(),
@@ -1265,7 +1265,7 @@ public class ProcessService {
             parentProcessInstance.getProcessInstancePriority(),
             parentProcessInstance.getDryRun(),
             subProcessInstanceId,
-            parentProcessInstance.getProcessDefinitionVersion()
+            subProcessDefinition.getVersion()
         );
     }
 
