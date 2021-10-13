@@ -287,7 +287,7 @@ public class SqlTask extends AbstractTask {
 
         int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
 
-        while (rowCount < sqlParameters.getLimit() && resultSet.next()) {
+        while (rowCount < limit && resultSet.next()) {
             JSONObject mapOfColValues = new JSONObject(true);
             for (int i = 1; i <= num; i++) {
                 mapOfColValues.put(md.getColumnLabel(i), resultSet.getObject(i));
