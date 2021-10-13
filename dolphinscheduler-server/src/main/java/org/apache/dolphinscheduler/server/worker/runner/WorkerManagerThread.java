@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,12 +74,21 @@ public class WorkerManagerThread implements Runnable {
     }
 
     /**
-     * get queue size
+     * get delay queue size
      *
      * @return queue size
      */
-    public int getQueueSize() {
+    public int getDelayQueueSize() {
         return workerExecuteQueue.size();
+    }
+
+    /**
+     * get thread pool queue size
+     *
+     * @return queue size
+     */
+    public int getThreadPoolQueueSize() {
+        return ((ThreadPoolExecutor) workerExecService).getQueue().size();
     }
 
     /**

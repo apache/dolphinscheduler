@@ -19,8 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.ResInfo;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -47,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  lower weight host manager
+ * lower weight host manager
  */
 public class LowerWeightHostManager extends CommonHostManager {
 
@@ -79,7 +78,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         this.workerHostWeightsMap = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
-        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
+        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(), 0, 5, TimeUnit.SECONDS);
     }
 
     @PreDestroy
@@ -89,6 +88,7 @@ public class LowerWeightHostManager extends CommonHostManager {
 
     /**
      * select host
+     *
      * @param context context
      * @return host
      */
@@ -153,23 +153,23 @@ public class LowerWeightHostManager extends CommonHostManager {
             }
         }
 
-        public HostWeight getHostWeight(String addr, String workerGroup, String heartbeat) {
-            if (ResInfo.isValidHeartbeatForRegistryInfo(heartbeat)) {
-                String[] parts = heartbeat.split(Constants.COMMA);
-                int status = Integer.parseInt(parts[8]);
-                if (status == Constants.ABNORMAL_NODE_STATUS) {
-                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
-                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
-                    return null;
-                }
-                double cpu = Double.parseDouble(parts[0]);
-                double memory = Double.parseDouble(parts[1]);
-                double loadAverage = Double.parseDouble(parts[2]);
-                long startTime = DateUtils.stringToDate(parts[6]).getTime();
-                int weight = getWorkerHostWeightFromHeartbeat(heartbeat);
-                return new HostWeight(HostWorker.of(addr, weight, workerGroup), cpu, memory, loadAverage, startTime);
+        public HostWeight getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
+            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+            if (heartBeat == null) {
+                return null;
             }
-            return null;
+            if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
+                logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+                        addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
+                return null;
+            }
+            if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
+                logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
+                        addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
+                return null;
+            }
+            return new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                    heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(), heartBeat.getStartupTime());
         }
     }
 

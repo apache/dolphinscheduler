@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -96,14 +95,14 @@ public class MasterRegistryClient {
     private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
 
     /**
-     * master start time
+     * master startup time, ms
      */
-    private String startTime;
+    private long startupTime;
 
     private String localNodePath;
 
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-        this.startTime = DateUtils.dateToString(new Date());
+        this.startupTime = System.currentTimeMillis();
         this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
         this.processInstanceExecMaps = processInstanceExecMaps;
@@ -364,14 +363,14 @@ public class MasterRegistryClient {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 masterConfig.getMasterMaxCpuloadAvg(),
                 masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
                 Constants.MASTER_TYPE,
                 registryClient);
 
-        registryClient.persistEphemeral(localNodePath, heartBeatTask.heartBeatInfo());
+        registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
         registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
