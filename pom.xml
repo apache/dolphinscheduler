@@ -99,6 +99,7 @@
         <checkstyle.version>3.0.0</checkstyle.version>
         <apache.rat.version>0.13</apache.rat.version>
         <zookeeper.version>3.4.14</zookeeper.version>
+        <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
@@ -275,7 +276,11 @@
                 </exclusions>
                 <version>${zookeeper.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.test}</version>
+            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -1037,6 +1042,7 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-plugin-api</module>
+        <module>dolphinscheduler-standalone-server</module>
         <module>ext/skywalking</module>
     </modules>
 </project>

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop) <command> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -83,6 +83,8 @@ elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
+elif [ "$command" = "standalone-server" ]; then
+  CLASS=org.apache.dolphinscheduler.server.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
   exit 1
