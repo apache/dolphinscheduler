@@ -98,6 +98,11 @@ public class SqlTask extends AbstractTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
+    /**
+     * default query sql limit
+     */
+    private static final int QUERY_LIMIT = 10000;
+
     public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
 
@@ -279,6 +284,8 @@ public class SqlTask extends AbstractTask {
         int num = md.getColumnCount();
 
         int rowCount = 0;
+
+        int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
 
         while (rowCount < sqlParameters.getLimit() && resultSet.next()) {
             JSONObject mapOfColValues = new JSONObject(true);
