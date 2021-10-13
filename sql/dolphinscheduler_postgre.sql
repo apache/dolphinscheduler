@@ -240,23 +240,27 @@ CREATE TABLE t_ds_alertgroup(
 DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
-  command_type int DEFAULT NULL ,
-  process_definition_code bigint NOT NULL ,
-  command_param text ,
-  task_depend_type int DEFAULT NULL ,
-  failure_strategy int DEFAULT '0' ,
-  warning_type int DEFAULT '0' ,
-  warning_group_id int DEFAULT NULL ,
-  schedule_time timestamp DEFAULT NULL ,
-  start_time timestamp DEFAULT NULL ,
-  executor_id int DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
+  command_type              int DEFAULT NULL ,
+  process_definition_code   bigint NOT NULL ,
+  command_param             text ,
+  task_depend_type          int DEFAULT NULL ,
+  failure_strategy          int DEFAULT '0' ,
+  warning_type              int DEFAULT '0' ,
+  warning_group_id          int DEFAULT NULL ,
+  schedule_time             timestamp DEFAULT NULL ,
+  start_time                timestamp DEFAULT NULL ,
+  executor_id               int DEFAULT NULL ,
+  update_time               timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group varchar(64),
-  environment_code bigint DEFAULT '-1',
-  dry_run int DEFAULT '0' ,
+  worker_group              varchar(64),
+  environment_code          bigint DEFAULT '-1',
+  dry_run                   int DEFAULT '0' ,
+  process_instance_id       int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 ) ;
+
+create index priority_id_index on t_ds_command (process_instance_priority,id);
 
 --
 -- Table structure for table t_ds_datasource
@@ -282,23 +286,24 @@ CREATE TABLE t_ds_datasource (
 
 DROP TABLE IF EXISTS t_ds_error_command;
 CREATE TABLE t_ds_error_command (
-  id int NOT NULL ,
-  command_type int DEFAULT NULL ,
-  executor_id int DEFAULT NULL ,
-  process_definition_code bigint NOT NULL ,
-  command_param text ,
-  task_depend_type int DEFAULT NULL ,
-  failure_strategy int DEFAULT '0' ,
-  warning_type int DEFAULT '0' ,
-  warning_group_id int DEFAULT NULL ,
-  schedule_time timestamp DEFAULT NULL ,
-  start_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
+  id int NOT NULL  ,
+  command_type              int DEFAULT NULL ,
+  process_definition_code   bigint NOT NULL ,
+  command_param             text ,
+  task_depend_type          int DEFAULT NULL ,
+  failure_strategy          int DEFAULT '0' ,
+  warning_type              int DEFAULT '0' ,
+  warning_group_id          int DEFAULT NULL ,
+  schedule_time             timestamp DEFAULT NULL ,
+  start_time                timestamp DEFAULT NULL ,
+  executor_id               int DEFAULT NULL ,
+  update_time               timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group varchar(64),
-  environment_code bigint DEFAULT '-1',
-  message text ,
-  dry_ru int DEFAULT '0' ,
+  worker_group              varchar(64),
+  environment_code          bigint DEFAULT '-1',
+  dry_run                   int DEFAULT '0' ,
+  process_instance_id       int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 );
 --
@@ -380,8 +385,7 @@ CREATE TABLE t_ds_task_definition (
   resource_ids varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id) ,
-  CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+  PRIMARY KEY (id)
 ) ;
 
 create index task_definition_index on t_ds_task_definition (project_code,id);

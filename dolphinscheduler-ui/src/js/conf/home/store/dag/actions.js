@@ -318,19 +318,16 @@ export default {
   /**
    * Process instance update
    */
-  updateInstance ({ state }, payload) {
+  updateInstance ({ state }, instanceId) {
     return new Promise((resolve, reject) => {
-      const data = {
-        globalParams: state.globalParams,
-        tasks: state.tasks,
-        tenantId: state.tenantId,
-        timeout: state.timeout
-      }
-      io.put(`projects/${state.projectCode}/process-instances/${payload}`, {
-        processInstanceJson: JSON.stringify(data),
+      io.put(`projects/${state.projectCode}/process-instances/${instanceId}`, {
+        syncDefine: state.syncDefine,
+        globalParams: JSON.stringify(state.globalParams),
         locations: JSON.stringify(state.locations),
-        connects: JSON.stringify(state.connects),
-        syncDefine: state.syncDefine
+        taskDefinitionJson: JSON.stringify(state.tasks),
+        taskRelationJson: JSON.stringify(state.connects),
+        tenantCode: state.tenantCode,
+        timeout: state.timeout
       }, res => {
         resolve(res)
         state.isEditDag = false
