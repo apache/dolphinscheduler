@@ -452,7 +452,7 @@
           query = { subProcessIds: ids.join(',') }
         }
         let $name = this.$route.name.split('-')
-        this.$router.push({ path: `/${$name[0]}/${$name[1]}/list/${id}`, query: query })
+        this.$router.push({ path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${id}`, query: query })
       },
       /**
        * Subprocess processing
@@ -469,7 +469,7 @@
           subProcessIds.push(this.urlParam.id)
         }
         let $name = this.$route.name.split('-')
-        this.$router.push({ path: `/${$name[0]}/${$name[1]}/list/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
+        this.$router.push({ path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
       },
       /**
        * Refresh data
