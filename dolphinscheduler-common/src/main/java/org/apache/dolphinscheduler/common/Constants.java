@@ -521,8 +521,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 13;
 
     /**
      * jar
@@ -1029,6 +1028,7 @@ public final class Constants {
 
     public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
+    public static final int BUSY_NODE_STATUE = 2;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
@@ -1093,4 +1093,11 @@ public final class Constants {
     public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
     public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
     public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
+
+    /**
+     * dry run flag
+     */
+    public static final int DRY_RUN_FLAG_NO = 0;
+    public static final int DRY_RUN_FLAG_YES = 1;
+
 }

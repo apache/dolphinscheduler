@@ -66,6 +66,7 @@ public class TaskInstanceMapperTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningGroupId(0);
         processInstance.setCommandParam("");
+        processInstance.setProcessDefinitionCode(1L);
         processInstanceMapper.insert(processInstance);
         processInstanceId = processInstance.getId();
     }
@@ -270,6 +271,27 @@ public class TaskInstanceMapperTest {
         TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(
                 task.getProcessInstanceId(),
                 task.getName()
+        );
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertNotEquals(taskInstance, null);
+    }
+
+    /**
+     * test query by task instance id and code
+     */
+    @Test
+    public void testQueryByInstanceIdAndCode() {
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId());
+        task.setHost("111.111.11.11");
+        taskInstanceMapper.updateById(task);
+
+        TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(
+            task.getProcessInstanceId(),
+            task.getTaskCode()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstance, null);

@@ -82,7 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 
 /**
  * process service test
@@ -118,6 +117,8 @@ public class ProcessServiceTest {
     private ProcessDefinitionLogMapper processDefineLogMapper;
     @Mock
     private ResourceMapper resourceMapper;
+
+    private HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
 
     @Test
     public void testCreateSubCommand() {
@@ -240,63 +241,73 @@ public class ProcessServiceTest {
 
         //cannot construct process instance, return null;
         String host = "127.0.0.1";
-        int validThreadNum = 1;
         Command command = new Command();
         command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
             + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
-        Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
+        Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
 
+        int definitionVersion = 1;
+        long definitionCode = 123;
+        int processInstanceId = 222;
         //there is not enough thread for this command
         Command command1 = new Command();
-        command1.setProcessDefinitionCode(123);
+        command1.setProcessDefinitionCode(definitionCode);
+        command1.setProcessDefinitionVersion(definitionVersion);
         command1.setCommandParam("{\"ProcessInstanceId\":222}");
         command1.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(123);
         processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
+        processDefinition.setVersion(definitionVersion);
+        processDefinition.setCode(definitionCode);
         processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(222);
-        processInstance.setProcessDefinitionCode(11L);
-        processInstance.setProcessDefinitionVersion(1);
-        Mockito.when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode())).thenReturn(processDefinition);
+        processInstance.setId(processInstanceId);
+        processInstance.setProcessDefinitionCode(definitionCode);
+        processInstance.setProcessDefinitionVersion(definitionVersion);
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
             processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command1, processDefinitionCacheMaps));
 
         Command command2 = new Command();
         command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command2.setProcessDefinitionCode(123);
+        command2.setProcessDefinitionCode(definitionCode);
+        command2.setProcessDefinitionVersion(definitionVersion);
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
+        command2.setProcessInstanceId(processInstanceId);
 
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command2, processDefinitionCacheMaps));
 
         Command command3 = new Command();
-        command3.setProcessDefinitionCode(123);
+        command3.setProcessDefinitionCode(definitionCode);
+        command3.setProcessDefinitionVersion(definitionVersion);
+        command3.setProcessInstanceId(processInstanceId);
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command3, processDefinitionCacheMaps));
 
         Command command4 = new Command();
-        command4.setProcessDefinitionCode(123);
+        command4.setProcessDefinitionCode(definitionCode);
+        command4.setProcessDefinitionVersion(definitionVersion);
         command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command4.setCommandType(CommandType.REPEAT_RUNNING);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
+        command4.setProcessInstanceId(processInstanceId);
+        Assert.assertNotNull(processService.handleCommand(logger, host, command4, processDefinitionCacheMaps));
 
         Command command5 = new Command();
-        command5.setProcessDefinitionCode(123);
+        command5.setProcessDefinitionCode(definitionCode);
+        command5.setProcessDefinitionVersion(definitionVersion);
         HashMap<String, String> startParams = new HashMap<>();
         startParams.put("startParam1", "testStartParam1");
         HashMap<String, String> commandParams = new HashMap<>();
         commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
         command5.setCommandParam(JSONUtils.toJsonString(commandParams));
         command5.setCommandType(CommandType.START_PROCESS);
-        ProcessInstance processInstance1 = processService.handleCommand(logger, host, validThreadNum, command5);
+        command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
+        ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5, processDefinitionCacheMaps);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
     }
 

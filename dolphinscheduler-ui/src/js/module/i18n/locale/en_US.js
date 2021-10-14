@@ -586,6 +586,8 @@ export default {
   'Spark Version': 'Spark Version',
   TargetDataBase: 'target database',
   TargetTable: 'target table',
+  TargetJobName: 'target job name',
+  'Please enter Pigeon job name': 'Please enter Pigeon job name',
   'Please enter the table of target': 'Please enter the table of target',
   'Please enter a Target Table(required)': 'Please enter a Target Table(required)',
   SpeedByte: 'speed(byte count)',
