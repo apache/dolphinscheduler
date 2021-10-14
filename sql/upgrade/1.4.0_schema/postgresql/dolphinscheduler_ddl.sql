@@ -396,6 +396,10 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
 
+
+ALTER TABLE t_ds_task_definition ALTER COLUMN resource_ids TYPE text;
+ALTER TABLE t_ds_task_definition_log ALTER COLUMN resource_ids TYPE text;
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
