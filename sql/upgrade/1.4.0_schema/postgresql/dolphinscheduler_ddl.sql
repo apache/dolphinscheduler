@@ -379,6 +379,9 @@ CREATE TABLE t_ds_environment_worker_group_relation (
     CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
 );
 
+ALTER TABLE t_ds_task_definition ALTER COLUMN resource_ids TYPE text;
+ALTER TABLE t_ds_task_definition_log ALTER COLUMN resource_ids TYPE text;
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
