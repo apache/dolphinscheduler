@@ -297,22 +297,21 @@ public class SqlTask extends AbstractTask {
             resultJSONArray.add(mapOfColValues);
             rowCount++;
         }
-        int startRowIndex = 0;
-        if (resultSet.next()) {
-            logger.info("sql result limit : {} exceeding results are filtered", limit);
-            resultJSONArray.add(0, String.format("sql result limit : %d exceeding results are filtered", limit));
-            startRowIndex++;
 
-        }
         String result = JSONUtils.toJsonString(resultJSONArray);
         logger.debug("execute sql result : {}", result);
 
         int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
         displayRows = Math.min(displayRows, resultJSONArray.size());
         logger.info("display sql result {} rows as follows:", displayRows);
-        for (int i = startRowIndex; i < displayRows; i++) {
+
+        for (int i = 0; i < displayRows; i++) {
             String row = JSONUtils.toJsonString(resultJSONArray.get(i));
             logger.info("row {} : {}", i + 1, row);
+        }
+        if (resultSet.next()) {
+            logger.info("sql result limit : {} exceeding results are filtered", limit);
+            resultJSONArray.add(String.format("sql result limit : %d exceeding results are filtered", limit));
         }
 
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
