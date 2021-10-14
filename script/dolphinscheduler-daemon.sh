@@ -36,6 +36,7 @@ BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
 
 source /etc/profile
+source "${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh"
 
 export JAVA_HOME=$JAVA_HOME
 #export JAVA_HOME=/opt/soft/jdk
