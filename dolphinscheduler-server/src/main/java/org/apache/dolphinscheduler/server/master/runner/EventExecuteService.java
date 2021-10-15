@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -65,6 +66,12 @@ public class EventExecuteService extends Thread {
     @Autowired
     private MasterConfig masterConfig;
 
+    /**
+     * cache of process instance id and WorkflowExecuteThread
+     */
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
     private ExecutorService eventExecService;
 
     /**
@@ -73,20 +80,20 @@ public class EventExecuteService extends Thread {
     private StateEventCallbackService stateEventCallbackService;
 
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
-    private ConcurrentHashMap<String, WorkflowExecuteThread> eventHandlerMap = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, WorkflowExecuteThread> eventHandlerMap = new ConcurrentHashMap<>();
     ListeningExecutorService listeningExecutorService;
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-
+    /**
+     * constructor
+     */
+    public EventExecuteService() {
         eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
-
-        this.processInstanceExecMaps = processInstanceExecMaps;
 
         listeningExecutorService = MoreExecutors.listeningDecorator(eventExecService);
         this.stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
-
     }
+
+
 
     @Override
     public synchronized void start() {
@@ -115,7 +122,7 @@ public class EventExecuteService extends Thread {
     }
 
     private void eventHandler() {
-        for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecMaps.values()) {
+        for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             if (workflowExecuteThread.eventSize() == 0
                     || StringUtils.isEmpty(workflowExecuteThread.getKey())
                     || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
@@ -132,13 +139,13 @@ public class EventExecuteService extends Thread {
                 @Override
                 public void onSuccess(Object o) {
                     if (workflowExecuteThread.workFlowFinish()) {
-                        processInstanceExecMaps.remove(processInstanceId);
+                        processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged();
                         logger.info("process instance {} finished.", processInstanceId);
                     }
                     if (workflowExecuteThread.getProcessInstance().getId() != processInstanceId) {
-                        processInstanceExecMaps.remove(processInstanceId);
-                        processInstanceExecMaps.put(workflowExecuteThread.getProcessInstance().getId(), workflowExecuteThread);
+                        processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
+                        processInstanceExecCacheManager.cache(workflowExecuteThread.getProcessInstance().getId(), workflowExecuteThread);
 
                     }
                     eventHandlerMap.remove(workflowExecuteThread.getKey());
@@ -160,10 +167,10 @@ public class EventExecuteService extends Thread {
 
                 private void notifyMyself(ProcessInstance processInstance, TaskInstance taskInstance) {
                     logger.info("notify process {} task {} state change", processInstance.getId(), taskInstance.getId());
-                    if (!processInstanceExecMaps.containsKey(processInstance.getId())) {
+                    if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
                         return;
                     }
-                    WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
+                    WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecCacheManager.getByProcessInstanceId(processInstance.getId());
                     StateEvent stateEvent = new StateEvent();
                     stateEvent.setTaskInstanceId(taskInstance.getId());
                     stateEvent.setType(StateEventType.TASK_STATE_CHANGE);

@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
@@ -48,7 +49,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -88,11 +88,16 @@ public class MasterRegistryClient {
     private MasterConfig masterConfig;
 
     /**
+     * cache of process instance id and WorkflowExecuteThread
+     */
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    /**
      * heartbeat executor
      */
     private ScheduledExecutorService heartBeatExecutor;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
 
     /**
      * master startup time, ms
@@ -101,12 +106,15 @@ public class MasterRegistryClient {
 
     private String localNodePath;
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
+    /**
+     * constructor
+     */
+    public MasterRegistryClient() {
         this.startupTime = System.currentTimeMillis();
         this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        this.processInstanceExecMaps = processInstanceExecMaps;
     }
+
 
     public void start() {
         String nodeLock = registryClient.getMasterStartUpLockPath();
@@ -308,10 +316,10 @@ public class MasterRegistryClient {
 
                 taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
                 processService.saveTaskInstance(taskInstance);
-                if (!processInstanceExecMaps.containsKey(processInstance.getId())) {
+                if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
                     return;
                 }
-                WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
+                WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecCacheManager.getByProcessInstanceId(processInstance.getId());
                 StateEvent stateEvent = new StateEvent();
                 stateEvent.setTaskInstanceId(taskInstance.getId());
                 stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
