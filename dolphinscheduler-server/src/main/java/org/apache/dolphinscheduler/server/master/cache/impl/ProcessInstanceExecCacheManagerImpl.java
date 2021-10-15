@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cache.impl;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.springframework.stereotype.Component;
@@ -30,9 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecCacheManager {
 
-    /**
-     * use a concurrent map cache
-     */
     private final ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
 
     @Override
@@ -60,6 +58,6 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
 
     @Override
     public Collection<WorkflowExecuteThread> getAll() {
-        return processInstanceExecMaps.values();
+        return ImmutableList.copyOf(processInstanceExecMaps.values());
     }
 }
