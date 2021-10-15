@@ -84,6 +84,7 @@ elif [ "$command" = "logger-server" ]; then
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
 elif [ "$command" = "standalone-server" ]; then
+  LOG_FILE="-Dlogging.config=classpath:logback-standalone.xml"
   CLASS=org.apache.dolphinscheduler.server.StandaloneServer
 else
   echo "Error: No command named '$command' was found."
