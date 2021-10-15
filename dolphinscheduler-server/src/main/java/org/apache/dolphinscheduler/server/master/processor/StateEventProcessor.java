@@ -26,10 +26,8 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +49,6 @@ public class StateEventProcessor implements NettyRequestProcessor {
         stateEventResponseService = SpringApplicationContext.getBean(StateEventResponseService.class);
     }
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-        this.stateEventResponseService.init(processInstanceExecMaps);
-    }
 
     @Override
     public void process(Channel channel, Command command) {
