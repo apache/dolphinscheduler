@@ -349,7 +349,7 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean taskStateChangeHandler(StateEvent stateEvent) {
         TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
-        if (stateEvent.getExecutionStatus().typeIsFinished()) {
+        if (task.getState().typeIsFinished()) {
             taskFinished(task);
         } else if (activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
@@ -372,6 +372,18 @@ public class WorkflowExecuteThread implements Runnable {
                 task.getState());
         if (task.taskCanRetry()) {
             addTaskToStandByList(task);
+            if (!task.retryTaskIntervalOverTime()) {
+                logger.info("failure task will be submitted: process id: {}, task instance id: {} state:{} retry times:{} / {}, interval:{}",
+                        processInstance.getId(),
+                        task.getId(),
+                        task.getState(),
+                        task.getRetryTimes(),
+                        task.getMaxRetryTimes(),
+                        task.getRetryInterval());
+                this.addTimeoutCheck(task);
+            } else {
+                submitStandByTask();
+            }
             return;
         }
         ProcessInstance processInstance = processService.findProcessInstanceById(this.processInstance.getId());
@@ -648,18 +660,20 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void addTimeoutCheck(TaskInstance taskInstance) {
-
+        if (taskTimeoutCheckList.containsKey(taskInstance.getId())) {
+            return;
+        }
         TaskDefinition taskDefinition = processService.findTaskDefinition(
                 taskInstance.getTaskCode(),
                 taskInstance.getTaskDefinitionVersion()
         );
         taskInstance.setTaskDefine(taskDefinition);
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
+        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag() || taskInstance.taskCanRetry()) {
             this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-            return;
-        }
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
+        } else {
+            if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+                this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
+            }
         }
     }
 
@@ -1129,7 +1143,9 @@ public class WorkflowExecuteThread implements Runnable {
     private void addTaskToStandByList(TaskInstance taskInstance) {
         logger.info("add task to stand by list: {}", taskInstance.getName());
         try {
-            readyToSubmitTaskQueue.put(taskInstance);
+            if (!readyToSubmitTaskQueue.contains(taskInstance)) {
+                readyToSubmitTaskQueue.put(taskInstance);
+            }
         } catch (Exception e) {
             logger.error("add task instance to readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
         }
@@ -1189,34 +1205,10 @@ public class WorkflowExecuteThread implements Runnable {
                 this.addStateEvent(stateEvent);
             }
         }
-
     }
 
     public boolean workFlowFinish() {
         return this.processInstance.getState().typeIsFinished();
-    }
-
-    /**
-     * whether the retry interval is timed out
-     *
-     * @param taskInstance task instance
-     * @return Boolean
-     */
-    private boolean retryTaskIntervalOverTime(TaskInstance taskInstance) {
-        if (taskInstance.getState() != ExecutionStatus.FAILURE) {
-            return true;
-        }
-        if (taskInstance.getId() == 0
-                ||
-                taskInstance.getMaxRetryTimes() == 0
-                ||
-                taskInstance.getRetryInterval() == 0) {
-            return true;
-        }
-        Date now = new Date();
-        long failedTimeInterval = DateUtils.differSec(now, taskInstance.getEndTime());
-        // task retry does not over time, return false
-        return taskInstance.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     /**
@@ -1250,12 +1242,16 @@ public class WorkflowExecuteThread implements Runnable {
                 }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
-                    if (retryTaskIntervalOverTime(task)) {
+                    if (task.retryTaskIntervalOverTime()) {
+                        int originalId = task.getId();
                         TaskInstance taskInstance = submitTaskExec(task);
                         if (taskInstance == null) {
                             this.taskFailedSubmit = true;
                         } else {
                             removeTaskFromStandbyList(task);
+                            if (taskInstance.getId() != originalId) {
+                                activeTaskProcessorMaps.remove(originalId);
+                            }
                         }
                     }
                 } else if (DependResult.FAILED == dependResult) {
