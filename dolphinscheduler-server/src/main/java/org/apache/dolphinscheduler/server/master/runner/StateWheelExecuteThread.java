@@ -96,6 +96,10 @@ public class StateWheelExecuteThread extends Thread {
                     return;
                 }
             }
+            if(taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()){
+                processDependCheck(taskInstance);
+                taskInstanceCheckList.remove(taskInstance.getId());
+            }
             if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
                 processDependCheck(taskInstance);
             }

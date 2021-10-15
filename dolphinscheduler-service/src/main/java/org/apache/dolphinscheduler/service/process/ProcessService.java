@@ -1334,6 +1334,8 @@ public class ProcessService {
                         taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
                     }
                     taskInstance.setSubmitTime(null);
+                    taskInstance.setLogPath(null);
+                    taskInstance.setExecutePath(null);
                     taskInstance.setStartTime(null);
                     taskInstance.setEndTime(null);
                     taskInstance.setFlag(Flag.YES);
