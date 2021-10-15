@@ -597,7 +597,6 @@ public class TaskInstance implements Serializable {
     /**
      * whether the retry interval is timed out
      *
-     * @param taskInstance task instance
      * @return Boolean
      */
     public boolean retryTaskIntervalOverTime() {
@@ -605,10 +604,8 @@ public class TaskInstance implements Serializable {
             return true;
         }
         if (getId() == 0
-                ||
-                getMaxRetryTimes() == 0
-                ||
-                getRetryInterval() == 0) {
+                || getMaxRetryTimes() == 0
+                || getRetryInterval() == 0) {
             return true;
         }
         Date now = new Date();
