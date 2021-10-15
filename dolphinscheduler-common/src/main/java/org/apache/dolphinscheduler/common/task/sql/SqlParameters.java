@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -217,7 +218,7 @@ public class SqlParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
+        return datasource != 0 && !StringUtils.isEmpty(type) && !StringUtils.isEmpty(sql);
     }
 
     @Override
@@ -251,9 +252,9 @@ public class SqlParameters extends AbstractParameters {
                 sqlResultFormat.put(key, new ArrayList<>());
             }
             for (Map<String, String> info : sqlResult) {
-                for (String key : info.keySet()) {
-                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
-                }
+                info.forEach((key, value) -> {
+                    sqlResultFormat.get(key).add(value);
+                });
             }
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {

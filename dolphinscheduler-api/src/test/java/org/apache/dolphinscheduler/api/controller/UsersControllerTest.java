@@ -41,7 +41,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * users controller test
  */
-public class UsersControllerTest extends AbstractControllerTest{
+public class UsersControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
@@ -63,7 +63,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -86,7 +86,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -104,7 +104,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -122,11 +122,9 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
-
 
     @Test
     public void testGrantUDFFunc() throws Exception {
@@ -142,10 +140,9 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testGrantDataSource() throws Exception {
@@ -161,7 +158,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -174,7 +171,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -191,10 +188,9 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testAuthorizedUser() throws Exception {
@@ -209,7 +205,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -226,10 +222,9 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyUserName() throws Exception {
@@ -240,7 +235,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -257,7 +252,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -271,7 +266,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -290,7 +285,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
 
     @Test
@@ -306,7 +301,7 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
 
     @Test
@@ -324,6 +319,6 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
 }

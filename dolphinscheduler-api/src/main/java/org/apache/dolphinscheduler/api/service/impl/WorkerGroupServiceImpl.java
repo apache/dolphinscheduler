@@ -21,16 +21,18 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -136,7 +138,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
         }
         // check zookeeper
-        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
+        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
         return RegistryCenterUtils.isNodeExisted(workerGroupPath);
     }
 
@@ -169,14 +171,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return worker group list page
      */
     @Override
-    public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+    public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -186,7 +189,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (CollectionUtils.isNotEmpty(workerGroups)) {
             List<WorkerGroup> searchValDataList = new ArrayList<>();
 
-            if (StringUtils.isNotEmpty(searchVal)) {
+            if (!StringUtils.isEmpty(searchVal)) {
                 for (WorkerGroup workerGroup : workerGroups) {
                     if (workerGroup.getName().contains(searchVal)) {
                         searchValDataList.add(workerGroup);
@@ -205,10 +208,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(resultDataList.size());
-        pageInfo.setLists(resultDataList);
+        pageInfo.setTotal(resultDataList.size());
+        pageInfo.setTotalList(resultDataList);
 
-        result.put(Constants.DATA_LIST, pageInfo);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -263,7 +266,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
+            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
             List<String> childrenNodes = null;
             try {
                 childrenNodes = RegistryCenterUtils.getChildrenNodes(workerGroupPath);
@@ -277,7 +280,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = RegistryCenterUtils.getNodeData(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = RegistryCenterUtils.getNodeData(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);

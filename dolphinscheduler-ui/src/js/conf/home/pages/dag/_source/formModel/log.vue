@@ -16,7 +16,7 @@
  */
 <template>
   <span class="log-model">
-    <span  v-if="stateId && item.type !== 'SUB_PROCESS'">
+    <span  v-if="taskInstanceId && item.type !== 'SUB_PROCESS'">
       <slot name="history"></slot>
       <span @click="_ckLog">
         <slot name="log" ></slot>
@@ -79,7 +79,6 @@
         store,
         router,
         isLog: false,
-        stateId: $(`#${this.item.id}`).attr('data-state-id') || null,
         isScreen: false,
         loadingIndex: 0,
         isData: true,
@@ -95,7 +94,10 @@
         type: String,
         default: 'from'
       },
-      logId: Number
+      taskInstanceId: {
+        type: Number,
+        default: 0
+      }
     },
     methods: {
       _refreshLog () {
@@ -169,7 +171,7 @@
        */
       _downloadLog () {
         downloadFile('log/download-log', {
-          taskInstanceId: this.stateId || this.logId
+          taskInstanceId: this.taskInstanceId
         })
       },
       /**
@@ -230,7 +232,7 @@
     watch: {},
     created () {
       // Source is a task instance
-      if (this.source === 'list') {
+      if (this.source === 'list' || this.source === 'dag') {
         this.$message.info(`${i18n.$t('Loading Log...')}`)
         this._ckLog()
       }
@@ -243,7 +245,7 @@
     computed: {
       _rtParam () {
         return {
-          taskInstanceId: this.stateId || this.logId,
+          taskInstanceId: this.taskInstanceId,
           skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
           limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
         }

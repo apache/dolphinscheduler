@@ -66,6 +66,7 @@ public class TaskInstanceMapperTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningGroupId(0);
         processInstance.setCommandParam("");
+        processInstance.setProcessDefinitionCode(1L);
         processInstanceMapper.insert(processInstance);
         processInstanceId = processInstance.getId();
     }
@@ -276,6 +277,27 @@ public class TaskInstanceMapperTest {
     }
 
     /**
+     * test query by task instance id and code
+     */
+    @Test
+    public void testQueryByInstanceIdAndCode() {
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId());
+        task.setHost("111.111.11.11");
+        taskInstanceMapper.updateById(task);
+
+        TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(
+            task.getProcessInstanceId(),
+            task.getTaskCode()
+        );
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertNotEquals(taskInstance, null);
+    }
+
+    /**
      * test count task instance
      */
     @Test
@@ -323,7 +345,6 @@ public class TaskInstanceMapperTest {
         TaskInstance task = insertTaskInstance(processInstance.getId());
         ProcessDefinition definition = new ProcessDefinition();
         definition.setCode(1111L);
-        definition.setProjectId(1111);
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
@@ -348,7 +369,6 @@ public class TaskInstanceMapperTest {
     public void testQueryTaskInstanceListPaging() {
         ProcessDefinition definition = new ProcessDefinition();
         definition.setCode(1L);
-        definition.setProjectId(1111);
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());

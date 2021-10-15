@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +41,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * resources controller test
  */
-public class ResourcesControllerTest extends AbstractControllerTest{
+public class ResourcesControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class);
 
@@ -56,10 +57,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryResourceListPaging() throws Exception {
@@ -78,10 +78,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyResourceName() throws Exception {
@@ -99,7 +98,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -111,7 +110,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         paramsMap.add("skipLineNum","2");
         paramsMap.add("limit","100");
 
-
         MvcResult mvcResult = mockMvc.perform(get("/resources/view")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -121,7 +119,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -135,7 +133,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         paramsMap.add("description","test");
         paramsMap.add("content","echo 1111");
 
-
         MvcResult mvcResult = mockMvc.perform(post("/resources/online-create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -145,7 +142,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -156,8 +153,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         paramsMap.add("id", "1");
         paramsMap.add("content","echo test_1111");
 
-
-        MvcResult mvcResult = mockMvc.perform(post("/resources/update-content")
+        MvcResult mvcResult = mockMvc.perform(put("/resources/1/update-content")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -166,7 +162,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -176,7 +172,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "5");
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/download")
+        MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/download",5)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -185,10 +181,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testCreateUdfFunc() throws Exception {
@@ -202,7 +197,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         paramsMap.add("description", "description");
         paramsMap.add("resourceId", "1");
 
-
         MvcResult mvcResult = mockMvc.perform(post("/resources/udf-func/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -212,7 +206,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -231,10 +225,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testUpdateUdfFunc() throws Exception {
@@ -258,10 +251,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryUdfFuncList() throws Exception {
@@ -279,11 +271,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
-
 
     @Test
     public void testQueryResourceList() throws Exception {
@@ -299,10 +289,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyUdfFuncName() throws Exception {
@@ -318,7 +307,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -336,10 +325,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testUnauthorizedFile() throws Exception {
@@ -355,10 +343,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testAuthorizedUDFFunction() throws Exception {
@@ -374,7 +361,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -392,10 +379,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testDeleteUdfFunc() throws Exception {
@@ -411,10 +397,9 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testDeleteResource() throws Exception {
@@ -428,7 +413,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

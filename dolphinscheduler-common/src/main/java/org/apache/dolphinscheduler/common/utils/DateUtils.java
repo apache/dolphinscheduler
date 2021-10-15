@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,16 +28,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * date utils
- */
-public class DateUtils {
+public final class DateUtils {
 
     static final long C0 = 1L;
     static final long C1 = C0 * 1000L;
@@ -45,34 +43,10 @@ public class DateUtils {
     static final long C5 = C4 * 60L;
     static final long C6 = C5 * 24L;
 
-    /**
-     * a default datetime formatter for the timestamp
-     */
-    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
-    }
-
-    /**
-     * @param timeMillis timeMillis like System.currentTimeMillis()
-     * @return string formatted as yyyy-MM-dd HH:mm:ss
-     */
-    public static String formatTimeStamp(long timeMillis) {
-        return formatTimeStamp(timeMillis, DEFAULT_DATETIME_FORMATTER);
-    }
-
-    /**
-     * @param timeMillis timeMillis like System.currentTimeMillis()
-     * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
-     * @return formatted string
-     */
-    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
-        Objects.requireNonNull(dateTimeFormatter);
-        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
-                ZoneId.systemDefault()));
     }
 
     /**
@@ -197,28 +171,6 @@ public class DateUtils {
      */
     public static long differMs(Date d1, Date d2) {
         return Math.abs(d1.getTime() - d2.getTime());
-    }
-
-    /**
-     * get hours between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ hours
-     */
-    public static long diffHours(Date d1, Date d2) {
-        return (long) Math.ceil(diffMin(d1, d2) / 60.0);
-    }
-
-    /**
-     * get minutes between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ minutes
-     */
-    public static long diffMin(Date d1, Date d2) {
-        return (long) Math.ceil(differSec(d1, d2) / 60.0);
     }
 
     /**
@@ -558,19 +510,6 @@ public class DateUtils {
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
-
-        public static long toSeconds(long d) {
-            return d / (C3 / C2);
-        }
-
-        public static long toMinutes(long d) {
-            return d / (C4 / C2);
-        }
-
-        public static long toHours(long d) {
-            return d / (C5 / C2);
-        }
-
         public static long toDays(long d) {
             return d / (C6 / C2);
         }

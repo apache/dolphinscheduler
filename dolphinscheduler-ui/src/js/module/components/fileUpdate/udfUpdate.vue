@@ -44,7 +44,7 @@
           </el-input>
         </li>
         <li style="margin-top: -4px;margin-bottom: 8px;">
-          <el-button type="success" size="mini" @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `Loading... (${progress}%)` : $t('Upload UDF Resources')}}</el-button>
+          <el-button type="success" size="mini" @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `${$t('Loading...')} (${progress}%)` : $t('Upload UDF Resources')}}</el-button>
         </li>
       </ul>
     </div>
@@ -119,7 +119,7 @@
         formData.append('description', this.udfDesc)
         this.spinnerLoading = true
         this.$emit('on-update-present', false)
-        io.post('resources/create', res => {
+        io.post('resources', res => {
           this.$message.success(res.msg)
           this.spinnerLoading = false
           this.progress = 0

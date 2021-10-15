@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -84,7 +84,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
         Map<String, Object> result = new HashMap<>();
 
-        if (BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()))) {
+        if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
             putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
             return result;
         }
@@ -183,19 +183,19 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
     @Override
     public boolean checkExistPluginInstanceName(String pluginInstanceName) {
-        return BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(pluginInstanceName));
+        return alertPluginInstanceMapper.existInstanceName(pluginInstanceName) == Boolean.TRUE;
     }
 
     @Override
-    public Map<String, Object> queryPluginPage(int pageIndex, int pageSize) {
+    public Result queryPluginPage(int pageIndex, int pageSize) {
         IPage<AlertPluginInstance> pluginInstanceIPage = new Page<>(pageIndex, pageSize);
         pluginInstanceIPage = alertPluginInstanceMapper.selectPage(pluginInstanceIPage, null);
 
         PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageIndex, pageSize);
-        pageInfo.setTotalCount((int) pluginInstanceIPage.getTotal());
-        pageInfo.setLists(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) pluginInstanceIPage.getTotal());
+        pageInfo.setTotalList(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
+        Result result = new Result();
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

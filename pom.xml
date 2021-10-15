@@ -16,11 +16,11 @@
   ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.6-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -70,20 +70,21 @@
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
-        <druid.version>1.1.22</druid.version>
+        <druid.version>1.2.4</druid.version>
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
         <junit.version>4.12</junit.version>
-        <mysql.connector.version>5.1.34</mysql.connector.version>
+        <mysql.connector.version>8.0.16</mysql.connector.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
         <slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <commons.httpclient>3.0.1</commons.httpclient>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.lang.version>2.6</commons.lang.version>
         <commons.email.version>1.5</commons.email.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
@@ -97,7 +98,7 @@
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
-        <checkstyle.version>3.0.0</checkstyle.version>
+        <checkstyle.version>3.1.2</checkstyle.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
@@ -125,10 +126,16 @@
         <protostuff.version>1.7.2</protostuff.version>
         <reflections.version>0.9.12</reflections.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
+        <java-websocket.version>1.5.1</java-websocket.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.java-websocket</groupId>
+                <artifactId>Java-WebSocket</artifactId>
+                <version>${java-websocket.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -204,6 +211,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-standalone-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -310,7 +322,6 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-test</artifactId>
                 <version>${curator.test}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -410,6 +421,14 @@
             </dependency>
 
             <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <version>${jacoco.version}</version>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
@@ -453,6 +472,12 @@
                 <groupId>commons-configuration</groupId>
                 <artifactId>commons-configuration</artifactId>
                 <version>${commons.configuration.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
             </dependency>
 
             <dependency>
@@ -653,7 +678,6 @@
                 <artifactId>javax.mail</artifactId>
                 <version>1.6.2</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -826,6 +850,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <systemPropertyVariables>
+                        <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
+                    </systemPropertyVariables>
                     <includes>
                         <!--registry plugin -->
                         <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
@@ -835,6 +862,7 @@
                         <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
+                        <include>**/api/controller/SchedulerControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
@@ -876,9 +904,12 @@
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
+                        <include>**/api/service/EnvironmentServiceTest.java</include>
+                        <include>**/api/service/EnvironmentWorkerGroupRelationServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
+                        <include>**/api/controller/EnvironmentControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
@@ -888,7 +919,6 @@
                         <include>**/api/utils/ResultTest.java</include>
                         <include>**/common/graph/DAGTest.java</include>
                         <include>**/common/os/OshiTest.java</include>
-                        <include>**/common/os/OSUtilsTest.java</include>
                         <include>**/common/shell/ShellExecutorTest.java</include>
                         <include>**/common/task/DataxParametersTest.java</include>
                         <include>**/common/task/EntityTestUtils.java</include>
@@ -908,7 +938,6 @@
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/NetUtilsTest.java</include>
-                        <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
                         <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>
@@ -961,6 +990,7 @@
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
+                        <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <include>**/server/log/LoggerRequestProcessorTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
@@ -980,6 +1010,7 @@
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
                         <include>**/server/master/ConditionsTaskTest.java</include>
+                        <include>**/server/master/SwitchTaskTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/master/SubProcessTaskTest.java</include>
@@ -1022,7 +1053,6 @@
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
-                        <include>**/service/log/SensitiveDataConverterTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
                         <include>**/service/alert/ProcessAlertManagerTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
@@ -1054,7 +1084,6 @@
                         <include>**/plugin/alert/email/EmailAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/email/EmailAlertChannelTest.java</include>
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
-                        <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
                         <include>**/plugin/alert/dingtalk/DingTalkSenderTest.java</include>
                         <include>**/plugin/alert/dingtalk/DingTalkAlertChannelFactoryTest.java</include>
@@ -1081,6 +1110,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+                        <include>**/plugin/task/pigeon/PigeonTaskTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1092,19 +1122,23 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
-                    <destFile>target/jacoco.exec</destFile>
-                    <dataFile>target/jacoco.exec</dataFile>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>jacoco-initialize</id>
+                        <id>default-instrument</id>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>instrument</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>jacoco-site</id>
-                        <phase>test</phase>
+                        <id>default-restore-instrumented-classes</id>
+                        <goals>
+                            <goal>restore-instrumented-classes</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
                         <goals>
                             <goal>report</goal>
                         </goals>
@@ -1138,15 +1172,13 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.18</version>
+                        <version>8.45</version>
                     </dependency>
                 </dependencies>
                 <configuration>
                     <consoleOutput>true</consoleOutput>
                     <encoding>UTF-8</encoding>
                     <configLocation>style/checkstyle.xml</configLocation>
-                    <suppressionsLocation>style/checkstyle-suppressions.xml</suppressionsLocation>
-                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                     <failOnViolation>true</failOnViolation>
                     <violationSeverity>warning</violationSeverity>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -1154,7 +1186,6 @@
                         <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
                     </sourceDirectories>
                     <excludes>**\/generated-sources\/</excludes>
-                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -1190,6 +1221,7 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
+        <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
@@ -1200,5 +1232,6 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-standalone-server</module>
     </modules>
 </project>

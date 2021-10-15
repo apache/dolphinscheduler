@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -36,7 +35,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "QUEUE_TAG")
 @RestController
-@RequestMapping("/queue")
+@RequestMapping("/queues")
 public class QueueController extends BaseController {
 
     @Autowired
@@ -81,18 +82,18 @@ public class QueueController extends BaseController {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return queue list
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -100,30 +101,30 @@ public class QueueController extends BaseController {
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
      * create queue
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return create result
      */
     @ApiOperation(value = "createQueue", notes = "CREATE_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -138,23 +139,23 @@ public class QueueController extends BaseController {
      * update queue
      *
      * @param loginUser login user
-     * @param queue     queue
-     * @param id        queue id
+     * @param queue queue
+     * @param id queue id
      * @param queueName queue name
      * @return update result code
      */
     @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "id") int id,
+                              @PathVariable(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
         Map<String, Object> result = queueService.updateQueue(loginUser, id, queue, queueName);
@@ -165,16 +166,16 @@ public class QueueController extends BaseController {
      * verify queue and queue name
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
-    @PostMapping(value = "/verify-queue")
+    @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -185,6 +186,4 @@ public class QueueController extends BaseController {
 
         return queueService.verifyQueue(queue, queueName);
     }
-
-
 }

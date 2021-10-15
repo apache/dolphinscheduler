@@ -24,13 +24,18 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
@@ -92,6 +97,11 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterSchedulerService masterSchedulerService;
 
+    @Autowired
+    private EventExecuteService eventExecuteService;
+
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
+
     /**
      * master server startup, not use web service
      *
@@ -111,16 +121,28 @@ public class MasterServer implements IStoppable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        TaskAckProcessor ackProcessor = new TaskAckProcessor();
+        ackProcessor.init(processInstanceExecMaps);
+        TaskResponseProcessor taskResponseProcessor = new TaskResponseProcessor();
+        taskResponseProcessor.init(processInstanceExecMaps);
+        StateEventProcessor stateEventProcessor = new StateEventProcessor();
+        stateEventProcessor.init(processInstanceExecMaps);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, ackProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
         this.nettyRemotingServer.start();
 
         // self tolerant
+        this.masterRegistryClient.init(this.processInstanceExecMaps);
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
+        this.eventExecuteService.init(this.processInstanceExecMaps);
+        this.eventExecuteService.start();
         // scheduler start
+        this.masterSchedulerService.init(this.processInstanceExecMaps);
+
         this.masterSchedulerService.start();
 
         // start QuartzExecutors

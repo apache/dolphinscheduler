@@ -21,10 +21,11 @@ import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.List;

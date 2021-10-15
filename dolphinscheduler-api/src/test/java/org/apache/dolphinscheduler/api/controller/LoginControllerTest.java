@@ -37,7 +37,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * login controller test
  */
-public class LoginControllerTest extends AbstractControllerTest{
+public class LoginControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
@@ -54,7 +54,7 @@ public class LoginControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -70,7 +70,7 @@ public class LoginControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
