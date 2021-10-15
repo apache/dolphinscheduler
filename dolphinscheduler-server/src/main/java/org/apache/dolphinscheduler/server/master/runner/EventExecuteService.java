@@ -122,7 +122,7 @@ public class EventExecuteService extends Thread {
                 continue;
             }
             int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
-            logger.info("handle process instance : {} events, count:{}",
+            logger.info("handle process instance : {} , events count:{}",
                     processInstanceId,
                     workflowExecuteThread.eventSize());
             logger.info("already exists handler process size:{}", this.eventHandlerMap.size());
