@@ -99,11 +99,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     /**
-     * task logger
-     */
-    private Logger taskLogger;
-
-    /**
      * alert client server
      */
     private AlertClientService alertClientService;
@@ -143,7 +138,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             // check if the OS user exists
             if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
                 String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
-                taskLogger.error(errorLog);
+                logger.error(errorLog);
                 responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
                 responseCommand.setEndTime(new Date());
                 return;
