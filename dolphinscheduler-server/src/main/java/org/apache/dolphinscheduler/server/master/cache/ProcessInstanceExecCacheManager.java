@@ -53,7 +53,7 @@ public interface ProcessInstanceExecCacheManager {
      * cache
      *
      * @param processInstanceId     processInstanceId
-     * @param workflowExecuteThread notnull
+     * @param workflowExecuteThread if it is null, will not be cached
      */
     void cache(int processInstanceId, WorkflowExecuteThread workflowExecuteThread);
 

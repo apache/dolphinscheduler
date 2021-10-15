@@ -98,7 +98,6 @@ public class MasterRegistryClient {
      */
     private ScheduledExecutorService heartBeatExecutor;
 
-
     /**
      * master startup time, ms
      */
@@ -106,15 +105,11 @@ public class MasterRegistryClient {
 
     private String localNodePath;
 
-    /**
-     * constructor
-     */
     public MasterRegistryClient() {
         this.startupTime = System.currentTimeMillis();
         this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
-
 
     public void start() {
         String nodeLock = registryClient.getMasterStartUpLockPath();

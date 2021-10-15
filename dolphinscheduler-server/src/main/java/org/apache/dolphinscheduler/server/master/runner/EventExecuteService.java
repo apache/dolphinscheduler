@@ -83,17 +83,12 @@ public class EventExecuteService extends Thread {
     private ConcurrentHashMap<String, WorkflowExecuteThread> eventHandlerMap = new ConcurrentHashMap<>();
     ListeningExecutorService listeningExecutorService;
 
-    /**
-     * constructor
-     */
     public EventExecuteService() {
         eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
 
         listeningExecutorService = MoreExecutors.listeningDecorator(eventExecService);
         this.stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
     }
-
-
 
     @Override
     public synchronized void start() {
