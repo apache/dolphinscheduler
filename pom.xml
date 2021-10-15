@@ -1231,7 +1231,6 @@
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
-        <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-standalone-server</module>
     </modules>
 </project>
