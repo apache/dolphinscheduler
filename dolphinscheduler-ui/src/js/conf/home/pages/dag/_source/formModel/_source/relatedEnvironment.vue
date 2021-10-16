@@ -109,17 +109,10 @@
       }
     },
     created () {
-      let stateEnvironmentList = this.store.state.security.environmentListAll || []
-
-      if (stateEnvironmentList.length && stateEnvironmentList.length > 0) {
-        this.environmentList = stateEnvironmentList
+      this._getEnvironmentAll().then(res => {
+        this.environmentList = res
         this._initEnvironmentOptions(this.workerGroup)
-      } else {
-        this._getEnvironmentAll().then(res => {
-          this.environmentList = res
-          this._initEnvironmentOptions(this.workerGroup)
-        })
-      }
+      })
     }
   }
 </script>
