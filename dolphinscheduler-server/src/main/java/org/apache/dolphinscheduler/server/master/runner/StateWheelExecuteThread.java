@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+
 import org.apache.hadoop.util.ThreadUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +45,7 @@ public class StateWheelExecuteThread extends Thread {
 
     ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
     ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;;
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     private int stateCheckIntervalSecs;
 

@@ -119,14 +119,14 @@ public class EventExecuteService extends Thread {
     private void eventHandler() {
         for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             if (workflowExecuteThread.eventSize() == 0
-                    || StringUtils.isEmpty(workflowExecuteThread.getKey())
-                    || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
+                || StringUtils.isEmpty(workflowExecuteThread.getKey())
+                || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
                 continue;
             }
             int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
             logger.info("handle process instance : {} events, count:{}",
-                    processInstanceId,
-                    workflowExecuteThread.eventSize());
+                processInstanceId,
+                workflowExecuteThread.eventSize());
             logger.info("already exists handler process size:{}", this.eventHandlerMap.size());
             eventHandlerMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
             ListenableFuture future = this.listeningExecutorService.submit(workflowExecuteThread);
@@ -148,7 +148,7 @@ public class EventExecuteService extends Thread {
 
                 private void notifyProcessChanged() {
                     Map<ProcessInstance, TaskInstance> fatherMaps
-                            = processService.notifyProcessList(processInstanceId, 0);
+                        = processService.notifyProcessList(processInstanceId, 0);
 
                     for (ProcessInstance processInstance : fatherMaps.keySet()) {
                         String address = NetUtils.getAddr(masterConfig.getListenPort());
@@ -178,15 +178,15 @@ public class EventExecuteService extends Thread {
                     String host = processInstance.getHost();
                     if (StringUtils.isEmpty(host)) {
                         logger.info("process {} host is empty, cannot notify task {} now.",
-                                processInstance.getId(), taskInstance.getId());
+                            processInstance.getId(), taskInstance.getId());
                         return;
                     }
                     String address = host.split(":")[0];
                     int port = Integer.parseInt(host.split(":")[1]);
                     logger.info("notify process {} task {} state change, host:{}",
-                            processInstance.getId(), taskInstance.getId(), host);
+                        processInstance.getId(), taskInstance.getId(), host);
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
-                            processInstanceId, 0, workflowExecuteThread.getProcessInstance().getState(), processInstance.getId(), taskInstance.getId()
+                        processInstanceId, 0, workflowExecuteThread.getProcessInstance().getState(), processInstance.getId(), taskInstance.getId()
                     );
 
                     stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());

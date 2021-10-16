@@ -66,7 +66,6 @@ public class StateEventResponseService {
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-
     @PostConstruct
     public void start() {
         this.responseWorker = new StateEventResponseWorker();

@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,6 @@ public class StateEventProcessor implements NettyRequestProcessor {
     public StateEventProcessor() {
         stateEventResponseService = SpringApplicationContext.getBean(StateEventResponseService.class);
     }
-
 
     @Override
     public void process(Channel channel, Command command) {

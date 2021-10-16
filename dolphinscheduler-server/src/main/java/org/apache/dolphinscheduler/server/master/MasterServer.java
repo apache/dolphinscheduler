@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
-
 import javax.annotation.PostConstruct;
 
 import org.quartz.SchedulerException;
@@ -97,7 +96,6 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private EventExecuteService eventExecuteService;
-
 
     /**
      * master server startup, not use web service
