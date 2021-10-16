@@ -30,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessInstanceExecCacheManagerImplTest {
 
@@ -46,7 +45,6 @@ public class ProcessInstanceExecCacheManagerImplTest {
 
         processInstanceExecCacheManager.cache(1, workflowExecuteThread);
     }
-
 
     @Test
     public void testGetByProcessInstanceId() {
