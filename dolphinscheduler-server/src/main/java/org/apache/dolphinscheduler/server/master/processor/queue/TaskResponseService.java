@@ -77,8 +77,6 @@ public class TaskResponseService {
      */
     private Thread taskResponseWorker;
 
-
-
     @PostConstruct
     public void start() {
         this.taskResponseWorker = new TaskResponseWorker();
@@ -156,11 +154,11 @@ public class TaskResponseService {
                     if (taskInstance != null) {
                         ExecutionStatus status = taskInstance.getState().typeIsFinished() ? taskInstance.getState() : taskResponseEvent.getState();
                         processService.changeTaskState(taskInstance, status,
-                                taskResponseEvent.getStartTime(),
-                                taskResponseEvent.getWorkerAddress(),
-                                taskResponseEvent.getExecutePath(),
-                                taskResponseEvent.getLogPath(),
-                                taskResponseEvent.getTaskInstanceId());
+                            taskResponseEvent.getStartTime(),
+                            taskResponseEvent.getWorkerAddress(),
+                            taskResponseEvent.getExecutePath(),
+                            taskResponseEvent.getLogPath(),
+                            taskResponseEvent.getTaskInstanceId());
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
@@ -175,11 +173,11 @@ public class TaskResponseService {
                 try {
                     if (taskInstance != null) {
                         processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
-                                taskResponseEvent.getEndTime(),
-                                taskResponseEvent.getProcessId(),
-                                taskResponseEvent.getAppIds(),
-                                taskResponseEvent.getTaskInstanceId(),
-                                taskResponseEvent.getVarPool()
+                            taskResponseEvent.getEndTime(),
+                            taskResponseEvent.getProcessId(),
+                            taskResponseEvent.getAppIds(),
+                            taskResponseEvent.getTaskInstanceId(),
+                            taskResponseEvent.getVarPool()
                         );
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success

@@ -152,7 +152,7 @@ public class MasterRegistryClient {
     /**
      * remove zookeeper node path
      *
-     * @param path zookeeper node path
+     * @param path     zookeeper node path
      * @param nodeType zookeeper node type
      * @param failover is failover
      */
@@ -188,7 +188,7 @@ public class MasterRegistryClient {
      * failover server when server down
      *
      * @param serverHost server host
-     * @param nodeType zookeeper node type
+     * @param nodeType   zookeeper node type
      */
     private void failoverServerWhenDown(String serverHost, NodeType nodeType) {
         switch (nodeType) {
@@ -276,7 +276,7 @@ public class MasterRegistryClient {
      * 2. change task state from running to need failover.
      * 3. failover all tasks when workerHost is null
      *
-     * @param workerHost worker host
+     * @param workerHost           worker host
      * @param needCheckWorkerAlive need check worker alive
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive, boolean checkOwner) {
@@ -291,21 +291,21 @@ public class MasterRegistryClient {
 
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
             if (workerHost == null
-                    || !checkOwner
-                    || processInstance.getHost().equalsIgnoreCase(workerHost)) {
+                || !checkOwner
+                || processInstance.getHost().equalsIgnoreCase(workerHost)) {
                 // only failover the task owned myself if worker down.
                 // failover master need handle worker at the same time
                 if (processInstance == null) {
                     logger.error("failover error, the process {} of task {} do not exists.",
-                            taskInstance.getProcessInstanceId(), taskInstance.getId());
+                        taskInstance.getProcessInstanceId(), taskInstance.getId());
                     continue;
                 }
                 taskInstance.setProcessInstance(processInstance);
 
                 TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                        .buildTaskInstanceRelatedInfo(taskInstance)
-                        .buildProcessInstanceRelatedInfo(processInstance)
-                        .create();
+                    .buildTaskInstanceRelatedInfo(taskInstance)
+                    .buildProcessInstanceRelatedInfo(processInstance)
+                    .create();
                 // only kill yarn job if exists , the local thread has exited
                 ProcessUtils.killYarnJob(taskExecutionContext);
 
@@ -367,11 +367,11 @@ public class MasterRegistryClient {
         localNodePath = getMasterPath();
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                masterConfig.getMasterMaxCpuloadAvg(),
-                masterConfig.getMasterReservedMemory(),
-                Sets.newHashSet(getMasterPath()),
-                Constants.MASTER_TYPE,
-                registryClient);
+            masterConfig.getMasterMaxCpuloadAvg(),
+            masterConfig.getMasterReservedMemory(),
+            Sets.newHashSet(getMasterPath()),
+            Constants.MASTER_TYPE,
+            registryClient);
 
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
         registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());

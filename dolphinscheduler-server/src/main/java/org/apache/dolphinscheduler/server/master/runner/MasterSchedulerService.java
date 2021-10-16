@@ -128,9 +128,9 @@ public class MasterSchedulerService extends Thread {
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
         stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
-                taskTimeoutCheckList,
-                this.processInstanceExecCacheManager,
-                masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
+            taskTimeoutCheckList,
+            this.processInstanceExecCacheManager,
+            masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
 
     @Override
@@ -189,28 +189,28 @@ public class MasterSchedulerService extends Thread {
             logger.info("find one command: id: {}, type: {}", command.getId(), command.getCommandType());
             try {
                 ProcessInstance processInstance = processService.handleCommand(logger,
-                        getLocalAddress(),
-                        command,
-                        processDefinitionCacheMaps);
+                    getLocalAddress(),
+                    command,
+                    processDefinitionCacheMaps);
                 if (!masterConfig.getMasterCacheProcessDefinition()
-                        && processDefinitionCacheMaps.size() > 0) {
+                    && processDefinitionCacheMaps.size() > 0) {
                     processDefinitionCacheMaps.clear();
                 }
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
-                            processInstance
-                            , processService
-                            , nettyExecutorManager
-                            , processAlertManager
-                            , masterConfig
-                            , taskTimeoutCheckList);
+                        processInstance
+                        , processService
+                        , nettyExecutorManager
+                        , processAlertManager
+                        , masterConfig
+                        , taskTimeoutCheckList);
 
                     this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
                     if (processInstance.getTimeout() > 0) {
                         this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
                     }
                     logger.info("handle command end, command {} process {} start...",
-                            command.getId(), processInstance.getId());
+                        command.getId(), processInstance.getId());
                     masterExecService.execute(workflowExecuteThread);
                 }
             } catch (Exception e) {
@@ -237,15 +237,15 @@ public class MasterSchedulerService extends Thread {
             for (Command command : commandList) {
                 int slot = ServerNodeManager.getSlot();
                 if (ServerNodeManager.MASTER_SIZE != 0
-                        && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
+                    && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
                     result = command;
                     break;
                 }
             }
             if (result != null) {
                 logger.info("find command {}, slot:{} :",
-                        result.getId(),
-                        ServerNodeManager.getSlot());
+                    result.getId(),
+                    ServerNodeManager.getSlot());
                 break;
             }
             pageNumber += 1;
