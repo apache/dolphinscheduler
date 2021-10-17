@@ -89,8 +89,6 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, SwitchParameters.class);
             case "BLOCKING":
                 return JSONUtils.parseObject(parameter, BlockingParameters.class);
-            case "TIS":
-                return JSONUtils.parseObject(parameter, TISCommonParameters.class);
             case "PIGEON":
                 return JSONUtils.parseObject(parameter, PigeonCommonParameters.class);
             default:

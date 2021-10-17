@@ -569,16 +569,16 @@ public class DagHelper {
     /**
      * is there have blocking node after the parent node
      */
-    public static boolean haveBlockingAfterNode(String parentNodeName,
+    public static boolean haveBlockingAfterNode(String parentNodeCode,
                                                 DAG<String,TaskNode,TaskNodeRelation> dag) {
-        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeName);
+        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeCode);
         if (CollectionUtils.isEmpty(subsequentNodes)) {
             return false;
         }
         for (String nodeName : subsequentNodes) {
             TaskNode taskNode = dag.getNode(nodeName);
             List<String> preTaskList = JSONUtils.toList(taskNode.getPreTasks(),String.class);
-            if (preTaskList.contains(parentNodeName) && taskNode.isBlockingTask()) {
+            if (preTaskList.contains(parentNodeCode) && taskNode.isBlockingTask()) {
                 return true;
             }
         }

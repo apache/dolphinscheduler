@@ -412,8 +412,8 @@ public class WorkflowExecuteThread implements Runnable {
             submitPostNode(Long.toString(task.getTaskCode()));
         } else if (task.getState().typeIsFailure()) {
             if (task.isConditionsTask()
-                    || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
-                // blocking 
+                    || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)
+                    || DagHelper.haveBlockingAfterNode(Long.toString(task.getTaskCode()), dag)) {
                 submitPostNode(Long.toString(task.getTaskCode()));
             } else {
                 errorTaskList.put(Long.toString(task.getTaskCode()), task);
