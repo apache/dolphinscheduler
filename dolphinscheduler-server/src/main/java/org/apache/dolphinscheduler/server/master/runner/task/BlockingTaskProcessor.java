@@ -193,7 +193,8 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
      */
     private void endTask() {
         ExecutionStatus status = ExecutionStatus.SUCCESS;
-        DependResult expected = "BlockingOnSuccess".equals(this.blockingConditionResult) ? DependResult.SUCCESS : DependResult.FAILED;
+        String successConditionStr = "BlockingOnSuccess";
+        DependResult expected = successConditionStr.equals(this.blockingConditionResult) ? DependResult.SUCCESS : DependResult.FAILED;
         logger.info("blocking result: expected-->{}, actual-->{}",expected,conditionResult);
         isBlocked = expected == conditionResult ? true : false;
         taskInstance.setState(status);
