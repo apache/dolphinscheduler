@@ -31,12 +31,14 @@ import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.ResInfo;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,10 +95,17 @@ public class RegistryClient extends RegistryCenter {
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
-            Server server = ResInfo.parseHeartbeatForRegistryInfo(entry.getValue());
-            if (server == null) {
+            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(entry.getValue());
+            if (heartBeat == null) {
                 continue;
             }
+
+            Server server = new Server();
+            server.setResInfo(JSONUtils.toJsonString(heartBeat));
+            server.setCreateTime(new Date(heartBeat.getStartupTime()));
+            server.setLastHeartbeatTime(new Date(heartBeat.getReportTime()));
+            server.setId(heartBeat.getProcessId());
+
             String key = entry.getKey();
             server.setZkDirectory(parentPath + "/" + key);
             // set host and port

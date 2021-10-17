@@ -57,7 +57,8 @@ do
     fi
 
     echo "start to scp $dsDir to $host/$installPath"
-    scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
+    # Use quiet mode to reduce command line output
+    scp -q -P $sshPort -r $workDir/../$dsDir  $host:$installPath
   done
 
   echo "scp dirs to $host/$installPath complete"

@@ -240,22 +240,27 @@ CREATE TABLE t_ds_alertgroup(
 DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
-  command_type int DEFAULT NULL ,
-  process_definition_code bigint NOT NULL ,
-  command_param text ,
-  task_depend_type int DEFAULT NULL ,
-  failure_strategy int DEFAULT '0' ,
-  warning_type int DEFAULT '0' ,
-  warning_group_id int DEFAULT NULL ,
-  schedule_time timestamp DEFAULT NULL ,
-  start_time timestamp DEFAULT NULL ,
-  executor_id int DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
+  command_type              int DEFAULT NULL ,
+  process_definition_code   bigint NOT NULL ,
+  command_param             text ,
+  task_depend_type          int DEFAULT NULL ,
+  failure_strategy          int DEFAULT '0' ,
+  warning_type              int DEFAULT '0' ,
+  warning_group_id          int DEFAULT NULL ,
+  schedule_time             timestamp DEFAULT NULL ,
+  start_time                timestamp DEFAULT NULL ,
+  executor_id               int DEFAULT NULL ,
+  update_time               timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group varchar(64),
-  environment_code bigint DEFAULT '-1',
+  worker_group              varchar(64),
+  environment_code          bigint DEFAULT '-1',
+  dry_run                   int DEFAULT '0' ,
+  process_instance_id       int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 ) ;
+
+create index priority_id_index on t_ds_command (process_instance_priority,id);
 
 --
 -- Table structure for table t_ds_datasource
@@ -281,22 +286,24 @@ CREATE TABLE t_ds_datasource (
 
 DROP TABLE IF EXISTS t_ds_error_command;
 CREATE TABLE t_ds_error_command (
-  id int NOT NULL ,
-  command_type int DEFAULT NULL ,
-  executor_id int DEFAULT NULL ,
-  process_definition_code bigint NOT NULL ,
-  command_param text ,
-  task_depend_type int DEFAULT NULL ,
-  failure_strategy int DEFAULT '0' ,
-  warning_type int DEFAULT '0' ,
-  warning_group_id int DEFAULT NULL ,
-  schedule_time timestamp DEFAULT NULL ,
-  start_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
+  id int NOT NULL  ,
+  command_type              int DEFAULT NULL ,
+  process_definition_code   bigint NOT NULL ,
+  command_param             text ,
+  task_depend_type          int DEFAULT NULL ,
+  failure_strategy          int DEFAULT '0' ,
+  warning_type              int DEFAULT '0' ,
+  warning_group_id          int DEFAULT NULL ,
+  schedule_time             timestamp DEFAULT NULL ,
+  start_time                timestamp DEFAULT NULL ,
+  executor_id               int DEFAULT NULL ,
+  update_time               timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group varchar(64),
-  environment_code bigint DEFAULT '-1',
-  message text ,
+  worker_group              varchar(64),
+  environment_code          bigint DEFAULT '-1',
+  dry_run                   int DEFAULT '0' ,
+  process_instance_id       int DEFAULT 0,
+  process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 );
 --
@@ -375,11 +382,10 @@ CREATE TABLE t_ds_task_definition (
   timeout_notify_strategy int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   delay_time int DEFAULT '0' ,
-  resource_ids varchar(255) DEFAULT NULL ,
+  resource_ids text ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id) ,
-  CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+  PRIMARY KEY (id)
 ) ;
 
 create index task_definition_index on t_ds_task_definition (project_code,id);
@@ -405,7 +411,7 @@ CREATE TABLE t_ds_task_definition_log (
   timeout_notify_strategy int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   delay_time int DEFAULT '0' ,
-  resource_ids varchar(255) DEFAULT NULL ,
+  resource_ids text ,
   operator int DEFAULT NULL ,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -490,6 +496,7 @@ CREATE TABLE t_ds_process_instance (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
+  dry_run int DEFAULT '0' ,
   PRIMARY KEY (id)
 ) ;
 
@@ -703,6 +710,7 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
+  dry_run int DEFAULT '0' ,
   PRIMARY KEY (id),
   CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;

@@ -30,10 +30,10 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -55,14 +55,12 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     MasterConfig masterConfig;
 
     @Autowired
-    NettyExecutorManager nettyExecutorManager;
+    NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
     /**
      * logger of MasterBaseTaskExecThread
      */
     protected Logger logger = LoggerFactory.getLogger(getClass());
-
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
@@ -124,12 +122,16 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(), org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+
+            TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
+            taskPriority.setTaskExecutionContext(taskExecutionContext);
+
             taskUpdateQueue.put(taskPriority);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
             return true;
         } catch (Exception e) {
             logger.error("submit task  Exception: ", e);
-            logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
+            logger.error("task error : {}", JSONUtils.toJsonString(taskInstance));
             return false;
         }
     }

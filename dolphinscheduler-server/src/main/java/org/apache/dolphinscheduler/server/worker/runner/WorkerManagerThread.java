@@ -23,16 +23,17 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,12 +74,21 @@ public class WorkerManagerThread implements Runnable {
     }
 
     /**
-     * get queue size
+     * get delay queue size
      *
      * @return queue size
      */
-    public int getQueueSize() {
+    public int getDelayQueueSize() {
         return workerExecuteQueue.size();
+    }
+
+    /**
+     * get thread pool queue size
+     *
+     * @return queue size
+     */
+    public int getThreadPoolQueueSize() {
+        return ((ThreadPoolExecutor) workerExecService).getQueue().size();
     }
 
     /**

@@ -38,7 +38,7 @@ public enum TaskType {
      * 12 SQOOP
      * 13 WATERDROP
      * 14 SWITCH
-     * 15 TIS
+     * 15 PIGEON
      * 16 BLOCKING
      */
     SHELL(0, "SHELL"),
@@ -56,8 +56,8 @@ public enum TaskType {
     SQOOP(12, "SQOOP"),
     WATERDROP(13, "WATERDROP"),
     SWITCH(14, "SWITCH"),
-    TIS(15, "TIS"),
-    BLOCKING(16,"BLOCKING");
+    PIGEON(15, "PIGEON"),
+    BLOCKING(16, "BLOCKING");
 
     TaskType(int code, String desc) {
         this.code = code;

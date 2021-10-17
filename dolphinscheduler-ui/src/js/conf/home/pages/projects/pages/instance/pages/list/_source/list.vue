@@ -298,7 +298,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}`, query: { code: item.processDefinitionCode } })
       },
       /**
        * Rerun

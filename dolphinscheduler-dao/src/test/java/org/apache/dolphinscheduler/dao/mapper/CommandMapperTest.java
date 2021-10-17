@@ -147,7 +147,7 @@ public class CommandMapperTest {
 
         createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        Command actualCommand = commandMapper.getOneToRun();
+        List<Command> actualCommand = commandMapper.queryCommandPage(1,0);
 
         assertNotNull(actualCommand);
     }
@@ -259,6 +259,8 @@ public class CommandMapperTest {
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setProcessInstanceId(0);
+        command.setProcessDefinitionVersion(0);
         commandMapper.insert(command);
 
         return command;
