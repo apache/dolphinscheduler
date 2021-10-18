@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+import org.apache.dolphinscheduler.server.log.LoggerServer;
 import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
@@ -63,7 +64,8 @@ public class StandaloneServer {
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
                 MasterServer.class,
-                WorkerServer.class
+                WorkerServer.class,
+                LoggerServer.class
         ).run(args);
     }
 
