@@ -1046,6 +1046,7 @@
                         <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
+                        <include>**/server/master/cache/impl/ProcessInstanceExecCacheManagerImplTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/registry/RegistryClientTest.java</include>
