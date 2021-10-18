@@ -57,6 +57,13 @@ public class ProcessInstanceExecCacheManagerImplTest {
     }
 
     @Test
+    public void testCacheNull() {
+        processInstanceExecCacheManager.cache(2, null);
+        WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(2);
+        Assert.assertNull(workflowExecuteThread);
+    }
+
+    @Test
     public void testRemoveByProcessInstanceId() {
         processInstanceExecCacheManager.removeByProcessInstanceId(1);
         WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(1);
