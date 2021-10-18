@@ -59,18 +59,22 @@ public class StandaloneServer {
 
         startRegistry();
 
-       // startAlertServer();
-
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
                 MasterServer.class,
-                WorkerServer.class,
-                LoggerServer.class
+                WorkerServer.class
         ).run(args);
+
+        startLoggerServer();
+        startAlertServer();
     }
 
     private static void startAlertServer() {
         AlertServer.getInstance().start();
+    }
+
+    private static void startLoggerServer(){
+        new LoggerServer().start();
     }
 
     private static void startRegistry() throws Exception {
