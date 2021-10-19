@@ -386,6 +386,7 @@ BEGIN
     IF EXISTS (SELECT 1 FROM pg_stat_all_indexes
           WHERE relname='t_ds_task_definition'
                             AND indexrelname ='task_definition_unique')
+    THEN
         ALTER TABLE t_ds_task_definition drop CONSTRAINT task_definition_unique;
     END IF;
 END;
