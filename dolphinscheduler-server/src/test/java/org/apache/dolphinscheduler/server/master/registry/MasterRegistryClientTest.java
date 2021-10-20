@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -65,6 +66,9 @@ public class MasterRegistryClientTest {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
 
     @Before
     public void before() throws Exception {
