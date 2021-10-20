@@ -694,7 +694,6 @@
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-maven-plugin</artifactId>
                     <version>1.0.0</version>
-                    <extensions>true</extensions>
                 </plugin>
 
                 <plugin>
@@ -774,11 +773,14 @@
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-maven-plugin</artifactId>
                 <extensions>true</extensions>
-                <!--<configuration>-->
-                <!--<allowedProvidedDependencies>-->
-                <!--<allowedProvidedDependency>org.apache.dolphinscheduler:dolphinscheduler-common</allowedProvidedDependency>-->
-                <!--</allowedProvidedDependencies>-->
-                <!--</configuration>-->
+                <configuration>
+                <allowedProvidedDependencies>
+                    <allowedProvidedDependency>org.apache.dolphinscheduler:dolphinscheduler-datasource-api</allowedProvidedDependency>
+                    <allowedProvidedDependency>com.google.guava:guava</allowedProvidedDependency>
+                    <allowedProvidedDependency>com.alibaba:druid</allowedProvidedDependency>
+                    <allowedProvidedDependency>org.springframework:spring-jdbc</allowedProvidedDependency>
+                </allowedProvidedDependencies>
+                </configuration>
             </plugin>
 
             <plugin>
