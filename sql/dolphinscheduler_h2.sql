@@ -328,6 +328,8 @@ CREATE TABLE t_ds_command
     worker_group              varchar(64),
     environment_code          bigint(20) DEFAULT '-1',
     dry_run                   int NULL DEFAULT 0,
+    process_instance_id       int(11) DEFAULT 0,
+    process_definition_version int(11) DEFAULT 0,
     PRIMARY KEY (id),
     KEY                       priority_id_index (process_instance_priority, id)
 );
@@ -381,6 +383,8 @@ CREATE TABLE t_ds_error_command
     environment_code          bigint(20) DEFAULT '-1',
     message                   text,
     dry_run                   int NULL DEFAULT 0,
+    process_instance_id       int(11) DEFAULT 0,
+    process_definition_version int(11) DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -471,7 +475,7 @@ CREATE TABLE t_ds_task_definition
     timeout_notify_strategy tinyint(4) DEFAULT NULL,
     timeout                 int(11) DEFAULT '0',
     delay_time              int(11) DEFAULT '0',
-    resource_ids            varchar(255) DEFAULT NULL,
+    resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
     PRIMARY KEY (id, code)
@@ -502,7 +506,7 @@ CREATE TABLE t_ds_task_definition_log
     timeout_notify_strategy tinyint(4) DEFAULT NULL,
     timeout                 int(11) DEFAULT '0',
     delay_time              int(11) DEFAULT '0',
-    resource_ids            varchar(255) DEFAULT NULL,
+    resource_ids            text,
     operator                int(11) DEFAULT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,

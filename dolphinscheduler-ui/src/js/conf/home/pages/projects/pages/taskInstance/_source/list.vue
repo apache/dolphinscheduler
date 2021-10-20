@@ -149,7 +149,7 @@
         this.$emit('on-update')
       },
       _go (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.processInstanceId}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.processInstanceId}` })
       }
     },
     watch: {
@@ -166,7 +166,7 @@
       this.list = this.taskInstanceList
     },
     computed: {
-      ...mapState('dag', ['projectId'])
+      ...mapState('dag', ['projectCode'])
     },
     components: { mLog }
   }

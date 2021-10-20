@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 
 import org.apache.hadoop.util.ThreadUtil;
 
@@ -44,17 +45,17 @@ public class StateWheelExecuteThread extends Thread {
 
     ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
     ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     private int stateCheckIntervalSecs;
 
     public StateWheelExecuteThread(ConcurrentHashMap<Integer, ProcessInstance> processInstances,
                                    ConcurrentHashMap<Integer, TaskInstance> taskInstances,
-                                   ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps,
+                                   ProcessInstanceExecCacheManager processInstanceExecCacheManager,
                                    int stateCheckIntervalSecs) {
         this.processInstanceCheckList = processInstances;
         this.taskInstanceCheckList = taskInstances;
-        this.processInstanceExecMaps = processInstanceExecMaps;
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.stateCheckIntervalSecs = stateCheckIntervalSecs;
     }
 
@@ -96,6 +97,10 @@ public class StateWheelExecuteThread extends Thread {
                     return;
                 }
             }
+            if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
+                processDependCheck(taskInstance);
+                taskInstanceCheckList.remove(taskInstance.getId());
+            }
             if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
                 processDependCheck(taskInstance);
             }
@@ -117,10 +122,10 @@ public class StateWheelExecuteThread extends Thread {
 
     private void putEvent(StateEvent stateEvent) {
 
-        if (!processInstanceExecMaps.containsKey(stateEvent.getProcessInstanceId())) {
+        if (!processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
             return;
         }
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecMaps.get(stateEvent.getProcessInstanceId());
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         workflowExecuteThread.addStateEvent(stateEvent);
     }
 
