@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.spi.task.UdfFuncBean.UdfFuncDeserializer;
+import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest.UdfFuncDeserializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  *  SQL Task ExecutionContext
