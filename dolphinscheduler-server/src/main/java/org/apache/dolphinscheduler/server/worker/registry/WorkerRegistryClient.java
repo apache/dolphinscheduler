@@ -24,16 +24,15 @@ import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Date;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.Executors;
@@ -64,6 +63,12 @@ public class WorkerRegistryClient {
     private WorkerConfig workerConfig;
 
     /**
+     * worker manager
+     */
+    @Autowired
+    private WorkerManagerThread workerManagerThread;
+
+    /**
      * heartbeat executor
      */
     private ScheduledExecutorService heartBeatExecutor;
@@ -71,16 +76,16 @@ public class WorkerRegistryClient {
     private RegistryClient registryClient;
 
     /**
-     * worker start time
+     * worker startup time, ms
      */
-    private String startTime;
+    private long startupTime;
 
     private Set<String> workerGroups;
 
     @PostConstruct
     public void initWorkRegistry() {
         this.workerGroups = workerConfig.getWorkerGroups();
-        this.startTime = DateUtils.dateToString(new Date());
+        this.startupTime = System.currentTimeMillis();
         this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -98,13 +103,16 @@ public class WorkerRegistryClient {
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 workerConfig.getWorkerMaxCpuloadAvg(),
                 workerConfig.getWorkerReservedMemory(),
                 workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_TYPE,
-                registryClient);
+                registryClient,
+                workerConfig.getWorkerExecThreads(),
+                workerManagerThread
+        );
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
