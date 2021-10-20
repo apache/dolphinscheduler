@@ -125,6 +125,8 @@ public class StandaloneServer {
         if (Files.exists(taskPluginPath)) {
             System.setProperty("task.plugin.binding", taskPluginPath.toString());
             System.setProperty("task.plugin.dir", "");
+        } else {
+            System.setProperty("task.plugin.binding", "lib/plugin/task/shell");
         }
     }
 }
