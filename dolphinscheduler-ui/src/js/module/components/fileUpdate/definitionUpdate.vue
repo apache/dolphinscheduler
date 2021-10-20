@@ -137,9 +137,9 @@
         return new Promise((resolve, reject) => {
           let self = this
           let formData = new FormData()
+          const projectCode = this.store.state.dag.projectCode
           formData.append('file', this.file)
-          formData.append('projectName', this.store.state.dag.projectName)
-          io.post('projects/import-definition', res => {
+          io.post(`projects/${projectCode}/process-definition/import`, res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateDefinition')
