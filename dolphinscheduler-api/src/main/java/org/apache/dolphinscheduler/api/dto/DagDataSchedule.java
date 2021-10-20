@@ -30,6 +30,9 @@ public class DagDataSchedule extends DagData {
      */
     private Schedule schedule;
 
+    public DagDataSchedule() {
+    }
+
     public DagDataSchedule(DagData dagData) {
         super();
         this.setProcessDefinition(dagData.getProcessDefinition());
