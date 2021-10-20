@@ -84,7 +84,7 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * default query sql limit
      */
-    private static final int LIMIT = 10000;
+    private static final int QUERY_LIMIT = 10000;
 
     /**
      * Abstract Yarn Task
@@ -239,7 +239,7 @@ public class SqlTask extends AbstractTaskExecutor {
             int num = md.getColumnCount();
 
             int rowCount = 0;
-            int limit = sqlParameters.getLimit() == 0 ? LIMIT : sqlParameters.getLimit();
+            int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
 
             while (rowCount < limit && resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
@@ -249,13 +249,17 @@ public class SqlTask extends AbstractTaskExecutor {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
-
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
             logger.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
                 String row = JSONUtils.toJsonString(resultJSONArray.get(i));
                 logger.info("row {} : {}", i + 1, row);
+            }
+            if (resultSet.next()) {
+                logger.info("sql result limit : {} exceeding results are filtered", limit);
+                String log = String.format("sql result limit : %d exceeding results are filtered", limit);
+                resultJSONArray.add(JSONUtils.toJsonNode(log));
             }
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
