@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.plugin.task.util.HdfsUtils;
+import org.apache.dolphinscheduler.plugin.task.util.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
@@ -149,7 +149,7 @@ public class SqlTask extends AbstractTaskExecutor {
                     .collect(Collectors.toList());
 
             List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
-                    logger);
+                    sqlTaskExecutionContext.getDefaultFS(), logger);
 
             // execute sql task
             executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
@@ -520,7 +520,7 @@ public class SqlTask extends AbstractTaskExecutor {
      * @param logger logger
      * @return create function list
      */
-    public static List<String> createFuncs(Map<UdfFuncRequest, String> udfFuncTenantCodeMap, Logger logger) {
+    public static List<String> createFuncs(Map<UdfFuncRequest, String> udfFuncTenantCodeMap, String defaultFS, Logger logger) {
 
         if (MapUtils.isEmpty(udfFuncTenantCodeMap)) {
             logger.info("can't find udf function resource");
@@ -529,7 +529,7 @@ public class SqlTask extends AbstractTaskExecutor {
         List<String> funcList = new ArrayList<>();
 
         // build jar sql
-        buildJarSql(funcList, udfFuncTenantCodeMap);
+        buildJarSql(funcList, udfFuncTenantCodeMap, defaultFS);
 
         // build temp function sql
         buildTempFuncSql(funcList, new ArrayList<>(udfFuncTenantCodeMap.keySet()));
@@ -557,13 +557,12 @@ public class SqlTask extends AbstractTaskExecutor {
      * @param sqls                  sql list
      * @param udfFuncTenantCodeMap  key is udf function,value is tenant code
      */
-    private static void buildJarSql(List<String> sqls, Map<UdfFuncRequest,String> udfFuncTenantCodeMap) {
-        String defaultFS = HdfsUtils.getInstance().getDefaultFS();
+    private static void buildJarSql(List<String> sqls, Map<UdfFuncRequest,String> udfFuncTenantCodeMap, String defaultFS) {
         String resourceFullName;
         Set<Entry<UdfFuncRequest, String>> entries = udfFuncTenantCodeMap.entrySet();
         for (Map.Entry<UdfFuncRequest, String> entry : entries) {
             String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
-            String uploadPath = HdfsUtils.getHdfsUdfDir(entry.getValue());
+            String uploadPath = CommonUtils.getHdfsUdfDir(entry.getValue());
             resourceFullName = entry.getKey().getResourceName();
             resourceFullName = resourceFullName.startsWith("/") ? resourceFullName : String.format("/%s", resourceFullName);
             sqls.add(String.format("add jar %s%s%s", prefixPath, uploadPath, resourceFullName));

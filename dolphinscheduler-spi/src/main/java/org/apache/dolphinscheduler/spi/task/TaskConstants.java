@@ -25,9 +25,9 @@ public class TaskConstants {
 
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
 
-    /** string true */
-    public static final String STRING_TRUE = "true";
-    /** string false */
+    /**
+     * string false
+     */
     public static final String STRING_FALSE = "false";
 
     /**
@@ -331,34 +331,4 @@ public class TaskConstants {
      */
     public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
 
-    /**
-     * hdfs configuration
-     * hdfs.root.user
-     */
-    public static final String HDFS_ROOT_USER = "hdfs.root.user";
-
-    /**
-     * fs.defaultFS
-     */
-    public static final String FS_DEFAULTFS = "fs.defaultFS";
-
-    /**
-     * com.amazonaws.services.s3.enableV4
-     */
-    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
-
-    /**
-     * fs s3a endpoint
-     */
-    public static final String FS_S3A_ENDPOINT = "fs.s3a.endpoint";
-
-    /**
-     * fs s3a access key
-     */
-    public static final String FS_S3A_ACCESS_KEY = "fs.s3a.access.key";
-
-    /**
-     * fs s3a secret key
-     */
-    public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
 }

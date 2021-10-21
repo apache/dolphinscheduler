@@ -183,6 +183,13 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
+     * @return DefaultFS
+     */
+    public String getDefaultFS() {
+        return getConfiguration().get(Constants.FS_DEFAULTFS);
+    }
+
+    /**
      * get application url
      *
      * @param applicationId application id
