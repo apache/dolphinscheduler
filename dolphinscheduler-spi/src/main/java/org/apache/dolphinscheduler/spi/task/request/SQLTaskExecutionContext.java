@@ -84,11 +84,10 @@ public class SQLTaskExecutionContext implements Serializable {
 
     @Override
     public String toString() {
-        return "SQLTaskExecutionContext{" +
-                "warningGroupId=" + warningGroupId +
-                ", connectionParams='" + connectionParams + '\'' +
-                ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap +
-                ", defaultFS='" + defaultFS + '\'' +
-                '}';
+        return "SQLTaskExecutionContext{"
+                + "warningGroupId=" + warningGroupId
+                + ", connectionParams='" + connectionParams + '\''
+                + ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap
+                + ", defaultFS='" + defaultFS + '\'' + '}';
     }
 }
