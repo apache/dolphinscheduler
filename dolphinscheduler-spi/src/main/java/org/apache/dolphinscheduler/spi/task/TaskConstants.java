@@ -324,4 +324,11 @@ public class TaskConstants {
      * Task Logger Thread's name
      */
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
+
+    /**
+     * hdfs/s3 configuration
+     * resource.upload.path
+     */
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+
 }
