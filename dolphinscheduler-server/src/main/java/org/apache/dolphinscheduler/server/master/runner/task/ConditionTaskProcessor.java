@@ -90,7 +90,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
         logger.info("dependent task start");
-        endTask();
         return true;
     }
 
@@ -103,6 +102,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     public void run() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
+            endTask();
         } else {
             endTask();
         }
