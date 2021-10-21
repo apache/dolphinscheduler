@@ -23,10 +23,10 @@ public enum ProfileType {
     /**
      * This profile used for Unit test
      */
-    public static final String UNIT_TEST = "unit_test";
+    public static final String H2 = "h2";
 
     /**
      * This profile used for UnUnit test
      */
-    public static final String UN_UNIT_TEST = "!unit_test";
+    public static final String NON_H2 = "!h2";
 }

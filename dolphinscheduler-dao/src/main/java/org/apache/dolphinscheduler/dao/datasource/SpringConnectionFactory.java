@@ -86,7 +86,7 @@ public class SpringConnectionFactory {
      * @return druid dataSource
      */
     @Bean(destroyMethod = "", name = "datasource")
-    @Profile(value = {ProfileType.UN_UNIT_TEST})
+    @Profile(value = {ProfileType.NON_H2})
     public DataSource dataSource() throws SQLException {
 
         DruidDataSource druidDataSource = new DruidDataSource();
@@ -120,7 +120,7 @@ public class SpringConnectionFactory {
     }
 
     @Bean(name = "datasource")
-    @Profile(value = {ProfileType.UNIT_TEST})
+    @Profile(value = {ProfileType.H2})
     public DataSource h2DataSource() {
         EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder(new FileSystemResourceLoader());
         EmbeddedDatabase datasource = embeddedDatabaseBuilder.setType(EmbeddedDatabaseType.H2)

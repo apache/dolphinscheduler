@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles(value = ProfileType.UNIT_TEST)
+@ActiveProfiles(value = ProfileType.H2)
 @ContextConfiguration(classes = SpringConnectionFactory.class)
 @Transactional
 @Rollback
