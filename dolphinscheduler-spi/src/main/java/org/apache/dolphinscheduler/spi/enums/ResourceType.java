@@ -14,22 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
+
+package org.apache.dolphinscheduler.spi.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * resource type
  */
-public enum  ResourceType {
+public enum ResourceType {
     /**
      * 0 file, 1 udf
      */
     FILE(0, "file"),
     UDF(1, "udf");
 
-
-    ResourceType(int code, String descp){
+    ResourceType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
