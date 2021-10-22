@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 public enum ProfileType {
     ;
 
-    /**
-     * This profile used for Unit test
-     */
     public static final String H2 = "h2";
 
-    /**
-     * This profile used for UnUnit test
-     */
-    public static final String NON_H2 = "!h2";
+    public static final String MYSQL = "mysql";
+
+    public static final String POSTGRESQL = "postgresql";
+
+    public static final List<String> DATASOURCE_PROFILE = Lists.newArrayList(H2, MYSQL, POSTGRESQL);
 }

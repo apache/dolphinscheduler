@@ -148,6 +148,7 @@ public class AlertServer {
     }
 
     public static void main(String[] args) {
+        System.setProperty("spring.profiles.active", "h2");
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(alertServer::stop));

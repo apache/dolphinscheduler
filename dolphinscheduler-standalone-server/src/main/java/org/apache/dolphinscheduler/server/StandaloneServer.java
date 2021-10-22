@@ -17,30 +17,18 @@
 
 package org.apache.dolphinscheduler.server;
 
-import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME;
-import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_URL;
-import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_USERNAME;
-
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
 import org.apache.curator.test.TestingServer;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
-import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,7 +41,7 @@ public class StandaloneServer {
     public static void main(String[] args) throws Exception {
         Thread.currentThread().setName("Standalone-Server");
 
-        System.setProperty("spring.profiles.active", "api");
+        System.setProperty("spring.profiles.active", "api,h2");
 
         startDatabase();
 
@@ -88,25 +76,9 @@ public class StandaloneServer {
         System.setProperty("registry.servers", server.getConnectString());
     }
 
-    private static void startDatabase() throws IOException, SQLException {
-        final Path temp = Files.createTempDirectory("dolphinscheduler_");
-        LOGGER.info("H2 database directory: {}", temp);
-        System.setProperty(
-                SPRING_DATASOURCE_DRIVER_CLASS_NAME,
-                org.h2.Driver.class.getName()
-        );
-        System.setProperty(
-                SPRING_DATASOURCE_URL,
-                String.format("jdbc:h2:tcp://localhost/%s;MODE=MySQL;DATABASE_TO_LOWER=true", temp.toAbsolutePath())
-        );
-        System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
-        System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
-
-        Server.createTcpServer("-ifNotExists", "-tcpDaemon").start();
-
-        final DataSource ds = ConnectionFactory.getInstance().getDataSource();
-        final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
-        runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
+    private static void startDatabase() {
+        System.setProperty("spring.datasource.sql.schema", "file:./sql/dolphinscheduler_h2.sql");
+        ConnectionFactory.getInstance().getDataSource();
     }
 
     private static void setTaskPlugin() {
