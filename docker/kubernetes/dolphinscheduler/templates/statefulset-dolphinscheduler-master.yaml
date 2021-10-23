@@ -19,267 +19,67 @@ kind: StatefulSet
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-master
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: master
+    {{- include "dolphinscheduler.master.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: {{ .Values.master.podManagementPolicy }}
   replicas: {{ .Values.master.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/managed-by: {{ .Release.Service }}
-      app.kubernetes.io/component: master
+      {{- include "dolphinscheduler.master.labels" . | nindent 6 }}
   serviceName: {{ template "dolphinscheduler.fullname" . }}-master-headless
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/managed-by: {{ .Release.Service }}
-        app.kubernetes.io/component: master
-      {{- if .Values.alert.annotations }}
+        {{- include "dolphinscheduler.master.labels" . | nindent 8 }}
+      {{- if .Values.master.annotations }}
       annotations:
-        {{- toYaml .Values.alert.annotations | nindent 8 }}
+        {{- toYaml .Values.master.annotations | nindent 8 }}
       {{- end }}
     spec:
       {{- if .Values.master.affinity }}
-      affinity: {{- toYaml .Values.master.affinity | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.master.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.master.nodeSelector }}
-      nodeSelector: {{- toYaml .Values.master.nodeSelector | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.master.nodeSelector | nindent 8 }}
       {{- end }}
       {{- if .Values.master.tolerations }}
-      tolerations: {{- toYaml . | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.master.tolerations | nindent 8 }}
       {{- end }}
-      initContainers:
-        - name: init-zookeeper
-          image: busybox:1.31.0
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
-                  while ! nc -z ${line%:*} ${line#*:}; do
-                      counter=$((counter+1))
-                      if [ $counter == 5 ]; then
-                          echo "Error: Couldn't connect to zookeeper."
-                          exit 1
-                      fi
-                      echo "Trying to connect to zookeeper at ${line}. Attempt $counter."
-                      sleep 60
-                  done
-              done
-          env:
-            - name: ZOOKEEPER_QUORUM
-              {{- if .Values.zookeeper.enabled }}
-              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
-              {{- else }}
-              value: {{ .Values.externalZookeeper.zookeeperQuorum }}
-              {{- end }}
-        - name: init-database
-          image: busybox:1.31.0
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
-                  counter=$((counter+1))
-                  if [ $counter == 5 ]; then
-                      echo "Error: Couldn't connect to database."
-                      exit 1
-                  fi
-                  echo "Trying to connect to database at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
-                  sleep 60
-              done
-          env:
-            - name: DATABASE_HOST
-              {{- if .Values.postgresql.enabled }}
-              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
-              {{- else }}
-              value: {{ .Values.externalDatabase.host | quote }}
-              {{- end }}
-            - name: DATABASE_PORT
-              {{- if .Values.postgresql.enabled }}
-              value: "5432"
-              {{- else }}
-              value: {{ .Values.externalDatabase.port | quote }}
-              {{- end }}
-      {{- if .Values.image.pullSecrets }}
+      {{- if .Values.image.pullSecret }}
       imagePullSecrets:
-      - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
+      - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
-          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          image: {{ include "dolphinscheduler.image.fullname" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "master-server"
           ports:
-            - containerPort: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+            - containerPort: 5678
               name: "master-port"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: DOLPHINSCHEDULER_OPTS
-              value: {{ default "" .Values.master.jvmOptions }}
             - name: TZ
               value: {{ .Values.timezone }}
-            - name: MASTER_EXEC_THREADS
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_EXEC_THREADS
-            - name: MASTER_EXEC_TASK_NUM
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_EXEC_TASK_NUM
-            - name: MASTER_HEARTBEAT_INTERVAL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_HEARTBEAT_INTERVAL
-            - name: MASTER_TASK_COMMIT_RETRYTIMES
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_TASK_COMMIT_RETRYTIMES
-            - name: MASTER_TASK_COMMIT_INTERVAL
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_TASK_COMMIT_INTERVAL
-            - name: MASTER_MAX_CPULOAD_AVG
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_MAX_CPULOAD_AVG
-            - name: MASTER_RESERVED_MEMORY
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_RESERVED_MEMORY
-            - name: MASTER_LISTEN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_LISTEN_PORT
-            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
-            - name: DATABASE_TYPE
-              {{- if .Values.postgresql.enabled }}
-              value: "postgresql"
-              {{- else }}
-              value: {{ .Values.externalDatabase.type | quote }}
-              {{- end }}
-            - name: DATABASE_DRIVER
-              {{- if .Values.postgresql.enabled }}
-              value: "org.postgresql.Driver"
-              {{- else }}
-              value: {{ .Values.externalDatabase.driver | quote }}
-              {{- end }}
-            - name: DATABASE_HOST
-              {{- if .Values.postgresql.enabled }}
-              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
-              {{- else }}
-              value: {{ .Values.externalDatabase.host | quote }}
-              {{- end }}
-            - name: DATABASE_PORT
-              {{- if .Values.postgresql.enabled }}
-              value: "5432"
-              {{- else }}
-              value: {{ .Values.externalDatabase.port | quote }}
-              {{- end }}
-            - name: DATABASE_USERNAME
-              {{- if .Values.postgresql.enabled }}
-              value: {{ .Values.postgresql.postgresqlUsername }}
-              {{- else }}
-              value: {{ .Values.externalDatabase.username | quote }}
-              {{- end }}
-            - name: DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- if .Values.postgresql.enabled }}
-                  name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-                  key: postgresql-password
-                  {{- else }}
-                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
-                  key: db-password
-                  {{- end }}
-            - name: DATABASE_DATABASE
-              {{- if .Values.postgresql.enabled }}
-              value: {{ .Values.postgresql.postgresqlDatabase }}
-              {{- else }}
-              value: {{ .Values.externalDatabase.database | quote }}
-              {{- end }}
-            - name: DATABASE_PARAMS
-              {{- if .Values.postgresql.enabled }}
-              value: "characterEncoding=utf8"
-              {{- else }}
-              value: {{ .Values.externalDatabase.params | quote }}
-              {{- end }}
-            - name: ZOOKEEPER_QUORUM
-              {{- if .Values.zookeeper.enabled }}
-              value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
-              {{- else }}
-              value: {{ .Values.externalZookeeper.zookeeperQuorum }}
-              {{- end }}
-            - name: ZOOKEEPER_ROOT
-              {{- if .Values.zookeeper.enabled }}
-              value: "/dolphinscheduler"
-              {{- else }}
-              value: {{ .Values.externalZookeeper.zookeeperRoot }}
-              {{- end }}
-            - name: RESOURCE_STORAGE_TYPE
-              valueFrom:
-                configMapKeyRef:
-                  key: RESOURCE_STORAGE_TYPE
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: RESOURCE_UPLOAD_PATH
-              valueFrom:
-                configMapKeyRef:
-                  key: RESOURCE_UPLOAD_PATH
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_DEFAULT_FS
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_DEFAULT_FS
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_ENDPOINT
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_ACCESS_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_ACCESS_KEY
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_SECRET_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_SECRET_KEY
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.zookeeper.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "dolphinscheduler.fullname" . }}-common
+            - configMapRef:
+                name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.resources }}
           resources:
-            limits:
-              memory: {{ .Values.master.resources.limits.memory | quote }}
-              cpu: {{ .Values.master.resources.limits.cpu | quote }}
-            requests:
-              memory: {{ .Values.master.resources.requests.memory | quote }}
-              cpu: {{ .Values.master.resources.requests.cpu | quote }}
+            {{- toYaml .Values.master.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.master.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - MasterServer
+              command: ["bash", "/root/checkpoint.sh", "MasterServer"]
             initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
@@ -289,10 +89,7 @@ spec:
           {{- if .Values.master.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - MasterServer
+              command: ["bash", "/root/checkpoint.sh", "MasterServer"]
             initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}
@@ -302,6 +99,7 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-master
+            {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.persistentVolumeClaim.enabled }}
@@ -310,19 +108,19 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
   {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: {{ include "dolphinscheduler.fullname" . }}-master
         labels:
           app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
-          {{- range .Values.master.persistentVolumeClaim.accessModes }}
+        {{- range .Values.master.persistentVolumeClaim.accessModes }}
           - {{ . | quote }}
-          {{- end }}
+        {{- end }}
         storageClassName: {{ .Values.master.persistentVolumeClaim.storageClassName | quote }}
         resources:
           requests:

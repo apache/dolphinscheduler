@@ -14,11 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,18 +38,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * users controller test
  */
-public class UsersControllerTest extends AbstractControllerTest{
+public class UsersControllerTest extends AbstractControllerTest {
+
     private static Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
     @Test
@@ -123,8 +126,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-
     @Test
     public void testGrantUDFFunc() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -142,7 +143,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testGrantDataSource() throws Exception {
@@ -192,7 +192,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testAuthorizedUser() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -226,7 +225,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyUserName() throws Exception {

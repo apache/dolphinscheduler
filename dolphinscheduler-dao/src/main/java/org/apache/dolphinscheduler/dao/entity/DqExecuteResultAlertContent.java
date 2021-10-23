@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.CheckType;
-import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -64,7 +60,7 @@ public class DqExecuteResultAlertContent implements Serializable {
      * rule_type
      */
     @JsonProperty(value = "ruleType")
-    private RuleType ruleType;
+    private int ruleType;
     /**
      * rule_name
      */
@@ -84,7 +80,7 @@ public class DqExecuteResultAlertContent implements Serializable {
      * check_type
      */
     @JsonProperty(value = "checkType")
-    private CheckType checkType;
+    private int checkType;
     /**
      * task_instance_id
      */
@@ -114,7 +110,7 @@ public class DqExecuteResultAlertContent implements Serializable {
      * state
      */
     @JsonProperty(value = "state")
-    private DqTaskState state;
+    private int state;
 
     @JsonProperty(value = "errorDataPath")
     private String errorDataPath;
@@ -151,17 +147,17 @@ public class DqExecuteResultAlertContent implements Serializable {
         private String processInstanceName;
         private long taskInstanceId;
         private String taskName;
-        private RuleType ruleType;
+        private int ruleType;
         private String ruleName;
         private double statisticsValue;
         private double comparisonValue;
-        private CheckType checkType;
+        private int checkType;
         private double threshold;
         private int operator;
         private int failureStrategy;
         private int userId;
         private String userName;
-        private DqTaskState state;
+        private int state;
         private String errorDataPath;
 
         public Builder processDefinitionId(long processDefinitionId) {
@@ -194,7 +190,7 @@ public class DqExecuteResultAlertContent implements Serializable {
             return this;
         }
 
-        public Builder ruleType(RuleType ruleType) {
+        public Builder ruleType(int ruleType) {
             this.ruleType = ruleType;
             return this;
         }
@@ -214,7 +210,7 @@ public class DqExecuteResultAlertContent implements Serializable {
             return this;
         }
 
-        public Builder checkType(CheckType checkType) {
+        public Builder checkType(int checkType) {
             this.checkType = checkType;
             return this;
         }
@@ -244,7 +240,7 @@ public class DqExecuteResultAlertContent implements Serializable {
             return this;
         }
 
-        public Builder state(DqTaskState state) {
+        public Builder state(int state) {
             this.state = state;
             return this;
         }

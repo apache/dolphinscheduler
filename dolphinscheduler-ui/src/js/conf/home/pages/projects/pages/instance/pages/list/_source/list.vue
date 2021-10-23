@@ -19,13 +19,13 @@
     <div class="table-box">
       <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50"></el-table-column>
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+                <router-link :to="{ path: `/projects/${projectCode}/instance/list/${scope.row.id}` , query:{code: scope.row.processDefinitionCode}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -56,11 +56,21 @@
             <span>{{scope.row.endTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
+        <el-table-column :label="$t('Dry-run flag')" width="100">
+          <template slot-scope="scope">
+            <span v-if="scope.row.dryRun == 1">YES</span>
+            <span v-else>NO</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
-        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
+        <el-table-column prop="host" :label="$t('host')" min-width="210"></el-table-column>
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
           <template slot-scope="scope">
             <div v-show="scope.row.disabled">
@@ -83,7 +93,7 @@
               <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
                 <span><el-button type="warning" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+              <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
                   :cancelButtonText="$t('Cancel')"
@@ -216,7 +226,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+    <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
@@ -230,7 +240,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
 
   export default {
@@ -288,7 +298,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}`, query: { code: item.processDefinitionCode } })
       },
       /**
        * Rerun
@@ -429,7 +439,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/gantt/${item.id}` })
       },
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
@@ -476,6 +486,9 @@
     created () {
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectCode'])
     },
     components: { }
   }

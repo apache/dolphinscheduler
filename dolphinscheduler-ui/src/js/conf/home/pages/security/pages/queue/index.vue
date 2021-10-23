@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create queue')}}</el-button>
           <el-dialog
             :title="item ? $t('Edit queue') : $t('Create queue')"
-            :v-if="createQueueDialog"
+            v-if="createQueueDialog"
             :visible.sync="createQueueDialog"
             width="auto">
             <m-create-queue :item="item" @onUpdate="onUpdate" @close="close"></m-create-queue>
@@ -117,11 +117,9 @@
         this._debounceGET('false')
         this.createQueueDialog = false
       },
-
       close () {
         this.createQueueDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false

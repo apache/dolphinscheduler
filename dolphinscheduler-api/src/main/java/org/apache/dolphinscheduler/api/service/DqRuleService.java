@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -30,12 +31,12 @@ public interface DqRuleService {
 
     Map<String, Object> queryAllRuleList();
 
-    Map<String, Object> queryRuleListPaging(User loginUser,
-                                            String searchVal,
-                                            Integer ruleType,
-                                            String startTime,
-                                            String endTime,
-                                            Integer pageNo, Integer pageSize);
+    Result queryRuleListPaging(User loginUser,
+                               String searchVal,
+                               Integer ruleType,
+                               String startTime,
+                               String endTime,
+                               Integer pageNo, Integer pageSize);
 
     Map<String,Object> getDatasourceOptionsById(int datasourceId);
 }

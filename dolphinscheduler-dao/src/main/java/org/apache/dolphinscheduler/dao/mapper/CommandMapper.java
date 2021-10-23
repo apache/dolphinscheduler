@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.ibatis.annotations.Param;
@@ -29,27 +31,24 @@ import java.util.List;
  */
 public interface CommandMapper extends BaseMapper<Command> {
 
-
-    /**
-     * get one command
-     * @return command
-     */
-    Command getOneToRun();
-
     /**
      * count command state
      * @param userId userId
      * @param startTime startTime
      * @param endTime endTime
-     * @param projectIdArray projectIdArray
+     * @param projectCodeArray projectCodeArray
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
             @Param("userId") int userId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("projectIdArray") Integer[] projectIdArray);
+            @Param("projectCodeArray") Long[] projectCodeArray);
 
-
+    /**
+     * query command page
+     * @return
+     */
+    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
 
 }

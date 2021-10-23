@@ -43,4 +43,10 @@
         where instance_name = #{instanceName}
     </select>
 
+    <select id="existInstanceName" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_alert_plugin_instance
+        where instance_name = #{instanceName} limit 1
+    </select>
+
 </mapper>

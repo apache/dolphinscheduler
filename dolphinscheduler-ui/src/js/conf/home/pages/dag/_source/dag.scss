@@ -550,25 +550,20 @@ svg path:hover {
 }
 
 .from-mirror {
+}
+.dag-chart {
   width: 100%;
-  position: relative;
-  z-index: 0;
-  .CodeMirror {
-    height:auto;
-    min-height: 72px;
-  }
+  height: calc(100vh - 100px);
+  padding: 10px;
+  background: #f2f3f7;
 
-  .CodeMirror-scroll {
-    height:auto;
-    min-height: 72px;
-    overflow-y: hidden;
-    overflow-x: auto;
+  &.full-screen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
   }
 }
-
-.ans-modal-box.ans-drawer.ans-drawer-right.dagMask.mask {
-    width: 628px;
-    left: auto;
-}
-
 

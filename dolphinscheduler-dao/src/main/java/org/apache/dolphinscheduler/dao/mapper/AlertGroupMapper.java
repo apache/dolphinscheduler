@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * alertgroup mapper interface
@@ -47,6 +50,13 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @return alertgroup list
      */
     List<AlertGroup> queryByGroupName(@Param("groupName") String groupName);
+
+    /**
+     * Judge whether the alert group exist
+     * @param groupName groupName
+     * @return if exist return true else return null
+     */
+    Boolean existGroupName(@Param("groupName") String groupName);
 
     /**
      * query by userId
@@ -73,4 +83,13 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @return
      */
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
+
+    /**
+     * query alertGroupVo page list
+     * @param page page
+     * @param groupName groupName
+     * @return IPage<AlertGroupVo>: include alert group id and group_name
+     */
+    IPage<AlertGroupVo> queryAlertGroupVo(Page<AlertGroupVo> page,
+                                          @Param("groupName") String groupName);
 }

@@ -24,18 +24,17 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,9 +78,9 @@ public class DqExecuteResultServiceTest {
         when(dqExecuteResultMapper.queryResultListPaging(
                 any(IPage.class), eq(""), eq(loginUser.getId()), any(),eq(ruleType), eq(start), eq(end))).thenReturn(page);
 
-        Map<String,Object> result = dqExecuteResultService.queryResultListPaging(
+        Result result = dqExecuteResultService.queryResultListPaging(
                 loginUser,searchVal,1,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
     }
 
     public List<DqExecuteResult> getExecuteResultList() {
@@ -89,7 +88,7 @@ public class DqExecuteResultServiceTest {
         List<DqExecuteResult> list = new ArrayList<>();
         DqExecuteResult dqExecuteResult = new DqExecuteResult();
         dqExecuteResult.setId(1);
-        dqExecuteResult.setState(DqTaskState.FAILURE);
+        dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
         list.add(dqExecuteResult);
 
         return list;

@@ -24,9 +24,10 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+
 import org.mockito.Mockito;
 
 /**
@@ -47,7 +48,7 @@ public class ExecutionContextTestUtils {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(NetUtils.getHost() + ":" + port));
+        executionContext.setHost(Host.of(NetUtils.getAddr(port)));
 
         return executionContext;
     }

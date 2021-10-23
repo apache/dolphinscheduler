@@ -16,7 +16,10 @@
  */
 
 import Vue from 'vue'
+import store from '@/conf/home/store'
+import localStore from '@/module/util/localStorage'
 import i18n from '@/module/i18n/index.js'
+import config from '~/external/config'
 import Router from 'vue-router'
 
 Vue.use(Router)
@@ -36,7 +39,7 @@ const router = new Router({
       component: resolve => require(['../pages/home/index'], resolve),
       meta: {
         title: `${i18n.$t('Home')} - DolphinScheduler`,
-        refresh_in_switched_tab: true
+        refreshInSwitchedTab: config.refreshInSwitchedTab
       }
     },
     {
@@ -49,66 +52,86 @@ const router = new Router({
       redirect: {
         name: 'projects-list'
       },
+      beforeEnter: (to, from, next) => {
+        const blacklist = ['projects', 'projects-list']
+        if (!blacklist.includes(to.name) && to.params.projectId && to.params.projectId !== localStore.getItem('projectId')) {
+          store.dispatch('projects/getProjectById', {
+            projectId: to.params.projectId
+          }).then(res => {
+            store.commit('dag/setProjectId', res.id)
+            store.commit('dag/setProjectCode', res.code)
+            store.commit('dag/setProjectName', res.name)
+            localStore.setItem('projectId', res.id)
+            localStore.setItem('projectCode', res.code)
+            localStore.setItem('projectName', res.name)
+            next()
+          }).catch(e => {
+            next({ name: 'projects-list' })
+          })
+        } else {
+          next()
+        }
+      },
       children: [
-        {
-          path: '/projects/index',
-          name: 'projects-index',
-          component: resolve => require(['../pages/projects/pages/index/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Project Home')}`,
-            refresh_in_switched_tab: true
-          }
-        },
-        {
-          path: '/projects/kinship',
-          name: 'projects-kinship',
-          component: resolve => require(['../pages/projects/pages/kinship/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Kinship')}`,
-            refresh_in_switched_tab: true
-          }
-        },
         {
           path: '/projects/list',
           name: 'projects-list',
           component: resolve => require(['../pages/projects/pages/list/index'], resolve),
           meta: {
             title: `${i18n.$t('Project')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
-          path: '/projects/definition',
+          path: '/projects/:projectCode/index',
+          name: 'projects-index',
+          component: resolve => require(['../pages/projects/pages/index/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Project Home')}`,
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
+        },
+        {
+          path: '/projects/:projectCode/kinship',
+          name: 'projects-kinship',
+          component: resolve => require(['../pages/projects/pages/kinship/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Kinship')}`,
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
+        },
+        {
+          path: '/projects/:projectCode/definition',
           name: 'definition',
           component: resolve => require(['../pages/projects/pages/definition/index'], resolve),
           meta: {
             title: `${i18n.$t('Process definition')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           },
           redirect: {
             name: 'projects-definition-list'
           },
           children: [
             {
-              path: '/projects/definition/list',
+              path: '/projects/:projectCode/definition/list',
               name: 'projects-definition-list',
               component: resolve => require(['../pages/projects/pages/definition/pages/list/index'], resolve),
               meta: {
                 title: `${i18n.$t('Process definition')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
-              path: '/projects/definition/list/:id',
+              path: '/projects/:projectCode/definition/list/:code',
               name: 'projects-definition-details',
               component: resolve => require(['../pages/projects/pages/definition/pages/details/index'], resolve),
               meta: {
                 title: `${i18n.$t('Process definition details')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
-              path: '/projects/definition/create',
+              path: '/projects/:projectCode/definition/create',
               name: 'definition-create',
               component: resolve => require(['../pages/projects/pages/definition/pages/create/index'], resolve),
               meta: {
@@ -116,27 +139,27 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/definition/tree/:id',
+              path: '/projects/:projectCode/definition/tree/:code',
               name: 'definition-tree-view-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/index'], resolve),
               meta: {
                 title: `${i18n.$t('TreeView')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
-              path: '/projects/definition/list/timing/:id',
+              path: '/projects/:projectCode/definition/list/timing/:code',
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {
                 title: `${i18n.$t('Scheduled task list')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             }
           ]
         },
         {
-          path: '/projects/instance',
+          path: '/projects/:projectCode/instance',
           name: 'instance',
           component: resolve => require(['../pages/projects/pages/instance/index'], resolve),
           meta: {
@@ -147,60 +170,60 @@ const router = new Router({
           },
           children: [
             {
-              path: '/projects/instance/list',
+              path: '/projects/:projectCode/instance/list',
               name: 'projects-instance-list',
               component: resolve => require(['../pages/projects/pages/instance/pages/list/index'], resolve),
               meta: {
                 title: `${i18n.$t('Process Instance')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
-              path: '/projects/instance/list/:id',
+              path: '/projects/:projectCode/instance/list/:id',
               name: 'projects-instance-details',
               component: resolve => require(['../pages/projects/pages/instance/pages/details/index'], resolve),
               meta: {
                 title: `${i18n.$t('Process instance details')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
-              path: '/projects/instance/gantt/:id',
+              path: '/projects/:projectCode/instance/gantt/:id',
               name: 'instance-gantt-index',
               component: resolve => require(['../pages/projects/pages/instance/pages/gantt/index'], resolve),
               meta: {
                 title: `${i18n.$t('Gantt')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             }
           ]
         },
         {
-          path: '/projects/task-instance',
+          path: '/projects/:projectCode/task-instance',
           name: 'task-instance',
           component: resolve => require(['../pages/projects/pages/taskInstance'], resolve),
           meta: {
             title: `${i18n.$t('Task Instance')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
 
         },
         {
-          path: '/projects/task-record',
+          path: '/projects/:projectCode/task-record',
           name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
           meta: {
             title: `${i18n.$t('Task record')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
-          path: '/projects/history-task-record',
+          path: '/projects/:projectCode/history-task-record',
           name: 'history-task-record',
           component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
           meta: {
             title: `${i18n.$t('History task record')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
 
         }
@@ -215,7 +238,7 @@ const router = new Router({
       },
       meta: {
         title: `${i18n.$t('Resources')}`,
-        refresh_in_switched_tab: true
+        refreshInSwitchedTab: config.refreshInSwitchedTab
       },
       children: [
         {
@@ -224,7 +247,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/file/pages/list/index'], resolve),
           meta: {
             title: `${i18n.$t('File Manage')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -249,7 +272,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/file/pages/subFileFolder/index'], resolve),
           meta: {
             title: `${i18n.$t('Create Resource')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -258,7 +281,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/file/pages/subFile/index'], resolve),
           meta: {
             title: `${i18n.$t('Create Resource')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -267,7 +290,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/file/pages/details/index'], resolve),
           meta: {
             title: `${i18n.$t('File Details')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -276,7 +299,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/file/pages/subdirectory/index'], resolve),
           meta: {
             title: `${i18n.$t('File Manage')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -293,7 +316,7 @@ const router = new Router({
           component: resolve => require(['../pages/resource/pages/udf/index'], resolve),
           meta: {
             title: `${i18n.$t('UDF manage')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           },
           children: [
             {
@@ -302,7 +325,7 @@ const router = new Router({
               component: resolve => require(['../pages/resource/pages/udf/pages/resource/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Resources')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
@@ -311,7 +334,7 @@ const router = new Router({
               component: resolve => require(['../pages/resource/pages/udf/pages/subUdfDirectory/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Resources')}`,
-                refresh_in_switched_tab: true
+                refreshInSwitchedTab: config.refreshInSwitchedTab
               }
             },
             {
@@ -388,7 +411,7 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
             title: `${i18n.$t('User Manage')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -421,6 +444,14 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
           meta: {
             title: `${i18n.$t('Worker group manage')}`
+          }
+        },
+        {
+          path: '/security/environments',
+          name: 'environment-manage',
+          component: resolve => require(['../pages/security/pages/environment/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Environment manage')}`
           }
         },
         {
@@ -516,7 +547,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/master'], resolve),
           meta: {
             title: `${i18n.$t('Service-Master')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -525,7 +556,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/worker'], resolve),
           meta: {
             title: `${i18n.$t('Service-Worker')}`,
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -534,7 +565,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
           meta: {
             title: 'Alert',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -543,7 +574,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
             title: 'Rpcserver',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -552,7 +583,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
           meta: {
             title: 'Zookeeper',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -561,7 +592,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
           meta: {
             title: 'Apiserver',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -570,7 +601,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/db'], resolve),
           meta: {
             title: 'DB',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
         {
@@ -579,7 +610,7 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/statistics'], resolve),
           meta: {
             title: 'statistics',
-            refresh_in_switched_tab: true
+            refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         }
       ]

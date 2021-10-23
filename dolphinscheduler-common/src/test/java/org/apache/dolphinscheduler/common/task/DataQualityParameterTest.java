@@ -17,16 +17,16 @@
 
 package org.apache.dolphinscheduler.common.task;
 
-import org.apache.dolphinscheduler.common.form.ParamsOptions;
-import org.apache.dolphinscheduler.common.form.PluginParams;
-import org.apache.dolphinscheduler.common.form.TriggerType;
-import org.apache.dolphinscheduler.common.form.Validate;
-import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
-import org.apache.dolphinscheduler.common.form.props.SelectParamsProps;
-import org.apache.dolphinscheduler.common.form.type.InputParam;
-import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.TriggerType;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParamProps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,19 +88,26 @@ public class DataQualityParameterTest {
                 + "\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
 
         List<PluginParams> pluginParamsList = new ArrayList<>();
+        SelectParamProps selectParamProps = new SelectParamProps();
+        selectParamProps.setMultiple(false);
+        selectParamProps.setDisabled(false);
+        selectParamProps.setSize("small");
+
         SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type","源数据类型")
-                .setProps(new SelectParamsProps().setMultiple(false).setDisabled(false).setSize("small"))
-                .addParamsOptions(new ParamsOptions("HIVE","HIVE",false))
-                .addParamsOptions(new ParamsOptions("JDBC","JDBC",false))
+                .setProps(selectParamProps)
+                .addOptions(new ParamsOptions("HIVE","HIVE",false))
+                .addOptions(new ParamsOptions("JDBC","JDBC",false))
                 .setValue("JDBC")
                 .build();
 
+        InputParamProps inputParamProps = new InputParamProps();
+        inputParamProps.setPlaceholder("Please enter source table name");
+        inputParamProps.setDisabled(false);
+        inputParamProps.setSize("small");
+        inputParamProps.setRows(0);
+
         InputParam srcTable = InputParam.newBuilder("src_table","源数据表")
-                .setProps(new InputParamsProps()
-                        .setPlaceholder("Please enter source table name")
-                        .setDisabled(false)
-                        .setSize("small")
-                        .setRows(0))
+                .setProps(inputParamProps)
                 .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
                 .build();
 

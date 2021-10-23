@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.InputParam;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -56,8 +56,8 @@ public class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         RadioParam scriptTypeParams = RadioParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TYPE, ScriptParamsConstants.SCRIPT_TYPE)
-                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getCode(), false))
-                .setValue(ScriptType.SHELL.getCode())
+                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getDescp(), false))
+                .setValue(ScriptType.SHELL.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 

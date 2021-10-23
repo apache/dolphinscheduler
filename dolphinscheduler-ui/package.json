@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A vue.js project",
   "author": "DolphinScheduler",
-  "repository": "https://github.com/apache/incubator-dolphinscheduler",
+  "repository": "https://github.com/apache/dolphinscheduler",
   "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
@@ -15,6 +15,8 @@
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
+    "@antv/layout": "^0.1.18",
+    "@antv/x6": "^1.25.5",
     "@form-create/element-ui": "^1.0.18",
     "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.16.2",
@@ -33,6 +35,7 @@
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
+    "moment-timezone": "^0.5.33",
     "normalize.css": "^8.0.1",
     "remixicon": "^2.5.0",
     "vue": "^2.5.17",
@@ -95,7 +98,7 @@
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "ie >= 9",
+    "ie >= 10",
     "edge >= 12",
     "firefox >= 28",
     "chrome >= 29",

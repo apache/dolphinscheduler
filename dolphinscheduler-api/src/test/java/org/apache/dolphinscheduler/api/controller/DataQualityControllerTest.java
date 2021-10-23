@@ -26,9 +26,9 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.task.dq.enums.RuleType;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -95,12 +95,21 @@ public class DataQualityControllerTest {
         }
     }
 
+    public void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
+        }
+    }
+
     private List<DqRule> getRuleList() {
         List<DqRule> list = new ArrayList<>();
         DqRule rule = new DqRule();
         rule.setId(1);
         rule.setName("空值检测");
-        rule.setType(RuleType.SINGLE_TABLE);
+        rule.setType(RuleType.SINGLE_TABLE.getCode());
         rule.setUserId(1);
         rule.setUserName("admin");
         rule.setCreateTime(new Date());
@@ -120,12 +129,12 @@ public class DataQualityControllerTest {
         String end = "2020-01-02 00:00:00";
 
         PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
-        pageInfo.setTotalCount(10);
-        pageInfo.setLists(getRuleList());
+        pageInfo.setTotal(10);
+        pageInfo.setTotalList(getRuleList());
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, pageInfo);
 
         when(dqRuleService.queryRuleListPaging(
                 user, searchVal, ruleType, start, end,1, 10)).thenReturn(result);
@@ -156,11 +165,11 @@ public class DataQualityControllerTest {
         String end = "2020-01-02 00:00:00";
 
         PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
-        pageInfo.setTotalCount(10);
+        pageInfo.setTotal(10);
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, pageInfo);
 
         when(dqExecuteResultService.queryResultListPaging(
                 user, searchVal, 0,ruleType, start, end,1, 10)).thenReturn(result);

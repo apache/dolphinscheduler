@@ -47,10 +47,17 @@ public class ProcessInstance {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private Long processDefinitionCode;
+
+    /**
+     * process definition version
+     */
+    private int processDefinitionVersion;
+
     /**
      * process state
      */
@@ -144,9 +151,10 @@ public class ProcessInstance {
     private String globalParams;
 
     /**
-     * process instance json
+     * dagData
      */
-    private String processInstanceJson;
+    @TableField(exist = false)
+    private DagData dagData;
 
     /**
      * executor id
@@ -179,12 +187,8 @@ public class ProcessInstance {
     /**
      * task locations for web
      */
+    @TableField(exist = false)
     private String locations;
-
-    /**
-     * task connects for web
-     */
-    private String connects;
 
     /**
      * history command
@@ -194,6 +198,7 @@ public class ProcessInstance {
     /**
      * depend processes schedule time
      */
+    @TableField(exist = false)
     private String dependenceScheduleTimes;
 
     /**
@@ -202,7 +207,7 @@ public class ProcessInstance {
      * @return
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * process instance priority
@@ -213,6 +218,11 @@ public class ProcessInstance {
      * worker group
      */
     private String workerGroup;
+
+    /**
+     * environment code
+     */
+    private Long environmentCode;
 
     /**
      * process timeout for warning
@@ -229,6 +239,11 @@ public class ProcessInstance {
      */
     private String varPool;
 
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+
     public ProcessInstance() {
 
     }
@@ -241,12 +256,12 @@ public class ProcessInstance {
     public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
         this.name = processDefinition.getName()
-                + "-"
-                +
-                processDefinition.getVersion()
-                + "-"
-                +
-                DateUtils.getCurrentTimeStamp();
+            + "-"
+            +
+            processDefinition.getVersion()
+            + "-"
+            +
+            DateUtils.getCurrentTimeStamp();
     }
 
     public String getVarPool() {
@@ -271,14 +286,6 @@ public class ProcessInstance {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
     }
 
     public ExecutionStatus getState() {
@@ -421,12 +428,12 @@ public class ProcessInstance {
         this.globalParams = globalParams;
     }
 
-    public String getProcessInstanceJson() {
-        return processInstanceJson;
+    public DagData getDagData() {
+        return dagData;
     }
 
-    public void setProcessInstanceJson(String processInstanceJson) {
-        this.processInstanceJson = processInstanceJson;
+    public void setDagData(DagData dagData) {
+        this.dagData = dagData;
     }
 
     public String getTenantCode() {
@@ -477,14 +484,6 @@ public class ProcessInstance {
         this.locations = locations;
     }
 
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
-    }
-
     public String getHistoryCmd() {
         return historyCmd;
     }
@@ -499,6 +498,22 @@ public class ProcessInstance {
 
     public void setExecutorName(String executorName) {
         this.executorName = executorName;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
     }
 
     /**
@@ -547,11 +562,11 @@ public class ProcessInstance {
         this.dependenceScheduleTimes = dependenceScheduleTimes;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -579,79 +594,97 @@ public class ProcessInstance {
         this.tenantId = tenantId;
     }
 
+    public Long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
+
+    public void setProcessDefinitionCode(Long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{"
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", state=" + state
-                + ", recovery=" + recovery
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", runTimes=" + runTimes
-                + ", name='" + name + '\''
-                + ", host='" + host + '\''
-                + ", processDefinition="
-                + processDefinition
-                + ", commandType="
-                + commandType
-                + ", commandParam='"
-                + commandParam
-                + '\''
-                + ", taskDependType="
-                + taskDependType
-                + ", maxTryTimes="
-                + maxTryTimes
-                + ", failureStrategy="
-                + failureStrategy
-                + ", warningType="
-                + warningType
-                + ", warningGroupId="
-                + warningGroupId
-                + ", scheduleTime="
-                + scheduleTime
-                + ", commandStartTime="
-                + commandStartTime
-                + ", globalParams='"
-                + globalParams
-                + '\''
-                + ", processInstanceJson='"
-                + processInstanceJson
-                + '\''
-                + ", executorId="
-                + executorId
-                + ", tenantCode='"
-                + tenantCode
-                + '\''
-                + ", queue='"
-                + queue
-                + '\''
-                + ", isSubProcess="
-                + isSubProcess
-                + ", locations='"
-                + locations
-                + '\''
-                + ", connects='"
-                + connects
-                + '\''
-                + ", historyCmd='"
-                + historyCmd
-                + '\''
-                + ", dependenceScheduleTimes='"
-                + dependenceScheduleTimes
-                + '\''
-                + ", duration="
-                + duration
-                + ", processInstancePriority="
-                + processInstancePriority
-                + ", workerGroup='"
-                + workerGroup
-                + '\''
-                + ", timeout="
-                + timeout
-                + ", tenantId="
-                + tenantId
-                + '}';
+            + "id=" + id
+            + ", state=" + state
+            + ", recovery=" + recovery
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", runTimes=" + runTimes
+            + ", name='" + name + '\''
+            + ", host='" + host + '\''
+            + ", processDefinition="
+            + processDefinition
+            + ", commandType="
+            + commandType
+            + ", commandParam='"
+            + commandParam
+            + '\''
+            + ", taskDependType="
+            + taskDependType
+            + ", maxTryTimes="
+            + maxTryTimes
+            + ", failureStrategy="
+            + failureStrategy
+            + ", warningType="
+            + warningType
+            + ", warningGroupId="
+            + warningGroupId
+            + ", scheduleTime="
+            + scheduleTime
+            + ", commandStartTime="
+            + commandStartTime
+            + ", globalParams='"
+            + globalParams
+            + '\''
+            + ", executorId="
+            + executorId
+            + ", tenantCode='"
+            + tenantCode
+            + '\''
+            + ", queue='"
+            + queue
+            + '\''
+            + ", isSubProcess="
+            + isSubProcess
+            + ", locations='"
+            + locations
+            + '\''
+            + ", historyCmd='"
+            + historyCmd
+            + '\''
+            + ", dependenceScheduleTimes='"
+            + dependenceScheduleTimes
+            + '\''
+            + ", duration="
+            + duration
+            + ", processInstancePriority="
+            + processInstancePriority
+            + ", workerGroup='"
+            + workerGroup
+            + '\''
+            + ", timeout="
+            + timeout
+            + ", tenantId="
+            + tenantId
+            + ", processDefinitionCode='"
+            + processDefinitionCode
+            + '\''
+            + ", processDefinitionVersion='"
+            + processDefinitionVersion
+            + '\''
+            + ", dryRun='"
+            + dryRun
+            + '\''
+            + '}';
     }
 
     @Override
@@ -672,4 +705,5 @@ public class ProcessInstance {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

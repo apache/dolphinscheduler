@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTE_RESULT_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_PAGING_ERROR;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
@@ -108,13 +107,13 @@ public class DataQualityController extends BaseController {
                                       @RequestParam(value = "endDate", required = false) String endTime,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = dqRuleService.queryRuleListPaging(loginUser, searchVal, ruleType, startTime, endTime, pageNo, pageSize);
-        return returnDataListPaging(result);
+
+        return dqRuleService.queryRuleListPaging(loginUser, searchVal, ruleType, startTime, endTime, pageNo, pageSize);
     }
 
     /**
@@ -164,13 +163,14 @@ public class DataQualityController extends BaseController {
                                        @RequestParam(value = "endDate", required = false) String endTime,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = dqExecuteResultService.queryResultListPaging(loginUser, searchVal, state, ruleType, startTime, endTime, pageNo, pageSize);
-        return returnDataListPaging(result);
+
+        return dqExecuteResultService.queryResultListPaging(loginUser, searchVal, state, ruleType, startTime, endTime, pageNo, pageSize);
     }
 
     /**

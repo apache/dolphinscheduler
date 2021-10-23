@@ -14,41 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
-import javax.servlet.http.HttpServletRequest;
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * session service
  */
 public interface SessionService {
 
-  /**
-   * get user session from request
-   *
-   * @param request request
-   * @return session
-   */
-  Session getSession(HttpServletRequest request);
+    /**
+     * get user session from request
+     *
+     * @param request request
+     * @return session
+     */
+    Session getSession(HttpServletRequest request);
 
-  /**
-   * create session
-   *
-   * @param user user
-   * @param ip ip
-   * @return session string
-   */
-  String createSession(User user, String ip);
+    /**
+     * create session
+     *
+     * @param user user
+     * @param ip ip
+     * @return session string
+     */
+    String createSession(User user, String ip);
 
-  /**
-   * sign out
-   * remove ip restrictions
-   *
-   * @param ip   no use
-   * @param loginUser login user
-   */
-  void signOut(String ip, User loginUser);
+    /**
+     * sign out
+     * remove ip restrictions
+     *
+     * @param ip   no use
+     * @param loginUser login user
+     */
+    void signOut(String ip, User loginUser);
 }

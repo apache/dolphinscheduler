@@ -54,6 +54,7 @@ public class TenantMapperTest {
         Tenant tenant = new Tenant();
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
+        tenant.setTenantCode("test_code");
         tenantMapper.insert(tenant);
         return tenant;
     }
@@ -118,10 +119,10 @@ public class TenantMapperTest {
      */
     @Test
     public void testQueryByTenantCode() {
-
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
+        Assert.assertNotNull(tenantMapper.queryByTenantCode("ut code"));
     }
 
     /**
@@ -139,11 +140,18 @@ public class TenantMapperTest {
         tenant.setTenantCode("ut code");
         tenant.setQueueId(queue.getId());
         tenantMapper.updateById(tenant);
-        Page<Tenant> page = new Page(1,3);
+        Page<Tenant> page = new Page(1, 3);
 
         //tenant.getTenantCode() used instead of tenant.getTenantName()
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantCode());
 
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
+    }
+
+    public void testExistTenant() {
+        String tenantCode = "test_code";
+        Assert.assertNull(tenantMapper.existTenant(tenantCode));
+        insertOne();
+        Assert.assertTrue(tenantMapper.existTenant(tenantCode));
     }
 }

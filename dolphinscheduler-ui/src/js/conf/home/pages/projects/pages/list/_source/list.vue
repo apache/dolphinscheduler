@@ -52,7 +52,7 @@
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -89,12 +89,15 @@
     },
     methods: {
       ...mapActions('projects', ['deleteProjects']),
-      ...mapMutations('dag', ['setProjectName']),
+      ...mapMutations('dag', ['setProjectId', 'setProjectCode', 'setProjectName']),
       _switchProjects (item) {
+        this.setProjectId(item.id)
+        this.setProjectCode(item.code)
         this.setProjectName(item.name)
-        localStore.setItem('projectName', `${item.name}`)
-        localStore.setItem('projectId', `${item.id}`)
-        this.$router.push({ path: '/projects/index' })
+        localStore.setItem('projectId', item.id)
+        localStore.setItem('projectCode', item.code)
+        localStore.setItem('projectName', item.name)
+        this.$router.push({ path: `/projects/${item.code}/index` })
       },
       /**
        * Delete Project
@@ -103,7 +106,7 @@
        */
       _delete (item, i) {
         this.deleteProjects({
-          projectId: item.id
+          projectCode: item.code
         }).then(res => {
           this.$emit('on-update')
           this.$message.success(res.msg)

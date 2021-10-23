@@ -38,16 +38,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * alert sender
- */
 public class AlertSender {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertSender.class);
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private AlertPluginManager alertPluginManager;
+    private final AlertPluginManager alertPluginManager;
 
     public AlertSender(AlertPluginManager alertPluginManager) {
         this.alertPluginManager = alertPluginManager;
@@ -164,7 +161,6 @@ public class AlertSender {
             alertResult = new AlertResult("false", e.getMessage());
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
         }
-
 
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);

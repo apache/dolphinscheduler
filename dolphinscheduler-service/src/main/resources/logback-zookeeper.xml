@@ -32,7 +32,7 @@
     <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-zookeeper.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.base}/dolphinscheduler-zookeeper.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>20</maxHistory>
             <maxFileSize>64MB</maxFileSize>
         </rollingPolicy>

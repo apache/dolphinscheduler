@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
@@ -25,7 +24,7 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
+import org.apache.dolphinscheduler.common.task.mr.MapReduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
@@ -33,6 +32,8 @@ import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.tis.PigeonCommonParameters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskParametersUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskParametersUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskParametersUtils.class);
 
     private TaskParametersUtils() {
         throw new UnsupportedOperationException("Construct TaskParametersUtils");
@@ -56,42 +57,42 @@ public class TaskParametersUtils {
      * @return task parameters
      */
     public static AbstractParameters getParameters(String taskType, String parameter) {
-        TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskType);
-        if (anEnum == null) {
-            logger.error("not support task type: {}", taskType);
-            return null;
-        }
-        switch (anEnum) {
-            case SUB_PROCESS:
+        switch (taskType) {
+            case "SUB_PROCESS":
                 return JSONUtils.parseObject(parameter, SubProcessParameters.class);
-            case SHELL:
-            case WATERDROP:
+            case "SHELL":
+            case "WATERDROP":
                 return JSONUtils.parseObject(parameter, ShellParameters.class);
-            case PROCEDURE:
+            case "PROCEDURE":
                 return JSONUtils.parseObject(parameter, ProcedureParameters.class);
-            case SQL:
+            case "SQL":
                 return JSONUtils.parseObject(parameter, SqlParameters.class);
-            case MR:
-                return JSONUtils.parseObject(parameter, MapreduceParameters.class);
-            case SPARK:
+            case "MR":
+                return JSONUtils.parseObject(parameter, MapReduceParameters.class);
+            case "SPARK":
                 return JSONUtils.parseObject(parameter, SparkParameters.class);
-            case PYTHON:
+            case "PYTHON":
                 return JSONUtils.parseObject(parameter, PythonParameters.class);
-            case DEPENDENT:
+            case "DEPENDENT":
                 return JSONUtils.parseObject(parameter, DependentParameters.class);
-            case FLINK:
+            case "FLINK":
                 return JSONUtils.parseObject(parameter, FlinkParameters.class);
-            case HTTP:
+            case "HTTP":
                 return JSONUtils.parseObject(parameter, HttpParameters.class);
-            case DATAX:
+            case "DATAX":
                 return JSONUtils.parseObject(parameter, DataxParameters.class);
-            case CONDITIONS:
+            case "CONDITIONS":
                 return JSONUtils.parseObject(parameter, ConditionsParameters.class);
-            case SQOOP:
+            case "SQOOP":
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
-            case DATA_QUALITY:
+            case "DATA_QUALITY":
                 return JSONUtils.parseObject(parameter, DataQualityParameters.class);
+            case "SWITCH":
+                return JSONUtils.parseObject(parameter, SwitchParameters.class);
+            case "PIGEON":
+                return JSONUtils.parseObject(parameter, PigeonCommonParameters.class);
             default:
+                logger.error("not support task type: {}", taskType);
                 return null;
         }
 

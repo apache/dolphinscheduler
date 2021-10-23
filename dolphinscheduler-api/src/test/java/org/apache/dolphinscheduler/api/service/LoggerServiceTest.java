@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -35,6 +36,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * logger service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 @PrepareForTest({LoggerServiceImpl.class})
 public class LoggerServiceTest {
@@ -43,6 +47,7 @@ public class LoggerServiceTest {
 
     @InjectMocks
     private LoggerServiceImpl loggerService;
+
     @Mock
     private ProcessService processService;
 
@@ -50,7 +55,6 @@ public class LoggerServiceTest {
     public void init() {
         this.loggerService.init();
     }
-
 
     @Test
     public void testQueryDataSourceList() {

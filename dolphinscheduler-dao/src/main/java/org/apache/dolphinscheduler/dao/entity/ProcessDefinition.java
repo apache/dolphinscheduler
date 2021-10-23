@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -34,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 
 /**
  * process definition
@@ -49,6 +49,11 @@ public class ProcessDefinition {
     private int id;
 
     /**
+     * code
+     */
+    private long code;
+
+    /**
      * name
      */
     private String name;
@@ -56,7 +61,7 @@ public class ProcessDefinition {
     /**
      * version
      */
-    private long version;
+    private int version;
 
     /**
      * release state : online/offline
@@ -64,14 +69,9 @@ public class ProcessDefinition {
     private ReleaseState releaseState;
 
     /**
-     * project id
+     * project code
      */
-    private int projectId;
-
-    /**
-     * definition json string
-     */
-    private String processDefinitionJson;
+    private long projectCode;
 
     /**
      * description
@@ -135,11 +135,6 @@ public class ProcessDefinition {
     private String locations;
 
     /**
-     * connects array for web
-     */
-    private String connects;
-
-    /**
      * schedule release state : online/offline
      */
     @TableField(exist = false)
@@ -156,13 +151,21 @@ public class ProcessDefinition {
     private int tenantId;
 
     /**
+     * tenant code
+     */
+    @TableField(exist = false)
+    private String tenantCode;
+
+    /**
      * modify user name
      */
+    @TableField(exist = false)
     private String modifyBy;
 
     /**
      * resource ids
      */
+    @TableField(exist = false)
     private String resourceIds;
 
     /**
@@ -170,6 +173,43 @@ public class ProcessDefinition {
      */
     @TableField(exist = false)
     private int warningGroupId;
+
+    public ProcessDefinition() {
+    }
+
+    public ProcessDefinition(long projectCode,
+                             String name,
+                             long code,
+                             String description,
+                             String globalParams,
+                             String locations,
+                             int timeout,
+                             int userId,
+                             int tenantId) {
+        set(projectCode, name, description, globalParams, locations, timeout, tenantId);
+        this.code = code;
+        this.userId = userId;
+        Date date = new Date();
+        this.createTime = date;
+        this.updateTime = date;
+    }
+
+    public void set(long projectCode,
+                    String name,
+                    String description,
+                    String globalParams,
+                    String locations,
+                    int timeout,
+                    int tenantId) {
+        this.projectCode = projectCode;
+        this.name = name;
+        this.description = description;
+        this.globalParams = globalParams;
+        this.locations = locations;
+        this.timeout = timeout;
+        this.tenantId = tenantId;
+        this.flag = Flag.YES;
+    }
 
     public String getName() {
         return name;
@@ -179,11 +219,11 @@ public class ProcessDefinition {
         this.name = name;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
@@ -203,28 +243,12 @@ public class ProcessDefinition {
         this.releaseState = releaseState;
     }
 
-    public String getProcessDefinitionJson() {
-        return processDefinitionJson;
-    }
-
-    public void setProcessDefinitionJson(String processDefinitionJson) {
-        this.processDefinitionJson = processDefinitionJson;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public int getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
     }
 
     public Date getUpdateTime() {
@@ -272,10 +296,9 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        if (globalParams == null) {
+        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
-        } else {
-            this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
     }
@@ -285,7 +308,6 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONUtils.toJsonString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
@@ -308,14 +330,6 @@ public class ProcessDefinition {
 
     public void setLocations(String locations) {
         this.locations = locations;
-    }
-
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
     }
 
     public ReleaseState getScheduleReleaseState() {
@@ -350,6 +364,14 @@ public class ProcessDefinition {
         this.tenantId = tenantId;
     }
 
+    public String getTenantCode() {
+        return tenantCode;
+    }
+
+    public void setTenantCode(String tenantCode) {
+        this.tenantCode = tenantCode;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -366,6 +388,22 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public long getCode() {
+        return code;
+    }
+
+    public void setCode(long code) {
+        this.code = code;
+    }
+
+    public long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
+    }
+
     public int getWarningGroupId() {
         return warningGroupId;
     }
@@ -375,14 +413,35 @@ public class ProcessDefinition {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProcessDefinition that = (ProcessDefinition) o;
+        return projectCode == that.projectCode
+            && userId == that.userId
+            && timeout == that.timeout
+            && tenantId == that.tenantId
+            && Objects.equals(name, that.name)
+            && releaseState == that.releaseState
+            && Objects.equals(description, that.description)
+            && Objects.equals(globalParams, that.globalParams)
+            && flag == that.flag
+            && Objects.equals(locations, that.locations);
+    }
+
+    @Override
     public String toString() {
         return "ProcessDefinition{"
             + "id=" + id
+            + ", code=" + code
             + ", name='" + name + '\''
             + ", version=" + version
             + ", releaseState=" + releaseState
-            + ", projectId=" + projectId
-            + ", processDefinitionJson='" + processDefinitionJson + '\''
+            + ", projectCode=" + projectCode
             + ", description='" + description + '\''
             + ", globalParams='" + globalParams + '\''
             + ", globalParamList=" + globalParamList
@@ -394,14 +453,13 @@ public class ProcessDefinition {
             + ", userName='" + userName + '\''
             + ", projectName='" + projectName + '\''
             + ", locations='" + locations + '\''
-            + ", connects='" + connects + '\''
             + ", scheduleReleaseState=" + scheduleReleaseState
             + ", timeout=" + timeout
-            + ", warningGroupId=" + warningGroupId
             + ", tenantId=" + tenantId
+            + ", tenantCode='" + tenantCode + '\''
             + ", modifyBy='" + modifyBy + '\''
             + ", resourceIds='" + resourceIds + '\''
+            + ", warningGroupId=" + warningGroupId
             + '}';
     }
-
 }

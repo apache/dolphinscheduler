@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
 
 /**
  * DqExecuteResultService
  */
 public interface DqExecuteResultService {
 
-    Map<String, Object> queryResultListPaging(User loginUser,
-                                              String searchVal,
-                                              Integer state,
-                                              Integer ruleType,
-                                              String startTime,
-                                              String endTime,
-                                              Integer pageNo, Integer pageSize);
+    Result queryResultListPaging(User loginUser,
+                                 String searchVal,
+                                 Integer state,
+                                 Integer ruleType,
+                                 String startTime,
+                                 String endTime,
+                                 Integer pageNo, Integer pageSize);
 }

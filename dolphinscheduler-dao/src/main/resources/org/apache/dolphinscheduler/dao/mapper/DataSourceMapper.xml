@@ -91,7 +91,7 @@
         where
         id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
         union select id as datasource_id from t_ds_datasource where user_id=#{userId})
-        <if test="dataSourceIds != null and dataSourceIds != ''">
+        <if test="dataSourceIds != null and dataSourceIds.length > 0">
             and id in
             <foreach collection="dataSourceIds" item="i" open="(" close=")" separator=",">
                 #{i}

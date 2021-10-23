@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,18 +53,6 @@ public class DateUtilsTest {
         Assert.assertEquals(monday, monday1);
         Assert.assertEquals(sunday, sunday1);
 
-    }
-
-    @Test
-    public void diffHours() {
-        Date d1 = DateUtils.stringToDate("2019-01-28 00:00:00");
-        Date d2 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d1, d2), 20);
-        Date d3 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d3, d2), 0);
-        Assert.assertEquals(DateUtils.diffHours(d2, d1), 20);
-        Date d4 = null;
-        Assert.assertEquals(DateUtils.diffHours(d2, d4), 0);
     }
 
     @Test
@@ -153,8 +143,67 @@ public class DateUtilsTest {
 
     @Test
     public void getCurrentTimeStamp() {
-        String timeStamp =  DateUtils.getCurrentTimeStamp();
+        String timeStamp = DateUtils.getCurrentTimeStamp();
         Assert.assertNotNull(timeStamp);
     }
 
+    @Test
+    public void testFormat2Duration() {
+
+        // days hours minutes seconds
+        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date d2 = DateUtils.stringToDate("2020-01-21 12:10:10");
+        String duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1d 1h 10m 10s", duration);
+
+        // hours minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        d2 = DateUtils.stringToDate("2020-01-20 12:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1h 10m 10s", duration);
+
+        // minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("10m 10s", duration);
+
+        // minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("10s", duration);
+
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-21 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1d 10s", duration);
+
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-20 16:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("5h 10s", duration);
+
+    }
+
+    @Test
+    public void testNullDuration() {
+        // days hours minutes seconds
+        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date d2 = null;
+        Assert.assertNull(DateUtils.format2Duration(d1, d2));
+    }
+
+    @Test
+    public void testTransformToTimezone() {
+        Date date = new Date();
+        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
+        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
+    }
+
+    @Test
+    public void testGetTimezone() {
+        Assert.assertNull(DateUtils.getTimezone(null));
+        Assert.assertEquals(TimeZone.getTimeZone("MST"), DateUtils.getTimezone("MST"));
+    }
 }

@@ -138,7 +138,8 @@
       }
     },
     props: {
-      item: Object
+      item: Object,
+      fromUserInfo: Boolean
     },
     methods: {
       _ok () {
@@ -271,7 +272,7 @@
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
           this.$refs.popover.spinnerLoading = false
-          this.$emit('onUpdate', param)
+          this.$emit('onUpdate')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -292,8 +293,9 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
+            this.state = this.item.state
             this.userState = this.item.state + '' || '1'
-            if (this.item.tenantName) {
+            if (this.fromUserInfo || this.item.tenantId) {
               this.tenantId = this.item.tenantId
             }
             this.$nextTick(() => {
@@ -310,8 +312,9 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
+          this.state = this.item.state
           this.userState = this.state + '' || '1'
-          if (this.item.tenantName) {
+          if (this.fromUserInfo || this.item.tenantId) {
             this.tenantId = this.item.tenantId
           }
           if (this.queueList.length > 0) {

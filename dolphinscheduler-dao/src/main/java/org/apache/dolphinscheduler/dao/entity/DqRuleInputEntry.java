@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.FormType;
-import org.apache.dolphinscheduler.common.enums.dq.InputType;
-import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
-import org.apache.dolphinscheduler.common.enums.dq.ValueType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -50,7 +49,7 @@ public class DqRuleInputEntry implements Serializable {
      * form type
       */
     @TableField(value = "type")
-    private FormType type;
+    private String type;
     /**
      * form title
      */
@@ -76,17 +75,17 @@ public class DqRuleInputEntry implements Serializable {
      * the source type of options，use default options or other
      */
     @TableField(value = "option_source_type")
-    private OptionSourceType optionSourceType = OptionSourceType.DEFAULT;
+    private int optionSourceType = OptionSourceType.DEFAULT.getCode();
     /**
      * input entry type: string，array，number .etc
      */
     @TableField(value = "value_type")
-    private ValueType valueType = ValueType.NUMBER;
+    private int valueType = ValueType.NUMBER.getCode();
     /**
      * input entry type: default,statistics,comparison
      */
     @TableField(value = "input_type")
-    private InputType inputType = InputType.DEFAULT;
+    private int inputType = InputType.DEFAULT.getCode();
     /**
      * whether to display on the front end
      */
@@ -147,11 +146,11 @@ public class DqRuleInputEntry implements Serializable {
         this.field = field;
     }
 
-    public FormType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(FormType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -187,27 +186,27 @@ public class DqRuleInputEntry implements Serializable {
         this.placeholder = placeholder;
     }
 
-    public OptionSourceType getOptionSourceType() {
+    public int getOptionSourceType() {
         return optionSourceType;
     }
 
-    public void setOptionSourceType(OptionSourceType optionSourceType) {
+    public void setOptionSourceType(int optionSourceType) {
         this.optionSourceType = optionSourceType;
     }
 
-    public ValueType getValueType() {
+    public int getValueType() {
         return valueType;
     }
 
-    public void setValueType(ValueType valueType) {
+    public void setValueType(int valueType) {
         this.valueType = valueType;
     }
 
-    public InputType getInputType() {
+    public int getInputType() {
         return inputType;
     }
 
-    public void setInputType(InputType inputType) {
+    public void setInputType(int inputType) {
         this.inputType = inputType;
     }
 

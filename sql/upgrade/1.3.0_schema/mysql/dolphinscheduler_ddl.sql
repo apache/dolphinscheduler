@@ -276,24 +276,3 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
 DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
-
--- ac_dolphin_T_t_ds_user_A_state
-drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_user_A_state;
-delimiter d//
-CREATE PROCEDURE ac_dolphin_T_t_ds_user_A_state()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_user'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='state')
-   THEN
-         ALTER TABLE t_ds_user ADD `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL ac_dolphin_T_t_ds_user_A_state;
-DROP PROCEDURE ac_dolphin_T_t_ds_user_A_state;
-

@@ -16,16 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.dolphinscheduler.common.Constants;
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
 
 public class OSUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
@@ -38,12 +35,12 @@ public class OSUtilsTest {
     }
 
     @Test
-    public void testOSMetric(){
+    public void testOSMetric() {
         if (!OSUtils.isWindows()) {
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             Assert.assertTrue(availablePhysicalMemorySize >= 0.0d);
-            double totalMemorySize = OSUtils.totalMemorySize();
-            Assert.assertTrue(totalMemorySize >= 0.0d);
+            double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
+            Assert.assertTrue(totalPhysicalMemorySize >= 0.0d);
             double loadAverage = OSUtils.loadAverage();
             logger.info("loadAverage {}", loadAverage);
             double memoryUsage = OSUtils.memoryUsage();
@@ -76,8 +73,21 @@ public class OSUtilsTest {
     }
 
     @Test
+    public void createUserIfAbsent() {
+        OSUtils.createUserIfAbsent("test123");
+        Assert.assertTrue("create user test123 success", true);
+    }
+
+    @Test
+    public void testGetSudoCmd() {
+        String cmd = "kill -9 1234";
+        String sudoCmd = OSUtils.getSudoCmd("test123", cmd);
+        Assert.assertEquals("sudo -u test123 " + cmd, sudoCmd);
+    }
+
+    @Test
     public void exeCmd() {
-        if(OSUtils.isMacOS() || !OSUtils.isWindows()){
+        if (OSUtils.isMacOS() || !OSUtils.isWindows()) {
             try {
                 String result = OSUtils.exeCmd("echo helloWorld");
                 Assert.assertEquals("helloWorld\n",result);
@@ -87,45 +97,16 @@ public class OSUtilsTest {
         }
     }
     @Test
-    public void getProcessID(){
+    public void getProcessID() {
         int processId = OSUtils.getProcessID();
         Assert.assertNotEquals(0, processId);
     }
     @Test
-    public void getHost(){
-        String host = NetUtils.getHost();
-        Assert.assertNotNull(host);
-        Assert.assertNotEquals("", host);
-    }
-    @Test
-    public void checkResource(){
+    public void checkResource() {
         boolean resource = OSUtils.checkResource(100,0);
         Assert.assertTrue(resource);
         resource = OSUtils.checkResource(0,Double.MAX_VALUE);
         Assert.assertFalse(resource);
-
-        Configuration configuration = new PropertiesConfiguration();
-
-        configuration.setProperty(Constants.MASTER_MAX_CPULOAD_AVG,100);
-        configuration.setProperty(Constants.MASTER_RESERVED_MEMORY,0);
-        resource = OSUtils.checkResource(configuration,true);
-        Assert.assertTrue(resource);
-
-        configuration.setProperty(Constants.MASTER_MAX_CPULOAD_AVG,0);
-        configuration.setProperty(Constants.MASTER_RESERVED_MEMORY,Double.MAX_VALUE);
-        resource = OSUtils.checkResource(configuration,true);
-        Assert.assertFalse(resource);
-
-        configuration.setProperty(Constants.WORKER_MAX_CPULOAD_AVG,100);
-        configuration.setProperty(Constants.WORKER_RESERVED_MEMORY,0);
-        resource = OSUtils.checkResource(configuration,false);
-        Assert.assertTrue(resource);
-
-        configuration.setProperty(Constants.WORKER_MAX_CPULOAD_AVG,0);
-        configuration.setProperty(Constants.WORKER_RESERVED_MEMORY,Double.MAX_VALUE);
-        resource = OSUtils.checkResource(configuration,false);
-        Assert.assertFalse(resource);
-
     }
 
 }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -57,7 +57,7 @@ public class DqRuleExecuteSql implements Serializable {
      * input entry type: default,statistics,comparison,check
      */
     @TableField(value = "type")
-    private ExecuteSqlType type = ExecuteSqlType.MIDDLE;
+    private int type = ExecuteSqlType.MIDDLE.getCode();
     /**
      * is error output sql
      */
@@ -108,11 +108,11 @@ public class DqRuleExecuteSql implements Serializable {
         this.tableAlias = tableAlias;
     }
 
-    public ExecuteSqlType getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(ExecuteSqlType type) {
+    public void setType(int type) {
         this.type = type;
     }
 

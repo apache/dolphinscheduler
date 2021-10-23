@@ -22,11 +22,10 @@ import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
-import org.apache.dolphinscheduler.spi.params.base.DataType;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -91,9 +90,8 @@ public class EmailAlertChannelTest {
         InputParam mailSmtpPort = InputParam.newBuilder("serverPort", "smtp.port")
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
-                        .setType(DataType.NUMBER.getDataType())
                         .build())
-                .setValue(25)
+                .setValue("25")
                 .build();
 
         InputParam mailSender = InputParam.newBuilder("sender", "sender")
@@ -102,10 +100,10 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "smtp.auth")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(false)
+                .setValue("false")
                 .build();
 
         InputParam mailUser = InputParam.newBuilder("user", "user")
@@ -119,17 +117,17 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "starttls.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "smtp.ssl.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         InputParam sslTrust = InputParam.newBuilder("smtpSslTrust", "smtp.ssl.trust")
@@ -143,7 +141,7 @@ public class EmailAlertChannelTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
         RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
-                .setParamsOptionsList(emailShowTypeList)
+                .setOptions(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();

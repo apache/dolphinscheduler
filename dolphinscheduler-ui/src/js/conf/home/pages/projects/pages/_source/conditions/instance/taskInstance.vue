@@ -53,7 +53,7 @@
         <el-input v-model="searchParams.processInstanceName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
       </div>
       <div class="list">
-        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('name')"></el-input>
+        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Name')"></el-input>
       </div>
     </template>
   </m-conditions>
@@ -113,6 +113,10 @@
       // Routing parameter merging
       if (!_.isEmpty(this.$route.query)) {
         this.searchParams = _.assign(this.searchParams, this.$route.query)
+        if (this.searchParams.endDate && this.searchParams.startDate) {
+          this.dataTime[0] = this.searchParams.startDate
+          this.dataTime[1] = this.searchParams.endDate
+        }
       }
     },
     mounted () {

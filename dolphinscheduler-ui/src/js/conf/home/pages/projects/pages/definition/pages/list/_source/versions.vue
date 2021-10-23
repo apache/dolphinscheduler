@@ -27,8 +27,8 @@
         <el-table-column prop="userName" :label="$t('Version')">
           <template slot-scope="scope">
             <span v-if="scope.row.version">
-              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>{{scope.row.version}} {{$t('Current Version')}}</strong></span>
-              <span v-else>{{scope.row.version}}</span>
+              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>V{{scope.row.version}} {{$t('Current Version')}}</strong></span>
+              <span v-else>V{{scope.row.version}}</span>
             </span>
             <span v-else>-</span>
           </template>
@@ -50,19 +50,19 @@
                 :title="$t('Confirm Switch To This Version?')"
                 @onConfirm="_mVersionSwitchProcessDefinitionVersion(scope.row)"
               >
-                <el-button type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
+                <el-button :disabled="versionData.processDefinition.releaseState === 'ONLINE' || scope.row.version === versionData.processDefinition.version || isInstance" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
                 icon="el-icon-info"
                 iconColor="red"
                 :title="$t('Delete?')"
-                @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row,scope.row.id)"
+                @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button :disabled="scope.row.version === versionData.processDefinition.version || isInstance" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -110,6 +110,7 @@
       }
     },
     props: {
+      isInstance: Boolean,
       versionData: Object
     },
     methods: {
@@ -119,7 +120,7 @@
       _mVersionSwitchProcessDefinitionVersion (item) {
         this.$emit('mVersionSwitchProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },
@@ -130,7 +131,7 @@
       _mVersionDeleteProcessDefinitionVersion (item) {
         this.$emit('mVersionDeleteProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },
@@ -142,7 +143,7 @@
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
           pageSize: this.pageSize,
-          processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },

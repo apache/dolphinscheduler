@@ -116,21 +116,18 @@
         this.getPlugins({ pluginType: 'ALERT' }).then(res => {
           this.pluginInstance = res
         }).catch(e => {
-          this.$message.error(e.msg)
+          this.$message.error(e.msg || '')
         })
         this.item = item
         this.createWarningDialog = true
       },
-
       onUpdate () {
         this._debounceGET('false')
         this.createWarningDialog = false
       },
-
       close () {
         this.createWarningDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
@@ -148,6 +145,7 @@
             this.isLoading = false
           }
         }).catch(e => {
+          this.$message.error(e.msg || '')
           this.isLoading = false
         })
       }

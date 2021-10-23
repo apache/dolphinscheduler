@@ -18,21 +18,23 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
-import org.apache.dolphinscheduler.server.worker.WorkerServer;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import org.quartz.SchedulerException;
@@ -43,11 +45,20 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ *  master server
+ */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.server.worker.*",
+                "org.apache.dolphinscheduler.server.monitor.*",
+                "org.apache.dolphinscheduler.server.log.*"
+        })
 })
-public class MasterServer {
+@EnableTransactionManagement
+public class MasterServer implements IStoppable {
 
     /**
      * logger of MasterServer
@@ -61,8 +72,8 @@ public class MasterServer {
     private MasterConfig masterConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -73,16 +84,10 @@ public class MasterServer {
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     * master registry
-     */
-    @Autowired
-    private MasterRegistry masterRegistry;
-
-    /**
      * zk master client
      */
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * scheduler service
@@ -90,10 +95,14 @@ public class MasterServer {
     @Autowired
     private MasterSchedulerService masterSchedulerService;
 
+    @Autowired
+    private EventExecuteService eventExecuteService;
+
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps = new ConcurrentHashMap<>();
+
     /**
-     * master server startup
+     * master server startup, not use web service
      *
-     * master server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -106,23 +115,32 @@ public class MasterServer {
      */
     @PostConstruct
     public void run() {
-
-        //init remoting server
+        // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        TaskAckProcessor ackProcessor = new TaskAckProcessor();
+        ackProcessor.init(processInstanceExecMaps);
+        TaskResponseProcessor taskResponseProcessor = new TaskResponseProcessor();
+        taskResponseProcessor.init(processInstanceExecMaps);
+        StateEventProcessor stateEventProcessor = new StateEventProcessor();
+        stateEventProcessor.init(processInstanceExecMaps);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, ackProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
         this.nettyRemotingServer.start();
 
-        // register
-        this.masterRegistry.registry();
-
         // self tolerant
-        this.zkMasterClient.start();
+        this.masterRegistryClient.init(this.processInstanceExecMaps);
+        this.masterRegistryClient.start();
+        this.masterRegistryClient.setRegistryStoppable(this);
 
+        this.eventExecuteService.init(this.processInstanceExecMaps);
+        this.eventExecuteService.start();
         // scheduler start
+        this.masterSchedulerService.init(this.processInstanceExecMaps);
+
         this.masterSchedulerService.start();
 
         // start QuartzExecutors
@@ -140,11 +158,10 @@ public class MasterServer {
         }
 
         /**
-         *  register hooks, which are called before the process exits
+         * register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
                 close("shutdownHook");
             }
         }));
@@ -153,12 +170,13 @@ public class MasterServer {
 
     /**
      * gracefully close
+     *
      * @param cause close cause
      */
     public void close(String cause) {
 
         try {
-            //execute only once
+            // execute only once
             if (Stopper.isStopped()) {
                 return;
             }
@@ -169,28 +187,32 @@ public class MasterServer {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quietly stop
+                // thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
-            //
+            // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.masterRegistry.unRegistry();
-            this.zkMasterClient.close();
 
-            //close quartz
+            this.masterRegistryClient.closeRegistry();
+            // close quartz
             try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
             } catch (Exception e) {
-                logger.warn("Quartz service stopped exception:{}",e.getMessage());
+                logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
+            // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+            springApplicationContext.close();
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
-            System.exit(-1);
         }
     }
-}
 
+    @Override
+    public void stop(String cause) {
+        close(cause);
+    }
+}

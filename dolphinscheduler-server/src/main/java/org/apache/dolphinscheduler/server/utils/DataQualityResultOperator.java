@@ -19,15 +19,16 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.dq.CheckType;
-import org.apache.dolphinscheduler.common.enums.dq.DqFailureStrategy;
-import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
-import org.apache.dolphinscheduler.common.enums.dq.OperatorType;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.spi.task.dq.enums.CheckType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqFailureStrategy;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
+import org.apache.dolphinscheduler.spi.task.dq.enums.OperatorType;
 
 import java.math.BigDecimal;
 
@@ -53,10 +54,8 @@ public class DataQualityResultOperator {
     @Autowired
     private ProcessService processService;
 
-    /**
-     * alert manager
-     */
-    private final AlertManager alertManager = new AlertManager();
+    @Autowired
+    private ProcessAlertManager alertManager;
 
     public void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
@@ -89,7 +88,7 @@ public class DataQualityResultOperator {
         if (isFailure(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
-                dqExecuteResult.setState(DqTaskState.FAILURE);
+                dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
                 sendDqTaskResultAlert(dqExecuteResult,processInstance);
                 switch (dqFailureStrategy) {
                     case ALERT:
@@ -104,14 +103,14 @@ public class DataQualityResultOperator {
                 }
             }
         } else {
-            dqExecuteResult.setState(DqTaskState.SUCCESS);
+            dqExecuteResult.setState(DqTaskState.SUCCESS.getCode());
         }
 
         processService.updateDqExecuteResultState(dqExecuteResult);
     }
 
     private boolean isFailure(DqExecuteResult dqExecuteResult) {
-        CheckType checkType = dqExecuteResult.getCheckType();
+        CheckType checkType = CheckType.of(dqExecuteResult.getCheckType());
 
         double statisticsValue = dqExecuteResult.getStatisticsValue();
         double comparisonValue = dqExecuteResult.getComparisonValue();

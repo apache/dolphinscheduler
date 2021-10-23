@@ -20,6 +20,7 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="instanceName" :label="$t('Alarm instance name')"></el-table-column>
+        <el-table-column prop="alertPluginName" :label="$t('Alarm plugin name')"></el-table-column>
         <el-table-column :label="$t('Create Time')">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
@@ -35,7 +36,7 @@
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"

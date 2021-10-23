@@ -147,6 +147,14 @@ public class JSONUtilsTest {
     }
 
     @Test
+    public void testNodeString() {
+        Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
+        Assert.assertEquals("\"foo\"", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+    }
+    
+    @Test
     public void testJsonByteArray() {
         String str = "foo";
         byte[] serializeByte = JSONUtils.toJsonByteArray(str);
@@ -191,8 +199,6 @@ public class JSONUtilsTest {
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
-        Assert.assertNull(JSONUtils.toMap("3", null, null));
-        Assert.assertNull(JSONUtils.toMap(null, null, null));
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);

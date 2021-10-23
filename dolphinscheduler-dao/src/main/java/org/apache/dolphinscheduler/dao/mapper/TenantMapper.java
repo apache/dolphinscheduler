@@ -38,9 +38,9 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     /**
      * query tenant by code
      * @param tenantCode tenantCode
-     * @return tenant list
+     * @return tenant
      */
-    List<Tenant> queryByTenantCode(@Param("tenantCode") String tenantCode);
+    Tenant queryByTenantCode(@Param("tenantCode") String tenantCode);
 
     /**
      * tenant page
@@ -50,4 +50,11 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      */
     IPage<Tenant> queryTenantPaging(IPage<Tenant> page,
                                     @Param("searchVal") String searchVal);
+
+    /**
+     * check tenant exist
+     * @param tenantCode tenantCode
+     * @return true if exist else return null
+     */
+    Boolean existTenant(@Param("tenantCode") String tenantCode);
 }

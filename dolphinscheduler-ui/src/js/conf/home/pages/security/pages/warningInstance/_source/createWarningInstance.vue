@@ -55,7 +55,7 @@
             </el-select>
           </template>
         </m-list-box-f>
-        <div  class="alertForm">
+        <div class="alertForm">
           <template>
             <form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create>
           </template>
@@ -111,6 +111,10 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
+        if (!this.pluginDefineId) {
+          this.$message.warning(`${i18n.$t('Select Alarm plugin')}`)
+          return false
+        }
         return true
       },
       // Select plugin
@@ -123,34 +127,46 @@
             if (item.title.indexOf('$t') !== -1) {
               item.title = this.$t(item.field)
             }
+            // fix null pointer exception
+            if (!item.props) {
+              item.props = {}
+            }
           })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
       _submit () {
-        this.$f.rule.forEach(item => {
-          item.title = item.name
-        })
-        let param = {
-          instanceName: this.instanceName,
-          pluginDefineId: this.pluginDefineId,
-          pluginInstanceParams: JSON.stringify(this.$f.rule)
-        }
-        if (this.item) {
-          param.alertPluginInstanceId = this.item.id
-          param.pluginDefineId = null
-        }
-        this.$refs.popover.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
-          this.$refs.popover.spinnerLoading = false
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+        this.$f.validate((valid) => {
+          if (valid) {
+            this.$f.rule.forEach(item => {
+              item.title = item.name
+            })
+            let param = {
+              instanceName: this.instanceName,
+              pluginDefineId: this.pluginDefineId,
+              pluginInstanceParams: JSON.stringify(this.$f.rule)
+            }
+            if (this.item) {
+              param.alertPluginInstanceId = this.item.id
+              param.pluginDefineId = null
+            }
+            this.$refs.popover.spinnerLoading = true
+            this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
+              this.$refs.popover.spinnerLoading = false
+              this.$emit('onUpdate')
+              this.$message.success(res.msg)
+            }).catch(e => {
+              this.$message.error(e.msg || '')
+              this.$refs.popover.spinnerLoading = false
+            })
+          } else {
+            this.$message.warning(`${i18n.$t('Instance parameter exception')}`)
+            this.$refs.popover.spinnerLoading = false
+          }
         })
       },
+
       close () {
         this.$emit('close')
       }

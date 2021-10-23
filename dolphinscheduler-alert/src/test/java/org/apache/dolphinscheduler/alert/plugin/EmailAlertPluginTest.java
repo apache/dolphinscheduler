@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.alert.plugin;
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
@@ -32,14 +32,16 @@ import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -48,7 +50,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -58,12 +59,11 @@ import com.google.common.collect.ImmutableList;
  */
 public class EmailAlertPluginTest {
 
-    AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-    PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     @Test
-    @Ignore
-    public void testRunSend() throws Exception {
+    public void testRunSend() {
 
         //create alert group
         AlertGroup alertGroup = new AlertGroup();
@@ -127,7 +127,7 @@ public class EmailAlertPluginTest {
         alertPluginInstance.setCreateTime(new Date());
         alertPluginInstance.setInstanceName("test email alert");
 
-        List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("email alert", "alert");
+        List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("Email", "alert");
         if (pluginDefineList == null || pluginDefineList.size() == 0) {
             throw new RuntimeException("no alert plugin be load");
         }
@@ -217,7 +217,7 @@ public class EmailAlertPluginTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
         RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
-                .setParamsOptionsList(emailShowTypeList)
+                .setOptions(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();

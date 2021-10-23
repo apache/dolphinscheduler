@@ -24,15 +24,10 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
-import org.apache.dolphinscheduler.common.enums.dq.FormType;
-import org.apache.dolphinscheduler.common.enums.dq.InputType;
-import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-import org.apache.dolphinscheduler.common.enums.dq.ValueType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -43,6 +38,12 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.spi.params.base.FormType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.InputType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.RuleType;
+import org.apache.dolphinscheduler.spi.task.dq.enums.ValueType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -135,9 +136,9 @@ public class DqRuleServiceTest {
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
 
-        Map<String,Object> result = dqRuleService.queryRuleListPaging(
+        Result result = dqRuleService.queryRuleListPaging(
                 loginUser,searchVal,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
     }
 
     private  List<DataSource> dataSourceList() {
@@ -161,7 +162,7 @@ public class DqRuleServiceTest {
         DqRule rule = new DqRule();
         rule.setId(1);
         rule.setName("空值检测");
-        rule.setType(RuleType.SINGLE_TABLE);
+        rule.setType(RuleType.SINGLE_TABLE.getCode());
         rule.setUserId(1);
         rule.setUserName("admin");
         rule.setCreateTime(new Date());
@@ -178,40 +179,40 @@ public class DqRuleServiceTest {
         DqRuleInputEntry srcConnectorType = new DqRuleInputEntry();
         srcConnectorType.setTitle("源数据类型");
         srcConnectorType.setField("src_connector_type");
-        srcConnectorType.setType(FormType.SELECT);
+        srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
         srcConnectorType.setShow(true);
         srcConnectorType.setValue("JDBC");
         srcConnectorType.setPlaceholder("Please select the source connector type");
-        srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT);
+        srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcConnectorType.setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
-        srcConnectorType.setInputType(InputType.DEFAULT);
-        srcConnectorType.setValueType(ValueType.NUMBER);
+        srcConnectorType.setInputType(InputType.DEFAULT.getCode());
+        srcConnectorType.setValueType(ValueType.NUMBER.getCode());
         srcConnectorType.setEmit(true);
         srcConnectorType.setValidate(true);
 
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
         statisticsName.setTitle("统计值名");
         statisticsName.setField("statistics_name");
-        statisticsName.setType(FormType.INPUT);
+        statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(true);
         statisticsName.setShow(true);
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
-        statisticsName.setOptionSourceType(OptionSourceType.DEFAULT);
-        statisticsName.setInputType(InputType.DEFAULT);
-        statisticsName.setValueType(ValueType.STRING);
+        statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
+        statisticsName.setInputType(InputType.DEFAULT.getCode());
+        statisticsName.setValueType(ValueType.STRING.getCode());
         statisticsName.setEmit(false);
         statisticsName.setValidate(true);
 
         DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
         statisticsExecuteSql.setTitle("统计值计算SQL");
         statisticsExecuteSql.setField("statistics_execute_sql");
-        statisticsExecuteSql.setType(FormType.TEXTAREA);
+        statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
         statisticsExecuteSql.setCanEdit(true);
         statisticsExecuteSql.setShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
-        statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT);
-        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL);
+        statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
+        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
         statisticsExecuteSql.setEmit(false);
         statisticsExecuteSql.setValidate(true);
 
@@ -229,7 +230,7 @@ public class DqRuleServiceTest {
         executeSqlDefinition.setIndex(0);
         executeSqlDefinition.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
         executeSqlDefinition.setTableAlias("total_count");
-        executeSqlDefinition.setType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition.setType(ExecuteSqlType.COMPARISON.getCode());
         list.add(executeSqlDefinition);
 
         return list;

@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
-
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
@@ -30,8 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,21 +39,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * DqExecuteResultServiceImpl
  */
 @Service
-public class DqExecuteResultServiceImpl extends BaseService implements DqExecuteResultService {
+public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExecuteResultService {
 
     @Autowired
     private DqExecuteResultMapper dqExecuteResultMapper;
 
     @Override
-    public Map<String, Object> queryResultListPaging(User loginUser,
-                                                     String searchVal,
-                                                     Integer state,
-                                                     Integer ruleType,
-                                                     String startTime,
-                                                     String endTime,
-                                                     Integer pageNo,
-                                                     Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryResultListPaging(User loginUser,
+                                        String searchVal,
+                                        Integer state,
+                                        Integer ruleType,
+                                        String startTime,
+                                        String endTime,
+                                        Integer pageNo,
+                                        Integer pageSize) {
+
+        Result result = new Result();
         int[] statusArray = null;
         // filter by state
         if (state != null) {
@@ -95,9 +92,9 @@ public class DqExecuteResultServiceImpl extends BaseService implements DqExecute
                         start,
                         end);
 
-        pageInfo.setTotalCount((int) dqsResultPage.getTotal());
-        pageInfo.setLists(dqsResultPage.getRecords());
-        result.put(DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) dqsResultPage.getTotal());
+        pageInfo.setTotalList(dqsResultPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

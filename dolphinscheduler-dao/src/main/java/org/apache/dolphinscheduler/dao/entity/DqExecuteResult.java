@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.CheckType;
-import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -71,7 +67,7 @@ public class DqExecuteResult implements Serializable {
      * rule type
      */
     @TableField(value = "rule_type")
-    private RuleType ruleType;
+    private int ruleType;
     /**
      * rule name
      */
@@ -101,7 +97,7 @@ public class DqExecuteResult implements Serializable {
      * check type
      */
     @TableField(value = "check_type")
-    private CheckType checkType;
+    private int checkType;
     /**
      * threshold
      */
@@ -131,13 +127,12 @@ public class DqExecuteResult implements Serializable {
      * state
      */
     @TableField(value = "state")
-    private DqTaskState state;
+    private int state;
     /**
      * error output path
      */
     @TableField(value = "error_output_path")
     private String errorOutputPath;
-
     /**
      * create_time
      */
@@ -255,27 +250,27 @@ public class DqExecuteResult implements Serializable {
         this.userName = userName;
     }
 
-    public RuleType getRuleType() {
+    public int getRuleType() {
         return ruleType;
     }
 
-    public void setRuleType(RuleType ruleType) {
+    public void setRuleType(int ruleType) {
         this.ruleType = ruleType;
     }
 
-    public CheckType getCheckType() {
+    public int getCheckType() {
         return checkType;
     }
 
-    public void setCheckType(CheckType checkType) {
+    public void setCheckType(int checkType) {
         this.checkType = checkType;
     }
 
-    public DqTaskState getState() {
+    public int getState() {
         return state;
     }
 
-    public void setState(DqTaskState state) {
+    public void setState(int state) {
         this.state = state;
     }
 

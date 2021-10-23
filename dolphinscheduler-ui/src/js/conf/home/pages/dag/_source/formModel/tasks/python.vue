@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 <template>
-  <div class="shell-model">
+  <div class="python-model">
     <m-list-box>
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea id="code-python-mirror" name="code-python-mirror" style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
@@ -32,11 +32,10 @@
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <treeselect v-model="resourceList" :multiple="true" maxHeight="200" :options="resourceOptions" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}<span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
         </treeselect>
       </div>
     </m-list-box>
-
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -66,6 +65,8 @@
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+  import Clipboard from 'clipboard'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
 
   let editor
 
@@ -99,6 +100,25 @@
       backfillItem: Object
     },
     methods: {
+      _copyPath (e, node) {
+        e.stopPropagation()
+        let clipboard = new Clipboard('.copy-path', {
+          text: function () {
+            return node.raw.fullName
+          }
+        })
+        clipboard.on('success', handler => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', handler => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+      },
       /**
        * return localParams
        */
@@ -180,40 +200,14 @@
 
         return editor
       },
-      diGuiTree (item) { // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-            ? this.operationTree(item) : this.diGuiTree(item.children)
-        })
-      },
-      operationTree (item) {
-        if (item.dirctory) {
-          item.isDisabled = true
-        }
-        delete item.children
-      },
-      searchTree (element, id) {
-        // 根据id查找节点
-        if (element.id === id) {
-          return element
-        } else if (element.children !== null) {
-          let i
-          let result = null
-          for (i = 0; result === null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id)
-          }
-          return result
-        }
-        return null
-      },
       dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -279,8 +273,8 @@
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -299,7 +293,7 @@
     },
     created () {
       let item = this.store.state.dag.resourcesListS
-      this.diGuiTree(item)
+      diGuiTree(item)
       this.resourceOptions = item
       let o = this.backfillItem
 

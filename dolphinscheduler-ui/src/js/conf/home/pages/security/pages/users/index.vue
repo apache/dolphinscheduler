@@ -60,7 +60,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapMutations } from 'vuex'
   import mList from './_source/list'
   import mCreateUser from './_source/createUser'
   import mSpin from '@/module/components/spin/spin'
@@ -89,6 +89,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
+      ...mapMutations('user', ['setUserInfo']),
       ...mapActions('security', ['getUsersListP']),
       /**
        * Query
@@ -113,16 +114,13 @@
         this.item = item
         this.createUserDialog = true
       },
-
       onUpdate () {
         this._debounceGET('false')
         this.createUserDialog = false
       },
-
       close () {
         this.createUserDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false

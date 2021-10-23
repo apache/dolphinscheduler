@@ -27,9 +27,11 @@ export default {
    */
   createDatasources ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('datasources/create', payload, res => {
+      io.post('datasources', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
@@ -42,7 +44,9 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/connect', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
@@ -68,7 +72,7 @@ export default {
    */
   getDatasourcesListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('datasources/list-paging', payload, res => {
+      io.get('datasources', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -80,7 +84,7 @@ export default {
    */
   deleteDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('datasources/delete', payload, res => {
+      io.delete(`datasources/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -92,16 +96,18 @@ export default {
    */
   updateDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('datasources/update', payload, res => {
+      io.put(`datasources/${payload.id}`, payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
   },
   getEditDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('datasources/update-ui', payload, res => {
+      io.get(`datasources/${payload.id}`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

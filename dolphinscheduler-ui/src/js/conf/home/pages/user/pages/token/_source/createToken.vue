@@ -108,6 +108,10 @@
           this.$message.warning(`${i18n.$t('Please generate token')}`)
           return false
         }
+        if (!this.expireTime) {
+          this.$message.warning(`${i18n.$t('Please Select token')}`)
+          return false
+        }
         return true
       },
       _submit () {

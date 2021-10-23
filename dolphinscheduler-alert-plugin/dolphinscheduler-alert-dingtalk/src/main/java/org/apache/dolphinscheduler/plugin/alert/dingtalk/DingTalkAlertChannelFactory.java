@@ -17,11 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_FALSE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_NO;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_TRUE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
+
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -52,9 +57,9 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
             .build();
         RadioParam isEnableProxy =
             RadioParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE)
-                    .addParamsOptions(new ParamsOptions("YES", true, false))
-                    .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(true)
+                    .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                    .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_TRUE)
                 .addValidate(Validate.newBuilder()
                     .setRequired(false)
                     .build())

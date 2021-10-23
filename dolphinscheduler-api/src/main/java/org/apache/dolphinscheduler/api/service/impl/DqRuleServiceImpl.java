@@ -18,23 +18,15 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
+import static org.apache.dolphinscheduler.spi.utils.Constants.CHANGE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.SMALL;
 
 import org.apache.dolphinscheduler.api.dto.RuleDefinition;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.enums.dq.PropsType;
-import org.apache.dolphinscheduler.common.form.ParamsOptions;
-import org.apache.dolphinscheduler.common.form.PluginParams;
-import org.apache.dolphinscheduler.common.form.Validate;
-import org.apache.dolphinscheduler.common.form.props.GroupParamsProps;
-import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
-import org.apache.dolphinscheduler.common.form.type.GroupParam;
-import org.apache.dolphinscheduler.common.form.type.InputParam;
-import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -51,6 +43,18 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
+import org.apache.dolphinscheduler.spi.params.base.FormType;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.PropsType;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.group.GroupParam;
+import org.apache.dolphinscheduler.spi.params.group.GroupParamsProps;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParamProps;
+import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +79,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * DqRuleServiceImpl
  */
 @Service
-public class DqRuleServiceImpl extends BaseService implements DqRuleService {
+public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService {
 
     private final Logger logger = LoggerFactory.getLogger(DqRuleServiceImpl.class);
 
@@ -104,7 +108,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         if (ruleInputEntryList == null || ruleInputEntryList.isEmpty()) {
             putMsg(result, Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
         } else {
-            result.put(Constants.DATA_LIST, getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList)));
+            result.put(DATA_LIST, getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList)));
             putMsg(result, Status.SUCCESS);
         }
 
@@ -118,7 +122,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         List<DqRule> ruleList =
                 dqRuleMapper.selectList(new QueryWrapper<>());
 
-        result.put(Constants.DATA_LIST, ruleList);
+        result.put(DATA_LIST, ruleList);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -140,21 +144,21 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
             }
         }
 
-        result.put(Constants.DATA_LIST, options);
+        result.put(DATA_LIST, options);
         putMsg(result, Status.SUCCESS);
 
         return result;
     }
 
     @Override
-    public Map<String, Object> queryRuleListPaging(User loginUser,
-                                                   String searchVal,
-                                                   Integer ruleType,
-                                                   String startTime,
-                                                   String endTime,
-                                                   Integer pageNo,
-                                                   Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryRuleListPaging(User loginUser,
+                                      String searchVal,
+                                      Integer ruleType,
+                                      String startTime,
+                                      String endTime,
+                                      Integer pageNo,
+                                      Integer pageSize) {
+        Result result = new Result();
         
         Date start = null;
         Date end = null;
@@ -195,11 +199,11 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
             });
 
-            pageInfo.setTotalCount((int) dqRulePage.getTotal());
-            pageInfo.setLists(dataList);
+            pageInfo.setTotal((int) dqRulePage.getTotal());
+            pageInfo.setTotalList(dataList);
         }
 
-        result.put(DATA_LIST, pageInfo);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -209,7 +213,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
 
         for (DqRuleInputEntry inputEntry : ruleInputEntryList) {
             if (Boolean.TRUE.equals(inputEntry.getShow())) {
-                switch (inputEntry.getType()) {
+                switch (FormType.of(inputEntry.getType())) {
                     case INPUT:
                         params.add(getInputParam(inputEntry));
                         break;
@@ -242,25 +246,30 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
     }
 
     private InputParam getTextareaParam(DqRuleInputEntry inputEntry) {
+
+        InputParamProps paramProps =
+                new InputParamProps();
+        paramProps.setDisabled(!inputEntry.getCanEdit());
+        paramProps.setSize(SMALL);
+        paramProps.setType(PropsType.TEXTAREA.getPropsType());
+        paramProps.setRows(1);
+
         return InputParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
                         .setRequired(inputEntry.getValidate())
                         .build())
-                .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
+                .setProps(paramProps)
                 .setValue(inputEntry.getValue())
-                .setSize(Constants.SMALL)
-                .setType(PropsType.TEXTAREA)
-                .setRows(1)
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
     private SelectParam getSelectParam(DqRuleInputEntry inputEntry) {
         List<ParamsOptions> options = null;
 
-        switch (inputEntry.getOptionSourceType()) {
+        switch (OptionSourceType.of(inputEntry.getOptionSourceType())) {
             case DEFAULT:
                 String optionStr = inputEntry.getOptions();
                 if (StringUtils.isNotEmpty(optionStr)) {
@@ -271,7 +280,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 options = new ArrayList<>();
                 ParamsOptions paramsOptions = null;
                 for (DbType dbtype: DbType.values()) {
-                    paramsOptions = new ParamsOptions(dbtype.getDescp().toUpperCase(),dbtype.getCode(),false);
+                    paramsOptions = new ParamsOptions(dbtype.name(),dbtype.getCode(),false);
                     options.add(paramsOptions);
                 }
                 break;
@@ -289,27 +298,34 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 break;
         }
 
+        SelectParamProps selectParamProps = new SelectParamProps();
+        selectParamProps.setSize(SMALL);
+
         return SelectParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                .setParamsOptionsList(options)
+                .setOptions(options)
                 .setValue(inputEntry.getValue())
-                .setSize(Constants.SMALL)
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
+                .setProps(selectParamProps)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
     private InputParam getInputParam(DqRuleInputEntry inputEntry) {
+        InputParamProps paramProps =
+                new InputParamProps();
+        paramProps.setDisabled(!inputEntry.getCanEdit());
+        paramProps.setSize(SMALL);
+        paramProps.setRows(2);
+
         return InputParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
                                      .setRequired(inputEntry.getValidate())
                                      .build())
-                .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
+                .setProps(paramProps)
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setSize(Constants.SMALL)
-                .setRows(2)
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
@@ -320,7 +336,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                         .setRequired(inputEntry.getValidate())
                         .build())
                 .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(),PluginParams.class)).setFontSize(20))
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 }

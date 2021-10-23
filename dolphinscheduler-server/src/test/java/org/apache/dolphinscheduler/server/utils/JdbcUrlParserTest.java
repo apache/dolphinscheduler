@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.model.JdbcInfo;
+import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
+import org.apache.dolphinscheduler.spi.utils.JdbcUrlParser;
 
 import org.junit.Assert;
 import org.junit.Test;

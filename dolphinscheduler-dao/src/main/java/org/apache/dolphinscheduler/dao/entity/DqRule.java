@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -43,7 +41,7 @@ public class DqRule implements Serializable {
      * type
      */
     @TableField(value = "type")
-    private RuleType type;
+    private int type;
     /**
      * type
      */
@@ -86,11 +84,11 @@ public class DqRule implements Serializable {
         this.name = name;
     }
 
-    public RuleType getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(RuleType type) {
+    public void setType(int type) {
         this.type = type;
     }
 

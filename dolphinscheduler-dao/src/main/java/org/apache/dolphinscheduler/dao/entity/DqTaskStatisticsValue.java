@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -64,7 +62,7 @@ public class DqTaskStatisticsValue implements Serializable {
      * rule type
      */
     @TableField(exist = false)
-    private RuleType ruleType;
+    private int ruleType;
     /**
      * rule name
      */
@@ -147,11 +145,11 @@ public class DqTaskStatisticsValue implements Serializable {
         this.ruleId = ruleId;
     }
 
-    public RuleType getRuleType() {
+    public int getRuleType() {
         return ruleType;
     }
 
-    public void setRuleType(RuleType ruleType) {
+    public void setRuleType(int ruleType) {
         this.ruleType = ruleType;
     }
 

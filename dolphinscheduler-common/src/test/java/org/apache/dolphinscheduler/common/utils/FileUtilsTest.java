@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 import org.apache.dolphinscheduler.common.Constants;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -60,10 +59,8 @@ public class FileUtilsTest {
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getProcessExecDir(1,2,3, 4);
-        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3/4", dir);
-        dir = FileUtils.getProcessExecDir(1,2,3);
-        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3", dir);
+        String dir = FileUtils.getProcessExecDir(1L, 2L, 1, 3, 4);
+        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2_1/3/4", dir);
     }
 
     @Test
@@ -92,10 +89,10 @@ public class FileUtilsTest {
     public void testWriteContent2File() throws FileNotFoundException {
         // file exists, fmt is invalid
         String filePath = "test/testFile.txt";
-        String content = "正正正faffdasfasdfas";
+        String content = "正正正faffdasfasdfas，한국어； 한글……にほんご\nfrançais";
         FileUtils.writeContent2File(content, filePath);
 
-        String  fileContent = FileUtils.readFile2Str(new FileInputStream(new File(filePath)));
+        String fileContent = FileUtils.readFile2Str(new FileInputStream(filePath));
         Assert.assertEquals(content, fileContent);
     }
 

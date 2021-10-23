@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 /**
@@ -30,6 +31,7 @@ public enum DataType {
      * 6 time, "HH:MM:SS"
      * 7 time stamp
      * 8 Boolean
+     * 9 list <String>
      */
-    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN
+    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN,LIST
 }

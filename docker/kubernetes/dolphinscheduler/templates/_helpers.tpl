@@ -16,12 +16,6 @@
 #
 
 {{/* vim: set filetype=mustache: */}}
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "dolphinscheduler.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
@@ -29,79 +23,59 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "dolphinscheduler.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
 {{- end -}}
 
 {{/*
-Create chart name and version as used by the chart label.
+Create a default docker image fullname.
 */}}
-{{- define "dolphinscheduler.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- define "dolphinscheduler.image.fullname" -}}
+{{- .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 
 {{/*
-Common labels
+Create a default common labels.
 */}}
-{{- define "dolphinscheduler.labels" -}}
-helm.sh/chart: {{ include "dolphinscheduler.chart" . }}
-{{ include "dolphinscheduler.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-{{/*
-Selector labels
-*/}}
-{{- define "dolphinscheduler.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.name" . }}
+{{- define "dolphinscheduler.common.labels" -}}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/version: {{ .Chart.AppVersion }}
 {{- end -}}
 
 {{/*
-Create the name of the service account to use
+Create a master labels.
 */}}
-{{- define "dolphinscheduler.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "dolphinscheduler.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
+{{- define "dolphinscheduler.master.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
+app.kubernetes.io/component: master
+{{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
 
 {{/*
-Create a default docker image registry.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+Create a worker labels.
 */}}
-{{- define "dolphinscheduler.image.registry" -}}
-{{- $registry := default "docker.io" .Values.image.registry -}}
-{{- printf "%s" $registry | trunc 63 | trimSuffix "/" -}}
+{{- define "dolphinscheduler.worker.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+app.kubernetes.io/component: worker
+{{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
 
 {{/*
-Create a default docker image repository.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+Create an alert labels.
 */}}
-{{- define "dolphinscheduler.image.repository" -}}
-{{- printf "%s/%s:%s" (include "dolphinscheduler.image.registry" .) .Values.image.repository .Values.image.tag -}}
+{{- define "dolphinscheduler.alert.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+app.kubernetes.io/component: alert
+{{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
 
 {{/*
-Create a default image pull secrects.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+Create an api labels.
 */}}
-{{- define "dolphinscheduler.image.pullSecrets" -}}
-{{- default nil .Values.image.pullSecrets -}}
+{{- define "dolphinscheduler.api.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+app.kubernetes.io/component: api
+{{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
 
 {{/*
@@ -124,18 +98,145 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{/*
 Create a default fully qualified zookkeeper quorum.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
 {{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
-{{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port -}}
 {{- end -}}
 
 {{/*
-Create a default dolphinscheduler worker base dir.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+Create a database environment variables.
 */}}
-{{- define "dolphinscheduler.worker.base.dir" -}}
-{{- $name := default "/tmp/dolphinscheduler" .Values.worker.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH -}}
-{{- printf "%s" $name | trunc 63 | trimSuffix "/" -}}
+{{- define "dolphinscheduler.database.env_vars" -}}
+- name: DATABASE_TYPE
+  {{- if .Values.postgresql.enabled }}
+  value: "postgresql"
+  {{- else }}
+  value: {{ .Values.externalDatabase.type | quote }}
+  {{- end }}
+- name: DATABASE_DRIVER
+  {{- if .Values.postgresql.enabled }}
+  value: "org.postgresql.Driver"
+  {{- else }}
+  value: {{ .Values.externalDatabase.driver | quote }}
+  {{- end }}
+- name: DATABASE_HOST
+  {{- if .Values.postgresql.enabled }}
+  value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
+- name: DATABASE_PORT
+  {{- if .Values.postgresql.enabled }}
+  value: "5432"
+  {{- else }}
+  value: {{ .Values.externalDatabase.port | quote }}
+  {{- end }}
+- name: DATABASE_USERNAME
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.postgresqlUsername }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.username | quote }}
+  {{- end }}
+- name: DATABASE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      {{- if .Values.postgresql.enabled }}
+      name: {{ template "dolphinscheduler.postgresql.fullname" . }}
+      key: postgresql-password
+      {{- else }}
+      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+      key: database-password
+      {{- end }}
+- name: DATABASE_DATABASE
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.postgresqlDatabase }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
+- name: DATABASE_PARAMS
+  {{- if .Values.postgresql.enabled }}
+  value: "characterEncoding=utf8"
+  {{- else }}
+  value: {{ .Values.externalDatabase.params | quote }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Create a registry environment variables.
+*/}}
+{{- define "dolphinscheduler.registry.env_vars" -}}
+- name: REGISTRY_PLUGIN_DIR
+  {{- if .Values.zookeeper.enabled }}
+  value: "lib/plugin/registry"
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryPluginDir }}
+  {{- end }}
+- name: REGISTRY_PLUGIN_NAME
+  {{- if .Values.zookeeper.enabled }}
+  value: "zookeeper"
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryPluginName }}
+  {{- end }}
+- name: REGISTRY_SERVERS
+  {{- if .Values.zookeeper.enabled }}
+  value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryServers }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Create a common fs_s3a environment variables.
+*/}}
+{{- define "dolphinscheduler.fs_s3a.env_vars" -}}
+{{- if eq (default "HDFS" .Values.common.configmap.RESOURCE_STORAGE_TYPE) "S3" -}}
+- name: FS_S3A_SECRET_KEY
+  valueFrom:
+    secretKeyRef:
+      key: fs-s3a-secret-key
+      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a sharedStoragePersistence volume.
+*/}}
+{{- define "dolphinscheduler.sharedStorage.volume" -}}
+{{- if .Values.common.sharedStoragePersistence.enabled -}}
+- name: {{ include "dolphinscheduler.fullname" . }}-shared
+  persistentVolumeClaim:
+    claimName: {{ include "dolphinscheduler.fullname" . }}-shared
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a sharedStoragePersistence volumeMount.
+*/}}
+{{- define "dolphinscheduler.sharedStorage.volumeMount" -}}
+{{- if .Values.common.sharedStoragePersistence.enabled -}}
+- mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a fsFileResourcePersistence volume.
+*/}}
+{{- define "dolphinscheduler.fsFileResource.volume" -}}
+{{- if .Values.common.fsFileResourcePersistence.enabled -}}
+- name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+  persistentVolumeClaim:
+    claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a fsFileResourcePersistence volumeMount.
+*/}}
+{{- define "dolphinscheduler.fsFileResource.volumeMount" -}}
+{{- if .Values.common.fsFileResourcePersistence.enabled -}}
+- mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
 {{- end -}}
