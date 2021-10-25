@@ -302,6 +302,7 @@ CREATE TABLE t_ds_error_command (
   worker_group              varchar(64),
   environment_code          bigint DEFAULT '-1',
   dry_run                   int DEFAULT '0' ,
+  message                   text ,
   process_instance_id       int DEFAULT 0,
   process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
