@@ -337,25 +337,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
 
--- uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName()
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.STATISTICS
-                   WHERE TABLE_NAME='t_ds_task_definition'
-                     AND TABLE_SCHEMA=(SELECT DATABASE())
-                     AND INDEX_NAME ='task_unique')
-        ALTER TABLE t_ds_task_definition drop INDEX `task_unique`;
-    END IF;
-END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName;
-
 -- ----------------------------
 -- Table structure for t_ds_environment
 -- ----------------------------
