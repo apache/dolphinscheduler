@@ -46,6 +46,13 @@ public interface ProjectService {
      */
     Map<String, Object> queryByCode(User loginUser, long projectCode);
 
+    /**
+     * query project details by name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @return project detail information
+     */
     Map<String, Object> queryByName(User loginUser, String projectName);
 
     /**

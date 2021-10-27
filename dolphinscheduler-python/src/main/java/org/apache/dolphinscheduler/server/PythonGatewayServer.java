@@ -151,7 +151,6 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
      * If process definition already exists in Project=`projectCode` would update it
      * All requests
      * <p>
-     * //     * @param loginUser          login user
      *
      * @param name               process definition name
      * @param description        description
