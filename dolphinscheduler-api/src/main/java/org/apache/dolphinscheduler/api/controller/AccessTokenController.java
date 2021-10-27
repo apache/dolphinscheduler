@@ -152,7 +152,7 @@ public class AccessTokenController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result delAccessTokenById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result delAccessTokenById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id) {
         Map<String, Object> result = accessTokenService.delAccessTokenById(loginUser, id);
         return returnDataList(result);
@@ -174,7 +174,7 @@ public class AccessTokenController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @PathVariable(value = "id") int id,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
