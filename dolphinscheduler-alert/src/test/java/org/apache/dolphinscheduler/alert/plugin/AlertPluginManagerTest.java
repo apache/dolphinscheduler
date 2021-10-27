@@ -31,8 +31,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * AlertPluginManager Tester.
  */
@@ -53,13 +51,6 @@ public class AlertPluginManagerTest {
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
             alertPluginManagerConfig.setMavenLocalRepository(Objects.requireNonNull(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY)).trim());
-        }
-
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
-        try {
-            //alertPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
         }
 
         Assert.assertNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
