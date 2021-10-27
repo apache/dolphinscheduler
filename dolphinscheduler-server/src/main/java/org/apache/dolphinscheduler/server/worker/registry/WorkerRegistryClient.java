@@ -122,15 +122,20 @@ public class WorkerRegistryClient {
      * remove registry info
      */
     public void unRegistry() {
-        String address = getLocalAddress();
-        Set<String> workerZkPaths = getWorkerZkPaths();
-        for (String workerZkPath : workerZkPaths) {
-            registryClient.remove(workerZkPath);
-            logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
+        try {
+            String address = getLocalAddress();
+            Set<String> workerZkPaths = getWorkerZkPaths();
+            for (String workerZkPath : workerZkPaths) {
+                registryClient.remove(workerZkPath);
+                logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
+            }
+            this.heartBeatExecutor.shutdownNow();
+            logger.info("heartbeat executor shutdown");
+            registryClient.close();
+        } catch (Exception ex) {
+            logger.error("remove registry info exception", ex);
         }
-        this.heartBeatExecutor.shutdownNow();
-        logger.info("heartbeat executor shutdown");
-        registryClient.close();
+        logger.info("remove registry info successfully");
     }
 
     /**
