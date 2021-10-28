@@ -129,13 +129,15 @@ public class WorkerRegistryClient {
                 registryClient.remove(workerZkPath);
                 logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
             }
-            this.heartBeatExecutor.shutdownNow();
-            logger.info("heartbeat executor shutdown");
-            registryClient.close();
         } catch (Exception ex) {
-            logger.error("remove registry info exception", ex);
+            logger.error("remove worker zk path exception", ex);
         }
-        logger.info("remove registry info successfully");
+
+        this.heartBeatExecutor.shutdownNow();
+        logger.info("heartbeat executor shutdown");
+
+        registryClient.close();
+        logger.info("registry client closed");
     }
 
     /**
