@@ -41,18 +41,3 @@ def gateway_result_checker(
     if msg_check is not None and result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != msg_check:
         raise ValueError(f"Get result state not success.")
     return result
-
-# try to add decorators bu failed
-# def gateway_result_checker(func, *args, **kwargs):
-#     from functools import wraps
-#     @wraps(func)
-#     def wrapper():
-#         result = func(*args, **kwargs)
-#         if result[JavaGatewayDefault.RESULT_STATUS_KEYWORD].toString() != \
-#                 JavaGatewayDefault.RESULT_STATUS_SUCCESS:
-#             raise RuntimeError(f"Function {func.__name__} failed when try to got result for java gateway")
-#         elif result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != JavaGatewayDefault.RESULT_MESSAGE_SUCCESS:
-#             raise ValueError(f"Function {func.__name__} result state not success.")
-#         return result
-# 
-#     return wrapper
