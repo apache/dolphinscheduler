@@ -29,7 +29,7 @@ task_parent -->                        -->  task_union
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
 
-with ProcessDefinition(name="tutorial") as pd:
+with ProcessDefinition(name="tutorial", tenant="tenant_exists") as pd:
     task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
     task_child_one = Shell(name="task_child_one", command="echo 'child one'")
     task_child_two = Shell(name="task_child_two", command="echo 'child two'")

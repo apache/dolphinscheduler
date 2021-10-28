@@ -55,6 +55,10 @@ cd dolphinscheduler-python/pydolphinscheduler
 python example/tutorial.py
 ```
 
+> **_NOTICE:_** Since Apache DolphinScheduler's tenant is requests while running command, you might need to change
+> tenant value in `example/tutorial.py`. For now the value is `tenant_exists`, please change it to username exists
+> in you environment. 
+
 After command execute, you could see a new project with single process definition named *tutorial* in the [UI][ui-project].
 
 Until now, we finish quick start by an example of pydolphinscheduler and run it. If you want to inspect or join
