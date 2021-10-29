@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class, DataSourceClientProvider.class})
 public class DatasourceUtilTest {
 
     @Test
@@ -83,18 +82,21 @@ public class DatasourceUtilTest {
     }
 
     @Test
-    public void testGetConnection() throws ClassNotFoundException, SQLException {
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.when(Class.forName(Mockito.any())).thenReturn(null);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
+    public void testGetConnection() {
+
+        PowerMockito.mockStatic(DataSourceClientProvider.class);
+        DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
+        PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+
+        Connection connection = PowerMockito.mock(Connection.class);
+        PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
         MysqlConnectionParam connectionParam = new MysqlConnectionParam();
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
-        Connection connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
+        connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
 
-        Assert.assertNull(connection);
+        Assert.assertNotNull(connection);
 
     }
 
