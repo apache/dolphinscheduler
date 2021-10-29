@@ -86,7 +86,6 @@
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.lang.version>2.6</commons.lang.version>
         <commons.email.version>1.5</commons.email.version>
-        <commons-lang3.version>3.9</commons-lang3.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
         <commons.collections4.version>4.1</commons.collections4.version>
@@ -339,11 +338,6 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>${commons.logging.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -968,16 +962,17 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/common/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/db2/Db2DatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/hive/HiveDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/oracle/OracleDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/presto/PrestoDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/spark/SparkDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/DatasourceUtilTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/db2/Db2DatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/hive/HiveDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/oracle/OracleDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/presto/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/spark/SparkDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/utils/DatasourceUtilTest.java</include>
+                        <include>**/plugin/datasource/api/utils/CommonUtilsTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
