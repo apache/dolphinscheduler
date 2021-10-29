@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
@@ -25,11 +29,13 @@ import java.sql.DriverManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class})
+@PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class Db2DatasourceProcessorTest {
 
     private Db2DatasourceProcessor db2DatasourceProcessor = new Db2DatasourceProcessor();
@@ -42,6 +48,8 @@ public class Db2DatasourceProcessorTest {
         db2DatasourceParamDTO.setHost("localhost");
         db2DatasourceParamDTO.setPort(5142);
         db2DatasourceParamDTO.setDatabase("default");
+        PowerMockito.mockStatic(PasswordUtils.class);
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
                 .createConnectionParams(db2DatasourceParamDTO);

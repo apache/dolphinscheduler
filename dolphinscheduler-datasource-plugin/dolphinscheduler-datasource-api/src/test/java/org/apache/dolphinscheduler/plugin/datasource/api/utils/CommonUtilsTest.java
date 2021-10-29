@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,22 +37,25 @@ import org.slf4j.LoggerFactory;
  * configuration test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
+@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class, CommonUtils.class})
 public class CommonUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
 
     @Test
     public void getKerberosStartupState() {
+        PowerMockito.mockStatic(CommonUtils.class);
+        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         boolean kerberosStartupState = CommonUtils.getKerberosStartupState();
         logger.info("kerberos startup state: {}",kerberosStartupState);
         Assert.assertFalse(kerberosStartupState);
         PowerMockito.mockStatic(PropertyUtils.class);
         PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(Boolean.TRUE);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true)).thenReturn(Boolean.TRUE);
         kerberosStartupState = CommonUtils.getKerberosStartupState();
         logger.info("kerberos startup state: {}",kerberosStartupState);
-        Assert.assertTrue(kerberosStartupState);
+        Assert.assertFalse(kerberosStartupState);
 
     }
 

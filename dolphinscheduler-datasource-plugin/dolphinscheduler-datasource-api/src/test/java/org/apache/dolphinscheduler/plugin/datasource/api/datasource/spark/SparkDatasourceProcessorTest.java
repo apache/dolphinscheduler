@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
@@ -25,11 +29,13 @@ import java.sql.DriverManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class})
+@PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class SparkDatasourceProcessorTest {
 
     private SparkDatasourceProcessor sparkDatasourceProcessor = new SparkDatasourceProcessor();
@@ -42,7 +48,8 @@ public class SparkDatasourceProcessorTest {
         sparkDatasourceParamDTO.setHost("localhost1,localhost2");
         sparkDatasourceParamDTO.setPort(1234);
         sparkDatasourceParamDTO.setDatabase("default");
-
+        PowerMockito.mockStatic(PasswordUtils.class);
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
                 .createConnectionParams(sparkDatasourceParamDTO);
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());

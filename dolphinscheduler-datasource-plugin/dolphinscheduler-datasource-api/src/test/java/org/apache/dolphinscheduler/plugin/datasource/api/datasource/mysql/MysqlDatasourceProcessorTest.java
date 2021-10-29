@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -26,11 +30,13 @@ import java.sql.DriverManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class})
+@PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class MysqlDatasourceProcessorTest {
 
     private MysqlDatasourceProcessor mysqlDatasourceProcessor = new MysqlDatasourceProcessor();
@@ -43,7 +49,8 @@ public class MysqlDatasourceProcessorTest {
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setDatabase("default");
-
+        PowerMockito.mockStatic(PasswordUtils.class);
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(mysqlDatasourceParamDTO);
         System.out.println(JSONUtils.toJsonString(connectionParams));

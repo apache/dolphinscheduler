@@ -41,8 +41,6 @@ import java.io.IOException;
  */
 public class CommonUtils {
 
-    public static final String resourceUploadPath = PropertyUtils.getString(TaskConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
-
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
@@ -130,6 +128,7 @@ public class CommonUtils {
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
+        String resourceUploadPath = PropertyUtils.getString(TaskConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
         if ("/".equals(resourceUploadPath)) {
             // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
             return "";
