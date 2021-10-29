@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 public class ClickhouseDataSourceChannelFactory implements DataSourceChannelFactory {
     @Override
     public String getName() {
-        return "mysql";
+        return "clickhouse";
     }
 
     @Override

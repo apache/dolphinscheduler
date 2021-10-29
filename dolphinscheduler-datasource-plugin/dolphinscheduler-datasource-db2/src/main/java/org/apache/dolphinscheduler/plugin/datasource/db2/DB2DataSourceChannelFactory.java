@@ -24,7 +24,7 @@ public class DB2DataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return "hive";
+        return "db2";
     }
 
     @Override
