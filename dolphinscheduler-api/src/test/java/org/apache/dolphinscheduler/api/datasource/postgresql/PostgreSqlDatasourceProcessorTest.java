@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql;
+package org.apache.dolphinscheduler.api.datasource.postgresql;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;

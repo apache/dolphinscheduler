@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.utils;
+package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 

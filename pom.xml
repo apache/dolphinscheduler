@@ -962,17 +962,17 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/db2/Db2DatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/hive/HiveDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/oracle/OracleDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/presto/PrestoDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/spark/SparkDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
-                        <include>**/plugin/datasource/api/utils/DatasourceUtilTest.java</include>
-                        <include>**/plugin/datasource/api/utils/CommonUtilsTest.java</include>
+                        <include>**/api/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/db2/Db2DatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/hive/HiveDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/oracle/OracleDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/presto/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/spark/SparkDatasourceProcessorTest.java</include>
+                        <include>**/api/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/DatasourceUtilTest.java</include>
+                        <include>**/api/utils/CommonUtilsTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>

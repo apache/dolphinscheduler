@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto;
+package org.apache.dolphinscheduler.api.datasource.mysql;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.DriverManager;
 
@@ -36,53 +40,52 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
-public class PrestoDatasourceProcessorTest {
+public class MysqlDatasourceProcessorTest {
 
-    private PrestoDatasourceProcessor prestoDatasourceProcessor = new PrestoDatasourceProcessor();
+    private MysqlDatasourceProcessor mysqlDatasourceProcessor = new MysqlDatasourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
-        PrestoDatasourceParamDTO prestoDatasourceParamDTO = new PrestoDatasourceParamDTO();
-        prestoDatasourceParamDTO.setHost("localhost");
-        prestoDatasourceParamDTO.setPort(1234);
-        prestoDatasourceParamDTO.setDatabase("default");
-        prestoDatasourceParamDTO.setUserName("root");
-        prestoDatasourceParamDTO.setPassword("123456");
+        MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
+        mysqlDatasourceParamDTO.setUserName("root");
+        mysqlDatasourceParamDTO.setPassword("123456");
+        mysqlDatasourceParamDTO.setHost("localhost");
+        mysqlDatasourceParamDTO.setPort(3306);
+        mysqlDatasourceParamDTO.setDatabase("default");
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
-        Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
+                .createConnectionParams(mysqlDatasourceParamDTO);
+        System.out.println(JSONUtils.toJsonString(connectionParams));
+        Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
+        Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
     }
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
+        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://localhost:3306\""
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
+        MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionParams);
+        Assert.assertNotNull(connectionJson);
         Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
+        Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
-        PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
-        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
-        prestoConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
-                prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
-
+        MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
+        mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
+        Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+                mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
     }
 }

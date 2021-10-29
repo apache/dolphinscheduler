@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark;
+package org.apache.dolphinscheduler.api.datasource.spark;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;

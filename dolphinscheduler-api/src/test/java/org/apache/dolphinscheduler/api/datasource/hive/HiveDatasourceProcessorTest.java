@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver;
+package org.apache.dolphinscheduler.api.datasource.hive;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
@@ -37,52 +40,51 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
-public class SqlServerDatasourceProcessorTest {
+public class HiveDatasourceProcessorTest {
 
-    private SqlServerDatasourceProcessor sqlServerDatasourceProcessor = new SqlServerDatasourceProcessor();
+    private HiveDatasourceProcessor hiveDatasourceProcessor = new HiveDatasourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
-        SqlServerDatasourceParamDTO sqlServerDatasourceParamDTO = new SqlServerDatasourceParamDTO();
-        sqlServerDatasourceParamDTO.setUserName("root");
-        sqlServerDatasourceParamDTO.setPassword("123456");
-        sqlServerDatasourceParamDTO.setDatabase("default");
-        sqlServerDatasourceParamDTO.setHost("localhost");
-        sqlServerDatasourceParamDTO.setPort(1234);
+        HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
+        hiveDataSourceParamDTO.setHost("localhost1,localhost2");
+        hiveDataSourceParamDTO.setPort(5142);
+        hiveDataSourceParamDTO.setUserName("default");
+        hiveDataSourceParamDTO.setDatabase("default");
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        SqlServerConnectionParam connectionParams = (SqlServerConnectionParam) sqlServerDatasourceProcessor
-                .createConnectionParams(sqlServerDatasourceParamDTO);
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
-        Assert.assertEquals("root", connectionParams.getUser());
+        HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
+                .createConnectionParams(hiveDataSourceParamDTO);
+        System.out.println(JSONUtils.toJsonString(connectionParams));
+        Assert.assertNotNull(connectionParams);
+        Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142", connectionParams.getAddress());
     }
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
-        SqlServerConnectionParam sqlServerConnectionParam = JSONUtils.parseObject(connectionJson, SqlServerConnectionParam.class);
-        Assert.assertNotNull(sqlServerConnectionParam);
-        Assert.assertEquals("root", sqlServerConnectionParam.getUser());
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\"}";
+        HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
+                .createConnectionParams(connectionParam);
+        Assert.assertNotNull(connectionParam);
+        Assert.assertEquals("default", connectionParams.getUser());
     }
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER, sqlServerDatasourceProcessor.getDatasourceDriver());
+        Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, hiveDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
-        SqlServerConnectionParam sqlServerConnectionParam = new SqlServerConnectionParam();
-        sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
-        sqlServerConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;other",
-                sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
+        HiveConnectionParam connectionParam = new HiveConnectionParam();
+        connectionParam.setJdbcUrl("jdbc:hive2://localhost1:5142,localhost2:5142/default");
+        Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142/default",
+                hiveDatasourceProcessor.getJdbcUrl(connectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.SQLSERVER, sqlServerDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.HIVE, hiveDatasourceProcessor.getDbType());
     }
 }

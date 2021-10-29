@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2;
+package org.apache.dolphinscheduler.api.datasource.db2;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2ConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
