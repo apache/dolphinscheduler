@@ -31,13 +31,6 @@ import java.util.List;
  */
 public interface CommandMapper extends BaseMapper<Command> {
 
-
-    /**
-     * get one command
-     * @return command
-     */
-    Command getOneToRun();
-
     /**
      * count command state
      * @param userId userId
@@ -56,6 +49,6 @@ public interface CommandMapper extends BaseMapper<Command> {
      * query command page
      * @return
      */
-    IPage<Command> queryCommandPage(IPage<Command> page);
+    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
 
 }

@@ -143,7 +143,7 @@ export default {
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
         state.timeout = res.data.processDefinition.timeout
-        // tenantId
+        // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
         state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
@@ -161,7 +161,8 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
         resolve(res.data)
       }).catch(res => {
@@ -257,7 +258,8 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
@@ -316,19 +318,16 @@ export default {
   /**
    * Process instance update
    */
-  updateInstance ({ state }, payload) {
+  updateInstance ({ state }, instanceId) {
     return new Promise((resolve, reject) => {
-      const data = {
-        globalParams: state.globalParams,
-        tasks: state.tasks,
-        tenantId: state.tenantId,
-        timeout: state.timeout
-      }
-      io.put(`projects/${state.projectCode}/process-instances/${payload}`, {
-        processInstanceJson: JSON.stringify(data),
+      io.put(`projects/${state.projectCode}/process-instances/${instanceId}`, {
+        syncDefine: state.syncDefine,
+        globalParams: JSON.stringify(state.globalParams),
         locations: JSON.stringify(state.locations),
-        connects: JSON.stringify(state.connects),
-        syncDefine: state.syncDefine
+        taskDefinitionJson: JSON.stringify(state.tasks),
+        taskRelationJson: JSON.stringify(state.connects),
+        tenantCode: state.tenantCode,
+        timeout: state.timeout
       }, res => {
         resolve(res)
         state.isEditDag = false
@@ -375,7 +374,7 @@ export default {
         resolve()
         return
       }
-      io.get('projects/list', payload, res => {
+      io.get('projects/created-and-authed', payload, res => {
         state.projectListS = res.data
         resolve(res.data)
       }).catch(res => {
@@ -688,7 +687,7 @@ export default {
    */
   getViewvariables ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-variables`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}/view-variables`, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -724,7 +723,7 @@ export default {
    */
   forceTaskSuccess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/task-instances/${payload.code}/force-success`, payload, res => {
+      io.post(`projects/${state.projectCode}/task-instances/${payload.taskInstanceId}/force-success`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

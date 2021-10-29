@@ -21,11 +21,12 @@
     <parent>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.6-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-sql</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
         <dependency>
@@ -39,8 +40,15 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
-
-
+    <build>
+        <finalName>dolphinscheduler-task-sql-${project.version}</finalName>
+    </build>
 </project>

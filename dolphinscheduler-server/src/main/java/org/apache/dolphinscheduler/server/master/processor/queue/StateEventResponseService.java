@@ -21,12 +21,12 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
@@ -34,6 +34,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -59,13 +60,8 @@ public class StateEventResponseService {
      */
     private Thread responseWorker;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
-
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
-        if (this.processInstanceMapper == null) {
-            this.processInstanceMapper = processInstanceMapper;
-        }
-    }
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @PostConstruct
     public void start() {
@@ -114,6 +110,7 @@ public class StateEventResponseService {
                 } catch (InterruptedException e) {
                     logger.warn("persist task error", e);
                     Thread.currentThread().interrupt();
+                    break;
                 }
             }
             logger.info("StateEventResponseWorker stopped");
@@ -130,16 +127,16 @@ public class StateEventResponseService {
 
     private void persist(StateEvent stateEvent) {
         try {
-            if (!this.processInstanceMapper.containsKey(stateEvent.getProcessInstanceId())) {
+            if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
                 writeResponse(stateEvent, ExecutionStatus.FAILURE);
                 return;
             }
 
-            WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(stateEvent.getProcessInstanceId());
+            WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
             workflowExecuteThread.addStateEvent(stateEvent);
             writeResponse(stateEvent, ExecutionStatus.SUCCESS);
         } catch (Exception e) {
-            logger.error("persist event queue error:", stateEvent.toString(), e);
+            logger.error("persist event queue error, event: {}", stateEvent, e);
         }
     }
 

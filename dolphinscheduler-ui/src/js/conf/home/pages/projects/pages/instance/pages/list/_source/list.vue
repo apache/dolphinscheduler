@@ -63,6 +63,12 @@
         </el-table-column>
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
+        <el-table-column :label="$t('Dry-run flag')" width="100">
+          <template slot-scope="scope">
+            <span v-if="scope.row.dryRun == 1">YES</span>
+            <span v-else>NO</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
         <el-table-column prop="host" :label="$t('host')" min-width="210"></el-table-column>
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
@@ -292,7 +298,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectCode}/instance/list/${item.id}`, query: { code: item.processDefinitionCode } })
       },
       /**
        * Rerun

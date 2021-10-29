@@ -18,35 +18,8 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.SqoopJobType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
-import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
-import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -55,18 +28,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -160,18 +127,17 @@ public class TaskPriorityQueueConsumer extends Thread {
     protected boolean dispatch(TaskPriority taskPriority) {
         boolean result = false;
         try {
-            int taskInstanceId = taskPriority.getTaskId();
-            TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
+            TaskExecutionContext context = taskPriority.getTaskExecutionContext();
             ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 
-            if (taskInstanceIsFinalState(taskInstanceId)) {
+            if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
                 // when task finish, ignore this task, there is no need to dispatch anymore
                 return true;
             } else {
                 result = dispatcher.dispatch(executionContext);
             }
         } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage());
+            logger.error("dispatch error: {}", e.getMessage(),e);
         }
         return result;
     }
@@ -186,222 +152,5 @@ public class TaskPriorityQueueConsumer extends Thread {
     public Boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
-    }
-
-    /**
-     * get TaskExecutionContext
-     *
-     * @param taskInstanceId taskInstanceId
-     * @return TaskExecutionContext
-     */
-    protected TaskExecutionContext getTaskExecutionContext(int taskInstanceId) {
-        TaskInstance taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstanceId);
-
-        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
-        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
-
-        // verify tenant is null
-        if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(taskInstance, ExecutionStatus.FAILURE,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    null,
-                    taskInstance.getId());
-            return null;
-        }
-        // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
-        taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
-        taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        taskInstance.setResources(getResourceFullNames(taskInstance));
-
-        SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
-        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
-        ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
-        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
-
-        // SQL task
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setSQLTaskRelation(sqlTaskExecutionContext, taskInstance);
-        }
-
-        // DATAX task
-        if (TaskType.DATAX.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
-        }
-
-        // procedure task
-        if (TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setProcedureTaskRelation(procedureTaskExecutionContext, taskInstance);
-        }
-
-        if (TaskType.SQOOP.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
-            setSqoopTaskRelation(sqoopTaskExecutionContext, taskInstance);
-        }
-
-        return TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
-                .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
-                .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
-                .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
-                .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
-                .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
-                .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
-                .create();
-    }
-
-    /**
-     * set procedure task relation
-     *
-     * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
-        ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
-        int datasourceId = procedureParameters.getDatasource();
-        DataSource datasource = processService.findDataSourceById(datasourceId);
-        procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
-    }
-
-    /**
-     * set datax task relation
-     *
-     * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
-        DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
-
-        DataSource dbSource = processService.findDataSourceById(dataxParameters.getDataSource());
-        DataSource dbTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
-
-        if (dbSource != null) {
-            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-            dataxTaskExecutionContext.setSourcetype(dbSource.getType().getCode());
-            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
-        }
-
-        if (dbTarget != null) {
-            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-            dataxTaskExecutionContext.setTargetType(dbTarget.getType().getCode());
-            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
-        }
-    }
-
-    /**
-     * set sqoop task relation
-     *
-     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
-        SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
-
-        // sqoop job type is template set task relation
-        if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
-            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
-            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
-
-            DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
-            DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
-
-            if (dataSource != null) {
-                sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
-                sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-                sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
-            }
-
-            if (dataTarget != null) {
-                sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
-                sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-                sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
-            }
-        }
-    }
-
-    /**
-     * set SQL task relation
-     *
-     * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskInstance taskInstance
-     */
-    private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
-        SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
-        int datasourceId = sqlParameters.getDatasource();
-        DataSource datasource = processService.findDataSourceById(datasourceId);
-        sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
-
-        // whether udf type
-        boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
-                && !StringUtils.isEmpty(sqlParameters.getUdfs());
-
-        if (udfTypeFlag) {
-            String[] udfFunIds = sqlParameters.getUdfs().split(",");
-            int[] udfFunIdsArray = new int[udfFunIds.length];
-            for (int i = 0; i < udfFunIds.length; i++) {
-                udfFunIdsArray[i] = Integer.parseInt(udfFunIds[i]);
-            }
-
-            List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(udfFunIdsArray);
-            Map<UdfFunc, String> udfFuncMap = new HashMap<>();
-            for (UdfFunc udfFunc : udfFuncList) {
-                String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
-                udfFuncMap.put(udfFunc, tenantCode);
-            }
-
-            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
-        }
-    }
-
-    /**
-     * whehter tenant is null
-     *
-     * @param tenant tenant
-     * @param taskInstance taskInstance
-     * @return result
-     */
-    protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
-        if (tenant == null) {
-            logger.error("tenant not exists,process instance id : {},task instance id : {}",
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * get resource map key is full name and value is tenantCode
-     */
-    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
-        Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
-
-        if (baseParam != null) {
-            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-
-                // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
-                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
-                }
-
-                // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
-                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
-
-                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
-                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
-
-                    List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
-                }
-            }
-        }
-
-        return resourcesMap;
     }
 }

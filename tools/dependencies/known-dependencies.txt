@@ -56,7 +56,7 @@ datanucleus-core-4.1.6.jar
 datanucleus-rdbms-4.1.7.jar
 derby-10.14.2.0.jar
 error_prone_annotations-2.1.3.jar
-druid-1.1.22.jar
+druid-1.2.4.jar
 gson-2.8.6.jar
 guava-24.1-jre.jar
 guava-retrying-2.0.0.jar
@@ -252,3 +252,4 @@ xmlbeans-3.1.0.jar
 xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
+Java-WebSocket-1.5.1.jar
