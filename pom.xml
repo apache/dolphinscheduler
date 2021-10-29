@@ -84,6 +84,7 @@
         <commons.httpclient>3.0.1</commons.httpclient>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.lang.version>2.6</commons.lang.version>
         <commons.email.version>1.5</commons.email.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <poi.version>4.1.2</poi.version>
@@ -483,6 +484,12 @@
                 <groupId>commons-configuration</groupId>
                 <artifactId>commons-configuration</artifactId>
                 <version>${commons.configuration.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
             </dependency>
 
             <dependency>
@@ -1053,6 +1060,7 @@
                         <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
+                        <include>**/server/master/cache/impl/ProcessInstanceExecCacheManagerImplTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/registry/RegistryClientTest.java</include>

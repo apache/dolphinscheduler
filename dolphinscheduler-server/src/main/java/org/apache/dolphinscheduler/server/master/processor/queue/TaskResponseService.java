@@ -25,13 +25,13 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
@@ -71,13 +71,8 @@ public class TaskResponseService {
      */
     private Thread taskResponseWorker;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
-
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
-        if (this.processInstanceMapper == null) {
-            this.processInstanceMapper = processInstanceMapper;
-        }
-    }
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @PostConstruct
     public void start() {
@@ -194,7 +189,7 @@ public class TaskResponseService {
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(taskResponseEvent.getProcessInstanceId());
         if (workflowExecuteThread != null) {
             StateEvent stateEvent = new StateEvent();
             stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());

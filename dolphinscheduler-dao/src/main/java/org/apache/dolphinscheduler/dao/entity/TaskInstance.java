@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -25,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -589,6 +592,26 @@ public class TaskInstance implements Serializable {
             return (this.getState().typeIsFailure()
                     && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+    }
+
+    /**
+     * whether the retry interval is timed out
+     *
+     * @return Boolean
+     */
+    public boolean retryTaskIntervalOverTime() {
+        if (getState() != ExecutionStatus.FAILURE) {
+            return true;
+        }
+        if (getId() == 0
+                || getMaxRetryTimes() == 0
+                || getRetryInterval() == 0) {
+            return true;
+        }
+        Date now = new Date();
+        long failedTimeInterval = DateUtils.differSec(now, getEndTime());
+        // task retry does not over time, return false
+        return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     public Priority getTaskInstancePriority() {

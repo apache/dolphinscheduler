@@ -81,12 +81,6 @@ public class WorkerServer implements IStoppable {
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     * worker registry
-     */
-    @Autowired
-    private WorkerRegistryClient workerRegistryClient;
-
-    /**
      * worker config
      */
     @Autowired
@@ -109,6 +103,12 @@ public class WorkerServer implements IStoppable {
 
     @Autowired
     private WorkerManagerThread workerManagerThread;
+
+    /**
+     * worker registry
+     */
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
 
     private TaskPluginManager taskPluginManager;
 

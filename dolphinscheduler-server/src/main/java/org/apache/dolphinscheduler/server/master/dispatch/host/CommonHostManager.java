@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.ResInfo;
+import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -36,7 +36,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  common host manager
+ * common host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
@@ -48,6 +48,7 @@ public abstract class CommonHostManager implements HostManager {
 
     /**
      * select host
+     *
      * @param context context
      * @return host
      */
@@ -87,12 +88,12 @@ public abstract class CommonHostManager implements HostManager {
         return hostWorkers;
     }
 
-    protected int getWorkerHostWeightFromHeartbeat(String heartbeat) {
+    protected int getWorkerHostWeightFromHeartbeat(String heartBeatInfo) {
         int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
-        if (!StringUtils.isEmpty(heartbeat)) {
-            String[] parts = heartbeat.split(Constants.COMMA);
-            if (ResInfo.isNewHeartbeatWithWeight(parts)) {
-                hostWeight = Integer.parseInt(parts[10]);
+        if (!StringUtils.isEmpty(heartBeatInfo)) {
+            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
+            if (heartBeat != null) {
+                hostWeight = heartBeat.getWorkerHostWeight();
             }
         }
         return hostWeight;

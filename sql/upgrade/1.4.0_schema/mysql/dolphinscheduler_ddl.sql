@@ -337,25 +337,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
 
--- uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName()
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.STATISTICS
-                   WHERE TABLE_NAME='t_ds_task_definition'
-                     AND TABLE_SCHEMA=(SELECT DATABASE())
-                     AND INDEX_NAME ='task_unique')
-        ALTER TABLE t_ds_task_definition drop INDEX `task_unique`;
-    END IF;
-END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_definition_A_drop_UN_taskName;
-
 -- ----------------------------
 -- Table structure for t_ds_environment
 -- ----------------------------
@@ -398,7 +379,7 @@ CREATE TABLE `t_ds_task_definition` (
   `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
   `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `resource_ids` text COMMENT 'resource id, separated by comma',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -428,7 +409,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
   `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `resource_ids` text COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -442,6 +423,9 @@ ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default '-1'
 ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
 ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text COMMENT 'environment config' AFTER `environment_code`;
+
+ALTER TABLE t_ds_task_definition MODIFY COLUMN `resource_ids` text;
+ALTER TABLE t_ds_task_definition_log MODIFY COLUMN `resource_ids` text;
 
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation

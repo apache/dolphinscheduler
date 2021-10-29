@@ -521,8 +521,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 13;
 
     /**
      * jar
@@ -1042,6 +1041,7 @@ public final class Constants {
 
     public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
+    public static final int BUSY_NODE_STATUE = 2;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
