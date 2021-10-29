@@ -152,11 +152,15 @@ public class DolphinPluginManagerConfig {
         DocumentBuilder documentBuilder;
         try {
             // security settings
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            try {
+                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            } catch (Exception e) {
+                logger.warn("Error at parse settings.xml, setting security features: {}", e.getLocalizedMessage());
+            }
             documentBuilder = factory.newDocumentBuilder();
             Document document = documentBuilder.parse(settingsXmlPath.toFile());
             // search node named 'localRepository'
@@ -181,6 +185,7 @@ public class DolphinPluginManagerConfig {
             }
             return defaultRepository;
         } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
             return defaultRepository;
         }
     }
