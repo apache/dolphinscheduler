@@ -111,6 +111,12 @@
           &.icos-switch {
             background-image: url("../images/task-icos/switch.png");
           }
+          &.icos-tis {
+            background-image: url("../images/task-icos/pigeon.png");
+          }
+          &.icos-blocking {
+            background-image: url("../images/task-icos/blocking.png");
+          }
         }
 
         span {
@@ -170,6 +176,9 @@
             }
             &.icos-switch {
               background-image: url("../images/task-icos/switch_hover.png");
+            }
+            &.icos-tis {
+              background-image: url("../images/task-icos/pigeon_hover.png");
             }
           }
         }

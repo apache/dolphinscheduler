@@ -148,7 +148,8 @@
             nodeData.taskType !== 'SUB_PROCESS' &&
             nodeData.taskType !== 'CONDITIONS' &&
             nodeData.taskType !== 'DEPENDENT' &&
-            nodeData.taskType !== 'SWITCH'
+            nodeData.taskType !== 'SWITCH' &&
+            nodeData.taskType != 'BLOCKING'
           "
         >
           <div slot="text">{{ $t("Delay execution time") }}</div>
@@ -377,6 +378,16 @@
             :prev-tasks="prevTasks"
           >
           </m-conditions>
+          <m-blocking
+            v-if="nodeData.taskType === 'BLOCKING'"
+            ref="BLOCKING"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            @on-dependent="_onDependent"
+            @on-cache-dependent="_onCacheDependent"
+            :backfill-item="backfillItem"
+            :prev-tasks="prevTasks">
+          </m-blocking>
           <m-switch
             v-if="nodeData.taskType === 'SWITCH'"
             ref="SWITCH"
@@ -449,6 +460,7 @@
   import mWorkerGroups from './_source/workerGroups'
   import mRelatedEnvironment from './_source/relatedEnvironment'
   import mPreTasks from './tasks/pre_tasks'
+  import mBlocking from './tasks/blocking'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
@@ -780,7 +792,9 @@
             delayTime: this.delayTime,
             environmentCode: this.environmentCode || -1,
             status: this.status,
-            branch: this.branch
+            branch: this.branch,
+            blockingCondition: this.blockingCondition,
+            alertWhenBlocking: this.alertWhenBlocking
           },
           fromThis: this
         })
@@ -986,7 +1000,8 @@
       mPriority,
       mWorkerGroups,
       mRelatedEnvironment,
-      mPreTasks
+      mPreTasks,
+      mBlocking
       // ReferenceFromTask
     }
   }

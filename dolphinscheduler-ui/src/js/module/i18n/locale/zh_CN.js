@@ -711,5 +711,11 @@ export default {
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空',
   'Reference from': '使用已有任务',
-  'No more...': '没有更多了...'
+  'No more...': '没有更多了...',
+  'Alert When Blocking': '阻断时告警',
+  'Blocking Condition': '阻断时机',
+  'Blocking on Failed': '失败时阻断',
+  'Blocking on Success': '成功时阻断',
+  Alert: '告警',
+  'Do not Alert': '不告警'
 }

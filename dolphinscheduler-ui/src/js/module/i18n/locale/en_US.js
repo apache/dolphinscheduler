@@ -712,5 +712,11 @@ export default {
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
-  'No more...': 'No more...'
+  'No more...': 'No more...',
+  'Alert When Blocking': 'Alert When Blocking',
+  'Blocking Condition': 'Blocking Condition',
+  'Blocking on Failed': 'Blocking on Failed',
+  'Blocking on Success': 'Blocking on Success',
+  Alert: 'Alert',
+  'Do not Alert': 'Do not Alert'
 }
