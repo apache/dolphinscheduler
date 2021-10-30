@@ -849,6 +849,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
         processDefinition.setName(processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp());
+        processDefinition.setId(0);
+        processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
             processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
@@ -892,8 +894,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessTaskRelationLog> taskRelationLogList = new ArrayList<>();
         for (ProcessTaskRelation processTaskRelation : taskRelationList) {
             ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-            processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
-            processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+            if (taskCodeMap.containsKey(processTaskRelationLog.getPreTaskCode())) {
+                processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
+            }
+            if (taskCodeMap.containsKey(processTaskRelationLog.getPostTaskCode())) {
+                processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+            }
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
             taskRelationLogList.add(processTaskRelationLog);

@@ -15,60 +15,54 @@
 # limitations under the License.
 #
 
-on: ["pull_request"]
-env:
-  DOCKER_DIR: ./docker
-  LOG_DIR: /tmp/dolphinscheduler
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
 
-name: Test
+env:
+  TAG: ci
+  RECORDING_PATH: /tmp/recording
+
+name: E2E
 
 concurrency:
   group: e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: E2E
+  e2e:
+    name: ${{ matrix.case.name }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        case:
+          - name: Tenant
+            class: org.apache.dolphinscheduler.e2e.cases.security.TenantE2ETest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
-      - uses: actions/cache@v1
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
       - name: Build Image
+        run: TAG=ci sh ./docker/build/hooks/build
+      - name: Run Test
         run: |
-          sh ./docker/build/hooks/build
-      - name: Docker Run
-        run: |
-          export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
-          sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
-          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
-      - name: Check Server Status
-        run: sh $(pwd)/docker/docker-swarm/check
-      - name: Prepare e2e env
-        run: |
-          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome*.deb
-          sudo apt-get install -f -y
-          google-chrome -version
-          googleVersion=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          wget -N https://chromedriver.storage.googleapis.com/${googleVersion}/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv -f chromedriver /usr/local/share/chromedriver
-          sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-#     - name: Run e2e Test
-#       run: cd ./e2e && mvn -B clean test
-      - name: Collect logs
-        if: failure()
-        uses: actions/upload-artifact@v2
+          ./mvnw -f dolphinscheduler-e2e/pom.xml -am \
+            -DfailIfNoTests=false \
+            -Dtest=${{ matrix.case.class }} test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        name: Upload Recording
         with:
-          name: dslogs
-          path: ${{ github.workspace }}/docker/docker-swarm/dolphinscheduler-logs
-
-
+          name: recording
+          path: ${{ env.RECORDING_PATH }}
+          retention-days: 1
