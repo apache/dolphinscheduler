@@ -263,6 +263,32 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     }
 
     /**
+     * query queue by queueName
+     *
+     * @param queueName queue name
+     * @return queue object for provide queue name
+     */
+    @Override
+    public Map<String, Object> queryQueueName(String queueName) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+            return result;
+        }
+
+        if (!checkQueueNameExist(queueName)) {
+            putMsg(result, Status.QUEUE_NOT_EXIST, queueName);
+            return result;
+        }
+
+        List<Queue> queueList = queueMapper.queryQueueName(queueName);
+        result.put(Constants.DATA_LIST, queueList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * check queue exist
      * if exists return true，not exists return false
      * check queue exist

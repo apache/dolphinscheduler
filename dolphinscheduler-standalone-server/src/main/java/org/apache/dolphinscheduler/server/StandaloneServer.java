@@ -66,7 +66,8 @@ public class StandaloneServer {
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
                 MasterServer.class,
-                WorkerServer.class
+                WorkerServer.class,
+                PythonGatewayServer.class
         ).run(args);
     }
 

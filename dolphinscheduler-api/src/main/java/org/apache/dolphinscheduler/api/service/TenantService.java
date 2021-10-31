@@ -92,4 +92,20 @@ public interface TenantService {
      * @return true if tenant code can user, otherwise return false
      */
     Result verifyTenantCode(String tenantCode);
+
+    /**
+     * check if provide tenant code object exists
+     *
+     * @param tenantCode tenant code
+     * @return true if tenant code exists, false if not
+     */
+    boolean checkTenantExists(String tenantCode);
+
+    /**
+     * query tenant by tenant code
+     *
+     * @param tenantCode tenant code
+     * @return tenant list
+     */
+    Map<String, Object> queryByTenantCode(String tenantCode);
 }
