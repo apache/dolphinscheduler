@@ -26,31 +26,31 @@ public class WeChatAlertParamsConstants {
         throw new IllegalStateException(WeChatAlertParamsConstants.class.getName());
     }
 
-    static final String ENTERPRISE_WE_CHAT_CORP_ID = "corp.id";
+    static final String ENTERPRISE_WE_CHAT_CORP_ID = "$t('corpId')";
 
     static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "corpId";
 
 
-    static final String ENTERPRISE_WE_CHAT_SECRET = "secret";
+    static final String ENTERPRISE_WE_CHAT_SECRET = "$t('secret')";
 
     static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "secret";
 
-    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "team.send.msg";
+    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "$t('teamSendMsg')";
 
     static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "teamSendMsg";
 
 
-    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "user.send.msg";
+    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "$t('userSendMsg')";
 
     static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "userSendMsg";
 
 
-    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "agent.id";
+    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "$t('agentId')";
 
     static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "agentId";
 
 
-    static final String ENTERPRISE_WE_CHAT_USERS = "users";
+    static final String ENTERPRISE_WE_CHAT_USERS = "$t('users')";
 
 
     static final String NAME_ENTERPRISE_WE_CHAT_USERS = "users";

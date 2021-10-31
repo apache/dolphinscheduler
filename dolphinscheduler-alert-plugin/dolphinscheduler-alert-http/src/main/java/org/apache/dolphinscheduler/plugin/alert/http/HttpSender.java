@@ -75,11 +75,11 @@ public class HttpSender {
 
     public HttpSender(Map<String, String> paramsMap) {
 
-        url = paramsMap.get(HttpAlertConstants.URL);
-        headerParams = paramsMap.get(HttpAlertConstants.HEADER_PARAMS);
-        bodyParams = paramsMap.get(HttpAlertConstants.BODY_PARAMS);
-        contentField = paramsMap.get(HttpAlertConstants.CONTENT_FIELD);
-        requestType = paramsMap.get(HttpAlertConstants.REQUEST_TYPE);
+        url = paramsMap.get(HttpAlertConstants.NAME_URL);
+        headerParams = paramsMap.get(HttpAlertConstants.NAME_HEADER_PARAMS);
+        bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
+        contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
+        requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
     }
 
     public AlertResult send(String msg) {

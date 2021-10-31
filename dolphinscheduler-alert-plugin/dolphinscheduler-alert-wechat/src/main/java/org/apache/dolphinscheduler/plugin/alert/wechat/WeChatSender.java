@@ -85,8 +85,8 @@ public class WeChatSender {
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
-        showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + MUST_NOT_NULL);
+        showType = config.get(AlertConstants.NAME_SHOW_TYPE);
+        requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
             .replace(CORP_ID_REGEX, weChatCorpId)
             .replace(SECRET_REGEX, weChatSecret);

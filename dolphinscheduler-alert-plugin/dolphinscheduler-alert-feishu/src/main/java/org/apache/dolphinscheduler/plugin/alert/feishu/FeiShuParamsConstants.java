@@ -23,27 +23,27 @@ public class FeiShuParamsConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    static final String WEB_HOOK = "webhook";
+    static final String WEB_HOOK = "$t('webhook')";
 
-    static final String NAME_WEB_HOOK = "webHook";
+    static final String NAME_WEB_HOOK = "WebHook";
 
-    public static final String FEI_SHU_PROXY_ENABLE = "isEnableProxy";
+    public static final String FEI_SHU_PROXY_ENABLE = "$t('isEnableProxy')";
 
-    static final String NAME_FEI_SHU_PROXY_ENABLE = "isEnableProxy";
+    static final String NAME_FEI_SHU_PROXY_ENABLE = "IsEnableProxy";
 
-    static final String FEI_SHU_PROXY = "proxy";
+    static final String FEI_SHU_PROXY = "$t('proxy')";
 
-    static final String NAME_FEI_SHU_PROXY = "proxy";
+    static final String NAME_FEI_SHU_PROXY = "Proxy";
 
-    static final String FEI_SHU_PORT = "port";
+    static final String FEI_SHU_PORT = "$t('port')";
 
-    static final String NAME_FEI_SHU_PORT = "port";
+    static final String NAME_FEI_SHU_PORT = "Port";
 
-    static final String FEI_SHU_USER = "user";
+    static final String FEI_SHU_USER = "$t('user')";
 
-    static final String NAME_FEI_SHU_USER = "user";
+    static final String NAME_FEI_SHU_USER = "User";
 
-    static final String FEI_SHU_PASSWORD = "password";
+    static final String FEI_SHU_PASSWORD = "$t('password')";
 
-    static final String NAME_FEI_SHU_PASSWORD = "password";
+    static final String NAME_FEI_SHU_PASSWORD = "Password";
 }

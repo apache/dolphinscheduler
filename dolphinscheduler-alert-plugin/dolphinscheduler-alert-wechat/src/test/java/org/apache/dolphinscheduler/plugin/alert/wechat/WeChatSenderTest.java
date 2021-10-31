@@ -67,7 +67,7 @@ public class WeChatSenderTest {
         );
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, "Kris");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG, "msg");
-        weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class WeChatSenderTest {
 
     @Test
     public void testSendWeChatTextMsg() {
-        weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
+        weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TEXT.getDescp());
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
         Assert.assertEquals("false", alertResult.getStatus());

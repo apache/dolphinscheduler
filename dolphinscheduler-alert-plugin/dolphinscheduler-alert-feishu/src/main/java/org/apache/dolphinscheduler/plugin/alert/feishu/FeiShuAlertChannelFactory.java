@@ -48,7 +48,7 @@ public class FeiShuAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
         RadioParam isEnableProxy =
-                RadioParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE, FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE)
+                RadioParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE, FeiShuParamsConstants.FEI_SHU_PROXY_ENABLE)
                         .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
                         .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
                         .setValue(STRING_TRUE)
