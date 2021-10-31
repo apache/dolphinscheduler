@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -1368,6 +1368,8 @@ public class ProcessService {
                         taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
                     }
                     taskInstance.setSubmitTime(null);
+                    taskInstance.setLogPath(null);
+                    taskInstance.setExecutePath(null);
                     taskInstance.setStartTime(null);
                     taskInstance.setEndTime(null);
                     taskInstance.setFlag(Flag.YES);

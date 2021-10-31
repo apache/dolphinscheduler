@@ -343,4 +343,11 @@ public class TaskConstants {
      * data.quality.error.output.path
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
+
+    /**
+     * hdfs/s3 configuration
+     * resource.upload.path
+     */
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+
 }

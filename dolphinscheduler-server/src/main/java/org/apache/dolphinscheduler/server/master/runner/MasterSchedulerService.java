@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
@@ -94,10 +95,9 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
-    /**
-     * process instance execution list
-     */
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
     /**
      * process timeout check list
      */
@@ -119,15 +119,14 @@ public class MasterSchedulerService extends Thread {
     /**
      * constructor of MasterSchedulerService
      */
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-        this.processInstanceExecMaps = processInstanceExecMaps;
+    public void init() {
         this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
         stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
                 taskTimeoutCheckList,
-                this.processInstanceExecMaps,
+                this.processInstanceExecCacheManager,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
 
@@ -203,7 +202,7 @@ public class MasterSchedulerService extends Thread {
                             , masterConfig
                             , taskTimeoutCheckList);
 
-                    this.processInstanceExecMaps.put(processInstance.getId(), workflowExecuteThread);
+                    this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
                     if (processInstance.getTimeout() > 0) {
                         this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
                     }

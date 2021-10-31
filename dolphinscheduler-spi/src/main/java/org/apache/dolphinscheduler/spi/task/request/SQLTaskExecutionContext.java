@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.task.request;
 
-import org.apache.dolphinscheduler.spi.task.UdfFuncBean.UdfFuncDeserializer;
+import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest.UdfFuncDeserializer;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -45,6 +45,10 @@ public class SQLTaskExecutionContext implements Serializable {
     @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
     private Map<UdfFuncRequest,String> udfFuncTenantCodeMap;
 
+    /**
+     * DefaultFS
+     */
+    private String defaultFS;
 
     public int getWarningGroupId() {
         return warningGroupId;
@@ -70,12 +74,20 @@ public class SQLTaskExecutionContext implements Serializable {
         this.connectionParams = connectionParams;
     }
 
+    public String getDefaultFS() {
+        return defaultFS;
+    }
+
+    public void setDefaultFS(String defaultFS) {
+        this.defaultFS = defaultFS;
+    }
+
     @Override
     public String toString() {
-        return "SQLTaskExecutionContext{" +
-                "warningGroupId=" + warningGroupId +
-                ", connectionParams='" + connectionParams + '\'' +
-                ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap +
-                '}';
+        return "SQLTaskExecutionContext{"
+                + "warningGroupId=" + warningGroupId
+                + ", connectionParams='" + connectionParams + '\''
+                + ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap
+                + ", defaultFS='" + defaultFS + '\'' + '}';
     }
 }

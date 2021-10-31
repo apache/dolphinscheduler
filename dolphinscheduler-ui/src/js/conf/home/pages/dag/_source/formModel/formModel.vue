@@ -390,6 +390,7 @@
             @on-switch-result="_onSwitchResult"
             :backfill-item="backfillItem"
             :nodeData="nodeData"
+            :postTasks="postTasks"
           ></m-switch>
           <!-- waterdrop node -->
           <m-waterdrop
@@ -525,7 +526,7 @@
             label: `${i18n.$t('Failed')}`
           }
         ],
-        // for CONDITIONS
+        // for CONDITIONS and SWITCH
         postTasks: [],
         prevTasks: [],
         // refresh part of the formModel, after set backfillItem outside
@@ -558,6 +559,7 @@
         return {
           code: task.code,
           conditionResult: task.taskParams.conditionResult,
+          switchResult: task.taskParams.switchResult,
           delayTime: task.delayTime,
           dependence: task.taskParams.dependence,
           desc: task.description,
@@ -567,7 +569,8 @@
           params: _.omit(task.taskParams, [
             'conditionResult',
             'dependence',
-            'waitStartTimeout'
+            'waitStartTimeout',
+            'switchResult'
           ]),
           retryInterval: task.failRetryInterval,
           runFlag: task.flag,
@@ -771,7 +774,8 @@
               ...this.params,
               dependence: this.cacheDependence,
               conditionResult: this.conditionResult,
-              waitStartTimeout: this.waitStartTimeout
+              waitStartTimeout: this.waitStartTimeout,
+              switchResult: this.switchResult
             },
             flag: this.runFlag,
             taskPriority: this.taskInstancePriority,
@@ -868,6 +872,9 @@
           if (o.conditionResult) {
             this.successBranch = o.conditionResult.successNode[0]
             this.failedBranch = o.conditionResult.failedNode[0]
+          }
+          if (o.switchResult) {
+            this.switchResult = o.switchResult
           }
           // If the workergroup has been deleted, set the default workergroup
           for (
