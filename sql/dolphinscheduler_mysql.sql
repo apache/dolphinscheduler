@@ -1142,7 +1142,7 @@ INSERT INTO `t_ds_dq_rule_execute_sql`
 VALUES(10, 1, 'SELECT COUNT(*) AS regexps FROM regexp_items', 'regexp_count', 1, false, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_execute_sql`
 (`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
-VALUES(11, 1, 'SELECT * FROM ${src_table} WHERE (to_unix_timestamp(${src_field}, ''${datetime_format}'')-to_unix_timestamp(''${deadline}'', ''${datetime_format}'') <= 0) AND (${src_filter}) ', 'timeliness_items', 0, true, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(11, 1, 'SELECT * FROM ${src_table} WHERE (to_unix_timestamp(${src_field}, ''${datetime_format}'')-to_unix_timestamp(''${deadline}'', ''${datetime_format}'') <= 0) AND (to_unix_timestamp(${src_field}, ''${datetime_format}'')-to_unix_timestamp(''${begin_time}'', ''${datetime_format}'') >= 0) AND (${src_filter}) ', 'timeliness_items', 0, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO `t_ds_dq_rule_execute_sql`
 (`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
 VALUES(12, 1, 'SELECT COUNT(*) AS timeliness FROM timeliness_items', 'timeliness_count', 1, false, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
@@ -1270,6 +1270,9 @@ VALUES(27, 'datetime_format', 'input', '时间格式', NULL, NULL, 'Please enter
 INSERT INTO `t_ds_dq_rule_input_entry`
 (`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(28, 'enum_list', 'input', '枚举值列表', NULL, NULL, 'Please enter enumeration', 0, 0, 0, 1, 1, 0, 0, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO `t_ds_dq_rule_input_entry`
+(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+VALUES(29, 'begin_time', 'input', '起始时间', NULL, NULL, 'Please enter begin time', 0, 0, 0, 1, 1, 0, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 --
 -- Table structure for table `t_ds_dq_task_statistics_value`
@@ -1659,28 +1662,28 @@ INSERT INTO `t_ds_relation_rule_input_entry`
 VALUES(113, 8, 6, '{"statistics_name":"timeliness_count.timeliness"}', 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(114, 8, 26, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(114, 8, 26, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(115, 8, 27, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(115, 8, 27, NULL, 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(116, 8, 7, NULL, 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(116, 8, 7, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(117, 8, 8, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(117, 8, 8, NULL, 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(118, 8, 9, NULL, 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(118, 8, 9, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(119, 8, 10, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(119, 8, 10, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(120, 8, 17, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(120, 8, 17, NULL, 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
-VALUES(121, 8, 19, NULL, 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(121, 8, 19, NULL, 15, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
 VALUES(124, 9, 1, NULL, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
@@ -1753,6 +1756,9 @@ VALUES(148, 10, 17, NULL, 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.00
 INSERT INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
 VALUES(149, 10, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
+VALUES(150, 8, 29, NULL, 7, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 -- ----------------------------
 -- Table structure for t_ds_environment
