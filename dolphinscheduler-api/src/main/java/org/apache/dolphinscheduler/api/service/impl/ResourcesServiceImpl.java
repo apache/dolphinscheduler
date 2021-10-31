@@ -136,7 +136,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource directory {} has exist, can't recreate", fullName);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -208,7 +208,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // check resource name exists
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -246,12 +246,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * check resource is exists
      *
      * @param fullName  fullName
-     * @param userId    user id
      * @param type      type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String fullName, int userId, int type) {
-        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
+    private boolean checkResourceExists(String fullName, int type) {
+        Boolean existResource = resourcesMapper.existResource(fullName, type);
         return existResource == Boolean.TRUE;
     }
 
@@ -298,7 +297,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/") + 1),name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -751,7 +750,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
