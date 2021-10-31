@@ -275,6 +275,7 @@ public class MasterRegistryClient {
      *
      * @param workerHost worker host
      * @param needCheckWorkerAlive need check worker alive
+     * @param checkOwner need check process instance owner
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive, boolean checkOwner) {
         logger.info("start worker[{}] failover ...", workerHost);
@@ -289,9 +290,8 @@ public class MasterRegistryClient {
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
             if (workerHost == null
                     || !checkOwner
-                    || processInstance.getHost().equalsIgnoreCase(workerHost)) {
+                    || processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
                 // only failover the task owned myself if worker down.
-                // failover master need handle worker at the same time
                 if (processInstance == null) {
                     logger.error("failover error, the process {} of task {} do not exists.",
                             taskInstance.getProcessInstanceId(), taskInstance.getId());
