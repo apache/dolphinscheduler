@@ -126,7 +126,7 @@ public enum CommandType {
     /**
      * process host update
      */
-    PROCESS_HOST_UPDATE_REQUST,
+    PROCESS_HOST_UPDATE_REQUEST,
 
     /**
      * process host update response
