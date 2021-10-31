@@ -151,7 +151,9 @@ public class JSONUtilsTest {
         Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
-        Assert.assertEquals("\"foo\"", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
+        Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
     
     @Test
