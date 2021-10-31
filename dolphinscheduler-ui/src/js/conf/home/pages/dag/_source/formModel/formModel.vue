@@ -368,13 +368,6 @@
             :backfill-item="backfillItem"
           >
           </m-sqoop>
-          <m-data-quality
-            v-if="nodeData.taskType === 'DATA_QUALITY'"
-            @on-params="_onParams"
-            @on-cache-params="_onCacheParams"
-            ref="DATA_QUALITY"
-            :backfill-item="backfillItem">
-          </m-data-quality>
           <m-conditions
             v-if="nodeData.taskType === 'CONDITIONS'"
             ref="CONDITIONS"
@@ -384,6 +377,13 @@
             :prev-tasks="prevTasks"
           >
           </m-conditions>
+          <m-data-quality
+            v-if="nodeData.taskType === 'DATA_QUALITY'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="DATA_QUALITY"
+            :backfill-item="backfillItem">
+          </m-data-quality>
           <m-switch
             v-if="nodeData.taskType === 'SWITCH'"
             ref="SWITCH"

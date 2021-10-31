@@ -136,4 +136,9 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <artifactSet to="lib/plugin/task/dataquality">
+        <artifact id="${project.groupId}:dolphinscheduler-task-dataquality:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>

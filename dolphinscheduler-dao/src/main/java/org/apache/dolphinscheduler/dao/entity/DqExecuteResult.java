@@ -39,10 +39,15 @@ public class DqExecuteResult implements Serializable {
     @TableField(value = "process_definition_id")
     private long processDefinitionId;
     /**
-     * process define name
+     * process definition name
      */
     @TableField(exist = false)
     private String  processDefinitionName;
+    /**
+     * process definition code
+     */
+    @TableField(exist = false)
+    private long processDefinitionCode;
     /**
      * process instance id
      */
@@ -298,6 +303,14 @@ public class DqExecuteResult implements Serializable {
         this.processDefinitionName = processDefinitionName;
     }
 
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
+
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
+
     public String getTaskName() {
         return taskName;
     }
@@ -336,6 +349,7 @@ public class DqExecuteResult implements Serializable {
                 + "id=" + id
                 + ", processDefinitionId=" + processDefinitionId
                 + ", processDefinitionName='" + processDefinitionName + '\''
+                + ", processDefinitionCode='" + processDefinitionCode + '\''
                 + ", processInstanceId=" + processInstanceId
                 + ", processInstanceName='" + processInstanceName + '\''
                 + ", taskInstanceId=" + taskInstanceId

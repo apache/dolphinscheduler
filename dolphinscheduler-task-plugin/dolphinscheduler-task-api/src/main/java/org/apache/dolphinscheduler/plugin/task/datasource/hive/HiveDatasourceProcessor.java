@@ -31,11 +31,10 @@ import org.apache.dolphinscheduler.plugin.task.datasource.BaseDataSourceParamDTO
 import org.apache.dolphinscheduler.plugin.task.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.HiveConfUtils;
 import org.apache.dolphinscheduler.plugin.task.util.CommonUtils;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.MapUtils;
 
 import java.io.IOException;
 import java.sql.Connection;

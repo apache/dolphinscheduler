@@ -1062,7 +1062,6 @@
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/HostTest.java</include>
-                        <include>**/server/utils/JdbcUrlParserTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/MapReduceArgsUtilsTest.java</include>
@@ -1076,7 +1075,6 @@
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <include>**/server/worker/task/dq/DataQualityTaskTest.java</include>
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
@@ -1145,8 +1143,10 @@
                         <include>**/plugin/alert/slack/SlackAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/slack/SlackAlertPluginTest.java</include>
                         <include>**/plugin/alert/slack/SlackSenderTest.java</include>
+                        <include>**/plugin/task/dq/DataQualityTaskTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <include>**/spi/plugin/DolphinSchedulerPluginLoaderTest.java</include>
+                        <include>**/spi/task/dq/utils/JdbcUrlParserTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
@@ -1271,7 +1271,7 @@
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-task-plugin</module>
-<!--        <module>dolphinscheduler-ui</module>-->
+        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>

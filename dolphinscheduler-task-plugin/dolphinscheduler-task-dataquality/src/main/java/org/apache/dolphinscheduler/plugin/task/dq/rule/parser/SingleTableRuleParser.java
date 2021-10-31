@@ -64,6 +64,7 @@ public class SingleTableRuleParser implements IRuleParser {
                                             transformerConfigList);
 
         String writerSql = RuleManager.DEFAULT_COMPARISON_WRITER_SQL;
+
         if (context.isCompareWithFixedValue()) {
             writerSql = writerSql.replaceAll("full join \\$\\{comparison_table}","");
         }

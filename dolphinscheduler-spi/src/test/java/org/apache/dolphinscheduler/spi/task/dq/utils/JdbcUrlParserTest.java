@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.spi.task.dq.utils;
 
 import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
-import org.apache.dolphinscheduler.spi.utils.JdbcUrlParser;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -53,7 +53,6 @@ import org.apache.dolphinscheduler.spi.params.group.GroupParamsProps;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
 import org.apache.dolphinscheduler.spi.params.select.SelectParam;
-import org.apache.dolphinscheduler.spi.params.select.SelectParamProps;
 import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
 
 import java.util.ArrayList;
@@ -298,14 +297,12 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                 break;
         }
 
-        SelectParamProps selectParamProps = new SelectParamProps();
-        selectParamProps.setSize(SMALL);
-
         return SelectParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
                 .setOptions(options)
                 .setValue(inputEntry.getValue())
-                .setProps(selectParamProps)
+                .setSize(SMALL)
+                .setPlaceHolder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }

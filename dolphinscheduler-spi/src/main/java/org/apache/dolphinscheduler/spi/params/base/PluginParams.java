@@ -112,6 +112,7 @@ public class PluginParams {
         this.info = builder.info;
         this.display = builder.display;
         this.hidden = builder.hidden;
+        this.emit = builder.emit;
     }
 
     @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")

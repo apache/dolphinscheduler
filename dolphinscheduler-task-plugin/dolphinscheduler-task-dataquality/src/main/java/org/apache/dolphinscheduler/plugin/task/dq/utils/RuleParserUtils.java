@@ -17,12 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_BUSINESS_DATE;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_CURRENT_DATE;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_DATETIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.AND;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.BATCH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.CHECK_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TABLE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.CREATE_TIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.DATABASE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.DATA_TIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.DRIVER;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.ERROR_OUTPUT_PATH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.FAILURE_STRATEGY;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.HDFS_FILE;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.INDEX;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.INPUT_TABLE;
@@ -30,6 +39,10 @@ import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.OUTPUT_TABLE;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PASSWORD;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PATH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PROCESS_DEFINITION_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PROCESS_INSTANCE_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.RULE_NAME;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.RULE_TYPE;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SQL;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_FIELD;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.SRC_FILTER;
@@ -40,11 +53,11 @@ import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_FIELD;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_FILTER;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_TABLE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.THRESHOLD;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.UPDATE_TIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.URL;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.USER;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_BUSINESS_DATE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_CURRENT_DATE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_DATETIME;
 
 import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
@@ -512,24 +525,22 @@ public class RuleParserUtils {
 
         Map<String,String> newInputParameterValue = new HashMap<>(inputParameterValue);
 
-        newInputParameterValue.remove("rule_type");
-        newInputParameterValue.remove("rule_name");
-        newInputParameterValue.remove("create_time");
-        newInputParameterValue.remove("update_time");
-        newInputParameterValue.remove("process_definition_id");
-        newInputParameterValue.remove("process_instance_id");
-        newInputParameterValue.remove("task_instance_id");
-        newInputParameterValue.remove("check_type");
-        newInputParameterValue.remove("operator");
-        newInputParameterValue.remove("threshold");
-        newInputParameterValue.remove("failure_strategy");
-        newInputParameterValue.remove("operator");
-        newInputParameterValue.remove("threshold");
-        newInputParameterValue.remove("data_time");
-        newInputParameterValue.remove("error_output_path");
-        newInputParameterValue.remove("comparison_type");
-        newInputParameterValue.remove("comparison_name");
-        newInputParameterValue.remove("comparison_table");
+        newInputParameterValue.remove(RULE_TYPE);
+        newInputParameterValue.remove(RULE_NAME);
+        newInputParameterValue.remove(CREATE_TIME);
+        newInputParameterValue.remove(UPDATE_TIME);
+        newInputParameterValue.remove(PROCESS_DEFINITION_ID);
+        newInputParameterValue.remove(PROCESS_INSTANCE_ID);
+        newInputParameterValue.remove(TASK_INSTANCE_ID);
+        newInputParameterValue.remove(CHECK_TYPE);
+        newInputParameterValue.remove(OPERATOR);
+        newInputParameterValue.remove(THRESHOLD);
+        newInputParameterValue.remove(FAILURE_STRATEGY);
+        newInputParameterValue.remove(DATA_TIME);
+        newInputParameterValue.remove(ERROR_OUTPUT_PATH);
+        newInputParameterValue.remove(COMPARISON_TYPE);
+        newInputParameterValue.remove(COMPARISON_NAME);
+        newInputParameterValue.remove(COMPARISON_TABLE);
         newInputParameterValue.remove(PARAMETER_CURRENT_DATE);
         newInputParameterValue.remove(PARAMETER_BUSINESS_DATE);
         newInputParameterValue.remove(PARAMETER_DATETIME);

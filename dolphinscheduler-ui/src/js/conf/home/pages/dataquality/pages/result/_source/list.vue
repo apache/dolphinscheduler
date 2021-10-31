@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.processInstanceName }}</p>
               <div slot="reference" class="name-wrapper">
-                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis" :title="scope.row.processInstanceName">{{scope.row.processInstanceName}}</span></a>
+                <router-link :to="{ path: `/projects/${projectCode}/instance/list/${scope.row.processInstanceId}` , query:{code: scope.row.processDefinitionCode}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.processInstanceName }}</span></router-link>
               </div>
             </el-popover>
           </template>

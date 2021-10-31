@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="spark-model">
+  <div class="dataquality-model">
     <m-list-box>
       <div slot="text">{{$t('Rule Name')}}</div>
       <div slot="content">
@@ -35,7 +35,7 @@
       </div>
     </m-list-box>
     <div class="form-box">
-      <form-create v-model="fApi" :rule="rule" :option="option"></form-create>
+        <form-create v-model="fApi" :rule="rule" :option="option"></form-create>
     </div>
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
@@ -48,7 +48,7 @@
       </div>
     </m-list-box>
     <m-list-4-box>
-      <div slot="text">{{$t('Driver cores')}}</div>
+      <div slot="text">{{$t('Driver Cores')}}</div>
       <div slot="content">
         <el-input
           :disabled="isDetails"
@@ -58,7 +58,7 @@
           :placeholder="$t('Please enter Driver cores')">
         </el-input>
       </div>
-      <div slot="text-2">{{$t('Driver memory')}}</div>
+      <div slot="text-2">{{$t('Driver Memory')}}</div>
       <div slot="content-2">
         <el-input
           :disabled="isDetails"
@@ -80,7 +80,7 @@
           :placeholder="$t('Please enter Executor number')">
         </el-input>
       </div>
-      <div slot="text-2">{{$t('Executor memory')}}</div>
+      <div slot="text-2">{{$t('Executor Memory')}}</div>
       <div slot="content-2">
         <el-input
           :disabled="isDetails"
@@ -92,7 +92,7 @@
       </div>
     </m-list-4-box>
     <m-list-4-box>
-      <div slot="text">{{$t('Executor cores')}}</div>
+      <div slot="text">{{$t('Executor Cores')}}</div>
       <div slot="content">
         <el-input
           :disabled="isDetails"
@@ -103,9 +103,8 @@
         </el-input>
       </div>
     </m-list-4-box>
-
     <m-list-box>
-      <div slot="text">{{$t('Other parameters')}}</div>
+      <div slot="text">{{$t('Option Parameters')}}</div>
       <div slot="content">
         <el-input
             :disabled="isDetails"
@@ -113,19 +112,18 @@
             type="textarea"
             size="small"
             v-model="others"
-            :placeholder="$t('Please enter other parameters')">
+            :placeholder="$t('Please enter option parameters')">
         </el-input>
       </div>
     </m-list-box>
-
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
-          ref="refLocalParams"
-          @on-local-params="_onLocalParams"
-          :udp-list="localParams"
-          :hide="false">
+                ref="refLocalParams"
+                @on-local-params="_onLocalParams"
+                :udp-list="localParams"
+                :hide="false">
         </m-local-params>
       </div>
     </m-list-box>
@@ -158,7 +156,7 @@
         // Executor Number of cores
         executorCores: 2,
         // Other parameters
-        others: '',
+        others: '--conf spark.yarn.maxAppAttempts=1',
 
         ruleId: 0,
         // ruleNameList
@@ -330,7 +328,6 @@
               obj.value = item.id
               this.ruleNameList.push(obj)
             })
-
             if (this.ruleId === 0) {
               this.ruleId = this.ruleNameList[0].value
               this._getRuluInputEntryList(this.ruleId)
@@ -542,7 +539,6 @@
 
     created () {
       let o = this.backfillItem
-
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.deployMode = o.params.sparkParameters.deployMode || ''
@@ -559,7 +555,7 @@
         }
 
         this.inputEntryValueMap = o.params.ruleInputParameter
-        if (this.inputEntryValueMap.mapping_columns !== null) {
+        if (this.inputEntryValueMap.mapping_columns) {
           this.inputEntryValueMap.mapping_columns = JSON.parse(this.inputEntryValueMap.mapping_columns)
         }
       }

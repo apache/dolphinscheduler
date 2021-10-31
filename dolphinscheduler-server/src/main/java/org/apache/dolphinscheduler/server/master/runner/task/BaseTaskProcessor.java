@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.common.Constants.ADDRESS;
 import static org.apache.dolphinscheduler.common.Constants.DATABASE;
+import static org.apache.dolphinscheduler.common.Constants.JDBC_URL;
 import static org.apache.dolphinscheduler.common.Constants.OTHER;
 import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.USER;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.COMPARISON_TABLE;
@@ -427,6 +429,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 properties.setProperty(DATABASE, jdbcInfo.getDatabase());
                 properties.setProperty(ADDRESS,jdbcInfo.getAddress());
                 properties.setProperty(OTHER,jdbcInfo.getParams());
+                properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
                 dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
                 dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
             }

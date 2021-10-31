@@ -93,6 +93,10 @@ public class TaskConstants {
      * AT SIGN
      */
     public static final String AT_SIGN = "@";
+    /**
+     * UNDERLINE
+     */
+    public static final String UNDERLINE = "_";
 
     /**
      * sleep time

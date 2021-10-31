@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -59,6 +58,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -113,13 +113,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.spi.task.dq.enums.DqTaskState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -223,6 +222,7 @@ public class ProcessService {
     @Autowired
     private DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
 
+    @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
@@ -236,7 +236,6 @@ public class ProcessService {
 
     @Autowired
     private EnvironmentMapper environmentMapper;
-
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -2539,11 +2538,17 @@ public class ProcessService {
             return -1;
         }
 
-        ProcessDefinition processDefinition = processDefineMapper.selectById(dqExecuteResult.getProcessDefinitionId());
+        ProcessInstance processInstance = processInstanceMapper.selectById(dqExecuteResult.getProcessInstanceId());
+        if (processInstance == null) {
+            return -1;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition == null) {
             return -1;
         }
 
+        dqExecuteResult.setProcessDefinitionId(processDefinition.getId());
         dqExecuteResult.setUserId(processDefinition.getUserId());
         dqExecuteResult.setState(DqTaskState.DEFAULT.getCode());
         return dqExecuteResultMapper.updateById(dqExecuteResult);

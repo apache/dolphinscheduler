@@ -17,13 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq;
 
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SLASH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.UNDERLINE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.CREATE_TIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.DATA_TIME;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.ERROR_OUTPUT_PATH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PROCESS_DEFINITION_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.PROCESS_INSTANCE_ID;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.REGEXP_PATTERN;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SLASH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.RULE_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.RULE_NAME;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.RULE_TYPE;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.UPDATE_TIME;
 import static org.apache.dolphinscheduler.spi.utils.Constants.YYYY_MM_DD_HH_MM_SS;
-
-import static java.awt.font.TextAttribute.UNDERLINE;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
@@ -117,14 +124,14 @@ public class DataQualityTask extends AbstractYarnTask {
         LocalDateTime time = LocalDateTime.now();
         String now = df.format(time);
 
-        inputParameter.put("rule_id", String.valueOf(dataQualityTaskExecutionContext.getRuleId()));
-        inputParameter.put("rule_type", String.valueOf(dataQualityTaskExecutionContext.getRuleType()));
-        inputParameter.put("rule_name", StringUtils.wrapperSingleQuotes(dataQualityTaskExecutionContext.getRuleName()));
-        inputParameter.put("create_time", StringUtils.wrapperSingleQuotes(now));
-        inputParameter.put("update_time", StringUtils.wrapperSingleQuotes(now));
-        inputParameter.put("process_definition_id", String.valueOf(dqTaskExecutionContext.getProcessDefineId()));
-        inputParameter.put("process_instance_id", String.valueOf(dqTaskExecutionContext.getProcessInstanceId()));
-        inputParameter.put("task_instance_id", String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
+        inputParameter.put(RULE_ID, String.valueOf(dataQualityTaskExecutionContext.getRuleId()));
+        inputParameter.put(RULE_TYPE, String.valueOf(dataQualityTaskExecutionContext.getRuleType()));
+        inputParameter.put(RULE_NAME, StringUtils.wrapperSingleQuotes(dataQualityTaskExecutionContext.getRuleName()));
+        inputParameter.put(CREATE_TIME, StringUtils.wrapperSingleQuotes(now));
+        inputParameter.put(UPDATE_TIME, StringUtils.wrapperSingleQuotes(now));
+        inputParameter.put(PROCESS_DEFINITION_ID, String.valueOf(dqTaskExecutionContext.getProcessDefineId()));
+        inputParameter.put(PROCESS_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getProcessInstanceId()));
+        inputParameter.put(TASK_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
             inputParameter.put(DATA_TIME,StringUtils.wrapperSingleQuotes(now));
