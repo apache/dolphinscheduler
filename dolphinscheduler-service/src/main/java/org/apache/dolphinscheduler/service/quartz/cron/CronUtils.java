@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.week;
 
 import static com.cronutils.model.CronType.QUARTZ;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -182,18 +183,26 @@ public class CronUtils {
      * gets all scheduled times for a period of time based on self dependency
      * if schedulers is empty then default scheduler = 1 day
      */
-    public static List<Date> getSelfFireDateList(Date startTime, Date endTime, List<Schedule> schedules) {
+    public static List<Date> getSelfFireDateList(final Date startTime, final Date endTime, final List<Schedule> schedules) {
         List<Date> result = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(schedules)) {
-            for (Schedule schedule : schedules) {
-                result.addAll(CronUtils.getSelfFireDateList(startTime, endTime, schedule.getCrontab()));
-            }
-        } else {
-            Date start = startTime;
-            for (int i = 0; start.before(endTime); i++) {
-                start = DateUtils.getSomeDay(startTime, i);
-                result.add(start);
-            }
+        if(startTime.equals(endTime)){
+            result.add(startTime);
+            return result;
+        }
+
+        // support left closed and right open time interval (startDate <= N < endDate)
+        Date from = new Date(startTime.getTime() - Constants.SECOND_TIME_MILLIS);
+        Date to = new Date(endTime.getTime() - Constants.SECOND_TIME_MILLIS);
+
+        List<Schedule> listSchedule = new ArrayList<>();
+        listSchedule.addAll(schedules);
+        if (CollectionUtils.isEmpty(listSchedule)) {
+            Schedule schedule = new Schedule();
+            schedule.setCrontab(Constants.DEFAULT_CRON_STRING);
+            listSchedule.add(schedule);
+        }
+        for (Schedule schedule : listSchedule) {
+            result.addAll(CronUtils.getSelfFireDateList(from, to, schedule.getCrontab()));
         }
         return result;
     }

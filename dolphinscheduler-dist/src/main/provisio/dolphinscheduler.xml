@@ -81,13 +81,8 @@
         </artifact>
     </artifactSet>
     <!-- Task Plugins -->
-    <artifactSet to="lib/plugin/task/shell">
-        <artifact id="${project.groupId}:dolphinscheduler-task-shell:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/task/python">
-        <artifact id="${project.groupId}:dolphinscheduler-task-python:zip:${project.version}">
+    <artifactSet to="lib/plugin/task/datax">
+        <artifact id="${project.groupId}:dolphinscheduler-task-datax:zip:${project.version}">
             <unpack/>
         </artifact>
     </artifactSet>
@@ -96,15 +91,49 @@
             <unpack/>
         </artifact>
     </artifactSet>
-    <artifactSet to="lib/plugin/task/spark">
-        <artifact id="${project.groupId}:dolphinscheduler-task-spark:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
     <artifactSet to="lib/plugin/task/http">
         <artifact id="${project.groupId}:dolphinscheduler-task-http:zip:${project.version}">
             <unpack/>
         </artifact>
     </artifactSet>
-
+    <artifactSet to="lib/plugin/task/mr">
+        <artifact id="${project.groupId}:dolphinscheduler-task-mr:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/pigeon">
+        <artifact id="${project.groupId}:dolphinscheduler-task-pigeon:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/procedure">
+        <artifact id="${project.groupId}:dolphinscheduler-task-procedure:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/python">
+        <artifact id="${project.groupId}:dolphinscheduler-task-python:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/shell">
+        <artifact id="${project.groupId}:dolphinscheduler-task-shell:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/spark">
+        <artifact id="${project.groupId}:dolphinscheduler-task-spark:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/sql">
+        <artifact id="${project.groupId}:dolphinscheduler-task-sql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/task/sqoop">
+        <artifact id="${project.groupId}:dolphinscheduler-task-sqoop:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>

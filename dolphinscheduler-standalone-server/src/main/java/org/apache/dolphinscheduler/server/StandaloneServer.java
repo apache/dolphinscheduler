@@ -66,7 +66,8 @@ public class StandaloneServer {
         new SpringApplicationBuilder(
                 ApiApplicationServer.class,
                 MasterServer.class,
-                WorkerServer.class
+                WorkerServer.class,
+                PythonGatewayServer.class
         ).run(args);
     }
 
@@ -110,7 +111,7 @@ public class StandaloneServer {
         System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
         System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
 
-        Server.createTcpServer("-ifNotExists").start();
+        Server.createTcpServer("-ifNotExists", "-tcpDaemon").start();
 
         final DataSource ds = ConnectionFactory.getInstance().getDataSource();
         final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
@@ -125,6 +126,8 @@ public class StandaloneServer {
         if (Files.exists(taskPluginPath)) {
             System.setProperty("task.plugin.binding", taskPluginPath.toString());
             System.setProperty("task.plugin.dir", "");
+        } else {
+            System.setProperty("task.plugin.binding", "lib/plugin/task/shell");
         }
     }
 }

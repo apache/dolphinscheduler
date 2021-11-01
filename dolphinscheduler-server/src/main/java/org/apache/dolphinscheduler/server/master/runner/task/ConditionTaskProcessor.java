@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,7 +65,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     private TaskDefinition taskDefinition;
@@ -92,7 +90,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
         logger.info("dependent task start");
-        endTask();
         return true;
     }
 
@@ -105,6 +102,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     public void run() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
+            endTask();
         } else {
             endTask();
         }
