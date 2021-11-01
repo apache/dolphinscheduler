@@ -707,5 +707,8 @@ export default {
   condition: '条件',
   'The condition content cannot be empty': '条件内容不能为空',
   'Reference from': '使用已有任务',
-  'No more...': '没有更多了...'
+  'No more...': '没有更多了...',
+  'Task Definition': '任务定义',
+  'Create task': '创建任务',
+  'Task Type': '任务类型'
 }

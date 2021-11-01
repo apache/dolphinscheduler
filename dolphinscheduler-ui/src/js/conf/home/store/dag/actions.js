@@ -838,5 +838,30 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * Query Task Definitions List Paging
+   */
+  getTaskDefinitionsList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete Task Definition by CODE_NOTES
+   */
+  deleteTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.code}`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
+
 }

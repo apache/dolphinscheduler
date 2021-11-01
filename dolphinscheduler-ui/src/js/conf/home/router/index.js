@@ -209,6 +209,15 @@ const router = new Router({
 
         },
         {
+          path: '/projects/:projectCode/task-definition',
+          name: 'task-definition',
+          component: resolve => require(['../pages/projects/pages/taskDifinition/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Task Definition')}`,
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
+        },
+        {
           path: '/projects/:projectCode/task-record',
           name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),

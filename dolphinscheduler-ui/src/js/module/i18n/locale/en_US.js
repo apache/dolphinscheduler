@@ -708,5 +708,9 @@ export default {
   condition: 'condition',
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
-  'No more...': 'No more...'
+  'No more...': 'No more...',
+  'Task Definition': 'Task Definition',
+  'Create task': 'Create task',
+  'Task Type': 'Task Type'
+
 }
