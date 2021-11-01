@@ -19,6 +19,10 @@
 
 # pydolphinscheduler
 
+[![GitHub Build](https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev)](https://github.com/apache/dolphinscheduler/actions)
+
+https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev
+
 pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
 
