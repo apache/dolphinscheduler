@@ -42,6 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,7 +155,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
 
         public HostWeight getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
-            if (heartBeatInfo == null) {
+            if (StringUtils.isEmpty(heartBeatInfo)) {
                 logger.warn("worker {} in work group {} have not received the heartbeat",
                     addr, workerGroup);
                 return null;
