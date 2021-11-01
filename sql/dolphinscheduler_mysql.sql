@@ -760,7 +760,7 @@ CREATE TABLE `t_ds_schedules` (
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
-  `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',
+  `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
   `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
@@ -896,7 +896,7 @@ CREATE TABLE `t_ds_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
-  `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable',
+  `state` tinyint(4) DEFAULT '1' COMMENT 'state 0:disable 1:enable',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
