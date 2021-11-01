@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.remote.utils;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * server address
@@ -134,4 +135,20 @@ public class Host implements Serializable {
                 + '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Host host = (Host) o;
+        return port == host.port && Objects.equals(address, host.address) && Objects.equals(ip, host.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address, ip, port);
+    }
 }
