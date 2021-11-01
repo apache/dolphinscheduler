@@ -290,6 +290,13 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
     /**
+     * upgrade DolphinScheduler to 2.0.0
+     */
+    public void upgradeDolphinSchedulerJsonSplit() {
+        processDefinitionJsonSplit();
+    }
+
+    /**
      * updateProcessDefinitionJsonWorkerGroup
      */
     protected void updateProcessDefinitionJsonWorkerGroup() {
@@ -543,4 +550,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    public void processDefinitionJsonSplit() {
+
+    }
 }
