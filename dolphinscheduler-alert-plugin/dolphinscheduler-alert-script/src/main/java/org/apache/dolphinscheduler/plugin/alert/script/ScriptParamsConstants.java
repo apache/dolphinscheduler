@@ -26,15 +26,15 @@ public class ScriptParamsConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    static final String SCRIPT_TYPE = "type";
+    static final String SCRIPT_TYPE = "$t('scriptType')";
 
     static final String NAME_SCRIPT_TYPE = "type";
 
-    static final String SCRIPT_PATH = "path";
+    static final String SCRIPT_PATH = "$t('scriptPath')";
 
     static final String NAME_SCRIPT_PATH = "path";
 
-    static final String SCRIPT_USER_PARAMS = "user.params";
+    static final String SCRIPT_USER_PARAMS = "$t('userParams')";
 
     static final String NAME_SCRIPT_USER_PARAMS = "userParams";
 }
