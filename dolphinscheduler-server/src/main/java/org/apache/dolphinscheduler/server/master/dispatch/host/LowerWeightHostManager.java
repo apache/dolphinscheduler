@@ -154,6 +154,11 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
 
         public HostWeight getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
+            if (heartBeatInfo == null) {
+                logger.warn("worker {} in work group {} have not received the heartbeat",
+                    addr, workerGroup);
+                return null;
+            }
             HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
             if (heartBeat == null) {
                 return null;
