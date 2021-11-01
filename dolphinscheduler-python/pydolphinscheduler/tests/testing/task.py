@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from datetime import datetime
+import uuid
 
 from pydolphinscheduler.core.task import Task as SourceTask
 
@@ -24,5 +24,4 @@ class Task(SourceTask):
     DEFAULT_VERSION = 1
 
     def gen_code_and_version(self):
-        now_timestamp = int(datetime.now().timestamp() * 1000000)
-        return now_timestamp, self.DEFAULT_VERSION
+        return uuid.uuid1().time, self.DEFAULT_VERSION
