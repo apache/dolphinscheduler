@@ -426,9 +426,11 @@ public class ResourceMapperTest {
         String fullName = "/ut-resource";
         int userId = 111;
         int type = ResourceType.FILE.getCode();
-        Assert.assertNull(resourceMapper.existResource(fullName, userId, type));
+        Assert.assertNull(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertNull(resourceMapper.existResource(fullName, type));
         insertOne();
-        Assert.assertTrue(resourceMapper.existResource(fullName, userId, type));
+        Assert.assertTrue(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertTrue(resourceMapper.existResource(fullName, type));
     }
 }
 

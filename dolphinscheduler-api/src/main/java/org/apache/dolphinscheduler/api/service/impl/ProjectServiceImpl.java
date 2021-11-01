@@ -139,6 +139,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
+    @Override
+    public Map<String, Object> queryByName(User loginUser, String projectName) {
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(projectName);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
+        if (project != null) {
+            result.put(Constants.DATA_LIST, project);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
     /**
      * check project and authorization
      *
