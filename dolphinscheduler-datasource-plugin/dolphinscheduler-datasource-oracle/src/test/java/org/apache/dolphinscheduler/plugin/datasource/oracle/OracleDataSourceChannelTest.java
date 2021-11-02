@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2ConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleConnectionParam;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,6 +38,6 @@ public class OracleDataSourceChannelTest {
         OracleDataSourceChannel sourceChannel = PowerMockito.mock(OracleDataSourceChannel.class);
         OracleDataSourceClient dataSourceClient = PowerMockito.mock(OracleDataSourceClient.class);
         PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam()));
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam()));
     }
 }
