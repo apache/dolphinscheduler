@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,15 @@ public class ClickHouseDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         ClickHouseDatasourceParamDTO clickhouseConnectionParam = new ClickHouseDatasourceParamDTO();
         clickhouseConnectionParam.setUserName("user");
         clickhouseConnectionParam.setPassword("password");
         clickhouseConnectionParam.setHost("localhost");
         clickhouseConnectionParam.setPort(8123);
         clickhouseConnectionParam.setDatabase("default");
+        clickhouseConnectionParam.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         ClickhouseConnectionParam connectionParams = (ClickhouseConnectionParam) clickHouseDatasourceProcessor

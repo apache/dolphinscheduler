@@ -47,19 +47,18 @@ public class DataSourceClientProvider {
 
     private static final Map<String, DataSourceClient> uniqueId2dataSourceClientMap = new ConcurrentHashMap<>();
 
-    private static DataSourceClientProvider instance;
-
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {
         initDataSourcePlugin();
     }
 
-    public static synchronized DataSourceClientProvider getInstance() {
-        if (instance == null) {
-            instance = new DataSourceClientProvider();
-        }
-        return instance;
+    private static class DataSourceClientProviderHolder {
+        private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
+    }
+
+    public static DataSourceClientProvider getInstance() {
+        return DataSourceClientProviderHolder.INSTANCE;
     }
 
     public Connection getConnection(DbType dbType, ConnectionParam connectionParam) {

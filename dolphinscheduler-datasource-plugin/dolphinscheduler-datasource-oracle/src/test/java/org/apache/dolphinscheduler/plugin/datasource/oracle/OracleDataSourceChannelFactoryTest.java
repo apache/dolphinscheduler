@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
-
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 
 public class OracleDataSourceChannelFactoryTest {
 
