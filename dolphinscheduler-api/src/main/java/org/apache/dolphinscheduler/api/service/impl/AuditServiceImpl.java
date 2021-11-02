@@ -118,8 +118,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<AuditDto> auditDtos = CollectionUtils.transformToList(logList,
-            auditLog -> transformAuditLog(auditLog));
+        List<AuditDto> auditDtos = CollectionUtils.transformToList(logList, this::transformAuditLog);
         pageInfo.setTotal(auditDtos.size());
         pageInfo.setTotalList(auditDtos);
         result.setData(pageInfo);

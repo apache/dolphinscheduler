@@ -49,7 +49,7 @@ public class AuditPublishService {
     @PostConstruct
     private void init() {
         if (auditConfiguration.isAuditGlobalControlSwitch()) {
-            Thread thread = new Thread(() -> doPublish());
+            Thread thread = new Thread(this::doPublish);
             thread.setDaemon(true);
             thread.setName("Audit-Log-Consume-Thread");
             thread.start();
@@ -62,10 +62,8 @@ public class AuditPublishService {
      * @param message audit message
      */
     public void publish(AuditMessage message) {
-        if (auditConfiguration.isAuditGlobalControlSwitch()) {
-            if (!auditMessageQueue.offer(message)) {
-                logger.error("add audit message failed {}", message.toString());
-            }
+        if (auditConfiguration.isAuditGlobalControlSwitch() && !auditMessageQueue.offer(message)) {
+            logger.error("add audit message failed {}", message.toString());
         }
     }
 
@@ -81,11 +79,11 @@ public class AuditPublishService {
                     try {
                         subscriber.execute(message);
                     } catch (Exception e) {
-                        logger.error("consume audit message failed {}", message.toString(), e);
+                        logger.error("consume audit message {} failed, error detail {}", message, e);
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error("consume audit message failed", e);
+                logger.error("consume audit message failed {}.", e);
                 Thread.currentThread().interrupt();
             }
         }

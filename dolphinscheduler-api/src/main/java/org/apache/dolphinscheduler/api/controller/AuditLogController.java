@@ -28,8 +28,6 @@ import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,8 +47,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("projects/audit")
 public class AuditLogController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuditLogController.class);
 
     @Autowired
     AuditService auditService;
