@@ -177,7 +177,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         long projectCode = project.getCode();
         Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, name);
 
-        if (verifyProcessDefinitionExists.get(Constants.STATUS) != Status.SUCCESS) {
+        if (verifyProcessDefinitionExists.get(Constants.STATUS) == Status.PROCESS_DEFINITION_NAME_EXIST) {
             // update process definition
             ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
             long processDefinitionCode = processDefinition.getCode();
