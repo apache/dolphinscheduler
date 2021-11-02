@@ -17,7 +17,7 @@ public class RefreshResourceTaskTest {
 
   @Test
   public void testGetHostWeightWithResult() {
-    Assert.assertEquals(refreshResourceTask.getHostWeight(
-        "192.168.1.1:22", "default", null), null);
+    Assert.assertTrue(refreshResourceTask.getHostWeight(
+        "192.168.1.1:22", "default", null) == null);
   }
 }
