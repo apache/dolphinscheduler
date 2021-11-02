@@ -95,10 +95,10 @@ public class DataSourceClientProvider {
         try {
             datasourcePluginLoader.loadPlugins();
         } catch (Exception e) {
-            throw new RuntimeException("Load datasource Plugin Failed !", e);
+            throw PluginException.getInstance("Load datasource Plugin Failed !", e);
         }
         if (MapUtils.isEmpty(dataSourcePluginManager.getDataSourceChannelMap())) {
-            throw new PluginException("datasource Plugin Not Found,Please Check Config File");
+            throw PluginException.getInstance("datasource Plugin Not Found,Please Check Config File");
         }
     }
 

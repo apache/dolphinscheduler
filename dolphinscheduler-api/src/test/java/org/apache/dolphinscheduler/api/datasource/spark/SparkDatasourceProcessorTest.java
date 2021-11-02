@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,15 @@ public class SparkDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         SparkDatasourceParamDTO sparkDatasourceParamDTO = new SparkDatasourceParamDTO();
         sparkDatasourceParamDTO.setUserName("root");
         sparkDatasourceParamDTO.setPassword("12345");
         sparkDatasourceParamDTO.setHost("localhost1,localhost2");
         sparkDatasourceParamDTO.setPort(1234);
         sparkDatasourceParamDTO.setDatabase("default");
+        sparkDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
@@ -86,5 +91,10 @@ public class SparkDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.SPARK, sparkDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDatasourceProcessor.getValidationQuery());
     }
 }

@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,15 @@ public class PostgreSqlDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         PostgreSqlDatasourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSqlDatasourceParamDTO();
         postgreSqlDatasourceParamDTO.setUserName("root");
         postgreSqlDatasourceParamDTO.setPassword("123456");
         postgreSqlDatasourceParamDTO.setHost("localhost");
         postgreSqlDatasourceParamDTO.setPort(3308);
         postgreSqlDatasourceParamDTO.setDatabase("default");
+        postgreSqlDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         PostgreSqlConnectionParam connectionParams = (PostgreSqlConnectionParam) postgreSqlDatasourceProcessor
@@ -89,5 +94,10 @@ public class PostgreSqlDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.POSTGRESQL, postgreSqlDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.POSTGRESQL_VALIDATION_QUERY, postgreSqlDatasourceProcessor.getValidationQuery());
     }
 }

@@ -96,4 +96,9 @@ public class ClickHouseDatasourceProcessorTest {
     public void testGetDbType() {
         Assert.assertEquals(DbType.CLICKHOUSE, clickHouseDatasourceProcessor.getDbType());
     }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.CLICKHOUSE_VALIDATION_QUERY, clickHouseDatasourceProcessor.getValidationQuery());
+    }
 }

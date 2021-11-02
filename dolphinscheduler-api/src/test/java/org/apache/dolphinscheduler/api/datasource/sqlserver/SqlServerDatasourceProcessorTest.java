@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,12 +48,15 @@ public class SqlServerDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         SqlServerDatasourceParamDTO sqlServerDatasourceParamDTO = new SqlServerDatasourceParamDTO();
         sqlServerDatasourceParamDTO.setUserName("root");
         sqlServerDatasourceParamDTO.setPassword("123456");
         sqlServerDatasourceParamDTO.setDatabase("default");
         sqlServerDatasourceParamDTO.setHost("localhost");
         sqlServerDatasourceParamDTO.setPort(1234);
+        sqlServerDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         SqlServerConnectionParam connectionParams = (SqlServerConnectionParam) sqlServerDatasourceProcessor
@@ -87,5 +92,10 @@ public class SqlServerDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.SQLSERVER, sqlServerDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.SQLSERVER_VALIDATION_QUERY, sqlServerDatasourceProcessor.getValidationQuery());
     }
 }

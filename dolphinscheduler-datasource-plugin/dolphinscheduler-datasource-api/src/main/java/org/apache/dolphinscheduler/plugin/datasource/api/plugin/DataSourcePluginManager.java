@@ -69,7 +69,6 @@ public class DataSourcePluginManager extends AbstractDolphinPluginManager {
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(datasourceChannelFactory.getClass().getClassLoader())) {
             DataSourceChannel datasourceChannel = datasourceChannelFactory.create();
             this.datasourceClientMap.put(name, datasourceChannel);
-            logger.info("-- datasourceClientMap datasource Plugin {} --", datasourceClientMap.entrySet().toString());
         }
 
         logger.info("-- Loaded datasource Plugin {} --", name);

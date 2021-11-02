@@ -57,7 +57,7 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String other;
 
-    protected Map<String, String> props = new HashMap<>();
+    private Map<String, String> props = new HashMap<>();
 
     public String getUser() {
         return user;

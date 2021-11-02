@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,12 +48,15 @@ public class MysqlDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPassword("123456");
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setDatabase("default");
+        mysqlDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
@@ -87,5 +92,18 @@ public class MysqlDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.MYSQL_VALIDATION_QUERY, mysqlDatasourceProcessor.getValidationQuery());
+    }
+
+    @Test
+    public void testGetDatasourceUniqueId() {
+        MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
+        mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
+        mysqlConnectionParam.setUser("root");
+        Assert.assertEquals("mysql@root@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
     }
 }

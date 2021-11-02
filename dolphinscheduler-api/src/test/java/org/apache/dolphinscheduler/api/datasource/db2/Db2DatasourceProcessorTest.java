@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,15 @@ public class Db2DatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         Db2DatasourceParamDTO db2DatasourceParamDTO = new Db2DatasourceParamDTO();
         db2DatasourceParamDTO.setUserName("root");
         db2DatasourceParamDTO.setPassword("123456");
         db2DatasourceParamDTO.setHost("localhost");
         db2DatasourceParamDTO.setPort(5142);
         db2DatasourceParamDTO.setDatabase("default");
+        db2DatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
@@ -91,4 +96,8 @@ public class Db2DatasourceProcessorTest {
         Assert.assertEquals(DbType.DB2, db2DatasourceProcessor.getDbType());
     }
 
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.DB2_VALIDATION_QUERY, db2DatasourceProcessor.getValidationQuery());
+    }
 }

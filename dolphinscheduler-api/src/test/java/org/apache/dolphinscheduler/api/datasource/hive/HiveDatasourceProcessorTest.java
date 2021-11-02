@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,11 +48,14 @@ public class HiveDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
         hiveDataSourceParamDTO.setHost("localhost1,localhost2");
         hiveDataSourceParamDTO.setPort(5142);
         hiveDataSourceParamDTO.setUserName("default");
         hiveDataSourceParamDTO.setDatabase("default");
+        hiveDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
@@ -86,5 +91,10 @@ public class HiveDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.HIVE, hiveDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, hiveDatasourceProcessor.getValidationQuery());
     }
 }

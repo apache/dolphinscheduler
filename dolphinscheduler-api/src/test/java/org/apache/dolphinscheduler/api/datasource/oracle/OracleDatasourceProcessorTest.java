@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,6 +48,8 @@ public class OracleDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         OracleDatasourceParamDTO oracleDatasourceParamDTO = new OracleDatasourceParamDTO();
         oracleDatasourceParamDTO.setConnectType(DbConnectType.ORACLE_SID);
         oracleDatasourceParamDTO.setHost("localhost");
@@ -53,6 +57,7 @@ public class OracleDatasourceProcessorTest {
         oracleDatasourceParamDTO.setUserName("root");
         oracleDatasourceParamDTO.setPassword("123456");
         oracleDatasourceParamDTO.setDatabase("default");
+        oracleDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
@@ -89,5 +94,10 @@ public class OracleDatasourceProcessorTest {
     @Test
     public void getDbType() {
         Assert.assertEquals(DbType.ORACLE, oracleDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDatasourceProcessor.getValidationQuery());
     }
 }

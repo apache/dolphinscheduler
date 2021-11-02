@@ -34,9 +34,6 @@ public class JdbcDataSourceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcDataSourceProvider.class);
 
-    public JdbcDataSourceProvider() {
-    }
-
     public static DruidDataSource createJdbcDataSource(BaseConnectionParam properties) {
         logger.info("Creating DruidDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 

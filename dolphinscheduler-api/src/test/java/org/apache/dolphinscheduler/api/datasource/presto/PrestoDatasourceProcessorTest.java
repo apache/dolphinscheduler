@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,15 @@ public class PrestoDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
+        Map<String, String> props = new HashMap<>();
+        props.put("serverTimezone", "utc");
         PrestoDatasourceParamDTO prestoDatasourceParamDTO = new PrestoDatasourceParamDTO();
         prestoDatasourceParamDTO.setHost("localhost");
         prestoDatasourceParamDTO.setPort(1234);
         prestoDatasourceParamDTO.setDatabase("default");
         prestoDatasourceParamDTO.setUserName("root");
         prestoDatasourceParamDTO.setPassword("123456");
+        prestoDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
@@ -87,5 +92,10 @@ public class PrestoDatasourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
+    }
+
+    @Test
+    public void testGetValidationQuery() {
+        Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
     }
 }
