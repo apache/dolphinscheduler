@@ -106,7 +106,6 @@ To test locally, you could directly run pytest after set `PYTHONPATH`
 PYTHONPATH=src/ pytest
 ```
 
-
 <!-- content -->
 [pypi]: https://pypi.org/
 [dev-setup]: https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html
