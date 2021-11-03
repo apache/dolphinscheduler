@@ -55,6 +55,8 @@ public class SparkDatasourceProcessorTest {
         sparkDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        PowerMockito.mockStatic(CommonUtils.class);
+        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
                 .createConnectionParams(sparkDatasourceParamDTO);
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());

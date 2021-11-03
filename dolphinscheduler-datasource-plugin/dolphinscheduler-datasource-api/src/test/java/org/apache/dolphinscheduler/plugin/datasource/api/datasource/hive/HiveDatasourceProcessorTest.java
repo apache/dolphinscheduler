@@ -55,6 +55,8 @@ public class HiveDatasourceProcessorTest {
         hiveDataSourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        PowerMockito.mockStatic(CommonUtils.class);
+        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
                 .createConnectionParams(hiveDataSourceParamDTO);
         System.out.println(JSONUtils.toJsonString(connectionParams));
