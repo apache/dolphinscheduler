@@ -139,6 +139,14 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/../ext/skywalking/target/skywalking-agent</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>./ext/skywalking-agent</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <includes>
                 <include>**/*.*</include>

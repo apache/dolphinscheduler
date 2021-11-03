@@ -129,6 +129,7 @@
         <java-websocket.version>1.5.1</java-websocket.version>
         <py4j.version>0.10.9</py4j.version>
         <auto-service.version>1.0.1</auto-service.version>
+        <skywalking.version>8.7.0</skywalking.version>
     </properties>
 
     <dependencyManagement>
@@ -704,6 +705,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.skywalking</groupId>
+                <artifactId>apm-toolkit-logback-1.x</artifactId>
+                <version>${skywalking.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
                 <version>${auto-service.version}</version>
@@ -1267,5 +1274,7 @@
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-standalone-server</module>
         <module>dolphinscheduler-python</module>
+
+        <module>ext/skywalking</module>
     </modules>
 </project>
