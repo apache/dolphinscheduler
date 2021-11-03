@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.alert.plugin;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -51,6 +52,14 @@ public class AlertPluginManagerTest {
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
             alertPluginManagerConfig.setMavenLocalRepository(Objects.requireNonNull(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY)).trim());
+        }
+
+
+        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
+        try {
+            alertPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("load Alert Plugin Failed !", e);
         }
 
         Assert.assertNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
