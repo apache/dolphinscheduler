@@ -42,8 +42,8 @@ public class JsonSplitDao {
      */
     public void executeJsonSplitProcessDefinition(Connection conn, List<ProcessDefinitionLog> processDefinitionLogs) {
         String updateSql = "UPDATE t_ds_process_definition SET global_params=?,timeout=?,tenant_id=?,locations=?,update_time=? where id=?";
-        String insertLogSql = "insert into t_ds_process_definition_log (code,name,version,description,project_code,release_state,user_id," +
-                "global_params,flag,locations,timeout,tenant_id,operator,operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertLogSql = "insert into t_ds_process_definition_log (code,name,version,description,project_code,release_state,user_id,"
+            + "global_params,flag,locations,timeout,tenant_id,operator,operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement processUpdate = conn.prepareStatement(updateSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -102,11 +102,11 @@ public class JsonSplitDao {
      * @param processTaskRelationLogs processTaskRelationLogs
      */
     public void executeJsonSplitProcessTaskRelation(Connection conn, List<ProcessTaskRelationLog> processTaskRelationLogs) {
-        String insertSql = "insert into t_ds_process_task_relation (project_code,process_definition_code,process_definition_version,pre_task_code,pre_task_version," +
-                "post_task_code,post_task_version,condition_type,condition_params,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?)";
-        String insertLogSql = "insert into t_ds_process_task_relation_log (project_code,process_definition_code,process_definition_version,pre_task_code," +
-                "pre_task_version,post_task_code,post_task_version,condition_type,condition_params,operator,operate_time,create_time,update_time) " +
-                "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertSql = "insert into t_ds_process_task_relation (project_code,process_definition_code,process_definition_version,pre_task_code,pre_task_version,"
+            + "post_task_code,post_task_version,condition_type,condition_params,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?)";
+        String insertLogSql = "insert into t_ds_process_task_relation_log (project_code,process_definition_code,process_definition_version,pre_task_code,"
+            + "pre_task_version,post_task_code,post_task_version,condition_type,condition_params,operator,operate_time,create_time,update_time) "
+            + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -167,12 +167,12 @@ public class JsonSplitDao {
      * @param taskDefinitionLogs taskDefinitionLogs
      */
     public void executeJsonSplitTaskDefinition(Connection conn, List<TaskDefinitionLog> taskDefinitionLogs) {
-        String insertSql = "insert into t_ds_task_definition (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority," +
-                "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids," +
-                "create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        String insertLogSql = "insert into t_ds_task_definition_log (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority," +
-                "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,operator," +
-                "operate_time,create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertSql = "insert into t_ds_task_definition (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
+            + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,"
+            + "create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertLogSql = "insert into t_ds_task_definition_log (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
+            + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,operator,"
+            + "operate_time,create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
