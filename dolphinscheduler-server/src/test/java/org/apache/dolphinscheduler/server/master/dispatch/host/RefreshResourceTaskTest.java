@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -29,12 +32,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RefreshResourceTaskTest {
 
-  @Mock
-  private LowerWeightHostManager.RefreshResourceTask refreshResourceTask;
+    @Mock
+    private ServerNodeManager serverNodeManager;
 
-  @Test
-  public void testGetHostWeightWithResult() {
-    Assert.assertTrue(refreshResourceTask.getHostWeight(
-        "192.168.1.1:22", "default", null) == null);
-  }
+    @InjectMocks
+    LowerWeightHostManager lowerWeightHostManager;
+
+    @Test
+    public void testGetHostWeightWithResult() {
+      Assert.assertTrue(lowerWeightHostManager.new RefreshResourceTask().getHostWeight(
+          "192.168.1.1:22", "default", null) == null);
+    }
 }
