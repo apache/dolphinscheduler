@@ -89,7 +89,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         try {
             conn = dataSource.getConnection();
 
-            rs = conn.getMetaData().getTables(null, SCHEMA, tableName, null);
+            rs = conn.getMetaData().getTables(conn.getCatalog(), SCHEMA, tableName, null);
 
             return rs.next();
         } catch (SQLException e) {
@@ -113,7 +113,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
-            rs = conn.getMetaData().getColumns(null, SCHEMA,tableName,columnName);
+            rs = conn.getMetaData().getColumns(conn.getCatalog(), SCHEMA,tableName,columnName);
             return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
