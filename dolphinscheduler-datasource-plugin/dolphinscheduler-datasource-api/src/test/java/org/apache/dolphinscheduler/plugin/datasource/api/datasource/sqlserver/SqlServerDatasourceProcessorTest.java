@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.datasource.sqlserver;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;

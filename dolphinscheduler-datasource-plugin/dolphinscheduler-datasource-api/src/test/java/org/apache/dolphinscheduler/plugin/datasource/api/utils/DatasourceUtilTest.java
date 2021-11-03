@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.utils;
+package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;

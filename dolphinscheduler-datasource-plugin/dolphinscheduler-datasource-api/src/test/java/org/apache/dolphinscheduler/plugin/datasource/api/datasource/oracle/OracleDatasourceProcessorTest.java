@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.datasource.oracle;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;

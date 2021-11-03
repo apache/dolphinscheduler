@@ -974,17 +974,6 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/api/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/db2/Db2DatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/hive/HiveDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/oracle/OracleDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/presto/PrestoDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/spark/SparkDatasourceProcessorTest.java</include>
-                        <include>**/api/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
-                        <include>**/api/utils/DatasourceUtilTest.java</include>
-                        <include>**/api/utils/CommonUtilsTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
@@ -1131,6 +1120,40 @@
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
                         <include>**/plugin/task/pigeon/PigeonTaskTest.java</include>
+                        <include>**/plugin/datasource/api/client/CommonDataSourceClientTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/db2/Db2DatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/hive/HiveDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/oracle/OracleDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/presto/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/spark/SparkDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/plugin/datasource/api/provider/JdbcDataSourceProviderTest.java</include>
+                        <include>**/plugin/datasource/api/utils/DatasourceUtilTest.java</include>
+                        <include>**/plugin/datasource/api/utils/CommonUtilsTest.java</include>
+                        <include>**/plugin/datasource/clickhouse/ClickhouseDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/clickhouse/ClickhouseDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/clickhouse/ClickhouseDataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/db2/DB2DataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/db2/DB2DataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/db2/DB2DataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/hive/HiveDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/hive/HiveDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/hive/HiveDataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/mysql/MysqlDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/mysql/MysqlDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/mysql/MysqlDataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/oracle/OracleDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/oracle/OracleDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/oracle/OracleDataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/postgresql/PostgresqlDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/postgresql/PostgresqlDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/postgresql/PostgresqlDataSourcePluginTest.java</include>
+                        <include>**/plugin/datasource/sqlserver/SqlserverDataSourceChannelFactoryTest.java</include>
+                        <include>**/plugin/datasource/sqlserver/SqlserverDataSourceChannelTest.java</include>
+                        <include>**/plugin/datasource/sqlserver/SqlserverDataSourcePluginTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>

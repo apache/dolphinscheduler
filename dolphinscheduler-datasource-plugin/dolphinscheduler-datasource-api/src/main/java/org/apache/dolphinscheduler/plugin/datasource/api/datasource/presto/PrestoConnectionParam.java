@@ -28,6 +28,9 @@ public class PrestoConnectionParam extends BaseConnectionParam {
                 + ", address='" + address + '\''
                 + ", database='" + database + '\''
                 + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
                 + '}';
     }

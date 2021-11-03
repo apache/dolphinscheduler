@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.datasource.spark;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
@@ -41,34 +38,34 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DatasourceUtil.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
-public class SparkDatasourceProcessorTest {
+public class PrestoDatasourceProcessorTest {
 
-    private SparkDatasourceProcessor sparkDatasourceProcessor = new SparkDatasourceProcessor();
+    private PrestoDatasourceProcessor prestoDatasourceProcessor = new PrestoDatasourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
-        SparkDatasourceParamDTO sparkDatasourceParamDTO = new SparkDatasourceParamDTO();
-        sparkDatasourceParamDTO.setUserName("root");
-        sparkDatasourceParamDTO.setPassword("12345");
-        sparkDatasourceParamDTO.setHost("localhost1,localhost2");
-        sparkDatasourceParamDTO.setPort(1234);
-        sparkDatasourceParamDTO.setDatabase("default");
-        sparkDatasourceParamDTO.setOther(props);
+        PrestoDatasourceParamDTO prestoDatasourceParamDTO = new PrestoDatasourceParamDTO();
+        prestoDatasourceParamDTO.setHost("localhost");
+        prestoDatasourceParamDTO.setPort(1234);
+        prestoDatasourceParamDTO.setDatabase("default");
+        prestoDatasourceParamDTO.setUserName("root");
+        prestoDatasourceParamDTO.setPassword("123456");
+        prestoDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(sparkDatasourceParamDTO);
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
+        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
+                .createConnectionParams(prestoDatasourceParamDTO);
+        Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
+        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
     }
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
+        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
+        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("root", connectionParams.getUser());
@@ -76,25 +73,26 @@ public class SparkDatasourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, sparkDatasourceProcessor.getDatasourceDriver());
+        Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
-        SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
-        sparkConnectionParam.setJdbcUrl("jdbc:hive2://localhost1:1234,localhost2:1234/default");
-        sparkConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default;other",
-                sparkDatasourceProcessor.getJdbcUrl(sparkConnectionParam));
+        PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
+        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
+        prestoConnectionParam.setOther("other");
+        Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+                prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
+
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.SPARK, sparkDatasourceProcessor.getDbType());
+        Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDatasourceProcessor.getValidationQuery());
+        Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
     }
 }
