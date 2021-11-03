@@ -162,4 +162,9 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <artifactSet to="lib/plugin/datasource/oracle">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-oracle:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>
