@@ -45,14 +45,14 @@ public class CommonDataSourceClientTest {
     private CommonDataSourceClient commonDataSourceClient;
 
     @Test
-    public void testPreInit(){
+    public void testPreInit() {
         PowerMockito.doNothing().when(commonDataSourceClient).preInit();
         commonDataSourceClient.preInit();
         Mockito.verify(commonDataSourceClient).preInit();
     }
 
     @Test
-    public void testCheckEnv(){
+    public void testCheckEnv() {
         BaseConnectionParam baseConnectionParam = new MysqlConnectionParam();
         PowerMockito.doNothing().when(commonDataSourceClient).checkEnv(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.checkEnv(baseConnectionParam);
@@ -77,7 +77,7 @@ public class CommonDataSourceClientTest {
     }
 
     @Test
-    public void testInitClient(){
+    public void testInitClient() {
         BaseConnectionParam baseConnectionParam = new MysqlConnectionParam();
         PowerMockito.doNothing().when(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.initClient(baseConnectionParam);
@@ -85,17 +85,16 @@ public class CommonDataSourceClientTest {
     }
 
     @Test
-    public void testCheckClient(){
+    public void testCheckClient() {
         PowerMockito.doNothing().when(this.commonDataSourceClient).checkClient();
         this.commonDataSourceClient.checkClient();
         Mockito.verify(this.commonDataSourceClient).checkClient();
     }
 
     @Test
-    public void testGetConnection(){
+    public void testGetConnection() {
         Connection connection = PowerMockito.mock(Connection.class);
         PowerMockito.when(commonDataSourceClient.getConnection()).thenReturn(connection);
         Assert.assertNotNull(commonDataSourceClient.getConnection());
     }
-
 }

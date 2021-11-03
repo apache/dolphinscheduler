@@ -39,7 +39,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class, DataSourceClientProvider.class})
+@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class DatasourceUtilTest {
 
     @Test
@@ -64,6 +64,8 @@ public class DatasourceUtilTest {
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setPassword("123456");
+        PowerMockito.mockStatic(PasswordUtils.class);
+        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(mysqlDatasourceParamDTO);
         Assert.assertNotNull(connectionParam);
     }
