@@ -82,7 +82,6 @@ const menu = {
           path: 'task-definition',
           id: 5,
           enabled: true
-
         }
       ]
     }

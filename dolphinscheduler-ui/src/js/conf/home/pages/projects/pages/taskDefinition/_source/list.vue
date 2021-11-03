@@ -26,7 +26,7 @@
         <el-table-column
           prop="id"
           :label="$t('#')"
-          width="50"
+          min-width="50"
         ></el-table-column>
         <el-table-column :label="$t('Task Name')" min-width="200">
           <template v-slot="scope">
@@ -36,7 +36,7 @@
                 <a
                   href="javascript:"
                   class="links"
-                  @click="_switchTasks(scope.row)"
+                  @click="viewTaskDetail(scope.row)"
                 >
                   {{ scope.row.name }}
                 </a>
@@ -44,35 +44,40 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Task Type')" prop="taskType" width="135">
+        <el-table-column :label="$t('Task Type')" prop="taskType" min-width="135">
         </el-table-column>
         <el-table-column
           :label="$t('User Name')"
           prop="userName"
           width="135"
         ></el-table-column>
-        <el-table-column :label="$t('Version Info')" prop="version" width="135">
-        </el-table-column>
-        <el-table-column :label="$t('Description')">
+        <el-table-column :label="$t('Version Info')" min-width="135">
           <template v-slot="scope">
-            <span>{{ scope.row.description | filterNull }} </span>
+            <span>
+              {{ 'V' + scope.row.version }}
+            </span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Create Time')" width="135">
+        <el-table-column :label="$t('Create Time')" min-width="135">
           <template v-slot="scope">
             <span>
               {{ scope.row.createTime | formatDate }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" width="135">
+        <el-table-column :label="$t('Update Time')" min-width="135">
           <template v-slot="scope">
             <span>
               {{ scope.row.updateTime | formateDate }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="200" fixed="right">
+        <el-table-column :label="$t('Description')" min-width="100">
+          <template v-slot="scope">
+            <span>{{ scope.row.description | filterNull }} </span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100" fixed="right">
           <template v-slot="scope">
             <el-tooltip
               :content="$t('Edit')"
@@ -85,7 +90,7 @@
                   size="mini"
                   icon="el-icon-edit-outline"
                   circle
-                  @click="_edit(scope.row)"
+                  @click="editTask(scope.row)"
                 ></el-button>
               </span>
             </el-tooltip>
@@ -100,7 +105,7 @@
                 icon="el-icon-info"
                 iconColor="red"
                 :title="$t('Delete?')"
-                @onConfirm="_delete(scope.row.code, scope.row.projectCode)"
+                @onConfirm="deleteTask(scope.row.code, scope.row.projectCode)"
               >
                 <el-button
                   type="danger"
@@ -159,7 +164,7 @@
       /**
        * deleteTaskDefinition
        */
-      _delete (code, projectCode) {
+      deleteTask (code) {
         this.deleteTaskDefinition({
           code: code
         })
@@ -174,11 +179,15 @@
       /**
        * taskdefinition detail
        */
-      _switchTasks () {},
+      viewTaskDetail (task) {
+        this.$emit('viewTaskDetail', task)
+      },
       /**
        * task edit
        */
-      _edit () {}
+      editTask (task) {
+        this.$emit('editTask', task)
+      }
     }
   }
 </script>

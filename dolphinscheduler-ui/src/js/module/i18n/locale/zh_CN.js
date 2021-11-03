@@ -742,5 +742,6 @@ export default {
   agentId: '应用ID',
   users: '群员',
   Username: '用户名',
-  showType: '内容展示类型'
+  showType: '内容展示类型',
+  'Please select a task type (required)': '请选择任务类型(必选)'
 }

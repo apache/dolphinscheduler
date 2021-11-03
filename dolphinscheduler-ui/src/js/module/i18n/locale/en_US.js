@@ -743,5 +743,6 @@ export default {
   agentId: 'AgentId',
   users: 'Users',
   Username: 'Username',
-  showType: 'Show Type'
+  showType: 'Show Type',
+  'Please select a task type (required)': 'Please select a task type (required)'
 }

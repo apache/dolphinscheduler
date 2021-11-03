@@ -20,7 +20,7 @@
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template v-slot:button-group>
-            <el-button size="mini" @click="_onCreate">
+            <el-button size="mini" @click="createTask">
               {{ $t("Create task") }}
             </el-button>
           </template>
@@ -28,7 +28,12 @@
       </template>
       <template v-slot:content>
         <template v-if="tasksList.length || total > 0">
-          <m-list :tasksList="tasksList" @on-update="_onUpdate"></m-list>
+          <m-list
+            :tasksList="tasksList"
+            @on-update="_onUpdate"
+            @editTask="editTask"
+            @viewTaskDetail="viewTaskDetail"
+          ></m-list>
           <div class="page-box">
             <el-pagination
               background
@@ -49,8 +54,25 @@
         <m-spin :is-spin="isLoading"></m-spin>
       </template>
     </m-list-construction>
-    <el-drawer :visible.sync="taskDrawer" size="">
-      <m-form-model v-if="taskDrawer" :nodeData="nodeData" class="form-model">
+    <el-drawer
+      :visible.sync="taskDrawer"
+      size=""
+      :with-header="false"
+      @close="closeTaskDrawer"
+    >
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width: 0px; height: 0px; overflow: hidden">
+        <el-input type="text" />
+      </div>
+      <m-form-model
+        v-if="taskDrawer"
+        :nodeData="nodeData"
+        type="task-definition"
+        @changeTaskType="changeTaskType"
+        @close="closeTaskDrawer"
+        @addTaskInfo="saveTask"
+        :taskDefinition="editingTask"
+      >
       </m-form-model>
     </el-drawer>
   </div>
@@ -70,10 +92,9 @@
   import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
 
   const DEFAULT_NODE_DATA = {
-    id: null,
-    taskType: '',
-    self: {},
-    instanceId: null
+    id: -1,
+    taskType: 'SHELL',
+    instanceId: -1
   }
   export default {
     name: 'task-definition-index',
@@ -95,12 +116,19 @@
         // nodeData
         nodeData: { ...DEFAULT_NODE_DATA },
         // tasksType
-        tasksTypeList
+        tasksTypeList,
+        // editing task definition
+        editingTask: null
       }
     },
     mixins: [listUrlParamHandle],
     methods: {
-      ...mapActions('dag', ['getTaskDefinitionsList', 'genTaskCodeList']),
+      ...mapActions('dag', [
+        'getTaskDefinitionsList',
+        'genTaskCodeList',
+        'saveTaskDefinition',
+        'updateTaskDefinition'
+      ]),
       ...mapActions('dag', [
         'getProcessList',
         'getProjectList',
@@ -108,25 +136,83 @@
         'getResourcesListJar',
         'getResourcesListJar'
       ]),
-      ...mapMutations('dag', ['resetParams']),
+      ...mapMutations('dag', ['resetParams', 'setIsDetails']),
       ...mapActions('security', [
         'getTenantList',
         'getWorkerGroupsAll',
         'getAlarmGroupsAll'
       ]),
       /**
-       * taskCreate
+       * Toggle task drawer
        */
-      _onCreate () {},
+      showTaskDrawer () {
+        this.taskDrawer = true
+      },
+      closeTaskDrawer () {
+        this.setIsDetails(false)
+        this.taskDrawer = false
+      },
+      saveTask ({ item }) {
+        const isEditing = !!this.editingTask
+        if (isEditing) {
+          this.updateTaskDefinition(item)
+            .then((res) => {
+              this.$message.success(res.msg)
+              this._onUpdate()
+              this.closeTaskDrawer()
+            })
+            .catch((e) => {
+              this.$message.error(e.msg || '')
+            })
+        } else {
+          this.genTaskCodeList({
+            genNum: 1
+          })
+            .then((res) => {
+              const [code] = res
+              return code
+            })
+            .then((code) => {
+              return this.saveTaskDefinition({
+                taskDefinitionJson: [
+                  {
+                    ...item,
+                    code
+                  }
+                ]
+              })
+            })
+            .then((res) => {
+              this.$message.success(res.msg)
+              this._onUpdate()
+              this.closeTaskDrawer()
+            })
+            .catch((e) => {
+              this.$message.error(e.msg || '')
+            })
+        }
+      },
+      createTask () {
+        this.editingTask = null
+        this.nodeData.taskType = DEFAULT_NODE_DATA.taskType
+        this.showTaskDrawer()
+      },
+      editTask (task) {
+        this.editingTask = task
+        this.nodeData.id = task.code
+        this.nodeData.taskType = task.taskType
+        this.showTaskDrawer()
+      },
+      viewTaskDetail (task) {
+        this.setIsDetails(true)
+        this.editTask(task)
+      },
       /**
        * pageNo
        */
       _page (val) {
         this.searchParams.pageNo = val
       },
-      /**
-       * pageSize
-       */
       _pageSize (val) {
         this.searchParams.pageSize = val
       },
@@ -138,7 +224,7 @@
         this.searchParams.pageNo = 1
       },
       /**
-       * get data list
+       * get task definition list
        */
       _getList (flag) {
         this.isLoading = !flag
@@ -162,6 +248,12 @@
        */
       _onUpdate () {
         this._debounceGET('false')
+      },
+      /**
+       * change form modal task type
+       */
+      changeTaskType (value) {
+        this.nodeData.taskType = value
       }
     },
     created () {
@@ -208,9 +300,6 @@
 .task-definition {
   .taskGroupBtn {
     width: 300px;
-  }
-  .form-model {
-    border: 1px solid blue;
   }
 }
 </style>
