@@ -119,7 +119,7 @@ public class DolphinSchedulerManager {
                     } else if ("1.3.2".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerResourceList();
                     } else if ("2.0.0".equals(schemaVersion)) {
-                        upgradeDao.upgradeDolphinSchedulerJsonSplit();
+                        upgradeDao.upgradeDolphinSchedulerTo200(schemaDir);
                     }
                     version = schemaVersion;
                 }
