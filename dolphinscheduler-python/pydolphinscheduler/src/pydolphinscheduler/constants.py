@@ -38,6 +38,7 @@ class ProcessDefinitionDefault:
     USER_STATE: int = 1
     QUEUE: str = "queuePythonGateway"
     WORKER_GROUP: str = "default"
+    TIME_ZONE: str = "Asia/Shanghai"
 
 
 class TaskPriority(str):

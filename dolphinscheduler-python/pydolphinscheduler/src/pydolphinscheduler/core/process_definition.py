@@ -18,6 +18,7 @@
 """Module process definition, core class for workflow define."""
 
 import json
+from datetime import datetime
 from typing import Optional, List, Dict, Set
 
 from pydolphinscheduler.constants import (
@@ -83,6 +84,10 @@ class ProcessDefinition(Base):
         self,
         name: str,
         description: Optional[str] = None,
+        schedule: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        timezone: Optional[str] = ProcessDefinitionDefault.TIME_ZONE,
         user: Optional[str] = ProcessDefinitionDefault.USER,
         project: Optional[str] = ProcessDefinitionDefault.PROJECT,
         tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
@@ -93,6 +98,10 @@ class ProcessDefinition(Base):
         param: Optional[List] = None,
     ):
         super().__init__(name, description)
+        self.schedule = schedule
+        self.start_time = start_time
+        self.end_time = end_time
+        self.timezone = timezone
         self._user = user
         self._project = project
         self._tenant = tenant
@@ -165,6 +174,18 @@ class ProcessDefinition(Base):
         else:
             self._handle_root_relation()
             return [tr.to_dict() for tr in self._task_relations]
+
+    @property
+    def schedule_json(self) -> Optional[Dict]:
+        if not self.schedule:
+            return None
+        else:
+            return {
+                "startTime": self.start_time if self.start else datetime.now().strftime("%Y-%m-%d %H:%M%S"),
+                "endTime": self.end_time if self.end_time else "9999-12-31 00:00:00",
+                "crontab": self.schedule,
+                "timezoneId": self.timezone,
+            }
 
     # TODO inti DAG's tasks are in the same location with default {x: 0, y: 0}
     @property
@@ -274,6 +295,7 @@ class ProcessDefinition(Base):
             self.name,
             str(self.description) if self.description else "",
             str(self.param) if self.param else None,
+            json.dumps(self.schedule_json) if self.schedule_json else None,
             json.dumps(self.task_location),
             self.timeout,
             self.worker_group,
