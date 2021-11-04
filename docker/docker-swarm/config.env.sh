@@ -104,6 +104,7 @@ WORKER_HOST_WEIGHT=100
 WORKER_MAX_CPULOAD_AVG=-1
 WORKER_RESERVED_MEMORY=0.3
 WORKER_GROUPS=default
+TASK_PLUGIN_DIR=lib/plugin/task
 ALERT_LISTEN_HOST=dolphinscheduler-alert
 
 #============================================================================

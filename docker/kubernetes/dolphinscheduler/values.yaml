@@ -225,6 +225,7 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "-1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_GROUPS: "default"
+    TASK_PLUGIN_DIR: "lib/plugin/task"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

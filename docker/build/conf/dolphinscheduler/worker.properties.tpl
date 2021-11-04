@@ -39,5 +39,8 @@ worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 # default worker groups separated by comma, like 'worker.groups=default,test'
 worker.groups=${WORKER_GROUPS}
 
+#task.plugin.dir config the #task.plugin.dir config the Task Plugin dir . WorkerServer while find and load the Task Plugin Jar from this dir when deploy and start WorkerServer on the server .
+task.plugin.dir=${TASK_PLUGIN_DIR}
+
 # alert server listen host
 alert.listen.host=${ALERT_LISTEN_HOST}
