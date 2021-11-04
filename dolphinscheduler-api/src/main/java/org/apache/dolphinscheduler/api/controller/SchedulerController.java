@@ -52,6 +52,7 @@ public class SchedulerController extends BaseController {
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
+    public static final String DEFAULT_PROCESS_INSTANCE_PRIORITY = "2";
 
 
     @Autowired
@@ -99,7 +100,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "receivers", required = false) String receivers,
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) throws IOException {
+                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) throws IOException {
         logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
                 loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
