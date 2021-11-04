@@ -400,7 +400,7 @@ alter table t_ds_schedules add environment_code bigint(20) DEFAULT '-1' COMMENT 
 
 -- t_ds_process_definition
 alter table t_ds_process_definition add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `id`;
-alter table t_ds_process_definition add `project_code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `project_id`;
+alter table t_ds_process_definition change project_id project_code bigint(20) NOT NULL COMMENT 'project code' AFTER `description`;
 alter table t_ds_process_definition add `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `locations`;
 alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;
 alter table t_ds_process_definition modify `description` text COMMENT 'description' after `version`;
