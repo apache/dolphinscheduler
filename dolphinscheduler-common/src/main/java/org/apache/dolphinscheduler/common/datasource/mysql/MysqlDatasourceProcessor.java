@@ -32,8 +32,10 @@ import org.apache.commons.lang.StringUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -144,9 +146,9 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
+        List<String> list = new ArrayList<>();
+        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+        return String.join("&", list);
     }
 
     private static boolean checkKeyIsLegitimate(String key) {
