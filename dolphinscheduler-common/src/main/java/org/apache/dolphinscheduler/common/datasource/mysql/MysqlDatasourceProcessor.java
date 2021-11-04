@@ -62,7 +62,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        mysqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        mysqlDatasourceParamDTO.setOther(parseOther(getDbType(),connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -85,7 +85,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         mysqlConnectionParam.setAddress(address);
         mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
         mysqlConnectionParam.setPassword(CommonUtils.encodePassword(mysqlDatasourceParam.getPassword()));
-        mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
+        mysqlConnectionParam.setOther(transformOther(getDbType(),mysqlDatasourceParam.getOther()));
 
         return mysqlConnectionParam;
     }
@@ -132,7 +132,8 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.MYSQL;
     }
 
-    private String transformOther(Map<String, String> paramMap) {
+    @Override
+    public String transformOther(DbType type, Map<String, String> paramMap) {
         if (MapUtils.isEmpty(paramMap)) {
             return null;
         }
@@ -156,17 +157,6 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
                 && !key.contains(AUTO_DESERIALIZE)
                 && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
                 && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
     }
 
 }

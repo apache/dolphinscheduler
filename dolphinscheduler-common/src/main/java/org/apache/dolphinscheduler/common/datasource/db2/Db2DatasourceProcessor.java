@@ -45,7 +45,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
 
         Db2DatasourceParamDTO db2DatasourceParamDTO = new Db2DatasourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        db2DatasourceParamDTO.setOther(parseOther(getDbType(),connectionParams.getOther()));
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
@@ -68,7 +68,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         db2ConnectionParam.setJdbcUrl(jdbcUrl);
         db2ConnectionParam.setUser(db2Param.getUserName());
         db2ConnectionParam.setPassword(CommonUtils.encodePassword(db2Param.getPassword()));
-        db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
+        db2ConnectionParam.setOther(transformOther(getDbType(),db2Param.getOther()));
 
         return db2ConnectionParam;
     }
@@ -105,23 +105,4 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.DB2;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join(";", list);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

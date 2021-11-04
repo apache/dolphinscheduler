@@ -47,7 +47,7 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
 
         oracleDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
-        oracleDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        oracleDatasourceParamDTO.setOther(parseOther(getDbType(),connectionParams.getOther()));
 
         String hostSeperator = Constants.DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
@@ -81,7 +81,7 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         oracleConnectionParam.setJdbcUrl(jdbcUrl);
         oracleConnectionParam.setDatabase(oracleParam.getDatabase());
         oracleConnectionParam.setConnectType(oracleParam.getConnectType());
-        oracleConnectionParam.setOther(transformOther(oracleParam.getOther()));
+        oracleConnectionParam.setOther(transformOther(getDbType(),oracleParam.getOther()));
 
         return oracleConnectionParam;
     }
@@ -118,24 +118,4 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.ORACLE;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join("&", list);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

@@ -45,7 +45,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         PostgreSqlDatasourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSqlDatasourceParamDTO();
         postgreSqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         postgreSqlDatasourceParamDTO.setUserName(connectionParams.getUser());
-        postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        postgreSqlDatasourceParamDTO.setOther(parseOther(getDbType(),connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -68,7 +68,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         postgreSqlConnectionParam.setDatabase(postgreSqlParam.getDatabase());
         postgreSqlConnectionParam.setUser(postgreSqlParam.getUserName());
         postgreSqlConnectionParam.setPassword(CommonUtils.encodePassword(postgreSqlParam.getPassword()));
-        postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
+        postgreSqlConnectionParam.setOther(transformOther(getDbType(),postgreSqlParam.getOther()));
 
         return postgreSqlConnectionParam;
     }
@@ -105,24 +105,4 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.POSTGRESQL;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join("&", list);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            String[] split = config.split("=");
-            otherMap.put(split[0], split[1]);
-        }
-        return otherMap;
-    }
 }

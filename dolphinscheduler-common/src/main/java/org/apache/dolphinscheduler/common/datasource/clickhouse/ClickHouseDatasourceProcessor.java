@@ -45,7 +45,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         ClickHouseDatasourceParamDTO clickHouseDatasourceParamDTO = new ClickHouseDatasourceParamDTO();
         clickHouseDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
-        clickHouseDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        clickHouseDatasourceParamDTO.setOther(parseOther(getDbType(),connectionParams.getOther()));
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -67,7 +67,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         clickhouseConnectionParam.setJdbcUrl(jdbcUrl);
         clickhouseConnectionParam.setUser(clickHouseParam.getUserName());
         clickhouseConnectionParam.setPassword(CommonUtils.encodePassword(clickHouseParam.getPassword()));
-        clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
+        clickhouseConnectionParam.setOther(transformOther(getDbType(),clickHouseParam.getOther()));
         return clickhouseConnectionParam;
     }
 
@@ -104,24 +104,4 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.CLICKHOUSE;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join("&", list);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }
