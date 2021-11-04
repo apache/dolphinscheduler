@@ -22,7 +22,8 @@ from pydolphinscheduler.tasks.shell import Shell
 
 
 def test_shell_to_dict():
-    code = "123"
+    code = 123
+    version = 1
     name = "test_shell_to_dict"
     command = "echo test shell"
     expect = {
@@ -49,13 +50,13 @@ def test_shell_to_dict():
         },
         "flag": "YES",
         "taskPriority": "MEDIUM",
-        "workerGroup": "worker-group-pydolphin",
+        "workerGroup": "default",
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
         "timeoutNotifyStrategy": None,
         "timeout": 0
     }
-    with patch('pydolphinscheduler.core.task.Task.gen_code', return_value=code):
+    with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
         shell = Shell(name, command)
         assert shell.to_dict() == expect

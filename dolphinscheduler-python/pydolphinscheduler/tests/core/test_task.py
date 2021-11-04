@@ -52,14 +52,15 @@ def test_task_relation_to_dict():
 
 
 def test_task_to_dict():
-    code = "123"
+    code = 123
+    version = 1
     name = "test_task_to_dict"
     task_type = "test_task_to_dict_type"
     raw_script = "test_task_params_to_dict"
     expect = {
         "code": code,
         "name": name,
-        "version": 1,
+        "version": version,
         "description": None,
         "delayTime": 0,
         "taskType": task_type,
@@ -80,14 +81,14 @@ def test_task_to_dict():
         },
         "flag": "YES",
         "taskPriority": "MEDIUM",
-        "workerGroup": "worker-group-pydolphin",
+        "workerGroup": "default",
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
         "timeoutNotifyStrategy": None,
         "timeout": 0
     }
-    with patch('pydolphinscheduler.core.task.Task.gen_code', return_value=code):
+    with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
         task = Task(
             name=name,
             task_type=task_type,

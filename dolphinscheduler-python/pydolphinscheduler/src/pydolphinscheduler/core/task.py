@@ -151,10 +151,7 @@ class Task(Base):
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:
-        if self._process_definition:
-            return self._process_definition
-        else:
-            raise ValueError(f'Task {self} has not been assigned to a ProcessDefinition yet')
+        return self._process_definition
 
     @process_definition.setter
     def process_definition(self, process_definition: Optional[ProcessDefinition]):

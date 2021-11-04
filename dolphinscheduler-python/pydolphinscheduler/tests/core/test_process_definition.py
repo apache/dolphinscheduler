@@ -19,8 +19,9 @@ import pytest
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault, ProcessDefinitionReleaseState
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.core.task import TaskParams
 from pydolphinscheduler.side import Tenant, Project, User
+from tests.testing.task import Task
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
