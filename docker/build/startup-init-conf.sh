@@ -103,7 +103,6 @@ export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"-1"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.3"}
 export WORKER_GROUPS=${WORKER_GROUPS:-"default"}
 export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"localhost"}
-export TASK_PLUGIN_DIR=${TASK_PLUGIN_DIR:-"lib/plugin/task"}
 
 #============================================================================
 # Alert Server
