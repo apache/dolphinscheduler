@@ -40,7 +40,8 @@ public class AlertPluginManagerTest {
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);
 
     @Test
-    public void testLoadPlugins() {
+    public void testLoadPlugins()
+            throws Exception {
         logger.info("begin test AlertPluginManagerTest");
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
@@ -56,11 +57,7 @@ public class AlertPluginManagerTest {
 
 
         DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
-        try {
-            alertPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
-        }
+        alertPluginLoader.loadPlugins();
 
         Assert.assertNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
     }
