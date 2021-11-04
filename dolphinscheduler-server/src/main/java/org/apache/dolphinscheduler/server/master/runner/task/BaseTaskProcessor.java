@@ -152,6 +152,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
+    @Override
+    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
+
+    }
+
     /**
      * get TaskExecutionContext
      *

@@ -475,6 +475,7 @@ CREATE TABLE t_ds_task_definition
     timeout_notify_strategy tinyint(4) DEFAULT NULL,
     timeout                 int(11) DEFAULT '0',
     delay_time              int(11) DEFAULT '0',
+    task_group_id              int(11) DEFAULT NULL,
     resource_ids            text,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -508,6 +509,7 @@ CREATE TABLE t_ds_task_definition_log
     delay_time              int(11) DEFAULT '0',
     resource_ids            text,
     operator                int(11) DEFAULT NULL,
+    task_group_id           int(11) DEFAULT NULL,
     operate_time            datetime     DEFAULT NULL,
     create_time             datetime    NOT NULL,
     update_time             datetime     DEFAULT NULL,
@@ -841,6 +843,7 @@ CREATE TABLE t_ds_task_instance
     executor_id             int(11) DEFAULT NULL,
     first_submit_time       datetime     DEFAULT NULL,
     delay_time              int(4) DEFAULT '0',
+    task_group_id           int(11) DEFAULT NULL,
     var_pool                longtext,
     dry_run                 int NULL DEFAULT 0,
     PRIMARY KEY (id),
@@ -1036,4 +1039,36 @@ CREATE TABLE t_ds_environment_worker_group_relation
     update_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY environment_worker_group_unique (environment_code,worker_group)
+);
+DROP TABLE IF EXISTS t_ds_task_group_queue;
+CREATE TABLE t_ds_task_group_queue
+(
+   id           int(11) NOT NULL AUTO_INCREMENT ,
+   task_id      int(11) DEFAULT NULL ,
+   task_name    VARCHAR(100) DEFAULT NULL ,
+   group_id     int(11) DEFAULT NULL ,
+   process_id   int(11) DEFAULT NULL ,
+   priority     int(8) DEFAULT '0' ,
+   status       int(4) DEFAULT '-1' ,
+   force_start  int(4) DEFAULT '0' ,
+   in_queue     int(4) DEFAULT '0' ,
+   create_time  datetime DEFAULT NULL ,
+   update_time  datetime DEFAULT NULL ,
+   PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS t_ds_task_group;
+CREATE TABLE t_ds_task_group
+(
+   id          int(11)  NOT NULL AUTO_INCREMENT ,
+   name        varchar(100) DEFAULT NULL ,
+   description varchar(200) DEFAULT NULL ,
+   group_size  int(11) NOT NULL ,
+   use_size    int(11) DEFAULT '0' ,
+   user_id     int(11) DEFAULT NULL ,
+   project_id  int(11) DEFAULT NULL ,
+   status      int(4) DEFAULT '1'  ,
+   create_time datetime DEFAULT NULL ,
+   update_time datetime DEFAULT NULL ,
+   PRIMARY KEY(id)
 );

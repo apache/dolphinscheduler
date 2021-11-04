@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -70,6 +71,18 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
+        int taskGroupId = task.getTaskGroupId();
+        if (taskGroupId > 0) {
+            boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+                    task.getName(),
+                    taskGroupId,
+                    task.getProcessInstanceId(),
+                    task.getTaskInstancePriority().getCode());
+            if (!acquireTaskGroup) {
+                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
+                return true;
+            }
+        }
         dispatchTask(taskInstance, processInstance);
         return true;
     }
@@ -77,6 +90,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     @Override
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
+    }
+
+    @Override
+    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
+        this.dispatchTask(taskInstance,processInstance);
     }
 
     @Override

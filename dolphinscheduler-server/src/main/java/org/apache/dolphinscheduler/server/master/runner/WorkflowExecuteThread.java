@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -54,6 +55,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskGroup;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
@@ -307,6 +310,9 @@ public class WorkflowExecuteThread implements Runnable {
             case TASK_TIMEOUT:
                 result = taskTimeout(stateEvent);
                 break;
+            case WAIT_TASK_GROUP:
+                result = checkForceStartAndWakeUp(stateEvent);
+                break;
             default:
                 break;
         }
@@ -315,6 +321,33 @@ public class WorkflowExecuteThread implements Runnable {
             this.stateEvents.remove(stateEvent);
         }
         return result;
+    }
+
+    private boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
+        TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(stateEvent.getTaskInstanceId());
+        if(taskGroupQueue.getForceStart() == Flag.YES.getCode()){
+            ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
+            TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
+            taskProcessor.dispatch(taskInstance,processInstance);
+            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(),TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            return true;
+        }
+        if(taskGroupQueue.getInQueue() == Flag.YES.getCode()){
+            ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
+            TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
+            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
+                    taskInstance.getName(),
+                    taskInstance.getTaskGroupId(),
+                    taskInstance.getProcessInstanceId(),
+                    taskInstance.getTaskInstancePriority().getCode());
+            if(acquireTaskGroup){
+                taskProcessor.dispatch(taskInstance,processInstance);
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean taskTimeout(StateEvent stateEvent) {
@@ -351,6 +384,10 @@ public class WorkflowExecuteThread implements Runnable {
         TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
         if (task.getState().typeIsFinished()) {
             taskFinished(task);
+            if(task.getTaskGroupId() > 0){
+                //release task group
+                this.processService.releaseTaskGroup(task);
+            }
         } else if (activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             iTaskProcessor.run();
@@ -614,15 +651,17 @@ public class WorkflowExecuteThread implements Runnable {
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
+            // set task group id
+            TaskDefinition taskDefinition = processService.findTaskDefinition(
+                    taskInstance.getTaskCode(),
+                    taskInstance.getTaskDefinitionVersion());
+            taskInstance.setTaskGroupId(taskDefinition.getTaskGroupId());
             boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
             if (submit) {
                 this.taskInstanceHashMap.put(taskInstance.getId(), taskInstance.getTaskCode(), taskInstance);
                 activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
                 taskProcessor.run();
                 addTimeoutCheck(taskInstance);
-                TaskDefinition taskDefinition = processService.findTaskDefinition(
-                        taskInstance.getTaskCode(),
-                        taskInstance.getTaskDefinitionVersion());
                 taskInstance.setTaskDefine(taskDefinition);
                 if (taskProcessor.taskState().typeIsFinished()) {
                     StateEvent stateEvent = new StateEvent();
@@ -631,6 +670,18 @@ public class WorkflowExecuteThread implements Runnable {
                     stateEvent.setExecutionStatus(taskProcessor.taskState());
                     stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
                     this.stateEvents.add(stateEvent);
+                }
+                if(taskInstance.getTaskGroupId() > 0){
+                    TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(taskInstance.getId());
+                    //for force start and wake up
+                    if(taskGroupQueue != null && TaskGroupQueueStatus.WAIT_QUEUE == taskGroupQueue.getStatus()){
+                        StateEvent stateEvent = new StateEvent();
+                        stateEvent.setProcessInstanceId(this.processInstance.getId());
+                        stateEvent.setTaskInstanceId(taskInstance.getId());
+                        stateEvent.setExecutionStatus(taskProcessor.taskState());
+                        stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
+                        this.stateEvents.add(stateEvent);
+                    }
                 }
                 return taskInstance;
             } else {
