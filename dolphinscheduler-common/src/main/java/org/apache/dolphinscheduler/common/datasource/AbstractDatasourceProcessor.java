@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -84,10 +85,11 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
 
     /**
      * transform other
+     *
      * @param type type
      * @param otherMap otherMap
      */
-    protected String transformOther(DbType type,Map<String, String> otherMap){
+    protected String transformOther(DbType type, Map<String, String> otherMap) {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
@@ -99,10 +101,11 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
 
     /**
      * parse Other
+     *
      * @param type type
      * @param other other
      */
-    protected Map<String, String> parseOther(DbType type,String other){
+    protected Map<String, String> parseOther(DbType type, String other) {
         if (StringUtils.isEmpty(other)) {
             return null;
         }
@@ -115,10 +118,10 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
     }
 
     /**
-     *  get db separator
+     * get db separator
      * @param type type
      */
-    private String getDbSeparator(DbType type){
+    private String getDbSeparator(DbType type) {
         String separator = "";
         if (Constants.MYSQL.equals(type.name())
                 || Constants.POSTGRESQL.equals(type.name())
