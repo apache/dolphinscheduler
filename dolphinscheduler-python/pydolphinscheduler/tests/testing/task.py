@@ -14,3 +14,14 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+
+import uuid
+
+from pydolphinscheduler.core.task import Task as SourceTask
+
+
+class Task(SourceTask):
+    DEFAULT_VERSION = 1
+
+    def gen_code_and_version(self):
+        return uuid.uuid1().time, self.DEFAULT_VERSION
