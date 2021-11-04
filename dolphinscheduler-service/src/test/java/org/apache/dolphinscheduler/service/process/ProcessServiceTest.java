@@ -337,14 +337,14 @@ public class ProcessServiceTest {
         processInstance2.setProcessDefinitionCode(11L);
         processInstance2.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryDetailById(223)).thenReturn(processInstance2);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command1, processDefinitionCacheMaps));
         Command command6 = new Command();
         command6.setProcessDefinitionCode(123);
         command6.setCommandParam("{\"ProcessInstanceId\":223}");
         command6.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(11L,Constants.RUNNING_PROCESS_STATE,223)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateNextProcessIdById(223, 222)).thenReturn(true);
-        ProcessInstance processInstance6 = processService.handleCommand(logger, host, validThreadNum, command6);
+        ProcessInstance processInstance6 = processService.handleCommand(logger, host, command6, processDefinitionCacheMaps);
         Assert.assertTrue(processInstance6 == null);
 
         processDefinition1.setExecutionType(ProcessExecutionTypeEnum.SERIAL_DISCARD);
@@ -359,7 +359,7 @@ public class ProcessServiceTest {
         command7.setCommandParam("{\"ProcessInstanceId\":224}");
         command7.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(11L,Constants.RUNNING_PROCESS_STATE,224)).thenReturn(null);
-        ProcessInstance processInstance8 = processService.handleCommand(logger, host, validThreadNum, command7);
+        ProcessInstance processInstance8 = processService.handleCommand(logger, host, command7, processDefinitionCacheMaps);
         Assert.assertTrue(processInstance8 == null);
 
         ProcessDefinition processDefinition2 = new ProcessDefinition();
@@ -380,7 +380,7 @@ public class ProcessServiceTest {
         Mockito.when(processInstanceMapper.queryDetailById(225)).thenReturn(processInstance9);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndStatusAndNextId(11L,Constants.RUNNING_PROCESS_STATE,225)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
-        ProcessInstance processInstance10 = processService.handleCommand(logger, host, validThreadNum, command9);
+        ProcessInstance processInstance10 = processService.handleCommand(logger, host, command9, processDefinitionCacheMaps);
         Assert.assertTrue(processInstance10 == null);
     }
 
