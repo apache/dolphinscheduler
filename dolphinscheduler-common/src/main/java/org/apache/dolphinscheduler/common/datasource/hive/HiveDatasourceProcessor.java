@@ -27,17 +27,12 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
 
