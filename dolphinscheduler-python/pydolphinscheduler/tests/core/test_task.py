@@ -83,10 +83,9 @@ def test_task_to_dict():
         "timeoutNotifyStrategy": None,
         "timeout": 0,
     }
-    with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
-        task = Task(
-            name=name,
-            task_type=task_type,
-            task_params=TaskParams(raw_script)
-        )
+    with patch(
+        "pydolphinscheduler.core.task.Task.gen_code_and_version",
+        return_value=(code, version),
+    ):
+        task = Task(name=name, task_type=task_type, task_params=TaskParams(raw_script))
         assert task.to_dict() == expect

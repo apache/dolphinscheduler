@@ -50,6 +50,9 @@ def test_shell_to_dict():
         "timeoutNotifyStrategy": None,
         "timeout": 0,
     }
-    with patch('pydolphinscheduler.core.task.Task.gen_code_and_version', return_value=(code, version)):
+    with patch(
+        "pydolphinscheduler.core.task.Task.gen_code_and_version",
+        return_value=(code, version),
+    ):
         shell = Shell(name, command)
         assert shell.to_dict() == expect
