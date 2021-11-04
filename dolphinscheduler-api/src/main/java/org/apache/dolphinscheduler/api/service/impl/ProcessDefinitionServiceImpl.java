@@ -527,7 +527,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
-        processDefinition.setExecutionType(executionType);
+        processDefinition.setExecutionType(executionType == null ?ProcessExecutionTypeEnum.PARALLEL:executionType);
         return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
     }
 
