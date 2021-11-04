@@ -60,6 +60,7 @@ class ProcessDefinition(Base):
         "description",
         "_project",
         "_tenant",
+        "worker_group",
         "timeout",
         "release_state",
         "param",
@@ -76,6 +77,7 @@ class ProcessDefinition(Base):
             project: Optional[str] = ProcessDefinitionDefault.PROJECT,
             tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
             queue: Optional[str] = ProcessDefinitionDefault.QUEUE,
+            worker_group: Optional[str] = ProcessDefinitionDefault.WORKER_GROUP,
             timeout: Optional[int] = 0,
             release_state: Optional[str] = ProcessDefinitionReleaseState.ONLINE,
             param: Optional[List] = None
@@ -85,6 +87,7 @@ class ProcessDefinition(Base):
         self._project = project
         self._tenant = tenant
         self._queue = queue
+        self.worker_group = worker_group
         self.timeout = timeout
         self.release_state = release_state
         self.param = param
@@ -226,6 +229,7 @@ class ProcessDefinition(Base):
             str(self.param) if self.param else None,
             json.dumps(self.task_location),
             self.timeout,
+            self.worker_group,
             self._tenant,
             # TODO add serialization function
             json.dumps(self.task_relation_json),
@@ -244,6 +248,6 @@ class ProcessDefinition(Base):
             self._project,
             self.name,
             "",
-            "default",
+            self.worker_group,
             24 * 3600,
         )
