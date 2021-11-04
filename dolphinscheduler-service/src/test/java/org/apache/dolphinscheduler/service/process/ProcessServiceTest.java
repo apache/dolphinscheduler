@@ -87,7 +87,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * process service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
