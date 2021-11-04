@@ -18,41 +18,17 @@
 
 set -e
 
-echo "------ dolphinscheduler start - build -------"
-printenv
+ROOT_DIR=$(dirname "$0")/../../..
+MVN="$ROOT_DIR"/mvnw
+VERSION=$("$MVN" -q -DforceStdout -N org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version)
 
-if [ -z "${VERSION}" ]
-then
-    echo "set default environment variable [VERSION]"
-    export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
-fi
+DOCKER_REPO=${DOCKER_REPO:-"apache/dolphinscheduler"}
+TAG=${TAG:-"$VERSION"}
 
-if [ "${DOCKER_REPO}x" = "x" ]
-then
-    echo "set default environment variable [DOCKER_REPO]"
-    export DOCKER_REPO='apache/dolphinscheduler'
-fi
+echo "Building Docker image as: $DOCKER_REPO:$TAG"
 
-echo "Version: $VERSION"
-echo "Repo: $DOCKER_REPO"
+"$MVN" -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-echo -e "Current Directory is $(pwd)\n"
+cp "$ROOT_DIR"/dolphinscheduler-dist/target/apache-dolphinscheduler-$VERSION-bin.tar.gz "$ROOT_DIR"/docker/build/
 
-# maven package(Project Directory)
-echo -e "./mvnw -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
-./mvnw -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
-
-# mv dolphinscheduler-bin.tar.gz file to docker/build directory
-echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-${VERSION}-bin.tar.gz $(pwd)/docker/build/\n"
-mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-${VERSION}-bin.tar.gz $(pwd)/docker/build/
-
-# docker build
-BUILD_COMMAND="docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/docker/build/"
-echo -e "$BUILD_COMMAND\n"
-if (docker info 2> /dev/null | grep -i "ERROR"); then
-    sudo $BUILD_COMMAND
-else
-    $BUILD_COMMAND
-fi
-
-echo "------ dolphinscheduler end   - build -------"
+docker build --build-arg VERSION=$VERSION -t $DOCKER_REPO:$TAG "$ROOT_DIR"/docker/build/

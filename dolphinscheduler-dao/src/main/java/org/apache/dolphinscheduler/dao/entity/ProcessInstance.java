@@ -243,6 +243,11 @@ public class ProcessInstance {
      */
     private int nextProcessInstanceId;
 
+    /**
+     * dry run flag
+     */
+    private int dryRun;
+
     public ProcessInstance() {
 
     }
@@ -507,6 +512,14 @@ public class ProcessInstance {
         this.environmentCode = environmentCode;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     /**
      * add command to history
      *
@@ -671,6 +684,9 @@ public class ProcessInstance {
             + '\''
             + ", processDefinitionVersion='"
             + processDefinitionVersion
+            + '\''
+            + ", dryRun='"
+            + dryRun
             + '\''
             + '}';
     }

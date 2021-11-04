@@ -23,8 +23,9 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
 import java.util.concurrent.locks.Lock;
@@ -45,7 +46,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
      */
     private final Lock runLock = new ReentrantLock();
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    private StateEventCallbackService stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
 
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
@@ -125,8 +126,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
         processService.updateProcessInstance(subProcessInstance);
-        //TODO...
-        // send event to sub process master
+        sendToSubProcess();
         return true;
     }
 
@@ -161,7 +161,17 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
         processService.updateProcessInstance(subProcessInstance);
+        sendToSubProcess();
         return true;
+    }
+
+    private void sendToSubProcess() {
+        StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+                processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(), subProcessInstance.getId(), 0
+        );
+        String address = subProcessInstance.getHost().split(":")[0];
+        int port = Integer.parseInt(subProcessInstance.getHost().split(":")[1]);
+        this.stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
     }
 
     @Override

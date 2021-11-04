@@ -70,20 +70,21 @@
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
-        <druid.version>1.1.22</druid.version>
+        <druid.version>1.2.4</druid.version>
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
         <junit.version>4.12</junit.version>
-        <mysql.connector.version>5.1.34</mysql.connector.version>
+        <mysql.connector.version>8.0.16</mysql.connector.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
         <slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <commons.httpclient>3.0.1</commons.httpclient>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.lang.version>2.6</commons.lang.version>
         <commons.email.version>1.5</commons.email.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
@@ -126,6 +127,7 @@
         <reflections.version>0.9.12</reflections.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
         <java-websocket.version>1.5.1</java-websocket.version>
+        <py4j.version>0.10.9</py4j.version>
     </properties>
 
     <dependencyManagement>
@@ -260,6 +262,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-python</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -474,6 +481,12 @@
             </dependency>
 
             <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
@@ -670,6 +683,12 @@
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
                 <version>1.6.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sf.py4j</groupId>
+                <artifactId>py4j</artifactId>
+                <version>${py4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1039,6 +1058,7 @@
                         <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
+                        <include>**/server/master/cache/impl/ProcessInstanceExecCacheManagerImplTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/registry/RegistryClientTest.java</include>
@@ -1103,7 +1123,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
-                        <include>**/plugin/task/tis/TISTaskTest.java</include>
+                        <include>**/plugin/task/pigeon/PigeonTaskTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1215,7 +1235,7 @@
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-task-plugin</module>
-<!--        <module>dolphinscheduler-ui</module>-->
+        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
@@ -1226,5 +1246,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-standalone-server</module>
+        <module>dolphinscheduler-python</module>
     </modules>
 </project>

@@ -78,7 +78,7 @@ public class EmailAlertPluginTest {
         map1.put("mysql service name", "mysql200");
         map1.put("mysql address", "192.168.xx.xx");
         map1.put("port", "3306");
-        map1.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
+        map1.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TEXT.getDescp());
         map1.put("no index of number", "80");
         map1.put("database client connections", "190");
 
@@ -87,7 +87,7 @@ public class EmailAlertPluginTest {
         map2.put("mysql address", "192.168.xx.xx");
         map2.put("port", "3306");
         map2.put("no index of number", "10");
-        map1.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        map1.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());
         map2.put("database client connections", "90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
@@ -216,7 +216,7 @@ public class EmailAlertPluginTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
+        RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, "showType")
                 .setOptions(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())

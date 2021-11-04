@@ -707,7 +707,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         List<Task> taskList = new ArrayList<>();
         for (String node : nodeList) {
-            TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstanceId, node);
+            TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, Long.parseLong(node));
             if (taskInstance == null) {
                 continue;
             }

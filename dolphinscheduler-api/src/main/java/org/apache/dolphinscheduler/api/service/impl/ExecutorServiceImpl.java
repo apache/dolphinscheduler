@@ -133,7 +133,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Long environmentCode,Integer timeout,
-                                                   Map<String, String> startParams, Integer expectedParallelismNumber) {
+                                                   Map<String, String> startParams, Integer expectedParallelismNumber,
+                                                   int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -170,7 +171,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          */
         int create = this.createCommand(commandType, processDefinition.getCode(),
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber);
+                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -282,13 +283,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         switch (executeType) {
             case REPEAT_RUNNING:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.REPEAT_RUNNING, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams);
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
                 break;
             case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
                 break;
             case STOP:
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
@@ -408,10 +409,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param loginUser           login user
      * @param instanceId          instance id
      * @param processDefinitionCode process definition code
+     * @param version
      * @param commandType         command type
      * @return insert result code
      */
-    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode, CommandType commandType, String startParams) {
+    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode, int processVersion, CommandType commandType, String startParams) {
         Map<String, Object> result = new HashMap<>();
 
         //To add startParams only when repeat running is needed
@@ -426,6 +428,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
+        command.setProcessDefinitionVersion(processVersion);
+        command.setProcessInstanceId(instanceId);
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
             putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionCode);
@@ -507,7 +511,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup, Long environmentCode,
-                              Map<String, String> startParams, Integer expectedParallelismNumber) {
+                              Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun) {
 
         /**
          * instantiate command schedule instance
@@ -543,6 +547,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessInstancePriority(processInstancePriority);
         command.setWorkerGroup(workerGroup);
         command.setEnvironmentCode(environmentCode);
+        command.setDryRun(dryRun);
+        ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(processDefineCode);
+        if (processDefinition != null) {
+            command.setProcessDefinitionVersion(processDefinition.getVersion());
+        }
+        command.setProcessInstanceId(0);
 
         Date start = null;
         Date end = null;
@@ -602,15 +612,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         createCount = Math.min(listDate.size(), expectedParallelismNumber);
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
+
+                    listDate.addLast(end);
                     int chunkSize = listDate.size() / createCount;
 
                     for (int i = 0; i < createCount; i++) {
                         int rangeStart = i == 0 ? i : (i * chunkSize);
                         int rangeEnd = i == createCount - 1 ? listDate.size() - 1
                                 : rangeStart + chunkSize;
-                        if (rangeEnd == listDate.size()) {
-                            rangeEnd = listDate.size() - 1;
-                        }
+
                         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(listDate.get(rangeStart)));
                         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(rangeEnd)));
                         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
