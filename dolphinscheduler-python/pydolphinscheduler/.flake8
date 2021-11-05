@@ -15,4 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Init tasks package tests."""
+[flake8]
+max-line-length = 110
+exclude =
+    .git,
+    __pycache__,
+    .pytest_cache,
+    *.egg-info,
+    docs/source/conf.py
+    old,
+    build,
+    dist,
+    htmlcov
+ignore = 
+    # It's clear and not need to add docstring
+    D107,  # D107: Don't require docstrings on __init__
+    D105,  # D105: Missing docstring in magic method
+    # Conflict to Black
+    W503   # W503: Line breaks before binary operators
+per-file-ignores =
+    src/pydolphinscheduler/side/__init__.py:F401
