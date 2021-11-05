@@ -19,8 +19,9 @@ import pytest
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault, ProcessDefinitionReleaseState
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.core.task import TaskParams
 from pydolphinscheduler.side import Tenant, Project, User
+from tests.testing.task import Task
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
@@ -48,6 +49,7 @@ def test_process_definition_key_attr(func):
                       ProcessDefinitionDefault.TENANT,
                       ProcessDefinitionDefault.QUEUE,
                       ProcessDefinitionDefault.USER_STATE)),
+        ("worker_group", ProcessDefinitionDefault.WORKER_GROUP),
         ("release_state", ProcessDefinitionReleaseState.ONLINE),
     ],
 )
@@ -62,6 +64,7 @@ def test_process_definition_default_value(name, value):
     [
         ("project", Project, "project"),
         ("tenant", Tenant, "tenant"),
+        ("worker_group", str, "worker_group"),
     ],
 )
 def test_process_definition_set_attr(name, cls, expect):
@@ -77,6 +80,7 @@ def test_process_definition_to_dict_without_task():
         "description": None,
         "project": ProcessDefinitionDefault.PROJECT,
         "tenant": ProcessDefinitionDefault.TENANT,
+        "workerGroup": ProcessDefinitionDefault.WORKER_GROUP,
         "timeout": 0,
         "releaseState": ProcessDefinitionReleaseState.ONLINE,
         "param": None,

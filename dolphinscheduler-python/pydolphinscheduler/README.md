@@ -19,6 +19,8 @@
 
 # pydolphinscheduler
 
+[![GitHub Build][ga-py-test]][ga]
+
 pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
 
@@ -47,7 +49,7 @@ section "DolphinScheduler Standalone Quick Start" to set up developer environmen
 and frontend server in this step, which mean that you could view DolphinScheduler UI in your browser with URL
 http://localhost:12345/dolphinscheduler
 
-After backend server is being start, all requests from `pydolphinscheduler` would be sends to backend server.
+After backend server is being start, all requests from `pydolphinscheduler` would be sent to backend server.
 And for now we could run a simple example by:
 
 ```shell
@@ -78,7 +80,7 @@ just open directory `dolphinscheduler-python/pydolphinscheduler` instead of `dol
 ### Brief Concept
 
 Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
-define by code, user usually do not care user, tanant, or queue exists or not. All user care about is create
+define by code, user usually do not care user, tenant, or queue exists or not. All user care about is created
 a new workflow by the code his/her definition. So we have some **side object** in `pydolphinscheduler/side`
 directory, their only check object exists or not, and create them if not exists. 
 
@@ -91,9 +93,20 @@ other word for more simple).
 
 pydolphinscheduler tasks object, we use tasks to define exact job we want DolphinScheduler do for us. For now,
 we only support `shell` task to execute shell task. [This link][all-task] list all tasks support in DolphinScheduler
-and would be implement in the further.
+and would be implemented in the further.
 
+### Testing
 
+pydolphinscheduler using [pytest][pytest] to test our codebase. GitHub Action will run our test when you create
+pull request or commit to dev branch, with python version `3.6|3.7|3.8|3.9` and operating system `linux|macOS|windows`.
+
+To test locally, you could directly run pytest after set `PYTHONPATH` 
+
+```shell
+PYTHONPATH=src/ pytest
+```
+
+<!-- content -->
 [pypi]: https://pypi.org/
 [dev-setup]: https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html
 [ui-project]: http://8.142.34.29:12345/dolphinscheduler/ui/#/projects/list
@@ -101,3 +114,7 @@ and would be implement in the further.
 [pycharm]: https://www.jetbrains.com/pycharm
 [idea]: https://www.jetbrains.com/idea/
 [all-task]: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/task/shell.html
+[pytest]: https://docs.pytest.org/en/latest/
+<!-- badge -->
+[ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev
+[ga]: https://github.com/apache/dolphinscheduler/actions
