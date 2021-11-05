@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -30,173 +31,175 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- *  netty executor manager
+ * netty executor manager
  */
 @Service
-public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
+public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
-    private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
+	private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
-    /**
-     * server node manager
-     */
-    @Autowired
-    private ServerNodeManager serverNodeManager;
+	/**
+	 * server node manager
+	 */
+	@Autowired
+	private ServerNodeManager serverNodeManager;
 
-    /**
-     * netty remote client
-     */
-    private final NettyRemotingClient nettyRemotingClient;
+	/**
+	 * netty remote client
+	 */
+	private final NettyRemotingClient nettyRemotingClient;
 
-    /**
-     * constructor
-     */
-    public NettyExecutorManager(){
-        final NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
-    }
+	/**
+	 * constructor
+	 */
+	public NettyExecutorManager() {
+		final NettyClientConfig clientConfig = new NettyClientConfig();
+		this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+	}
 
-    @PostConstruct
-    public void init(){
-        /**
-         * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
-         * register EXECUTE_TASK_ACK command type TaskAckProcessor
-         */
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
-    }
+	@PostConstruct
+	public void init() {
+		/**
+		 * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
+		 * register EXECUTE_TASK_ACK command type TaskAckProcessor
+		 */
+		this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+		this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+		this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+	}
 
-    /**
-     * execute logic
-     * @param context context
-     * @return result
-     * @throws ExecuteException if error throws ExecuteException
-     */
-    @Override
-    public Boolean execute(ExecutionContext context) throws ExecuteException {
+	/**
+	 * execute logic
+	 *
+	 * @param context context
+	 * @return result
+	 * @throws ExecuteException if error throws ExecuteException
+	 */
+	@Override
+	public Boolean execute(ExecutionContext context) throws ExecuteException {
 
-        /**
-         *  all nodes
-         */
-        Set<String> allNodes = getAllNodes(context);
+		/**
+		 *  all nodes
+		 */
+		Set<String> allNodes = getAllNodes(context);
 
-        /**
-         * fail nodes
-         */
-        Set<String> failNodeSet = new HashSet<>();
+		/**
+		 * fail nodes
+		 */
+		Set<String> failNodeSet = new HashSet<>();
 
-        /**
-         *  build command accord executeContext
-         */
-        Command command = context.getCommand();
+		/**
+		 *  build command accord executeContext
+		 */
+		Command command = context.getCommand();
 
-        /**
-         * execute task host
-         */
-        Host host = context.getHost();
-        boolean success = false;
-        while (!success) {
-            try {
-                doExecute(host,command);
-                success = true;
-                context.setHost(host);
-            } catch (ExecuteException ex) {
-                logger.error(String.format("execute command : %s error", command), ex);
-                try {
-                    failNodeSet.add(host.getAddress());
-                    Set<String> tmpAllIps = new HashSet<>(allNodes);
-                    Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
-                    if (remained != null && remained.size() > 0) {
-                        host = Host.of(remained.iterator().next());
-                        logger.error("retry execute command : {} host : {}", command, host);
-                    } else {
-                        throw new ExecuteException("fail after try all nodes");
-                    }
-                } catch (Throwable t) {
-                    throw new ExecuteException("fail after try all nodes");
-                }
-            }
-        }
+		/**
+		 * execute task host
+		 */
+		Host host = context.getHost();
+		boolean success = false;
+		while (!success) {
+			try {
+				doExecute(host, command);
+				success = true;
+				context.setHost(host);
+			} catch (ExecuteException ex) {
+				logger.error(String.format("execute command : %s error", command), ex);
+				try {
+					failNodeSet.add(host.getAddress());
+					Set<String> tmpAllIps = new HashSet<>(allNodes);
+					Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
+					if (remained != null && remained.size() > 0) {
+						host = Host.of(remained.iterator().next());
+						logger.error("retry execute command : {} host : {}", command, host);
+					} else {
+						throw new ExecuteException("fail after try all nodes");
+					}
+				} catch (Throwable t) {
+					throw new ExecuteException("fail after try all nodes");
+				}
+			}
+		}
 
-        return success;
-    }
+		return success;
+	}
 
-    @Override
-    public void executeDirectly(ExecutionContext context) throws ExecuteException {
-        Host host = context.getHost();
-        doExecute(host, context.getCommand());
-    }
+	@Override
+	public void executeDirectly(ExecutionContext context) throws ExecuteException {
+		Host host = context.getHost();
+		doExecute(host, context.getCommand());
+	}
 
-    /**
-     *  execute logic
-     * @param host host
-     * @param command command
-     * @throws ExecuteException if error throws ExecuteException
-     */
-    public void doExecute(final Host host, final Command command) throws ExecuteException {
-        /**
-         * retry count，default retry 3
-         */
-        int retryCount = 3;
-        boolean success = false;
-        do {
-            try {
-                nettyRemotingClient.send(host, command);
-                success = true;
-            } catch (Exception ex) {
-                logger.error(String.format("send command : %s to %s error", command, host), ex);
-                retryCount--;
-                ThreadUtils.sleep(100);
-            }
-        } while (retryCount >= 0 && !success);
+	/**
+	 * execute logic
+	 *
+	 * @param host    host
+	 * @param command command
+	 * @throws ExecuteException if error throws ExecuteException
+	 */
+	public void doExecute(final Host host, final Command command) throws ExecuteException {
+		/**
+		 * retry count，default retry 3
+		 */
+		int retryCount = 3;
+		boolean success = false;
+		do {
+			try {
+				nettyRemotingClient.send(host, command);
+				success = true;
+			} catch (Exception ex) {
+				logger.error(String.format("send command : %s to %s error", command, host), ex);
+				retryCount--;
+				ThreadUtils.sleep(100);
+			}
+		} while (retryCount >= 0 && !success);
 
-        if (!success) {
-            throw new ExecuteException(String.format("send command : %s to %s error", command, host));
-        }
-    }
+		if (!success) {
+			//Because the number of errors exceeds the limit, there may be work errors, or the channel has failed.
+            //THE channel must to be closed.
+			nettyRemotingClient.closeChannel(host);
+			throw new ExecuteException(String.format("send command : %s to %s error", command, host));
+		}
+	}
 
-    /**
-     *  get all nodes
-     * @param context context
-     * @return nodes
-     */
-    private Set<String> getAllNodes(ExecutionContext context){
-        Set<String> nodes = Collections.emptySet();
-        /**
-         * executor type
-         */
-        ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
-            case WORKER:
-                nodes = serverNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
-                break;
-            case CLIENT:
-                break;
-            default:
-                throw new IllegalArgumentException("invalid executor type : " + executorType);
+	/**
+	 * get all nodes
+	 *
+	 * @param context context
+	 * @return nodes
+	 */
+	private Set<String> getAllNodes(ExecutionContext context) {
+		Set<String> nodes = Collections.emptySet();
+		/**
+		 * executor type
+		 */
+		ExecutorType executorType = context.getExecutorType();
+		switch (executorType) {
+			case WORKER:
+				nodes = serverNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
+				break;
+			case CLIENT:
+				break;
+			default:
+				throw new IllegalArgumentException("invalid executor type : " + executorType);
 
-        }
-        return nodes;
-    }
+		}
+		return nodes;
+	}
 
-    public NettyRemotingClient getNettyRemotingClient() {
-        return nettyRemotingClient;
-    }
+	public NettyRemotingClient getNettyRemotingClient() {
+		return nettyRemotingClient;
+	}
 }
