@@ -16,11 +16,14 @@
 # under the License.
 
 """
-This example show you how to create workflows in batch mode. After this example run, we will create 10
-workflows named `workflow:<workflow_num>`, and with 3 tasks named `task:<task_num>-workflow:<workflow_num>`
-in each workflow. Each workflow is linear shape as below, since we set `IS_CHAIN=True`
+This example show you how to create workflows in batch mode.
+
+After this example run, we will create 10 workflows named `workflow:<workflow_num>`, and with 3 tasks
+named `task:<task_num>-workflow:<workflow_num>` in each workflow. Task shape as below
 
 task:1-workflow:1 -> task:2-workflow:1 -> task:3-workflow:1
+
+Each workflow is linear since we set `IS_CHAIN=True`, you could change task to parallel by set it to `False`.
 """
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition

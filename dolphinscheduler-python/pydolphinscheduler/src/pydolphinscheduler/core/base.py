@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler Base object."""
+
 from typing import Optional, Dict
 
 # from pydolphinscheduler.side.user import User
@@ -22,24 +24,15 @@ from pydolphinscheduler.utils.string import attr2camel
 
 
 class Base:
-    """
-    Base
-    """
+    """DolphinScheduler Base object."""
 
-    _KEY_ATTR: set = {
-        "name",
-        "description"
-    }
+    _KEY_ATTR: set = {"name", "description"}
 
     _TO_DICT_ATTR: set = set()
 
     DEFAULT_ATTR: Dict = {}
 
-    def __init__(
-            self,
-            name: str,
-            description: Optional[str] = None
-    ):
+    def __init__(self, name: str, description: Optional[str] = None):
         self.name = name
         self.description = description
 
@@ -47,12 +40,18 @@ class Base:
         return f'<{type(self).__name__}: name="{self.name}">'
 
     def __eq__(self, other):
-        return type(self) == type(other) and \
-               all(getattr(self, a, None) == getattr(other, a, None) for a in self._KEY_ATTR)
+        return type(self) == type(other) and all(
+            getattr(self, a, None) == getattr(other, a, None) for a in self._KEY_ATTR
+        )
 
     # TODO check how Redash do
     # TODO DRY
     def to_dict(self, camel_attr=True) -> Dict:
+        """Get object key attribute dict.
+
+        use attribute `self._TO_DICT_ATTR` to determine which attributes should including to
+        children `to_dict` function.
+        """
         # content = {}
         # for attr, value in self.__dict__.items():
         #     # Don't publish private variables
