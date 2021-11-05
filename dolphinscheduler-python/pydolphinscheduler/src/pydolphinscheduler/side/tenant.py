@@ -15,31 +15,31 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler Tenant object."""
+
 from typing import Optional
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault
 from pydolphinscheduler.core.base_side import BaseSide
-from pydolphinscheduler.java_gateway import launch_gateway, gateway_result_checker
+from pydolphinscheduler.java_gateway import launch_gateway
 
 
 class Tenant(BaseSide):
-    """
-    Tenant
-    """
+    """DolphinScheduler Tenant object."""
 
     def __init__(
-            self,
-            name: str = ProcessDefinitionDefault.TENANT,
-            queue: str = ProcessDefinitionDefault.QUEUE,
-            description: Optional[str] = None
+        self,
+        name: str = ProcessDefinitionDefault.TENANT,
+        queue: str = ProcessDefinitionDefault.QUEUE,
+        description: Optional[str] = None,
     ):
         super().__init__(name, description)
         self.queue = queue
 
-    def create_if_not_exists(self, queue_name: str, user=ProcessDefinitionDefault.USER) -> None:
-        """
-        Create Tenant if not exists
-        """
+    def create_if_not_exists(
+        self, queue_name: str, user=ProcessDefinitionDefault.USER
+    ) -> None:
+        """Create Tenant if not exists."""
         gateway = launch_gateway()
-        result = gateway.entry_point.createTenant(self.name, self.description, queue_name)
+        gateway.entry_point.createTenant(self.name, self.description, queue_name)
         # gateway_result_checker(result, None)

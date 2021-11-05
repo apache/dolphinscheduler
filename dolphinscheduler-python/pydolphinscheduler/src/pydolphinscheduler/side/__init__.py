@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Init Side package, Side package keep object related to DolphinScheduler but not in the Core part."""
+
 from pydolphinscheduler.side.project import Project
 from pydolphinscheduler.side.tenant import Tenant
 from pydolphinscheduler.side.user import User
