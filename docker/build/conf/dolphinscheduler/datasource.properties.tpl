@@ -22,7 +22,7 @@ spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
 
 # mysql example
-#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+#spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 #spring.datasource.url=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
 #spring.datasource.username=ds_user
 #spring.datasource.password=dolphinscheduler

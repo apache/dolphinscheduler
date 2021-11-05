@@ -51,7 +51,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
-    private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
+    private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false&useSSL=false";
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
@@ -95,7 +95,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_MYSQL_JDBC_DRIVER;
+        return Constants.COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
     @Override

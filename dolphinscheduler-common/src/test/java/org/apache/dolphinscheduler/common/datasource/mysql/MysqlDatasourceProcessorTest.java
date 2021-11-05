@@ -63,7 +63,7 @@ public class MysqlDatasourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
+        Assert.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test

@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.d
 import static org.apache.dolphinscheduler.plugin.task.datasource.PasswordUtils.encodePassword;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_MYSQL_JDBC_DRIVER;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.COM_MYSQL_CJ_JDBC_DRIVER;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JDBC_MYSQL;
 
@@ -101,7 +101,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return COM_MYSQL_JDBC_DRIVER;
+        return COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
     @Override

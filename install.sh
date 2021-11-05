@@ -30,7 +30,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     txt="''"
 fi
 
-datasourceDriverClassname="com.mysql.jdbc.Driver"
+datasourceDriverClassname="com.mysql.cj.jdbc.Driver"
 if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
