@@ -185,6 +185,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
         List<WorkerGroup> workerGroups = getWorkerGroups(true);
         List<WorkerGroup> resultDataList = new ArrayList<>();
+        int total = 0;
 
         if (CollectionUtils.isNotEmpty(workerGroups)) {
             List<WorkerGroup> searchValDataList = new ArrayList<>();
@@ -198,7 +199,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             } else {
                 searchValDataList = workerGroups;
             }
-
+            total = searchValDataList.size();
             if (fromIndex < searchValDataList.size()) {
                 if (toIndex > searchValDataList.size()) {
                     toIndex = searchValDataList.size();
@@ -208,7 +209,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal(resultDataList.size());
+        pageInfo.setTotal(total);
         pageInfo.setTotalList(resultDataList);
 
         result.setData(pageInfo);
