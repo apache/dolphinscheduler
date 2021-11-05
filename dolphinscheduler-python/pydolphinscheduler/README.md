@@ -20,6 +20,7 @@
 # pydolphinscheduler
 
 [![GitHub Build][ga-py-test]][ga]
+[![Code style: black][black-shield]][black-gh]
 
 pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
@@ -39,7 +40,7 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 # Install pydolphinscheduler from source
 cd dolphinscheduler-python/pydolphinscheduler
-pip setup.py install
+pip install -e .
 ```
 
 ### Start Server And Run Example
@@ -77,6 +78,12 @@ We already clone the code in [quick start](#quick-start), so next step we have t
 in you editor. We recommend you use [pycharm][pycharm] instead of [IntelliJ IDEA][idea] to open it. And you could
 just open directory `dolphinscheduler-python/pydolphinscheduler` instead of `dolphinscheduler-python`.
 
+Then you should add developer dependence to make sure you could run test and check code style locally
+
+```shell
+pip install -r requirements_dev.txt
+```
+
 ### Brief Concept
 
 Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
@@ -94,6 +101,25 @@ other word for more simple).
 pydolphinscheduler tasks object, we use tasks to define exact job we want DolphinScheduler do for us. For now,
 we only support `shell` task to execute shell task. [This link][all-task] list all tasks support in DolphinScheduler
 and would be implemented in the further.
+
+### Code Style
+
+We use [Black][black] for code formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]
+or [IntelliJ IDEA][idea], maybe you could follow [Black-integration][black-editor] to configure them in your environment.
+
+Our Python API CI would automatically run unittest when you submit pull request in GitHub, you could also run
+static check locally.
+
+```shell
+# We recommend you run Black before Flake8, because Black could auto fix some code style issue
+# but Flake8 just hint when code style not match pep8
+
+# Run Black
+black .
+
+# Run Flake8
+flake8
+```
 
 ### Testing
 
@@ -115,6 +141,11 @@ PYTHONPATH=src/ pytest
 [idea]: https://www.jetbrains.com/idea/
 [all-task]: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/task/shell.html
 [pytest]: https://docs.pytest.org/en/latest/
+[black]: https://black.readthedocs.io/en/stable/index.html
+[flake8]: https://flake8.pycqa.org/en/latest/index.html
+[black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 <!-- badge -->
-[ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev
+[ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
+[black-shield]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-gh]: https://github.com/psf/black
