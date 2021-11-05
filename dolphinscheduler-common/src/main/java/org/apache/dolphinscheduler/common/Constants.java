@@ -876,6 +876,12 @@ public final class Constants {
         ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.SERIAL_WAIT.ordinal()
+    };
+
     /**
      * status
      */

@@ -281,6 +281,7 @@ class ProcessDefinition(Base):
             # TODO add serialization function
             json.dumps(self.task_relation_json),
             json.dumps(self.task_definition_json),
+            None,
         )
         return self._process_definition_code
 
