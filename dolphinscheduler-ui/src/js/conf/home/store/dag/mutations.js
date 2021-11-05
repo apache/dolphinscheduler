@@ -64,6 +64,12 @@ export default {
     state.timeout = payload
   },
   /**
+   * set executionType
+   */
+  setExecutionType (state, payload) {
+    state.executionType = payload
+  },
+  /**
    * set tenantCode
    */
   setTenantCode (state, payload) {
@@ -113,6 +119,7 @@ export default {
     state.name = (payload && payload.name) || ''
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
+    state.executionType = (payload && payload.executionType) || 'PARALLEL'
     state.tenantCode = (payload && payload.tenantCode) || 'default'
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []

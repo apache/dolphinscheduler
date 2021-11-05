@@ -266,7 +266,7 @@
        * Return run type
        */
       _rtRunningType (code) {
-        return _.filter(runningType, v => v.code === code)[0].desc
+        return (_.filter(runningType, v => v.code === code)[0] || {}).desc
       },
       /**
        * Return status

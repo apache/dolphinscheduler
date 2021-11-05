@@ -143,6 +143,9 @@ export default {
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
         state.timeout = res.data.processDefinition.timeout
+        // executionType
+        state.executionType = res.data.processDefinition.executionType
+        // tenantId
         // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
@@ -240,6 +243,8 @@ export default {
         state.globalParams = processDefinition.globalParamList
         // timeout
         state.timeout = processDefinition.timeout
+        // executionType
+        state.executionType = processDefinition.executionType
         // tenantCode
         state.tenantCode = res.data.tenantCode || 'default'
         // tasks info
@@ -282,6 +287,7 @@ export default {
         taskDefinitionJson: JSON.stringify(state.tasks),
         taskRelationJson: JSON.stringify(state.connects),
         tenantCode: state.tenantCode,
+        executionType: state.executionType,
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout
@@ -303,6 +309,7 @@ export default {
         taskDefinitionJson: JSON.stringify(state.tasks),
         taskRelationJson: JSON.stringify(state.connects),
         tenantCode: state.tenantCode,
+        executionType: state.executionType,
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout,

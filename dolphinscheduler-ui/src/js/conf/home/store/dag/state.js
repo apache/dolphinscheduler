@@ -37,6 +37,8 @@ export default {
   tasks: [],
   // Timeout alarm
   timeout: 0,
+  // process execute type
+  executionType: 'PARALLEL',
   // tenant code
   tenantCode: 'default',
   // Node location information
