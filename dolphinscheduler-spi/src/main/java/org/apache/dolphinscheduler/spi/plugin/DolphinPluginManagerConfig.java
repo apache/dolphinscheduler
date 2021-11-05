@@ -65,7 +65,7 @@ public class DolphinPluginManagerConfig {
      */
     private final String defaultLocalRepository = System.getProperty("user.home") + "/.m2/repository";
     private String mavenLocalRepository = getMavenLocalRepositoryOrDefault(defaultLocalRepository);
-    private List<String> mavenRemoteRepository = ImmutableList.of("http://repo1.maven.org/maven2/");
+    private List<String> mavenRemoteRepository = ImmutableList.of("https://repo1.maven.org/maven2/");
 
     File getInstalledPluginsDir() {
         return installedPluginsDir;
