@@ -54,7 +54,7 @@ def test_process_definition_key_attr(func):
                 ProcessDefinitionDefault.USER_PHONE,
                 ProcessDefinitionDefault.TENANT,
                 ProcessDefinitionDefault.QUEUE,
-                ProcessDefinitionDefault.USER_STATE
+                ProcessDefinitionDefault.USER_STATE,
             ),
         ),
         ("worker_group", ProcessDefinitionDefault.WORKER_GROUP),
