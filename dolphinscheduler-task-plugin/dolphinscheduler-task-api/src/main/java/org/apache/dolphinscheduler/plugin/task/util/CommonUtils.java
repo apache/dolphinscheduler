@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.LOGIN_USER_KEY_
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.RESOURCE_STORAGE_TYPE;
 
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -39,6 +40,8 @@ import java.io.IOException;
  * common utils
  */
 public class CommonUtils {
+
+    public static final String resourceUploadPath = PropertyUtils.getString(TaskConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
@@ -101,6 +104,38 @@ public class CommonUtils {
             return true;
         }
         return false;
+    }
+
+    /**
+     * hdfs udf dir
+     *
+     * @param tenantCode tenant code
+     * @return get udf dir on hdfs
+     */
+    public static String getHdfsUdfDir(String tenantCode) {
+        return String.format("%s/udfs", getHdfsTenantDir(tenantCode));
+    }
+
+    /**
+     * @param tenantCode tenant code
+     * @return file directory of tenants on hdfs
+     */
+    public static String getHdfsTenantDir(String tenantCode) {
+        return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
+    }
+
+    /**
+     * get data hdfs path
+     *
+     * @return data hdfs path
+     */
+    public static String getHdfsDataBasePath() {
+        if ("/".equals(resourceUploadPath)) {
+            // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
+            return "";
+        } else {
+            return resourceUploadPath;
+        }
     }
 
 }

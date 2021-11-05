@@ -23,10 +23,12 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
@@ -34,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -92,27 +95,39 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps;
+    /**
+     * process timeout check list
+     */
     ConcurrentHashMap<Integer, ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
+
+    /**
+     * task time out checkout list
+     */
     ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
+
+    /**
+     * key:code-version
+     * value: processDefinition
+     */
+    HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
      * constructor of MasterSchedulerService
      */
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-        this.processInstanceExecMaps = processInstanceExecMaps;
+    public void init() {
         this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
         stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
                 taskTimeoutCheckList,
-                this.processInstanceExecMaps,
+                this.processInstanceExecCacheManager,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
-
     }
 
     @Override
@@ -165,7 +180,6 @@ public class MasterSchedulerService extends Thread {
      */
     private void scheduleProcess() throws Exception {
 
-        int activeCount = masterExecService.getActiveCount();
         // make sure to scan and delete command  table in one transaction
         Command command = findOneCommand();
         if (command != null) {
@@ -173,7 +187,12 @@ public class MasterSchedulerService extends Thread {
             try {
                 ProcessInstance processInstance = processService.handleCommand(logger,
                         getLocalAddress(),
-                        this.masterConfig.getMasterExecThreads() - activeCount, command);
+                        command,
+                        processDefinitionCacheMaps);
+                if (!masterConfig.getMasterCacheProcessDefinition()
+                        && processDefinitionCacheMaps.size() > 0) {
+                    processDefinitionCacheMaps.clear();
+                }
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
@@ -183,11 +202,11 @@ public class MasterSchedulerService extends Thread {
                             , masterConfig
                             , taskTimeoutCheckList);
 
-                    this.processInstanceExecMaps.put(processInstance.getId(), workflowExecuteThread);
+                    this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
                     if (processInstance.getTimeout() > 0) {
                         this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
                     }
-                    logger.info("command {} process {} start...",
+                    logger.info("handle command end, command {} process {} start...",
                             command.getId(), processInstance.getId());
                     masterExecService.execute(workflowExecuteThread);
                 }

@@ -218,7 +218,7 @@ export default {
 
     // Authorized project
     const p1 = new Promise((resolve, reject) => {
-      io.get(`${o.category}/authorize-resource-tree`, param, res => {
+      io.get(`${o.category}/authed-resource-tree`, param, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -398,7 +398,7 @@ export default {
    */
   queryAllAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/list', payload, res => {
+      io.get('alert-plugin-instances/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -482,7 +482,7 @@ export default {
    */
   deletAelertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`alert-plugin-instance/${payload.id}`, payload, res => {
+      io.delete(`alert-plugin-instances/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

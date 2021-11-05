@@ -149,6 +149,11 @@ public class TaskRequest {
     private String envFile;
 
     /**
+     * environmentConfig
+     */
+    private String environmentConfig;
+
+    /**
      * definedParams
      */
     private Map<String, String> definedParams;
@@ -178,7 +183,18 @@ public class TaskRequest {
      */
     private int delayTime;
 
+    /**
+     *  Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     */
+    private String taskLogName;
 
+    public String getTaskLogName() {
+        return taskLogName;
+    }
+
+    public void setTaskLogName(String taskLogName) {
+        this.taskLogName = taskLogName;
+    }
 
     /**
      * resources full name and tenant code
@@ -399,6 +415,14 @@ public class TaskRequest {
 
     public void setEnvFile(String envFile) {
         this.envFile = envFile;
+    }
+
+    public String getEnvironmentConfig() {
+        return environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String config) {
+        this.environmentConfig = config;
     }
 
     public Map<String, String> getDefinedParams() {

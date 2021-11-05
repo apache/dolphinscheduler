@@ -16,30 +16,54 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.SchemaUtils;
+import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 
 import org.apache.commons.lang.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.sql.DataSource;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
 
@@ -266,9 +290,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @param schemaDir schema dir
      */
     public void upgradeDolphinScheduler(String schemaDir) {
-
-        upgradeDolphinSchedulerDDL(schemaDir);
-
+        upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl.sql");
         upgradeDolphinSchedulerDML(schemaDir);
     }
 
@@ -287,6 +309,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     public void upgradeDolphinSchedulerResourceList() {
         updateProcessDefinitionJsonResourceList();
+    }
+
+    /**
+     * upgrade DolphinScheduler to 2.0.0
+     */
+    public void upgradeDolphinSchedulerTo200(String schemaDir) {
+        processDefinitionJsonSplit();
+        upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl_post.sql");
     }
 
     /**
@@ -474,11 +504,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      *
      * @param schemaDir schemaDir
      */
-    private void upgradeDolphinSchedulerDDL(String schemaDir) {
+    private void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/{3}", rootDir, schemaDir, getDbType().name().toLowerCase(), scriptFile);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -510,7 +540,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         } finally {
             ConnectionUtils.releaseResource(pstmt, conn);
         }
-
     }
 
 
@@ -543,4 +572,181 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * upgrade DolphinScheduler to 2.0.0, json split
+     */
+    private void processDefinitionJsonSplit() {
+        ProjectDao projectDao = new ProjectDao();
+        ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
+        ScheduleDao scheduleDao = new ScheduleDao();
+        JsonSplitDao jsonSplitDao = new JsonSplitDao();
+        try {
+            // execute project
+            Map<Integer, Long> projectIdCodeMap = projectDao.queryAllProject(dataSource.getConnection());
+            projectDao.updateProjectCode(dataSource.getConnection(), projectIdCodeMap);
+
+            // execute process definition code
+            List<ProcessDefinition> processDefinitions = processDefinitionDao.queryProcessDefinition(dataSource.getConnection());
+            processDefinitionDao.updateProcessDefinitionCode(dataSource.getConnection(), processDefinitions, projectIdCodeMap);
+
+            // execute schedule
+            Map<Integer, Long> allSchedule = scheduleDao.queryAllSchedule(dataSource.getConnection());
+            Map<Integer, Long> processIdCodeMap = processDefinitions.stream().collect(Collectors.toMap(ProcessDefinition::getId, ProcessDefinition::getCode));
+            scheduleDao.updateScheduleCode(dataSource.getConnection(), allSchedule, processIdCodeMap);
+
+            // json split
+            Map<Integer, String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
+            List<ProcessDefinitionLog> processDefinitionLogs = new ArrayList<>();
+            List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+            List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+            splitProcessDefinitionJson(processDefinitions, processDefinitionJsonMap, processDefinitionLogs, processTaskRelationLogs, taskDefinitionLogs);
+
+            // execute json split
+            jsonSplitDao.executeJsonSplitProcessDefinition(dataSource.getConnection(), processDefinitionLogs);
+            jsonSplitDao.executeJsonSplitProcessTaskRelation(dataSource.getConnection(), processTaskRelationLogs);
+            jsonSplitDao.executeJsonSplitTaskDefinition(dataSource.getConnection(), taskDefinitionLogs);
+        } catch (Exception e) {
+            logger.error("json split error", e);
+        }
+    }
+
+    private void splitProcessDefinitionJson(List<ProcessDefinition> processDefinitions,
+                                            Map<Integer, String> processDefinitionJsonMap,
+                                            List<ProcessDefinitionLog> processDefinitionLogs,
+                                            List<ProcessTaskRelationLog> processTaskRelationLogs,
+                                            List<TaskDefinitionLog> taskDefinitionLogs) throws Exception {
+        Map<Integer, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
+                .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
+        Date now = new Date();
+        for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()) {
+            if (entry.getValue() == null) {
+                throw new Exception("processDefinitionJson is null");
+            }
+            ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
+            ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
+            if (processDefinition != null) {
+                processDefinition.setTenantId(jsonObject.get("tenantId").asInt());
+                processDefinition.setTimeout(jsonObject.get("timeout").asInt());
+                processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
+            } else {
+                throw new Exception("It can't find processDefinition, please check !");
+            }
+            Map<String, Long> taskIdCodeMap = new HashMap<>();
+            Map<String, List<String>> taskNamePreMap = new HashMap<>();
+            Map<String, Long> taskNameCodeMap = new HashMap<>();
+            ArrayNode tasks = JSONUtils.parseArray(jsonObject.get("tasks").toString());
+            for (int i = 0; i < tasks.size(); i++) {
+                ObjectNode task = (ObjectNode) tasks.path(i);
+                ObjectNode param = (ObjectNode) task.get("params");
+                TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+                if (param != null) {
+                    List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
+                    if (!resourceList.isEmpty()) {
+                        List<Integer> resourceIds = resourceList.stream().map(ResourceInfo::getId).collect(Collectors.toList());
+                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, ","));
+                    }
+                    param.put("conditionResult", task.get("conditionResult"));
+                    param.put("dependence", task.get("dependence"));
+                    taskDefinitionLog.setTaskParams(param.toString());
+                }
+                TaskTimeoutParameter timeout = JSONUtils.parseObject(JSONUtils.toJsonString(task.get("timeout")), TaskTimeoutParameter.class);
+                if (timeout != null) {
+                    taskDefinitionLog.setTimeout(timeout.getInterval());
+                    taskDefinitionLog.setTimeoutFlag(timeout.getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
+                    taskDefinitionLog.setTimeoutNotifyStrategy(timeout.getStrategy());
+                }
+                taskDefinitionLog.setDescription(task.get("description").toString());
+                taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").toString()) ? Flag.YES : Flag.NO);
+                taskDefinitionLog.setTaskType(task.get("type").toString());
+                taskDefinitionLog.setFailRetryInterval(task.get("retryInterval").asInt());
+                taskDefinitionLog.setFailRetryTimes(task.get("maxRetryTimes").asInt());
+                taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
+                String name = task.get("name").toString();
+                taskDefinitionLog.setName(name);
+                taskDefinitionLog.setWorkerGroup(task.get("workerGroup").toString());
+                long taskCode = SnowFlakeUtils.getInstance().nextId();
+                taskDefinitionLog.setCode(taskCode);
+                taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
+                taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());
+                taskDefinitionLog.setUserId(processDefinition.getUserId());
+                taskDefinitionLog.setEnvironmentCode(-1);
+                taskDefinitionLog.setDelayTime(0);
+                taskDefinitionLog.setOperator(1);
+                taskDefinitionLog.setOperateTime(now);
+                taskDefinitionLog.setCreateTime(now);
+                taskDefinitionLog.setUpdateTime(now);
+                taskDefinitionLogs.add(taskDefinitionLog);
+                taskIdCodeMap.put(task.get("id").toString(), taskCode);
+                List<String> preTasks = JSONUtils.toList(task.get("preTasks").toString(), String.class);
+                taskNamePreMap.put(name, preTasks);
+                taskNameCodeMap.put(name, taskCode);
+            }
+            processDefinition.setLocations(convertLocations(processDefinition.getLocations(), taskIdCodeMap));
+            ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+            processDefinitionLog.setOperator(1);
+            processDefinitionLog.setOperateTime(now);
+            processDefinitionLog.setUpdateTime(now);
+            processDefinitionLogs.add(processDefinitionLog);
+            handleProcessTaskRelation(taskNamePreMap, taskNameCodeMap, processDefinition, processTaskRelationLogs);
+        }
+    }
+
+    private String convertLocations(String locations, Map<String, Long> taskIdCodeMap) {
+        if (StringUtils.isBlank(locations)) {
+            return locations;
+        }
+        Map<String, String> locationsMap = JSONUtils.toMap(locations);
+        JsonNodeFactory factory = new JsonNodeFactory(false);
+        ArrayNode jsonNodes = factory.arrayNode();
+        for (Map.Entry<String, String> entry : locationsMap.entrySet()) {
+            ObjectNode nodes = factory.objectNode();
+            nodes.put("taskCode", taskIdCodeMap.get(entry.getKey()));
+            ObjectNode oldNodes = JSONUtils.parseObject(entry.getValue());
+            nodes.put("x", oldNodes.get("x").asInt());
+            nodes.put("y", oldNodes.get("y").asInt());
+            jsonNodes.add(nodes);
+        }
+        return jsonNodes.toString();
+    }
+
+    private void handleProcessTaskRelation(Map<String, List<String>> taskNamePreMap,
+                                           Map<String, Long> taskNameCodeMap,
+                                           ProcessDefinition processDefinition,
+                                           List<ProcessTaskRelationLog> processTaskRelationLogs) {
+        Date now = new Date();
+        for (Map.Entry<String, List<String>> entry : taskNamePreMap.entrySet()) {
+            List<String> entryValue = entry.getValue();
+            if (CollectionUtils.isNotEmpty(entryValue)) {
+                for (String preTaskName : entryValue) {
+                    ProcessTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(processDefinition, now);
+                    processTaskRelationLog.setPreTaskCode(taskNameCodeMap.get(preTaskName));
+                    processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
+                    processTaskRelationLog.setPostTaskCode(taskNameCodeMap.get(entry.getKey()));
+                    processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
+                    processTaskRelationLogs.add(processTaskRelationLog);
+                }
+            } else {
+                ProcessTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(processDefinition, now);
+                processTaskRelationLog.setPreTaskCode(0);
+                processTaskRelationLog.setPreTaskVersion(0);
+                processTaskRelationLog.setPostTaskCode(taskNameCodeMap.get(entry.getKey()));
+                processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
+                processTaskRelationLogs.add(processTaskRelationLog);
+            }
+        }
+    }
+
+    private ProcessTaskRelationLog setProcessTaskRelationLog(ProcessDefinition processDefinition, Date now) {
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(processDefinition.getProjectCode());
+        processTaskRelationLog.setProcessDefinitionCode(processDefinition.getCode());
+        processTaskRelationLog.setProcessDefinitionVersion(processDefinition.getVersion());
+        processTaskRelationLog.setConditionType(ConditionType.NONE);
+        processTaskRelationLog.setConditionParams("{}");
+        processTaskRelationLog.setOperator(1);
+        processTaskRelationLog.setOperateTime(now);
+        processTaskRelationLog.setCreateTime(now);
+        processTaskRelationLog.setUpdateTime(now);
+        return processTaskRelationLog;
+    }
 }

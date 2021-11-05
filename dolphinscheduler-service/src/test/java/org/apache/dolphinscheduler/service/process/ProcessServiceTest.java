@@ -20,17 +20,19 @@ package org.apache.dolphinscheduler.service.process;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
-
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -40,6 +42,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -50,16 +54,21 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -68,6 +77,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,9 +110,15 @@ public class ProcessServiceTest {
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
     @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
+    @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
+    @Mock
+    private ResourceMapper resourceMapper;
+
+    private HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
 
     @Test
     public void testCreateSubCommand() {
@@ -225,63 +241,73 @@ public class ProcessServiceTest {
 
         //cannot construct process instance, return null;
         String host = "127.0.0.1";
-        int validThreadNum = 1;
         Command command = new Command();
         command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
             + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
-        Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
+        Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
 
+        int definitionVersion = 1;
+        long definitionCode = 123;
+        int processInstanceId = 222;
         //there is not enough thread for this command
         Command command1 = new Command();
-        command1.setProcessDefinitionCode(123);
+        command1.setProcessDefinitionCode(definitionCode);
+        command1.setProcessDefinitionVersion(definitionVersion);
         command1.setCommandParam("{\"ProcessInstanceId\":222}");
         command1.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(123);
         processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
+        processDefinition.setVersion(definitionVersion);
+        processDefinition.setCode(definitionCode);
         processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(222);
-        processInstance.setProcessDefinitionCode(11L);
-        processInstance.setProcessDefinitionVersion(1);
-        Mockito.when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode())).thenReturn(processDefinition);
+        processInstance.setId(processInstanceId);
+        processInstance.setProcessDefinitionCode(definitionCode);
+        processInstance.setProcessDefinitionVersion(definitionVersion);
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
             processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command1, processDefinitionCacheMaps));
 
         Command command2 = new Command();
         command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command2.setProcessDefinitionCode(123);
+        command2.setProcessDefinitionCode(definitionCode);
+        command2.setProcessDefinitionVersion(definitionVersion);
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
+        command2.setProcessInstanceId(processInstanceId);
 
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command2, processDefinitionCacheMaps));
 
         Command command3 = new Command();
-        command3.setProcessDefinitionCode(123);
+        command3.setProcessDefinitionCode(definitionCode);
+        command3.setProcessDefinitionVersion(definitionVersion);
+        command3.setProcessInstanceId(processInstanceId);
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command3, processDefinitionCacheMaps));
 
         Command command4 = new Command();
-        command4.setProcessDefinitionCode(123);
+        command4.setProcessDefinitionCode(definitionCode);
+        command4.setProcessDefinitionVersion(definitionVersion);
         command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command4.setCommandType(CommandType.REPEAT_RUNNING);
-        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
+        command4.setProcessInstanceId(processInstanceId);
+        Assert.assertNotNull(processService.handleCommand(logger, host, command4, processDefinitionCacheMaps));
 
         Command command5 = new Command();
-        command5.setProcessDefinitionCode(123);
+        command5.setProcessDefinitionCode(definitionCode);
+        command5.setProcessDefinitionVersion(definitionVersion);
         HashMap<String, String> startParams = new HashMap<>();
         startParams.put("startParam1", "testStartParam1");
         HashMap<String, String> commandParams = new HashMap<>();
         commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
         command5.setCommandParam(JSONUtils.toJsonString(commandParams));
         command5.setCommandType(CommandType.START_PROCESS);
-        ProcessInstance processInstance1 = processService.handleCommand(logger, host, validThreadNum, command5);
+        command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
+        ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5, processDefinitionCacheMaps);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
     }
 
@@ -358,6 +384,38 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assert.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
+    }
+
+    @Test
+    public void testSaveTaskDefine() {
+        User operator = new User();
+        operator.setId(-1);
+        operator.setUserType(UserType.GENERAL_USER);
+        long projectCode = 751485690568704L;
+        String taskJson = "[{\"code\":751500437479424,\"name\":\"aa\",\"version\":1,\"description\":\"\",\"delayTime\":0,"
+            + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"sleep 1s\\necho 11\","
+            + "\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"waitStartTimeout\":{}},"
+            + "\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"yarn\",\"failRetryTimes\":0,\"failRetryInterval\":1,"
+            + "\"timeoutFlag\":\"OPEN\",\"timeoutNotifyStrategy\":\"FAILED\",\"timeout\":1,\"environmentCode\":751496815697920},"
+            + "{\"code\":751516889636864,\"name\":\"bb\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
+            + "\"localParams\":[],\"rawScript\":\"echo 22\",\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},"
+            + "\"waitStartTimeout\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\","
+            + "\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":0,\"delayTime\":\"0\",\"environmentCode\":-1}]";
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskJson, TaskDefinitionLog.class);
+        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
+        taskDefinition.setCode(751500437479424L);
+        taskDefinition.setName("aa");
+        taskDefinition.setProjectCode(751485690568704L);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        taskDefinition.setUserId(-1);
+        taskDefinition.setVersion(1);
+        taskDefinition.setCreateTime(new Date());
+        taskDefinition.setUpdateTime(new Date());
+        Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
+        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs);
+        Assert.assertEquals(0, result);
     }
 
     @Test
@@ -438,6 +496,123 @@ public class ProcessServiceTest {
             + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
             + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
         processService.changeOutParam(taskInstance);
+    }
+
+    @Test
+    public void testUpdateTaskDefinitionResources() throws Exception {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        String taskParameters = "{\n"
+            + "    \"mainClass\": \"org.apache.dolphinscheduler.SparkTest\",\n"
+            + "    \"mainJar\": {\n"
+            + "        \"id\": 1\n"
+            + "    },\n"
+            + "    \"deployMode\": \"cluster\",\n"
+            + "    \"resourceList\": [\n"
+            + "        {\n"
+            + "            \"id\": 3\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"id\": 4\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"localParams\": [],\n"
+            + "    \"driverCores\": 1,\n"
+            + "    \"driverMemory\": \"512M\",\n"
+            + "    \"numExecutors\": 2,\n"
+            + "    \"executorMemory\": \"2G\",\n"
+            + "    \"executorCores\": 2,\n"
+            + "    \"appName\": \"\",\n"
+            + "    \"mainArgs\": \"\",\n"
+            + "    \"others\": \"\",\n"
+            + "    \"programType\": \"JAVA\",\n"
+            + "    \"sparkVersion\": \"SPARK2\",\n"
+            + "    \"dependence\": {},\n"
+            + "    \"conditionResult\": {\n"
+            + "        \"successNode\": [\n"
+            + "            \"\"\n"
+            + "        ],\n"
+            + "        \"failedNode\": [\n"
+            + "            \"\"\n"
+            + "        ]\n"
+            + "    },\n"
+            + "    \"waitStartTimeout\": {}\n"
+            + "}";
+        taskDefinition.setTaskParams(taskParameters);
+
+        Map<Integer, Resource> resourceMap =
+            Stream.of(1, 3, 4)
+                .map(i -> {
+                    Resource resource = new Resource();
+                    resource.setId(i);
+                    resource.setFileName("file" + i);
+                    resource.setFullName("/file" + i);
+                    return resource;
+                })
+                .collect(
+                    Collectors.toMap(
+                        Resource::getId,
+                        resource -> resource)
+                );
+        for (Integer integer : Arrays.asList(1, 3, 4)) {
+            Mockito.when(resourceMapper.selectById(integer))
+                .thenReturn(resourceMap.get(integer));
+        }
+
+        Whitebox.invokeMethod(processService,
+            "updateTaskDefinitionResources",
+            taskDefinition);
+
+        String taskParams = taskDefinition.getTaskParams();
+        SparkParameters sparkParameters = JSONUtils.parseObject(taskParams, SparkParameters.class);
+        ResourceInfo mainJar = sparkParameters.getMainJar();
+        Assert.assertEquals(1, mainJar.getId());
+        Assert.assertEquals("file1", mainJar.getRes());
+        Assert.assertEquals("/file1", mainJar.getResourceName());
+
+        Assert.assertEquals(2, sparkParameters.getResourceList().size());
+        ResourceInfo res1 = sparkParameters.getResourceList().get(0);
+        ResourceInfo res2 = sparkParameters.getResourceList().get(1);
+        Assert.assertEquals(3, res1.getId());
+        Assert.assertEquals("file3", res1.getRes());
+        Assert.assertEquals("/file3", res1.getResourceName());
+        Assert.assertEquals(4, res2.getId());
+        Assert.assertEquals("file4", res2.getRes());
+        Assert.assertEquals("/file4", res2.getResourceName());
+
+    }
+
+    @Test
+    public void testUpdateResourceInfo() throws Exception {
+        // test if input is null
+        ResourceInfo resourceInfoNull = null;
+        ResourceInfo updatedResourceInfo1 = Whitebox.invokeMethod(processService,
+            "updateResourceInfo",
+            resourceInfoNull);
+        Assert.assertNull(updatedResourceInfo1);
+
+        // test if resource id less than 1
+        ResourceInfo resourceInfoVoid = new ResourceInfo();
+        ResourceInfo updatedResourceInfo2 = Whitebox.invokeMethod(processService,
+            "updateResourceInfo",
+            resourceInfoVoid);
+        Assert.assertNull(updatedResourceInfo2);
+
+        // test normal situation
+        ResourceInfo resourceInfoNormal = new ResourceInfo();
+        resourceInfoNormal.setId(1);
+        Resource resource = new Resource();
+        resource.setId(1);
+        resource.setFileName("test.txt");
+        resource.setFullName("/test.txt");
+        Mockito.when(resourceMapper.selectById(1)).thenReturn(resource);
+        ResourceInfo updatedResourceInfo3 = Whitebox.invokeMethod(processService,
+            "updateResourceInfo",
+            resourceInfoNormal);
+
+        Assert.assertEquals(1, updatedResourceInfo3.getId());
+        Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());
+        Assert.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
+
     }
 
 }

@@ -83,9 +83,8 @@ public class DolphinSchedulerManager {
 
     /**
      * upgrade DolphinScheduler
-     * @throws Exception if error throws Exception
      */
-    public void upgradeDolphinScheduler() throws Exception{
+    public void upgradeDolphinScheduler() {
 
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
@@ -119,10 +118,11 @@ public class DolphinSchedulerManager {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     } else if ("1.3.2".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerResourceList();
+                    } else if ("2.0.0".equals(schemaVersion)) {
+                        upgradeDao.upgradeDolphinSchedulerTo200(schemaDir);
                     }
                     version = schemaVersion;
                 }
-
             }
         }
 

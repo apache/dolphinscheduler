@@ -18,16 +18,6 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
-    <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select cmd.id, cmd.command_type, cmd.process_definition_code, cmd.command_param, cmd.task_depend_type, cmd.failure_strategy,
-        cmd.warning_type, cmd.warning_group_id, cmd.schedule_time, cmd.start_time, cmd.executor_id, cmd.update_time,
-        cmd.process_instance_priority, cmd.worker_group, cmd.environment_code
-        from t_ds_command cmd
-        join t_ds_process_definition definition on cmd.process_definition_code = definition.code
-        where definition.release_state = 1 AND definition.flag = 1
-        order by cmd.update_time asc
-        limit 1
-    </select>
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
         select cmd.command_type as command_type, count(1) as count
         from t_ds_command cmd, t_ds_process_definition process
@@ -46,6 +36,7 @@
     <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
-        order by update_time asc
+        order by process_instance_priority, id asc
+        limit #{limit} offset #{offset}
     </select>
 </mapper>
