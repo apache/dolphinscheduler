@@ -70,7 +70,7 @@ public class MysqlDatasourceProcessorTest {
     public void testGetJdbcUrl() {
         MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
-        Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+        Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false&useSSL=false",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
