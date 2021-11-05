@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler User object."""
+
 from typing import Optional
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault
@@ -23,21 +25,17 @@ from pydolphinscheduler.java_gateway import launch_gateway, gateway_result_check
 
 
 class Queue(BaseSide):
-    """
-    Queue
-    """
+    """DolphinScheduler Queue object."""
 
     def __init__(
-            self,
-            name: str = ProcessDefinitionDefault.QUEUE,
-            description: Optional[str] = ""
+        self,
+        name: str = ProcessDefinitionDefault.QUEUE,
+        description: Optional[str] = "",
     ):
         super().__init__(name, description)
 
     def create_if_not_exists(self, user=ProcessDefinitionDefault.USER) -> None:
-        """
-        Create Queue if not exists
-        """
+        """Create Queue if not exists."""
         gateway = launch_gateway()
         # Here we set Queue.name and Queue.queueName same as self.name
         result = gateway.entry_point.createProject(user, self.name, self.name)

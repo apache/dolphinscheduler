@@ -16,6 +16,8 @@
 # under the License.
 
 r"""
+A tutorial example take you to experience pydolphinscheduler.
+
 After tutorial.py file submit to Apache DolphinScheduler server a DAG would be create,
 and workflow DAG graph as below:
 
@@ -24,10 +26,13 @@ and workflow DAG graph as below:
 task_parent -->                        -->  task_union
                 \                   /
                   --> task_child_two
+
+it will instantiate and run all the task it have.
 """
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
+
 
 with ProcessDefinition(name="tutorial", tenant="tenant_exists") as pd:
     task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")

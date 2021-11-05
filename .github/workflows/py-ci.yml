@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Python API Tests
+name: Python API
 
 on:
   push:
@@ -30,14 +30,41 @@ defaults:
     working-directory: dolphinscheduler-python/pydolphinscheduler
 
 jobs:
-  build:
+  sanity:
+    name: Sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+  lint:
+    name: Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Development Dependences
+        run: pip install -r requirements_dev.txt
+      - name: Run Black Checking
+        run: black --check .
+      - name: Run Flake8 Checking
+        run: flake8
+  pytest:
+    name: Pytest
+    needs:
+      - lint
+      - sanity
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
         os: [ubuntu-18.04, macOS-latest, windows-latest]
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}

@@ -15,13 +15,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Mock class Task for other test."""
+
 import uuid
 
 from pydolphinscheduler.core.task import Task as SourceTask
 
 
 class Task(SourceTask):
+    """Mock class :class:`pydolphinscheduler.core.task.Task` for unittest."""
+
     DEFAULT_VERSION = 1
 
     def gen_code_and_version(self):
+        """Mock java gateway code and version, convenience method for unittest."""
         return uuid.uuid1().time, self.DEFAULT_VERSION

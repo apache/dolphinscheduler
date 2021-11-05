@@ -15,19 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""The script for setting up pydolphinscheduler."""
 
 import sys
 from os.path import dirname, join
 
 from setuptools import find_packages, setup
 
-version = '0.0.1.dev0'
+version = "0.0.1.dev0"
 
 if sys.version_info[0] < 3:
-    raise Exception("pydolphinscheduler does not support Python 2. Please upgrade to Python 3.")
+    raise Exception(
+        "pydolphinscheduler does not support Python 2. Please upgrade to Python 3."
+    )
 
 
 def read(*names, **kwargs):
+    """Read file content from given file path."""
     return open(
         join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ).read()
@@ -86,5 +90,5 @@ setup(
         "py4j~=0.10",
         # Dev
         "pytest~=6.2",
-    ]
+    ],
 )
