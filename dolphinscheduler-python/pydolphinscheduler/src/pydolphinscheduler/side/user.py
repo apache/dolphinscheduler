@@ -15,13 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler User object."""
+
 from typing import Optional
 
 from pydolphinscheduler.core.base_side import BaseSide
-from pydolphinscheduler.java_gateway import launch_gateway, gateway_result_checker
+from pydolphinscheduler.java_gateway import launch_gateway
 
 
 class User(BaseSide):
+    """DolphinScheduler User object."""
+
     _KEY_ATTR = {
         "name",
         "password",
@@ -51,11 +55,9 @@ class User(BaseSide):
         self.status = status
 
     def create_if_not_exists(self, **kwargs):
-        """
-        Create User if not exists
-        """
+        """Create User if not exists."""
         gateway = launch_gateway()
-        result = gateway.entry_point.createUser(
+        gateway.entry_point.createUser(
             self.name,
             self.password,
             self.email,

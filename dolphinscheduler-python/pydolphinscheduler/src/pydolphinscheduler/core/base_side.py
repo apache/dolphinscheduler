@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Module for side object."""
+
 from typing import Optional
 
 from pydolphinscheduler.constants import ProcessDefinitionDefault
@@ -22,6 +24,8 @@ from pydolphinscheduler.core.base import Base
 
 
 class BaseSide(Base):
+    """Base class for side object, it declare base behavior for them."""
+
     def __init__(self, name: str, description: Optional[str] = None):
         super().__init__(name, description)
 
@@ -32,8 +36,5 @@ class BaseSide(Base):
         # user: Optional[User] = ProcessDefinitionDefault.USER
         user=ProcessDefinitionDefault.USER,
     ):
-        """
-        Create Base if not exists
-        """
-
+        """Create Base if not exists."""
         raise NotImplementedError

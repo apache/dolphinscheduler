@@ -15,17 +15,21 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Test pydolphinscheduler java gateway."""
+
 
 from py4j.java_gateway import java_import, JavaGateway
 
 
 def test_gateway_connect():
+    """Test weather client could connect java gate way or not."""
     gateway = JavaGateway()
     app = gateway.entry_point
     assert app.ping() == "PONG"
 
 
 def test_jvm_simple():
+    """Test use JVM build-in object and operator from java gateway."""
     gateway = JavaGateway()
     smaller = gateway.jvm.java.lang.Integer.MIN_VALUE
     bigger = gateway.jvm.java.lang.Integer.MAX_VALUE
@@ -33,12 +37,14 @@ def test_jvm_simple():
 
 
 def test_python_client_java_import_single():
+    """Test import single class from java gateway."""
     gateway = JavaGateway()
     java_import(gateway.jvm, "org.apache.dolphinscheduler.common.utils.FileUtils")
     assert hasattr(gateway.jvm, "FileUtils")
 
 
 def test_python_client_java_import_package():
+    """Test import package contain multiple class from java gateway."""
     gateway = JavaGateway()
     java_import(gateway.jvm, "org.apache.dolphinscheduler.common.utils.*")
     # test if jvm view have some common utils

@@ -15,17 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler Project object."""
+
 from typing import Optional
 
 from pydolphinscheduler.core.base_side import BaseSide
 from pydolphinscheduler.constants import ProcessDefinitionDefault
-from pydolphinscheduler.java_gateway import launch_gateway, gateway_result_checker
+from pydolphinscheduler.java_gateway import launch_gateway
 
 
 class Project(BaseSide):
-    """
-    Project
-    """
+    """DolphinScheduler Project object."""
 
     def __init__(
         self,
@@ -35,10 +35,8 @@ class Project(BaseSide):
         super().__init__(name, description)
 
     def create_if_not_exists(self, user=ProcessDefinitionDefault.USER) -> None:
-        """
-        Create Project if not exists
-        """
+        """Create Project if not exists."""
         gateway = launch_gateway()
-        result = gateway.entry_point.createProject(user, self.name, self.description)
+        gateway.entry_point.createProject(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)

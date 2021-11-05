@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Test Task class function."""
 
 from unittest.mock import patch
 
@@ -22,6 +23,7 @@ from pydolphinscheduler.core.task import TaskParams, TaskRelation, Task
 
 
 def test_task_params_to_dict():
+    """Test TaskParams object function to_dict."""
     raw_script = "test_task_params_to_dict"
     expect = {
         "resourceList": [],
@@ -36,6 +38,7 @@ def test_task_params_to_dict():
 
 
 def test_task_relation_to_dict():
+    """Test TaskRelation object function to_dict."""
     pre_task_code = 123
     post_task_code = 456
     expect = {
@@ -54,6 +57,7 @@ def test_task_relation_to_dict():
 
 
 def test_task_to_dict():
+    """Test Task object function to_dict."""
     code = 123
     version = 1
     name = "test_task_to_dict"

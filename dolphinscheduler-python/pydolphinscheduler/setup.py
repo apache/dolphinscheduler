@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""The script for setting up pydolphinscheduler."""
 
 import sys
 from os.path import dirname, join
@@ -30,6 +31,7 @@ if sys.version_info[0] < 3:
 
 
 def read(*names, **kwargs):
+    """Read file content from given file path."""
     return open(
         join(dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")
     ).read()

@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Test process definition."""
+
 import pytest
 
 from pydolphinscheduler.constants import (
@@ -31,6 +33,7 @@ TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
 @pytest.mark.parametrize("func", ["run", "submit", "start"])
 def test_process_definition_key_attr(func):
+    """Test process definition have specific functions or attributes."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         assert hasattr(
             pd, func
@@ -59,10 +62,12 @@ def test_process_definition_key_attr(func):
     ],
 )
 def test_process_definition_default_value(name, value):
+    """Test process definition default attributes."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
-        assert (
-            getattr(pd, name) == value
-        ), f"ProcessDefinition instance attribute `{name}` have not except default value `{getattr(pd, name)}`"
+        assert getattr(pd, name) == value, (
+            f"ProcessDefinition instance attribute `{name}` not with "
+            f"except default value `{getattr(pd, name)}`"
+        )
 
 
 @pytest.mark.parametrize(
@@ -74,6 +79,7 @@ def test_process_definition_default_value(name, value):
     ],
 )
 def test_process_definition_set_attr(name, cls, expect):
+    """Test process definition set specific attributes."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         setattr(pd, name, cls(expect))
         assert getattr(pd, name) == cls(
@@ -82,6 +88,7 @@ def test_process_definition_set_attr(name, cls, expect):
 
 
 def test_process_definition_to_dict_without_task():
+    """Test process definition function to_dict without task."""
     expect = {
         "name": TEST_PROCESS_DEFINITION_NAME,
         "description": None,
@@ -100,6 +107,7 @@ def test_process_definition_to_dict_without_task():
 
 
 def test_process_definition_simple():
+    """Test process definition simple create workflow, including process definition, task, relation define."""
     expect_tasks_num = 5
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         for i in range(expect_tasks_num):

@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Test Task shell."""
+
 
 from unittest.mock import patch
 
@@ -22,6 +24,7 @@ from pydolphinscheduler.tasks.shell import Shell
 
 
 def test_shell_to_dict():
+    """Test task shell function to_dict."""
     code = 123
     version = 1
     name = "test_shell_to_dict"

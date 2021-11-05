@@ -15,14 +15,20 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Task shell."""
+
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task, TaskParams
 
 
 class Shell(Task):
-    # TODO maybe we could use instance name to replace attribute `name`
-    # which is simplify as `task_shell = Shell(command = "echo 1")` and
-    # task.name assign to `task_shell`
+    """Task shell object, declare behavior for shell task to dolphinscheduler.
+
+    TODO maybe we could use instance name to replace attribute `name`
+    which is simplify as `task_shell = Shell(command = "echo 1")` and
+    task.name assign to `task_shell`
+    """
+
     def __init__(
         self, name: str, command: str, task_type: str = TaskType.SHELL, *args, **kwargs
     ):

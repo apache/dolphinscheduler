@@ -15,15 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""DolphinScheduler Worker Group object."""
+
 from typing import Optional
 
 from pydolphinscheduler.core.base_side import BaseSide
 
 
 class WorkerGroup(BaseSide):
-    """
-    Worker Group
-    """
+    """DolphinScheduler Worker Group object."""
 
     def __init__(self, name: str, address: str, description: Optional[str] = None):
         super().__init__(name, description)
