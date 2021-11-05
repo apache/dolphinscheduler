@@ -131,5 +131,5 @@ PYTHONPATH=src/ pytest
 [flake8]: https://flake8.pycqa.org/en/latest/index.html
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 <!-- badge -->
-[ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-tests.yml/badge.svg?branch=dev
+[ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
