@@ -59,6 +59,6 @@ public class AlertPluginManagerTest {
         DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
         alertPluginLoader.loadPlugins();
 
-        Assert.assertNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
+        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
     }
 }
