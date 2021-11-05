@@ -20,6 +20,7 @@
 # pydolphinscheduler
 
 [![GitHub Build][ga-py-test]][ga]
+[![Code style: black][black-shield]][black-gh]
 
 pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
@@ -39,7 +40,7 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 # Install pydolphinscheduler from source
 cd dolphinscheduler-python/pydolphinscheduler
-pip setup.py install
+pip install -e .
 ```
 
 ### Start Server And Run Example
@@ -77,6 +78,12 @@ We already clone the code in [quick start](#quick-start), so next step we have t
 in you editor. We recommend you use [pycharm][pycharm] instead of [IntelliJ IDEA][idea] to open it. And you could
 just open directory `dolphinscheduler-python/pydolphinscheduler` instead of `dolphinscheduler-python`.
 
+Then you should add developer dependence to make sure you could run test and check code style locally
+
+```shell
+pip install -r requirements_dev.txt
+```
+
 ### Brief Concept
 
 Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
@@ -104,7 +111,14 @@ Our Python API CI would automatically run unittest when you submit pull request 
 static check locally.
 
 ```shell
-flake8 .
+# We recommend you run Black before Flake8, because Black could auto fix some code style issue
+# but Flake8 just hint when code style not match pep8
+
+# Run Black
+black .
+
+# Run Flake8
+flake8
 ```
 
 ### Testing
@@ -133,3 +147,5 @@ PYTHONPATH=src/ pytest
 <!-- badge -->
 [ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
+[black-shield]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-gh]: https://github.com/psf/black
