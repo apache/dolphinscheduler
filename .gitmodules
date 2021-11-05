@@ -18,9 +18,6 @@
 [submodule ".github/actions/comment-on-issue"]
 	path = .github/actions/comment-on-issue
 	url = https://github.com/xingchun-chen/actions-comment-on-issue
-[submodule ".github/actions/lable-on-issue"]
-	path = .github/actions/lable-on-issue
-	url = https://github.com/xingchun-chen/labeler
 [submodule ".github/actions/translate-on-issue"]
 	path = .github/actions/translate-on-issue
 	url = https://github.com/xingchun-chen/translation-helper

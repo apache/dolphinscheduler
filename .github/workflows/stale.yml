@@ -30,22 +30,22 @@ jobs:
       - uses: actions/stale@v4
         with:
           # Stale Issues
-          days-before-issue-stale: 14
-          days-before-issue-close: 3
+          days-before-issue-stale: 30
+          days-before-issue-close: 7
           # We do not stale Issues with label `Waiting for reply`, `new feature` and `DSIP`
           exempt-issue-labels: 'Waiting for reply,new feature,DSIP'
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had recent activity
-            for 14 days. It will be closed in next 3 days if no further activity occurs.
+            for 30 days. It will be closed in next 7 days if no further activity occurs.
           close-issue-message: >
             This issue has been closed because it has not received response for too long time. You could
             reopen it if you encountered similar problems in the future.
           # Stale PRs
-          days-before-pr-stale: 60
-          days-before-pr-close: 5
+          days-before-pr-stale: 120
+          days-before-pr-close: 7
           stale-pr-message: >
             This pull request has been automatically marked as stale because it has not had recent
-            activity for 60 days. It will be closed in 5 days if no further activity occurs.
+            activity for 120 days. It will be closed in 7 days if no further activity occurs.
           close-pr-message: >
             This pull request has been closed because it has not had recent activity. You could reopen it
             if you try to continue your work, and anyone who are interested in it are encouraged to continue
