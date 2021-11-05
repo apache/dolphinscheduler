@@ -190,7 +190,7 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             // sync worker node info
             Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
-            syncWorkerNodeInfo(newWorkerNodeInfo);
+            syncAllWorkerNodeInfo(newWorkerNodeInfo);
 
             // sync worker group nodes from database
             List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
@@ -218,7 +218,7 @@ public class ServerNodeManager implements InitializingBean {
     class WorkerDataListener implements SubscribeListener {
 
         @Override
-        public void notify(String path, DataChangeEvent dataChangeEvent) {
+        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
             if (registryClient.isWorkerPath(path)) {
                 try {
                     if (dataChangeEvent == DataChangeEvent.ADD) {
@@ -233,6 +233,14 @@ public class ServerNodeManager implements InitializingBean {
                         Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
+                    } else if (dataChangeEvent == DataChangeEvent.UPDATE) {
+                        logger.debug("worker group node : {} update, data: {}", path, data);
+                        String group = parseGroup(path);
+                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        syncWorkerGroupNodes(group, currentNodes);
+
+                        String node = parseNode(path);
+                        syncSingleWorkerNodeInfo(node, data);
                     }
                 } catch (IllegalArgumentException ex) {
                     logger.warn(ex.getMessage());
@@ -251,6 +259,13 @@ public class ServerNodeManager implements InitializingBean {
             return parts[parts.length - 2];
         }
 
+        private String parseNode(String path) {
+            String[] parts = path.split("/");
+            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
+                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+            }
+            return parts[parts.length - 1];
+        }
     }
 
     /**
@@ -258,7 +273,7 @@ public class ServerNodeManager implements InitializingBean {
      */
     class MasterDataListener implements SubscribeListener {
         @Override
-        public void notify(String path, DataChangeEvent dataChangeEvent) {
+        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
             if (registryClient.isMasterPath(path)) {
                 try {
                     if (dataChangeEvent.equals(DataChangeEvent.ADD)) {
@@ -407,11 +422,23 @@ public class ServerNodeManager implements InitializingBean {
      *
      * @param newWorkerNodeInfo new worker node info
      */
-    private void syncWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
+    private void syncAllWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
         workerNodeInfoLock.lock();
         try {
             workerNodeInfo.clear();
             workerNodeInfo.putAll(newWorkerNodeInfo);
+        } finally {
+            workerNodeInfoLock.unlock();
+        }
+    }
+
+    /**
+     * sync single worker node info
+     */
+    private void syncSingleWorkerNodeInfo(String node, String info) {
+        workerNodeInfoLock.lock();
+        try {
+            workerNodeInfo.put(node, info);
         } finally {
             workerNodeInfoLock.unlock();
         }

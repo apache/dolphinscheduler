@@ -25,6 +25,6 @@ public interface SubscribeListener {
     /**
      * Processing logic when the subscription node changes
      */
-    void notify(String path, DataChangeEvent dataChangeEvent);
+    void notify(String path, String data, DataChangeEvent dataChangeEvent);
 
 }

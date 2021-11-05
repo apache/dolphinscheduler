@@ -115,7 +115,7 @@ public class ZookeeperRegistryTest {
     class TestListener implements SubscribeListener {
 
         @Override
-        public void notify(String path, DataChangeEvent dataChangeEvent) {
+        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
             logger.info("I'm test listener");
         }
     }

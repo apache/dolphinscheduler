@@ -39,9 +39,8 @@ public class MasterRegistryDataListener implements SubscribeListener {
         masterRegistryClient = SpringApplicationContext.getBean(MasterRegistryClient.class);
     }
 
-
     @Override
-    public void notify(String path, DataChangeEvent event) {
+    public void notify(String path, String data, DataChangeEvent event) {
         //monitor master
         if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS + Constants.SINGLE_SLASH)) {
             handleMasterEvent(event, path);
