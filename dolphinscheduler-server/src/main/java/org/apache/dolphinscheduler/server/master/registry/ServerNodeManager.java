@@ -22,17 +22,21 @@ import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHED
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,16 +107,35 @@ public class ServerNodeManager implements InitializingBean {
     private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
+     * eg : /node/worker/group/127.0.0.1:xxx
+     */
+    private static final int WORKER_LISTENER_CHECK_LENGTH = 5;
+
+    /**
      * worker group mapper
      */
     @Autowired
     private WorkerGroupMapper workerGroupMapper;
+
+    private MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
     /**
      * alert dao
      */
     @Autowired
     private AlertDao alertDao;
+
+    public static volatile List<Integer> SLOT_LIST = new ArrayList<>();
+
+    public static volatile Integer MASTER_SIZE = 0;
+
+    public static Integer getSlot() {
+        if (SLOT_LIST.size() > 0) {
+            return SLOT_LIST.get(0);
+        }
+        return 0;
+    }
+
 
     /**
      * init listener
@@ -137,18 +160,17 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new MasterDataListener());
+        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
     }
 
     /**
      * load nodes from zookeeper
      */
-    private void load() {
+    public void load() {
         /**
          * master nodes from zookeeper
          */
-        Set<String> initMasterNodes = registryClient.getMasterNodesDirectly();
-        syncMasterNodes(initMasterNodes);
+        updateMasterNodes();
 
         /**
          * worker group nodes from zookeeper
@@ -168,7 +190,7 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             // sync worker node info
             Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
-            syncWorkerNodeInfo(newWorkerNodeInfo);
+            syncAllWorkerNodeInfo(newWorkerNodeInfo);
 
             // sync worker group nodes from database
             List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
@@ -193,10 +215,10 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * worker group node listener
      */
-    class WorkerGroupNodeListener implements SubscribeListener {
+    class WorkerDataListener implements SubscribeListener {
 
         @Override
-        public void notify(String path, DataChangeEvent dataChangeEvent) {
+        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
             if (registryClient.isWorkerPath(path)) {
                 try {
                     if (dataChangeEvent == DataChangeEvent.ADD) {
@@ -211,6 +233,14 @@ public class ServerNodeManager implements InitializingBean {
                         Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
+                    } else if (dataChangeEvent == DataChangeEvent.UPDATE) {
+                        logger.debug("worker group node : {} update, data: {}", path, data);
+                        String group = parseGroup(path);
+                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        syncWorkerGroupNodes(group, currentNodes);
+
+                        String node = parseNode(path);
+                        syncSingleWorkerNodeInfo(node, data);
                     }
                 } catch (IllegalArgumentException ex) {
                     logger.warn(ex.getMessage());
@@ -223,12 +253,19 @@ public class ServerNodeManager implements InitializingBean {
 
         private String parseGroup(String path) {
             String[] parts = path.split("/");
-            if (parts.length < 6) {
+            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
             return parts[parts.length - 2];
         }
 
+        private String parseNode(String path) {
+            String[] parts = path.split("/");
+            if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
+                throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+            }
+            return parts[parts.length - 1];
+        }
     }
 
     /**
@@ -236,18 +273,16 @@ public class ServerNodeManager implements InitializingBean {
      */
     class MasterDataListener implements SubscribeListener {
         @Override
-        public void notify(String path, DataChangeEvent dataChangeEvent) {
+        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
             if (registryClient.isMasterPath(path)) {
                 try {
                     if (dataChangeEvent.equals(DataChangeEvent.ADD)) {
                         logger.info("master node : {} added.", path);
-                        Set<String> currentNodes = registryClient.getMasterNodesDirectly();
-                        syncMasterNodes(currentNodes);
+                        updateMasterNodes();
                     }
                     if (dataChangeEvent.equals(DataChangeEvent.REMOVE)) {
                         logger.info("master node : {} down.", path);
-                        Set<String> currentNodes = registryClient.getMasterNodesDirectly();
-                        syncMasterNodes(currentNodes);
+                        updateMasterNodes();
                         alertDao.sendServerStopedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
@@ -255,6 +290,23 @@ public class ServerNodeManager implements InitializingBean {
                 }
             }
         }
+    }
+
+    private void updateMasterNodes() {
+        SLOT_LIST.clear();
+        this.masterNodes.clear();
+        String nodeLock = registryClient.getMasterLockPath();
+        try {
+            registryClient.getLock(nodeLock);
+            Set<String> currentNodes = registryClient.getMasterNodesDirectly();
+            List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
+            syncMasterNodes(currentNodes, masterNodes);
+        } catch (Exception e) {
+            logger.error("update master nodes error", e);
+        } finally {
+            registryClient.releaseLock(nodeLock);
+        }
+
     }
 
     /**
@@ -276,11 +328,20 @@ public class ServerNodeManager implements InitializingBean {
      *
      * @param nodes master nodes
      */
-    private void syncMasterNodes(Set<String> nodes) {
+    private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
-            masterNodes.clear();
-            masterNodes.addAll(nodes);
+            this.masterNodes.addAll(nodes);
+            this.masterPriorityQueue.clear();
+            this.masterPriorityQueue.putList(masterNodes);
+            int index = masterPriorityQueue.getIndex(NetUtils.getHost());
+            if (index >= 0) {
+                MASTER_SIZE = nodes.size();
+                SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getHost()));
+            }
+            logger.info("update master nodes, master size: {}, slot: {}",
+                    MASTER_SIZE, SLOT_LIST.toString()
+            );
         } finally {
             masterLock.unlock();
         }
@@ -361,11 +422,23 @@ public class ServerNodeManager implements InitializingBean {
      *
      * @param newWorkerNodeInfo new worker node info
      */
-    private void syncWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
+    private void syncAllWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
         workerNodeInfoLock.lock();
         try {
             workerNodeInfo.clear();
             workerNodeInfo.putAll(newWorkerNodeInfo);
+        } finally {
+            workerNodeInfoLock.unlock();
+        }
+    }
+
+    /**
+     * sync single worker node info
+     */
+    private void syncSingleWorkerNodeInfo(String node, String info) {
+        workerNodeInfoLock.lock();
+        try {
+            workerNodeInfo.put(node, info);
         } finally {
             workerNodeInfoLock.unlock();
         }

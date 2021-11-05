@@ -151,7 +151,9 @@ public class JSONUtilsTest {
         Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
-        Assert.assertEquals("\"foo\"", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
+        Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
     
     @Test
@@ -199,8 +201,6 @@ public class JSONUtilsTest {
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
-        Assert.assertNull(JSONUtils.toMap("3", null, null));
-        Assert.assertNull(JSONUtils.toMap(null, null, null));
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);

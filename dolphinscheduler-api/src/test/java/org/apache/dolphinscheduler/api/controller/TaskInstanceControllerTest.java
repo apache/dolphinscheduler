@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -72,9 +72,9 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(""),  eq(1), eq(""), eq(""), eq(""),any(), any(),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L),  eq(1), eq(""), eq(""), eq(""),any(), any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(result);
-        Result taskResult = taskInstanceController.queryTaskListPaging(null, "", 1, "", "",
+        Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "",
                 "", "", ExecutionStatus.SUCCESS,"192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",pageNo, pageSize);
         Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
@@ -88,7 +88,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>(5);
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         mockResult.put(Constants.MSG, Status.SUCCESS.getMsg());
-        when(taskInstanceService.forceTaskSuccess(any(User.class), anyString(), anyInt())).thenReturn(mockResult);
+        when(taskInstanceService.forceTaskSuccess(any(User.class), anyLong(), anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")
                 .header(SESSION_ID, sessionId)
@@ -98,7 +98,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
 }

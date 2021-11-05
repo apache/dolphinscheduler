@@ -148,14 +148,12 @@ public class ZookeeperRegistry implements Registry {
             String dataPath = null;
             switch (type) {
                 case NODE_ADDED:
-
                     dataPath = event.getData().getPath();
                     eventType = DataChangeEvent.ADD;
                     break;
                 case NODE_UPDATED:
                     eventType = DataChangeEvent.UPDATE;
                     dataPath = event.getData().getPath();
-
                     break;
                 case NODE_REMOVED:
                     eventType = DataChangeEvent.REMOVE;
@@ -164,7 +162,7 @@ public class ZookeeperRegistry implements Registry {
                 default:
             }
             if (null != eventType && null != dataPath) {
-                ListenerManager.dataChange(path, dataPath, eventType);
+                ListenerManager.dataChange(path, dataPath, new String(event.getData().getData()), eventType);
             }
         };
         treeCache.getListenable().addListener(treeCacheListener);

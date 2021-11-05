@@ -24,9 +24,9 @@ import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -83,7 +83,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         ClickhouseConnectionParam clickhouseConnectionParam = (ClickhouseConnectionParam) connectionParam;
         String jdbcUrl = clickhouseConnectionParam.getJdbcUrl();
-        if (StringUtils.isNotEmpty(clickhouseConnectionParam.getOther())) {
+        if (!StringUtils.isEmpty(clickhouseConnectionParam.getOther())) {
             jdbcUrl = String.format("%s?%s", jdbcUrl, clickhouseConnectionParam.getOther());
         }
         return jdbcUrl;

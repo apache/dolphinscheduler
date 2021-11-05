@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -24,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -220,6 +224,15 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+    /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
+     * environment config
+     */
+    private String environmentConfig;
 
     /**
      * executor id
@@ -250,6 +263,11 @@ public class TaskInstance implements Serializable {
      * task params
      */
     private String taskParams;
+
+    /**
+     * dry run flag
+     */
+    private int dryRun;
 
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
@@ -421,9 +439,25 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public String getEnvironmentConfig() {
+        return this.environmentConfig;
+    }
+
+    public void setEnvironmentConfig(String environmentConfig) {
+        this.environmentConfig = environmentConfig;
+    }
+
     public DependentParameters getDependency() {
         if (this.dependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
             this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
         }
         return this.dependency;
@@ -435,14 +469,14 @@ public class TaskInstance implements Serializable {
 
     public SwitchParameters getSwitchDependency() {
         if (this.switchDependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
             this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
         }
         return this.switchDependency;
     }
 
     public void setSwitchDependency(SwitchParameters switchDependency) {
-        Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {});
         taskParamsMap.put(Constants.SWITCH_RESULT,JSONUtils.toJsonString(switchDependency));
         this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
@@ -503,6 +537,14 @@ public class TaskInstance implements Serializable {
         this.executorName = executorName;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
@@ -550,6 +592,26 @@ public class TaskInstance implements Serializable {
             return (this.getState().typeIsFailure()
                     && this.getRetryTimes() < this.getMaxRetryTimes());
         }
+    }
+
+    /**
+     * whether the retry interval is timed out
+     *
+     * @return Boolean
+     */
+    public boolean retryTaskIntervalOverTime() {
+        if (getState() != ExecutionStatus.FAILURE) {
+            return true;
+        }
+        if (getId() == 0
+                || getMaxRetryTimes() == 0
+                || getRetryInterval() == 0) {
+            return true;
+        }
+        Date now = new Date();
+        long failedTimeInterval = DateUtils.differSec(now, getEndTime());
+        // task retry does not over time, return false
+        return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     public Priority getTaskInstancePriority() {
@@ -623,9 +685,12 @@ public class TaskInstance implements Serializable {
                 + ", processInstancePriority=" + processInstancePriority
                 + ", dependentResult='" + dependentResult + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", environmentCode=" + environmentCode
+                + ", environmentConfig='" + environmentConfig + '\''
                 + ", executorId=" + executorId
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
+                + ", dryRun=" + dryRun
                 + '}';
     }
 

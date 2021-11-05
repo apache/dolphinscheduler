@@ -151,11 +151,10 @@ public class ProcessInstance {
     private String globalParams;
 
     /**
-     * process instance json
-     * TODO delete
+     * dagData
      */
     @TableField(exist = false)
-    private String processInstanceJson;
+    private DagData dagData;
 
     /**
      * executor id
@@ -192,12 +191,6 @@ public class ProcessInstance {
     private String locations;
 
     /**
-     * task connects for web
-     */
-    @TableField(exist = false)
-    private String connects;
-
-    /**
      * history command
      */
     private String historyCmd;
@@ -227,6 +220,11 @@ public class ProcessInstance {
     private String workerGroup;
 
     /**
+     * environment code
+     */
+    private Long environmentCode;
+
+    /**
      * process timeout for warning
      */
     private int timeout;
@@ -240,6 +238,15 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
+    /**
+     * serial queue next processInstanceId
+     */
+    private int nextProcessInstanceId;
+
+    /**
+     * dry run flag
+     */
+    private int dryRun;
 
     public ProcessInstance() {
 
@@ -253,12 +260,12 @@ public class ProcessInstance {
     public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
         this.name = processDefinition.getName()
-                + "-"
-                +
-                processDefinition.getVersion()
-                + "-"
-                +
-                DateUtils.getCurrentTimeStamp();
+            + "-"
+            +
+            processDefinition.getVersion()
+            + "-"
+            +
+            DateUtils.getCurrentTimeStamp();
     }
 
     public String getVarPool() {
@@ -425,12 +432,12 @@ public class ProcessInstance {
         this.globalParams = globalParams;
     }
 
-    public String getProcessInstanceJson() {
-        return processInstanceJson;
+    public DagData getDagData() {
+        return dagData;
     }
 
-    public void setProcessInstanceJson(String processInstanceJson) {
-        this.processInstanceJson = processInstanceJson;
+    public void setDagData(DagData dagData) {
+        this.dagData = dagData;
     }
 
     public String getTenantCode() {
@@ -481,14 +488,6 @@ public class ProcessInstance {
         this.locations = locations;
     }
 
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
-    }
-
     public String getHistoryCmd() {
         return historyCmd;
     }
@@ -503,6 +502,22 @@ public class ProcessInstance {
 
     public void setExecutorName(String executorName) {
         this.executorName = executorName;
+    }
+
+    public Long getEnvironmentCode() {
+        return this.environmentCode;
+    }
+
+    public void setEnvironmentCode(Long environmentCode) {
+        this.environmentCode = environmentCode;
+    }
+
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
     }
 
     /**
@@ -602,81 +617,78 @@ public class ProcessInstance {
     @Override
     public String toString() {
         return "ProcessInstance{"
-                + "id=" + id
-                + ", state=" + state
-                + ", recovery=" + recovery
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", runTimes=" + runTimes
-                + ", name='" + name + '\''
-                + ", host='" + host + '\''
-                + ", processDefinition="
-                + processDefinition
-                + ", commandType="
-                + commandType
-                + ", commandParam='"
-                + commandParam
-                + '\''
-                + ", taskDependType="
-                + taskDependType
-                + ", maxTryTimes="
-                + maxTryTimes
-                + ", failureStrategy="
-                + failureStrategy
-                + ", warningType="
-                + warningType
-                + ", warningGroupId="
-                + warningGroupId
-                + ", scheduleTime="
-                + scheduleTime
-                + ", commandStartTime="
-                + commandStartTime
-                + ", globalParams='"
-                + globalParams
-                + '\''
-                + ", processInstanceJson='"
-                + processInstanceJson
-                + '\''
-                + ", executorId="
-                + executorId
-                + ", tenantCode='"
-                + tenantCode
-                + '\''
-                + ", queue='"
-                + queue
-                + '\''
-                + ", isSubProcess="
-                + isSubProcess
-                + ", locations='"
-                + locations
-                + '\''
-                + ", connects='"
-                + connects
-                + '\''
-                + ", historyCmd='"
-                + historyCmd
-                + '\''
-                + ", dependenceScheduleTimes='"
-                + dependenceScheduleTimes
-                + '\''
-                + ", duration="
-                + duration
-                + ", processInstancePriority="
-                + processInstancePriority
-                + ", workerGroup='"
-                + workerGroup
-                + '\''
-                + ", timeout="
-                + timeout
-                + ", tenantId="
-                + tenantId
-                + ", processDefinitionCode='"
-                + processDefinitionCode
-                + '\''
-                + ", processDefinitionVersion='"
-                + processDefinitionVersion
-                + '\''
-                + '}';
+            + "id=" + id
+            + ", state=" + state
+            + ", recovery=" + recovery
+            + ", startTime=" + startTime
+            + ", endTime=" + endTime
+            + ", runTimes=" + runTimes
+            + ", name='" + name + '\''
+            + ", host='" + host + '\''
+            + ", processDefinition="
+            + processDefinition
+            + ", commandType="
+            + commandType
+            + ", commandParam='"
+            + commandParam
+            + '\''
+            + ", taskDependType="
+            + taskDependType
+            + ", maxTryTimes="
+            + maxTryTimes
+            + ", failureStrategy="
+            + failureStrategy
+            + ", warningType="
+            + warningType
+            + ", warningGroupId="
+            + warningGroupId
+            + ", scheduleTime="
+            + scheduleTime
+            + ", commandStartTime="
+            + commandStartTime
+            + ", globalParams='"
+            + globalParams
+            + '\''
+            + ", executorId="
+            + executorId
+            + ", tenantCode='"
+            + tenantCode
+            + '\''
+            + ", queue='"
+            + queue
+            + '\''
+            + ", isSubProcess="
+            + isSubProcess
+            + ", locations='"
+            + locations
+            + '\''
+            + ", historyCmd='"
+            + historyCmd
+            + '\''
+            + ", dependenceScheduleTimes='"
+            + dependenceScheduleTimes
+            + '\''
+            + ", duration="
+            + duration
+            + ", processInstancePriority="
+            + processInstancePriority
+            + ", workerGroup='"
+            + workerGroup
+            + '\''
+            + ", timeout="
+            + timeout
+            + ", tenantId="
+            + tenantId
+            + ", processDefinitionCode='"
+            + processDefinitionCode
+            + '\''
+            + ", processDefinitionVersion='"
+            + processDefinitionVersion
+            + '\''
+            + ", dryRun='"
+            + dryRun
+            + '\''
+            + '}';
     }
 
     @Override
@@ -698,4 +710,11 @@ public class ProcessInstance {
         return Objects.hash(id);
     }
 
+    public int getNextProcessInstanceId() {
+        return nextProcessInstanceId;
+    }
+
+    public void setNextProcessInstanceId(int nextProcessInstanceId) {
+        this.nextProcessInstanceId = nextProcessInstanceId;
+    }
 }

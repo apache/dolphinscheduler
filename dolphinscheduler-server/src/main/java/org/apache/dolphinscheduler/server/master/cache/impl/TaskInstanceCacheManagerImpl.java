@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -110,7 +110,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(TaskExecuteAckCommand taskAckCommand) {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(taskAckCommand.getTaskInstanceId());
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
         taskInstance.setHost(taskAckCommand.getHost());

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.alert.processor;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -31,16 +30,15 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 import io.netty.channel.Channel;
 
-/**
- * alert request processor
- */
 public class AlertRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
-    private AlertDao alertDao;
-    private AlertPluginManager alertPluginManager;
+    private final AlertDao alertDao;
+    private final AlertPluginManager alertPluginManager;
 
     public AlertRequestProcessor(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         this.alertDao = alertDao;

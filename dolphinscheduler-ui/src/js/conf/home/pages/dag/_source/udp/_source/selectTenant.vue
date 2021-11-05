@@ -61,8 +61,11 @@
       }
     },
     methods: {
-      _onChange (o) {
-        this.$emit('tenantSelectEvent', o)
+      _onChange (id) {
+        const tenant = this.itemList.find(item => item.id === id)
+        if (tenant) {
+          this.$emit('tenantSelectEvent', tenant.tenantCode)
+        }
       }
     },
     watch: {

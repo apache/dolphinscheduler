@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
@@ -38,31 +38,31 @@ public class HttpAlertChannelFactory implements AlertChannelFactory {
     @Override
     public List<PluginParams> getParams() {
 
-        InputParam url = InputParam.newBuilder(HttpAlertConstants.URL, HttpAlertConstants.URL)
+        InputParam url = InputParam.newBuilder(HttpAlertConstants.NAME_URL, HttpAlertConstants.URL)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
                 .build();
 
-        InputParam headerParams = InputParam.newBuilder(HttpAlertConstants.HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
+        InputParam headerParams = InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
                 .build();
 
-        InputParam bodyParams = InputParam.newBuilder(HttpAlertConstants.BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
+        InputParam bodyParams = InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
                 .build();
 
-        InputParam contentField = InputParam.newBuilder(HttpAlertConstants.CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
+        InputParam contentField = InputParam.newBuilder(HttpAlertConstants.NAME_CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
                 .build();
 
-        InputParam requestType = InputParam.newBuilder(HttpAlertConstants.REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
+        InputParam requestType = InputParam.newBuilder(HttpAlertConstants.NAME_REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())

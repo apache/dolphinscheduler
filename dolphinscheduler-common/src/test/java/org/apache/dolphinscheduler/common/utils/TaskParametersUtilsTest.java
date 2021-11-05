@@ -41,5 +41,6 @@ public class TaskParametersUtilsTest {
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.DEPENDENT.getDesc(), "{}"));
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.FLINK.getDesc(), "{}"));
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.HTTP.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.PIGEON.getDesc(), "{}"));
     }
 }

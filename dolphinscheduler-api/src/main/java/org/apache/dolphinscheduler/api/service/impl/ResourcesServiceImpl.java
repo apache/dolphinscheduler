@@ -33,14 +33,12 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -55,6 +53,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 
 import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -128,16 +127,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource directory {} has exist, can't recreate", fullName);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -193,23 +192,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          int pid,
                                          String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         result = verifyPid(loginUser, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // check resource name exists
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -247,13 +246,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * check resource is exists
      *
      * @param fullName  fullName
-     * @param userId    user id
      * @param type      type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String fullName, int userId, int type) {
-        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
-        return BooleanUtils.isTrue(existResource);
+    private boolean checkResourceExists(String fullName, int type) {
+        Boolean existResource = resourcesMapper.existResource(fullName, type);
+        return existResource == Boolean.TRUE;
     }
 
     /**
@@ -275,7 +273,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -299,14 +297,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/") + 1),name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -674,7 +672,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> delete(User loginUser, int resourceId) throws IOException {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -752,7 +750,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -830,7 +828,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> readResource(int resourceId, int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -899,7 +897,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -918,7 +916,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String name = fileName.trim() + "." + nameSuffix;
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -941,7 +939,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
         result = uploadContentToHdfs(fullName, tenantCode, content);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -961,7 +959,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
         Result<Object> result = verifyResourceName(fullName, type, loginUser);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         return verifyPid(loginUser, pid);
@@ -995,7 +993,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> updateResourceContent(int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -1026,7 +1024,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resourcesMapper.updateById(resource);
 
         result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
-        if (result.isFailed()) {
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
         return result;

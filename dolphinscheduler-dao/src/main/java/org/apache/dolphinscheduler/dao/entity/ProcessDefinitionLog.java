@@ -61,13 +61,13 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setUserName(processDefinition.getUserName());
         this.setProjectName(processDefinition.getProjectName());
         this.setLocations(processDefinition.getLocations());
-        this.setConnects(processDefinition.getConnects());
         this.setScheduleReleaseState(processDefinition.getScheduleReleaseState());
         this.setTimeout(processDefinition.getTimeout());
         this.setTenantId(processDefinition.getTenantId());
         this.setModifyBy(processDefinition.getModifyBy());
         this.setResourceIds(processDefinition.getResourceIds());
         this.setWarningGroupId(processDefinition.getWarningGroupId());
+        this.setExecutionType(processDefinition.getExecutionType());
     }
 
     public int getOperator() {
@@ -84,6 +84,11 @@ public class ProcessDefinitionLog extends ProcessDefinition {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
     }
 
 }

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -426,9 +426,11 @@ public class ResourceMapperTest {
         String fullName = "/ut-resource";
         int userId = 111;
         int type = ResourceType.FILE.getCode();
-        Assert.assertNull(resourceMapper.existResource(fullName, userId, type));
+        Assert.assertNull(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertNull(resourceMapper.existResource(fullName, type));
         insertOne();
-        Assert.assertTrue(resourceMapper.existResource(fullName, userId, type));
+        Assert.assertTrue(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertTrue(resourceMapper.existResource(fullName, type));
     }
 }
 

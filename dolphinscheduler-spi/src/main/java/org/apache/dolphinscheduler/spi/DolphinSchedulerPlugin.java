@@ -21,6 +21,7 @@ import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.register.RegistryFactory;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
 /**
  * Dolphinscheduler plugin interface
@@ -48,4 +49,13 @@ public interface DolphinSchedulerPlugin {
     default Iterable<RegistryFactory> getRegisterFactorys() {
         return emptyList();
     }
+
+    /**
+     * get task plugin factory
+     * @return registry factory
+     */
+    default Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+        return emptyList();
+    }
+
 }
