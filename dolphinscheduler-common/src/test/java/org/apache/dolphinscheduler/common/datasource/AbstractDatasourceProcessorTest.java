@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceProcessor;
 import org.apache.dolphinscheduler.common.enums.DbType;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,10 +30,6 @@ import org.mockito.Answers;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MysqlDatasourceProcessor.class})
