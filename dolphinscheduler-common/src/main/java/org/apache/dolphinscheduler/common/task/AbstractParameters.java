@@ -127,7 +127,7 @@ public abstract class AbstractParameters implements IParameters {
             return;
         }
         Map<String, String> taskResult = getMapByString(result);
-        if (taskResult == null || taskResult.size() == 0) {
+        if (taskResult.isEmpty()) {
             return;
         }
         for (Property info : outProperty) {
