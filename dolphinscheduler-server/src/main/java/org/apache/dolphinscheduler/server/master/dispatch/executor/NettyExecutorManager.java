@@ -168,8 +168,10 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         } while (retryCount >= 0 && !success);
 
         if (!success) {
-            //Because the number of errors exceeds the limit, there may be work errors, or the channel has failed.
-            //THE channel must to be closed.
+            /**
+             * Because the number of errors exceeds the limit, there may be work errors, or the channel has failed.
+             * The channel must to be closed.
+             */
             nettyRemotingClient.closeChannel(host);
             throw new ExecuteException(String.format("send command : %s to %s error", command, host));
         }
