@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import java.util.Optional;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
@@ -29,6 +28,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.util.Optional;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
