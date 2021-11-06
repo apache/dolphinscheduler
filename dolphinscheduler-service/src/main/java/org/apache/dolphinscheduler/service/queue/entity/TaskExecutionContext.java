@@ -228,6 +228,9 @@ public class TaskExecutionContext implements Serializable {
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
+    /**
+     * data quality TaskExecutionContext
+     */
     private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
     /**

@@ -67,7 +67,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqRuleServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(DqRuleServiceTest.class);
 
     @InjectMocks
     private DqRuleServiceImpl dqRuleService;

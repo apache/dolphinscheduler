@@ -162,6 +162,7 @@ public class AlertSender {
             logger.error("send alert error alert data id :{},", alertData.getId(), e);
         }
 
+
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
             alertResultExtend.setStatus(String.valueOf(false));

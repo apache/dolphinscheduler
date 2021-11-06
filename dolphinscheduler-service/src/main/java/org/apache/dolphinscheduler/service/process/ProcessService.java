@@ -204,7 +204,6 @@ public class ProcessService {
     private ProjectMapper projectMapper;
 
     @Autowired
-
     private DqExecuteResultMapper dqExecuteResultMapper;
 
     @Autowired

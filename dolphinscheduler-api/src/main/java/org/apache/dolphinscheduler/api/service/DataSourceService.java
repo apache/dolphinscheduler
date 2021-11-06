@@ -129,7 +129,18 @@ public interface DataSourceService {
      */
     Map<String, Object> authedDatasource(User loginUser, Integer userId);
 
+    /**
+     * get tables
+     * @param datasourceId
+     * @return
+     */
     Map<String, Object> getTables(Integer datasourceId);
 
+    /**
+     * get table columns
+     * @param datasourceId
+     * @param tableName
+     * @return
+     */
     Map<String, Object> getTableColumns(Integer datasourceId,String tableName);
 }

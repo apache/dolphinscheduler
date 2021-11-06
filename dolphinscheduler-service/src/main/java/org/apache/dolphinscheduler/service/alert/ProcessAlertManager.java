@@ -260,7 +260,6 @@ public class ProcessAlertManager {
 
     /**
      * send data quality task alert
-     * if result is null ,send task failure message
      */
     public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, ProcessInstance processInstance) {
         Alert alert = new Alert();
@@ -345,6 +344,5 @@ public class ProcessAlertManager {
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
         alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(),processInstance.getName(),
                 taskInstance.getId(), taskInstance.getName());
-
     }
 }

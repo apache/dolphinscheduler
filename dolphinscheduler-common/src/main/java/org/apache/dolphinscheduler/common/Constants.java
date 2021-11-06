@@ -206,47 +206,6 @@ public final class Constants {
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
-<<<<<<< HEAD
-     * MasterServer directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
-
-    /**
-     * WorkerServer directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-
-    /**
-     * all servers directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
-
-    /**
-     * MasterServer lock directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
-
-
-    /**
-     * MasterServer failover directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
-
-    /**
-     * WorkerServer failover directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
-
-    /**
-     * MasterServer startup  failover runing and fault tolerance process
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
-
-    /**
-     * dot .
-     */
-    public static final String DOT = ".";
-    /**
      * comma ,
      */
     public static final String COMMA = ",";

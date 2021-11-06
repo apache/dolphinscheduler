@@ -186,7 +186,6 @@ public class MasterServer implements IStoppable {
             // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-
             this.masterRegistryClient.closeRegistry();
             // close quartz
             try {

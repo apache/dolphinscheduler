@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -174,7 +175,6 @@ public class TaskResponseService {
             case RESULT:
                 try {
                     if (taskInstance != null) {
-
                         dataQualityResultOperator.operateDqExecuteResult(taskResponseEvent, taskInstance);
 
                         processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
