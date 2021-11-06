@@ -27,7 +27,7 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_user_A_state()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='state')
    THEN
-         ALTER TABLE t_ds_user ADD `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable';
+         ALTER TABLE t_ds_user ADD `state` tinyint(4) DEFAULT '1' COMMENT 'state 0:disable 1:enable';
        END IF;
  END;
 
@@ -56,186 +56,6 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_tenant_A_tenant_name;
 DROP PROCEDURE uc_dolphin_T_t_ds_tenant_A_tenant_name;
-
--- uc_dolphin_T_t_ds_task_instance_A_first_submit_time
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_first_submit_time;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_first_submit_time()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='first_submit_time')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_first_submit_time();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_first_submit_time;
-
--- uc_dolphin_T_t_ds_task_instance_A_delay_time
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_delay_time;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_delay_time()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='delay_time')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_delay_time();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_delay_time;
-
--- uc_dolphin_T_t_ds_task_instance_A_var_pool
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_var_pool;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_task_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='var_pool')
-   THEN
-         ALTER TABLE t_ds_task_instance ADD `var_pool` longtext NULL;
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_task_instance_A_var_pool();
-DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool;
-
--- uc_dolphin_T_t_ds_process_instance_A_var_pool
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_var_pool;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_var_pool()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_instance'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='var_pool')
-   THEN
-         ALTER TABLE t_ds_process_instance ADD `var_pool` longtext NULL;
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_instance_A_var_pool();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_var_pool;
-
--- uc_dolphin_T_t_ds_process_definition_A_modify_by
-drop PROCEDURE if EXISTS ct_dolphin_T_t_ds_process_definition_version;
-delimiter d//
-CREATE PROCEDURE ct_dolphin_T_t_ds_process_definition_version()
-BEGIN
-    CREATE TABLE IF NOT EXISTS `t_ds_process_definition_version` (
-        `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-        `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
-        `version` int(11) DEFAULT NULL COMMENT 'process definition version',
-        `process_definition_json` longtext COMMENT 'process definition json content',
-        `description` text,
-        `global_params` text COMMENT 'global parameters',
-        `locations` text COMMENT 'Node location information',
-        `connects` text COMMENT 'Node connection information',
-        `receivers` text COMMENT 'receivers',
-        `receivers_cc` text COMMENT 'cc',
-        `create_time` datetime DEFAULT NULL COMMENT 'create time',
-        `timeout` int(11) DEFAULT '0' COMMENT 'time out',
-        `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `process_definition_id_and_version` (`process_definition_id`,`version`) USING BTREE,
-        KEY `process_definition_index` (`id`) USING BTREE
-    ) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
-END;
-
-d//
-
-delimiter ;
-CALL ct_dolphin_T_t_ds_process_definition_version;
-DROP PROCEDURE ct_dolphin_T_t_ds_process_definition_version;
-
--- ----------------------------
--- Table structure for t_ds_plugin_define
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_plugin_define`;
-CREATE TABLE `t_ds_plugin_define` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `plugin_name` varchar(100) NOT NULL COMMENT 'the name of plugin eg: email',
-    `plugin_type` varchar(100) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
-    `plugin_params` text COMMENT 'plugin params',
-    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_alert_plugin_instance
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
-CREATE TABLE `t_ds_alert_plugin_instance` (
-    `id`                     int NOT NULL AUTO_INCREMENT,
-    `plugin_define_id`       int NOT NULL,
-    `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
-    `create_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `instance_name`          varchar(200) DEFAULT NULL COMMENT 'alert instance name',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- uc_dolphin_T_t_ds_process_definition_A_warning_group_id
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_warning_group_id;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_warning_group_id()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_definition'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='warning_group_id')
-   THEN
-         ALTER TABLE t_ds_process_definition ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_definition_A_warning_group_id();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_warning_group_id;
-
--- uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_definition_version'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='warning_group_id')
-   THEN
-         ALTER TABLE t_ds_process_definition_version ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id;
 
 -- uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids;
@@ -317,115 +137,73 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
 DROP PROCEDURE uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName;
 
--- uc_dolphin_T_t_ds_schedules_A_add_timezone
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_schedules_A_add_timezone;
+-- uc_dolphin_T_t_ds_project_A_add_code
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_project_A_add_code;
 delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone()
+CREATE PROCEDURE uc_dolphin_T_t_ds_project_A_add_code()
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-                   WHERE TABLE_NAME='t_ds_schedules'
+                   WHERE TABLE_NAME='t_ds_project'
                      AND TABLE_SCHEMA=(SELECT DATABASE())
-                     AND COLUMN_NAME ='timezone_id')
+                     AND COLUMN_NAME ='code')
     THEN
-        ALTER TABLE t_ds_schedules ADD COLUMN `timezone_id` varchar(40) default NULL COMMENT 'schedule timezone id' AFTER `end_time`;
+           alter table t_ds_project add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `name`;
     END IF;
 END;
 
 d//
 
 delimiter ;
-CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
-DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
+CALL uc_dolphin_T_t_ds_project_A_add_code();
+DROP PROCEDURE uc_dolphin_T_t_ds_project_A_add_code;
+
+-- ----------------------------
+-- Table structure for t_ds_plugin_define
+-- ----------------------------
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+DROP TABLE IF EXISTS `t_ds_plugin_define`;
+CREATE TABLE `t_ds_plugin_define` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_name` varchar(100) NOT NULL COMMENT 'the name of plugin eg: email',
+  `plugin_type` varchar(100) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
+  `plugin_params` text COMMENT 'plugin params',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
+CREATE TABLE `t_ds_alert_plugin_instance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_define_id` int NOT NULL,
+  `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_ds_environment
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_environment`;
 CREATE TABLE `t_ds_environment` (
-   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-   `code` bigint(20) DEFAULT NULL COMMENT 'encoding',
-   `name` varchar(100) NOT NULL COMMENT 'environment config name',
-   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
-   `description` text NULL DEFAULT NULL COMMENT 'the details',
-   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   PRIMARY KEY (`id`),
-   UNIQUE KEY `environment_name_unique` (`name`),
-   UNIQUE KEY `environment_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_task_definition
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_definition`;
-CREATE TABLE `t_ds_task_definition` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
-  `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` longtext COMMENT 'job custom parameters',
-  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
-  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
-  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
-  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
-  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
-  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
-  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
-  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` text COMMENT 'resource id, separated by comma',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_task_definition_log
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_definition_log`;
-CREATE TABLE `t_ds_task_definition_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
-  `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
-  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
-  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
-  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
-  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
-  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
-  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
-  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
-  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
-  `resource_ids` text COMMENT 'resource id, separated by comma',
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
+  `name` varchar(100) NOT NULL COMMENT 'environment name',
+  `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
+  `description` text NULL DEFAULT NULL COMMENT 'the details',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `environment_name_unique` (`name`),
+  UNIQUE KEY `environment_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-ALTER TABLE t_ds_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_error_command ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_schedules ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_process_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_instance ADD COLUMN `environment_code` bigint(20) default '-1' COMMENT 'environment code' AFTER `worker_group`;
-ALTER TABLE t_ds_task_instance ADD COLUMN `environment_config` text COMMENT 'environment config' AFTER `environment_code`;
-
-ALTER TABLE t_ds_task_definition MODIFY COLUMN `resource_ids` text;
-ALTER TABLE t_ds_task_definition_log MODIFY COLUMN `resource_ids` text;
 
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
@@ -443,33 +221,209 @@ CREATE TABLE `t_ds_environment_worker_group_relation` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
+-- Table structure for t_ds_process_definition_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_log`;
+CREATE TABLE `t_ds_process_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
+  `version` int(11) DEFAULT '0' COMMENT 'process definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
+  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
+  `global_params` text COMMENT 'global parameters',
+  `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `locations` text COMMENT 'Node location information',
+  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
+  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- ALTER TABLE t_ds_alert DROP `show_type`, DROP `alert_type`, DROP `receivers`, DROP `receivers_cc`;
+-- ----------------------------
+-- Table structure for t_ds_task_definition
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition`;
+CREATE TABLE `t_ds_task_definition` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT '0' COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` longtext COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` text COMMENT 'resource id, separated by comma',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`,`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- ALTER TABLE t_ds_alertgroup DROP `group_type`;
+-- ----------------------------
+-- Table structure for t_ds_task_definition_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition_log`;
+CREATE TABLE `t_ds_task_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT '0' COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` text COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- ALTER TABLE t_ds_process_definition DROP `receivers`, DROP `receivers_cc`;
+-- ----------------------------
+-- Table structure for t_ds_process_task_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation`;
+CREATE TABLE `t_ds_process_task_relation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
+  `process_definition_version` int(11) NOT NULL COMMENT 'process version',
+  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
+  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
+  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
+  `condition_params` text COMMENT 'condition params(json)',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- ALTER TABLE t_ds_process_definition_version DROP `receivers`, DROP `receivers_cc`;
+-- ----------------------------
+-- Table structure for t_ds_process_task_relation_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
+CREATE TABLE `t_ds_process_task_relation_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
+  `process_definition_version` int(11) NOT NULL COMMENT 'process version',
+  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
+  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
+  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
+  `condition_params` text COMMENT 'condition params(json)',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime NOT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
--- DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+-- t_ds_command
+alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
+alter table t_ds_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
+alter table t_ds_command add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER environment_code;
+alter table t_ds_command add process_definition_version int(11) DEFAULT '0' COMMENT 'process definition version' AFTER process_definition_code;
+alter table t_ds_command add process_instance_id int(11) DEFAULT '0' COMMENT 'process instance id' AFTER process_definition_version;
+alter table t_ds_command add KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE;
+
+-- t_ds_error_command
+alter table t_ds_error_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
+alter table t_ds_error_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
+alter table t_ds_error_command add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER message;
+alter table t_ds_error_command add process_definition_version int(11) DEFAULT '0' COMMENT 'process definition version' AFTER process_definition_code;
+alter table t_ds_error_command add process_instance_id int(11) DEFAULT '0' COMMENT 'process instance id' AFTER process_definition_version;
+
+-- t_ds_process_instance  note: Data migration is not supported
+alter table t_ds_process_instance change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
+alter table t_ds_process_instance add process_definition_version int(11) DEFAULT '0' COMMENT 'process definition version' AFTER process_definition_code;
+alter table t_ds_process_instance add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
+alter table t_ds_process_instance add var_pool longtext COMMENT 'var_pool' AFTER tenant_id;
+alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
+alter table t_ds_process_instance drop KEY `process_instance_index`;
+alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
+alter table t_ds_process_instance drop process_instance_json;
+alter table t_ds_process_instance drop locations;
+alter table t_ds_process_instance drop connects;
+alter table t_ds_process_instance drop dependence_schedule_times;
+
+-- t_ds_task_instance   note: Data migration is not supported
+alter table t_ds_task_instance change process_definition_id task_code bigint(20) NOT NULL COMMENT 'task definition code';
+alter table t_ds_task_instance add task_definition_version int(11) DEFAULT '0' COMMENT 'task definition version' AFTER task_code;
+alter table t_ds_task_instance add task_params text COMMENT 'job custom parameters' AFTER app_link;
+alter table t_ds_task_instance add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
+alter table t_ds_task_instance add environment_config text COMMENT 'this config contains many environment variables config' AFTER environment_code;
+alter table t_ds_task_instance add first_submit_time datetime DEFAULT NULL COMMENT 'task first submit time' AFTER executor_id;
+alter table t_ds_task_instance add delay_time int(4) DEFAULT '0' COMMENT 'task delay execution time' AFTER first_submit_time;
+alter table t_ds_task_instance add var_pool longtext COMMENT 'var_pool' AFTER delay_time;
+alter table t_ds_task_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
+alter table t_ds_task_instance drop KEY `task_instance_index`;
+alter table t_ds_task_instance drop task_json;
+
+-- t_ds_schedules
+alter table t_ds_schedules change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
+alter table t_ds_schedules add timezone_id varchar(40) DEFAULT NULL COMMENT 'timezoneId' AFTER end_time;
+alter table t_ds_schedules add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
+
+-- t_ds_process_definition
+alter table t_ds_process_definition add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `id`;
+alter table t_ds_process_definition change project_id project_code bigint(20) NOT NULL COMMENT 'project code' AFTER `description`;
+alter table t_ds_process_definition add `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `locations`;
+alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;
+alter table t_ds_process_definition modify `description` text COMMENT 'description' after `version`;
+alter table t_ds_process_definition modify `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online' after `project_code`;
+alter table t_ds_process_definition modify `create_time` datetime DEFAULT NULL COMMENT 'create time' after `tenant_id`;
+alter table t_ds_process_definition add `execution_type` tinyint(4) DEFAULT 0 COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority' after `tenant_id`;
+alter table t_ds_process_instance add `next_process_instance_id` int(11) DEFAULT 0 COMMENT 'serial queue next processInstanceId' after 'dry_run'
 
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
 DROP TABLE IF EXISTS `t_ds_dq_comparison_type`;
 CREATE TABLE `t_ds_dq_comparison_type` (
-   `id` int(11) NOT NULL AUTO_INCREMENT,
-   `type` varchar(100) NOT NULL,
-   `execute_sql` text DEFAULT NULL,
-   `output_table` varchar(100) DEFAULT NULL,
-   `name` varchar(100) DEFAULT NULL,
-   `create_time` datetime DEFAULT NULL,
-   `update_time` datetime DEFAULT NULL,
-   `is_inner_source` tinyint(1) DEFAULT '0',
-   PRIMARY KEY (`id`)
+                                           `id` int(11) NOT NULL AUTO_INCREMENT,
+                                           `type` varchar(100) NOT NULL,
+                                           `execute_sql` text DEFAULT NULL,
+                                           `output_table` varchar(100) DEFAULT NULL,
+                                           `name` varchar(100) DEFAULT NULL,
+                                           `create_time` datetime DEFAULT NULL,
+                                           `update_time` datetime DEFAULT NULL,
+                                           `is_inner_source` tinyint(1) DEFAULT '0',
+                                           PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_dq_comparison_type`
@@ -477,19 +431,19 @@ INSERT INTO `t_ds_dq_comparison_type`
 VALUES(1, '固定值', NULL, NULL, NULL, '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(2, '日波动', 'select round(avg(statistics_value),2) as day_avg from `t_ds_dq_task_statistics_value` where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(2, '日波动', 'select round(avg(statistics_value),2) as day_avg from t_ds_dq_task_statistics_value where data_time >=date_trunc(''DAY'', ${data_time}) and data_time < date_add(date_trunc(''day'', ${data_time}),1) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'day_range', 'day_range.day_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(3, '周波动', 'select round(avg(statistics_value),2) as week_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(3, '周波动', 'select round(avg(statistics_value),2) as week_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''WEEK'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'week_range', 'week_range.week_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(4, '月波动', 'select round(avg(statistics_value),2) as month_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(4, '月波动', 'select round(avg(statistics_value),2) as month_avg from t_ds_dq_task_statistics_value where  data_time >= date_trunc(''MONTH'', ${data_time}) and data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'month_range', 'month_range.month_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(5, '最近7天波动', 'select round(avg(statistics_value),2) as last_7_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(5, '最近7天波动', 'select round(avg(statistics_value),2) as last_7_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-7) and  data_time <date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_seven_days', 'last_seven_days.last_7_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
-VALUES(6, '最近30天波动', 'select round(avg(statistics_value),2) as last_30_avg from `t_ds_dq_task_statistics_value` where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
+VALUES(6, '最近30天波动', 'select round(avg(statistics_value),2) as last_30_avg from t_ds_dq_task_statistics_value where  data_time >= date_add(date_trunc(''day'', ${data_time}),-30) and  data_time < date_trunc(''day'', ${data_time}) and unique_code = ${unique_code} and statistics_name = ''${statistics_name}''', 'last_thirty_days', 'last_thirty_days.last_30_avg', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', true);
 INSERT INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
 VALUES(7, '源表总行数', 'SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})', 'total_count', 'total_count.total', '2021-06-30 00:00:00.000', '2021-06-30 00:00:00.000', false);
@@ -502,25 +456,25 @@ VALUES(8, '目标表总行数', 'SELECT COUNT(*) AS total FROM ${target_table} W
 --
 DROP TABLE IF EXISTS `t_ds_dq_execute_result`;
 CREATE TABLE `t_ds_dq_execute_result` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `process_definition_id` int(11) DEFAULT NULL,
-    `process_instance_id` int(11) DEFAULT NULL,
-    `task_instance_id` int(11) DEFAULT NULL,
-    `rule_type` int(11) DEFAULT NULL,
-    `rule_name` varchar(255) DEFAULT NULL,
-    `statistics_value` double DEFAULT NULL,
-    `comparison_value` double DEFAULT NULL,
-    `check_type` int(11) DEFAULT NULL,
-    `threshold` double DEFAULT NULL,
-    `operator` int(11) DEFAULT NULL,
-    `failure_strategy` int(11) DEFAULT NULL,
-    `state` int(11) DEFAULT NULL,
-    `user_id` int(11) DEFAULT NULL,
-    `comparison_type` int(11) DEFAULT NULL,
-    `error_output_path` text DEFAULT NULL,
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
+                                          `id` int(11) NOT NULL AUTO_INCREMENT,
+                                          `process_definition_id` int(11) DEFAULT NULL,
+                                          `process_instance_id` int(11) DEFAULT NULL,
+                                          `task_instance_id` int(11) DEFAULT NULL,
+                                          `rule_type` int(11) DEFAULT NULL,
+                                          `rule_name` varchar(255) DEFAULT NULL,
+                                          `statistics_value` double DEFAULT NULL,
+                                          `comparison_value` double DEFAULT NULL,
+                                          `check_type` int(11) DEFAULT NULL,
+                                          `threshold` double DEFAULT NULL,
+                                          `operator` int(11) DEFAULT NULL,
+                                          `failure_strategy` int(11) DEFAULT NULL,
+                                          `state` int(11) DEFAULT NULL,
+                                          `user_id` int(11) DEFAULT NULL,
+                                          `comparison_type` int(11) DEFAULT NULL,
+                                          `error_output_path` text DEFAULT NULL,
+                                          `create_time` datetime DEFAULT NULL,
+                                          `update_time` datetime DEFAULT NULL,
+                                          PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -528,13 +482,13 @@ CREATE TABLE `t_ds_dq_execute_result` (
 --
 DROP TABLE IF EXISTS `t_ds_dq_rule`;
 CREATE TABLE `t_ds_dq_rule` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(100) DEFAULT NULL,
-    `type` int(11) DEFAULT NULL,
-    `user_id` int(11) DEFAULT NULL,
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
+                                `id` int(11) NOT NULL AUTO_INCREMENT,
+                                `name` varchar(100) DEFAULT NULL,
+                                `type` int(11) DEFAULT NULL,
+                                `user_id` int(11) DEFAULT NULL,
+                                `create_time` datetime DEFAULT NULL,
+                                `update_time` datetime DEFAULT NULL,
+                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_dq_rule`
@@ -573,15 +527,15 @@ VALUES(10, '表行数校验', 0, 1, '2020-01-12 00:00:00.000', '2020-01-12 00:00
 --
 DROP TABLE IF EXISTS `t_ds_dq_rule_execute_sql`;
 CREATE TABLE `t_ds_dq_rule_execute_sql` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `index` int(11) DEFAULT NULL,
-    `sql` text DEFAULT NULL,
-    `table_alias` varchar(255) DEFAULT NULL,
-    `type` int(11) DEFAULT NULL,
-    `is_error_output_sql` tinyint(1) DEFAULT '0',
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
+                                            `id` int(11) NOT NULL AUTO_INCREMENT,
+                                            `index` int(11) DEFAULT NULL,
+                                            `sql` text DEFAULT NULL,
+                                            `table_alias` varchar(255) DEFAULT NULL,
+                                            `type` int(11) DEFAULT NULL,
+                                            `is_error_output_sql` tinyint(1) DEFAULT '0',
+                                            `create_time` datetime DEFAULT NULL,
+                                            `update_time` datetime DEFAULT NULL,
+                                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_dq_rule_execute_sql`
@@ -641,23 +595,23 @@ VALUES(17, 1, 'SELECT * FROM ${src_table} WHERE (length(${src_field}) ${logic_op
 --
 DROP TABLE IF EXISTS `t_ds_dq_rule_input_entry`;
 CREATE TABLE `t_ds_dq_rule_input_entry` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `field` varchar(255) DEFAULT NULL,
-    `type` varchar(255) DEFAULT NULL,
-    `title` varchar(255) DEFAULT NULL,
-    `value` varchar(255)  DEFAULT NULL,
-    `options` text DEFAULT NULL,
-    `placeholder` varchar(255) DEFAULT NULL,
-    `option_source_type` int(11) DEFAULT NULL,
-    `value_type` int(11) DEFAULT NULL,
-    `input_type` int(11) DEFAULT NULL,
-    `is_show` tinyint(1) DEFAULT '1',
-    `can_edit` tinyint(1) DEFAULT '1',
-    `is_emit` tinyint(1) DEFAULT '0',
-    `is_validate` tinyint(1) DEFAULT '1',
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`)
+                                            `id` int(11) NOT NULL AUTO_INCREMENT,
+                                            `field` varchar(255) DEFAULT NULL,
+                                            `type` varchar(255) DEFAULT NULL,
+                                            `title` varchar(255) DEFAULT NULL,
+                                            `value` varchar(255)  DEFAULT NULL,
+                                            `options` text DEFAULT NULL,
+                                            `placeholder` varchar(255) DEFAULT NULL,
+                                            `option_source_type` int(11) DEFAULT NULL,
+                                            `value_type` int(11) DEFAULT NULL,
+                                            `input_type` int(11) DEFAULT NULL,
+                                            `is_show` tinyint(1) DEFAULT '1',
+                                            `can_edit` tinyint(1) DEFAULT '1',
+                                            `is_emit` tinyint(1) DEFAULT '0',
+                                            `is_validate` tinyint(1) DEFAULT '1',
+                                            `create_time` datetime DEFAULT NULL,
+                                            `update_time` datetime DEFAULT NULL,
+                                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_dq_rule_input_entry`
@@ -753,17 +707,17 @@ VALUES(29, 'begin_time', 'input', '起始时间', NULL, NULL, 'Please enter begi
 --
 DROP TABLE IF EXISTS `t_ds_dq_task_statistics_value`;
 CREATE TABLE `t_ds_dq_task_statistics_value` (
-     `id` int(11) NOT NULL AUTO_INCREMENT,
-     `process_definition_id` int(11) DEFAULT NULL,
-     `task_instance_id` int(11) DEFAULT NULL,
-     `rule_id` int(11) NOT NULL,
-     `unique_code` varchar(255) NULL,
-     `statistics_name` varchar(255) NULL,
-     `statistics_value` double NULL,
-     `data_time` datetime DEFAULT NULL,
-     `create_time` datetime DEFAULT NULL,
-     `update_time` datetime DEFAULT NULL,
-     PRIMARY KEY (`id`)
+                                                 `id` int(11) NOT NULL AUTO_INCREMENT,
+                                                 `process_definition_id` int(11) DEFAULT NULL,
+                                                 `task_instance_id` int(11) DEFAULT NULL,
+                                                 `rule_id` int(11) NOT NULL,
+                                                 `unique_code` varchar(255) NULL,
+                                                 `statistics_name` varchar(255) NULL,
+                                                 `statistics_value` double NULL,
+                                                 `data_time` datetime DEFAULT NULL,
+                                                 `create_time` datetime DEFAULT NULL,
+                                                 `update_time` datetime DEFAULT NULL,
+                                                 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -771,12 +725,12 @@ CREATE TABLE `t_ds_dq_task_statistics_value` (
 --
 DROP TABLE IF EXISTS `t_ds_relation_rule_execute_sql`;
 CREATE TABLE `t_ds_relation_rule_execute_sql` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `rule_id` int(11) DEFAULT NULL,
-    `execute_sql_id` int(11) DEFAULT NULL,
-    `create_time` datetime NULL,
-    `update_time` datetime NULL,
-    PRIMARY KEY (`id`)
+                                                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                                                  `rule_id` int(11) DEFAULT NULL,
+                                                  `execute_sql_id` int(11) DEFAULT NULL,
+                                                  `create_time` datetime NULL,
+                                                  `update_time` datetime NULL,
+                                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_relation_rule_execute_sql`
@@ -830,14 +784,14 @@ VALUES(15, 5, 17, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 --
 DROP TABLE IF EXISTS `t_ds_relation_rule_input_entry`;
 CREATE TABLE `t_ds_relation_rule_input_entry` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `rule_id` int(11) DEFAULT NULL,
-    `rule_input_entry_id` int(11) DEFAULT NULL,
-    `values_map` text DEFAULT NULL,
-    `index` int(11) DEFAULT NULL,
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-PRIMARY KEY (`id`)
+                                                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                                                  `rule_id` int(11) DEFAULT NULL,
+                                                  `rule_input_entry_id` int(11) DEFAULT NULL,
+                                                  `values_map` text DEFAULT NULL,
+                                                  `index` int(11) DEFAULT NULL,
+                                                  `create_time` datetime DEFAULT NULL,
+                                                  `update_time` datetime DEFAULT NULL,
+                                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `t_ds_relation_rule_input_entry`
@@ -1233,8 +1187,3 @@ VALUES(149, 10, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.00
 INSERT INTO t_ds_relation_rule_input_entry
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
 VALUES(150, 8, 29, NULL, 7, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
-
--- ALTER TABLE t_ds_command DROP `dependence`;
-
--- ALTER TABLE t_ds_error_command DROP `dependence`;
-

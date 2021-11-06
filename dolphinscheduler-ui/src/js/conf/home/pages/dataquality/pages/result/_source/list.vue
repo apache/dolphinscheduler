@@ -43,7 +43,6 @@
         </el-table-column>
         <el-table-column prop="statisticsValue" :label="$t('Statistics Value')"></el-table-column>
         <el-table-column prop="comparisonValue" :label="$t('Comparison Value')"></el-table-column>
-        <el-table-column prop="comparisonTypeName" :label="$t('Comparison Type')"></el-table-column>
         <el-table-column :label="$t('Check Type')" width="200">
           <template slot-scope="scope">
             {{_rtCheckType(scope.row.checkType)}}
@@ -60,6 +59,7 @@
             {{_rtFailureStrategy(scope.row.failureStrategy)}}
           </template>
         </el-table-column>
+         <el-table-column prop="comparisonTypeName" :label="$t('Comparison Type')"></el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">

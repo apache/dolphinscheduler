@@ -18,22 +18,21 @@
   <div class="list-model">
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column width="50" type="expand">
+            <template slot-scope="scope">
+            <div>
+              <el-table :data="JSON.parse(scope.row.ruleJson).ruleInputEntryList" size="mini" style="width: 100%">
+                <el-table-column prop="title" :label="$t('InputEntry Title')"></el-table-column>
+                <el-table-column prop="field" :label="$t('InputEntry Field')"></el-table-column>
+                <el-table-column prop="type" :label="$t('InputEntry Type')"></el-table-column>
+              </el-table>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="name" :label="$t('Name')"></el-table-column>
         <el-table-column :label="$t('Rule Type')" width="120">
           <template slot-scope="scope">
             {{_rtRuleType(scope.row.type)}}
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('DataQuality Rule Json')">
-          <template slot-scope="scope">
-            <div>
-              <m-tooltips-JSON :JSON="JSON.parse(scope.row.ruleJson)" :id="scope.row.id">
-                <span slot="reference">
-                  <el-button size="small" type="text">{{$t('Click to view')}}</el-button>
-                </span>
-            </m-tooltips-JSON>
-            </div>
           </template>
         </el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
@@ -54,7 +53,6 @@
 <script>
   import _ from 'lodash'
   import { ruleType } from '@/conf/home/pages/dataquality/_source/common'
-  import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
   export default {
     name: 'rule-list',
     data () {
@@ -84,7 +82,6 @@
       this.list = this.ruleList
     },
     mounted () {
-    },
-    components: { mTooltipsJSON }
+    }
   }
 </script>

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import java.util.HashMap;
@@ -50,7 +51,8 @@ public enum CommandType {
     REPEAT_RUNNING(7, "repeat running a process"),
     PAUSE(8, "pause a process"),
     STOP(9, "stop a process"),
-    RECOVER_WAITING_THREAD(10, "recover waiting thread");
+    RECOVER_WAITING_THREAD(10, "recover waiting thread"),
+    RECOVER_SERIAL_WAIT(11, "recover serial wait");
 
     CommandType(int code, String descp){
         this.code = code;

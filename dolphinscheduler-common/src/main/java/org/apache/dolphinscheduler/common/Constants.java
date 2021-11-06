@@ -419,6 +419,7 @@ public final class Constants {
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
+    public static final String THREAD_NAME_GATEWAY_SERVER = "Gateway-Server";
 
     /**
      * command parameter keys
@@ -877,6 +878,12 @@ public final class Constants {
         ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
         ExecutionStatus.WAITING_THREAD.ordinal(),
         ExecutionStatus.WAITING_DEPEND.ordinal()
+    };
+
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 
     /**
