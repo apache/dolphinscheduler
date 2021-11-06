@@ -117,7 +117,7 @@
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
               <em class="el-icon-tickets"></em>
-              <span>{{$t('Project manage')}}</span>
+              <span>{{$t('Project Manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
               <em class="el-icon-folder"></em>
