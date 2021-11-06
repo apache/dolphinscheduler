@@ -147,7 +147,7 @@
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
           $(`#${o.id}`).siblings().each(function () {
-            if (v1.depTasks === $(this).text()) {
+            if (v1.depTaskCode === $(this).text()) {
               v1.state = $(this).attr('data-dependent-depstate')
             }
           })
