@@ -33,6 +33,7 @@ import org.apache.curator.test.TestingServer;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,11 +72,17 @@ public class StandaloneServer {
         ).run(args);
     }
 
-    private static void startAlertServer() {
-        final Path alertPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+    private static Path getAbsolutePath(String relativePath) throws URISyntaxException {
+        String primaryPath = Paths.get(
+                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().toURI()
+        ).toAbsolutePath().toString();
+        return Paths.get(primaryPath, relativePath).normalize().toAbsolutePath();
+    }
+
+    private static void startAlertServer() throws URISyntaxException {
+        final Path alertPluginPath = getAbsolutePath(
                 "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
-        ).toAbsolutePath();
+        );
         if (Files.exists(alertPluginPath)) {
             System.setProperty("alert.plugin.binding", alertPluginPath.toString());
             System.setProperty("alert.plugin.dir", "");
@@ -87,10 +94,10 @@ public class StandaloneServer {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
 
-        final Path registryPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+        final Path registryPath = getAbsolutePath(
                 "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
-        ).toAbsolutePath();
+        );
+
         if (Files.exists(registryPath)) {
             System.setProperty("registry.plugin.binding", registryPath.toString());
             System.setProperty("registry.plugin.dir", "");
@@ -98,31 +105,38 @@ public class StandaloneServer {
     }
 
     private static void startDatabase() throws IOException, SQLException {
-        final Path temp = Files.createTempDirectory("dolphinscheduler_");
-        LOGGER.info("H2 database directory: {}", temp);
+        final String databaseDir = "dolphinscheduler";
+        final String storageFilePrefix = "standalone.server";
+        final String storageFileName = "standalone.server.mv.db";
+
+        Path databaseDirPath = Paths.get(System.getProperty("java.io.tmpdir"), databaseDir);
+        LOGGER.info("H2 database directory: {}", databaseDirPath);
         System.setProperty(
                 SPRING_DATASOURCE_DRIVER_CLASS_NAME,
                 org.h2.Driver.class.getName()
         );
         System.setProperty(
                 SPRING_DATASOURCE_URL,
-                String.format("jdbc:h2:tcp://localhost/%s;MODE=MySQL;DATABASE_TO_LOWER=true", temp.toAbsolutePath())
+                String.format("jdbc:h2:tcp://localhost/%s/%s;MODE=MySQL;DATABASE_TO_LOWER=true",
+                        databaseDirPath.toAbsolutePath(), storageFilePrefix)
         );
         System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
         System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
 
         Server.createTcpServer("-ifNotExists", "-tcpDaemon").start();
 
-        final DataSource ds = ConnectionFactory.getInstance().getDataSource();
-        final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
-        runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
+        if (Files.notExists(Paths.get(databaseDirPath.toString(), storageFileName))) {
+            final DataSource ds = ConnectionFactory.getInstance().getDataSource();
+            final ScriptRunner runner = new ScriptRunner(ds.getConnection(), true, true);
+            runner.runScript(new FileReader("sql/dolphinscheduler_h2.sql"));
+        }
     }
 
-    private static void setTaskPlugin() {
-        final Path taskPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
+    private static void setTaskPlugin() throws URISyntaxException {
+        final Path taskPluginPath = getAbsolutePath(
                 "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
-        ).toAbsolutePath();
+        );
+
         if (Files.exists(taskPluginPath)) {
             System.setProperty("task.plugin.binding", taskPluginPath.toString());
             System.setProperty("task.plugin.dir", "");
