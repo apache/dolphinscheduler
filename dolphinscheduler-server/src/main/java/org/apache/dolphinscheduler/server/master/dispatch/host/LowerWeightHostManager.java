@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import java.util.Optional;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
@@ -139,9 +140,9 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for (String node : nodes) {
                         String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
-                        HostWeight hostWeight = getHostWeight(node, workerGroup, heartbeat);
-                        if (hostWeight != null) {
-                            hostWeights.add(hostWeight);
+                        Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
+                        if (hostWeightOpt.isPresent()) {
+                            hostWeights.add(hostWeightOpt.get());
                         }
                     }
                     if (!hostWeights.isEmpty()) {
@@ -154,28 +155,30 @@ public class LowerWeightHostManager extends CommonHostManager {
             }
         }
 
-        public HostWeight getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
+        public Optional<HostWeight> getHostWeight(String addr, String workerGroup, String heartBeatInfo) {
             if (StringUtils.isEmpty(heartBeatInfo)) {
                 logger.warn("worker {} in work group {} have not received the heartbeat",
                     addr, workerGroup);
-                return null;
+                return Optional.empty();
             }
             HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
             if (heartBeat == null) {
-                return null;
+                return Optional.empty();
             }
             if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
                 logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
                         addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
-                return null;
+                return Optional.empty();
             }
             if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
                 logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
                         addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
-                return null;
+                return Optional.empty();
             }
-            return new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
-                    heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(), heartBeat.getStartupTime());
+            return Optional.of(
+                new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                    heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
+                    heartBeat.getStartupTime()));
         }
     }
 
