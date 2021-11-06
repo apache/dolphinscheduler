@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,9 +139,8 @@ public abstract class AbstractParameters implements IParameters {
     public List<Map<String, String>> getListMapByString(String json) {
         List<Map<String, String>> allParams = new ArrayList<>();
         ArrayNode paramsByJson = JSONUtils.parseArray(json);
-        Iterator<JsonNode> listIterator = paramsByJson.iterator();
-        while (listIterator.hasNext()) {
-            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+        for (JsonNode jsonNode : paramsByJson) {
+            Map<String, String> param = JSONUtils.toMap(jsonNode.toString());
             allParams.add(param);
         }
         return allParams;
