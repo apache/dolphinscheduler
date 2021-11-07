@@ -105,7 +105,8 @@ public class SchemaUtilsTest {
         List<String> real = SchemaUtils.getAllSchemaList();
         List<String> expect = Arrays.asList("1.0.1_schema", "1.0.2_schema",
                 "1.1.0_schema", "1.2.0_schema");
-        Assert.assertTrue(CollectionUtils.isEqualCollection(real, expect));
+        boolean result = org.apache.commons.collections.CollectionUtils.isEqualCollection(real, expect);
+        Assert.assertTrue(result);
 
         //normal
         files = new File[0];
