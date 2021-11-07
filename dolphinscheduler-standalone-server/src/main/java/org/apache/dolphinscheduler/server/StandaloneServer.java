@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
@@ -29,21 +28,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
 public class StandaloneServer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneServer.class);
 
     public static void main(String[] args) throws Exception {
         Thread.currentThread().setName("Standalone-Server");
 
         System.setProperty("spring.profiles.active", "api,h2");
-
-        startDatabase();
+        System.setProperty("spring.datasource.sql.schema", "file:./sql/dolphinscheduler_h2.sql");
 
         startRegistry();
 
@@ -74,11 +69,6 @@ public class StandaloneServer {
     private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
-    }
-
-    private static void startDatabase() {
-        System.setProperty("spring.datasource.sql.schema", "file:./sql/dolphinscheduler_h2.sql");
-        ConnectionFactory.getInstance().getDataSource();
     }
 
     private static void setTaskPlugin() {
