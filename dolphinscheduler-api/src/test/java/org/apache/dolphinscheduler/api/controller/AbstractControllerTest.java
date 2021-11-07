@@ -20,8 +20,9 @@ package org.apache.dolphinscheduler.api.controller;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,6 +46,7 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * abstract controller test
  */
+@ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class AbstractControllerTest {
@@ -58,6 +61,9 @@ public class AbstractControllerTest {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private UsersService usersService;
+
     protected User user;
 
     protected String sessionId;
@@ -66,7 +72,8 @@ public class AbstractControllerTest {
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        createSession();
+        user = usersService.queryUser(1);
+        createSession(user);
     }
 
     @After
@@ -74,11 +81,7 @@ public class AbstractControllerTest {
         sessionService.signOut("127.0.0.1", user);
     }
 
-    private void createSession() {
-
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
+    private void createSession(User loginUser) {
 
         user = loginUser;
 
