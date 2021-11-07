@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.text.MessageFormat;
