@@ -193,7 +193,7 @@
               <el-option
                 v-for="item in postTasks"
                 :key="item.code"
-                :value="item.name"
+                :value="item.code"
                 :label="item.name"
               ></el-option>
             </el-select>
@@ -230,7 +230,7 @@
               <el-option
                 v-for="item in postTasks"
                 :key="item.code"
-                :value="item.name"
+                :value="item.code"
                 :label="item.name"
               ></el-option>
             </el-select>
@@ -702,8 +702,7 @@
           return false
         }
         if (
-          this.successBranch !== '' &&
-          this.successBranch !== null &&
+          this.successBranch &&
           this.successBranch === this.failedBranch
         ) {
           this.$message.warning(
@@ -762,8 +761,8 @@
         if (this.$refs.preTasks) {
           this.$refs.preTasks.setPreNodes()
         }
-        this.conditionResult.successNode[0] = this.successBranch
-        this.conditionResult.failedNode[0] = this.failedBranch
+        this.successBranch && (this.conditionResult.successNode[0] = this.successBranch)
+        this.failedBranch && (this.conditionResult.failedNode[0] = this.failedBranch)
         this.$emit('addTaskInfo', {
           item: {
             code: this.nodeData.id,
