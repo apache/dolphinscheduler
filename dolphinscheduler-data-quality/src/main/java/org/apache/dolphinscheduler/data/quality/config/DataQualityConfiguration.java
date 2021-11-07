@@ -44,7 +44,7 @@ public class DataQualityConfiguration implements IConfig {
     @JsonProperty("writers")
     private List<WriterConfig> writerConfigs;
 
-    public DataQualityConfiguration(){}
+    public DataQualityConfiguration() {}
 
     public DataQualityConfiguration(String name,
                                     EnvConfig envConfig,

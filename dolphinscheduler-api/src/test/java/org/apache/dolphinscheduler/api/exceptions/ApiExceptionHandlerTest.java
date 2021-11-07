@@ -25,10 +25,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.lang.reflect.Method;
 
-import org.springframework.web.method.HandlerMethod;
-
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.web.method.HandlerMethod;
 
 public class ApiExceptionHandlerTest {
 
@@ -51,4 +50,5 @@ public class ApiExceptionHandlerTest {
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
         Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(),result.getCode().intValue());
     }
+
 }
