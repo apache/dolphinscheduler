@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 
 import java.util.Date;
@@ -25,21 +26,12 @@ import java.util.List;
 import org.assertj.core.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProcessTaskRelationMapperTest {
+public class ProcessTaskRelationMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProcessTaskRelationMapper processTaskRelationMapper;
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * insert
