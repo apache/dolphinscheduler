@@ -113,10 +113,10 @@ public class DependentExecute {
                 return DependResult.WAITING;
             }
             // need to check workflow for updates, so get all task and check the task state
-            if (dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)) {
+            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
                 result = dependResultByProcessInstance(processInstance);
             } else {
-                result = getDependTaskResult(dependentItem.getDepTasks(), processInstance);
+                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -143,17 +143,17 @@ public class DependentExecute {
     /**
      * get depend task result
      *
-     * @param taskName
+     * @param taskCode
      * @param processInstance
      * @return
      */
-    private DependResult getDependTaskResult(String taskName, ProcessInstance processInstance) {
+    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 
         for (TaskInstance task : taskInstanceList) {
-            if (task.getName().equals(taskName)) {
+            if (task.getTaskCode() == taskCode) {
                 taskInstance = task;
                 break;
             }

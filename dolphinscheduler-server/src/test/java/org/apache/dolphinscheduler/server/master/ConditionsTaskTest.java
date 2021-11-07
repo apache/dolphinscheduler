@@ -140,7 +140,7 @@ public class ConditionsTaskTest {
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
         DependentItem dependentItem = new DependentItem();
-        dependentItem.setDepTasks("1");
+        dependentItem.setDepTaskCode(11L);
         dependentItem.setStatus(ExecutionStatus.SUCCESS);
 
         DependentTaskModel dependentTaskModel = new DependentTaskModel();

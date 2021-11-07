@@ -106,7 +106,7 @@ public class DagHelper {
         } else {
             // specified start nodes or resume execution
             for (String startNodeCode : startNodeList) {
-                TaskNode startNode = findNodeByName(taskNodeList, startNodeCode);
+                TaskNode startNode = findNodeByCode(taskNodeList, startNodeCode);
                 List<TaskNode> childNodeList = new ArrayList<>();
                 if (startNode == null) {
                     logger.error("start node name [{}] is not in task node list [{}] ",

@@ -63,7 +63,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     /**
      * complete task map
      */
-    private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
+    private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
@@ -159,7 +159,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
         for (TaskInstance task : taskInstances) {
-            completeTaskList.putIfAbsent(task.getName(), task.getState());
+            completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
 
         List<DependResult> modelResultList = new ArrayList<>();
@@ -181,18 +181,18 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     private DependResult getDependResultForItem(DependentItem item) {
 
         DependResult dependResult = DependResult.SUCCESS;
-        if (!completeTaskList.containsKey(item.getDepTasks())) {
-            logger.info("depend item: {} have not completed yet.", item.getDepTasks());
+        if (!completeTaskList.containsKey(item.getDepTaskCode())) {
+            logger.info("depend item: {} have not completed yet.", item.getDepTaskCode());
             dependResult = DependResult.FAILED;
             return dependResult;
         }
-        ExecutionStatus executionStatus = completeTaskList.get(item.getDepTasks());
+        ExecutionStatus executionStatus = completeTaskList.get(item.getDepTaskCode());
         if (executionStatus != item.getStatus()) {
-            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTasks(), item.getStatus(), executionStatus);
+            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
         logger.info("dependent item complete {} {},{}",
-                Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
+                Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
         return dependResult;
     }
 
