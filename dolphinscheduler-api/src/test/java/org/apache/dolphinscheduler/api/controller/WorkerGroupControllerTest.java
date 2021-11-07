@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,12 +59,15 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @MockBean
     private ProcessInstanceMapper processInstanceMapper;
 
+    @MockBean
+    private RegistryClient registryClient;
+
     @Test
     public void testSaveWorkerGroup() throws Exception {
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("192.168.0.1", "192.168.0.1");
         serverMaps.put("192.168.0.2", "192.168.0.2");
-        PowerMockito.when(RegistryCenterUtils.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+        PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");

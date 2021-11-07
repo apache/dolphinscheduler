@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.Executors;
@@ -73,6 +74,7 @@ public class WorkerRegistryClient {
      */
     private ScheduledExecutorService heartBeatExecutor;
 
+    @Autowired
     private RegistryClient registryClient;
 
     /**
@@ -86,7 +88,6 @@ public class WorkerRegistryClient {
     public void initWorkRegistry() {
         this.workerGroups = workerConfig.getWorkerGroups();
         this.startupTime = System.currentTimeMillis();
-        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
@@ -121,7 +122,7 @@ public class WorkerRegistryClient {
     /**
      * remove registry info
      */
-    public void unRegistry() {
+    public void unRegistry() throws IOException {
         try {
             String address = getLocalAddress();
             Set<String> workerZkPaths = getWorkerZkPaths();
@@ -161,7 +162,7 @@ public class WorkerRegistryClient {
         return workerPaths;
     }
 
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
+    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
         registryClient.handleDeadServer(nodeSet, nodeType, opType);
     }
 

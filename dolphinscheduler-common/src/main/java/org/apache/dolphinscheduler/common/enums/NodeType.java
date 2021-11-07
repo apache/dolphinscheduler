@@ -16,15 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
-/**
- * zk node type
- */
 public enum NodeType {
-
-    /**
-     * 0 master node;
-     * 1 worker node;
-     * 2 dead_server node;
-     */
-    MASTER, WORKER, DEAD_SERVER;
+    MASTER, WORKER, DEAD_SERVER
 }

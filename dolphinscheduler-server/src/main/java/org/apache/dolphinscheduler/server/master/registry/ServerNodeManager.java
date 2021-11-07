@@ -27,16 +27,18 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.Event.Type;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
-import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,10 +103,8 @@ public class ServerNodeManager implements InitializingBean {
      */
     private ScheduledExecutorService executorService;
 
-    /**
-     * zk client
-     */
-    private RegistryClient registryClient = RegistryClient.getInstance();
+    @Autowired
+    private RegistryClient registryClient;
 
     /**
      * eg : /node/worker/group/127.0.0.1:xxx
@@ -153,11 +153,11 @@ public class ServerNodeManager implements InitializingBean {
          */
         executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
         executorService.scheduleWithFixedDelay(new WorkerNodeInfoAndGroupDbSyncTask(), 0, 10, TimeUnit.SECONDS);
-        /**
+        /*
          * init MasterNodeListener listener
          */
         registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
-        /**
+        /*
          * init WorkerNodeListener listener
          */
         registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
@@ -167,15 +167,15 @@ public class ServerNodeManager implements InitializingBean {
      * load nodes from zookeeper
      */
     public void load() {
-        /**
+        /*
          * master nodes from zookeeper
          */
         updateMasterNodes();
 
-        /**
+        /*
          * worker group nodes from zookeeper
          */
-        Set<String> workerGroups = registryClient.getWorkerGroupDirectly();
+        Collection<String> workerGroups = registryClient.getWorkerGroupDirectly();
         for (String workerGroup : workerGroups) {
             syncWorkerGroupNodes(workerGroup, registryClient.getWorkerGroupNodesDirectly(workerGroup));
         }
@@ -218,25 +218,28 @@ public class ServerNodeManager implements InitializingBean {
     class WorkerDataListener implements SubscribeListener {
 
         @Override
-        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
+        public void notify(Event event) {
+            final String path = event.path();
+            final Type type = event.type();
+            final String data = event.data();
             if (registryClient.isWorkerPath(path)) {
                 try {
-                    if (dataChangeEvent == DataChangeEvent.ADD) {
+                    if (type == Type.ADD) {
                         logger.info("worker group node : {} added.", path);
                         String group = parseGroup(path);
-                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         logger.info("currentNodes : {}", currentNodes);
                         syncWorkerGroupNodes(group, currentNodes);
-                    } else if (dataChangeEvent == DataChangeEvent.REMOVE) {
+                    } else if (type == Type.REMOVE) {
                         logger.info("worker group node : {} down.", path);
                         String group = parseGroup(path);
-                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
-                    } else if (dataChangeEvent == DataChangeEvent.UPDATE) {
+                    } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
                         String group = parseGroup(path);
-                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
+                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
 
                         String node = parseNode(path);
@@ -268,19 +271,18 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-    /**
-     * master node listener
-     */
     class MasterDataListener implements SubscribeListener {
         @Override
-        public void notify(String path, String data, DataChangeEvent dataChangeEvent) {
+        public void notify(Event event) {
+            final String path = event.path();
+            final Type type = event.type();
             if (registryClient.isMasterPath(path)) {
                 try {
-                    if (dataChangeEvent.equals(DataChangeEvent.ADD)) {
+                    if (type.equals(Type.ADD)) {
                         logger.info("master node : {} added.", path);
                         updateMasterNodes();
                     }
-                    if (dataChangeEvent.equals(DataChangeEvent.REMOVE)) {
+                    if (type.equals(Type.REMOVE)) {
                         logger.info("master node : {} down.", path);
                         updateMasterNodes();
                         alertDao.sendServerStopedAlert(1, path, "MASTER");
@@ -295,10 +297,10 @@ public class ServerNodeManager implements InitializingBean {
     private void updateMasterNodes() {
         SLOT_LIST.clear();
         this.masterNodes.clear();
-        String nodeLock = registryClient.getMasterLockPath();
+        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {
             registryClient.getLock(nodeLock);
-            Set<String> currentNodes = registryClient.getMasterNodesDirectly();
+            Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
             List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodes);
         } catch (Exception e) {
@@ -328,7 +330,7 @@ public class ServerNodeManager implements InitializingBean {
      *
      * @param nodes master nodes
      */
-    private void syncMasterNodes(Set<String> nodes, List<Server> masterNodes) {
+    private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
         masterLock.lock();
         try {
             this.masterNodes.addAll(nodes);
@@ -353,7 +355,7 @@ public class ServerNodeManager implements InitializingBean {
      * @param workerGroup worker group
      * @param nodes worker nodes
      */
-    private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes) {
+    private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
         workerGroupLock.lock();
         try {
             workerGroup = workerGroup.toLowerCase();
