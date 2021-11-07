@@ -1018,6 +1018,7 @@
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/registry/MasterRegistryClientTest.java</include>
                         <include>**/server/master/registry/ServerNodeManagerTest.java</include>
+                        <include>**/server/master/dispatch/host/RefreshResourceTaskTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
