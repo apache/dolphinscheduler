@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import com.github.rholder.retry.RetryException;
 
@@ -175,6 +176,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
             String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskExecutionContext.getFirstSubmitTime(),
                     taskExecutionContext.getProcessDefineCode(),
                     taskExecutionContext.getProcessDefineVersion(),
                     taskExecutionContext.getProcessInstanceId(),

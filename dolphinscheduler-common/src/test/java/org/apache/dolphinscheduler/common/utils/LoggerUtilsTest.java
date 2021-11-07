@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,9 +43,11 @@ public class LoggerUtilsTest {
     @Test
     public void buildTaskId() {
 
-        String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX, 798L,1,4084, 15210);
+        Date specifyDate = DateUtils.getSpecifyDate(2021, 11, 06);
 
-        Assert.assertEquals(" - [taskAppId=TASK-798_1-4084-15210]", taskId);
+        String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX, specifyDate, 798L, 1, 4084, 15210);
+
+        Assert.assertEquals(" - [taskAppId=TASK-20211106-798_1-4084-15210]", taskId);
     }
 
     @Test
