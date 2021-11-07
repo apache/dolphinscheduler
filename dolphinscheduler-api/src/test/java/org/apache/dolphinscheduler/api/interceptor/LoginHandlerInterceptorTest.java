@@ -33,9 +33,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +41,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
 @ActiveProfiles(value = {ProfileType.H2})
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-@PowerMockIgnore({"javax.management.*"})
 public class LoginHandlerInterceptorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptorTest.class);

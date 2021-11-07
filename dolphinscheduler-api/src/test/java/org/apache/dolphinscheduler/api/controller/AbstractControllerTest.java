@@ -46,7 +46,7 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * abstract controller test
  */
-@ActiveProfiles(value = {ProfileType.H2})    // todo: This need changed to h2
+@ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class AbstractControllerTest {
