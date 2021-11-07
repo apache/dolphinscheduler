@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceProcessor;
@@ -26,8 +28,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;

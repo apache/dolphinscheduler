@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_EMIT;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_NAME;
 import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_PROPS;
@@ -78,7 +79,7 @@ public class PluginParams {
     @JsonProperty(STRING_PLUGIN_PARAM_VALIDATE)
     protected List<Validate> validateList;
 
-    @JsonProperty("emit")
+    @JsonProperty(STRING_PLUGIN_PARAM_EMIT)
     protected List<String> emit;
 
     /**

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.common.enums;
 
 import static java.util.stream.Collectors.toMap;

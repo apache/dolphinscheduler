@@ -41,6 +41,8 @@ public class Constants {
     public static final String STRING_PLUGIN_PARAM_VALIDATE = "validate";
     /** alert plugin param options string **/
     public static final String STRING_PLUGIN_PARAM_OPTIONS = "options";
+    /**plugin param emit string **/
+    public static final String STRING_PLUGIN_PARAM_EMIT = "emit";
 
 
     /** string true */
