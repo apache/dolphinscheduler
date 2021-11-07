@@ -90,8 +90,6 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
-    public static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
-    public static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
     public static final String REGISTRY_SERVERS = "registry.servers";
 
     /**
