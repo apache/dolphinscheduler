@@ -23,6 +23,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * DataQualityConfiguration
+ * The reader is responsible for connecting to the data source,
+ * and the transformer is responsible for transformer the data that from reader,
+ * and the writer is responsible for writing data to the target datasource
  */
 public class DataQualityConfiguration {
 

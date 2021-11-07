@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task;
+package org.apache.dolphinscheduler.plugin.task.dq;
 
-import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
-import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
+import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkParameters;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.TriggerType;
