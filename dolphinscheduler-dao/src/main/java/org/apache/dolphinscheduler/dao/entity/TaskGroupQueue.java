@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
@@ -34,7 +35,7 @@ public class TaskGroupQueue implements Serializable {
     /**
      * key
      */
-    @TableId(value="id", type= IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
     /**
      * taskIntanceid
@@ -73,18 +74,17 @@ public class TaskGroupQueue implements Serializable {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     public TaskGroupQueue() {
 
     }
-
 
     public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority, TaskGroupQueueStatus status) {
         this.taskId = taskId;
@@ -159,20 +159,19 @@ public class TaskGroupQueue implements Serializable {
         this.updateTime = updateTime;
     }
 
-
     @Override
     public String toString() {
-        return "TaskGroupQueue{" +
-                "id=" + id +
-                ", taskId=" + taskId +
-                ", taskName='" + taskName + '\'' +
-                ", groupId=" + groupId +
-                ", processId=" + processId +
-                ", priority=" + priority +
-                ", status=" + status +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "TaskGroupQueue{"
+                + "id=" + id
+                + ", taskId=" + taskId
+                + ", taskName='" + taskName + '\''
+                + ", groupId=" + groupId
+                + ", processId=" + processId
+                + ", priority=" + priority
+                + ", status=" + status
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 
     public TaskGroupQueueStatus getStatus() {

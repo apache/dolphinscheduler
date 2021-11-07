@@ -17,9 +17,15 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,11 +34,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * queue controller test
@@ -46,8 +47,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryListAll() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","2");
-        paramsMap.add("pageSize","2");
+        paramsMap.add("pageNo", "2");
+        paramsMap.add("pageSize", "2");
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-all")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -65,9 +66,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryByName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
-        paramsMap.add("name","TGQ");
-        paramsMap.add("pageSize","10");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("name", "TGQ");
+        paramsMap.add("pageSize", "10");
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-name")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -85,9 +86,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryByStatus() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
-        paramsMap.add("status","1");
-        paramsMap.add("pageSize","10");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("status", "1");
+        paramsMap.add("pageSize", "10");
         MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-status")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -108,8 +109,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         // success
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name", "TGQ1");
-        paramsMap.add("description","this is a task group queue!");
-        paramsMap.add("groupSize","10");
+        paramsMap.add("description", "this is a task group queue!");
+        paramsMap.add("groupSize", "10");
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
@@ -118,14 +119,14 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue( result != null && result.isSuccess());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
         // failed
         // name exists
         paramsMap.clear();
         paramsMap.add("name", "TGQ1");
-        paramsMap.add("description","this is a task group queue!");
-        paramsMap.add("groupSize","10");
+        paramsMap.add("description", "this is a task group queue!");
+        paramsMap.add("groupSize", "10");
 
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
@@ -142,10 +143,10 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     public void testUpdateTaskGroup() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","1");
+        paramsMap.add("id", "1");
         paramsMap.add("name", "TGQ11");
-        paramsMap.add("description","this is a task group queue!");
-        paramsMap.add("groupSize","10");
+        paramsMap.add("description", "this is a task group queue!");
+        paramsMap.add("groupSize", "10");
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/update")
                 .header(SESSION_ID, sessionId)
@@ -178,7 +179,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         // start
         paramsMap.clear();
-        paramsMap.add("id","1");
+        paramsMap.add("id", "1");
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/start-task-group")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -187,7 +188,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result1 = JSONUtils.parseObject(mvcResult1.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult1.getResponse().getContentAsString());
-        Assert.assertTrue(result1  != null && result1.isSuccess());
+        Assert.assertTrue(result1 != null && result1.isSuccess());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -195,7 +196,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     public void testWakeCompulsively() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","1");
+        paramsMap.add("id", "1");
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/wake-task-compulsively")
                 .header(SESSION_ID, sessionId)

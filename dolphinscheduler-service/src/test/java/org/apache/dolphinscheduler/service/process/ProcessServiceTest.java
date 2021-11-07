@@ -20,13 +20,14 @@ package org.apache.dolphinscheduler.service.process;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -703,6 +704,7 @@ public class ProcessServiceTest {
         Assert.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
     }
+
     @Test
     public void testCreateTaskGroupQueue() {
         Mockito.when(taskGroupQueueMapper.insert(Mockito.any(TaskGroupQueue.class))).thenReturn(1);
@@ -713,7 +715,7 @@ public class ProcessServiceTest {
     @Test
     public void testDoRelease() {
 
-        TaskGroupQueue taskGroupQueue=getTaskGroupQueue();
+        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setProcessInstanceId(1);
@@ -727,14 +729,14 @@ public class ProcessServiceTest {
     }
 
     private TaskGroupQueue getTaskGroupQueue() {
-        TaskGroupQueue taskGroupQueue=new TaskGroupQueue();
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");
         taskGroupQueue.setId(1);
         taskGroupQueue.setGroupId(1);
         taskGroupQueue.setTaskId(1);
         taskGroupQueue.setPriority(1);
         taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
-        Date date=new Date(System.currentTimeMillis());
+        Date date = new Date(System.currentTimeMillis());
         taskGroupQueue.setUpdateTime(date);
         taskGroupQueue.setCreateTime(date);
         return taskGroupQueue;

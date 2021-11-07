@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.io.Serializable;
@@ -140,21 +141,6 @@ public class TaskGroup implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "TaskGroup{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", groupSize=" + groupSize +
-                ", useSize=" + useSize +
-                ", userId=" + userId +
-                ", status=" + status +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
-
-    @Override
     public int hashCode() {
         Integer result = id;
         result = 31 * result + userId;
@@ -185,5 +171,20 @@ public class TaskGroup implements Serializable {
     public void init() {
         this.status = 1;
         this.useSize = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskGroup{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", groupSize=" + groupSize
+                + ", useSize=" + useSize
+                + ", userId=" + userId
+                + ", status=" + status
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }

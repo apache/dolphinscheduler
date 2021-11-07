@@ -17,56 +17,59 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * the Dao interfaces of task group
+ *
  * @author yinrui
  * @since 2021-08-07
  */
-public interface TaskGroupMapper extends BaseMapper<TaskGroup>{
+public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     /**
      * compard and set to update table of task group
+     *
      * @param id primary key
      * @return affected rows
      */
-    int updateTaskGroupResource(@Param("id") int id,@Param("queueId") int queueId,
+    int updateTaskGroupResource(@Param("id") int id, @Param("queueId") int queueId,
                                 @Param("queueStatus") int queueStatus);
 
     /**
-     *  update table of task group
+     * update table of task group
+     *
      * @param id primary key
      * @return affected rows
      */
-    int releaseTaskGroupResource(@Param("id") int id,@Param("useSize") int useSize,
-                                 @Param("queueId") int queueId,@Param("queueStatus") int queueStatus);
+    int releaseTaskGroupResource(@Param("id") int id, @Param("useSize") int useSize,
+                                 @Param("queueId") int queueId, @Param("queueStatus") int queueStatus);
 
     /**
      * select task groups paging
-     * @param page page
+     *
+     * @param page   page
      * @param userId user id
-     * @param name name
+     * @param name   name
      * @param status status
      * @return result page
      */
-    IPage<TaskGroup>queryTaskGroupPaging(IPage<TaskGroup>page, @Param("userId") int userId,
-                                         @Param("name") String name, @Param("status") int status);
+    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("userId") int userId,
+                                          @Param("name") String name, @Param("status") int status);
 
     /**
      * query by task group name
+     *
      * @param userId user id
-     * @param name name
+     * @param name   name
      * @return task group
      */
-    TaskGroup queryByName(@Param("userId") int userId, @Param("name")  String name);
+    TaskGroup queryByName(@Param("userId") int userId, @Param("name") String name);
 
     int selectAvailableCountById(@Param("groupId") int groupId);
 

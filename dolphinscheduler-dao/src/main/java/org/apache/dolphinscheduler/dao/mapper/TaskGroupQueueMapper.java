@@ -28,32 +28,36 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * the Dao interfaces of task group queue
+ *
  * @author yinrui
  * @since 2021-08-07
  */
-public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue>{
+public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     /**
      * select task group queues by some conditions
-     * @param page page
+     *
+     * @param page    page
      * @param groupId group id
      * @return task group queue list
      */
-    IPage<TaskGroupQueue>queryTaskGroupQueuePaging(IPage<TaskGroupQueue>page,
-                                                   @Param("groupId") int groupId
+    IPage<TaskGroupQueue> queryTaskGroupQueuePaging(IPage<TaskGroupQueue> page,
+                                                    @Param("groupId") int groupId
     );
 
     TaskGroupQueue queryByTaskId(@Param("taskId") int taskId);
 
     /**
      * query by status
+     *
      * @param status status
      * @return result
      */
-    List<TaskGroupQueue>queryByStatus(@Param("status") int status);
+    List<TaskGroupQueue> queryByStatus(@Param("status") int status);
 
     /**
      * delete by task id
+     *
      * @param taskId task id
      * @return affected rows
      */
@@ -61,22 +65,23 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue>{
 
     /**
      * update status by task id
+     *
      * @param taskId task id
      * @param status status
      * @return
      */
     int updateStatusByTaskId(@Param("taskId") int taskId, @Param("status") int status);
 
-    List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId,@Param("priority") int priority,@Param("status") int status);
+    List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId, @Param("priority") int priority, @Param("status") int status);
 
-    TaskGroupQueue queryTheHighestPriorityTasks(@Param("groupId") int groupId,@Param("status") int status,
-                                                      @Param("forceStart") int forceStart,@Param("inQueue") int inQueue);
+    TaskGroupQueue queryTheHighestPriorityTasks(@Param("groupId") int groupId, @Param("status") int status,
+                                                @Param("forceStart") int forceStart, @Param("inQueue") int inQueue);
 
-    void updateInQueue(@Param("inQueue") int inQueue,@Param("id") int id);
+    void updateInQueue(@Param("inQueue") int inQueue, @Param("id") int id);
 
     int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue
             , @Param("groupId") int id, @Param("status") int status);
 
-    int updateInQueueCAS(@Param("oldValue") int oldValue,@Param("newValue") int newValue,@Param("id") int id);
+    int updateInQueueCAS(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("id") int id);
 
 }

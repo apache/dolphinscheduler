@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import java.util.HashMap;
@@ -25,10 +26,9 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum TaskGroupQueueStatus {
 
-    WAIT_QUEUE(-1,"wait queue"),
+    WAIT_QUEUE(-1, "wait queue"),
     ACQUIRE_SUCCESS(1, "acquire success"),
-    RELEASE(2, "release")
-    ;
+    RELEASE(2, "release");
 
     @EnumValue
     private final int code;

@@ -77,7 +77,6 @@ public class TaskGroupController extends BaseController {
             @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
             @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
             @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
-            @ApiImplicitParam(name = "name", value = "name", dataType = "Int")
 
     })
     @PostMapping(value = "/create")
