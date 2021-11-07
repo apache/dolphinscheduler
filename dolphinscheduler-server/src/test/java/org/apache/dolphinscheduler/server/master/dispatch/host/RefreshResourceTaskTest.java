@@ -15,16 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.server.master.dispatch.host;
+
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * Registration center subscription. All listeners must implement this interface
+ * RefreshResourceTask test
  */
-public interface SubscribeListener {
+@RunWith(MockitoJUnitRunner.class)
+public class RefreshResourceTaskTest {
 
-    /**
-     * Processing logic when the subscription node changes
-     */
-    void notify(String path, String data, DataChangeEvent dataChangeEvent);
+    @Mock
+    private ServerNodeManager serverNodeManager;
 
+    @InjectMocks
+    LowerWeightHostManager lowerWeightHostManager;
+
+    @Test
+    public void testGetHostWeightWithResult() {
+        Assert.assertTrue(!lowerWeightHostManager.new RefreshResourceTask()
+            .getHostWeight("192.168.1.1:22", "default", null)
+            .isPresent());
+    }
 }
