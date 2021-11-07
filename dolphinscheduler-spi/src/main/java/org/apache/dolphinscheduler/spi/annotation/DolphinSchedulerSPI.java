@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.spi.annotation;
 
-import org.apache.dolphinscheduler.spi.annotation.DolphinSchedulerSPI;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Registry the component factory, all registry must implement this interface
+ * Mark a interface as plugin interface, the extension will loaded by {@link org.apache.dolphinscheduler.spi.plugin.DolphinSPILoader}.
  */
-@DolphinSchedulerSPI
-public interface RegistryFactory {
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface DolphinSchedulerSPI {
 
-    /**
-     * get registry component name
-     */
-    String getName();
-
-    /**
-     * get registry
-     */
-    Registry create();
 }

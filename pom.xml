@@ -868,6 +868,7 @@
                     <includes>
                         <!--registry plugin -->
                         <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
+                        <include>**/plugin/registry/zookeeper/ZookeeperRegistryFactoryTest.java</include>
                         <!-- API -->
                         <include>**/api/controller/ProjectControllerTest.java</include>
                         <include>**/api/controller/QueueControllerTest.java</include>
@@ -1115,6 +1116,7 @@
                         <include>**/plugin/alert/slack/SlackAlertPluginTest.java</include>
                         <include>**/plugin/alert/slack/SlackSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
+                        <include>**/spi/plugin/DolphinSPILoaderTest.java</include>
                         <include>**/spi/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>

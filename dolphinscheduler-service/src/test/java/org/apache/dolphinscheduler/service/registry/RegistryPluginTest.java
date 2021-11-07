@@ -40,6 +40,5 @@ public class RegistryPluginTest {
         DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(registryPluginManagerConfig, ImmutableList.of(registryPluginManager));
         registryPluginLoader.loadPlugins();
         Assert.assertNotNull(registryPluginManager.getRegistry());
-
     }
 }

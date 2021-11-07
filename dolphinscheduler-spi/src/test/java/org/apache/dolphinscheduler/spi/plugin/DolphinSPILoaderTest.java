@@ -15,23 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import org.apache.dolphinscheduler.spi.annotation.DolphinSchedulerSPI;
 
-/**
- * Registry the component factory, all registry must implement this interface
- */
-@DolphinSchedulerSPI
-public interface RegistryFactory {
+import org.junit.Assert;
+import org.junit.Test;
 
-    /**
-     * get registry component name
-     */
-    String getName();
+public class DolphinSPILoaderTest {
 
-    /**
-     * get registry
-     */
-    Registry create();
+    @Test
+    public void loadSPI() {
+        SPIPlugin spiInstance = DolphinSPILoader.loadSPI(SPIPlugin.class, "test");
+        Assert.assertNotNull(spiInstance);
+    }
+
+
+    @DolphinSchedulerSPI
+    public interface SPIPlugin {
+
+    }
+
+    public static class SPIPluginInstance implements SPIPlugin {
+
+    }
 }

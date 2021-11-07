@@ -70,9 +70,10 @@ public class RegistryPluginManager extends AbstractDolphinPluginManager {
 
     /**
      * get registry
+     *
      * @return registry
      */
-    public  Registry getRegistry() {
+    public Registry getRegistry() {
         if (null == registry) {
             throw new RegistryException("not install registry");
         }
