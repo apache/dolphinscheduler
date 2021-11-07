@@ -435,6 +435,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
 
+    public static final String CMD_PARAM_START_NODES = "StartNodeList";
+
     public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
     public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
@@ -785,6 +787,8 @@ public final class Constants {
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final String DEPENDENT_ALL = "ALL";
+    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+
 
 
     /**
