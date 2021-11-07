@@ -83,15 +83,17 @@ public class DqRuleServiceTest {
 
     @Test
     public void testGetRuleFormCreateJsonById() {
-        String json = "[{\"field\":\"src_connector_type\",\"props\":{\"multiple\":false,\"disabled\":false,\"size\":\"small\"},"
-                + "\"type\":\"select\",\"title\":\"源数据类型\",\"value\":\"JDBC\",\"emit\":[\"change\"],\"options\":"
-                + "[{\"label\":\"HIVE\",\"value\":\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\","
-                + "\"disabled\":false}]},{\"field\":\"statistics_name\",\"props\":{\"placeholder\":\"Please enter statistics name, "
-                + "the alias in statistics execute sql\",\"rows\":2,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":"
-                + "\"统计值名\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]},{\"field\":"
-                + "\"statistics_execute_sql\",\"props\":{\"type\":\"textarea\",\"placeholder\":\"Please enter the statistics execute sql\","
-                + "\"rows\":1,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":\"统计值计算SQL\",\"validate\":"
-                + "[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
+        String json = "[{\"field\":\"src_connector_type\",\"name\":\"源数据类型\",\"props\":{\"placeholder\":"
+                + "\"Please select the source connector type\",\"size\":\"small\"},\"type\":\"select\",\"title\":"
+                + "\"源数据类型\",\"value\":\"JDBC\",\"emit\":[\"change\"],\"options\":[{\"label\":\"HIVE\",\"value\":"
+                + "\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},{\"props\":"
+                + "{\"disabled\":false,\"rows\":2,\"placeholder\":\"Please enter statistics name, the alias in "
+                + "statistics execute sql\",\"size\":\"small\"},\"field\":\"statistics_name\",\"name\":"
+                + "\"统计值名\",\"type\":\"input\",\"title\":\"统计值名\",\"validate\":[{\"required\":true,\"type\":"
+                + "\"string\",\"trigger\":\"blur\"}]},{\"props\":{\"disabled\":false,\"type\":\"textarea\",\"rows\":"
+                + "1,\"placeholder\":\"Please enter the statistics execute sql\",\"size\":\"small\"},\"field\":"
+                + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
+                + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         Map<String,Object> result = dqRuleService.getRuleFormCreateJsonById(1);
         Assert.assertEquals(json,result.get(Constants.DATA_LIST));
