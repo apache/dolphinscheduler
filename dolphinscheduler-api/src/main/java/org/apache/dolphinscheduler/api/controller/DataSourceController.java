@@ -340,7 +340,7 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
@@ -352,8 +352,8 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tableColumns", notes = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)

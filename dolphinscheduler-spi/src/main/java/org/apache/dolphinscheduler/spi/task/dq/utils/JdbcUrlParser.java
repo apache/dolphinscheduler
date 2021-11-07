@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.spi.task.dq.utils;
 
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.MYSQL;
-import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.POSTGRESQL;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_SLASH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.QUESTION;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SEMICOLON;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.MYSQL;
+import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.POSTGRESQL;
 
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.dq.model.JdbcInfo;
