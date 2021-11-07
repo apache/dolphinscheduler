@@ -543,7 +543,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
             String database = connectionParam.getDatabase();
             if (null == connection) {
-                return null;
+                return result;
             }
 
             DatabaseMetaData metaData = connection.getMetaData();

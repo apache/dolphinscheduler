@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.spi.task.dq.utils;
  */
 public class DataQualityConstants {
 
+    private DataQualityConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * data quality task
      */

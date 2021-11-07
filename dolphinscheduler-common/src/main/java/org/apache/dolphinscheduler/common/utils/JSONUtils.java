@@ -24,8 +24,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -235,7 +233,7 @@ public class JSONUtils {
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return Collections.emptyMap();
         }
 
         try {
@@ -245,7 +243,7 @@ public class JSONUtils {
             logger.error("json to map exception!", e);
         }
 
-        return null;
+        return Collections.emptyMap();
     }
 
     /**

@@ -113,7 +113,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     protected SpringConnectionFactory springConnectionFactory =
-                        SpringApplicationContext.getBean(SpringConnectionFactory.class);;
+                        SpringApplicationContext.getBean(SpringConnectionFactory.class);
 
     /**
      * pause task, common tasks donot need this.
