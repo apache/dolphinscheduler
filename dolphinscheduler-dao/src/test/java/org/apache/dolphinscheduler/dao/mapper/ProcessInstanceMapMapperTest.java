@@ -16,35 +16,26 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProcessInstanceMapMapperTest {
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+public class ProcessInstanceMapMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProcessInstanceMapMapper processInstanceMapMapper;
-
+    private ProcessInstanceMapMapper processInstanceMapMapper;
 
     /**
      * insert
+     *
      * @return ProcessInstanceMap
      */
-    private ProcessInstanceMap insertOne(){
+    private ProcessInstanceMap insertOne() {
         //insertOne
         ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
         processInstanceMap.setProcessInstanceId(0);

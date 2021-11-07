@@ -28,11 +28,11 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.Optional;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -175,9 +175,9 @@ public class LowerWeightHostManager extends CommonHostManager {
                 return Optional.empty();
             }
             return Optional.of(
-                new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
-                    heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
-                    heartBeat.getStartupTime()));
+                    new HostWeight(HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                            heartBeat.getCpuUsage(), heartBeat.getMemoryUsage(), heartBeat.getLoadAverage(),
+                            heartBeat.getStartupTime()));
         }
     }
 

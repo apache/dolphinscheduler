@@ -31,6 +31,7 @@ public class ConnectionFactoryTest {
      */
     @Test
     public void testConnection()throws Exception{
+        System.setProperty("spring.profiles.active", "h2");
         Connection connection = ConnectionFactory.getInstance().getDataSource().getConnection();
         Assert.assertTrue(connection != null);
     }

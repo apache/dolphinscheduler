@@ -75,7 +75,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "PROCESS_INSTANCE_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/process-instances")
+@RequestMapping("/projects/{projectCode}/process-instances")
 public class ProcessInstanceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);

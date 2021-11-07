@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.quartz;
 
-import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
 import static org.apache.dolphinscheduler.common.Constants.ORG_POSTGRESQL_DRIVER;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK;
@@ -150,7 +149,6 @@ public class QuartzExecutors {
      */
     private void init() {
         try {
-            PropertyUtils.loadPropertyFile(DATASOURCE_PROPERTIES);
             StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
             Properties properties = new Properties();
 

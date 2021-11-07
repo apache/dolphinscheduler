@@ -23,11 +23,17 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class AlertDaoTest {
+
+    @Before
+    public void setUp() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
 
     @Test
     public void testAlertDao() {

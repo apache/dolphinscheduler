@@ -14,18 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+package org.apache.dolphinscheduler.common.enums;
 
-@SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler")
-public class Application {
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class);
+import com.google.common.collect.Lists;
 
-    }
+public enum ProfileType {
+    ;
+
+    public static final String H2 = "h2";
+
+    public static final String MYSQL = "mysql";
+
+    public static final String POSTGRESQL = "postgresql";
+
+    public static final List<String> DATASOURCE_PROFILE = Lists.newArrayList(H2, MYSQL, POSTGRESQL);
 }

@@ -17,28 +17,19 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-
-public class PluginDefineTest {
+public class PluginDefineTest extends BaseDaoTest {
 
     @Autowired
-    PluginDefineMapper pluginDefineMapper;
+    private PluginDefineMapper pluginDefineMapper;
 
     @Test
     public void testQueryAllPluginDefineList() {

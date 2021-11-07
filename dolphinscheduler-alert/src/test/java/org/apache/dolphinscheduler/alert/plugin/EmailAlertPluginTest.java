@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -59,8 +60,15 @@ import com.google.common.collect.ImmutableList;
  */
 public class EmailAlertPluginTest {
 
-    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    private AlertDao alertDao;
+    private PluginDao pluginDao;
+
+    @Before
+    public void setUp() {
+        System.setProperty("spring.profiles.active", "h2");
+        alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    }
 
     @Test
     public void testRunSend() {

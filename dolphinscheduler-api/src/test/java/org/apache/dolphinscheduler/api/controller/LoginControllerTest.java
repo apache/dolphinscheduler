@@ -44,8 +44,8 @@ public class LoginControllerTest extends AbstractControllerTest {
     @Test
     public void testLogin() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userName","cxc");
-        paramsMap.add("userPassword","123456");
+        paramsMap.add("userName", "admin");
+        paramsMap.add("userPassword", "dolphinscheduler123");
 
         MvcResult mvcResult = mockMvc.perform(post("/login")
                 .params(paramsMap))

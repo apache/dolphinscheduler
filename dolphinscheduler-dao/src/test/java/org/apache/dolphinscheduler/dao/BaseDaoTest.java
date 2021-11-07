@@ -14,22 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.junit.Test;
+package org.apache.dolphinscheduler.dao;
 
-public class UpgradeDaoTest {
-    private PostgresqlUpgradeDao postgresqlUpgradeDao;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 
-    @Test
-    public void setUp() {
-        System.setProperty("spring.profiles.active", "h2");
-        postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
-    }
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-    @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception{
-        //postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
-    }
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles(value = ProfileType.H2)
+@ContextConfiguration(classes = SpringConnectionFactory.class)
+@Transactional
+@Rollback
+public abstract class BaseDaoTest {
 }

@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.datasource;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -34,6 +30,10 @@ import javax.sql.DataSource;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 /**
  * not spring manager connection, only use for init db, and alert module for non-spring application
@@ -53,6 +53,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
 
     private ConnectionFactory() {
         try {
+            init();
             dataSource = buildDataSource();
             sqlSessionFactory = getSqlSessionFactory();
             sqlSessionTemplate = getSqlSessionTemplate();
@@ -85,8 +86,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
      */
     private DataSource buildDataSource() throws SQLException {
 
-        DruidDataSource druidDataSource = dataSource();
-        return druidDataSource;
+        return dataSource();
     }
 
     /**
@@ -114,7 +114,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
         sqlSessionFactory = sqlSessionFactoryBean.getObject();
 
         return sqlSessionFactory;
-}
+    }
 
     private SqlSessionTemplate getSqlSessionTemplate() {
         sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
