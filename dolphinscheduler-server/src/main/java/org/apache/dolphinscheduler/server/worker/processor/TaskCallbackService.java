@@ -52,17 +52,11 @@ public class TaskCallbackService {
     private static final ConcurrentHashMap<Integer, NettyRemoteChannel> REMOTE_CHANNELS = new ConcurrentHashMap<>();
 
     /**
-     * zookeeper registry center
-     */
-    private RegistryClient registryClient;
-
-    /**
      * netty remoting client
      */
     private final NettyRemotingClient nettyRemotingClient;
 
     public TaskCallbackService() {
-        this.registryClient = RegistryClient.getInstance();
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
         this.nettyRemotingClient.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());

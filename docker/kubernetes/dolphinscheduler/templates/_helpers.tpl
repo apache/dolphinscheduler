@@ -166,12 +166,6 @@ Create a database environment variables.
 Create a registry environment variables.
 */}}
 {{- define "dolphinscheduler.registry.env_vars" -}}
-- name: REGISTRY_PLUGIN_DIR
-  {{- if .Values.zookeeper.enabled }}
-  value: "lib/plugin/registry"
-  {{- else }}
-  value: {{ .Values.externalRegistry.registryPluginDir }}
-  {{- end }}
 - name: REGISTRY_PLUGIN_NAME
   {{- if .Values.zookeeper.enabled }}
   value: "zookeeper"
