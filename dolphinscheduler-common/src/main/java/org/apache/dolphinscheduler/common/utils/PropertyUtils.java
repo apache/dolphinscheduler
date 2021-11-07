@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PAT
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
-import org.apache.directory.api.util.Strings;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -255,7 +255,7 @@ public class PropertyUtils {
     }
 
     public static Map<String, String> getPropertiesByPrefix(String prefix) {
-        if (Strings.isEmpty(prefix)) {
+        if (StringUtils.isEmpty(prefix)) {
             return null;
         }
         Set<Object> keys = properties.keySet();

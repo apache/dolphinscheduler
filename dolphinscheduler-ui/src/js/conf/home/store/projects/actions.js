@@ -31,9 +31,9 @@ export default {
     })
   },
   /**
-   * Get project by id
+   * Get project by code
    */
-  getProjectById ({ state }, payload) {
+  getProjectByCode ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${payload}`, {}, res => {
         resolve(res.data)

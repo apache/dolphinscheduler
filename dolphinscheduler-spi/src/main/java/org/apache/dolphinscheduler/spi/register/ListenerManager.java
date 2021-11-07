@@ -55,12 +55,12 @@ public class ListenerManager {
      *
      *After the data changes, it is distributed to the corresponding listener for processing
      */
-    public static void dataChange(String key,String path, DataChangeEvent dataChangeEvent) {
+    public static void dataChange(String key,String path, String data, DataChangeEvent dataChangeEvent) {
         SubscribeListener notifyListener = listeners.get(key);
         if (null == notifyListener) {
             return;
         }
-        notifyListener.notify(path,dataChangeEvent);
+        notifyListener.notify(path, data, dataChangeEvent);
     }
 
 }

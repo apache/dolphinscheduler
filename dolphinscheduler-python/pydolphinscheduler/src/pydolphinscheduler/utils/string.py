@@ -15,16 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""String util function collections."""
+
+
 def attr2camel(attr: str, include_private=True):
+    """Covert class attribute name to camel case."""
     if include_private:
         attr = attr.lstrip("_")
     return snake2camel(attr)
 
 
 def snake2camel(snake: str):
+    """Covert snake case to camel case."""
     components = snake.split("_")
     return components[0] + "".join(x.title() for x in components[1:])
 
 
 def class_name2camel(class_name: str):
+    """Covert class name string to camel case."""
     return class_name[0].lower() + class_name[1:]
