@@ -84,10 +84,16 @@
         where id = #{id}
     </update>
 
+    <update id="updateInQueueLimit1">
+        update t_ds_task_group_queue
+               set in_queue = #{newValue}
+        where group_id = #{groupId} and in_queue = #{oldValue} and status = #{status} order by priority desc limit 1
+    </update>
+
     <update id="updateInQueueCAS">
         update t_ds_task_group_queue
-               set in_queue = #{oldValue}
-        where id = #{id} and in_queue = #{newValue}
+               set in_queue = #{newValue}
+        where id = #{id} and in_queue = #{oldValue}
     </update>
 
     <select id="queryHighPriorityTasks" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">

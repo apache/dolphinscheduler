@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -55,7 +54,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
@@ -232,6 +230,7 @@ public class WorkflowExecuteThread implements Runnable {
         try {
             startProcess();
             handleEvents();
+            isStart = true;
         } catch (Exception e) {
             logger.error("handler error:", e);
         }
@@ -325,27 +324,23 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
         TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(stateEvent.getTaskInstanceId());
-        if(taskGroupQueue.getForceStart() == Flag.YES.getCode()){
+        if (taskGroupQueue.getForceStart() == Flag.YES.getCode()) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-            taskProcessor.dispatch(taskInstance,processInstance);
-            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(),TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            taskProcessor.dispatch(taskInstance, processInstance);
+            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
             return true;
         }
-        if(taskGroupQueue.getInQueue() == Flag.YES.getCode()){
-            ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
-            TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
-            ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-            boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
-                    taskInstance.getName(),
-                    taskInstance.getTaskGroupId(),
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getTaskInstancePriority().getCode());
-            if(acquireTaskGroup){
-                taskProcessor.dispatch(taskInstance,processInstance);
+        if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
+            boolean acquireTaskGroup = processService.acquireTaskGroupAgain(taskGroupQueue);
+            if (acquireTaskGroup) {
+                ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
+                TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+                ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
+                taskProcessor.dispatch(taskInstance, processInstance);
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -382,11 +377,24 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean taskStateChangeHandler(StateEvent stateEvent) {
         TaskInstance task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
-        if (task.getState().typeIsFinished()) {
+        if (task.getState().typeIsFinished() && !completeTaskList.containsKey(Long.toString(task.getTaskCode()))) {
             taskFinished(task);
-            if(task.getTaskGroupId() > 0){
+            if (task.getTaskGroupId() > 0) {
                 //release task group
-                this.processService.releaseTaskGroup(task);
+                TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(task);
+                if (nextTaskInstance != null) {
+                    if (nextTaskInstance.getProcessInstanceId() == task.getProcessInstanceId()) {
+                        StateEvent nextEvent = new StateEvent();
+                        nextEvent.setProcessInstanceId(this.processInstance.getId());
+                        nextEvent.setTaskInstanceId(nextTaskInstance.getId());
+                        nextEvent.setType(StateEventType.WAIT_TASK_GROUP);
+                        this.stateEvents.add(nextEvent);
+                    } else {
+                        ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
+                        this.processService.sendStartTask2Master(processInstance,nextTaskInstance.getId(),
+                                org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                    }
+                }
             }
         } else if (activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
@@ -537,7 +545,6 @@ public class WorkflowExecuteThread implements Runnable {
             buildFlowDag();
             initTaskQueue();
             submitPostNode(null);
-            isStart = true;
         }
     }
 
@@ -554,6 +561,8 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+        //release task group
+        processService.releaseAllTaskGroup(processInstance.getId());
     }
 
     /**
@@ -670,18 +679,6 @@ public class WorkflowExecuteThread implements Runnable {
                     stateEvent.setExecutionStatus(taskProcessor.taskState());
                     stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
                     this.stateEvents.add(stateEvent);
-                }
-                if(taskInstance.getTaskGroupId() > 0){
-                    TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(taskInstance.getId());
-                    //for force start and wake up
-                    if(taskGroupQueue != null && TaskGroupQueueStatus.WAIT_QUEUE == taskGroupQueue.getStatus()){
-                        StateEvent stateEvent = new StateEvent();
-                        stateEvent.setProcessInstanceId(this.processInstance.getId());
-                        stateEvent.setTaskInstanceId(taskInstance.getId());
-                        stateEvent.setExecutionStatus(taskProcessor.taskState());
-                        stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
-                        this.stateEvents.add(stateEvent);
-                    }
                 }
                 return taskInstance;
             } else {
@@ -1297,7 +1294,12 @@ public class WorkflowExecuteThread implements Runnable {
                 if (DependResult.SUCCESS == dependResult) {
                     if (task.retryTaskIntervalOverTime()) {
                         int originalId = task.getId();
-                        TaskInstance taskInstance = submitTaskExec(task);
+                        TaskInstance taskInstance = null;
+                        try {
+                            taskInstance = submitTaskExec(task);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         if (taskInstance == null) {
                             this.taskFailedSubmit = true;
                         } else {

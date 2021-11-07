@@ -56,14 +56,16 @@
     <update id="updateTaskGroupResource">
         update t_ds_task_group
            set use_size = use_size+1
-        where id = #{id} and use_size = #{oldUseSize} and use_size  &lt; group_size
+        where id = #{id} and use_size  &lt; group_size and
+         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
     </update>
 
     <!--modify data by id-->
     <update id="releaseTaskGroupResource">
         update t_ds_task_group
           set use_size = use_size-1
-        where id = #{id}
+        where id = #{id} and use_size > 0 and
+         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
     </update>
 
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">

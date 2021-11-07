@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * the Dao interfaces of task group queue
@@ -73,5 +74,9 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue>{
 
     void updateInQueue(@Param("inQueue") int inQueue,@Param("id") int id);
 
+    int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue
+            , @Param("groupId") int id, @Param("status") int status);
+
     int updateInQueueCAS(@Param("oldValue") int oldValue,@Param("newValue") int newValue,@Param("id") int id);
+
 }

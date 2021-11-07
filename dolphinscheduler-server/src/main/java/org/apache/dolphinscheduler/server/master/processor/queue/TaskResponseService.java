@@ -145,6 +145,7 @@ public class TaskResponseService {
         Channel channel = taskResponseEvent.getChannel();
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+
         switch (event) {
             case ACK:
                 try {

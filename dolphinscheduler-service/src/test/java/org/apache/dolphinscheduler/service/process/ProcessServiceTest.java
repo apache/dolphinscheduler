@@ -642,13 +642,7 @@ public class ProcessServiceTest {
         Mockito.when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
         Mockito.when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
 
-        Assert.assertNull(processService.releaseTaskGroup(taskInstance));
-
-    }
-    @Test
-    public void testDoAwake() {
-        boolean b=processService.doWakeTask();
-        Assert.assertTrue(b);
+        processService.releaseTaskGroup(taskInstance);
 
     }
 

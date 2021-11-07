@@ -118,7 +118,7 @@ public class EventExecuteService extends Thread {
         for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             if (workflowExecuteThread.eventSize() == 0
                     || StringUtils.isEmpty(workflowExecuteThread.getKey())
-                    || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
+                    || eventHandlerMap.containsKey(workflowExecuteThread.getKey()) || !workflowExecuteThread.isStart()) {
                 continue;
             }
             int processInstanceId = workflowExecuteThread.getProcessInstance().getId();

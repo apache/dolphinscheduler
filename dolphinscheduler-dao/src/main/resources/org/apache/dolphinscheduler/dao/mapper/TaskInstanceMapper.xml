@@ -162,4 +162,14 @@
         </if>
         order by instance.start_time desc
     </select>
+    <select id="loadAllInfosNoRelease" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        from t_ds_task_instance instance
+        left join t_ds_task_group_queue que on instance.id = que.task_id
+        where instance.process_instance_id = #{processInstanceId}
+        and que.status = #{status}
+    </select>
 </mapper>
