@@ -28,7 +28,7 @@ public class SlackAlertPluginTest {
 
     @Test
     public void testGetAlertChannelFactorys() {
-        Iterable<AlertChannelFactory> alertChannelFactorys = slackAlertPlugin.getAlertChannelFactorys();
+        Iterable<AlertChannelFactory> alertChannelFactorys = slackAlertPlugin.getAlertChannelFactories();
         for (AlertChannelFactory alertChannelFactory : alertChannelFactorys) {
             Assert.assertTrue(alertChannelFactory instanceof SlackAlertChannelFactory);
         }

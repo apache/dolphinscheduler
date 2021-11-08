@@ -31,7 +31,7 @@ public class HttpAlertPluginTest {
     public void getAlertChannelFactorysTest() {
 
         HttpAlertPlugin httpAlertPlugin = new HttpAlertPlugin();
-        Iterable<AlertChannelFactory> alertChannelFactorys = httpAlertPlugin.getAlertChannelFactorys();
+        Iterable<AlertChannelFactory> alertChannelFactorys = httpAlertPlugin.getAlertChannelFactories();
         Assert.assertNotNull(alertChannelFactorys);
 
     }

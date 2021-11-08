@@ -100,7 +100,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
 
     @Override
     public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
-        for (AlertChannelFactory alertChannelFactory : dolphinSchedulerPlugin.getAlertChannelFactorys()) {
+        for (AlertChannelFactory alertChannelFactory : dolphinSchedulerPlugin.getAlertChannelFactories()) {
             logger.info("Registering Alert Plugin '{}'", alertChannelFactory.getName());
             this.addAlertChannelFactory(alertChannelFactory);
             List<PluginParams> params = alertChannelFactory.getParams();

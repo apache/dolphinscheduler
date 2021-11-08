@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 public class DataxTaskPlugin implements DolphinSchedulerPlugin {
 
     @Override
-    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+    public Iterable<TaskChannelFactory> getTaskChannelFactories() {
         return ImmutableList.of(new DataxTaskChannelFactory());
     }
 }

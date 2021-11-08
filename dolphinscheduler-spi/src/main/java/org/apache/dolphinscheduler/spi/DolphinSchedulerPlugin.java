@@ -37,7 +37,7 @@ public interface DolphinSchedulerPlugin {
      * get alert channel factory
      * @return alert channel factory
      */
-    default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+    default Iterable<AlertChannelFactory> getAlertChannelFactories() {
         return emptyList();
     }
 
@@ -45,7 +45,7 @@ public interface DolphinSchedulerPlugin {
      * get task plugin factory
      * @return registry factory
      */
-    default Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+    default Iterable<TaskChannelFactory> getTaskChannelFactories() {
         return emptyList();
     }
 

@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
 
 public class FeiShuAlertPlugin  implements DolphinSchedulerPlugin {
     @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+    public Iterable<AlertChannelFactory> getAlertChannelFactories() {
         return ImmutableList.of(new FeiShuAlertChannelFactory());
     }
 }
