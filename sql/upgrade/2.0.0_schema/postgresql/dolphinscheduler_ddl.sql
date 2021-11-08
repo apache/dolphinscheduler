@@ -15,9 +15,7 @@
  * limitations under the License.
 */
 
-/* author by gaotianduo
- * date: 2021-11-8
- * des:
+/* des:
  *      update the ddl of dolphin from 1.3.9 to 2.0.0
  *
  * PS:
