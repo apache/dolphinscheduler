@@ -104,10 +104,7 @@ public class WorkflowExecuteThread implements Runnable {
      * runing TaskNode
      */
     private final Map<Integer, ITaskProcessor> activeTaskProcessorMaps = new ConcurrentHashMap<>();
-    /**
-     * task exec service
-     */
-    private final ExecutorService taskExecService;
+
     /**
      * process instance
      */
@@ -216,9 +213,6 @@ public class WorkflowExecuteThread implements Runnable {
 
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
-        int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
-        this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
-                masterTaskExecNum);
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
@@ -227,8 +221,11 @@ public class WorkflowExecuteThread implements Runnable {
     @Override
     public void run() {
         try {
-            startProcess();
-            handleEvents();
+            if (!this.isStart()) {
+                startProcess();
+            } else {
+                handleEvents();
+            }
         } catch (Exception e) {
             logger.error("handler error:", e);
         }
