@@ -35,6 +35,9 @@ public class SnowFlakeUtils {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
+    private static final long SYSTEM_TIMESTAMP = System.currentTimeMillis();
+    private static final long SYSTEM_NANOTIME  = System.nanoTime();
+
     private SnowFlakeUtils() throws SnowFlakeException {
         try {
             this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
@@ -80,7 +83,7 @@ public class SnowFlakeUtils {
     }
 
     private long nowTimestamp() {
-        return System.currentTimeMillis();
+        return SYSTEM_TIMESTAMP + (System.nanoTime() - SYSTEM_NANOTIME) / 1000000;
     }
 
     public static class SnowFlakeException extends Exception {
