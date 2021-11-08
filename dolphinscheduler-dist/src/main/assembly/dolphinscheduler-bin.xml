@@ -147,7 +147,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../sql</directory>
+            <directory>${basedir}/../dolphinscheduler-dao/src/main/resources/sql</directory>
             <includes>
                 <include>**/*</include>
             </includes>

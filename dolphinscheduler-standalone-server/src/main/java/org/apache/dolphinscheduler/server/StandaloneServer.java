@@ -38,7 +38,7 @@ public class StandaloneServer {
         Thread.currentThread().setName("Standalone-Server");
 
         System.setProperty("spring.profiles.active", "api,h2");
-        System.setProperty("spring.datasource.sql.schema", "file:./sql/dolphinscheduler_h2.sql");
+        System.setProperty("spring.datasource.sql.schema", "classpath:sql/dolphinscheduler_h2.sql");
 
         startRegistry();
 

@@ -51,6 +51,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -63,9 +64,13 @@ public class EmailAlertPluginTest {
     private AlertDao alertDao;
     private PluginDao pluginDao;
 
+    @BeforeClass
+    public static void setUpClass() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
+
     @Before
     public void setUp() {
-        System.setProperty("spring.profiles.active", "h2");
         alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
     }
