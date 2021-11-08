@@ -53,7 +53,7 @@ public class JsonSplitDao {
                 processUpdate.setInt(2, processDefinitionLog.getTimeout());
                 processUpdate.setInt(3, processDefinitionLog.getTenantId());
                 processUpdate.setString(4, processDefinitionLog.getLocations());
-                processUpdate.setDate(5, (Date) processDefinitionLog.getUpdateTime());
+                processUpdate.setDate(5, new Date(processDefinitionLog.getUpdateTime().getTime()));
                 processUpdate.setInt(6, processDefinitionLog.getId());
                 processUpdate.addBatch();
 
@@ -70,9 +70,9 @@ public class JsonSplitDao {
                 insertLog.setInt(11, processDefinitionLog.getTimeout());
                 insertLog.setInt(12, processDefinitionLog.getTenantId());
                 insertLog.setInt(13, processDefinitionLog.getOperator());
-                insertLog.setDate(14, (Date) processDefinitionLog.getOperateTime());
-                insertLog.setDate(15, (Date) processDefinitionLog.getCreateTime());
-                insertLog.setDate(16, (Date) processDefinitionLog.getUpdateTime());
+                insertLog.setDate(14, new Date(processDefinitionLog.getOperateTime().getTime()));
+                insertLog.setDate(15, new Date(processDefinitionLog.getCreateTime().getTime()));
+                insertLog.setDate(16, new Date(processDefinitionLog.getUpdateTime().getTime()));
                 insertLog.addBatch();
 
                 i++;
@@ -121,8 +121,8 @@ public class JsonSplitDao {
                 insert.setInt(7, processTaskRelationLog.getPostTaskVersion());
                 insert.setInt(8, processTaskRelationLog.getConditionType().getCode());
                 insert.setString(9, processTaskRelationLog.getConditionParams());
-                insert.setDate(10, (Date) processTaskRelationLog.getCreateTime());
-                insert.setDate(11, (Date) processTaskRelationLog.getUpdateTime());
+                insert.setDate(10, new Date(processTaskRelationLog.getCreateTime().getTime()));
+                insert.setDate(11, new Date(processTaskRelationLog.getUpdateTime().getTime()));
                 insert.addBatch();
 
                 insertLog.setLong(1, processTaskRelationLog.getProjectCode());
@@ -135,9 +135,9 @@ public class JsonSplitDao {
                 insertLog.setInt(8, processTaskRelationLog.getConditionType().getCode());
                 insertLog.setString(9, processTaskRelationLog.getConditionParams());
                 insertLog.setInt(10, processTaskRelationLog.getOperator());
-                insertLog.setDate(11, (Date) processTaskRelationLog.getOperateTime());
-                insertLog.setDate(12, (Date) processTaskRelationLog.getCreateTime());
-                insertLog.setDate(13, (Date) processTaskRelationLog.getUpdateTime());
+                insertLog.setDate(11, new Date(processTaskRelationLog.getOperateTime().getTime()));
+                insertLog.setDate(12, new Date(processTaskRelationLog.getCreateTime().getTime()));
+                insertLog.setDate(13, new Date(processTaskRelationLog.getUpdateTime().getTime()));
                 insertLog.addBatch();
 
                 i++;
@@ -169,10 +169,10 @@ public class JsonSplitDao {
     public void executeJsonSplitTaskDefinition(Connection conn, List<TaskDefinitionLog> taskDefinitionLogs) {
         String insertSql = "insert into t_ds_task_definition (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
             + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,"
-            + "create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         String insertLogSql = "insert into t_ds_task_definition_log (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
             + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,operator,"
-            + "operate_time,create_time,update_time) values values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -193,12 +193,12 @@ public class JsonSplitDao {
                 insert.setInt(13, taskDefinitionLog.getFailRetryTimes());
                 insert.setInt(14, taskDefinitionLog.getFailRetryInterval());
                 insert.setInt(15, taskDefinitionLog.getTimeoutFlag().getCode());
-                insert.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
+                insert.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0 : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
                 insert.setInt(17, taskDefinitionLog.getTimeout());
                 insert.setInt(18, taskDefinitionLog.getDelayTime());
                 insert.setString(19, taskDefinitionLog.getResourceIds());
-                insert.setDate(20, (Date) taskDefinitionLog.getCreateTime());
-                insert.setDate(21, (Date) taskDefinitionLog.getUpdateTime());
+                insert.setDate(20, new Date(taskDefinitionLog.getCreateTime().getTime()));
+                insert.setDate(21, new Date(taskDefinitionLog.getUpdateTime().getTime()));
                 insert.addBatch();
 
                 insertLog.setLong(1, taskDefinitionLog.getCode());
@@ -216,14 +216,14 @@ public class JsonSplitDao {
                 insertLog.setInt(13, taskDefinitionLog.getFailRetryTimes());
                 insertLog.setInt(14, taskDefinitionLog.getFailRetryInterval());
                 insertLog.setInt(15, taskDefinitionLog.getTimeoutFlag().getCode());
-                insertLog.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
+                insertLog.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0 : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
                 insertLog.setInt(17, taskDefinitionLog.getTimeout());
                 insertLog.setInt(18, taskDefinitionLog.getDelayTime());
                 insertLog.setString(19, taskDefinitionLog.getResourceIds());
                 insertLog.setInt(20, taskDefinitionLog.getOperator());
-                insertLog.setDate(21, (Date) taskDefinitionLog.getOperateTime());
-                insertLog.setDate(22, (Date) taskDefinitionLog.getCreateTime());
-                insertLog.setDate(23, (Date) taskDefinitionLog.getUpdateTime());
+                insertLog.setDate(21, new Date(taskDefinitionLog.getOperateTime().getTime()));
+                insertLog.setDate(22, new Date(taskDefinitionLog.getCreateTime().getTime()));
+                insertLog.setDate(23, new Date(taskDefinitionLog.getUpdateTime().getTime()));
                 insertLog.addBatch();
 
                 i++;
