@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
@@ -434,6 +434,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param loginUser           login user
      * @param instanceId          instance id
      * @param processDefinitionCode process definition code
+     * @param processVersion
      * @param commandType         command type
      * @return insert result code
      */
@@ -557,7 +558,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         if (!StringUtils.isEmpty(startNodeList)) {
-            cmdParam.put(CMD_PARAM_START_NODE_NAMES, startNodeList);
+            cmdParam.put(CMD_PARAM_START_NODES, startNodeList);
         }
         if (warningType != null) {
             command.setWarningType(warningType);

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -27,38 +28,20 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProcessDefinitionLogMapperTest {
+public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private ProjectMapper projectMapper;
 
     @Autowired
-    QueueMapper queueMapper;
-
-    @Autowired
-    TenantMapper tenantMapper;
-
-    @Autowired
-    ProjectMapper projectMapper;
-
-    @Autowired
-    ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     /**
      * insert
