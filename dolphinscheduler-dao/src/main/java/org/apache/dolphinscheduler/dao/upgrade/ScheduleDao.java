@@ -77,7 +77,7 @@ public class ScheduleDao {
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     long projectDefinitionCode = entry.getValue();
                     if (String.valueOf(projectDefinitionCode).length() <= 10) {
-                        Integer projectDefinitionId = Integer.getInteger(String.valueOf(projectDefinitionCode));
+                        Integer projectDefinitionId = Integer.parseInt(String.valueOf(projectDefinitionCode));
                         if (processIdCodeMap.containsKey(projectDefinitionId)) {
                             projectDefinitionCode = processIdCodeMap.get(projectDefinitionId);
                         }
