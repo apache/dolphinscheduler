@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.data.quality;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.SPARK_APP_NAME;
+
 import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.DataQualityConfiguration;
 import org.apache.dolphinscheduler.data.quality.config.EnvConfig;
@@ -55,8 +57,8 @@ public class DataQualityApplication {
         EnvConfig envConfig = dataQualityConfiguration.getEnvConfig();
         Config config = new Config(envConfig.getConfig());
         config.put("type",envConfig.getType());
-        if (StringUtils.isEmpty(config.getString("spark.app.name"))) {
-            config.put("spark.app.name",dataQualityConfiguration.getName());
+        if (StringUtils.isEmpty(config.getString(SPARK_APP_NAME))) {
+            config.put(SPARK_APP_NAME,dataQualityConfiguration.getName());
         }
 
         SparkRuntimeEnvironment sparkRuntimeEnvironment = new SparkRuntimeEnvironment(config);

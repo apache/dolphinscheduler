@@ -57,4 +57,6 @@ public final class Constants {
     public static final String SAVE_MODE = "save_mode";
 
     public static final String APPEND = "append";
+
+    public static final String SPARK_APP_NAME = "spark.app.name";
 }
