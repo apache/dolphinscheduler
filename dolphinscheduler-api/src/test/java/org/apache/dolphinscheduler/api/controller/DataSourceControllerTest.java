@@ -133,7 +133,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("searchVal","mysql");
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","1");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/list-paging")
+        MvcResult mvcResult = mockMvc.perform(get("/datasources")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

@@ -60,7 +60,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            rs = conn.getMetaData().getTables(null, null, tableName, null);
+            rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null);
             return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
@@ -82,7 +82,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            ResultSet rs = conn.getMetaData().getColumns(null,null,tableName,columnName);
+            ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(),tableName,columnName);
             return rs.next();
 
         } catch (SQLException e) {

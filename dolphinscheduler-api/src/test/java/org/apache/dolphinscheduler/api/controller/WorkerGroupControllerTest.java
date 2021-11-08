@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,17 +60,20 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @MockBean
     private ProcessInstanceMapper processInstanceMapper;
 
+    @MockBean
+    private RegistryClient registryClient;
+
     @Test
     public void testSaveWorkerGroup() throws Exception {
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("192.168.0.1", "192.168.0.1");
         serverMaps.put("192.168.0.2", "192.168.0.2");
-        PowerMockito.when(RegistryCenterUtils.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+        PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");
         paramsMap.add("addrList","192.168.0.1,192.168.0.2");
-        MvcResult mvcResult = mockMvc.perform(post("/worker-group/save")
+        MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -86,7 +90,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo","2");
         paramsMap.add("searchVal","cxc");
         paramsMap.add("pageSize","2");
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/list-paging")
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -100,7 +104,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryAllWorkerGroups() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/all-groups")
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups/all")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -121,11 +125,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","12");
-        MvcResult mvcResult = mockMvc.perform(post("/worker-group/delete-by-id")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+        MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();

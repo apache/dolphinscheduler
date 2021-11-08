@@ -18,7 +18,7 @@
 name: Bug report
 title: "[Bug] [Module Name] Bug title "
 description: Problems and issues with code of Apache Dolphinscheduler
-labels: [ "bug" ]
+labels: [ "bug", "Waiting for reply" ]
 body:
   - type: markdown
     attributes:

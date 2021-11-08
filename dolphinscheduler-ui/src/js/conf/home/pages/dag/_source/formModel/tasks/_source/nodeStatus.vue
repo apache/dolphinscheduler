@@ -17,8 +17,8 @@
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
-      <el-select style="width: 150px;" size="small" v-model="el.depTasks" :disabled="isDetails">
-        <el-option v-for="item in prevTasks" :key="item.code" :value="item.name" :label="item.name">
+      <el-select style="width: 150px;" size="small" :value="el.depTaskCode || ''" @change="(val) => { el.depTaskCode = val }" :disabled="isDetails">
+        <el-option v-for="item in prevTasks" :key="item.code" :value="item.code" :label="item.name">
         </el-option>
       </el-select>
       <el-select style="width: 116px;" size="small" v-model="el.status" :disabled="isDetails">
@@ -134,13 +134,13 @@
       },
       _rtNewParams () {
         return {
-          depTasks: '',
+          depTaskCode: 0,
           status: ''
         }
       },
       _rtOldParams (value, depTasksList, item) {
         return {
-          depTasks: '',
+          depTaskCode: 0,
           status: ''
         }
       },

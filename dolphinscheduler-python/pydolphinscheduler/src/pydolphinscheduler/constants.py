@@ -15,18 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Constants for pydolphinscheduler."""
+
+
 class ProcessDefinitionReleaseState:
-    """
-    ProcessDefinition release state
-    """
+    """Constants for :class:`pydolphinscheduler.core.process_definition.ProcessDefinition` release state."""
+
     ONLINE: str = "ONLINE"
     OFFLINE: str = "OFFLINE"
 
 
 class ProcessDefinitionDefault:
-    """
-    ProcessDefinition default values
-    """
+    """Constants default value for :class:`pydolphinscheduler.core.process_definition.ProcessDefinition`."""
+
     PROJECT: str = "project-pydolphin"
     TENANT: str = "tenant_pydolphin"
     USER: str = "userPythonGateway"
@@ -40,6 +41,8 @@ class ProcessDefinitionDefault:
 
 
 class TaskPriority(str):
+    """Constants for task priority."""
+
     HIGHEST = "HIGHEST"
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
@@ -48,23 +51,33 @@ class TaskPriority(str):
 
 
 class TaskFlag(str):
+    """Constants for task flag."""
+
     YES = "YES"
     NO = "NO"
 
 
 class TaskTimeoutFlag(str):
+    """Constants for task timeout flag."""
+
     CLOSE = "CLOSE"
 
 
 class TaskType(str):
+    """Constants for task type, it will also show you which kind we support up to now."""
+
     SHELL = "SHELL"
 
 
 class DefaultTaskCodeNum(str):
+    """Constants and default value for default task code number."""
+
     DEFAULT = 1
 
 
 class JavaGatewayDefault(str):
+    """Constants and default value for java gateway."""
+
     RESULT_MESSAGE_KEYWORD = "msg"
     RESULT_MESSAGE_SUCCESS = "success"
 
