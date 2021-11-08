@@ -63,10 +63,10 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
@@ -579,7 +579,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     /**
      * upgrade DolphinScheduler to 2.0.0, json split
      */
-    private void processDefinitionJsonSplit() {
+    public void processDefinitionJsonSplit() {
         ProjectDao projectDao = new ProjectDao();
         ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
         ScheduleDao scheduleDao = new ScheduleDao();
@@ -649,14 +649,17 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 ObjectNode param = (ObjectNode) task.get("params");
                 TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
                 if (param != null) {
-                    List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
-                    if (!resourceList.isEmpty()) {
+                    JsonNode resourceJsonNode = param.get("resourceList");
+                    if (resourceJsonNode != null && !resourceJsonNode.isEmpty()) {
+                        List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
                         List<Integer> resourceIds = resourceList.stream().map(ResourceInfo::getId).collect(Collectors.toList());
-                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, ","));
+                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, Constants.COMMA));
+                    } else {
+                        taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
                     }
                     param.put("conditionResult", task.get("conditionResult"));
                     param.put("dependence", task.get("dependence"));
-                    taskDefinitionLog.setTaskParams(param.asText());
+                    taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(param));
                 }
                 TaskTimeoutParameter timeout = JSONUtils.parseObject(JSONUtils.toJsonString(task.get("timeout")), TaskTimeoutParameter.class);
                 if (timeout != null) {
@@ -674,6 +677,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
                 long taskCode = SnowFlakeUtils.getInstance().nextId();
+                System.out.println(taskCode);
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());
@@ -686,7 +690,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 taskDefinitionLog.setUpdateTime(now);
                 taskDefinitionLogList.add(taskDefinitionLog);
                 taskIdCodeMap.put(task.get("id").asText(), taskCode);
-                List<String> preTasks = JSONUtils.toList(task.get("preTasks").asText(), String.class);
+                List<String> preTasks = JSONUtils.toList(task.get("preTasks").toString(), String.class);
                 taskNamePreMap.put(name, preTasks);
                 taskNameCodeMap.put(name, taskCode);
             }
@@ -745,13 +749,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isBlank(locations)) {
             return locations;
         }
-        Map<String, String> locationsMap = JSONUtils.toMap(locations);
-        JsonNodeFactory factory = new JsonNodeFactory(false);
-        ArrayNode jsonNodes = factory.arrayNode();
-        for (Map.Entry<String, String> entry : locationsMap.entrySet()) {
-            ObjectNode nodes = factory.objectNode();
+        Map<String, ObjectNode> locationsMap = JSONUtils.parseObject(locations, new TypeReference<Map<String, ObjectNode>>() {
+        });
+        if (locationsMap == null) {
+            return locations;
+        }
+        ArrayNode jsonNodes = JSONUtils.createArrayNode();
+        for (Map.Entry<String, ObjectNode> entry : locationsMap.entrySet()) {
+            ObjectNode nodes = JSONUtils.createObjectNode();
             nodes.put("taskCode", taskIdCodeMap.get(entry.getKey()));
-            ObjectNode oldNodes = JSONUtils.parseObject(entry.getValue());
+            ObjectNode oldNodes = entry.getValue();
             nodes.put("x", oldNodes.get("x").asInt());
             nodes.put("y", oldNodes.get("y").asInt());
             jsonNodes.add(nodes);
