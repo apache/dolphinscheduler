@@ -420,7 +420,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         try {
             DruidDataSource druidDataSource = springConnectionFactory.dataSource();
-
             dataSource.setUserName(druidDataSource.getUsername());
             JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(druidDataSource.getUrl());
             if (jdbcInfo != null) {
