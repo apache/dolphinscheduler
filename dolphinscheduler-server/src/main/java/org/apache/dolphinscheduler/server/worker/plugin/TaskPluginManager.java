@@ -91,7 +91,7 @@ public class TaskPluginManager extends AbstractDolphinPluginManager {
 
     @Override
     public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
-        for (TaskChannelFactory taskChannelFactory : dolphinSchedulerPlugin.getTaskChannelFactorys()) {
+        for (TaskChannelFactory taskChannelFactory : dolphinSchedulerPlugin.getTaskChannelFactories()) {
             logger.info("Registering Task Plugin '{}'", taskChannelFactory.getName());
             this.addTaskChannelFactory(taskChannelFactory);
             List<PluginParams> params = taskChannelFactory.getParams();
