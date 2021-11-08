@@ -579,7 +579,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     /**
      * upgrade DolphinScheduler to 2.0.0, json split
      */
-    public void processDefinitionJsonSplit() {
+    private void processDefinitionJsonSplit() {
         ProjectDao projectDao = new ProjectDao();
         ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
         ScheduleDao scheduleDao = new ScheduleDao();
@@ -677,7 +677,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
                 long taskCode = SnowFlakeUtils.getInstance().nextId();
-                System.out.println(taskCode);
+                // System.out.println(taskCode);
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());
