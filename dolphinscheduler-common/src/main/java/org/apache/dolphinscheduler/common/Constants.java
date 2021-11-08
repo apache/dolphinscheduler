@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -719,7 +719,7 @@ public final class Constants {
      * application regex
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
-    public static final String PID = OSUtils.isWindows() ? "handle" : "pid";
+    public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
     /**
      * month_begin
      */
@@ -751,7 +751,7 @@ public final class Constants {
     public static final char LEFT_BRACE_CHAR = '(';
     public static final char RIGHT_BRACE_CHAR = ')';
     public static final String ADD_STRING = "+";
-    public static final String MULTIPLY_STRING = "*";
+    public static final String STAR = "*";
     public static final String DIVISION_STRING = "/";
     public static final String LEFT_BRACE_STRING = "(";
     public static final char P = 'P';
