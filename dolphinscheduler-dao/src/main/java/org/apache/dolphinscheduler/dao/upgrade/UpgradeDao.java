@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
@@ -54,6 +55,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
@@ -61,8 +63,10 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
@@ -599,7 +603,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             List<ProcessDefinitionLog> processDefinitionLogs = new ArrayList<>();
             List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
             List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
-            splitProcessDefinitionJson(processDefinitions, processDefinitionJsonMap, processDefinitionLogs, processTaskRelationLogs, taskDefinitionLogs);
+            Map<Integer, Map<Long, Map<String, Long>>> processTaskMap = new HashMap<>();
+            splitProcessDefinitionJson(processDefinitions, processDefinitionJsonMap, processDefinitionLogs, processTaskRelationLogs, taskDefinitionLogs, processTaskMap);
+            convertDependence(taskDefinitionLogs, projectIdCodeMap, processTaskMap);
 
             // execute json split
             jsonSplitDao.executeJsonSplitProcessDefinition(dataSource.getConnection(), processDefinitionLogs);
@@ -614,7 +620,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                                             Map<Integer, String> processDefinitionJsonMap,
                                             List<ProcessDefinitionLog> processDefinitionLogs,
                                             List<ProcessTaskRelationLog> processTaskRelationLogs,
-                                            List<TaskDefinitionLog> taskDefinitionLogs) throws Exception {
+                                            List<TaskDefinitionLog> taskDefinitionLogs,
+                                            Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) throws Exception {
         Map<Integer, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
                 .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
         Date now = new Date();
@@ -634,20 +641,25 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             Map<String, Long> taskIdCodeMap = new HashMap<>();
             Map<String, List<String>> taskNamePreMap = new HashMap<>();
             Map<String, Long> taskNameCodeMap = new HashMap<>();
+            Map<Long, Map<String, Long>> processCodeTaskNameCodeMap = new HashMap<>();
+            List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
             ArrayNode tasks = JSONUtils.parseArray(jsonObject.get("tasks").toString());
             for (int i = 0; i < tasks.size(); i++) {
                 ObjectNode task = (ObjectNode) tasks.path(i);
                 ObjectNode param = (ObjectNode) task.get("params");
                 TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
                 if (param != null) {
-                    List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
-                    if (!resourceList.isEmpty()) {
+                    JsonNode resourceJsonNode = param.get("resourceList");
+                    if (resourceJsonNode != null && !resourceJsonNode.isEmpty()) {
+                        List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
                         List<Integer> resourceIds = resourceList.stream().map(ResourceInfo::getId).collect(Collectors.toList());
-                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, ","));
+                        taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, Constants.COMMA));
+                    } else {
+                        taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
                     }
                     param.put("conditionResult", task.get("conditionResult"));
                     param.put("dependence", task.get("dependence"));
-                    taskDefinitionLog.setTaskParams(param.toString());
+                    taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(param));
                 }
                 TaskTimeoutParameter timeout = JSONUtils.parseObject(JSONUtils.toJsonString(task.get("timeout")), TaskTimeoutParameter.class);
                 if (timeout != null) {
@@ -655,16 +667,17 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                     taskDefinitionLog.setTimeoutFlag(timeout.getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
                     taskDefinitionLog.setTimeoutNotifyStrategy(timeout.getStrategy());
                 }
-                taskDefinitionLog.setDescription(task.get("description").toString());
-                taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").toString()) ? Flag.YES : Flag.NO);
-                taskDefinitionLog.setTaskType(task.get("type").toString());
+                taskDefinitionLog.setDescription(task.get("description").asText());
+                taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
+                taskDefinitionLog.setTaskType(task.get("type").asText());
                 taskDefinitionLog.setFailRetryInterval(task.get("retryInterval").asInt());
                 taskDefinitionLog.setFailRetryTimes(task.get("maxRetryTimes").asInt());
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
-                String name = task.get("name").toString();
+                String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
-                taskDefinitionLog.setWorkerGroup(task.get("workerGroup").toString());
+                taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
                 long taskCode = SnowFlakeUtils.getInstance().nextId();
+                // System.out.println(taskCode);
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());
@@ -675,12 +688,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 taskDefinitionLog.setOperateTime(now);
                 taskDefinitionLog.setCreateTime(now);
                 taskDefinitionLog.setUpdateTime(now);
-                taskDefinitionLogs.add(taskDefinitionLog);
-                taskIdCodeMap.put(task.get("id").toString(), taskCode);
+                taskDefinitionLogList.add(taskDefinitionLog);
+                taskIdCodeMap.put(task.get("id").asText(), taskCode);
                 List<String> preTasks = JSONUtils.toList(task.get("preTasks").toString(), String.class);
                 taskNamePreMap.put(name, preTasks);
                 taskNameCodeMap.put(name, taskCode);
             }
+            convertConditions(taskDefinitionLogList, taskNameCodeMap);
+            taskDefinitionLogs.addAll(taskDefinitionLogList);
             processDefinition.setLocations(convertLocations(processDefinition.getLocations(), taskIdCodeMap));
             ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
             processDefinitionLog.setOperator(1);
@@ -688,6 +703,45 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             processDefinitionLog.setUpdateTime(now);
             processDefinitionLogs.add(processDefinitionLog);
             handleProcessTaskRelation(taskNamePreMap, taskNameCodeMap, processDefinition, processTaskRelationLogs);
+            processCodeTaskNameCodeMap.put(processDefinition.getCode(), taskNameCodeMap);
+            processTaskMap.put(entry.getKey(), processCodeTaskNameCodeMap);
+        }
+    }
+
+    public void convertConditions(List<TaskDefinitionLog> taskDefinitionLogList, Map<String, Long> taskNameCodeMap) throws Exception {
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
+            if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                ObjectNode taskParams = JSONUtils.parseObject(taskDefinitionLog.getTaskParams());
+                // reset conditionResult
+                ObjectNode conditionResult = (ObjectNode) taskParams.get("conditionResult");
+                List<String> successNode = JSONUtils.toList(conditionResult.get("successNode").toString(), String.class);
+                List<Long> nodeCode = new ArrayList<>();
+                successNode.forEach(node -> nodeCode.add(taskNameCodeMap.get(node)));
+                conditionResult.set("successNode", objectMapper.readTree(objectMapper.writeValueAsString(nodeCode)));
+                List<String> failedNode = JSONUtils.toList(conditionResult.get("failedNode").toString(), String.class);
+                nodeCode.clear();
+                failedNode.forEach(node -> nodeCode.add(taskNameCodeMap.get(node)));
+                conditionResult.set("failedNode", objectMapper.readTree(objectMapper.writeValueAsString(nodeCode)));
+                // reset dependItemList
+                ObjectNode dependence = (ObjectNode) taskParams.get("dependence");
+                ArrayNode dependTaskList = JSONUtils.parseArray(JSONUtils.toJsonString(dependence.get("dependTaskList")));
+                for (int i = 0; i < dependTaskList.size(); i++) {
+                    ObjectNode dependTask = (ObjectNode) dependTaskList.path(i);
+                    ArrayNode dependItemList = JSONUtils.parseArray(JSONUtils.toJsonString(dependTask.get("dependItemList")));
+                    for (int j = 0; j < dependItemList.size(); j++) {
+                        ObjectNode dependItem = (ObjectNode) dependItemList.path(j);
+                        JsonNode depTasks = dependItem.get("depTasks");
+                        dependItem.put("depTaskCode", taskNameCodeMap.get(depTasks.asText()));
+                        dependItem.remove("depTasks");
+                        dependItemList.set(j, dependItem);
+                    }
+                    dependTask.put("dependItemList", dependItemList);
+                    dependTaskList.set(i, dependTask);
+                }
+                dependence.put("dependTaskList", dependTaskList);
+                taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(taskParams));
+            }
         }
     }
 
@@ -695,18 +749,59 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isBlank(locations)) {
             return locations;
         }
-        Map<String, String> locationsMap = JSONUtils.toMap(locations);
-        JsonNodeFactory factory = new JsonNodeFactory(false);
-        ArrayNode jsonNodes = factory.arrayNode();
-        for (Map.Entry<String, String> entry : locationsMap.entrySet()) {
-            ObjectNode nodes = factory.objectNode();
+        Map<String, ObjectNode> locationsMap = JSONUtils.parseObject(locations, new TypeReference<Map<String, ObjectNode>>() {
+        });
+        if (locationsMap == null) {
+            return locations;
+        }
+        ArrayNode jsonNodes = JSONUtils.createArrayNode();
+        for (Map.Entry<String, ObjectNode> entry : locationsMap.entrySet()) {
+            ObjectNode nodes = JSONUtils.createObjectNode();
             nodes.put("taskCode", taskIdCodeMap.get(entry.getKey()));
-            ObjectNode oldNodes = JSONUtils.parseObject(entry.getValue());
+            ObjectNode oldNodes = entry.getValue();
             nodes.put("x", oldNodes.get("x").asInt());
             nodes.put("y", oldNodes.get("y").asInt());
             jsonNodes.add(nodes);
         }
         return jsonNodes.toString();
+    }
+
+    public void convertDependence(List<TaskDefinitionLog> taskDefinitionLogs,
+                                   Map<Integer, Long> projectIdCodeMap,
+                                   Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) {
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                ObjectNode taskParams = JSONUtils.parseObject(taskDefinitionLog.getTaskParams());
+                ObjectNode dependence = (ObjectNode) taskParams.get("dependence");
+                ArrayNode dependTaskList = JSONUtils.parseArray(JSONUtils.toJsonString(dependence.get("dependTaskList")));
+                for (int i = 0; i < dependTaskList.size(); i++) {
+                    ObjectNode dependTask = (ObjectNode) dependTaskList.path(i);
+                    ArrayNode dependItemList = JSONUtils.parseArray(JSONUtils.toJsonString(dependTask.get("dependItemList")));
+                    for (int j = 0; j < dependItemList.size(); j++) {
+                        ObjectNode dependItem = (ObjectNode) dependItemList.path(j);
+                        dependItem.put("projectCode", projectIdCodeMap.get(dependItem.get("projectId").asInt()));
+                        int definitionId = dependItem.get("definitionId").asInt();
+                        Map<Long, Map<String, Long>> processCodeTaskNameCodeMap = processTaskMap.get(definitionId);
+                        Optional<Map.Entry<Long, Map<String, Long>>> mapEntry = processCodeTaskNameCodeMap.entrySet().stream().findFirst();
+                        if (mapEntry.isPresent()) {
+                            Map.Entry<Long, Map<String, Long>> processCodeTaskNameCodeEntry = mapEntry.get();
+                            dependItem.put("definitionCode", processCodeTaskNameCodeEntry.getKey());
+                            String depTasks = dependItem.get("depTasks").asText();
+                            long taskCode = "ALL".equals(depTasks) ? 0L : processCodeTaskNameCodeEntry.getValue().get(depTasks);
+                            dependItem.put("depTaskCode", taskCode);
+                        }
+                        dependItem.remove("projectId");
+                        dependItem.remove("definitionId");
+                        dependItem.remove("depTasks");
+                        dependItemList.set(j, dependItem);
+                    }
+                    dependTask.put("dependItemList", dependItemList);
+                    dependTaskList.set(i, dependTask);
+                }
+                dependence.put("dependTaskList", dependTaskList);
+                taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(taskParams));
+            }
+        }
     }
 
     private void handleProcessTaskRelation(Map<String, List<String>> taskNamePreMap,

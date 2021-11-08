@@ -67,6 +67,7 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setModifyBy(processDefinition.getModifyBy());
         this.setResourceIds(processDefinition.getResourceIds());
         this.setWarningGroupId(processDefinition.getWarningGroupId());
+        this.setExecutionType(processDefinition.getExecutionType());
     }
 
     public int getOperator() {
@@ -89,4 +90,5 @@ public class ProcessDefinitionLog extends ProcessDefinition {
     public boolean equals(Object o) {
         return super.equals(o);
     }
+
 }

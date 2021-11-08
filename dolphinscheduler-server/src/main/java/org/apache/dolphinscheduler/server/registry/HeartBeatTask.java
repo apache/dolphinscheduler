@@ -33,11 +33,11 @@ public class HeartBeatTask implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
 
-    private Set<String> heartBeatPaths;
-    private RegistryClient registryClient;
+    private final Set<String> heartBeatPaths;
+    private final RegistryClient registryClient;
     private WorkerManagerThread workerManagerThread;
-    private String serverType;
-    private HeartBeat heartBeat;
+    private final String serverType;
+    private final HeartBeat heartBeat;
 
     public HeartBeatTask(long startupTime,
                          double maxCpuloadAvg,
@@ -89,7 +89,7 @@ public class HeartBeatTask implements Runnable {
             }
 
             for (String heartBeatPath : heartBeatPaths) {
-                registryClient.update(heartBeatPath, heartBeat.encodeHeartBeat());
+                registryClient.persistEphemeral(heartBeatPath, heartBeat.encodeHeartBeat());
             }
         } catch (Throwable ex) {
             logger.error("error write heartbeat info", ex);
