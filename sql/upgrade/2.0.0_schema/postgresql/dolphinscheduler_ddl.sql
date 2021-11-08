@@ -15,19 +15,6 @@
  * limitations under the License.
 */
 
-/* des:
- *      update the ddl of dolphin from 1.3.9 to 2.0.0
- *
- * PS:
- *      In the function of postgres it can rollback ddl
- * example:
- *      begin
- *          ddl1;
- *          ddl2;
- *      end;
- *      if ddl2 is failed ,the postgres will rollback all the ddl between begin and end;
-*/
-
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying
