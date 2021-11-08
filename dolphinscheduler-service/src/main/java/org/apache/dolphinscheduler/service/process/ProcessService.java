@@ -828,8 +828,8 @@ public class ProcessService {
     private Boolean checkCmdParam(Command command, Map<String, String> cmdParam) {
         if (command.getTaskDependType() == TaskDependType.TASK_ONLY || command.getTaskDependType() == TaskDependType.TASK_PRE) {
             if (cmdParam == null
-                || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODE_NAMES)
-                || cmdParam.get(Constants.CMD_PARAM_START_NODE_NAMES).isEmpty()) {
+                || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODES)
+                || cmdParam.get(Constants.CMD_PARAM_START_NODES).isEmpty()) {
                 logger.error("command node depend type is {}, but start nodes is null ", command.getTaskDependType());
                 return false;
             }

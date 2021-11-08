@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,27 +47,27 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","4");
-        paramsMap.add("expireTime","2019-12-18 00:00:00");
-        paramsMap.add("token","607f5aeaaa2093dbdff5d5522ce00510");
-        MvcResult mvcResult = mockMvc.perform(post("/access-token/create")
+        paramsMap.add("userId", "4");
+        paramsMap.add("expireTime", "2019-12-18 00:00:00");
+        paramsMap.add("token", "607f5aeaaa2093dbdff5d5522ce00510");
+        MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testExceptionHandler() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","-1");
-        paramsMap.add("expireTime","2019-12-18 00:00:00");
-        paramsMap.add("token","507f5aeaaa2093dbdff5d5522ce00510");
-        MvcResult mvcResult = mockMvc.perform(post("/access-token/create")
+        paramsMap.add("userId", "-1");
+        paramsMap.add("expireTime", "2019-12-18 00:00:00");
+        paramsMap.add("token", "507f5aeaaa2093dbdff5d5522ce00510");
+        MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -79,66 +81,64 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testGenerateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId","4");
-        paramsMap.add("expireTime","2019-12-28 00:00:00");
-        MvcResult mvcResult = mockMvc.perform(post("/access-token/generate")
-                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
+        paramsMap.add("userId", "4");
+        paramsMap.add("expireTime", "2019-12-28 00:00:00");
+        MvcResult mvcResult = mockMvc.perform(post("/access-tokens/generate")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryAccessTokenList() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
-        paramsMap.add("pageSize","20");
-        paramsMap.add("searchVal","");
-        MvcResult mvcResult = mockMvc.perform(get("/access-token/list-paging")
-                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "20");
+        paramsMap.add("searchVal", "");
+        MvcResult mvcResult = mockMvc.perform(get("/access-tokens")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDelAccessTokenById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","13");
-        MvcResult mvcResult = mockMvc.perform(post("/access-token/delete")
-                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
-                .params(paramsMap))
+        testCreateToken();
+        MvcResult mvcResult = mockMvc.perform(delete("/access-tokens/1")
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUpdateToken() throws Exception {
+        testCreateToken();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","12");
-        paramsMap.add("userId","4");
-        paramsMap.add("expireTime","2019-12-20 00:00:00");
-        paramsMap.add("token","cxctoken123update");
-        MvcResult mvcResult = mockMvc.perform(post("/access-token/update")
-                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
+        paramsMap.add("userId", "4");
+        paramsMap.add("expireTime", "2019-12-20 00:00:00");
+        paramsMap.add("token", "cxctoken123update");
+        MvcResult mvcResult = mockMvc.perform(put("/access-tokens/1")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

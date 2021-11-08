@@ -21,9 +21,8 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -106,10 +105,7 @@ public class WorkflowExecuteThread implements Runnable {
      * runing TaskNode
      */
     private final Map<Integer, ITaskProcessor> activeTaskProcessorMaps = new ConcurrentHashMap<>();
-    /**
-     * task exec service
-     */
-    private final ExecutorService taskExecService;
+
     /**
      * process instance
      */
@@ -218,9 +214,6 @@ public class WorkflowExecuteThread implements Runnable {
 
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
-        int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
-        this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
-                masterTaskExecNum);
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
@@ -229,8 +222,11 @@ public class WorkflowExecuteThread implements Runnable {
     @Override
     public void run() {
         try {
-            startProcess();
-            handleEvents();
+            if (!this.isStart()) {
+                startProcess();
+            } else {
+                handleEvents();
+            }
         } catch (Exception e) {
             logger.error("handler error:", e);
         }
@@ -810,8 +806,8 @@ public class WorkflowExecuteThread implements Runnable {
         Map<String, Property> allProperty = new HashMap<>();
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
-            for (String preTaskName : preTask) {
-                TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
+            for (String preTaskCode : preTask) {
+                TaskInstance preTaskInstance = completeTaskList.get(preTaskCode);
                 if (preTaskInstance == null) {
                     continue;
                 }
@@ -1360,8 +1356,8 @@ public class WorkflowExecuteThread implements Runnable {
         if (paramMap == null) {
             return startNodeNameList;
         }
-        if (paramMap.containsKey(CMD_PARAM_START_NODE_NAMES)) {
-            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODE_NAMES).split(Constants.COMMA));
+        if (paramMap.containsKey(CMD_PARAM_START_NODES)) {
+            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODES).split(Constants.COMMA));
         }
         return startNodeNameList;
     }
