@@ -995,7 +995,7 @@ CREATE TABLE t_ds_environment_worker_group_relation (
 
 DROP TABLE IF EXISTS t_ds_task_group_queue;
 CREATE TABLE t_ds_task_group_queue (
-   id           int NOT NULL AUTO_INCREMENT ,
+   id serial NOT NULL,
    task_id      int DEFAULT NULL ,
    task_name    VARCHAR(100) DEFAULT NULL ,
    group_id     int DEFAULT NULL ,
@@ -1011,7 +1011,7 @@ CREATE TABLE t_ds_task_group_queue (
 
 DROP TABLE IF EXISTS t_ds_task_group;
 CREATE TABLE t_ds_task_group (
-   id          int  NOT NULL AUTO_INCREMENT ,
+   id serial NOT NULL,
    name        varchar(100) DEFAULT NULL ,
    description varchar(200) DEFAULT NULL ,
    group_size  int NOT NULL ,
