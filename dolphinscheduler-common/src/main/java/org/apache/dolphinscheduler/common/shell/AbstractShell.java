@@ -92,7 +92,6 @@ public abstract class AbstractShell {
         this.lastTime = (interval < 0) ? 0 : -interval;
     }
 
-
     /**
      * set the environment for the command
      *
@@ -124,7 +123,6 @@ public abstract class AbstractShell {
         exitCode = 0;
         runCommand();
     }
-
 
     /**
      * Run a command   actual work
@@ -184,7 +182,7 @@ public abstract class AbstractShell {
                 try {
                     parseExecResult(inReader);
                 } catch (IOException ioe) {
-                    logger.warn("Error reading the in stream", ioe);
+                    logger.warn("Error reading the error stream", ioe);
                 }
                 super.run();
             }
@@ -193,6 +191,7 @@ public abstract class AbstractShell {
             errThread.start();
             inThread.start();
         } catch (IllegalStateException ise) {
+            logger.warn("Illegal state in a starting thread", ise);
         }
         try {
             // parse the output
@@ -274,7 +273,6 @@ public abstract class AbstractShell {
     private void setTimedOut() {
         this.timedOut.set(true);
     }
-
 
     /**
      * Timer which is used to timeout scripts spawned off by shell.
