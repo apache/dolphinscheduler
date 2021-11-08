@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.lang.SystemUtils;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -36,11 +38,9 @@ public class OSUtilsTest {
 
     @Test
     public void testOSMetric() {
-        if (!OSUtils.isWindows()) {
+        if (!SystemUtils.IS_OS_WINDOWS) {
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             Assert.assertTrue(availablePhysicalMemorySize >= 0.0d);
-            double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
-            Assert.assertTrue(totalPhysicalMemorySize >= 0.0d);
             double loadAverage = OSUtils.loadAverage();
             logger.info("loadAverage {}", loadAverage);
             double memoryUsage = OSUtils.memoryUsage();
@@ -87,7 +87,7 @@ public class OSUtilsTest {
 
     @Test
     public void exeCmd() {
-        if (OSUtils.isMacOS() || !OSUtils.isWindows()) {
+        if (SystemUtils.IS_OS_MAC || !SystemUtils.IS_OS_WINDOWS) {
             try {
                 String result = OSUtils.exeCmd("echo helloWorld");
                 Assert.assertEquals("helloWorld\n",result);

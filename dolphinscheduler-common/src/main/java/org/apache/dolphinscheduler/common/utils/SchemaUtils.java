@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class SchemaUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
-    private static Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+    private static final Pattern p = Pattern.compile("\\s*|\t|\r|\n");
 
     private SchemaUtils() {
         throw new UnsupportedOperationException("Construct SchemaUtils");
@@ -49,7 +47,6 @@ public class SchemaUtils {
      *
      * @return all schema list
      */
-    @SuppressWarnings("unchecked")
     public static List<String> getAllSchemaList() {
         List<String> schemaDirList = new ArrayList<>();
         File[] schemaDirArr = FileUtils.getAllDir("sql/upgrade");
@@ -61,28 +58,25 @@ public class SchemaUtils {
             schemaDirList.add(file.getName());
         }
 
-        Collections.sort(schemaDirList, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                try {
-                    String dir1 = String.valueOf(o1);
-                    String dir2 = String.valueOf(o2);
-                    String version1 = dir1.split("_")[0];
-                    String version2 = dir2.split("_")[0];
-                    if (version1.equals(version2)) {
-                        return 0;
-                    }
-
-                    if (SchemaUtils.isAGreatVersion(version1, version2)) {
-                        return 1;
-                    }
-
-                    return -1;
-
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    throw new RuntimeException(e);
+        schemaDirList.sort((o1, o2) -> {
+            try {
+                String dir1 = String.valueOf(o1);
+                String dir2 = String.valueOf(o2);
+                String version1 = dir1.split("_")[0];
+                String version2 = dir2.split("_")[0];
+                if (version1.equals(version2)) {
+                    return 0;
                 }
+
+                if (SchemaUtils.isAGreatVersion(version1, version2)) {
+                    return 1;
+                }
+
+                return -1;
+
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         });
 
@@ -124,7 +118,7 @@ public class SchemaUtils {
     public static String getSoftVersion() {
         String softVersion;
         try {
-            softVersion = FileUtils.readFile2Str(new FileInputStream(new File("sql/soft_version")));
+            softVersion = FileUtils.readFile2Str(new FileInputStream("sql/soft_version"));
             softVersion = replaceBlank(softVersion);
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);

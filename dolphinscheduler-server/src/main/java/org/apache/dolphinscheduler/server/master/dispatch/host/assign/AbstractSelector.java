@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Collection;
 

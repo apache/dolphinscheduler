@@ -36,14 +36,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class FileUtilsTest {
 
     @Test
-    public void suffix() {
-        Assert.assertEquals("java", FileUtils.suffix("ninfor.java"));
-        Assert.assertEquals("", FileUtils.suffix(null));
-        Assert.assertEquals("", FileUtils.suffix(""));
-        Assert.assertEquals("", FileUtils.suffix("ninfor-java"));
-    }
-
-    @Test
     public void testGetDownloadFilename() {
         PowerMockito.mockStatic(DateUtils.class);
         PowerMockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");

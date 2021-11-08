@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import ch.qos.logback.classic.pattern.MessageConverter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
+import static org.apache.dolphinscheduler.common.Constants.STAR;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import ch.qos.logback.classic.pattern.MessageConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
  * sensitive data log converter
@@ -69,7 +70,7 @@ public class SensitiveDataConverter extends MessageConverter {
      *
      * @param logMsg original log
      */
-    private String passwordHandler(Pattern pwdPattern, String logMsg) {
+    static String passwordHandler(Pattern pwdPattern, String logMsg) {
 
         Matcher matcher = pwdPattern.matcher(logMsg);
 
@@ -79,7 +80,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
             String password = matcher.group();
 
-            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
+            String maskPassword = StringUtils.repeat(STAR, StringUtils.length(password));
 
             matcher.appendReplacement(sb, maskPassword);
         }

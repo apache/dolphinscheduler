@@ -40,16 +40,6 @@ public class OSUtilsTest {
     }
 
     @Test
-    public void physicalMemorySize() {
-        double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-        double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
-        logger.info("availablePhysicalMemorySize : {}", availablePhysicalMemorySize);
-        logger.info("totalPhysicalMemorySize : {}", totalPhysicalMemorySize);
-        Assert.assertTrue(availablePhysicalMemorySize >= 0.0);
-        Assert.assertTrue(totalPhysicalMemorySize >= 0.0);
-    }
-
-    @Test
     public void loadAverage() {
         double loadAverage = OSUtils.loadAverage();
         logger.info("loadAverage : {}", loadAverage);

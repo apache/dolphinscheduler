@@ -16,21 +16,20 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * file utils
@@ -44,18 +43,9 @@ public class FileUtils {
      * @param file         file
      * @param destFilename destination file name
      */
-
     public static void copyFile(MultipartFile file, String destFilename) {
         try {
-
-            File destFile = new File(destFilename);
-            File destParentDir = new File(destFile.getParent());
-
-            if (!destParentDir.exists()) {
-                org.apache.commons.io.FileUtils.forceMkdir(destParentDir);
-            }
-
-            Files.copy(file.getInputStream(), Paths.get(destFilename));
+            org.apache.commons.io.FileUtils.copyFile(file.getResource().getFile(), new File(destFilename));
         } catch (IOException e) {
             logger.error("failed to copy file , {} is empty file", file.getOriginalFilename(), e);
         }
@@ -87,20 +77,12 @@ public class FileUtils {
      * @return file content string
      */
     public static String file2String(MultipartFile file) {
-        StringBuilder strBuilder = new StringBuilder();
-
-        try (InputStreamReader inputStreamReader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
-            BufferedReader streamReader = new BufferedReader(inputStreamReader);
-            String inputStr;
-
-            while ((inputStr = streamReader.readLine()) != null) {
-                strBuilder.append(inputStr);
-            }
-
+        try {
+            return IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error("file convert to string failed: {}", file.getName());
         }
 
-        return strBuilder.toString();
+        return "";
     }
 }

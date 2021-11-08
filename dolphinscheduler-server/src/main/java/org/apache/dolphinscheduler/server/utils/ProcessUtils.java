@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -30,7 +29,9 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -153,7 +154,7 @@ public class ProcessUtils {
         List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
-        if (OSUtils.isMacOS()) {
+        if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
             if (null != pids) {
                 mat = MACPATTERN.matcher(pids);
