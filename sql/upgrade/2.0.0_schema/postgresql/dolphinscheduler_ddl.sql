@@ -340,6 +340,21 @@ CREATE TABLE t_ds_environment (
     CONSTRAINT environment_code_unique UNIQUE (code)
 );
 
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_audit_log;
+CREATE TABLE t_ds_audit_log (
+    id serial NOT NULL,
+    user_name varchar(64) NOT NULL,
+    module int NOT NULL,
+    operation int NOT NULL,
+    time timestamp DEFAULT NULL ,
+    project_name text DEFAULT NULL,
+    process_name text DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
 ALTER TABLE t_ds_task_definition ADD COLUMN environment_code bigint DEFAULT '-1';
 comment on column t_ds_task_definition.environment_code is 'environment code';
 
