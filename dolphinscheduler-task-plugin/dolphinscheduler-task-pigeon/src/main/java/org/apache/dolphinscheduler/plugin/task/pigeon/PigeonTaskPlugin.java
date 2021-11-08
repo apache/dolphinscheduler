@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 public class PigeonTaskPlugin implements DolphinSchedulerPlugin {
 
     @Override
-    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+    public Iterable<TaskChannelFactory> getTaskChannelFactories() {
         return ImmutableList.of(new PigeonTaskChannelFactory());
     }
 }

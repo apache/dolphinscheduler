@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 public class SqlTaskPlugin implements DolphinSchedulerPlugin {
 
     @Override
-    public Iterable<TaskChannelFactory> getTaskChannelFactorys() {
+    public Iterable<TaskChannelFactory> getTaskChannelFactories() {
         return ImmutableList.of(new SqlTaskChannelFactory());
     }
 }
