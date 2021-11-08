@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceProcessor;
 import org.apache.dolphinscheduler.common.enums.DbType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,24 +39,24 @@ public class AbstractDatasourceProcessorTest {
     AbstractDatasourceProcessor abstractDatasourceProcessor;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         abstractDatasourceProcessor = PowerMockito.mock(AbstractDatasourceProcessor.class, Answers.CALLS_REAL_METHODS);
     }
 
     @Test
-    public void testParseOther(){
+    public void testParseOther() {
         String other = "serverTimezone=Asia/Shanghai&characterEncoding=utf8";
         Map<String, String> otherMap = abstractDatasourceProcessor.parseOther(DbType.MYSQL, other);
         Assert.assertNotNull(otherMap);
     }
 
     @Test
-    public void testTransferFromOther(){
-        Map<String,String > other = new HashMap<>();
+    public void testTransferFromOther() {
+        Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
         other.put("characterEncoding", "utf8");
         String otherParam = abstractDatasourceProcessor.transformOther(DbType.MYSQL, other);
-        Assert.assertEquals(otherParam,"serverTimezone=Asia/Shanghai&characterEncoding=utf8");
+        Assert.assertEquals(otherParam, "serverTimezone=Asia/Shanghai&characterEncoding=utf8");
     }
 
 }

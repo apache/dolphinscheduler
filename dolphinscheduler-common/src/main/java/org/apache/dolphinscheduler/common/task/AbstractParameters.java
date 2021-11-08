@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -154,7 +155,8 @@ public abstract class AbstractParameters implements IParameters {
         ArrayNode paramsByJson = JSONUtils.parseArray(json);
         Iterator<JsonNode> listIterator = paramsByJson.iterator();
         while (listIterator.hasNext()) {
-            Map<String, String> param = JSONUtils.parseObject(listIterator.next().toString(), new TypeReference<Map<String, String>>() {});
+            Map<String, String> param = JSONUtils.parseObject(listIterator.next().toString(), new TypeReference<Map<String, String>>() {
+            });
             allParams.add(param);
         }
         return allParams;
@@ -162,6 +164,7 @@ public abstract class AbstractParameters implements IParameters {
 
     /**
      * shell's result format is key=value$VarPool$key=value$VarPool$
+     *
      * @param result
      * @return
      */
