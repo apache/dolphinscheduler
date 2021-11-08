@@ -22,60 +22,72 @@ import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectionListener;
+import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.RegistryFactory;
+import org.apache.dolphinscheduler.registry.api.RegistryFactoryLoader;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
-import org.apache.commons.lang.StringUtils;
-
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-/**
- * registry client singleton
- */
-public class RegistryClient extends RegistryCenter {
+import com.google.common.base.Strings;
 
+@Component
+public class RegistryClient {
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
-    private static RegistryClient registryClient = new RegistryClient();
+    private static final String EMPTY = "";
+    private static final String REGISTRY_PREFIX = "registry";
+    private static final String REGISTRY_PLUGIN_NAME = "plugin.name";
+    private static final String REGISTRY_CONFIG_FILE_PATH = "/registry.properties";
+    private final AtomicBoolean isStarted = new AtomicBoolean(false);
+    private Registry registry;
+    private IStoppable stoppable;
 
-    private RegistryClient() {
-        super.init();
+    @PostConstruct
+    public void afterConstruct() {
+        start();
+        initNodes();
     }
 
-    public static RegistryClient getInstance() {
-        return registryClient;
-    }
-
-    /**
-     * get active master num
-     *
-     * @return active master number
-     */
     public int getActiveMasterNum() {
-        List<String> childrenList = new ArrayList<>();
+        Collection<String> childrenList = new ArrayList<>();
         try {
             // read master node parent path from conf
-            if (isExisted(getNodeParentPath(NodeType.MASTER))) {
-                childrenList = getChildrenKeys(getNodeParentPath(NodeType.MASTER));
+            if (exists(rootNodePath(NodeType.MASTER))) {
+                childrenList = getChildrenKeys(rootNodePath(NodeType.MASTER));
             }
         } catch (Exception e) {
             logger.error("getActiveMasterNum error", e);
@@ -83,15 +95,9 @@ public class RegistryClient extends RegistryCenter {
         return childrenList.size();
     }
 
-    /**
-     * get server list.
-     *
-     * @param nodeType zookeeper node type
-     * @return server list
-     */
     public List<Server> getServerList(NodeType nodeType) {
-        Map<String, String> serverMaps = getServerMaps(nodeType);
-        String parentPath = getNodeParentPath(nodeType);
+        Map<String, String> serverMaps = getServerMaps(nodeType, false);
+        String parentPath = rootNodePath(nodeType);
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
@@ -119,40 +125,11 @@ public class RegistryClient extends RegistryCenter {
         return serverList;
     }
 
-    /**
-     * get server nodes.
-     *
-     * @param nodeType registry node type
-     * @return result : list<node>
-     */
-    public List<String> getServerNodes(NodeType nodeType) {
-        String path = getNodeParentPath(nodeType);
-        List<String> serverList = getChildrenKeys(path);
-        if (nodeType == NodeType.WORKER) {
-            List<String> workerList = new ArrayList<>();
-            for (String group : serverList) {
-                List<String> groupServers = getChildrenKeys(path + SINGLE_SLASH + group);
-                for (String groupServer : groupServers) {
-                    workerList.add(group + SINGLE_SLASH + groupServer);
-                }
-            }
-            serverList = workerList;
-        }
-        return serverList;
-    }
-
-    /**
-     * get server list map.
-     *
-     * @param nodeType zookeeper node type
-     * @param hostOnly host only
-     * @return result : {host : resource info}
-     */
     public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         Map<String, String> serverMap = new HashMap<>();
         try {
-            String path = getNodeParentPath(nodeType);
-            List<String> serverList = getServerNodes(nodeType);
+            String path = rootNodePath(nodeType);
+            Collection<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
                 if (nodeType == NodeType.WORKER && hostOnly) {
@@ -167,298 +144,194 @@ public class RegistryClient extends RegistryCenter {
         return serverMap;
     }
 
-    /**
-     * get server list map.
-     *
-     * @param nodeType zookeeper node type
-     * @return result : {host : resource info}
-     */
-    public Map<String, String> getServerMaps(NodeType nodeType) {
-        return getServerMaps(nodeType, false);
-    }
-
-    /**
-     * get server node set.
-     *
-     * @param nodeType zookeeper node type
-     * @param hostOnly host only
-     * @return result : set<host>
-     */
-    public Set<String> getServerNodeSet(NodeType nodeType, boolean hostOnly) {
-        Set<String> serverSet = new HashSet<>();
-        try {
-            List<String> serverList = getServerNodes(nodeType);
-            for (String server : serverList) {
-                String host = server;
-                if (nodeType == NodeType.WORKER && hostOnly) {
-                    host = server.split(SINGLE_SLASH)[1];
-                }
-                serverSet.add(host);
-            }
-        } catch (Exception e) {
-            logger.error("get server node set failed", e);
-        }
-        return serverSet;
-    }
-
-    /**
-     * get server node list.
-     *
-     * @param nodeType zookeeper node type
-     * @param hostOnly host only
-     * @return result : list<host>
-     */
-    public List<String> getServerNodeList(NodeType nodeType, boolean hostOnly) {
-        Set<String> serverSet = getServerNodeSet(nodeType, hostOnly);
-        List<String> serverList = new ArrayList<>(serverSet);
-        Collections.sort(serverList);
-        return serverList;
-    }
-
-    /**
-     * check the zookeeper node already exists
-     *
-     * @param host host
-     * @param nodeType zookeeper node type
-     * @return true if exists
-     */
     public boolean checkNodeExists(String host, NodeType nodeType) {
-        String path = getNodeParentPath(nodeType);
-        if (StringUtils.isEmpty(path)) {
-            logger.error("check zk node exists error, host:{}, zk node type:{}",
-                    host, nodeType);
-            return false;
-        }
-        Map<String, String> serverMaps = getServerMaps(nodeType, true);
-        for (String hostKey : serverMaps.keySet()) {
-            if (hostKey.contains(host)) {
-                return true;
-            }
-        }
-        return false;
+        return getServerMaps(nodeType, true).keySet()
+                                            .stream()
+                                            .anyMatch(it -> it.contains(host));
     }
 
-    /**
-     * @return get worker node parent path
-     */
-    protected String getWorkerNodeParentPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-    }
+    public void handleDeadServer(Collection<String> nodes, NodeType nodeType, String opType) {
+        nodes.forEach(node -> {
+            final String host = getHostByEventDataPath(node);
+            final String type = nodeType == NodeType.MASTER ? MASTER_TYPE : WORKER_TYPE;
 
-    /**
-     * @return get master node parent path
-     */
-    protected String getMasterNodeParentPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-    }
-
-    /**
-     * @return get dead server node parent path
-     */
-    protected String getDeadNodeParentPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
-    }
-
-    /**
-     * @return get master lock path
-     */
-    public String getMasterLockPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
-    }
-
-    /**
-     * @param nodeType zookeeper node type
-     * @return get zookeeper node parent path
-     */
-    public String getNodeParentPath(NodeType nodeType) {
-        String path = "";
-        switch (nodeType) {
-            case MASTER:
-                return getMasterNodeParentPath();
-            case WORKER:
-                return getWorkerNodeParentPath();
-            case DEAD_SERVER:
-                return getDeadNodeParentPath();
-            default:
-                break;
-        }
-        return path;
-    }
-
-    /**
-     * @return get master start up lock path
-     */
-    public String getMasterStartUpLockPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
-    }
-
-    /**
-     * @return get master failover lock path
-     */
-    public String getMasterFailoverLockPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
-    }
-
-    /**
-     * @return get worker failover lock path
-     */
-    public String getWorkerFailoverLockPath() {
-        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
-    }
-
-    /**
-     * opType(add): if find dead server , then add to zk deadServerPath
-     * opType(delete): delete path from zk
-     *
-     * @param node node path
-     * @param nodeType master or worker
-     * @param opType delete or add
-     * @throws Exception errors
-     */
-    public void handleDeadServer(String node, NodeType nodeType, String opType) throws Exception {
-        String host = getHostByEventDataPath(node);
-        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
-
-        //check server restart, if restart , dead server path in zk should be delete
-        if (opType.equals(DELETE_OP)) {
-            removeDeadServerByHost(host, type);
-
-        } else if (opType.equals(ADD_OP)) {
-            String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-            if (!isExisted(deadServerPath)) {
-                //add dead server info to zk dead server path : /dead-servers/
-
-                persist(deadServerPath, (type + UNDERLINE + host));
-
-                logger.info("{} server dead , and {} added to zk dead server path success",
-                        nodeType, node);
-            }
-        }
-
-    }
-
-    /**
-     * check dead server or not , if dead, stop self
-     *
-     * @param node node path
-     * @param serverType master or worker prefix
-     * @return true if not exists
-     * @throws Exception errors
-     */
-    public boolean checkIsDeadServer(String node, String serverType) throws Exception {
-        // ip_sequence_no
-        String[] zNodesPath = node.split("\\/");
-        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
-        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
-
-        return !isExisted(node) || isExisted(deadServerPath);
-    }
-
-    /**
-     * get master nodes directly
-     *
-     * @return master nodes
-     */
-    public Set<String> getMasterNodesDirectly() {
-        List<String> masters = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_MASTERS);
-        return new HashSet<>(masters);
-    }
-
-    /**
-     * get worker nodes directly
-     *
-     * @return master nodes
-     */
-    public Set<String> getWorkerNodesDirectly() {
-        List<String> workers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
-        return new HashSet<>(workers);
-    }
-
-    /**
-     * get worker group directly
-     *
-     * @return worker group nodes
-     */
-    public Set<String> getWorkerGroupDirectly() {
-        List<String> workers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
-        return new HashSet<>(workers);
-    }
-
-    /**
-     * get worker group nodes
-     */
-    public Set<String> getWorkerGroupNodesDirectly(String workerGroup) {
-        List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
-        return new HashSet<>(workers);
-    }
-
-    /**
-     * opType(add): if find dead server , then add to zk deadServerPath
-     * opType(delete): delete path from zk
-     *
-     * @param nodeSet node path set
-     * @param nodeType master or worker
-     * @param opType delete or add
-     * @throws Exception errors
-     */
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
-
-        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
-        for (String node : nodeSet) {
-            String host = getHostByEventDataPath(node);
-            //check server restart, if restart , dead server path in zk should be delete
             if (opType.equals(DELETE_OP)) {
                 removeDeadServerByHost(host, type);
-
             } else if (opType.equals(ADD_OP)) {
-                String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-                if (!isExisted(deadServerPath)) {
-                    //add dead server info to zk dead server path : /dead-servers/
-                    persist(deadServerPath, (type + UNDERLINE + host));
-                    logger.info("{} server dead , and {} added to registry dead server path success",
-                            nodeType, node);
-                }
+                String deadServerPath = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + type + UNDERLINE + host;
+                // Add dead server info to zk dead server path : /dead-servers/
+                registry.put(deadServerPath, type + UNDERLINE + host, false);
+                logger.info("{} server dead , and {} added to zk dead server path success", nodeType, node);
             }
+        });
+    }
 
-        }
+    public boolean checkIsDeadServer(String node, String serverType) {
+        // ip_sequence_no
+        String[] zNodesPath = node.split("/");
+        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
+        String deadServerPath = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
 
+        return !exists(node) || exists(deadServerPath);
+    }
+
+    public Collection<String> getMasterNodesDirectly() {
+        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_MASTERS);
+    }
+
+    public Collection<String> getWorkerGroupDirectly() {
+        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS);
+    }
+
+    public Collection<String> getWorkerGroupNodesDirectly(String workerGroup) {
+        return getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup);
     }
 
     /**
-     * get host ip:port, string format: parentPath/ip:port
+     * get host ip:port, path format: parentPath/ip:port
      *
      * @param path path
      * @return host ip:port, string format: parentPath/ip:port
      */
     public String getHostByEventDataPath(String path) {
-        if (StringUtils.isEmpty(path)) {
-            logger.error("empty path!");
-            return "";
-        }
-        String[] pathArray = path.split(SINGLE_SLASH);
-        if (pathArray.length < 1) {
-            logger.error("parse ip error: {}", path);
-            return "";
-        }
-        return pathArray[pathArray.length - 1];
+        checkArgument(!Strings.isNullOrEmpty(path), "path cannot be null or empty");
 
+        final String[] pathArray = path.split(SINGLE_SLASH);
+
+        checkArgument(pathArray.length >= 1, "cannot parse path: %s", path);
+
+        return pathArray[pathArray.length - 1];
     }
 
-    /**
-     * remove dead server by host
-     *
-     * @param host host
-     * @param serverType serverType
-     */
-    public void removeDeadServerByHost(String host, String serverType) {
-        List<String> deadServers = getChildrenKeys(getDeadZNodeParentPath());
+    public void close() throws IOException {
+        if (isStarted.compareAndSet(true, false) && registry != null) {
+            registry.close();
+        }
+    }
+
+    public void persistEphemeral(String key, String value) {
+        registry.put(key, value, true);
+    }
+
+    public void remove(String key) {
+        registry.delete(key);
+    }
+
+    public String get(String key) {
+        return registry.get(key);
+    }
+
+    public void subscribe(String path, SubscribeListener listener) {
+        registry.subscribe(path, listener);
+    }
+
+    public void addConnectionStateListener(ConnectionListener listener) {
+        registry.addConnectionStateListener(listener);
+    }
+
+    public boolean exists(String key) {
+        return registry.exists(key);
+    }
+
+    public boolean getLock(String key) {
+        return registry.acquireLock(key);
+    }
+
+    public boolean releaseLock(String key) {
+        return registry.releaseLock(key);
+    }
+
+    public void setStoppable(IStoppable stoppable) {
+        this.stoppable = stoppable;
+    }
+
+    public IStoppable getStoppable() {
+        return stoppable;
+    }
+
+    public boolean isMasterPath(String path) {
+        return path != null && path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS);
+    }
+
+    public boolean isWorkerPath(String path) {
+        return path != null && path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS);
+    }
+
+    public Collection<String> getChildrenKeys(final String key) {
+        return registry.children(key);
+    }
+
+    public Set<String> getServerNodeSet(NodeType nodeType, boolean hostOnly) {
+        try {
+            return getServerNodes(nodeType).stream().map(server -> {
+                if (nodeType == NodeType.WORKER && hostOnly) {
+                    return server.split(SINGLE_SLASH)[1];
+                }
+                return server;
+            }).collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new RegistryException("Failed to get server node: " + nodeType, e);
+        }
+    }
+
+    private void start() {
+        if (isStarted.compareAndSet(false, true)) {
+            PropertyUtils.loadPropertyFile(REGISTRY_CONFIG_FILE_PATH);
+            final Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
+
+            if (null == registryConfig || registryConfig.isEmpty()) {
+                throw new RegistryException("registry config param is null");
+            }
+            final String pluginName = registryConfig.get(REGISTRY_PLUGIN_NAME);
+            final Map<String, RegistryFactory> factories = RegistryFactoryLoader.load();
+            if (!factories.containsKey(pluginName)) {
+                throw new RegistryException("No such registry plugin: " + pluginName);
+            }
+            registry = factories.get(pluginName).create();
+            registry.start(registryConfig);
+        }
+    }
+
+    private void initNodes() {
+        registry.put(REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY, false);
+        registry.put(REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY, false);
+        registry.put(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, EMPTY, false);
+    }
+
+    private String rootNodePath(NodeType type) {
+        switch (type) {
+            case MASTER:
+                return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+            case WORKER:
+                return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+            case DEAD_SERVER:
+                return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
+            default:
+                throw new IllegalStateException("Should not reach here");
+        }
+    }
+
+    private Collection<String> getServerNodes(NodeType nodeType) {
+        final String path = rootNodePath(nodeType);
+        final Collection<String> serverList = getChildrenKeys(path);
+        if (nodeType != NodeType.WORKER) {
+            return serverList;
+        }
+        return serverList.stream().flatMap(group ->
+            getChildrenKeys(path + SINGLE_SLASH + group)
+                .stream()
+                .map(it -> group + SINGLE_SLASH + it)
+        ).collect(Collectors.toList());
+    }
+
+    private void removeDeadServerByHost(String host, String serverType) {
+        Collection<String> deadServers = getChildrenKeys(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS);
         for (String serverPath : deadServers) {
             if (serverPath.startsWith(serverType + UNDERLINE + host)) {
-                String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
+                String server = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + serverPath;
                 remove(server);
                 logger.info("{} server {} deleted from zk dead server path success", serverType, host);
             }
         }
     }
-
 }

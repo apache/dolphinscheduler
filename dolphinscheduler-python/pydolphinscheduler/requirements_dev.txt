@@ -18,7 +18,6 @@
 # testting
 pytest~=6.2.5
 # code linting and formatting
-flake8-black~=0.2.3
-# flake8
-# flake8-docstrings
-# flake8-black
+flake8
+flake8-docstrings
+flake8-black

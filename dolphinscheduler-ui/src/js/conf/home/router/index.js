@@ -54,10 +54,9 @@ const router = new Router({
       },
       beforeEnter: (to, from, next) => {
         const blacklist = ['projects', 'projects-list']
-        if (!blacklist.includes(to.name) && to.params.projectId && to.params.projectId !== localStore.getItem('projectId')) {
-          store.dispatch('projects/getProjectById', {
-            projectId: to.params.projectId
-          }).then(res => {
+        const { projectCode } = to.params || {}
+        if (!blacklist.includes(to.name) && projectCode && projectCode !== localStore.getItem('projectCode')) {
+          store.dispatch('projects/getProjectByCode', projectCode).then(res => {
             store.commit('dag/setProjectId', res.id)
             store.commit('dag/setProjectCode', res.code)
             store.commit('dag/setProjectName', res.name)

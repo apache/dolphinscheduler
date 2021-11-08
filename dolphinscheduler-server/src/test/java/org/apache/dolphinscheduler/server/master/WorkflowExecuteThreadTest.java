@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,6 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -111,9 +112,7 @@ public class WorkflowExecuteThreadTest {
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(workflowExecuteThread, new DAG());
-        PowerMockito.doNothing().when(workflowExecuteThread, "executeProcess");
         PowerMockito.doNothing().when(workflowExecuteThread, "prepareProcess");
-        PowerMockito.doNothing().when(workflowExecuteThread, "runProcess");
         PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
     }
 
@@ -156,7 +155,7 @@ public class WorkflowExecuteThreadTest {
     public void testParseStartNodeName() throws ParseException {
         try {
             Map<String, String> cmdParam = new HashMap<>();
-            cmdParam.put(CMD_PARAM_START_NODE_NAMES, "t1,t2,t3");
+            cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");
             Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
             Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
@@ -251,6 +250,36 @@ public class WorkflowExecuteThreadTest {
             field.set(workflowExecuteThread, completeTaskList);
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testCheckSerialProcess() {
+        try {
+            ProcessDefinition processDefinition1 = new ProcessDefinition();
+            processDefinition1.setId(123);
+            processDefinition1.setName("test");
+            processDefinition1.setVersion(1);
+            processDefinition1.setCode(11L);
+            processDefinition1.setExecutionType(ProcessExecutionTypeEnum.SERIAL_WAIT);
+            Mockito.when(processInstance.getId()).thenReturn(225);
+            Mockito.when(processService.findProcessInstanceById(225)).thenReturn(processInstance);
+            workflowExecuteThread.checkSerialProcess(processDefinition1);
+
+            Mockito.when(processInstance.getId()).thenReturn(225);
+            Mockito.when(processInstance.getNextProcessInstanceId()).thenReturn(222);
+
+            ProcessInstance processInstance9 = new ProcessInstance();
+            processInstance9.setId(222);
+            processInstance9.setProcessDefinitionCode(11L);
+            processInstance9.setProcessDefinitionVersion(1);
+            processInstance9.setState(ExecutionStatus.SERIAL_WAIT);
+
+            Mockito.when(processService.findProcessInstanceById(225)).thenReturn(processInstance);
+            Mockito.when(processService.findProcessInstanceById(222)).thenReturn(processInstance9);
+            workflowExecuteThread.checkSerialProcess(processDefinition1);
         } catch (Exception e) {
             Assert.fail();
         }

@@ -65,7 +65,7 @@ public class DolphinPluginManagerConfig {
      */
     private final String defaultLocalRepository = System.getProperty("user.home") + "/.m2/repository";
     private String mavenLocalRepository = getMavenLocalRepositoryOrDefault(defaultLocalRepository);
-    private List<String> mavenRemoteRepository = ImmutableList.of("http://repo1.maven.org/maven2/");
+    private List<String> mavenRemoteRepository = ImmutableList.of("https://repo1.maven.org/maven2/");
 
     File getInstalledPluginsDir() {
         return installedPluginsDir;
@@ -138,12 +138,12 @@ public class DolphinPluginManagerConfig {
         // get 'settings.xml' from user home
         Path settingsXmlPath = getMavenSettingsXmlFromUserHome();
         // if user home does not exist settings.xml, get from '$MAVEN_HOME/conf/settings.xml'
-        if (settingsXmlPath == null) {
+        if (settingsXmlPath == null || !Files.exists(settingsXmlPath)) {
             logger.info("User home does not exists maven settings.xml");
             settingsXmlPath = getMavenSettingsXmlFromEvn();
         }
         // still not exist, return default repository
-        if (settingsXmlPath == null) {
+        if (settingsXmlPath == null || !Files.exists(settingsXmlPath)) {
             logger.info("Maven home does not exists maven settings.xml, use default");
             return defaultRepository;
         }

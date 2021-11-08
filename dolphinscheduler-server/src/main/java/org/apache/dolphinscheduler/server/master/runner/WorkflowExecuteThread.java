@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -510,6 +511,10 @@ public class WorkflowExecuteThread implements Runnable {
     private void endProcess() {
         this.stateEvents.clear();
         processInstance.setEndTime(new Date());
+        ProcessDefinition processDefinition = this.processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),processInstance.getProcessDefinitionVersion());
+        if (processDefinition.getExecutionType().typeIsSerialWait()) {
+            checkSerialProcess(processDefinition);
+        }
         processService.updateProcessInstance(processInstance);
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
@@ -517,6 +522,29 @@ public class WorkflowExecuteThread implements Runnable {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+    }
+
+    public void checkSerialProcess(ProcessDefinition processDefinition) {
+        this.processInstance = processService.findProcessInstanceById(processInstance.getId());
+        int nextInstanceId = processInstance.getNextProcessInstanceId();
+        if (nextInstanceId == 0) {
+            ProcessInstance nextProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(),ExecutionStatus.SERIAL_WAIT.getCode());
+            if (nextProcessInstance == null) {
+                return;
+            }
+            nextInstanceId = nextProcessInstance.getId();
+        }
+        ProcessInstance nextProcessInstance = this.processService.findProcessInstanceById(nextInstanceId);
+        if (nextProcessInstance.getState().typeIsFinished() || nextProcessInstance.getState().typeIsRunning()) {
+            return;
+        }
+        Map<String, Object> cmdParam = new HashMap<>();
+        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
+        Command command = new Command();
+        command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
+        command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+        processService.createCommand(command);
     }
 
     /**
@@ -781,8 +809,8 @@ public class WorkflowExecuteThread implements Runnable {
         Map<String, Property> allProperty = new HashMap<>();
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
-            for (String preTaskName : preTask) {
-                TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
+            for (String preTaskCode : preTask) {
+                TaskInstance preTaskInstance = completeTaskList.get(preTaskCode);
                 if (preTaskInstance == null) {
                     continue;
                 }
@@ -1331,8 +1359,8 @@ public class WorkflowExecuteThread implements Runnable {
         if (paramMap == null) {
             return startNodeNameList;
         }
-        if (paramMap.containsKey(CMD_PARAM_START_NODE_NAMES)) {
-            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODE_NAMES).split(Constants.COMMA));
+        if (paramMap.containsKey(CMD_PARAM_START_NODES)) {
+            startNodeNameList = Arrays.asList(paramMap.get(CMD_PARAM_START_NODES).split(Constants.COMMA));
         }
         return startNodeNameList;
     }

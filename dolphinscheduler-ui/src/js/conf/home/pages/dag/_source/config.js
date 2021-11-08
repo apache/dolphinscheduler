@@ -133,6 +133,10 @@ const runningType = [
   {
     desc: `${i18n.$t('Recovery waiting thread')}`,
     code: 'RECOVER_WAITING_THREAD'
+  },
+  {
+    desc: `${i18n.$t('Recover serial wait')}`,
+    code: 'RECOVER_SERIAL_WAIT'
   }
 ]
 
@@ -242,6 +246,13 @@ const tasksState = {
     desc: `${i18n.$t('Forced success')}`,
     color: '#5102ce',
     icoUnicode: 'el-icon-success',
+    isSpin: false
+  },
+  SERIAL_WAIT: {
+    id: 14,
+    desc: `${i18n.$t('Serial wait')}`,
+    color: '#5102ce',
+    icoUnicode: 'el-icon-loading',
     isSpin: false
   }
 }
