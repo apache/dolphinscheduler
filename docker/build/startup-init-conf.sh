@@ -101,7 +101,6 @@ export WORKER_HOST_WEIGHT=${WORKER_HOST_WEIGHT:-"100"}
 export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"-1"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.3"}
 export WORKER_GROUPS=${WORKER_GROUPS:-"default"}
-export TASK_PLUGIN_DIR=${TASK_PLUGIN_DIR:-"lib/plugin/task"}
 export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"localhost"}
 
 #============================================================================
