@@ -75,11 +75,6 @@
             <unpack/>
         </artifact>
     </artifactSet>
-    <artifactSet to="lib/plugin/registry/zookeeper">
-        <artifact id="${project.groupId}:dolphinscheduler-registry-zookeeper:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
     <!-- Task Plugins -->
     <artifactSet to="lib/plugin/task/datax">
         <artifact id="${project.groupId}:dolphinscheduler-task-datax:zip:${project.version}">

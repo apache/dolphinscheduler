@@ -56,7 +56,7 @@ public class ExecutorDispatcherTest {
     }
 
     @Test
-    public void testDispatch() throws ExecuteException {
+    public void testDispatch() throws Exception {
         int port = 30000;
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(port);

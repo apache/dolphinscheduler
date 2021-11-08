@@ -19,7 +19,13 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import org.junit.Test;
 
 public class UpgradeDaoTest {
-    PostgresqlUpgradeDao postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
+    private PostgresqlUpgradeDao postgresqlUpgradeDao;
+
+    @Test
+    public void setUp() {
+        System.setProperty("spring.profiles.active", "h2");
+        postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
+    }
 
     @Test
     public void testQueryQueryAllOldWorkerGroup() throws Exception{
