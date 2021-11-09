@@ -45,8 +45,12 @@ public class BusinessTimeUtils {
    */
   public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime) {
     Date businessDate = runTime;
+    Map<String, String> result = new HashMap<>();
     switch (commandType) {
       case COMPLEMENT_DATA:
+          if (runTime == null) {
+            return result;
+          }
           break;
       case START_PROCESS:
       case START_CURRENT_TASK_PROCESS:
@@ -66,7 +70,6 @@ public class BusinessTimeUtils {
           break;
     }
     Date businessCurrentDate = addDays(businessDate, 1);
-    Map<String, String> result = new HashMap<>();
     result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
     result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
     result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
