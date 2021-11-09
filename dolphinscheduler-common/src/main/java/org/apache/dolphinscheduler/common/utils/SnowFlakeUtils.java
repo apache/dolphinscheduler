@@ -40,7 +40,7 @@ public class SnowFlakeUtils {
 
     private SnowFlakeUtils() throws SnowFlakeException {
         try {
-            this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
+            this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 4;
         } catch (UnknownHostException e) {
             throw new SnowFlakeException(e.getMessage());
         }
