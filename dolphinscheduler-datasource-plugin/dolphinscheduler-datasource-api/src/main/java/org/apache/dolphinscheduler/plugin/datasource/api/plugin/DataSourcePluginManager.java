@@ -47,7 +47,7 @@ public class DataSourcePluginManager extends AbstractDolphinPluginManager {
     }
 
     private void addDatasourceClientFactory(DataSourceChannelFactory datasourceChannelFactory) {
-        requireNonNull(datasourceChannelFactory, "taskChannelFactory is null");
+        requireNonNull(datasourceChannelFactory, "datasourceChannelFactory is null");
 
         if (datasourceClientFactoryMap.putIfAbsent(datasourceChannelFactory.getName(), datasourceChannelFactory) != null) {
             throw PluginException.getInstance(format("Datasource Plugin '%s' is already registered", datasourceChannelFactory.getName()));
