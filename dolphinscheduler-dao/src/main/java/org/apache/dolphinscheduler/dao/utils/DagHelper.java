@@ -25,10 +25,11 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,8 +88,7 @@ public class DagHelper {
         List<TaskNode> destFlowNodeList = new ArrayList<>();
         List<String> startNodeList = startNodeNameList;
 
-        if (taskDependType != TaskDependType.TASK_POST
-                && CollectionUtils.isEmpty(startNodeList)) {
+        if (taskDependType != TaskDependType.TASK_POST && CollectionUtils.isEmpty(startNodeList)) {
             logger.error("start node list is empty! cannot continue run the process ");
             return destFlowNodeList;
         }

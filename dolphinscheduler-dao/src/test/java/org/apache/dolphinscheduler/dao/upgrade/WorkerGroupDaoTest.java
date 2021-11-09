@@ -25,10 +25,22 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WorkerGroupDaoTest {
-    protected final DataSource dataSource = getDataSource();
+    protected DataSource dataSource;
+
+    @BeforeClass
+    public static void setupClass() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
+
+    @Before
+    public void setup() {
+        dataSource = getDataSource();
+    }
 
     @Test
     public void testQueryQueryAllOldWorkerGroup() throws Exception {

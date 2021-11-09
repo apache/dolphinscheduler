@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.utils;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
