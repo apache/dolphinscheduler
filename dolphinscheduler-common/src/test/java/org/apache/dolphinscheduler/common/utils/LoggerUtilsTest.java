@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +43,10 @@ public class LoggerUtilsTest {
 
     @Test
     public void buildTaskId() {
-
-        Date specifyDate = DateUtils.getSpecifyDate(2021, 11, 06);
+        Calendar instance = Calendar.getInstance();
+        // Month value is 0-based. e.g., 0 for January.
+        instance.set(2021, 10, 06);
+        Date specifyDate = instance.getTime();
 
         String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX, specifyDate, 798L, 1, 4084, 15210);
 

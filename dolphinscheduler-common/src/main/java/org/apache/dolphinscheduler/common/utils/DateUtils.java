@@ -507,16 +507,6 @@ public final class DateUtils {
     }
 
     /**
-     * get specify date
-     */
-    public static Date getSpecifyDate(int year, int month, int date) {
-        Calendar instance = Calendar.getInstance();
-        // Month value is 0-based. e.g., 0 for January.
-        instance.set(year, month - 1, date);
-        return instance.getTime();
-    }
-
-    /**
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
