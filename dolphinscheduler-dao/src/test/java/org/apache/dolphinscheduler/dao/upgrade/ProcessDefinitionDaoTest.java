@@ -24,15 +24,15 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProcessDefinitionDaoTest {
-    DataSource dataSource;
+    static DataSource dataSource;
     final ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
 
-    @Before
-    public void seuUp() {
+    @BeforeClass
+    public static void seuUp() {
         System.setProperty("spring.profiles.active", "h2");
         dataSource = getDataSource();
     }

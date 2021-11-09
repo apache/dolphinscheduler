@@ -152,7 +152,7 @@ public class SpringConnectionFactory {
                     .setType(EmbeddedDatabaseType.H2)
                     .setScriptEncoding(Constants.UTF_8)
                     .setName("dolphinscheduler;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1")
-                    .addScript(PropertyUtils.getString("spring.datasource.sql.schema", "file:../sql/dolphinscheduler_h2.sql"))
+                    .addScript(PropertyUtils.getString("spring.datasource.sql.schema", "classpath:sql/dolphinscheduler_h2.sql"))
                     .build();
             logger.info("Initialize H2 DataSource success");
         }

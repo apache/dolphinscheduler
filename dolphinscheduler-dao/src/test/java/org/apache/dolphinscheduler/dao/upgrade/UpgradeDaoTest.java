@@ -16,14 +16,19 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UpgradeDaoTest {
     private PostgresqlUpgradeDao postgresqlUpgradeDao;
 
+    @BeforeClass
+    public static void setUpClass() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
+
     @Test
     public void setUp() {
-        System.setProperty("spring.profiles.active", "h2");
         postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
     }
 

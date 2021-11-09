@@ -28,6 +28,7 @@ import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,8 @@ public class AlertPluginManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         System.setProperty("spring.profiles.active", "h2");
     }
 

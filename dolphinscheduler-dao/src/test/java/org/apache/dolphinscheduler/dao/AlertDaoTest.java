@@ -23,15 +23,15 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class AlertDaoTest {
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         System.setProperty("spring.profiles.active", "h2");
     }
 
@@ -60,9 +60,9 @@ public class AlertDaoTest {
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
         long count = alertDao.listWaitExecutionAlert()
-                .stream()
-                .filter(alert -> alert.getContent().contains(host))
-                .count();
+                             .stream()
+                             .filter(alert -> alert.getContent().contains(host))
+                             .count();
         Assert.assertEquals(1L, count);
     }
 }
