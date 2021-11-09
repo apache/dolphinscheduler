@@ -99,11 +99,7 @@ public class ParameterUtils {
         }
         Map<String, String> allParamMap = new HashMap<>();
         //If it is a complement, a complement time needs to be passed in, according to the task type
-        Map<String, String> timeParams = null;
-
-        if (scheduleTime != null) {
-            timeParams = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime);
-        }
+        Map<String, String> timeParams = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime);
 
         if (timeParams != null) {
             allParamMap.putAll(timeParams);
