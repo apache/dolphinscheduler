@@ -27,11 +27,11 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import java.util.Objects;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * AlertPluginManager Tester.
@@ -39,6 +39,11 @@ import com.google.common.collect.ImmutableList;
 public class AlertPluginManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);
+
+    @BeforeClass
+    public static void setUp() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
 
     @Test
     public void testLoadPlugins() {
@@ -53,13 +58,6 @@ public class AlertPluginManagerTest {
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
             alertPluginManagerConfig.setMavenLocalRepository(Objects.requireNonNull(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY)).trim());
-        }
-
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
-        try {
-            //alertPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
         }
 
         Assert.assertNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));

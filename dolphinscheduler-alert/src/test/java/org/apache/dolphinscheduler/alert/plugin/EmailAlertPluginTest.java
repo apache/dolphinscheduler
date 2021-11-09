@@ -50,6 +50,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -59,8 +61,19 @@ import com.google.common.collect.ImmutableList;
  */
 public class EmailAlertPluginTest {
 
-    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    private AlertDao alertDao;
+    private PluginDao pluginDao;
+
+    @BeforeClass
+    public static void setUpClass() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
+
+    @Before
+    public void setUp() {
+        alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    }
 
     @Test
     public void testRunSend() {
@@ -78,7 +91,7 @@ public class EmailAlertPluginTest {
         map1.put("mysql service name", "mysql200");
         map1.put("mysql address", "192.168.xx.xx");
         map1.put("port", "3306");
-        map1.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
+        map1.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TEXT.getDescp());
         map1.put("no index of number", "80");
         map1.put("database client connections", "190");
 
@@ -87,7 +100,7 @@ public class EmailAlertPluginTest {
         map2.put("mysql address", "192.168.xx.xx");
         map2.put("port", "3306");
         map2.put("no index of number", "10");
-        map1.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        map1.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());
         map2.put("database client connections", "90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
@@ -216,7 +229,7 @@ public class EmailAlertPluginTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
+        RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, "showType")
                 .setOptions(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())

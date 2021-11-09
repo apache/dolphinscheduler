@@ -17,20 +17,22 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.sql.Connection;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 
 public class ConnectionFactoryTest {
+    @BeforeClass
+    public static void setup() {
+        System.setProperty("spring.profiles.active", "h2");
+    }
 
-    /**
-     * test connection
-     * @throws Exception if error throws Exception
-     */
     @Test
-    public void testConnection()throws Exception{
+    public void testConnection() throws Exception {
         Connection connection = ConnectionFactory.getInstance().getDataSource().getConnection();
         Assert.assertTrue(connection != null);
     }
