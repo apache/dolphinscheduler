@@ -79,6 +79,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     private String ip = "127.0.0.1";
     private UserType userType = UserType.GENERAL_USER;
 
+    @Override
     @Before
     public void setUp() {
         ldapAuthenticator = new LdapAuthenticator();
