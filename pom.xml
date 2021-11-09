@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
@@ -129,6 +129,7 @@
         <java-websocket.version>1.5.1</java-websocket.version>
         <py4j.version>0.10.9</py4j.version>
         <auto-service.version>1.0.1</auto-service.version>
+        <jacoco.skip>false</jacoco.skip>
     </properties>
 
     <dependencyManagement>
@@ -1156,6 +1157,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
+                    <skip>${jacoco.skip}</skip>
                     <dataFile>${project.build.directory}/jacoco.exec</dataFile>
                 </configuration>
                 <executions>
