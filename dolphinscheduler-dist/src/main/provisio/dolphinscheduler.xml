@@ -131,4 +131,35 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <!-- datasource plugins -->
+    <artifactSet to="lib/plugin/datasource/sqlserver">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-sqlserver:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/clickhouse">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-clickhouse:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/hive">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-hive:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/mysql">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-mysql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/postgresql">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-postgresql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/oracle">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-oracle:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>

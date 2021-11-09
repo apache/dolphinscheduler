@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 
 import org.apache.directory.api.util.Strings;
 
