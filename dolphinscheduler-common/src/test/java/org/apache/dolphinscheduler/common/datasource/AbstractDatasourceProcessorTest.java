@@ -44,6 +44,29 @@ public class AbstractDatasourceProcessorTest {
     }
 
     @Test
+    public void testCheckHost() {
+        String host = "192.168.1.1";
+        abstractDatasourceProcessor.checkHost(host);
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void testCheckDatasource() {
+        String database = "test-datacenter";
+        abstractDatasourceProcessor.checkDatasourcePatter(database);
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void testCheckOther() {
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        other.put("characterEncoding", "utf8");
+        abstractDatasourceProcessor.checkOther(other);
+        Assert.assertTrue(true);
+    }
+
+    @Test
     public void testParseOther() {
         String other = "serverTimezone=Asia/Shanghai&characterEncoding=utf8";
         Map<String, String> otherMap = abstractDatasourceProcessor.parseOther(DbType.MYSQL, other);

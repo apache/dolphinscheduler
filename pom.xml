@@ -1144,6 +1144,7 @@
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
                         <include>**/plugin/task/pigeon/PigeonTaskTest.java</include>
+                        <include>**/common/datasource/AbstractDatasourceProcessorTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
