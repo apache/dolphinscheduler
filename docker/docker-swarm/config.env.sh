@@ -109,7 +109,6 @@ ALERT_LISTEN_HOST=dolphinscheduler-alert
 # Alert Server
 #============================================================================
 ALERT_SERVER_OPTS=-Xms512m -Xmx512m -Xmn256m
-ALERT_PLUGIN_DIR=lib/plugin/alert
 
 #============================================================================
 # Api Server

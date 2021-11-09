@@ -23,13 +23,16 @@ import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 
-@Slf4j
-@RequiredArgsConstructor
 public final class ZookeeperConnectionStateListener implements ConnectionStateListener {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
+
     private final ConnectionListener listener;
+
+    public ZookeeperConnectionStateListener(ConnectionListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     public void stateChanged(CuratorFramework client,

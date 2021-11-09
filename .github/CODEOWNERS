@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+dolphinscheduler/dolphinscheduler-alert @kezhenxu94
 dolphinscheduler/dolphinscheduler-e2e @kezhenxu94
 dolphinscheduler/dolphinscheduler-registry @kezhenxu94
 dolphinscheduler/dolphinscheduler-standalone-server @kezhenxu94

@@ -233,12 +233,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
+                <artifactId>dolphinscheduler-registry-plugin</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -263,11 +258,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -276,10 +266,59 @@
                 <artifactId>dolphinscheduler-python</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-email</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-feishu</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-script</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-slack</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-wechat</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-registry-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -991,8 +1030,8 @@
     </build>
 
     <modules>
+        <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-spi</module>
-        <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-registry</module>
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-ui</module>
@@ -1000,7 +1039,6 @@
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
         <module>dolphinscheduler-dao</module>
-        <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>

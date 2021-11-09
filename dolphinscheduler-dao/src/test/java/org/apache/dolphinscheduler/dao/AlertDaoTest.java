@@ -46,7 +46,7 @@ public class AlertDaoTest {
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alertDao.addAlert(alert);
 
-        List<Alert> alerts = alertDao.listWaitExecutionAlert();
+        List<Alert> alerts = alertDao.listPendingAlerts();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
     }
@@ -59,7 +59,7 @@ public class AlertDaoTest {
         String serverType = "Master";
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
-        long count = alertDao.listWaitExecutionAlert()
+        long count = alertDao.listPendingAlerts()
                              .stream()
                              .filter(alert -> alert.getContent().contains(host))
                              .count();

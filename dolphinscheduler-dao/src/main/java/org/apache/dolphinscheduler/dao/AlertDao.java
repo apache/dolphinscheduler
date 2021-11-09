@@ -179,11 +179,9 @@ public class AlertDao extends AbstractBaseDao {
     }
 
     /**
-     * list the alert information of waiting to be executed
-     *
-     * @return alert list
+     * List alerts that are pending for execution
      */
-    public List<Alert> listWaitExecutionAlert() {
+    public List<Alert> listPendingAlerts() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
     }
 

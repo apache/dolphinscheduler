@@ -44,37 +44,6 @@
         </artifact>
     </artifactSet>
 
-    <!-- Plugins -->
-    <artifactSet to="lib/plugin/alert/email">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-email:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/script">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-script:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/wechat">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-wechat:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/dingtalk">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-dingtalk:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/http">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-http:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/feishu">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-feishu:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
     <!-- Task Plugins -->
     <artifactSet to="lib/plugin/task/datax">
         <artifact id="${project.groupId}:dolphinscheduler-task-datax:zip:${project.version}">

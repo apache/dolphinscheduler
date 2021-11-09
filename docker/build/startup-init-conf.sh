@@ -107,7 +107,6 @@ export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"localhost"}
 # Alert Server
 #============================================================================
 export ALERT_SERVER_OPTS=${ALERT_SERVER_OPTS:-"-Xms512m -Xmx512m -Xmn256m"}
-export ALERT_PLUGIN_DIR=${ALERT_PLUGIN_DIR:-"lib/plugin/alert"}
 
 #============================================================================
 # Api Server
