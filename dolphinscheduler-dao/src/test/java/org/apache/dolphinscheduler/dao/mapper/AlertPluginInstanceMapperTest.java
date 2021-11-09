@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -26,34 +27,25 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * AlertPluginInstanceMapper mapper test
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class AlertPluginInstanceMapperTest {
+public class AlertPluginInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
-    AlertPluginInstanceMapper alertPluginInstanceMapper;
+    private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
     @Autowired
-    PluginDefineMapper pluginDefineMapper;
+    private PluginDefineMapper pluginDefineMapper;
 
     @Autowired
-    AlertGroupMapper alertGroupMapper;
+    private AlertGroupMapper alertGroupMapper;
 
     @Test
     public void testQueryAllAlertPluginInstanceList() {
-        AlertPluginInstance alertPluginInstance = createAlertPluginInstance();
+        createAlertPluginInstance();
         List<AlertPluginInstance> alertPluginInstanceList = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
         Assert.assertTrue(alertPluginInstanceList.size() > 0);
     }

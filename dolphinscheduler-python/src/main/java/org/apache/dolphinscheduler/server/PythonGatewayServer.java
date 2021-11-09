@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -52,6 +53,8 @@ import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -69,6 +72,8 @@ import py4j.GatewayServer;
     })
 })
 public class PythonGatewayServer extends SpringBootServletInitializer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
+
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
@@ -171,27 +176,33 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                                 int timeout,
                                                 String tenantCode,
                                                 String taskRelationJson,
-                                                String taskDefinitionJson) {
+                                                String taskDefinitionJson,
+                                                ProcessExecutionTypeEnum executionType) {
         User user = usersService.queryUser(userName);
         Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
         long projectCode = project.getCode();
         Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, name);
 
-        if (verifyProcessDefinitionExists.get(Constants.STATUS) != Status.SUCCESS) {
+        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
             // update process definition
             ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
             long processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
             return processDefinitionCode;
-        } else {
+        } else if (verifyStatus == Status.SUCCESS) {
             // create process definition
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
             ProcessDefinition processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             return processDefinition.getCode();
+        } else {
+            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
+            LOGGER.error(msg);
+            throw new RuntimeException(msg);
         }
     }
 

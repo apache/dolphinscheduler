@@ -22,9 +22,7 @@ import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -38,6 +36,9 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,13 +63,16 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.io.Files;
 
 /**
  * resources service test
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
-@PrepareForTest({HadoopUtils.class, PropertyUtils.class, FileUtils.class, org.apache.dolphinscheduler.api.utils.FileUtils.class})
+@PrepareForTest({HadoopUtils.class, PropertyUtils.class,
+    FileUtils.class, org.apache.dolphinscheduler.api.utils.FileUtils.class,
+    Files.class})
 public class ResourcesServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
@@ -99,9 +103,9 @@ public class ResourcesServiceTest {
 
     @Before
     public void setUp() {
-
         PowerMockito.mockStatic(HadoopUtils.class);
         PowerMockito.mockStatic(FileUtils.class);
+        PowerMockito.mockStatic(Files.class);
         PowerMockito.mockStatic(org.apache.dolphinscheduler.api.utils.FileUtils.class);
         try {
             // new HadoopUtils
@@ -132,15 +136,15 @@ public class ResourcesServiceTest {
 
         //RESOURCE_SUFFIX_FORBID_CHANGE
         mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
-        PowerMockito.when(FileUtils.suffix("test.pdf")).thenReturn("pdf");
-        PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.jar")).thenReturn("jar");
+        PowerMockito.when(Files.getFileExtension("test.pdf")).thenReturn("pdf");
+        PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.createResource(user, "ResourcesServiceTest.jar", "ResourcesServiceTest", ResourceType.FILE, mockMultipartFile, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), result.getMsg());
 
         //UDF_RESOURCE_SUFFIX_NOT_JAR
         mockMultipartFile = new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf", "pdf", "test".getBytes());
-        PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.pdf")).thenReturn("pdf");
+        PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.pdf")).thenReturn("pdf");
         result = resourcesService.createResource(user, "ResourcesServiceTest.pdf", "ResourcesServiceTest", ResourceType.UDF, mockMultipartFile, -1, "/");
         logger.info(result.toString());
         Assert.assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
@@ -268,10 +272,10 @@ public class ResourcesServiceTest {
         resourcePage.setRecords(getResourceList());
 
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class),
-                Mockito.eq(0), Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"), Mockito.any())).thenReturn(resourcePage);
+            Mockito.eq(0), Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"), Mockito.any())).thenReturn(resourcePage);
         Result result = resourcesService.queryResourceListPaging(loginUser, -1, ResourceType.FILE, "test", 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int)result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         PageInfo pageInfo = (PageInfo) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
@@ -407,7 +411,7 @@ public class ResourcesServiceTest {
 
         //USER_NOT_EXIST
         PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("jar");
-        PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.jar")).thenReturn("jar");
+        PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
         Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
@@ -508,7 +512,7 @@ public class ResourcesServiceTest {
 
         //USER_NOT_EXIST
         PowerMockito.when(FileUtils.getResourceViewSuffixs()).thenReturn("jar");
-        PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.jar")).thenReturn("jar");
+        PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
         Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());

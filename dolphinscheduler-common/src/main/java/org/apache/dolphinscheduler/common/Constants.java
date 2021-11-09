@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -90,8 +90,6 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
-    public static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
-    public static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
     public static final String REGISTRY_SERVERS = "registry.servers";
 
     /**
@@ -404,7 +402,7 @@ public final class Constants {
     /**
      * datasource configuration path
      */
-    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
+    public static final String DATASOURCE_PROPERTIES = "/datasource-%s.properties";
 
     public static final String COMMON_TASK_TYPE = "common";
 
@@ -435,6 +433,8 @@ public final class Constants {
     public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
+
+    public static final String CMD_PARAM_START_NODES = "StartNodeList";
 
     public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
@@ -719,7 +719,7 @@ public final class Constants {
      * application regex
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
-    public static final String PID = OSUtils.isWindows() ? "handle" : "pid";
+    public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
     /**
      * month_begin
      */
@@ -751,7 +751,7 @@ public final class Constants {
     public static final char LEFT_BRACE_CHAR = '(';
     public static final char RIGHT_BRACE_CHAR = ')';
     public static final String ADD_STRING = "+";
-    public static final String MULTIPLY_STRING = "*";
+    public static final String STAR = "*";
     public static final String DIVISION_STRING = "/";
     public static final String LEFT_BRACE_STRING = "(";
     public static final char P = 'P';
@@ -786,6 +786,8 @@ public final class Constants {
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final String DEPENDENT_ALL = "ALL";
+    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+
 
 
     /**
@@ -874,6 +876,12 @@ public final class Constants {
         ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
         ExecutionStatus.WAITING_THREAD.ordinal(),
         ExecutionStatus.WAITING_DEPEND.ordinal()
+    };
+
+    public static final int[] RUNNING_PROCESS_STATE = new int[] {
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.SERIAL_WAIT.ordinal()
     };
 
     /**
@@ -1021,12 +1029,6 @@ public final class Constants {
      */
     public static final int AUTHORIZE_READABLE_PERM = 4;
 
-
-    /**
-     * plugin configurations
-     */
-    public static final String PLUGIN_JAR_SUFFIX = ".jar";
-
     public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
     public static final int BUSY_NODE_STATUE = 2;
@@ -1039,9 +1041,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-
-    public static final String EXCEL_SUFFIX_XLS = ".xls";
 
     /**
      * datasource encryption salt
@@ -1079,21 +1078,7 @@ public final class Constants {
      * docker & kubernetes
      */
     public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
-
-    /**
-     * task parameter keys
-     */
-    public static final String TASK_PARAMS = "params";
-    public static final String TASK_PARAMS_DATASOURCE = "datasource";
-    public static final String TASK_PARAMS_DATASOURCE_NAME = "datasourceName";
-    public static final String TASK_DEPENDENCE = "dependence";
-    public static final String TASK_DEPENDENCE_DEPEND_TASK_LIST = "dependTaskList";
-    public static final String TASK_DEPENDENCE_DEPEND_ITEM_LIST = "dependItemList";
-    public static final String TASK_DEPENDENCE_PROJECT_ID = "projectId";
-    public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
-    public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
-    public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
+    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag

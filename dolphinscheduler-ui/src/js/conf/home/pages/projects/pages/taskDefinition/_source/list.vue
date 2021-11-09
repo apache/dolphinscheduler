@@ -90,6 +90,7 @@
                   size="mini"
                   icon="el-icon-edit-outline"
                   circle
+                  :disabled="scope.row.taskType === 'CONDITIONS' || scope.row.taskType ==='SWITCH' "
                   @click="editTask(scope.row)"
                 ></el-button>
               </span>

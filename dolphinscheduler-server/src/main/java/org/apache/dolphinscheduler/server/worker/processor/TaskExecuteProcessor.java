@@ -148,11 +148,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
             }
         } catch (Throwable ex) {
-            String errorLog = String.format("create execLocalPath : %s", execLocalPath);
-            LoggerUtils.logError(Optional.of(logger), errorLog, ex);
+            logger.error("create execLocalPath: {}", execLocalPath, ex);
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
-        FileUtils.taskLoggerThreadLocal.remove();
 
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));

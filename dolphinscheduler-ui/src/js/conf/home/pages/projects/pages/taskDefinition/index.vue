@@ -18,7 +18,7 @@
   <div class="task-definition" v-if="!isLoading">
     <m-list-construction :title="$t('Task Definition')">
       <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
+        <m-conditions @on-conditions="_onConditions" :taskTypeShow="true">
           <template v-slot:button-group>
             <el-button size="mini" @click="createTask">
               {{ $t("Create task") }}
@@ -109,6 +109,7 @@
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
+          taskType: '',
           userId: ''
         },
         // whether the task config drawer is visible
@@ -221,6 +222,7 @@
        */
       _onConditions (o) {
         this.searchParams.searchVal = o.searchVal
+        this.searchParams.taskType = o.taskType
         this.searchParams.pageNo = 1
       },
       /**

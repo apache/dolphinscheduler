@@ -22,43 +22,43 @@ import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHED
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
-import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 public class MasterRegistryDataListener implements SubscribeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterRegistryDataListener.class);
 
-    private MasterRegistryClient masterRegistryClient;
+    private final MasterRegistryClient masterRegistryClient;
 
     public MasterRegistryDataListener() {
         masterRegistryClient = SpringApplicationContext.getBean(MasterRegistryClient.class);
     }
 
-
     @Override
-    public void notify(String path, DataChangeEvent event) {
+    public void notify(Event event) {
+        final String path = event.path();
+        if (Strings.isNullOrEmpty(path)) {
+            return;
+        }
         //monitor master
         if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS + Constants.SINGLE_SLASH)) {
-            handleMasterEvent(event, path);
+            handleMasterEvent(event);
         } else if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH)) {
             //monitor worker
-            handleWorkerEvent(event, path);
+            handleWorkerEvent(event);
         }
     }
 
-    /**
-     * monitor master
-     *
-     * @param event event
-     * @param path path
-     */
-    public void handleMasterEvent(DataChangeEvent event, String path) {
-        switch (event) {
+    public void handleMasterEvent(Event event) {
+        final String path = event.path();
+        switch (event.type()) {
             case ADD:
                 logger.info("master node added : {}", path);
                 break;
@@ -70,14 +70,9 @@ public class MasterRegistryDataListener implements SubscribeListener {
         }
     }
 
-    /**
-     * monitor worker
-     *
-     * @param event event
-     * @param path path
-     */
-    public void handleWorkerEvent(DataChangeEvent event, String path) {
-        switch (event) {
+    public void handleWorkerEvent(Event event) {
+        final String path = event.path();
+        switch (event.type()) {
             case ADD:
                 logger.info("worker node added : {}", path);
                 break;
