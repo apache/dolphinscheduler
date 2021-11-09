@@ -17,23 +17,16 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
+import static org.apache.dolphinscheduler.server.log.SensitiveDataConverter.passwordHandler;
 
-import java.util.Map;
-import java.util.regex.Matcher;
+import org.apache.dolphinscheduler.common.Constants;
+
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.LoggerContextVO;
 
 public class SensitiveDataConverterTest {
 
@@ -58,86 +51,7 @@ public class SensitiveDataConverterTest {
 
     @Test
     public void convert() {
-        SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
-        String result = sensitiveDataConverter.convert(new ILoggingEvent() {
-            @Override
-            public String getThreadName() {
-                return null;
-            }
-
-            @Override
-            public Level getLevel() {
-                return Level.INFO;
-            }
-
-            @Override
-            public String getMessage() {
-                return null;
-            }
-
-            @Override
-            public Object[] getArgumentArray() {
-                return new Object[0];
-            }
-
-            @Override
-            public String getFormattedMessage() {
-                return logMsg;
-            }
-
-            @Override
-            public String getLoggerName() {
-                return null;
-            }
-
-            @Override
-            public LoggerContextVO getLoggerContextVO() {
-                return null;
-            }
-
-            @Override
-            public IThrowableProxy getThrowableProxy() {
-                return null;
-            }
-
-            @Override
-            public StackTraceElement[] getCallerData() {
-                return new StackTraceElement[0];
-            }
-
-            @Override
-            public boolean hasCallerData() {
-                return false;
-            }
-
-            @Override
-            public Marker getMarker() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMDCPropertyMap() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMdc() {
-                return null;
-            }
-
-            @Override
-            public long getTimeStamp() {
-                return 0;
-            }
-
-            @Override
-            public void prepareForDeferredProcessing() {
-
-            }
-        });
-
         Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
-
     }
 
     /**
@@ -151,30 +65,6 @@ public class SensitiveDataConverterTest {
         Assert.assertEquals(logMsg, passwordHandler(pwdPattern, logMsg));
         Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
-    }
-
-    /**
-     * password regex test
-     *
-     * @param logMsg original log
-     */
-    private static String passwordHandler(Pattern pattern, String logMsg) {
-
-        Matcher matcher = pattern.matcher(logMsg);
-
-        StringBuffer sb = new StringBuffer(logMsg.length());
-
-        while (matcher.find()) {
-
-            String password = matcher.group();
-
-            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
-
-            matcher.appendReplacement(sb, maskPassword);
-        }
-        matcher.appendTail(sb);
-
-        return sb.toString();
     }
 
 }

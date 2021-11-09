@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ArrayUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
@@ -40,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.primitives.Bytes;
 
 /**
  * logger service impl
@@ -129,7 +130,7 @@ public class LoggerServiceImpl implements LoggerService {
                 taskInstance.getLogPath(),
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
-        return ArrayUtils.addAll(head,
+        return Bytes.concat(head,
                 logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath()));
     }
 

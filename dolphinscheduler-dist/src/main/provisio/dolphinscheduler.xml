@@ -44,42 +44,6 @@
         </artifact>
     </artifactSet>
 
-    <!-- Plugins -->
-    <artifactSet to="lib/plugin/alert/email">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-email:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/script">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-script:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/wechat">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-wechat:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/dingtalk">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-dingtalk:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/http">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-http:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/feishu">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-feishu:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/registry/zookeeper">
-        <artifact id="${project.groupId}:dolphinscheduler-registry-zookeeper:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
     <!-- Task Plugins -->
     <artifactSet to="lib/plugin/task/datax">
         <artifact id="${project.groupId}:dolphinscheduler-task-datax:zip:${project.version}">
@@ -133,6 +97,37 @@
     </artifactSet>
     <artifactSet to="lib/plugin/task/sqoop">
         <artifact id="${project.groupId}:dolphinscheduler-task-sqoop:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <!-- datasource plugins -->
+    <artifactSet to="lib/plugin/datasource/sqlserver">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-sqlserver:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/clickhouse">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-clickhouse:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/hive">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-hive:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/mysql">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-mysql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/postgresql">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-postgresql:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/datasource/oracle">
+        <artifact id="${project.groupId}:dolphinscheduler-datasource-oracle:zip:${project.version}">
             <unpack/>
         </artifact>
     </artifactSet>

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * dao factory
+ * dao factory TODO remove
  */
 public class DaoFactory {
 
