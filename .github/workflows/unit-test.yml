@@ -21,12 +21,12 @@ on:
   pull_request:
     paths-ignore:
       - '**/*.md'
-      - 'dolphinscheduler-ui'
+      - 'dolphinscheduler-ui/**'
       - 'dolphinscheduler-python/pydolphinscheduler/**'
   push:
     paths-ignore:
       - '**/*.md'
-      - 'dolphinscheduler-ui'
+      - 'dolphinscheduler-ui/**'
       - 'dolphinscheduler-python/pydolphinscheduler/**'
     branches:
       - dev
