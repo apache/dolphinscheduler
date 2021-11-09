@@ -77,11 +77,6 @@ public class DolphinPluginManagerConfig {
     /**
      * When development and run server in IDE, this method can set plugins in alert.properties .
      * Then when you start AlertServer in IDE, the plugin can be load.
-     * eg:
-     * file: alert.properties
-     * alert.plugin=\
-     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
-     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
      *
      * @param plugins plugins
      * @return DolphinPluginManagerConfig

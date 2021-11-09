@@ -34,9 +34,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PluginDao extends AbstractBaseDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
@@ -76,7 +73,10 @@ public class PluginDao extends AbstractBaseDao {
 
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (CollectionUtils.isEmpty(pluginDefineList)) {
-            return pluginDefineMapper.insert(pluginDefine);
+            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
+                return pluginDefine.getId();
+            }
+            throw new IllegalStateException("Failed to insert plugin definition");
         }
         PluginDefine currPluginDefine = pluginDefineList.get(0);
         if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
