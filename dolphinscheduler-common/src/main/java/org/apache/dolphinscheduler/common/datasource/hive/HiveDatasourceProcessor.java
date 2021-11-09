@@ -27,15 +27,12 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
 
@@ -46,7 +43,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
 
         hiveDataSourceParamDTO.setDatabase(hiveConnectionParam.getDatabase());
         hiveDataSourceParamDTO.setUserName(hiveConnectionParam.getUser());
-        hiveDataSourceParamDTO.setOther(parseOther(hiveConnectionParam.getOther()));
+        hiveDataSourceParamDTO.setOther(parseOther(getDbType(),hiveConnectionParam.getOther()));
         hiveDataSourceParamDTO.setLoginUserKeytabUsername(hiveConnectionParam.getLoginUserKeytabUsername());
         hiveDataSourceParamDTO.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
         hiveDataSourceParamDTO.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
@@ -91,7 +88,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
             hiveConnectionParam.setLoginUserKeytabPath(hiveParam.getLoginUserKeytabPath());
             hiveConnectionParam.setLoginUserKeytabUsername(hiveParam.getLoginUserKeytabUsername());
         }
-        hiveConnectionParam.setOther(transformOther(hiveParam.getOther()));
+        hiveConnectionParam.setOther(transformOther(getDbType(),hiveParam.getOther()));
         return hiveConnectionParam;
     }
 
@@ -131,15 +128,6 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         return DbType.HIVE;
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s;", key, value)));
-        return stringBuilder.toString();
-    }
-
     private String filterOther(String otherParams) {
         if (StringUtils.isBlank(otherParams)) {
             return "";
@@ -171,15 +159,4 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         return sessionVarListSb.toString() + hiveConfListSb.toString();
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split(";");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

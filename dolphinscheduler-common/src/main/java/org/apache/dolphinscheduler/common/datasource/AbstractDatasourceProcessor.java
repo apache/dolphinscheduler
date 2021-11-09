@@ -17,8 +17,15 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
-import org.apache.commons.collections4.MapUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -63,7 +70,6 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
 
     /**
      * check other is valid
-     *
      * @param other other
      */
     protected void checkOther(Map<String, String> other) {
@@ -76,4 +82,56 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
         }
     }
 
+    /**
+     * transform other
+     * @param type type
+     * @param otherMap otherMap
+     */
+    protected String transformOther(DbType type, Map<String, String> otherMap) {
+        if (MapUtils.isEmpty(otherMap)) {
+            return null;
+        }
+
+        List<String> list = new ArrayList<>();
+        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+        return String.join(getDbSeparator(type), list);
+    }
+
+    /**
+     * parse Other
+     * @param type type
+     * @param other other
+     */
+    protected Map<String, String> parseOther(DbType type, String other) {
+        if (StringUtils.isEmpty(other)) {
+            return null;
+        }
+        Map<String, String> otherMap = new LinkedHashMap<>();
+        String[] configs = other.split(getDbSeparator(type));
+        for (String config : configs) {
+            otherMap.put(config.split("=")[0], config.split("=")[1]);
+        }
+        return otherMap;
+    }
+
+    /**
+     * get db separator
+     * @param type type
+     */
+    private String getDbSeparator(DbType type) {
+        String separator = "";
+        if (Constants.MYSQL.equals(type.name())
+                || Constants.POSTGRESQL.equals(type.name())
+                || Constants.CLICKHOUSE.equals(type.name())
+                || Constants.ORACLE.equals(type.name())
+                || Constants.PRESTO.equals(type.name())) {
+            separator = "&";
+        } else if (Constants.HIVE.equals(type.name())
+                || Constants.SPARK.equals(type.name())
+                || Constants.DB2.equals(type.name())
+                || Constants.SQLSERVER.equals(type.name())) {
+            separator = ";";
+        }
+        return separator;
+    }
 }
