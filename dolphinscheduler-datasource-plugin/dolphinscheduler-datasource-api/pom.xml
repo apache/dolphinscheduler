@@ -29,7 +29,6 @@
     <artifactId>dolphinscheduler-datasource-api</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
@@ -162,16 +161,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-datasource-api-${project.version}</finalName>
-    </build>
 </project>

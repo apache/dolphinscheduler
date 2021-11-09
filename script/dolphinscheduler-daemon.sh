@@ -62,7 +62,7 @@ cd $DOLPHINSCHEDULER_HOME
 export DOLPHINSCHEDULER_OPTS="-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:$DOLPHINSCHEDULER_LOG_DIR/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof -XshowSettings:vm $DOLPHINSCHEDULER_OPTS"
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
+  LOG_FILE="-Dlogging.config=classpath:logback-api.xml"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
