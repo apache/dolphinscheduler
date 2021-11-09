@@ -70,9 +70,6 @@ sed -i ${txt} "s@^#*worker.tenant.auto.create=.*@worker.tenant.auto.create=${wor
 sed -i ${txt} "s@^#*alert.listen.host=.*@alert.listen.host=${alertServer}@g" conf/worker.properties
 sed -i ${txt} "s@^#*task.plugin.dir=.*@task.plugin.dir=${installPath}/${taskPluginDir}@g" conf/worker.properties
 
-# Change configuration in conf/alert.properties
-sed -i ${txt} "s@^#*alert.plugin.dir=.*@alert.plugin.dir=${installPath}/${alertPluginDir}@g" conf/alert.properties
-
 # Change configuration in conf/application-api.properties
 sed -i ${txt} "s@^#*server.port=.*@server.port=${apiServerPort}@g" conf/application-api.properties
 
