@@ -19,9 +19,7 @@ package org.apache.dolphinscheduler.spi;
 
 import static java.util.Collections.emptyList;
 
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
 /**
@@ -34,15 +32,6 @@ import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
  * Config contains custom parameters read from the plug-in configuration file.
  */
 public interface DolphinSchedulerPlugin {
-
-    /**
-     * get alert channel factory
-     * @return alert channel factory
-     */
-    default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return emptyList();
-    }
-
     /**
      * get task plugin factory
      * @return registry factory
