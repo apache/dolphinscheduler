@@ -150,29 +150,6 @@ public class PropertyUtils {
         return defaultValue;
     }
 
-    /**
-     * get property long value
-     *
-     * @param key key
-     * @param defaultVal default value
-     * @return property value
-     */
-    public static long getLong(String key, long defaultVal) {
-        String val = getString(key);
-        return val == null ? defaultVal : Long.parseLong(val);
-    }
-
-    /**
-     * @param key key
-     * @return property value
-     */
-    public static long getLong(String key) {
-        return getLong(key, -1);
-    }
-
-    /**
-     *
-     */
     public static void setValue(String key, String value) {
         properties.setProperty(key, value);
     }
