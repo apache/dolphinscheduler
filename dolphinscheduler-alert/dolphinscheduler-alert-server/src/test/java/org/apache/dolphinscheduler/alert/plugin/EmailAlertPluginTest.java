@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -47,7 +46,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,12 +70,6 @@ public class EmailAlertPluginTest {
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("spring.profiles.active", "h2");
-    }
-
-    @Before
-    public void setUp() {
-        alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-        pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
     }
 
     @Test
