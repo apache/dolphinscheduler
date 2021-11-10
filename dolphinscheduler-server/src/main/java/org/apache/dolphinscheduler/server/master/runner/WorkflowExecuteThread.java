@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -69,6 +68,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -105,10 +105,7 @@ public class WorkflowExecuteThread implements Runnable {
      * runing TaskNode
      */
     private final Map<Integer, ITaskProcessor> activeTaskProcessorMaps = new ConcurrentHashMap<>();
-    /**
-     * task exec service
-     */
-    private final ExecutorService taskExecService;
+
     /**
      * process instance
      */
@@ -217,9 +214,6 @@ public class WorkflowExecuteThread implements Runnable {
 
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
-        int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
-        this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
-                masterTaskExecNum);
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
@@ -228,8 +222,11 @@ public class WorkflowExecuteThread implements Runnable {
     @Override
     public void run() {
         try {
-            startProcess();
-            handleEvents();
+            if (!this.isStart()) {
+                startProcess();
+            } else {
+                handleEvents();
+            }
         } catch (Exception e) {
             logger.error("handler error:", e);
         }

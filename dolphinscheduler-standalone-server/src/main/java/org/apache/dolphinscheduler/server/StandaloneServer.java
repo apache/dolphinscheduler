@@ -38,11 +38,9 @@ public class StandaloneServer {
         Thread.currentThread().setName("Standalone-Server");
 
         System.setProperty("spring.profiles.active", "api,h2");
-        System.setProperty("spring.datasource.sql.schema", "file:./sql/dolphinscheduler_h2.sql");
+        System.setProperty("spring.datasource.sql.schema", "classpath:sql/dolphinscheduler_h2.sql");
 
         startRegistry();
-
-        startAlertServer();
 
         setTaskPlugin();
 
@@ -50,20 +48,9 @@ public class StandaloneServer {
                 ApiApplicationServer.class,
                 MasterServer.class,
                 WorkerServer.class,
+                AlertServer.class,
                 PythonGatewayServer.class
         ).run(args);
-    }
-
-    private static void startAlertServer() {
-        final Path alertPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(alertPluginPath)) {
-            System.setProperty("alert.plugin.binding", alertPluginPath.toString());
-            System.setProperty("alert.plugin.dir", "");
-        }
-        AlertServer.getInstance().start();
     }
 
     private static void startRegistry() throws Exception {
