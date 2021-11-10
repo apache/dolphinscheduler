@@ -79,21 +79,6 @@ public class Constants {
     public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
 
     /**
-     * datasource plugin conf
-     */
-
-    public static final String DATASOURCE_PLUGIN_BINDING = "datasource.plugin.binding";
-
-    public static final String DATASOURCE_PLUGIN_DIR = "datasource.plugin.dir";
-
-    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
-
-    /**
-     * default datasource plugin dir
-     */
-    public static final String DATASOURCE_PLUGIN_PATH = "lib/plugin/datasource";
-
-    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";

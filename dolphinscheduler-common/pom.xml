@@ -28,7 +28,6 @@
 
     <packaging>jar</packaging>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codehaus.janino.version>3.1.0</codehaus.janino.version>
     </properties>
     <dependencies>
@@ -41,14 +40,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.airlift.resolver</groupId>
-            <artifactId>resolver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
@@ -95,13 +86,6 @@
                     <artifactId>mockito-core</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

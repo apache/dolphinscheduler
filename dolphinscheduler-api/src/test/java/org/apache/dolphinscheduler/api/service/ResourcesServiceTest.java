@@ -246,7 +246,7 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF, null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
 
         //SUCCESS
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
@@ -326,7 +326,7 @@ public class ResourcesServiceTest {
             Mockito.when(userMapper.selectById(Mockito.anyInt())).thenReturn(loginUser);
             result = resourcesService.delete(loginUser, 1);
             logger.info(result.toString());
-            Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), result.getMsg());
+            Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
 
             //SUCCESS
             loginUser.setTenantId(1);
@@ -364,7 +364,7 @@ public class ResourcesServiceTest {
         }
         result = resourcesService.verifyResourceName("/test.jar", ResourceType.FILE, user);
         logger.info(result.toString());
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
 
         //RESOURCE_FILE_EXIST
         user.setTenantId(1);
@@ -420,7 +420,7 @@ public class ResourcesServiceTest {
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
 
         //RESOURCE_FILE_NOT_EXIST
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
@@ -486,9 +486,6 @@ public class ResourcesServiceTest {
 
     @Test
     public void testUpdateResourceContent() {
-
-        User loginUser = new User();
-        loginUser.setId(0);
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
         // HDFS_NOT_STARTUP
@@ -521,7 +518,7 @@ public class ResourcesServiceTest {
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
-        Assert.assertTrue(Status.TENANT_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getCode() == result.getCode());
 
         //SUCCESS
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());

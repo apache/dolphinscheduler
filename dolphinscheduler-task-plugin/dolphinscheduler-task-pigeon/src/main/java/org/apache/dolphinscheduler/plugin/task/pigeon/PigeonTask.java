@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -178,7 +178,7 @@ public class PigeonTask extends AbstractTaskExecutor {
             if (!cancelResult.isSuccess()) {
                 List<String> errormsg = triggerResult.getErrormsg();
                 StringBuffer errs = new StringBuffer();
-                if (org.apache.dolphinscheduler.spi.utils.CollectionUtils.isNotEmpty(errormsg)) {
+                if (CollectionUtils.isNotEmpty(errormsg)) {
                     errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
                 }
                 throw new Exception("cancel PIGEON job faild taskId:" + triggerResult.getTaskId() + errs.toString());

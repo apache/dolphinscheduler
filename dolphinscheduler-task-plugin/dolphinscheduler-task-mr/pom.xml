@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-mr</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -39,11 +39,5 @@
             <artifactId>dolphinscheduler-task-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-task-mr-${project.version}</finalName>
-    </build>
-
 </project>

@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -70,7 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public abstract class UpgradeDao extends AbstractBaseDao {
+public abstract class UpgradeDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
@@ -79,11 +78,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
-
-    @Override
-    protected void init() {
-
-    }
 
     /**
      * get datasource

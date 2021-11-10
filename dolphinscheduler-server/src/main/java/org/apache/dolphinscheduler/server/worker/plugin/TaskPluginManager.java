@@ -18,89 +18,75 @@
 package org.apache.dolphinscheduler.server.worker.plugin;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
-
-import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-public class TaskPluginManager extends AbstractDolphinPluginManager {
-
+@Component
+public class TaskPluginManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskPluginManager.class);
 
-    private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, TaskChannel> taskChannelMap = new ConcurrentHashMap<>();
 
-    /**
-     * k->pluginDefineId v->pluginDefineName
-     */
-    private final Map<Integer, String> pluginDefineMap = new HashMap<>();
+    private final PluginDao pluginDao;
 
-    private void addTaskChannelFactory(TaskChannelFactory taskChannelFactory) {
-        requireNonNull(taskChannelFactory, "taskChannelFactory is null");
-
-        if (taskChannelFactoryMap.putIfAbsent(taskChannelFactory.getName(), taskChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Task Plugin '%s' is already registered", taskChannelFactory.getName()));
-        }
-
-        try {
-            loadTaskChannel(taskChannelFactory.getName());
-        } catch (Exception e) {
-            throw new IllegalArgumentException(format("Task Plugin '%s' is can not load .", taskChannelFactory.getName()));
-        }
+    public TaskPluginManager(PluginDao pluginDao) {
+        this.pluginDao = pluginDao;
     }
 
-    private void loadTaskChannel(String name) {
-        requireNonNull(name, "name is null");
-
-        TaskChannelFactory taskChannelFactory = taskChannelFactoryMap.get(name);
-        checkState(taskChannelFactory != null, "Task Plugin {} is not registered", name);
-
-        try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(taskChannelFactory.getClass().getClassLoader())) {
-            TaskChannel taskChannel = taskChannelFactory.create();
-            this.taskChannelMap.put(name, taskChannel);
-        }
-
-        logger.info("-- Loaded Task Plugin {} --", name);
+    private void loadTaskChannel(TaskChannelFactory taskChannelFactory) {
+        TaskChannel taskChannel = taskChannelFactory.create();
+        taskChannelMap.put(taskChannelFactory.getName(), taskChannel);
     }
-
-
-    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     public Map<String, TaskChannel> getTaskChannelMap() {
-        return taskChannelMap;
+        return Collections.unmodifiableMap(taskChannelMap);
     }
 
-    @Override
-    public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
-        for (TaskChannelFactory taskChannelFactory : dolphinSchedulerPlugin.getTaskChannelFactorys()) {
-            logger.info("Registering Task Plugin '{}'", taskChannelFactory.getName());
-            this.addTaskChannelFactory(taskChannelFactory);
-            List<PluginParams> params = taskChannelFactory.getParams();
-            String nameEn = taskChannelFactory.getName();
+    @PostConstruct
+    public void installPlugin() {
+        final Set<String> names = new HashSet<>();
+
+        ServiceLoader.load(TaskChannelFactory.class).forEach(factory -> {
+            final String name = factory.getName();
+
+            logger.info("Registering task plugin: {}", name);
+
+            if (!names.add(name)) {
+                throw new IllegalStateException(format("Duplicate task plugins named '%s'", name));
+            }
+
+            loadTaskChannel(factory);
+
+            logger.info("Registered task plugin: {}", name);
+
+            List<PluginParams> params = factory.getParams();
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
-            PluginDefine pluginDefine = new PluginDefine(nameEn, PluginType.TASK.getDesc(), paramsJson);
-            int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
-            pluginDefineMap.put(id, pluginDefine.getPluginName());
-        }
+            PluginDefine pluginDefine = new PluginDefine(name, PluginType.TASK.getDesc(), paramsJson);
+            int count = pluginDao.addOrUpdatePluginDefine(pluginDefine);
+            if (count <= 0) {
+                throw new RuntimeException("Failed to update task plugin: " + name);
+            }
+        });
     }
 }

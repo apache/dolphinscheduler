@@ -40,13 +40,12 @@ import com.alibaba.druid.pool.DruidDataSource;
 @Component
 public class MonitorDBDao {
 
-    private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
     public static final String VARIABLE_NAME = "variable_name";
 
     @Autowired
     private DruidDataSource dataSource;
-
 
     /**
      * get current db performance

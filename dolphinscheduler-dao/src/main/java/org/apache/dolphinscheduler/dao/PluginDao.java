@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
@@ -27,20 +26,13 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PluginDao extends AbstractBaseDao {
+public class PluginDao {
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
-
-    @Override
-    protected void init() {
-        pluginDefineMapper = ConnectionFactory.getInstance().getMapper(PluginDefineMapper.class);
-    }
 
     /**
      * check plugin define table exist

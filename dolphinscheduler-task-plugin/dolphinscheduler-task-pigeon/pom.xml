@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-pigeon</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
     <dependencies>
 
         <dependency>
@@ -39,6 +39,10 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -63,18 +67,6 @@
                     <artifactId>commons-cli</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.asynchttpclient</groupId>-->
-<!--            <artifactId>async-http-client</artifactId>-->
-<!--            <version>2.12.3</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -104,10 +96,5 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-    <build>
-        <finalName>dolphinscheduler-task-pigeon-${project.version}</finalName>
-    </build>
-
 </project>

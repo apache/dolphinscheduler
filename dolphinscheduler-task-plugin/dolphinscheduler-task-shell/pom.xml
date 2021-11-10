@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-shell</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -45,8 +45,4 @@
             <artifactId>commons-collections4</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-task-shell-${project.version}</finalName>
-    </build>
 </project>

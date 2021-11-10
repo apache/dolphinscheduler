@@ -27,8 +27,7 @@
 
     <artifactId>dolphinscheduler-datasource-clickhouse</artifactId>
     <name>${project.artifactId}</name>
-    <!-- can be load as a datasource Plugin when development and run server in IDE -->
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -98,17 +97,5 @@
             <type>jar</type>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-datasource-clickhouse-${project.version}</finalName>
-    </build>
 </project>
