@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSource
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.exception.PluginException;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -86,7 +85,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         try {
             return CommonUtil.createUGI(getHadoopConf(), principal, keytab, krb5File, username);
         } catch (IOException e) {
-            throw PluginException.getInstance("createUserGroupInformation fail. ", e);
+            throw new RuntimeException("createUserGroupInformation fail. ", e);
         }
     }
 
