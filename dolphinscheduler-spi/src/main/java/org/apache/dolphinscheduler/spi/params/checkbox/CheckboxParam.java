@@ -25,9 +25,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * front-end checkbox component
  */
+@JsonDeserialize(builder = CheckboxParam.Builder.class)
 public class CheckboxParam extends PluginParams {
 
     private CheckboxParam(Builder builder) {
@@ -47,6 +52,21 @@ public class CheckboxParam extends PluginParams {
         }
 
         private CheckboxParamProps props;
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") CheckboxParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
+        ) {
+            super(name, CHECKBOX, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+        }
 
         public Builder setProps(CheckboxParamProps props) {
             this.props = props;
@@ -94,6 +114,11 @@ public class CheckboxParam extends PluginParams {
         public Builder setDisplay(Boolean display) {
             this.display = display;
             return this;
+        }
+        
+        @Override
+        public CheckboxParam build() {
+            return new CheckboxParam(this);
         }
     }
 

@@ -26,9 +26,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * front-end select component
  */
+@JsonDeserialize(builder = SelectParam.Builder.class)
 public class SelectParam extends PluginParams {
 
     private List<ParamsOptions> options;
@@ -52,6 +57,21 @@ public class SelectParam extends PluginParams {
         private List<ParamsOptions> options;
 
         private SelectParamProps props;
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") SelectParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
+        ) {
+            super(name, SELECT, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+        }
 
         public Builder setOptions(List<ParamsOptions> options) {
             this.options = options;
@@ -113,6 +133,11 @@ public class SelectParam extends PluginParams {
         public Builder setDisplay(Boolean display) {
             this.display = display;
             return this;
+        }
+
+        @Override
+        public SelectParam build() {
+            return new SelectParam(this);
         }
     }
 

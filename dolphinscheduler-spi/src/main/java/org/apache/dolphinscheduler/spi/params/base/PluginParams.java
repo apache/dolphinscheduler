@@ -27,18 +27,34 @@ import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARA
 
 import static java.util.Objects.requireNonNull;
 
+import org.apache.dolphinscheduler.spi.params.checkbox.CheckboxParam;
+import org.apache.dolphinscheduler.spi.params.fswitch.SwitchParam;
+import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
+import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * plugin params
  */
-@JsonDeserialize(builder = PluginParams.Builder.class)
-public class PluginParams {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = InputParam.class, name = "input"),
+    @JsonSubTypes.Type(value = RadioParam.class, name = "radio"),
+    @JsonSubTypes.Type(value = CheckboxParam.class, name = "checkbox"),
+    @JsonSubTypes.Type(value = SwitchParam.class, name = "switch"),
+    @JsonSubTypes.Type(value = InputNumberParam.class, name = "inputNumber"),
+    @JsonSubTypes.Type(value = SelectParam.class, name = "select")
+})
+public abstract class PluginParams {
 
     /**
      * param name
@@ -113,7 +129,7 @@ public class PluginParams {
     }
 
     @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
-    public static class Builder {
+    public abstract static class Builder {
         //Must have
         protected String name;
 
@@ -176,9 +192,7 @@ public class PluginParams {
             this.display = display;
         }
 
-        public PluginParams build() {
-            return new PluginParams(this);
-        }
+        public abstract PluginParams build();
     }
 
     public String getName() {

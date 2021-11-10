@@ -25,9 +25,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * front-end switch component
  */
+@JsonDeserialize(builder = SwitchParam.Builder.class)
 public class SwitchParam extends PluginParams {
 
     private SwitchParam(Builder builder) {
@@ -47,6 +52,21 @@ public class SwitchParam extends PluginParams {
         }
 
         private SwitchParamProps props;
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") SwitchParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
+        ) {
+            super(name, SWITCH, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+        }
 
         public Builder setProps(SwitchParamProps props) {
             this.props = props;
@@ -94,6 +114,11 @@ public class SwitchParam extends PluginParams {
         public Builder setDisplay(Boolean display) {
             this.display = display;
             return this;
+        }
+
+        @Override
+        public SwitchParam build() {
+            return new SwitchParam(this);
         }
     }
 

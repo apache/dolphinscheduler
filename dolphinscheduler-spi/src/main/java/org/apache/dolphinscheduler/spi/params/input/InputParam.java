@@ -25,9 +25,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * Text param
  */
+@JsonDeserialize(builder = InputParam.Builder.class)
 public class InputParam extends PluginParams {
 
     private InputParam(Builder builder) {
@@ -47,6 +52,21 @@ public class InputParam extends PluginParams {
         }
 
         private InputParamProps props;
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") InputParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
+        ) {
+            super(name, INPUT, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+        }
 
         public Builder setProps(InputParamProps props) {
             this.props = props;

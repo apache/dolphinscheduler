@@ -34,7 +34,9 @@ public class ParamsOptions {
      */
     private boolean disabled;
 
-    public ParamsOptions(String label, Object value, boolean disabled) {
+    public ParamsOptions(@JsonProperty("label") String label, 
+                         @JsonProperty("value") Object value,
+                         @JsonProperty("disabled") boolean disabled) {
         this.label = label;
         this.value = value;
         this.disabled = disabled;
@@ -68,5 +70,28 @@ public class ParamsOptions {
     public ParamsOptions setDisabled(boolean disabled) {
         this.disabled = disabled;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final ParamsOptions other = (ParamsOptions) obj;
+        if ((this.label == null) ? (other.label != null) : !this.label.equals(other.label)) {
+            return false;
+        }
+        if ((this.value == null) ? (other.value != null) : !this.value.equals(other.value)) {
+            return false;
+        }
+        if (this.disabled != other.disabled) {
+            return false;
+        }
+
+        return true;
     }
 }

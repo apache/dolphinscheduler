@@ -25,9 +25,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * front-end input number component
  */
+@JsonDeserialize(builder = InputNumberParam.Builder.class)
 public class InputNumberParam extends PluginParams {
 
     private InputNumberParam(Builder builder) {
@@ -47,6 +52,21 @@ public class InputNumberParam extends PluginParams {
         }
 
         private InputNumberParamProps props;
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") InputNumberParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display
+        ) {
+            super(name, INPUTNUMBER, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+        }
 
         public Builder setProps(InputNumberParamProps props) {
             this.props = props;
@@ -94,6 +114,11 @@ public class InputNumberParam extends PluginParams {
         public Builder setDisplay(Boolean display) {
             this.display = display;
             return this;
+        }
+
+        @Override
+        public InputNumberParam build() {
+            return new InputNumberParam(this);
         }
     }
 

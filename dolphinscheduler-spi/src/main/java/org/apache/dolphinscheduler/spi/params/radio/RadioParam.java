@@ -27,11 +27,14 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * front-end radio select component
  */
+@JsonDeserialize(builder = RadioParam.Builder.class)
 public class RadioParam extends PluginParams {
 
     @JsonProperty(STRING_PLUGIN_PARAM_OPTIONS)
@@ -57,7 +60,24 @@ public class RadioParam extends PluginParams {
         private List<ParamsOptions> options;
 
         private RadioParamProps props;
-        
+
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") RadioParamProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display,
+                       @JsonProperty("options") List<ParamsOptions> options
+        ) {
+            super(name, RADIO, title, props, value, fieldName, validateList, info, hidden, display);
+            this.props = props;
+            this.options = options;
+        }
+
         public Builder setOptions(List<ParamsOptions> options) {
             this.options = options;
             return this;
