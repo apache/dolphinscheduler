@@ -24,20 +24,23 @@ import java.util.Objects;
 public class SnowFlakeUtils {
     // start timestamp
     private static final long START_TIMESTAMP = 1609430400000L; //2021-01-01 00:00:00
-    // Number of digits
-    private static final long SEQUENCE_BIT = 13;
+    // Each machine generates 32 in the same millisecond
+    private static final long SEQUENCE_BIT = 5;
     private static final long MACHINE_BIT = 2;
     private static final long MAX_SEQUENCE = ~(-1L << SEQUENCE_BIT);
     // The displacement to the left
-    private static final long MACHINE_LEFT = SEQUENCE_BIT;
-    private static final long TIMESTAMP_LEFT = SEQUENCE_BIT + MACHINE_BIT;
+    private static final long MACHINE_LEFT = SEQUENCE_BIT + MACHINE_BIT;
+    private static final long TIMESTAMP_LEFT = SEQUENCE_BIT + MACHINE_BIT + MACHINE_LEFT;
     private final int machineId;
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
+    private static final long SYSTEM_TIMESTAMP = System.currentTimeMillis();
+    private static final long SYSTEM_NANOTIME  = System.nanoTime();
+
     private SnowFlakeUtils() throws SnowFlakeException {
         try {
-            this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
+            this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 4;
         } catch (UnknownHostException e) {
             throw new SnowFlakeException(e.getMessage());
         }
@@ -80,7 +83,7 @@ public class SnowFlakeUtils {
     }
 
     private long nowTimestamp() {
-        return System.currentTimeMillis();
+        return SYSTEM_TIMESTAMP + (System.nanoTime() - SYSTEM_NANOTIME) / 1000000;
     }
 
     public static class SnowFlakeException extends Exception {

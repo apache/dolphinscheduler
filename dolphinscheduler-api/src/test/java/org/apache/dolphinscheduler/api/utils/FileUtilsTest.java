@@ -63,16 +63,17 @@ public class FileUtilsTest {
     public void testCopyFile() throws IOException {
 
         //Define dest file path
+        String src = rootPath + System.getProperty("file.separator") + "src.txt";
         String destFilename = rootPath + System.getProperty("file.separator") + "data.txt";
         logger.info("destFilename: "+destFilename);
 
         //Define InputStream for MultipartFile
         String data = "data text";
-        InputStream targetStream = new ByteArrayInputStream(data.getBytes());
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(src), data);
 
         //Use Mockito to mock MultipartFile
-        MultipartFile file = Mockito.mock(MultipartFile.class);
-        Mockito.when(file.getInputStream()).thenReturn(targetStream);
+        MultipartFile file = Mockito.mock(MultipartFile.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(file.getResource().getFile()).thenReturn(new File(src));
 
         //Invoke copyFile
         FileUtils.copyFile(file,destFilename);

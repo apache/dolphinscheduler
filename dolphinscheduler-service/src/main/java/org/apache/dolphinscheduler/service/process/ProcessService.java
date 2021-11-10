@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -106,6 +105,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -794,8 +794,8 @@ public class ProcessService {
     private Boolean checkCmdParam(Command command, Map<String, String> cmdParam) {
         if (command.getTaskDependType() == TaskDependType.TASK_ONLY || command.getTaskDependType() == TaskDependType.TASK_PRE) {
             if (cmdParam == null
-                || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODE_NAMES)
-                || cmdParam.get(Constants.CMD_PARAM_START_NODE_NAMES).isEmpty()) {
+                || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODES)
+                || cmdParam.get(Constants.CMD_PARAM_START_NODES).isEmpty()) {
                 logger.error("command node depend type is {}, but start nodes is null ", command.getTaskDependType());
                 return false;
             }
@@ -2403,7 +2403,8 @@ public class ProcessService {
         if (!processTaskRelationList.isEmpty()) {
             Set<Integer> processTaskRelationSet = processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet = taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
-            if (CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet)) {
+            boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet);
+            if (result) {
                 return Constants.EXIT_CODE_SUCCESS;
             }
             processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);

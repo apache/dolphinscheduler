@@ -16,19 +16,22 @@
  */
 package org.apache.dolphinscheduler.dao;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.utils.MysqlPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgrePerformance;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.druid.pool.DruidDataSource;
 
 
 /**

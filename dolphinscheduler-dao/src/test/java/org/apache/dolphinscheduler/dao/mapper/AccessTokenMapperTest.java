@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -34,12 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,17 +43,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AccessToken mapper test
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback
-public class AccessTokenMapperTest {
+public class AccessTokenMapperTest extends BaseDaoTest {
 
     @Autowired
-    AccessTokenMapper accessTokenMapper;
+    private AccessTokenMapper accessTokenMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     /**
      * test insert
@@ -74,7 +66,7 @@ public class AccessTokenMapperTest {
      * test delete AccessToken By UserId
      */
     @Test
-    public void testDeleteAccessTokenByUserId() throws Exception {
+    public void testDeleteAccessTokenByUserId() {
         Integer userId = 1;
         int insertCount = 0;
 
@@ -223,9 +215,8 @@ public class AccessTokenMapperTest {
      *
      * @param userName userName
      * @return user
-     * @throws Exception
      */
-    private User createUser(String userName) throws Exception {
+    private User createUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("123");
@@ -252,9 +243,8 @@ public class AccessTokenMapperTest {
      * @param userId   userId
      * @param userName userName
      * @return accessToken
-     * @throws Exception
      */
-    private AccessToken createAccessToken(Integer userId, String userName) throws Exception {
+    private AccessToken createAccessToken(Integer userId, String userName) {
         //insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserName(userName);

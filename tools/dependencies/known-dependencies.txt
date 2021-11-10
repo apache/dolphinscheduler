@@ -30,7 +30,6 @@ commons-cli-1.2.jar
 commons-codec-1.11.jar
 commons-collections-3.2.2.jar
 commons-collections4-4.1.jar
-commons-compress-1.19.jar
 commons-compress-1.4.1.jar
 commons-compiler-3.0.16.jar
 commons-configuration-1.10.jar
@@ -42,7 +41,6 @@ commons-io-2.4.jar
 commons-lang-2.6.jar
 commons-logging-1.1.1.jar
 commons-math3-3.1.1.jar
-commons-math3-3.6.1.jar
 commons-net-3.1.jar
 commons-pool-1.6.jar
 cron-utils-5.0.5.jar
