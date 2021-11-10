@@ -104,8 +104,11 @@ public class StandaloneServer {
                 SPRING_DATASOURCE_DRIVER_CLASS_NAME,
                 org.h2.Driver.class.getName()
         );
-        String.format("jdbc:h2:tcp://localhost/%s/%s;MODE=MySQL;DATABASE_TO_LOWER=true",
-                temp.toAbsolutePath(), temp.getFileName());
+        System.setProperty(
+                SPRING_DATASOURCE_URL,
+                String.format("jdbc:h2:tcp://localhost/%s/%s;MODE=MySQL;DATABASE_TO_LOWER=true", temp.toAbsolutePath(),
+                        temp.getFileName())
+        );
         System.setProperty(SPRING_DATASOURCE_USERNAME, "sa");
         System.setProperty(SPRING_DATASOURCE_PASSWORD, "");
 
