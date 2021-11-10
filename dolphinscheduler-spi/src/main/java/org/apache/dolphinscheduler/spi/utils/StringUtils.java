@@ -30,8 +30,6 @@ public class StringUtils {
      */
     public static final String EMPTY = "";
 
-    public static final int INDEX_NOT_FOUND = -1;
-
     private StringUtils() {
         throw new UnsupportedOperationException("Construct StringUtils");
     }
@@ -86,16 +84,6 @@ public class StringUtils {
     }
 
     /**
-     * <p>Replace all strings matching the regular expression \t \n \r with _</p>
-     *
-     * @param src the String , may be null
-     * @return the string that has been replaced
-     */
-    public static String replaceNRTtoUnderline(String src) {
-        return isBlank(src) ? src : src.replaceAll("[\n|\r|\t]", "_");
-    }
-
-    /**
      * <p>Removes control characters (char &lt;= 32) from both
      * ends of this String, handling {@code null} by returning
      * {@code null}.</p>
@@ -132,46 +120,6 @@ public class StringUtils {
      */
     public static boolean equalsIgnoreCase(String str1, String str2) {
         return str1 == null ? str2 == null : str1.equalsIgnoreCase(str2);
-    }
-
-    public static String substringBefore(final String str, final String separator) {
-        if (isEmpty(str) || separator == null) {
-            return str;
-        }
-        if (separator.isEmpty()) {
-            return EMPTY;
-        }
-        final int pos = str.indexOf(separator);
-        if (pos == INDEX_NOT_FOUND) {
-            return str;
-        }
-        return str.substring(0, pos);
-    }
-
-    public static String substringAfter(final String str, final String separator) {
-        if (isEmpty(str)) {
-            return str;
-        }
-        if (separator == null) {
-            return EMPTY;
-        }
-        final int pos = str.indexOf(separator);
-        if (pos == INDEX_NOT_FOUND) {
-            return EMPTY;
-        }
-        return str.substring(pos + separator.length());
-    }
-
-    public static long strDigitToLong(String str, long defaultValue) {
-        if (str == null) {
-            return defaultValue;
-        } else {
-            try {
-                return Long.parseLong(str);
-            } catch (NumberFormatException var4) {
-                return defaultValue;
-            }
-        }
     }
 
     /**

@@ -24,50 +24,21 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
 import org.apache.curator.test.TestingServer;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
 public class StandaloneServer {
-
     public static void main(String[] args) throws Exception {
-        Thread.currentThread().setName("Standalone-Server");
-
-        System.setProperty("spring.profiles.active", "api,h2");
-        System.setProperty("spring.datasource.sql.schema", "classpath:sql/dolphinscheduler_h2.sql");
-
-        startRegistry();
-
-        setTaskPlugin();
-
-        new SpringApplicationBuilder(
-                ApiApplicationServer.class,
-                MasterServer.class,
-                WorkerServer.class,
-                AlertServer.class,
-                PythonGatewayServer.class
-        ).run(args);
-    }
-
-    private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
-    }
 
-    private static void setTaskPlugin() {
-        final Path taskPluginPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-task-plugin/dolphinscheduler-task-shell/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(taskPluginPath)) {
-            System.setProperty("task.plugin.binding", taskPluginPath.toString());
-            System.setProperty("task.plugin.dir", "");
-        } else {
-            System.setProperty("task.plugin.binding", "lib/plugin/task/shell");
-        }
+        new SpringApplicationBuilder(
+            ApiApplicationServer.class,
+            MasterServer.class,
+            WorkerServer.class,
+            AlertServer.class,
+            PythonGatewayServer.class
+        ).profiles("h2").run(args);
     }
 }
