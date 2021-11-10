@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -53,8 +54,6 @@ public class OSUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(OSUtils.class);
 
-    public static final ThreadLocal<Logger> taskLoggerThreadLocal = new ThreadLocal<>();
-
     private static final SystemInfo SI = new SystemInfo();
     public static final String TWO_DECIMAL = "0.00";
 
@@ -64,7 +63,7 @@ public class OSUtils {
      */
     public static final double NEGATIVE_ONE = -1;
 
-    private static HardwareAbstractionLayer hal = SI.getHardware();
+    private static final HardwareAbstractionLayer hal = SI.getHardware();
 
     private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
@@ -108,22 +107,6 @@ public class OSUtils {
     }
 
     /**
-     * get total physical memory size
-     * <p>
-     * Keep 2 decimal
-     *
-     * @return available Physical Memory Size, unit: G
-     */
-    public static double totalPhysicalMemorySize() {
-        GlobalMemory memory = hal.getMemory();
-        double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
-
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(totalPhysicalMemorySize));
-    }
-
-    /**
      * load average
      *
      * @return load average
@@ -164,9 +147,9 @@ public class OSUtils {
 
     public static List<String> getUserList() {
         try {
-            if (isMacOS()) {
+            if (SystemUtils.IS_OS_MAC) {
                 return getUserListFromMac();
-            } else if (isWindows()) {
+            } else if (SystemUtils.IS_OS_WINDOWS) {
                 return getUserListFromWindows();
             } else {
                 return getUserListFromLinux();
@@ -262,14 +245,10 @@ public class OSUtils {
      */
     public static void createUserIfAbsent(String userName) {
         // if not exists this user, then create
-        taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
         if (!getUserList().contains(userName)) {
             boolean isSuccess = createUser(userName);
-            String infoLog = String.format("create user %s %s", userName, isSuccess ? "success" : "fail");
-            LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
-            LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
+            logger.info("create user {} {}", userName, isSuccess ? "success" : "fail");
         }
-        taskLoggerThreadLocal.remove();
     }
 
     /**
@@ -283,21 +262,19 @@ public class OSUtils {
             String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
                 String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-                LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
-                LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), errorLog);
+                logger.error(errorLog);
                 return false;
             }
-            if (isMacOS()) {
+            if (SystemUtils.IS_OS_MAC) {
                 createMacUser(userName, userGroup);
-            } else if (isWindows()) {
+            } else if (SystemUtils.IS_OS_WINDOWS) {
                 createWindowsUser(userName, userGroup);
             } else {
                 createLinuxUser(userName, userGroup);
             }
             return true;
         } catch (Exception e) {
-            LoggerUtils.logError(Optional.ofNullable(logger), e);
-            LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
+            logger.error(e.getMessage(), e);
         }
 
         return false;
@@ -311,14 +288,9 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
-        String infoLog1 = String.format("create linux os user : %s", userName);
-        LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
-
+        logger.info("create linux os user: {}", userName);
         String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
-        String infoLog2 = String.format("execute cmd : %s", cmd);
-        LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
+        logger.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }
 
@@ -330,23 +302,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createMacUser(String userName, String userGroup) throws IOException {
-        Optional<Logger> optionalLogger = Optional.ofNullable(logger);
-        Optional<Logger> optionalTaskLogger = Optional.ofNullable(taskLoggerThreadLocal.get());
-
-        String infoLog1 = String.format("create mac os user : %s", userName);
-        LoggerUtils.logInfo(optionalLogger, infoLog1);
-        LoggerUtils.logInfo(optionalTaskLogger, infoLog1);
+        logger.info("create mac os user: {}", userName);
 
         String createUserCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
-        String infoLog2 = String.format("create user command : %s", createUserCmd);
-        LoggerUtils.logInfo(optionalLogger, infoLog2);
-        LoggerUtils.logInfo(optionalTaskLogger, infoLog2);
+        logger.info("create user command: {}", createUserCmd);
         exeCmd(createUserCmd);
 
         String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
-        String infoLog3 = String.format("append user to group : %s", appendGroupCmd);
-        LoggerUtils.logInfo(optionalLogger, infoLog3);
-        LoggerUtils.logInfo(optionalTaskLogger, infoLog3);
+        logger.info("append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -358,20 +321,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createWindowsUser(String userName, String userGroup) throws IOException {
-        String infoLog1 = String.format("create windows os user : %s", userName);
-        LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
+        logger.info("create windows os user: {}", userName);
 
         String userCreateCmd = String.format("net user \"%s\" /add", userName);
-        String infoLog2 = String.format("execute create user command : %s", userCreateCmd);
-        LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
+        logger.info("execute create user command: {}", userCreateCmd);
         exeCmd(userCreateCmd);
 
         String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
-        String infoLog3 = String.format("execute append user to group : %s", appendGroupCmd);
-        LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog3);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog3);
+        logger.info("execute append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -382,7 +339,7 @@ public class OSUtils {
      * @throws IOException errors
      */
     public static String getGroup() throws IOException {
-        if (isWindows()) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             String currentProcUserName = System.getProperty("user.name");
             String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
             String line = result.split("\n")[22];
@@ -452,33 +409,6 @@ public class OSUtils {
     public static int getProcessID() {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         return Integer.parseInt(runtimeMXBean.getName().split("@")[0]);
-    }
-
-    /**
-     * whether is macOS
-     *
-     * @return true if mac
-     */
-    public static boolean isMacOS() {
-        return getOSName().startsWith("Mac");
-    }
-
-    /**
-     * whether is windows
-     *
-     * @return true if windows
-     */
-    public static boolean isWindows() {
-        return getOSName().startsWith("Windows");
-    }
-
-    /**
-     * get current OS name
-     *
-     * @return current OS name
-     */
-    public static String getOSName() {
-        return System.getProperty("os.name");
     }
 
     /**

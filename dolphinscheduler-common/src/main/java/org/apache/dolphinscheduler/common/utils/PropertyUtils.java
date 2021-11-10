@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 
 import org.apache.directory.api.util.Strings;
 
@@ -180,58 +180,6 @@ public class PropertyUtils {
     }
 
     /**
-     * @param key key
-     * @return property value
-     */
-    public static long getLong(String key) {
-        return getLong(key, -1);
-    }
-
-    /**
-     * @param key key
-     * @param defaultVal default value
-     * @return property value
-     */
-    public static double getDouble(String key, double defaultVal) {
-        String val = getString(key);
-        return val == null ? defaultVal : Double.parseDouble(val);
-    }
-
-    /**
-     * get array
-     *
-     * @param key property name
-     * @param splitStr separator
-     * @return property value through array
-     */
-    public static String[] getArray(String key, String splitStr) {
-        String value = getString(key);
-        if (value == null) {
-            return new String[0];
-        }
-        try {
-            String[] propertyArray = value.split(splitStr);
-            return propertyArray;
-        } catch (NumberFormatException e) {
-            logger.info(e.getMessage(), e);
-        }
-        return new String[0];
-    }
-
-    /**
-     * @param key key
-     * @param type type
-     * @param defaultValue default value
-     * @param <T> T
-     * @return get enum value
-     */
-    public static <T extends Enum<T>> T getEnum(String key, Class<T> type,
-                                                T defaultValue) {
-        String val = getString(key);
-        return val == null ? defaultValue : Enum.valueOf(type, val);
-    }
-
-    /**
      * get all properties with specified prefix, like: fs.
      *
      * @param prefix prefix to search
@@ -247,9 +195,6 @@ public class PropertyUtils {
         return matchedProperties;
     }
 
-    /**
-     *
-     */
     public static void setValue(String key, String value) {
         properties.setProperty(key, value);
     }
