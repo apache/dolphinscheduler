@@ -711,20 +711,15 @@ export default {
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
   'No more...': 'No more...',
-<<<<<<< HEAD
-
   'Task Definition': 'Task Definition',
   'Create task': 'Create task',
   'Task Type': 'Task Type',
-
-=======
   'Process execute type': 'Process execute type',
   parallel: 'parallel',
   'Serial wait': 'Serial wait',
   'Serial discard': 'Serial discard',
   'Serial priority': 'Serial priority',
   'Recover serial wait': 'Recover serial wait',
->>>>>>> upstream/dev
   IsEnableProxy: 'Enable Proxy',
   WebHook: 'WebHook',
   Keyword: 'Keyword',
