@@ -19,10 +19,6 @@ name: Test
 
 on:
   pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-ui'
-      - 'dolphinscheduler-python/pydolphinscheduler'
   push:
     paths-ignore:
       - '**/*.md'
