@@ -210,7 +210,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_task_definition" (
-	  id serial int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  code bigint NOT NULL,
 	  name varchar(255) DEFAULT NULL ,
 	  version int NOT NULL ,
@@ -264,7 +264,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_process_task_relation" (
-	  id serial int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  name varchar(255) DEFAULT NULL ,
 	  project_code bigint DEFAULT NULL ,
 	  process_definition_code bigint DEFAULT NULL ,
@@ -300,7 +300,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_worker_group" (
-      id serial int(11) NOT NULL,
+      id serial NOT NULL,
       name varchar(255) NOT NULL,
       addr_list text DEFAULT NULL,
       create_time timestamp DEFAULT NULL,
