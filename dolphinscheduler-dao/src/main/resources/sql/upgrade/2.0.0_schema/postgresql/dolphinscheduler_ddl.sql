@@ -308,6 +308,7 @@ BEGIN
     PRIMARY KEY (id),
     UNIQUE KEY name_unique (name)
 	)';
+
 	return 'Success!';
 	exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
