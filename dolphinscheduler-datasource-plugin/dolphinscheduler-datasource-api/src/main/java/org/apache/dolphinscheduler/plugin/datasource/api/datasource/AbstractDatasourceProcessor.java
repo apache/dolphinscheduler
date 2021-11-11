@@ -93,8 +93,7 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
     }
 
     /**
-     * transform other
-     *
+     * transform other parameter(k-v map) as String
      * @param type type
      * @param otherMap otherMap
      */
@@ -109,8 +108,7 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
     }
 
     /**
-     * parse Other
-     *
+     * parse Other paremeter as k-v map
      * @param type type
      * @param other other
      */
