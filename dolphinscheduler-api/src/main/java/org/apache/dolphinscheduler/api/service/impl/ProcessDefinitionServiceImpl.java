@@ -692,20 +692,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         switch (releaseState) {
             case ONLINE:
-                // To check resources whether they are already cancel authorized or deleted
-                String resourceIds = processDefinition.getResourceIds();
-                if (org.apache.commons.lang.StringUtils.isNotBlank(resourceIds)) {
-                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(Constants.COMMA)).map(Integer::parseInt).toArray(Integer[]::new);
-                    PermissionCheck<Integer> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE_ID, processService, resourceIdArray, loginUser.getId(), logger);
-                    try {
-                        permissionCheck.checkPermission();
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION, RELEASESTATE);
-                        return result;
-                    }
-                }
-
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
                 break;
