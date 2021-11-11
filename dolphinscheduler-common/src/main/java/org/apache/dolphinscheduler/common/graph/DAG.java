@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.graph;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -233,7 +235,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         lock.readLock().lock();
 
         try {
-            return org.apache.commons.collections4.CollectionUtils.subtract(nodesMap.keySet(), reverseEdgesMap.keySet());
+            return CollectionUtils.subtract(nodesMap.keySet(), reverseEdgesMap.keySet());
         } finally {
             lock.readLock().unlock();
         }
@@ -249,7 +251,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         lock.readLock().lock();
 
         try {
-            return org.apache.commons.collections4.CollectionUtils.subtract(nodesMap.keySet(), edgesMap.keySet());
+            return CollectionUtils.subtract(nodesMap.keySet(), edgesMap.keySet());
         } finally {
             lock.readLock().unlock();
         }
