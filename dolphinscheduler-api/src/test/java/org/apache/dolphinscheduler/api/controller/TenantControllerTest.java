@@ -37,9 +37,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * tenant controller test
- */
 public class TenantControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);

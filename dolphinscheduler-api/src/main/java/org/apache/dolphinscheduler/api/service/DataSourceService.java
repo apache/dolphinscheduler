@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 

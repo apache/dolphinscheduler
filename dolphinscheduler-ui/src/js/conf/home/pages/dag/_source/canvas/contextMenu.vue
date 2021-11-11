@@ -104,7 +104,7 @@
         this.currentTask = { ...this.currentTask, ...task }
       },
       onStart () {
-        this.dagChart.startRunning(this.currentTask.name)
+        this.dagChart.startRunning(this.currentTask.code)
       },
       onEdit () {
         this.dagChart.openFormModel(this.currentTask.code, this.currentTask.type)

@@ -23,7 +23,8 @@ public class SnowFlakeUtilsTest {
     @Test
     public void testNextId() {
         try {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 100; i++) {
+                Thread.sleep(1);
                 System.out.println(SnowFlakeUtils.getInstance().nextId());
             }
         } catch (Exception e) {
