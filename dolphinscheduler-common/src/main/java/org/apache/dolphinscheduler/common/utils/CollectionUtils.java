@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+
 import org.apache.commons.beanutils.BeanMap;
 
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ public class CollectionUtils {
             return false;
         }
 
-        return org.apache.commons.collections.CollectionUtils.isEqualCollection(a, b);
+        return isEqualCollection(a, b);
     }
 
     /**

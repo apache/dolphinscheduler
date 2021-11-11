@@ -24,7 +24,8 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 

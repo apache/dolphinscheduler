@@ -17,18 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import org.apache.commons.beanutils.BeanMap;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Provides utility methods and decorators for {@link Collection} instances.
@@ -46,118 +37,6 @@ public class CollectionUtils {
 
     private CollectionUtils() {
         throw new UnsupportedOperationException("Construct CollectionUtils");
-    }
-
-    /**
-     * The load factor used when none specified in constructor.
-     */
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-    /**
-     * Returns a new {@link Collection} containing <i>a</i> minus a subset of
-     * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
-     * condition, <i>p</i> are subtracted from <i>a</i>.
-     *
-     * <p>The cardinality of each element <i>e</i> in the returned {@link Collection}
-     * that satisfies the predicate condition will be the cardinality of <i>e</i> in <i>a</i>
-     * minus the cardinality of <i>e</i> in <i>b</i>, or zero, whichever is greater.</p>
-     * <p>The cardinality of each element <i>e</i> in the returned {@link Collection} that does <b>not</b>
-     * satisfy the predicate condition will be equal to the cardinality of <i>e</i> in <i>a</i>.</p>
-     *
-     * @param a the collection to subtract from, must not be null
-     * @param b the collection to subtract, must not be null
-     * @param <T> T
-     * @return a new collection with the results
-     * @see Collection#removeAll
-     */
-    public static <T> Collection<T> subtract(Set<T> a, Set<T> b) {
-        return org.apache.commons.collections4.CollectionUtils.subtract(a, b);
-    }
-
-    public static boolean isNotEmpty(Collection coll) {
-        return !isEmpty(coll);
-    }
-
-    public static boolean isEmpty(Collection coll) {
-        return coll == null || coll.isEmpty();
-    }
-
-    /**
-     * String to map
-     *
-     * @param str string
-     * @param separator separator
-     * @return string to map
-     */
-    public static Map<String, String> stringToMap(String str, String separator) {
-        return stringToMap(str, separator, "");
-    }
-
-    /**
-     * String to map
-     *
-     * @param str string
-     * @param separator separator
-     * @param keyPrefix prefix
-     * @return string to map
-     */
-    public static Map<String, String> stringToMap(String str, String separator, String keyPrefix) {
-
-        Map<String, String> emptyMap = new HashMap<>(0);
-        if (StringUtils.isEmpty(str)) {
-            return emptyMap;
-        }
-        if (StringUtils.isEmpty(separator)) {
-            return emptyMap;
-        }
-        String[] strings = str.split(separator);
-        int initialCapacity = (int)(strings.length / DEFAULT_LOAD_FACTOR) + 1;
-        Map<String, String> map = new HashMap<>(initialCapacity);
-        for (int i = 0; i < strings.length; i++) {
-            String[] strArray = strings[i].split("=");
-            if (strArray.length != 2) {
-                return emptyMap;
-            }
-            //strArray[0] KEY  strArray[1] VALUE
-            if (StringUtils.isEmpty(keyPrefix)) {
-                map.put(strArray[0], strArray[1]);
-            } else {
-                map.put(keyPrefix + strArray[0], strArray[1]);
-            }
-        }
-        return map;
-    }
-
-    /**
-     * Transform item in collection
-     *
-     * @param collection origin collection
-     * @param transformFunc transform function
-     * @param <R> origin item type
-     * @param <T> target type
-     * @return transform list
-     */
-    public static <R, T> List<T> transformToList(Collection<R> collection, Function<R, T> transformFunc) {
-        if (isEmpty(collection)) {
-            return new ArrayList<>();
-        }
-        return collection.stream().map(transformFunc).collect(Collectors.toList());
-    }
-
-    /**
-     * Collect collection to map
-     *
-     * @param collection origin collection
-     * @param keyTransformFunction key transform function
-     * @param <K> target k type
-     * @param <V> value
-     * @return map
-     */
-    public static <K, V> Map<K, V> collectionToMap(Collection<V> collection, Function<V, K> keyTransformFunction) {
-        if (isEmpty(collection)) {
-            return new HashMap<>();
-        }
-        return collection.stream().collect(Collectors.toMap(keyTransformFunction, Function.identity()));
     }
 
     /**
@@ -284,37 +163,6 @@ public class CollectionUtils {
             count.put(obj, count.getOrDefault(obj, 0) + 1);
         }
         return count;
-    }
-
-    /**
-     * Removes certain attributes of each object in the list
-     *
-     * @param originList origin list
-     * @param exclusionSet exclusion set
-     * @param <T> T
-     * @return removes certain attributes of each object in the list
-     */
-    public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
-        List<Map<String, Object>> instanceList = new ArrayList<>();
-        if (exclusionSet == null) {
-            exclusionSet = new HashSet<>();
-        }
-        if (originList == null) {
-            return instanceList;
-        }
-        Map<String, Object> instanceMap;
-        for (T instance : originList) {
-            BeanMap beanMap = new BeanMap(instance);
-            instanceMap = new LinkedHashMap<>(16, 0.75f, true);
-            for (Map.Entry<Object, Object> entry : beanMap.entrySet()) {
-                if (exclusionSet.contains(entry.getKey())) {
-                    continue;
-                }
-                instanceMap.put((String) entry.getKey(), entry.getValue());
-            }
-            instanceList.add(instanceMap);
-        }
-        return instanceList;
     }
 
 }

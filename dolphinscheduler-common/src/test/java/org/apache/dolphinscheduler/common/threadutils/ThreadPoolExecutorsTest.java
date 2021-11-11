@@ -25,13 +25,10 @@ import org.slf4j.LoggerFactory;
  * Thread Pool Executor Test
  */
 public class ThreadPoolExecutorsTest {
-
     private static final Logger logger = LoggerFactory.getLogger(ThreadPoolExecutors.class);
-
 
     @Test
     public void testThreadPoolExecutors() throws InterruptedException {
-
         Thread2[] threadArr = new Thread2[10];
         for (int i = 0; i < threadArr.length; i++) {
 
@@ -43,14 +40,10 @@ public class ThreadPoolExecutorsTest {
         Thread.currentThread().join(40000l);
     }
 
-
-    //test thread
-    class Thread2 extends Thread {
+    static class Thread2 extends Thread {
         @Override
         public void run() {
             logger.info("ThreadPoolExecutors instance's hashcode is: {} ",ThreadPoolExecutors.getInstance("a",2).hashCode());
         }
     }
-
-
 }
