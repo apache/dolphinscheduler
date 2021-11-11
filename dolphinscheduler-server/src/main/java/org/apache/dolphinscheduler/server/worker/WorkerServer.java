@@ -57,7 +57,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
                 "org.apache.dolphinscheduler.server.master.*",
                 "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*"
+                "org.apache.dolphinscheduler.server.log.*",
+                "org.apache.dolphinscheduler.alert.*"
         })
 })
 @EnableTransactionManagement

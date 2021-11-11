@@ -24,10 +24,13 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
 import org.apache.curator.test.TestingServer;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
+
+@EnableAutoConfiguration
+@ComponentScan
 public class StandaloneServer {
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
