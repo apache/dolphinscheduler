@@ -103,6 +103,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 /**
@@ -348,6 +350,35 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query process definition simple list
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @return definition simple list
+     */
+    @Override
+    public Map<String, Object> queryProcessDefinitionSimpleList(User loginUser, long projectCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        ArrayNode arrayNode = JSONUtils.createArrayNode();
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            ObjectNode processDefinitionNode = JSONUtils.createObjectNode();
+            processDefinitionNode.put("id", processDefinition.getId());
+            processDefinitionNode.put("code", processDefinition.getCode());
+            processDefinitionNode.put("name", processDefinition.getName());
+            arrayNode.add(processDefinitionNode);
+        }
+        result.put(Constants.DATA_LIST, arrayNode);
         putMsg(result, Status.SUCCESS);
         return result;
     }
