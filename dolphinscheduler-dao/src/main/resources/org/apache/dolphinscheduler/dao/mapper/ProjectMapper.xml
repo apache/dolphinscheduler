@@ -99,9 +99,22 @@
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
         </include>
-        from t_ds_project p,t_ds_relation_project_user rel
-        where p.id = rel.project_id and rel.user_id= #{userId}
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        left join t_ds_user u on u.id=p.user_id
+        where 1=1
+        <if test="userId != 0">
+            and p.id in
+            (select project_id from t_ds_relation_project_user where user_id=#{userId}
+            )
+        </if>
     </select>
+
     <select id="queryRelationProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
         <include refid="baseSqlV2">
@@ -116,9 +129,18 @@
     </select>
     <select id="queryProjectExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSql"/>
-        from t_ds_project
-        where user_id <![CDATA[ <> ]]> #{userId}
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        left join t_ds_user u on u.id=p.user_id
+        where p.user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="queryProjectCreatedByUser" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
@@ -128,8 +150,18 @@
     </select>
     <select id="queryProjectCreatedAndAuthorizedByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSql"/>
-        from t_ds_project where id in
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        left join t_ds_user u on u.id=p.user_id
+        where p.id in
            (select project_id from t_ds_relation_project_user  where user_id=#{userId}
              union select id as project_id  from t_ds_project where user_id=#{userId})
     </select>
@@ -147,6 +179,17 @@
     </select>
 
     <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select * from t_ds_project
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        left join t_ds_user u on u.id=p.user_id
     </select>
 </mapper>
