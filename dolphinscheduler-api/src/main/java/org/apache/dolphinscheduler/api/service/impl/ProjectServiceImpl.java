@@ -433,7 +433,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         List<Project> projects = null;
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            projects = projectMapper.selectList(null);
+            projects = projectMapper.queryAllProject();
         } else {
             projects = projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId());
         }
@@ -485,14 +485,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query all project list
      *
+     * @param loginUser user
      * @return project list
      */
     @Override
-    public Map<String, Object> queryAllProjectList() {
-        Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProject();
+    public Map<String, Object> queryAllProjectList(User loginUser) {
+        List<Project> projectList;
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            projectList = projectMapper.queryAllProject();
+        } else {
+            projectList = projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId());
+        }
 
-        result.put(Constants.DATA_LIST, projects);
+        Map<String, Object> result = new HashMap<>(16);
+
+        result.put(Constants.DATA_LIST, projectList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
