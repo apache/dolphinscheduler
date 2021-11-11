@@ -286,7 +286,6 @@ public enum Status {
      * for monitor
      */
     QUERY_DATABASE_STATE_ERROR(70001, "query database state error", "查询数据库状态错误"),
-    QUERY_ZOOKEEPER_STATE_ERROR(70002, "query zookeeper state error", "查询zookeeper状态错误"),
 
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),
