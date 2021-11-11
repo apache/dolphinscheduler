@@ -210,6 +210,8 @@ public enum Status {
     QUERY_WORKER_ADDRESS_LIST_FAIL(10178, "query worker address list fail ", "查询worker地址列表失败"),
     TRANSFORM_PROJECT_OWNERSHIP(10179, "Please transform project ownership [{0}]", "请先转移项目所有权[{0}]"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
+    CURRENT_LOGIN_USER_TENANT_NOT_EXIST(10181, "the tenant of the currently login user is not specified", "未指定当前登录用户的租户"),
+
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -284,7 +286,6 @@ public enum Status {
      * for monitor
      */
     QUERY_DATABASE_STATE_ERROR(70001, "query database state error", "查询数据库状态错误"),
-    QUERY_ZOOKEEPER_STATE_ERROR(70002, "query zookeeper state error", "查询zookeeper状态错误"),
 
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),

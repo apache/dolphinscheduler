@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.plugin.datasource.db2;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(DataSourceChannelFactory.class)
 public class DB2DataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override

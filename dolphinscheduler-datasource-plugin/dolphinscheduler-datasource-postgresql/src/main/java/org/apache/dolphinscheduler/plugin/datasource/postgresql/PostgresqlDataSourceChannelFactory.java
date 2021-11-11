@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(DataSourceChannelFactory.class)
 public class PostgresqlDataSourceChannelFactory implements DataSourceChannelFactory {
     @Override
     public String getName() {

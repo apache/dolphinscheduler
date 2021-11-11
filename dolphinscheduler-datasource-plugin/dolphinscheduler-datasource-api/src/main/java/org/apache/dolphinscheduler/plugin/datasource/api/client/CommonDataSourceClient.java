@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.datasource.api.client;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.exception.PluginException;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.Connection;
@@ -102,7 +101,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         try {
             this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
         } catch (Exception e) {
-            throw PluginException.getInstance("JDBC connect failed", e);
+            throw new RuntimeException("JDBC connect failed", e);
         } finally {
             logger.info("Time to execute check jdbc client with sql {} for {} ms ", this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
