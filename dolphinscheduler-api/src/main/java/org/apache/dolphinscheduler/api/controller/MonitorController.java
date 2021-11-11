@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ZOOKEEPER_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -99,22 +98,6 @@ public class MonitorController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
-        return returnDataList(result);
-    }
-
-    /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    @ApiOperation(value = "queryZookeeperState", notes = "QUERY_ZOOKEEPER_STATE_NOTES")
-    @GetMapping(value = "/zookeepers")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryZookeeperState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
         return returnDataList(result);
     }
 

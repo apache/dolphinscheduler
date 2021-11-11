@@ -239,12 +239,6 @@ const menu = {
           enabled: true
         },
         {
-          name: 'Zookeeper',
-          path: 'servers-zookeeper',
-          id: 4,
-          enabled: true
-        },
-        {
           name: 'DB',
           path: 'servers-db',
           id: 6,

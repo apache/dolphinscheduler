@@ -548,15 +548,6 @@ const router = new Router({
           }
         },
         {
-          path: '/monitor/servers/zookeeper',
-          name: 'servers-zookeeper',
-          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
-          meta: {
-            title: 'Zookeeper',
-            refreshInSwitchedTab: config.refreshInSwitchedTab
-          }
-        },
-        {
           path: '/monitor/servers/apiserver',
           name: 'servers-apiserver',
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),

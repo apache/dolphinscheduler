@@ -89,23 +89,6 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     }
 
     /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    @Override
-    public Map<String, Object> queryZookeeperState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-
-        result.put(Constants.DATA_LIST, null);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-
-    }
-
-    /**
      * query worker list
      *
      * @param loginUser login user

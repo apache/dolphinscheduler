@@ -75,14 +75,6 @@ public class MonitorServiceTest {
     }
 
     @Test
-    public  void testQueryZookeeperState() {
-        //TODO need zk
-        /*Map<String,Object> result = monitorService.queryZookeeperState(null);*/
-        /*logger.info(result.toString());*/
-        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
-    }
-
-    @Test
     public  void testGetServerListFromZK() {
         //TODO need zk
         /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
