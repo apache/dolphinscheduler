@@ -130,9 +130,10 @@ public interface ProjectService {
     /**
      * query all project list that have one or more process definitions.
      *
+     * @param loginUser login user
      * @return project list
      */
-    Map<String, Object> queryAllProjectList();
+    Map<String, Object> queryAllProjectList(User loginUser);
 
     /**
      * query authorized and user create project list by user id
