@@ -177,11 +177,14 @@ class ProcessDefinition(Base):
 
     @property
     def schedule_json(self) -> Optional[Dict]:
+        """Get schedule parameter json object. This is requests from java gateway interface."""
         if not self.schedule:
             return None
         else:
             return {
-                "startTime": self.start_time if self.start else datetime.now().strftime("%Y-%m-%d %H:%M%S"),
+                "startTime": self.start_time
+                if self.start
+                else datetime.now().strftime("%Y-%m-%d %H:%M%S"),
                 "endTime": self.end_time if self.end_time else "9999-12-31 00:00:00",
                 "crontab": self.schedule,
                 "timezoneId": self.timezone,
