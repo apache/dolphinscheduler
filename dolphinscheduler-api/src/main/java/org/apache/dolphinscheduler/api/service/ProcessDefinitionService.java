@@ -69,6 +69,16 @@ public interface ProcessDefinitionService {
                                                    long projectCode);
 
     /**
+     * query process definition simple list
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return definition simple list
+     */
+    Map<String, Object> queryProcessDefinitionSimpleList(User loginUser,
+                                                         long projectCode);
+
+    /**
      * query process definition list paging
      *
      * @param loginUser login user
