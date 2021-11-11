@@ -283,7 +283,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-    <build>
-        <finalName>dolphinscheduler-task-api-${project.version}</finalName>
-    </build>
 </project>
