@@ -32,16 +32,6 @@ on:
       - 'dolphinscheduler-rpc/**'
       - 'dolphinscheduler-server/**'
   pull_request:
-    paths:
-      - '.github/workflows/backend.yml'
-      - 'package.xml'
-      - 'pom.xml'
-      - 'dolphinscheduler-alert/**'
-      - 'dolphinscheduler-api/**'
-      - 'dolphinscheduler-common/**'
-      - 'dolphinscheduler-dao/**'
-      - 'dolphinscheduler-rpc/**'
-      - 'dolphinscheduler-server/**'
 
 concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
