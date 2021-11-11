@@ -193,4 +193,17 @@ public class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
+
+    /**
+     * database type
+     */
+    public static final String MYSQL = "MYSQL";
+    public static final String POSTGRESQL = "POSTGRESQL";
+    public static final String HIVE = "HIVE";
+    public static final String SPARK = "SPARK";
+    public static final String CLICKHOUSE = "CLICKHOUSE";
+    public static final String ORACLE = "ORACLE";
+    public static final String SQLSERVER = "SQLSERVER";
+    public static final String DB2 = "DB2";
+    public static final String PRESTO = "PRESTO";
 }

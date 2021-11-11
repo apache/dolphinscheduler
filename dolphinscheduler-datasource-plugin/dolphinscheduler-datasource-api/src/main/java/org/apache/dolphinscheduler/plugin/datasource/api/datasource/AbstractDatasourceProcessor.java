@@ -20,10 +20,15 @@ package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -85,5 +90,60 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}", dbType.getDescp(), baseConnectionParam.getUser(), baseConnectionParam.getJdbcUrl());
+    }
+
+    /**
+     * transform other
+     *
+     * @param type type
+     * @param otherMap otherMap
+     */
+    protected String transformOther(DbType type, Map<String, String> otherMap) {
+        if (MapUtils.isEmpty(otherMap)) {
+            return null;
+        }
+
+        List<String> list = new ArrayList<>();
+        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+        return String.join(getDbSeparator(type), list);
+    }
+
+    /**
+     * parse Other
+     *
+     * @param type type
+     * @param other other
+     */
+    protected Map<String, String> parseOther(DbType type, String other) {
+        if (StringUtils.isEmpty(other)) {
+            return null;
+        }
+        Map<String, String> otherMap = new LinkedHashMap<>();
+        String[] configs = other.split(getDbSeparator(type));
+        for (String config : configs) {
+            otherMap.put(config.split("=")[0], config.split("=")[1]);
+        }
+        return otherMap;
+    }
+
+    /**
+     * get db separator
+     * @param type type
+     */
+    private String getDbSeparator(DbType type) {
+        String separator = "";
+        if (Constants.MYSQL.equals(type.name())
+                || Constants.POSTGRESQL.equals(type.name())
+                || Constants.CLICKHOUSE.equals(type.name())
+                || Constants.ORACLE.equals(type.name())
+                || Constants.PRESTO.equals(type.name())) {
+            separator = "&";
+        } else if (Constants.HIVE.equals(type.name())
+                || Constants.SPARK.equals(type.name())
+                || Constants.DB2.equals(type.name())
+                || Constants.SQLSERVER.equals(type.name())) {
+            separator = ";";
+        }
+        return separator;
     }
 }
