@@ -44,5 +44,5 @@ export default {
         reject(e)
       })
     })
-  },
+  }
 }
