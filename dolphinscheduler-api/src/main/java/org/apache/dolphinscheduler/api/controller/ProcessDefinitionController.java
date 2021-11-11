@@ -442,6 +442,24 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
+     * query Process definition simple list
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list
+     */
+    @ApiOperation(value = "querySimpleList", notes = "QUERY_PROCESS_DEFINITION_SIMPLE_LIST_NOTES")
+    @GetMapping(value = "/simple-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProcessDefinitionSimpleList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionSimpleList(loginUser, projectCode);
+        return returnDataList(result);
+    }
+
+    /**
      * query process definition list paging
      *
      * @param loginUser login user
