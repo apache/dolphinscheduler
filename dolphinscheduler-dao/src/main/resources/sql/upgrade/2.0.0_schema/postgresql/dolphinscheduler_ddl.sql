@@ -300,7 +300,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_worker_group" (
-	  id serial int(11) NOT NULL,
+    id serial int(11) NOT NULL,
     name varchar(255) NOT NULL ,
     addr_list text DEFAULT NULL ,
     create_time timestamp DEFAULT NULL ,
