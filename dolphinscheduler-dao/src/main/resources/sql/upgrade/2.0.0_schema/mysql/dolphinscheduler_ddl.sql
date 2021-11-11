@@ -352,6 +352,18 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+-- t_ds_worker_group
+DROP TABLE IF EXISTS `t_ds_worker_group`;
+CREATE TABLE `t_ds_worker_group` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(255) NOT NULL COMMENT 'worker group name',
+  `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
+  `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 -- t_ds_command
 alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';
 alter table t_ds_command add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;

@@ -298,6 +298,16 @@ BEGIN
 	  update_time timestamp DEFAULT NULL ,
 	  PRIMARY KEY (id)
 	)';
+
+	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_worker_group" (
+	  id int(11) NOT NULL,
+    name varchar(255) NOT NULL ,
+    addr_list text DEFAULT NULL ,
+    create_time timestamp DEFAULT NULL ,
+    update_time timestamp DEFAULT NULL ,
+    PRIMARY KEY (id),
+    UNIQUE KEY name_unique (name)
+	)';
 	return 'Success!';
 	exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
