@@ -345,7 +345,7 @@ export default {
         resolve()
         return
       }
-      io.get(`projects/${state.projectCode}/process-definition/list`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/simple-list`, payload, res => {
         state.processListS = res.data
         resolve(res.data)
       }).catch(res => {
