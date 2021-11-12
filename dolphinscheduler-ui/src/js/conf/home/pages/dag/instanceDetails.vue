@@ -43,7 +43,7 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
-      ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getInstancedetail', 'getResourcesListJar']),
+      ...mapActions('dag', ['getProjectList', 'getResourcesList', 'getInstancedetail', 'getResourcesListJar']),
       ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
       /**
        * init
@@ -56,8 +56,6 @@
         Promise.all([
           // Process instance details
           this.getInstancedetail(this.$route.params.id),
-          // get process definition
-          this.getProcessList(),
           // get project
           this.getProjectList(),
           // get resources
