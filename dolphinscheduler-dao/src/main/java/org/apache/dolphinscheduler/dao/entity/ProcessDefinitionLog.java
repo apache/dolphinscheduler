@@ -65,7 +65,6 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setTimeout(processDefinition.getTimeout());
         this.setTenantId(processDefinition.getTenantId());
         this.setModifyBy(processDefinition.getModifyBy());
-        this.setResourceIds(processDefinition.getResourceIds());
         this.setWarningGroupId(processDefinition.getWarningGroupId());
         this.setExecutionType(processDefinition.getExecutionType());
     }
