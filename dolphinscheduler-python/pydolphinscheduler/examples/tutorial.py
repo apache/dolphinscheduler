@@ -37,7 +37,7 @@ from pydolphinscheduler.tasks.shell import Shell
 with ProcessDefinition(
     name="tutorial",
     schedule="0 0 0 * * ? *",
-    start_time="2021-01-01 00:00:00",
+    start_time="2021-01-01",
     tenant="tenant_exists",
 ) as pd:
     task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
