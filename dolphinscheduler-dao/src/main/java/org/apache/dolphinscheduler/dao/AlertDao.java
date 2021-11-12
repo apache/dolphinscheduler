@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
@@ -32,6 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,10 +47,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 @Component
-public class AlertDao extends AbstractBaseDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class AlertDao {
     @Autowired
     private AlertMapper alertMapper;
 
@@ -59,13 +56,6 @@ public class AlertDao extends AbstractBaseDao {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
-
-    @Override
-    protected void init() {
-        alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
-        alertPluginInstanceMapper = ConnectionFactory.getInstance().getMapper(AlertPluginInstanceMapper.class);
-        alertGroupMapper = ConnectionFactory.getInstance().getMapper(AlertGroupMapper.class);
-    }
 
     /**
      * insert alert
@@ -178,11 +168,9 @@ public class AlertDao extends AbstractBaseDao {
     }
 
     /**
-     * list the alert information of waiting to be executed
-     *
-     * @return alert list
+     * List alerts that are pending for execution
      */
-    public List<Alert> listWaitExecutionAlert() {
+    public List<Alert> listPendingAlerts() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
     }
 

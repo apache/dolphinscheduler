@@ -20,11 +20,12 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class MonitorServiceTest {
     private MonitorDBDao monitorDBDao;
 
     @Test
-    public  void testQueryDatabaseState(){
+    public  void testQueryDatabaseState() {
 
         Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
         Map<String,Object> result = monitorService.queryDatabaseState(null);
@@ -64,41 +65,35 @@ public class MonitorServiceTest {
         List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
     }
+
     @Test
-    public  void testQueryMaster(){
+    public  void testQueryMaster() {
         //TODO need zk
-//        Map<String,Object> result = monitorService.queryMaster(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
-    @Test
-    public  void testQueryZookeeperState(){
-        //TODO need zk
-//        Map<String,Object> result = monitorService.queryZookeeperState(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        /*Map<String,Object> result = monitorService.queryMaster(null);*/
+        /*logger.info(result.toString());*/
+        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
     }
 
     @Test
-    public  void testGetServerListFromZK(){
+    public  void testGetServerListFromZK() {
         //TODO need zk
-//        List<Server> serverList = monitorService.getServerListFromZK(true);
-//        logger.info(serverList.toString());
+        /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
+        /*logger.info(serverList.toString());*/
     }
 
-    private List<MonitorRecord> getList(){
+    private List<MonitorRecord> getList() {
         List<MonitorRecord> monitorRecordList = new ArrayList<>();
         monitorRecordList.add(getEntity());
         return monitorRecordList;
     }
 
-    private MonitorRecord getEntity(){
+    private MonitorRecord getEntity() {
         MonitorRecord monitorRecord = new  MonitorRecord();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }
 
-    private List<Server> getServerList(){
+    private List<Server> getServerList() {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server());
         return servers;

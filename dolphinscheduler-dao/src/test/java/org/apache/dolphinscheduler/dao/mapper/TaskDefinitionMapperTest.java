@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -29,27 +29,15 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class TaskDefinitionMapperTest {
+public class TaskDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    UserMapper userMapper;
-
-    @Autowired
-    ProjectMapper projectMapper;
+    private UserMapper userMapper;
 
     public TaskDefinition insertOne() {
         return insertOne(99);
@@ -63,6 +51,8 @@ public class TaskDefinitionMapperTest {
         taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(userId);
         taskDefinition.setResourceIds("1");
+        taskDefinition.setWorkerGroup("default");
+        taskDefinition.setEnvironmentCode(1L);
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
@@ -79,38 +69,16 @@ public class TaskDefinitionMapperTest {
     @Test
     public void testQueryByDefinitionName() {
         TaskDefinition taskDefinition = insertOne();
-        TaskDefinition result = taskDefinitionMapper.queryByDefinitionName(taskDefinition.getProjectCode()
+        TaskDefinition result = taskDefinitionMapper.queryByName(taskDefinition.getProjectCode()
                 , taskDefinition.getName());
 
         Assert.assertNotNull(result);
-    }
-
-    @Test
-    public void testQueryByDefinitionId() {
-
-        User user = new User();
-        user.setUserName("un");
-        userMapper.insert(user);
-        User un = userMapper.queryByUserNameAccurately("un");
-
-        Project project = new Project();
-        project.setCode(1L);
-        project.setCreateTime(new Date());
-        project.setUpdateTime(new Date());
-        projectMapper.insert(project);
-
-        TaskDefinition taskDefinition = insertOne(un.getId());
-        TaskDefinition td = taskDefinitionMapper.queryByDefinitionName(taskDefinition.getProjectCode()
-                , taskDefinition.getName());
-        TaskDefinition result = taskDefinitionMapper.queryByDefinitionId(td.getId());
-        Assert.assertNotNull(result);
-
     }
 
     @Test
     public void testQueryByDefinitionCode() {
         TaskDefinition taskDefinition = insertOne();
-        TaskDefinition result = taskDefinitionMapper.queryByDefinitionCode(taskDefinition.getCode());
+        TaskDefinition result = taskDefinitionMapper.queryByCode(taskDefinition.getCode());
         Assert.assertNotNull(result);
 
     }
@@ -119,14 +87,6 @@ public class TaskDefinitionMapperTest {
     public void testQueryAllDefinitionList() {
         TaskDefinition taskDefinition = insertOne();
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryAllDefinitionList(taskDefinition.getProjectCode());
-        Assert.assertNotEquals(taskDefinitions.size(), 0);
-
-    }
-
-    @Test
-    public void testQueryDefinitionListByIdList() {
-        TaskDefinition taskDefinition = insertOne();
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryDefinitionListByIdList(new Integer[]{taskDefinition.getId()});
         Assert.assertNotEquals(taskDefinitions.size(), 0);
 
     }

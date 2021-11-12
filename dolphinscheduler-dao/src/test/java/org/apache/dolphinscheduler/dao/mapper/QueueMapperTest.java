@@ -17,38 +17,27 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class QueueMapperTest {
-
+public class QueueMapperTest extends BaseDaoTest {
 
     @Autowired
-    QueueMapper queueMapper;
-
+    private QueueMapper queueMapper;
 
     /**
      * insert
+     *
      * @return Queue
      */
     private Queue insertOne() {
@@ -133,7 +122,7 @@ public class QueueMapperTest {
         Assert.assertNull(queueMapper.existQueue("queue", null));
         Assert.assertNull(queueMapper.existQueue(null, "queue"));
         Queue queue = insertOne();
-        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(queue.getQueue(), null)));
-        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(null, queue.getQueueName())));
+        Assert.assertTrue(queueMapper.existQueue(queue.getQueue(), null) == Boolean.TRUE);
+        Assert.assertTrue(queueMapper.existQueue(null, queue.getQueueName()) == Boolean.TRUE);
     }
 }

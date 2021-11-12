@@ -26,15 +26,14 @@ import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -44,6 +43,9 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +80,9 @@ public class UsersServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private AccessTokenMapper accessTokenMapper;
 
     @Mock
     private TenantMapper tenantMapper;
@@ -221,7 +226,6 @@ public class UsersServiceTest {
         Assert.assertEquals(user.getId(), userExistId);
     }
 
-
     @Test
     public void testQueryUserList() {
         User user = new User();
@@ -247,16 +251,16 @@ public class UsersServiceTest {
         when(userMapper.queryUserPaging(any(Page.class), eq("userTest"))).thenReturn(page);
 
         //no operate
-        Map<String, Object> result = usersService.queryUserList(user, "userTest", 1, 10);
+        Result result = usersService.queryUserList(user, "userTest", 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), (int) result.getCode());
 
         //success
         user.setUserType(UserType.ADMIN_USER);
         result = usersService.queryUserList(user, "userTest", 1, 10);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        PageInfo<User> pageInfo = (PageInfo<User>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getLists().size() > 0);
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        PageInfo<User> pageInfo = (PageInfo<User>) result.getData();
+        Assert.assertTrue(pageInfo.getTotalList().size() > 0);
     }
 
     @Test
@@ -265,13 +269,13 @@ public class UsersServiceTest {
         String userPassword = "userTest0001";
         try {
             //user not exist
-            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0,userName,userPassword,"3443@qq.com",1,"13457864543","queue", 1);
+            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword, "3443@qq.com", 1, "13457864543", "queue", 1);
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
             logger.info(result.toString());
 
             //success
             when(userMapper.selectById(1)).thenReturn(getUser());
-            result = usersService.updateUser(getLoginUser(), 1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue", 1);
+            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1, "13457864543", "queue", 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -286,7 +290,7 @@ public class UsersServiceTest {
         try {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
-
+            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
             //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
@@ -356,7 +360,6 @@ public class UsersServiceTest {
 
     }
 
-
     @Test
     public void testGrantUDFFunction() {
         String udfIds = "100000,120000";
@@ -398,7 +401,7 @@ public class UsersServiceTest {
 
     }
 
-    private User getLoginUser(){
+    private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -430,7 +433,6 @@ public class UsersServiceTest {
         //check userName
         Assert.assertEquals("userTest0001", tempUser.getUserName());
     }
-
 
     @Test
     public void testQueryAllGeneralUsers() {
@@ -477,7 +479,6 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
-
 
     @Test
     public void testAuthorizedUser() {
@@ -534,7 +535,6 @@ public class UsersServiceTest {
             Assert.assertTrue(false);
         }
     }
-
 
     @Test
     public void testActivateUser() {
@@ -617,7 +617,6 @@ public class UsersServiceTest {
         user.setState(0);
         return user;
     }
-
 
     /**
      * get user

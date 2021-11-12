@@ -137,6 +137,15 @@ const menu = {
       children: []
     },
     {
+      name: `${i18n.$t('Environment manage')}`,
+      id: 3,
+      path: 'environment-manage',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-setting',
+      children: []
+    },
+    {
       name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token-manage',
@@ -227,12 +236,6 @@ const menu = {
           name: 'Worker',
           path: 'servers-worker',
           id: 1,
-          enabled: true
-        },
-        {
-          name: 'Zookeeper',
-          path: 'servers-zookeeper',
-          id: 4,
           enabled: true
         },
         {

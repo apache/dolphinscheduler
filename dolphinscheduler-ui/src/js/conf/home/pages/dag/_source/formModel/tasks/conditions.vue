@@ -53,8 +53,7 @@
               @on-delete-all="_onDeleteAll"
               @getDependTaskList="getDependTaskList"
               :index="$index"
-              :rear-list = "rearList"
-              :pre-node = "preNode">
+              :prev-tasks="prevTasks">
             </m-node-status>
           </div>
         </div>
@@ -79,8 +78,7 @@
     mixins: [disabledState],
     props: {
       backfillItem: Object,
-      preNode: Array,
-      rearList: Array
+      prevTasks: Array
     },
     methods: {
       _addDep () {
@@ -149,7 +147,7 @@
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
           $(`#${o.id}`).siblings().each(function () {
-            if (v1.depTasks === $(this).text()) {
+            if (v1.depTaskCode === $(this).text()) {
               v1.state = $(this).attr('data-dependent-depstate')
             }
           })

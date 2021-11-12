@@ -24,7 +24,8 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+
+import org.apache.commons.lang.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +38,12 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class, PropertyUtils.class})
+@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class, PropertyUtils.class, SystemUtils.class})
 public class ProcessUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
@@ -54,61 +56,11 @@ public class ProcessUtilsTest {
     @Test
     public void getPidsStr() throws Exception {
         int processId = 1;
-        String pidList = ProcessUtils.getPidsStr(processId);
-        Assert.assertNotEquals("The child process of process 1 should not be empty", pidList, "");
-
         PowerMockito.mockStatic(OSUtils.class);
-        when(OSUtils.isMacOS()).thenReturn(true);
+        Whitebox.setInternalState(SystemUtils.class, "IS_OS_MAC", true);
         when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId))).thenReturn(null);
         String pidListMac = ProcessUtils.getPidsStr(processId);
         Assert.assertEquals("", pidListMac);
-    }
-
-    @Test
-    public void testBuildCommandStr() {
-        List<String> commands = new ArrayList<>();
-        commands.add("sudo");
-        commands.add("-u");
-        commands.add("tenantCode");
-        //allowAmbiguousCommands false
-        Assert.assertEquals("sudo -u tenantCode", ProcessUtils.buildCommandStr(commands));
-
-        //quota
-        commands.clear();
-        commands.add("\"sudo\"");
-        Assert.assertEquals("\"sudo\"", ProcessUtils.buildCommandStr(commands));
-
-        //allowAmbiguousCommands true
-        commands.clear();
-        commands.add("sudo");
-        System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "false");
-        Assert.assertEquals("\"sudo\"", ProcessUtils.buildCommandStr(commands));
-    }
-
-    @Test
-    public void testKill() {
-        //get taskExecutionContext
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-
-        //process id eq 0
-        taskExecutionContext.setProcessId(0);
-        ProcessUtils.kill(taskExecutionContext);
-
-        //process id not eq 0
-        taskExecutionContext.setProcessId(1);
-        PowerMockito.mockStatic(OSUtils.class);
-        try {
-            when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, 1))).thenReturn("1111");
-            when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, 1))).thenReturn("1111");
-            when(OSUtils.exeCmd("sudo -u tenantCode kill -9")).thenReturn("1111");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        taskExecutionContext.setHost("127.0.0.1:8888");
-        taskExecutionContext.setLogPath("/log/1.log");
-        taskExecutionContext.setTenantCode("tenantCode");
-        ProcessUtils.kill(taskExecutionContext);
-        Assert.assertEquals(1, taskExecutionContext.getProcessId());
     }
 
     @Test

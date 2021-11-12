@@ -119,7 +119,7 @@
           dependTaskList: _.map(this.dependTaskList, v => {
             return {
               relation: v.relation,
-              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList', 'definitionList']))
             }
           })
         })
@@ -148,7 +148,7 @@
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
-          v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState
+          v1.state = dependentResult[`${v1.definitionId}-${v1.depTaskCode}-${v1.cycle}-${v1.dateValue}`] || defaultState
         }))
       }
     },
@@ -163,7 +163,7 @@
           dependTaskList: _.map(this.dependTaskList, v => {
             return {
               relation: v.relation,
-              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList', 'definitionList']))
             }
           })
         }

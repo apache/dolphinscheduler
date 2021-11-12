@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -52,18 +53,6 @@ public class DateUtilsTest {
         Assert.assertEquals(monday, monday1);
         Assert.assertEquals(sunday, sunday1);
 
-    }
-
-    @Test
-    public void diffHours() {
-        Date d1 = DateUtils.stringToDate("2019-01-28 00:00:00");
-        Date d2 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d1, d2), 20);
-        Date d3 = DateUtils.stringToDate("2019-01-28 20:00:00");
-        Assert.assertEquals(DateUtils.diffHours(d3, d2), 0);
-        Assert.assertEquals(DateUtils.diffHours(d2, d1), 20);
-        Date d4 = null;
-        Assert.assertEquals(DateUtils.diffHours(d2, d4), 0);
     }
 
     @Test

@@ -19,17 +19,18 @@
           ref="popup"
           :ok-text="$t('Confirm')"
           :nameText="$t('Related items')"
+          @close="_close"
           @ok="_ok">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <el-select v-model="itemId" size="small">
+            <el-select v-model="selected" size="small">
               <el-option
                       v-for="item in itemList"
-                      :key="item.id"
-                      :value="item.id"
+                      :key="item.code"
+                      :value="item.code"
                       :label="item.name">
               </el-option>
             </el-select>
@@ -51,24 +52,27 @@
       return {
         store,
         itemList: [],
-        itemId: ''
+        selected: ''
       }
     },
     props: {
       tmp: Boolean
     },
     methods: {
+      _close () {
+        this.$emit('closeRelatedItems')
+      },
       _ok () {
         if (this._verification()) {
           if (this.tmp) {
-            this.$emit('onBatchMove', this.itemId)
+            this.$emit('onBatchMove', this.selected)
           } else {
-            this.$emit('onBatchCopy', this.itemId)
+            this.$emit('onBatchCopy', this.selected)
           }
         }
       },
       _verification () {
-        if (!this.itemId) {
+        if (!this.selected) {
           this.$message.warning(`${i18n.$t('Project name is required')}`)
           return false
         }

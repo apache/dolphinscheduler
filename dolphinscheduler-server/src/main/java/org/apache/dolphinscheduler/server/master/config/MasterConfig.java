@@ -45,6 +45,9 @@ public class MasterConfig {
     @Value("${master.heartbeat.interval:10}")
     private int masterHeartbeatInterval;
 
+    @Value("${master.state.wheel.interval:5}")
+    private int stateWheelInterval;
+
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
 
@@ -56,6 +59,9 @@ public class MasterConfig {
 
     @Value("${master.reserved.memory:0.3}")
     private double masterReservedMemory;
+
+    @Value("${master.cache.process.definition:true}")
+    private boolean masterCacheProcessDefinition;
 
     public int getListenPort() {
         return listenPort;
@@ -139,4 +145,21 @@ public class MasterConfig {
     public void setMasterDispatchTaskNumber(int masterDispatchTaskNumber) {
         this.masterDispatchTaskNumber = masterDispatchTaskNumber;
     }
+
+    public int getStateWheelInterval() {
+        return this.stateWheelInterval;
+    }
+
+    public void setStateWheelInterval(int stateWheelInterval) {
+        this.stateWheelInterval = stateWheelInterval;
+    }
+
+    public boolean getMasterCacheProcessDefinition() {
+        return masterCacheProcessDefinition;
+    }
+
+    public void setMasterCacheProcessDefinition(boolean masterCacheProcessDefinition) {
+        this.masterCacheProcessDefinition = masterCacheProcessDefinition;
+    }
+
 }

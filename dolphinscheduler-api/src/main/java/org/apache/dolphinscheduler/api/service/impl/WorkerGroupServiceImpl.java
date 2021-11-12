@@ -20,12 +20,10 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.RegistryMonitor;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -33,14 +31,17 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,17 +60,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceImpl.class);
 
     @Autowired
-    WorkerGroupMapper workerGroupMapper;
-
-
-    @Autowired
-    private RegistryMonitor registryMonitor;
+    private WorkerGroupMapper workerGroupMapper;
 
     @Autowired
-    ProcessInstanceMapper processInstanceMapper;
+    private ProcessInstanceMapper processInstanceMapper;
 
-    @Resource
-    RegistryClient registryClient;
+    @Autowired
+    private RegistryClient registryClient;
 
     /**
      * create or update a worker group
@@ -146,8 +143,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
         }
         // check zookeeper
-        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
-        return registryClient.isExisted(workerGroupPath);
+        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
+        return registryClient.exists(workerGroupPath);
     }
 
     /**
@@ -157,7 +154,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        Map<String, String> serverMaps = registryMonitor.getServerMaps(NodeType.WORKER, true);
+        Map<String, String> serverMaps = registryClient.getServerMaps(NodeType.WORKER, true);
         if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
@@ -179,24 +176,26 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return worker group list page
      */
     @Override
-    public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+    public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         List<WorkerGroup> workerGroups = getWorkerGroups(true);
         List<WorkerGroup> resultDataList = new ArrayList<>();
+        int total = 0;
 
         if (CollectionUtils.isNotEmpty(workerGroups)) {
             List<WorkerGroup> searchValDataList = new ArrayList<>();
 
-            if (StringUtils.isNotEmpty(searchVal)) {
+            if (!StringUtils.isEmpty(searchVal)) {
                 for (WorkerGroup workerGroup : workerGroups) {
                     if (workerGroup.getName().contains(searchVal)) {
                         searchValDataList.add(workerGroup);
@@ -205,7 +204,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             } else {
                 searchValDataList = workerGroups;
             }
-
+            total = searchValDataList.size();
             if (fromIndex < searchValDataList.size()) {
                 if (toIndex > searchValDataList.size()) {
                     toIndex = searchValDataList.size();
@@ -215,10 +214,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(resultDataList.size());
-        pageInfo.setLists(resultDataList);
+        pageInfo.setTotal(total);
+        pageInfo.setTotalList(resultDataList);
 
-        result.put(Constants.DATA_LIST, pageInfo);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -256,11 +255,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
         // worker groups from zookeeper
         String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-        List<String> workerGroupList = null;
+        Collection<String> workerGroupList = null;
         try {
             workerGroupList = registryClient.getChildrenKeys(workerPath);
         } catch (Exception e) {
-            logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
+            logger.error("getWorkerGroups exception, workerPath: {}, isPaging: {}", workerPath, isPaging, e);
         }
 
         if (CollectionUtils.isEmpty(workerGroupList)) {
@@ -273,8 +272,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
-            List<String> childrenNodes = null;
+            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
+            Collection<String> childrenNodes = null;
             try {
                 childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
             } catch (Exception e) {
@@ -287,7 +286,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = registryClient.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);
@@ -334,7 +333,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        List<String> serverNodeList = registryMonitor.getServerNodeList(NodeType.WORKER, true);
+        Set<String> serverNodeList = registryClient.getServerNodeSet(NodeType.WORKER, true);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;

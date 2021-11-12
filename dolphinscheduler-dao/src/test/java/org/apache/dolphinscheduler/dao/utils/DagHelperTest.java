@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -251,6 +253,10 @@ public class DagHelperTest {
         skipNodeList.clear();
         completeTaskList.remove("3");
         taskInstance = new TaskInstance();
+
+        Map<String, Object> taskParamsMap = new HashMap<>();
+        taskParamsMap.put(Constants.SWITCH_RESULT, "");
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
         taskInstance.setState(ExecutionStatus.FAILURE);
         completeTaskList.put("3", taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
@@ -259,6 +265,17 @@ public class DagHelperTest {
         Assert.assertEquals(2, skipNodeList.size());
         Assert.assertTrue(skipNodeList.containsKey("5"));
         Assert.assertTrue(skipNodeList.containsKey("7"));
+
+        // dag: 1-2-3-5-7 4-3-6
+        // 3-if , complete:1/2/3/4
+        // 1.failure:3 expect post:6 skip:5/7
+        dag = generateDag2();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        taskInstance.setSwitchDependency(getSwitchNode());
+        completeTaskList.put("1", taskInstance);
+        postNodes = DagHelper.parsePostNodes("1", skipNodeList, dag, completeTaskList);
+        Assert.assertEquals(1, postNodes.size());
     }
 
     /**
@@ -274,28 +291,31 @@ public class DagHelperTest {
         TaskNode node1 = new TaskNode();
         node1.setId("1");
         node1.setName("1");
+        node1.setCode(1);
         node1.setType(TaskType.SHELL.getDesc());
         taskNodeList.add(node1);
 
         TaskNode node2 = new TaskNode();
         node2.setId("2");
         node2.setName("2");
+        node2.setCode(2);
         node2.setType(TaskType.SHELL.getDesc());
         List<String> dep2 = new ArrayList<>();
         dep2.add("1");
         node2.setPreTasks(JSONUtils.toJsonString(dep2));
         taskNodeList.add(node2);
 
-
         TaskNode node4 = new TaskNode();
         node4.setId("4");
         node4.setName("4");
+        node4.setCode(4);
         node4.setType(TaskType.SHELL.getDesc());
         taskNodeList.add(node4);
 
         TaskNode node3 = new TaskNode();
         node3.setId("3");
         node3.setName("3");
+        node3.setCode(3);
         node3.setType(TaskType.SHELL.getDesc());
         List<String> dep3 = new ArrayList<>();
         dep3.add("2");
@@ -306,6 +326,7 @@ public class DagHelperTest {
         TaskNode node5 = new TaskNode();
         node5.setId("5");
         node5.setName("5");
+        node5.setCode(5);
         node5.setType(TaskType.SHELL.getDesc());
         List<String> dep5 = new ArrayList<>();
         dep5.add("3");
@@ -316,6 +337,7 @@ public class DagHelperTest {
         TaskNode node6 = new TaskNode();
         node6.setId("6");
         node6.setName("6");
+        node6.setCode(6);
         node6.setType(TaskType.SHELL.getDesc());
         List<String> dep6 = new ArrayList<>();
         dep6.add("3");
@@ -325,6 +347,7 @@ public class DagHelperTest {
         TaskNode node7 = new TaskNode();
         node7.setId("7");
         node7.setName("7");
+        node7.setCode(7);
         node7.setType(TaskType.SHELL.getDesc());
         List<String> dep7 = new ArrayList<>();
         dep7.add("5");
@@ -334,6 +357,7 @@ public class DagHelperTest {
         TaskNode node8 = new TaskNode();
         node8.setId("8");
         node8.setName("8");
+        node8.setCode(8);
         node8.setType(TaskType.SHELL.getDesc());
         List<String> dep8 = new ArrayList<>();
         dep8.add("2");
@@ -349,6 +373,92 @@ public class DagHelperTest {
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(destTaskNodeList);
         return DagHelper.buildDagGraph(processDag);
+    }
+
+    /**
+     * 1->2->3->5->7
+     * 4->3->6
+     * 2->8->5->7
+     *
+     * @return dag
+     * @throws JsonProcessingException if error throws JsonProcessingException
+     */
+    private DAG<String, TaskNode, TaskNodeRelation> generateDag2() throws IOException {
+        List<TaskNode> taskNodeList = new ArrayList<>();
+
+        TaskNode node = new TaskNode();
+        node.setId("0");
+        node.setName("0");
+        node.setCode(0);
+        node.setType("SHELL");
+        taskNodeList.add(node);
+
+        TaskNode node1 = new TaskNode();
+        node1.setId("1");
+        node1.setName("1");
+        node1.setCode(1);
+        node1.setType("switch");
+        node1.setDependence(JSONUtils.toJsonString(getSwitchNode()));
+        taskNodeList.add(node1);
+
+        TaskNode node2 = new TaskNode();
+        node2.setId("2");
+        node2.setName("2");
+        node2.setCode(2);
+        node2.setType("SHELL");
+        List<String> dep2 = new ArrayList<>();
+        dep2.add("1");
+        node2.setPreTasks(JSONUtils.toJsonString(dep2));
+        taskNodeList.add(node2);
+
+        TaskNode node4 = new TaskNode();
+        node4.setId("4");
+        node4.setName("4");
+        node4.setCode(4);
+        node4.setType("SHELL");
+        List<String> dep4 = new ArrayList<>();
+        dep4.add("1");
+        node4.setPreTasks(JSONUtils.toJsonString(dep4));
+        taskNodeList.add(node4);
+
+        TaskNode node5 = new TaskNode();
+        node5.setId("4");
+        node5.setName("4");
+        node5.setCode(4);
+        node5.setType("SHELL");
+        List<String> dep5 = new ArrayList<>();
+        dep5.add("1");
+        node5.setPreTasks(JSONUtils.toJsonString(dep5));
+        taskNodeList.add(node5);
+
+        List<String> startNodes = new ArrayList<>();
+        List<String> recoveryNodes = new ArrayList<>();
+        List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
+                startNodes, recoveryNodes, TaskDependType.TASK_POST);
+        List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(destTaskNodeList);
+        return DagHelper.buildDagGraph(processDag);
+    }
+
+    private SwitchParameters getSwitchNode() {
+        SwitchParameters conditionsParameters = new SwitchParameters();
+        SwitchResultVo switchResultVo1 = new SwitchResultVo();
+        switchResultVo1.setCondition(" 2 == 1");
+        switchResultVo1.setNextNode("2");
+        SwitchResultVo switchResultVo2 = new SwitchResultVo();
+        switchResultVo2.setCondition(" 2 == 2");
+        switchResultVo2.setNextNode("4");
+        List<SwitchResultVo> list = new ArrayList<>();
+        list.add(switchResultVo1);
+        list.add(switchResultVo2);
+        conditionsParameters.setDependTaskList(list);
+        conditionsParameters.setNextNode("5");
+        conditionsParameters.setRelation("AND");
+
+        // in: AND(AND(1 is SUCCESS))
+        return conditionsParameters;
     }
 
     @Test

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ZOOKEEPER_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -61,7 +60,7 @@ public class MonitorController extends BaseController {
      * @return master list
      */
     @ApiOperation(value = "listMaster", notes = "MASTER_LIST_NOTES")
-    @GetMapping(value = "/master/list")
+    @GetMapping(value = "/masters")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -77,7 +76,7 @@ public class MonitorController extends BaseController {
      * @return worker information list
      */
     @ApiOperation(value = "listWorker", notes = "WORKER_LIST_NOTES")
-    @GetMapping(value = "/worker/list")
+    @GetMapping(value = "/workers")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -93,28 +92,12 @@ public class MonitorController extends BaseController {
      * @return data base state
      */
     @ApiOperation(value = "queryDatabaseState", notes = "QUERY_DATABASE_STATE_NOTES")
-    @GetMapping(value = "/database")
+    @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
-        return returnDataList(result);
-    }
-
-    /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    @ApiOperation(value = "queryZookeeperState", notes = "QUERY_ZOOKEEPER_STATE_NOTES")
-    @GetMapping(value = "/zookeeper/list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryZookeeperState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
         return returnDataList(result);
     }
 

@@ -25,8 +25,10 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -52,11 +54,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * worker server
  */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                "org.apache.dolphinscheduler.server.master.*",
-                "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*"
-        })
+    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.master.*",
+        "org.apache.dolphinscheduler.server.monitor.*",
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
+    })
 })
 @EnableTransactionManagement
 public class WorkerServer implements IStoppable {
@@ -70,12 +73,6 @@ public class WorkerServer implements IStoppable {
      * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
-
-    /**
-     * worker registry
-     */
-    @Autowired
-    private WorkerRegistryClient workerRegistryClient;
 
     /**
      * worker config
@@ -102,6 +99,15 @@ public class WorkerServer implements IStoppable {
     private WorkerManagerThread workerManagerThread;
 
     /**
+     * worker registry
+     */
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
+
+    /**
      * worker server startup, not use web service
      *
      * @param args arguments
@@ -123,10 +129,11 @@ public class WorkerServer implements IStoppable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService));
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService, taskPluginManager));
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, new HostUpdateProcessor());
         this.nettyRemotingServer.start();
 
         // worker registry
@@ -147,7 +154,7 @@ public class WorkerServer implements IStoppable {
         // retry report task status
         this.retryReportTaskStatusThread.start();
 
-        /**
+        /*
          * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -158,7 +165,6 @@ public class WorkerServer implements IStoppable {
     }
 
     public void close(String cause) {
-
         try {
             // execute only once
             if (Stopper.isStopped()) {
@@ -181,6 +187,7 @@ public class WorkerServer implements IStoppable {
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
+            this.springApplicationContext.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
         }

@@ -130,4 +130,5 @@ public class WorkerConfig {
     public void setAlertListenHost(String alertListenHost) {
         this.alertListenHost = alertListenHost;
     }
+
 }

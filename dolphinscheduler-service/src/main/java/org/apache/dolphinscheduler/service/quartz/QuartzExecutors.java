@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.quartz;
 
-import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
 import static org.apache.dolphinscheduler.common.Constants.ORG_POSTGRESQL_DRIVER;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK;
@@ -63,13 +62,13 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -150,7 +149,6 @@ public class QuartzExecutors {
      */
     private void init() {
         try {
-            PropertyUtils.loadPropertyFile(DATASOURCE_PROPERTIES);
             StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
             Properties properties = new Properties();
 

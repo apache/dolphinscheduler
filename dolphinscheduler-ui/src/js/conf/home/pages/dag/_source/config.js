@@ -133,6 +133,10 @@ const runningType = [
   {
     desc: `${i18n.$t('Recovery waiting thread')}`,
     code: 'RECOVER_WAITING_THREAD'
+  },
+  {
+    desc: `${i18n.$t('Recover serial wait')}`,
+    code: 'RECOVER_SERIAL_WAIT'
   }
 ]
 
@@ -243,6 +247,13 @@ const tasksState = {
     color: '#5102ce',
     icoUnicode: 'el-icon-success',
     isSpin: false
+  },
+  SERIAL_WAIT: {
+    id: 14,
+    desc: `${i18n.$t('Serial wait')}`,
+    color: '#5102ce',
+    icoUnicode: 'el-icon-loading',
+    isSpin: false
   }
 }
 
@@ -256,10 +267,6 @@ const tasksType = {
   SHELL: {
     desc: 'SHELL',
     color: '#646464'
-  },
-  WATERDROP: {
-    desc: 'WATERDROP',
-    color: '#646465'
   },
   SUB_PROCESS: {
     desc: 'SUB_PROCESS',
@@ -301,6 +308,10 @@ const tasksType = {
     desc: 'DataX',
     color: '#1fc747'
   },
+  PIGEON: {
+    desc: 'PIGEON',
+    color: '#1fc747'
+  },
   SQOOP: {
     desc: 'SQOOP',
     color: '#E46F13'
@@ -308,6 +319,14 @@ const tasksType = {
   CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
+  },
+  SWITCH: {
+    desc: 'SWITCH',
+    color: '#E46F13'
+  },
+  WATERDROP: {
+    desc: 'WATERDROP',
+    color: '#646465'
   }
 }
 

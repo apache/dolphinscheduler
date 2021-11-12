@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,25 +122,5 @@ public class LoggerUtils {
             logger.error("read file error", e);
         }
         return "";
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , String error) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(e.getMessage(), e));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , String error, Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error, e));
-    }
-
-    public static void logInfo(Optional<Logger> optionalLogger
-            , String info) {
-        optionalLogger.ifPresent((Logger logger) -> logger.info(info));
     }
 }

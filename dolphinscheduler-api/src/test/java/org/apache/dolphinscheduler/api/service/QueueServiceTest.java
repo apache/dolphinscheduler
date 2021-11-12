@@ -23,11 +23,12 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,7 @@ public class QueueServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(queueList));
 
     }
+
     @Test
     public void testQueryListPage() {
 
@@ -92,11 +94,12 @@ public class QueueServiceTest {
         page.setTotal(1L);
         page.setRecords(getQueueList());
         Mockito.when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.eq(queueName))).thenReturn(page);
-        Map<String, Object> result = queueService.queryList(getLoginUser(),queueName,1,10);
+        Result result = queueService.queryList(getLoginUser(),queueName,1,10);
         logger.info(result.toString());
-        PageInfo<Queue>  pageInfo = (PageInfo<Queue>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        PageInfo<Queue>  pageInfo = (PageInfo<Queue>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
+
     @Test
     public void testCreateQueue() {
 
@@ -154,27 +157,27 @@ public class QueueServiceTest {
         //queue null
         Result result = queueService.verifyQueue(null,queueName);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.REQUEST_PARAMS_NOT_VALID_ERROR));
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         //queueName null
         result = queueService.verifyQueue(queueName,null);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.REQUEST_PARAMS_NOT_VALID_ERROR));
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         //exist queueName
         result = queueService.verifyQueue(queueName,queueName);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.QUEUE_NAME_EXIST));
+        Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_NAME_EXIST.getCode());
 
         //exist queue
         result = queueService.verifyQueue(queueName,"test");
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.QUEUE_VALUE_EXIST));
+        Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_VALUE_EXIST.getCode());
 
         // success
         result = queueService.verifyQueue("test","test");
         logger.info(result.toString());
-        Assert.assertTrue(result.isSuccess());
+        Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
 
     }
 
@@ -195,7 +198,6 @@ public class QueueServiceTest {
         list.add(getLoginUser());
         return list;
     }
-
 
     /**
      * get queue

@@ -24,19 +24,22 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -159,7 +162,6 @@ public class JSONUtils {
         }
 
         try {
-
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
@@ -230,24 +232,14 @@ public class JSONUtils {
     public static String getNodeString(String json, String nodeName) {
         try {
             JsonNode rootNode = objectMapper.readTree(json);
-            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+            JsonNode jsonNode = rootNode.findValue(nodeName);
+            if (Objects.isNull(jsonNode)) {
+                return "";
+            }
+            return jsonNode.isTextual() ? jsonNode.asText() : jsonNode.toString();
         } catch (JsonProcessingException e) {
             return "";
         }
-    }
-    
-    /**
-     * json to map
-     *
-     * @param json json
-     * @param classK classK
-     * @param classV classV
-     * @param <K> K
-     * @param <V> V
-     * @return to map
-     */
-    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
     }
 
     /**

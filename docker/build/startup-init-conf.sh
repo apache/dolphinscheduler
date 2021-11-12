@@ -37,7 +37,6 @@ export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 #============================================================================
 # Registry
 #============================================================================
-export REGISTRY_PLUGIN_DIR=${REGISTRY_PLUGIN_DIR:-"lib/plugin/registry"}
 export REGISTRY_PLUGIN_NAME=${REGISTRY_PLUGIN_NAME:-"zookeeper"}
 export REGISTRY_SERVERS=${REGISTRY_SERVERS:-"127.0.0.1:2181"}
 
@@ -108,7 +107,6 @@ export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"localhost"}
 # Alert Server
 #============================================================================
 export ALERT_SERVER_OPTS=${ALERT_SERVER_OPTS:-"-Xms512m -Xmx512m -Xmn256m"}
-export ALERT_PLUGIN_DIR=${ALERT_PLUGIN_DIR:-"lib/plugin/alert"}
 
 #============================================================================
 # Api Server

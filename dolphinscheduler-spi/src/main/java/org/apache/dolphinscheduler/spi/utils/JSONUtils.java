@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +34,17 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
 /**
@@ -52,9 +61,23 @@ public class JSONUtils {
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .setTimeZone(TimeZone.getDefault());
 
     private JSONUtils() {
+        throw new UnsupportedOperationException("Construct JSONUtils");
+    }
+
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
+    }
+
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+    public static JsonNode toJsonNode(Object obj) {
+        return objectMapper.valueToTree(obj);
     }
 
     /**
@@ -103,6 +126,22 @@ public class JSONUtils {
     }
 
     /**
+     *  deserialize
+     *
+     * @param src byte array
+     * @param clazz class
+     * @param <T> deserialize type
+     * @return deserialize type
+     */
+    public static <T> T parseObject(byte[] src, Class<T> clazz) {
+        if (src == null) {
+            return null;
+        }
+        String json = new String(src, UTF_8);
+        return parseObject(json, clazz);
+    }
+
+    /**
      * json to list
      *
      * @param json json string
@@ -128,11 +167,26 @@ public class JSONUtils {
 
     /**
      * json to map
+     * {@link #toMap(String, Class, Class)}
      *
      * @param json json
      * @return json to map
      */
-    public static <K, V> Map<K, V> toMap(String json) {
+    public static Map<String, String> toMap(String json) {
+        return parseObject(json, new TypeReference<Map<String, String>>() {});
+    }
+
+    /**
+     * json to map
+     *
+     * @param json json
+     * @param classK classK
+     * @param classV classV
+     * @param <K> K
+     * @param <V> V
+     * @return to map
+     */
+    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
         return parseObject(json, new TypeReference<Map<K, V>>() {});
     }
 
@@ -172,9 +226,34 @@ public class JSONUtils {
         }
     }
 
+    /**
+     * serialize to json byte
+     *
+     * @param obj object
+     * @param <T> object type
+     * @return byte array
+     */
+    public static <T> byte[] toJsonByteArray(T obj)  {
+        if (obj == null) {
+            return null;
+        }
+        String json = "";
+        try {
+            json = toJsonString(obj);
+        } catch (Exception e) {
+            logger.error("json serialize exception.", e);
+        }
+
+        return json.getBytes(UTF_8);
+    }
+
     public static ObjectNode parseObject(String text) {
         try {
-            return (ObjectNode) objectMapper.readTree(text);
+            if (text.isEmpty()) {
+                return parseObject(text, ObjectNode.class);
+            } else {
+                return (ObjectNode) objectMapper.readTree(text);
+            }
         } catch (Exception e) {
             throw new RuntimeException("String json deserialization exception.", e);
         }
@@ -186,5 +265,22 @@ public class JSONUtils {
         } catch (Exception e) {
             throw new RuntimeException("Json deserialization exception.", e);
         }
+    }
+
+    /**
+     * json data deserializer
+     */
+    public static class JsonDataDeserializer extends JsonDeserializer<String> {
+
+        @Override
+        public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            JsonNode node = p.getCodec().readTree(p);
+            if (node instanceof TextNode) {
+                return node.asText();
+            } else {
+                return node.toString();
+            }
+        }
+
     }
 }

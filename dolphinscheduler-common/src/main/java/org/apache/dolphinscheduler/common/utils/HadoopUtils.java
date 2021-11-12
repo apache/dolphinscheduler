@@ -22,10 +22,11 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -179,6 +180,13 @@ public class HadoopUtils implements Closeable {
      */
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * @return DefaultFS
+     */
+    public String getDefaultFS() {
+        return getConfiguration().get(Constants.FS_DEFAULTFS);
     }
 
     /**

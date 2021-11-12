@@ -15,6 +15,12 @@
   ~ limitations under the License.
   -->
 <runtime>
+
+    <artifactSet to="/lib">
+        <exclusion>org.slf4j:slf4j-log4j12</exclusion>
+        <exclusion>org.slf4j:slf4j-api</exclusion>
+        <exclusion>ch.qos.logback:logback-classic</exclusion>
+    </artifactSet>
     <!-- Target -->
     <archive name="${project.artifactId}-${project.version}.tar.gz" hardLinkIncludes="**/*.jar"/>
     <!-- Notices -->
@@ -27,51 +33,4 @@
         </directory>
 
     </fileSet>
-
-    <!-- Server -->
-    <artifactSet to="bin">
-        <artifact id="io.airlift:launcher:tar.gz:bin:${dep.packaging.version}">
-            <unpack/>
-        </artifact>
-        <artifact id="io.airlift:launcher:tar.gz:properties:${dep.packaging.version}">
-            <unpack filter="true"/>
-        </artifact>
-    </artifactSet>
-
-    <!-- Plugins -->
-    <artifactSet to="lib/plugin/alert/email">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-email:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/script">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-script:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/wechat">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-wechat:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/dingtalk">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-dingtalk:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/http">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-http:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/alert/feishu">
-        <artifact id="${project.groupId}:dolphinscheduler-alert-feishu:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
-    <artifactSet to="lib/plugin/registry/zookeeper">
-        <artifact id="${project.groupId}:dolphinscheduler-registry-zookeeper:zip:${project.version}">
-            <unpack/>
-        </artifact>
-    </artifactSet>
 </runtime>

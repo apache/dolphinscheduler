@@ -44,7 +44,7 @@ public interface QueueService {
      * @param pageSize page size
      * @return queue list
      */
-    Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create queue
@@ -75,5 +75,13 @@ public interface QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     Result<Object> verifyQueue(String queue, String queueName);
+
+    /**
+     * query queue by queueName
+     *
+     * @param queueName queue name
+     * @return queue object for provide queue name
+     */
+    Map<String, Object> queryQueueName(String queueName);
 
 }

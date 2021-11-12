@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -52,25 +53,30 @@ public class TaskResponseServiceTest {
 
     private TaskInstance taskInstance;
 
+    @Mock
+    private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
+
     @Before
     public void before() {
         taskRspService.start();
 
         ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
-            new Date(),
-            "127.*.*.*",
-            "path",
-            "logPath",
-            22,
-            channel);
+                new Date(),
+                "127.*.*.*",
+                "path",
+                "logPath",
+                22,
+                channel,
+                1);
 
         resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
-            new Date(),
-            1,
-            "ids",
-            22,
-            "varPol",
-            channel);
+                new Date(),
+                1,
+                "ids",
+                22,
+                "varPol",
+                channel,
+                1);
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);
@@ -87,7 +93,8 @@ public class TaskResponseServiceTest {
 
     @After
     public void after() {
-        taskRspService.stop();
+        if (taskRspService != null) {
+            taskRspService.stop();
+        }
     }
-
 }

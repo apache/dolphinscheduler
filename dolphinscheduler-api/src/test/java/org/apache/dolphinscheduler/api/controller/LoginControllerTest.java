@@ -37,15 +37,15 @@ import org.springframework.util.MultiValueMap;
 /**
  * login controller test
  */
-public class LoginControllerTest extends AbstractControllerTest{
+public class LoginControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
     @Test
     public void testLogin() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userName","cxc");
-        paramsMap.add("userPassword","123456");
+        paramsMap.add("userName", "admin");
+        paramsMap.add("userPassword", "dolphinscheduler123");
 
         MvcResult mvcResult = mockMvc.perform(post("/login")
                 .params(paramsMap))
@@ -54,7 +54,7 @@ public class LoginControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -70,7 +70,7 @@ public class LoginControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,10 +33,15 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * date utils
- */
-public class DateUtils {
+public final class DateUtils {
+
+    static final long C0 = 1L;
+    static final long C1 = C0 * 1000L;
+    static final long C2 = C1 * 1000L;
+    static final long C3 = C2 * 1000L;
+    static final long C4 = C3 * 60L;
+    static final long C5 = C4 * 60L;
+    static final long C6 = C5 * 24L;
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
@@ -167,28 +174,6 @@ public class DateUtils {
     }
 
     /**
-     * get hours between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ hours
-     */
-    public static long diffHours(Date d1, Date d2) {
-        return (long) Math.ceil(diffMin(d1, d2) / 60.0);
-    }
-
-    /**
-     * get minutes between two dates
-     *
-     * @param d1 date1
-     * @param d2 date2
-     * @return differ minutes
-     */
-    public static long diffMin(Date d1, Date d2) {
-        return (long) Math.ceil(differSec(d1, d2) / 60.0);
-    }
-
-    /**
      * get the date of the specified date in the days before and after
      *
      * @param date date
@@ -253,7 +238,6 @@ public class DateUtils {
     }
 
     /**
-     *
      * format time to duration
      *
      * @param d1 d1
@@ -522,44 +506,23 @@ public class DateUtils {
         return TimeZone.getTimeZone(timezoneId);
     }
 
-    static final long C0 = 1L;
-    static final long C1 = C0 * 1000L;
-    static final long C2 = C1 * 1000L;
-    static final long C3 = C2 * 1000L;
-    static final long C4 = C3 * 60L;
-    static final long C5 = C4 * 60L;
-    static final long C6 = C5 * 24L;
-
     /**
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
-
-        public static long toSeconds(long d) {
-            return d / (C3 / C2);
-        }
-
-        public static long toMinutes(long d) {
-            return d / (C4 / C2);
-        }
-
-        public static long toHours(long d)   {
-            return d / (C5 / C2);
-        }
-
-        public static long toDays(long d)    {
+        public static long toDays(long d) {
             return d / (C6 / C2);
         }
 
-        public static long toDurationSeconds(long d)   {
+        public static long toDurationSeconds(long d) {
             return (d % (C4 / C2)) / (C3 / C2);
         }
 
-        public static long toDurationMinutes(long d)   {
+        public static long toDurationMinutes(long d) {
             return (d % (C5 / C2)) / (C4 / C2);
         }
 
-        public static long toDurationHours(long d)   {
+        public static long toDurationHours(long d) {
             return (d % (C6 / C2)) / (C5 / C2);
         }
 
