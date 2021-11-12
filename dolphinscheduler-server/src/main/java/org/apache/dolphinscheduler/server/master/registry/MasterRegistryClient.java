@@ -309,8 +309,9 @@ public class MasterRegistryClient {
 
                 taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
                 processService.saveTaskInstance(taskInstance);
+
                 if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
-                    return;
+                    continue;
                 }
                 WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecCacheManager.getByProcessInstanceId(processInstance.getId());
                 StateEvent stateEvent = new StateEvent();
