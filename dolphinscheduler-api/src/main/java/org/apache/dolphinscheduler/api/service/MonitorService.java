@@ -35,7 +35,7 @@ public interface MonitorService {
      * @return data base state
      */
     Map<String,Object> queryDatabaseState(User loginUser);
-    
+
     /**
      * query master list
      *
@@ -43,15 +43,7 @@ public interface MonitorService {
      * @return master information list
      */
     Map<String,Object> queryMaster(User loginUser);
-    
-    /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    Map<String,Object> queryZookeeperState(User loginUser);
-    
+
     /**
      * query worker list
      *
@@ -59,6 +51,6 @@ public interface MonitorService {
      * @return worker information list
      */
     Map<String,Object> queryWorker(User loginUser);
-    
+
     List<Server> getServerListFromRegistry(boolean isMaster);
 }
