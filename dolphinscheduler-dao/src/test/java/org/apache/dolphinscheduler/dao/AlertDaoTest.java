@@ -18,20 +18,32 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+@ActiveProfiles(ProfileType.H2)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@SpringBootApplication
 @Transactional
 public class AlertDaoTest {
+    @Autowired
+    private AlertDao alertDao;
 
     @Test
     public void testAlertDao() {
-        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", "
@@ -40,23 +52,22 @@ public class AlertDaoTest {
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alertDao.addAlert(alert);
 
-        List<Alert> alerts = alertDao.listWaitExecutionAlert();
+        List<Alert> alerts = alertDao.listPendingAlerts();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
     }
 
     @Test
     public void testSendServerStopedAlert() {
-        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         int alertGroupId = 1;
         String host = "127.0.0.998165432";
         String serverType = "Master";
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStopedAlert(alertGroupId, host, serverType);
-        long count = alertDao.listWaitExecutionAlert()
-                .stream()
-                .filter(alert -> alert.getContent().contains(host))
-                .count();
+        long count = alertDao.listPendingAlerts()
+                             .stream()
+                             .filter(alert -> alert.getContent().contains(host))
+                             .count();
         Assert.assertEquals(1L, count);
     }
 }

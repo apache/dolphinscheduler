@@ -16,11 +16,14 @@
 # under the License.
 
 """
-This example show you how to create workflows in batch mode. After this example run, we will create 10
-workflows named `workflow:<workflow_num>`, and with 3 tasks named `task:<task_num>-workflow:<workflow_num>`
-in each workflow. Each workflow is linear shape as below, since we set `IS_CHAIN=True`
+This example show you how to create workflows in batch mode.
+
+After this example run, we will create 10 workflows named `workflow:<workflow_num>`, and with 3 tasks
+named `task:<task_num>-workflow:<workflow_num>` in each workflow. Task shape as below
 
 task:1-workflow:1 -> task:2-workflow:1 -> task:3-workflow:1
+
+Each workflow is linear since we set `IS_CHAIN=True`, you could change task to parallel by set it to `False`.
 """
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
@@ -40,12 +43,12 @@ for wf in range(0, NUM_WORKFLOWS):
 
     with ProcessDefinition(name=workflow_name, tenant=TENANT) as pd:
         for t in range(0, NUM_TASKS):
-            task_name = f"task:{t}-workflow:{wf}"
+            task_name = f"task:{t}-{workflow_name}"
             command = f"echo This is task {task_name}"
             task = Shell(name=task_name, command=command)
 
             if IS_CHAIN and t > 0:
-                pre_task_name = f"task:{t-1}-wf:{wf}"
+                pre_task_name = f"task:{t-1}-{workflow_name}"
                 pd.get_one_task_by_name(pre_task_name) >> task
 
         # We just submit workflow and task definition without set schedule time or run it manually

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -56,7 +57,8 @@ public interface ProcessDefinitionService {
                                                 int timeout,
                                                 String tenantCode,
                                                 String taskRelationJson,
-                                                String taskDefinitionJson);
+                                                String taskDefinitionJson,
+                                                ProcessExecutionTypeEnum executionType);
 
     /**
      * query process definition list
@@ -67,6 +69,16 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> queryProcessDefinitionList(User loginUser,
                                                    long projectCode);
+
+    /**
+     * query process definition simple list
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return definition simple list
+     */
+    Map<String, Object> queryProcessDefinitionSimpleList(User loginUser,
+                                                         long projectCode);
 
     /**
      * query process definition list paging
@@ -164,7 +176,8 @@ public interface ProcessDefinitionService {
                                                 int timeout,
                                                 String tenantCode,
                                                 String taskRelationJson,
-                                                String taskDefinitionJson);
+                                                String taskDefinitionJson,
+                                                ProcessExecutionTypeEnum executionType);
 
     /**
      * verify process definition name unique

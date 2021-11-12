@@ -54,10 +54,9 @@ const router = new Router({
       },
       beforeEnter: (to, from, next) => {
         const blacklist = ['projects', 'projects-list']
-        if (!blacklist.includes(to.name) && to.params.projectId && to.params.projectId !== localStore.getItem('projectId')) {
-          store.dispatch('projects/getProjectById', {
-            projectId: to.params.projectId
-          }).then(res => {
+        const { projectCode } = to.params || {}
+        if (!blacklist.includes(to.name) && projectCode && projectCode !== localStore.getItem('projectCode')) {
+          store.dispatch('projects/getProjectByCode', projectCode).then(res => {
             store.commit('dag/setProjectId', res.id)
             store.commit('dag/setProjectCode', res.code)
             store.commit('dag/setProjectName', res.name)
@@ -545,15 +544,6 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
             title: 'Rpcserver',
-            refreshInSwitchedTab: config.refreshInSwitchedTab
-          }
-        },
-        {
-          path: '/monitor/servers/zookeeper',
-          name: 'servers-zookeeper',
-          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
-          meta: {
-            title: 'Zookeeper',
             refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },
