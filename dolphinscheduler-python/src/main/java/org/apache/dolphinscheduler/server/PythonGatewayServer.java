@@ -68,7 +68,8 @@ import py4j.GatewayServer;
         "org.apache.dolphinscheduler.server.master.*",
         "org.apache.dolphinscheduler.server.worker.*",
         "org.apache.dolphinscheduler.server.monitor.*",
-        "org.apache.dolphinscheduler.server.log.*"
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
     })
 })
 public class PythonGatewayServer extends SpringBootServletInitializer {
