@@ -510,19 +510,23 @@
         // Set default port for each type datasource
         this._setDefaultValues(value)
 
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('datasource/getKerberosStartupState').then(res => {
-            this.isShowPrincipal = res
-            if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
-              this.showPrincipal = false
-            } else {
-              this.showPrincipal = true
-            }
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-            reject(e)
+        if (value === 'HIVE' || value === 'SPARK') {
+          return new Promise((resolve, reject) => {
+            this.store.dispatch('datasource/getKerberosStartupState').then(res => {
+              this.isShowPrincipal = res
+              if (this.isShowPrincipal === true) {
+                this.showPrincipal = false
+              } else {
+                this.showPrincipal = true
+              }
+            }).catch(e => {
+              this.$message.error(e.msg || '')
+              reject(e)
+            })
           })
-        })
+        } else {
+          this.showPrincipal = true
+        }
       },
       /**
        * Cache the previous input port for each type datasource
