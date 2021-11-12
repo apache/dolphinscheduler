@@ -43,7 +43,7 @@ public class HikariConnectionProvider implements ConnectionProvider {
     }
 
     @Override
-    public void shutdown() throws SQLException {
+    public void shutdown() {
         dataSource.close();
     }
 
