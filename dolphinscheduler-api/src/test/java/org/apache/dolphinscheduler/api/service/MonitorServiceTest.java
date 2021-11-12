@@ -81,13 +81,6 @@ public class MonitorServiceTest {
         /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
     }
 
-    @Test
-    public  void testGetServerListFromZK() {
-        //TODO need zk
-        /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
-        /*logger.info(serverList.toString());*/
-    }
-
     private List<MonitorRecord> getList() {
         List<MonitorRecord> monitorRecordList = new ArrayList<>();
         monitorRecordList.add(getEntity());
