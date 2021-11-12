@@ -33,7 +33,7 @@ public class HikariConnectionProvider implements ConnectionProvider {
 
     private final HikariDataSource dataSource;
 
-    public HikariConnectionProvider(){
+    public HikariConnectionProvider() {
         this.dataSource = SpringApplicationContext.getBean(HikariDataSource.class);
     }
 
