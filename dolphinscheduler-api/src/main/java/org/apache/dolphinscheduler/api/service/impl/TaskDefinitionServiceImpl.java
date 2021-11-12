@@ -119,12 +119,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
             }
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
-            if (taskDefinition != null) {
-                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
-                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
-                return result;
-            }
         }
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
