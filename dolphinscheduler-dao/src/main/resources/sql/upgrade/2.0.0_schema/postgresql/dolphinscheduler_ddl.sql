@@ -210,7 +210,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_task_definition" (
-	  id int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  code bigint NOT NULL,
 	  name varchar(255) DEFAULT NULL ,
 	  version int NOT NULL ,
@@ -264,7 +264,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_process_task_relation" (
-	  id int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  name varchar(255) DEFAULT NULL ,
 	  project_code bigint DEFAULT NULL ,
 	  process_definition_code bigint DEFAULT NULL ,
@@ -298,6 +298,17 @@ BEGIN
 	  update_time timestamp DEFAULT NULL ,
 	  PRIMARY KEY (id)
 	)';
+
+	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_worker_group" (
+      id serial NOT NULL,
+      name varchar(255) NOT NULL,
+      addr_list text DEFAULT NULL,
+      create_time timestamp DEFAULT NULL,
+      update_time timestamp DEFAULT NULL,
+      PRIMARY KEY (id),
+      UNIQUE KEY name_unique (name)
+	)';
+
 	return 'Success!';
 	exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
