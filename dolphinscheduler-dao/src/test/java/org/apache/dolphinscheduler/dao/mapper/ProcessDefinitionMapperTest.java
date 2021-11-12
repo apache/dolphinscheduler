@@ -329,7 +329,6 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void listResourcesTest() {
         ProcessDefinition processDefinition = insertOne("def 1");
-        processDefinition.setResourceIds("3,5");
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         List<Map<String, Object>> maps = processDefinitionMapper.listResources();
         Assert.assertNotNull(maps);
@@ -338,7 +337,6 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void listResourcesByUserTest() {
         ProcessDefinition processDefinition = insertOne("def 1");
-        processDefinition.setResourceIds("3,5");
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         List<Map<String, Object>> maps = processDefinitionMapper.listResourcesByUser(processDefinition.getUserId());
         Assert.assertNotNull(maps);
