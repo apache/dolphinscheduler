@@ -50,11 +50,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *  master server
  */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                "org.apache.dolphinscheduler.server.worker.*",
-                "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*"
-        })
+    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.worker.*",
+        "org.apache.dolphinscheduler.server.monitor.*",
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
+    })
 })
 @EnableTransactionManagement
 public class MasterServer implements IStoppable {
