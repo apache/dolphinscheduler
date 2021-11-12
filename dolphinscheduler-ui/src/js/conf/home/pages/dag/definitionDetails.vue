@@ -46,7 +46,7 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),
-      ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getProcessDetails', 'getResourcesListJar']),
+      ...mapActions('dag', ['getProjectList', 'getResourcesList', 'getProcessDetails', 'getResourcesListJar']),
       ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
       /**
        * init
@@ -59,8 +59,6 @@
         Promise.all([
           // Node details
           this.getProcessDetails(this.$route.params.code),
-          // get process definition
-          this.getProcessList(),
           // get project
           this.getProjectList(),
           // get resource
