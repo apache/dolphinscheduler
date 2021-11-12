@@ -46,7 +46,7 @@
                 <include>**/*.json</include>
             </includes>
             <excludes>
-                <exclude>application.properties</exclude>
+                <exclude>application-api.properties</exclude>
             </excludes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
