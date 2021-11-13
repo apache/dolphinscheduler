@@ -195,6 +195,15 @@ def test_process_definition_simple():
                 }
 
 
+def test_schedule_json_start_and_end_time():
+    """Test function schedule_json with None as schedule."""
+    with ProcessDefinition(
+        TEST_PROCESS_DEFINITION_NAME,
+        schedule=None,
+    ) as pd:
+        assert pd.schedule_json is None
+
+
 # We freeze time here, because we test start_time with None, and if will get datetime.datetime.now. If we do
 # not freeze time, it will cause flaky test here.
 @freeze_time("2021-01-01")
