@@ -81,7 +81,6 @@ public class WorkerRegistryClientTest {
     @Test
     public void testRegistry() {
         //workerRegistryClient.initWorkRegistry();
-        // System.out.println(this.workerGroups.iterator());
         //Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
         //workerRegistryClient.registry();
        // workerRegistryClient.handleDeadServer();
