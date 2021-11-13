@@ -21,6 +21,9 @@ import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
 import java.util.List;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(TaskChannelFactory.class)
 public class PythonTaskChannelFactory implements TaskChannelFactory {
     @Override
     public TaskChannel create() {

@@ -26,9 +26,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-sql</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-all</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
@@ -39,6 +44,11 @@
             <artifactId>dolphinscheduler-task-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -47,8 +57,4 @@
         </dependency>
 
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-task-sql-${project.version}</finalName>
-    </build>
 </project>

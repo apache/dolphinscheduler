@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -113,6 +112,7 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
@@ -2418,7 +2418,8 @@ public class ProcessService {
         if (!processTaskRelationList.isEmpty()) {
             Set<Integer> processTaskRelationSet = processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet = taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
-            if (CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet)) {
+            boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet, taskRelationSet);
+            if (result) {
                 return Constants.EXIT_CODE_SUCCESS;
             }
             processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
