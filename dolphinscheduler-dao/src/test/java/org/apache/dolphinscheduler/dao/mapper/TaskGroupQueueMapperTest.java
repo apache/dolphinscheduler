@@ -49,11 +49,7 @@ public class TaskGroupQueueMapperTest {
 
     Integer userId = 1;
 
-    /**
-     * test insert
-     */
-    @Test
-    public void testInsert() throws Exception {
+    public TaskGroupQueue insertOne() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task1");
         taskGroupQueue.setGroupId(10);
@@ -63,9 +59,8 @@ public class TaskGroupQueueMapperTest {
         taskGroupQueue.setUpdateTime(date);
         taskGroupQueue.setUpdateTime(date);
 
-        int i = taskGroupQueueMapper.insert(taskGroupQueue);
-        Assert.assertEquals(i, 1);
-
+        taskGroupQueueMapper.insert(taskGroupQueue);
+        return taskGroupQueue;
     }
 
     /**
@@ -73,8 +68,7 @@ public class TaskGroupQueueMapperTest {
      */
     @Test
     public void testUpdate() {
-        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
-        taskGroupQueue.setId(1);
+        TaskGroupQueue taskGroupQueue = insertOne();
         taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
         taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
         int i = taskGroupQueueMapper.updateById(taskGroupQueue);
@@ -86,7 +80,8 @@ public class TaskGroupQueueMapperTest {
      */
     @Test
     public void testDelete() {
-        int i = taskGroupQueueMapper.deleteByTaskId(1);
+        TaskGroupQueue taskGroupQueue = insertOne();
+        int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getId());
         Assert.assertEquals(i, 1);
     }
 
@@ -95,11 +90,12 @@ public class TaskGroupQueueMapperTest {
      */
     @Test
     public void testSelect() {
-        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(1);
-        Assert.assertEquals(taskGroupQueue.getTaskName(), "task1");
+        TaskGroupQueue taskGroupQueue = insertOne();
+        TaskGroupQueue result = taskGroupQueueMapper.selectById(taskGroupQueue.getId());
+        Assert.assertEquals(result.getTaskName(), "task1");
 
-        List<TaskGroupQueue> taskGroupQueues = taskGroupQueueMapper.queryByStatus(1);
-        Assert.assertEquals(taskGroupQueues.size(), 3);
+        List<TaskGroupQueue> taskGroupQueues = taskGroupQueueMapper.queryByStatus(taskGroupQueue.getStatus().getCode());
+        Assert.assertEquals(taskGroupQueues.size(), 1);
 
     }
 
@@ -108,35 +104,26 @@ public class TaskGroupQueueMapperTest {
      */
     @Test
     public void testQueryTaskGroupPaging() {
+        TaskGroupQueue taskGroupQueue = insertOne();
         Page<TaskGroupQueue> page = new Page(1, 3);
         IPage<TaskGroupQueue> taskGroupIPage = taskGroupQueueMapper.queryTaskGroupQueuePaging(
                 page,
-                1);
+                taskGroupQueue.getGroupId());
 
-        for (TaskGroupQueue record : taskGroupIPage.getRecords()) {
-            System.out.println(record);
-        }
-        Page<TaskGroupQueue> page1 = new Page(1, 3);
-        IPage<TaskGroupQueue> taskGroupIPage1 = taskGroupQueueMapper.queryTaskGroupQueuePaging(
-                page1,
-                2);
-        System.out.println("-----------------------");
-        for (TaskGroupQueue record : taskGroupIPage1.getRecords()) {
-            System.out.println(record);
-        }
-        Assert.assertEquals(taskGroupIPage.getTotal(), 3);
-        Assert.assertEquals(taskGroupIPage1.getTotal(), 3);
+        Assert.assertEquals(taskGroupIPage.getTotal(), 1);
     }
 
     @Test
     public void testUpdateStatusByTaskId() {
-        int i = taskGroupQueueMapper.updateStatusByTaskId(1, 7);
+        TaskGroupQueue taskGroupQueue = insertOne();
+        int i = taskGroupQueueMapper.updateStatusByTaskId(taskGroupQueue.getTaskId(), 7);
         Assert.assertEquals(i, 1);
     }
 
     @Test
     public void testDeleteByTaskId() {
-        int i = taskGroupQueueMapper.deleteByTaskId(1);
+        TaskGroupQueue taskGroupQueue = insertOne();
+        int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getTaskId());
         Assert.assertEquals(i, 1);
     }
 }

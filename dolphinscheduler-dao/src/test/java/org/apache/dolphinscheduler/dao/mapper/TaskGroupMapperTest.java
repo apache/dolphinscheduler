@@ -52,19 +52,19 @@ public class TaskGroupMapperTest {
     /**
      * test insert
      */
-    @Test
-    public void testInsert() throws Exception {
+    public TaskGroup insertOne() {
         TaskGroup taskGroup = new TaskGroup();
         taskGroup.setName("task group");
+        taskGroup.setUserId(1);
+        taskGroup.setStatus(1);
         taskGroup.setGroupSize(10);
         taskGroup.setDescription("this is a task group");
         Date date = new Date(System.currentTimeMillis());
         taskGroup.setUpdateTime(date);
         taskGroup.setUpdateTime(date);
 
-        int i = taskGroupMapper.insert(taskGroup);
-        Assert.assertEquals(i, 1);
-
+        taskGroupMapper.insert(taskGroup);
+        return taskGroup;
     }
 
     /**
@@ -72,8 +72,7 @@ public class TaskGroupMapperTest {
      */
     @Test
     public void testUpdate() {
-        TaskGroup taskGroup = new TaskGroup();
-        taskGroup.setId(1);
+        TaskGroup taskGroup = insertOne();
         taskGroup.setGroupSize(100);
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int i = taskGroupMapper.updateById(taskGroup);
@@ -81,25 +80,13 @@ public class TaskGroupMapperTest {
     }
 
     /**
-     * test select
-     */
-    @Test
-    public void testSelect() {
-        TaskGroup taskGroup = taskGroupMapper.selectById(7);
-        Assert.assertEquals(taskGroup.getDescription(), "for test");
-    }
-
-    /**
      * test CheckName
      */
     @Test
     public void testCheckName() {
-
-        TaskGroup taskGroup = taskGroupMapper.queryByName(1, "task5");
-        Assert.assertNotNull(taskGroup);
-
-        taskGroup = taskGroupMapper.queryByName(0, "task5");
-        Assert.assertNull(taskGroup);
+        TaskGroup taskGroup = insertOne();
+        TaskGroup result = taskGroupMapper.queryByName(taskGroup.getUserId(), taskGroup.getName());
+        Assert.assertNotNull(result);
     }
 
     /**
@@ -107,24 +94,13 @@ public class TaskGroupMapperTest {
      */
     @Test
     public void testQueryTaskGroupPaging() {
+        TaskGroup taskGroup = insertOne();
         Page<TaskGroup> page = new Page(1, 3);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                1,
-                "1", 1);
+                taskGroup.getUserId(),
+                taskGroup.getName(), taskGroup.getStatus());
 
-        for (TaskGroup record : taskGroupIPage.getRecords()) {
-            System.out.println(record);
-        }
-        Page<TaskGroup> page1 = new Page(1, 3);
-        IPage<TaskGroup> taskGroupIPage1 = taskGroupMapper.queryTaskGroupPaging(
-                page1,
-                0,
-                null, 1);
-        for (TaskGroup record : taskGroupIPage1.getRecords()) {
-            System.out.println(record);
-        }
         Assert.assertEquals(taskGroupIPage.getTotal(), 1);
-        Assert.assertEquals(taskGroupIPage1.getTotal(), 1);
     }
 }
