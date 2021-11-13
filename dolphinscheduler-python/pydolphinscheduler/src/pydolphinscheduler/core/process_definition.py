@@ -144,8 +144,8 @@ class ProcessDefinition(Base):
             ProcessDefinitionDefault.USER_PWD,
             ProcessDefinitionDefault.USER_EMAIL,
             ProcessDefinitionDefault.USER_PHONE,
-            ProcessDefinitionDefault.TENANT,
-            ProcessDefinitionDefault.QUEUE,
+            self._tenant,
+            self._queue,
             ProcessDefinitionDefault.USER_STATE,
         )
 
