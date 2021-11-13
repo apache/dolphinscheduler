@@ -15,10 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# testting
-pytest~=6.2.5
-freezegun
-# code linting and formatting
-flake8
-flake8-docstrings
-flake8-black
+"""Init tests for utils package."""

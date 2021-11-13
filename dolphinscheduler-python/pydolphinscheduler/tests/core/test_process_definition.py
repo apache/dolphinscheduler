@@ -17,6 +17,9 @@
 
 """Test process definition."""
 
+from datetime import datetime
+from pydolphinscheduler.utils.date import conv_to_schedule
+
 import pytest
 
 from pydolphinscheduler.constants import (
@@ -27,6 +30,7 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import TaskParams
 from pydolphinscheduler.side import Tenant, Project, User
 from tests.testing.task import Task
+from freezegun import freeze_time
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
@@ -43,6 +47,7 @@ def test_process_definition_key_attr(func):
 @pytest.mark.parametrize(
     "name,value",
     [
+        ("timezone", ProcessDefinitionDefault.TIME_ZONE),
         ("project", Project(ProcessDefinitionDefault.PROJECT)),
         ("tenant", Tenant(ProcessDefinitionDefault.TENANT)),
         (
@@ -73,18 +78,61 @@ def test_process_definition_default_value(name, value):
 @pytest.mark.parametrize(
     "name,cls,expect",
     [
-        ("project", Project, "project"),
-        ("tenant", Tenant, "tenant"),
+        ("name", str, "name"),
+        ("description", str, "description"),
+        ("schedule", str, "schedule"),
+        ("timezone", str, "timezone"),
         ("worker_group", str, "worker_group"),
+        ("timeout", int, 1),
+        ("release_state", str, "OFFLINE"),
+        ("param", dict, {"key": "value"}),
     ],
 )
-def test_process_definition_set_attr(name, cls, expect):
-    """Test process definition set specific attributes."""
+def test_set_attr(name, cls, expect):
+    """Test process definition set attributes which get with same type."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
-        setattr(pd, name, cls(expect))
-        assert getattr(pd, name) == cls(
-            expect
+        setattr(pd, name, expect)
+        assert (
+            getattr(pd, name) == expect
         ), f"ProcessDefinition set attribute `{name}` do not work expect"
+
+
+@pytest.mark.parametrize(
+    "set_attr,set_val,get_attr,get_val",
+    [
+        ("_project", "project", "project", Project("project")),
+        ("_tenant", "tenant", "tenant", Tenant("tenant")),
+        ("_start_time", "2021-01-01", "start_time", datetime(2021, 1, 1)),
+        ("_end_time", "2021-01-01", "end_time", datetime(2021, 1, 1)),
+    ],
+)
+def test_set_attr_return_special_object(set_attr, set_val, get_attr, get_val):
+    """Test process definition set attributes which get with different type."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        setattr(pd, set_attr, set_val)
+        assert get_val == getattr(
+            pd, get_attr
+        ), f"Set attribute {set_attr} can not get back with {get_val}."
+
+
+@pytest.mark.parametrize(
+    "val,expect",
+    [
+        (datetime(2021, 1, 1), datetime(2021, 1, 1)),
+        (None, None),
+        ("2021-01-01", datetime(2021, 1, 1)),
+        ("2021-01-01 01:01:01", datetime(2021, 1, 1, 1, 1, 1)),
+    ],
+)
+def test__parse_datetime(val, expect):
+    """Test process definition function _parse_datetime.
+
+    Only two datetime test cases here because we have more test cases in tests/utils/test_date.py file.
+    """
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        assert expect == pd._parse_datetime(
+            val
+        ), f"Function _parse_datetime with unexpect value by {val}."
 
 
 def test_process_definition_to_dict_without_task():
@@ -173,3 +221,87 @@ def test_set_process_definition_user_attr(user_attrs):
             assert (
                 except_attr == actual_attr
             ), f"Except attribute is {except_attr} but get {actual_attr}"
+
+
+def test_schedule_json_none_schedule():
+    """Test function schedule_json with None as schedule."""
+    with ProcessDefinition(
+        TEST_PROCESS_DEFINITION_NAME,
+        schedule=None,
+    ) as pd:
+        assert pd.schedule_json is None
+
+
+# We freeze time here, because we test start_time with None, and if will get datetime.datetime.now. If we do
+# not freeze time, it will cause flaky test here.
+@freeze_time("2021-01-01")
+@pytest.mark.parametrize(
+    "start_time,end_time,expect_date",
+    [
+        (
+            "20210101",
+            "20210201",
+            {"start_time": "2021-01-01 00:00:00", "end_time": "2021-02-01 00:00:00"},
+        ),
+        (
+            "2021-01-01",
+            "2021-02-01",
+            {"start_time": "2021-01-01 00:00:00", "end_time": "2021-02-01 00:00:00"},
+        ),
+        (
+            "2021/01/01",
+            "2021/02/01",
+            {"start_time": "2021-01-01 00:00:00", "end_time": "2021-02-01 00:00:00"},
+        ),
+        # Test mix pattern
+        (
+            "2021/01/01 01:01:01",
+            "2021-02-02 02:02:02",
+            {"start_time": "2021-01-01 01:01:01", "end_time": "2021-02-02 02:02:02"},
+        ),
+        (
+            "2021/01/01 01:01:01",
+            "20210202 020202",
+            {"start_time": "2021-01-01 01:01:01", "end_time": "2021-02-02 02:02:02"},
+        ),
+        (
+            "20210101 010101",
+            "2021-02-02 02:02:02",
+            {"start_time": "2021-01-01 01:01:01", "end_time": "2021-02-02 02:02:02"},
+        ),
+        # Test None value
+        (
+            "2021/01/01 01:02:03",
+            None,
+            {"start_time": "2021-01-01 01:02:03", "end_time": "9999-12-31 23:59:59"},
+        ),
+        (
+            None,
+            None,
+            {
+                "start_time": conv_to_schedule(datetime(2021, 1, 1)),
+                "end_time": "9999-12-31 23:59:59",
+            },
+        ),
+    ],
+)
+def test_schedule_json_start_and_end_time(start_time, end_time, expect_date):
+    """Test function schedule_json about handle start_time and end_time.
+
+    Only two datetime test cases here because we have more test cases in tests/utils/test_date.py file.
+    """
+    schedule = "0 0 0 * * ? *"
+    expect = {
+        "crontab": schedule,
+        "startTime": expect_date["start_time"],
+        "endTime": expect_date["end_time"],
+        "timezoneId": ProcessDefinitionDefault.TIME_ZONE,
+    }
+    with ProcessDefinition(
+        TEST_PROCESS_DEFINITION_NAME,
+        schedule=schedule,
+        start_time=start_time,
+        end_time=end_time,
+        timezone=ProcessDefinitionDefault.TIME_ZONE,
+    ) as pd:
+        assert pd.schedule_json == expect
