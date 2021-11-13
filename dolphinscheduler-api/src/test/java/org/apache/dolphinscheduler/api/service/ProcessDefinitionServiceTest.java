@@ -436,8 +436,6 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
 
         // project check auth success, processs definition online
-        ProcessDefinition processDefinition1 = getProcessDefinition();
-        processDefinition1.setResourceIds("1,2");
         Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));

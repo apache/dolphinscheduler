@@ -684,10 +684,10 @@
           const processDefinitionId =
             this.backfillItem.params.processDefinitionId
           const process = this.processListS.find(
-            (process) => process.processDefinition.id === processDefinitionId
+            (def) => def.id === processDefinitionId
           )
           this.$emit('onSubProcess', {
-            subProcessCode: process.processDefinition.code,
+            subProcessCode: process.code,
             fromThis: this
           })
         }
@@ -1000,7 +1000,7 @@
        * Child workflow entry show/hide
        */
       _isGoSubProcess () {
-        return this.nodeData.taskType === 'SUB_PROCESS' && this.name
+        return this.nodeData.taskType === 'SUB_PROCESS' && this.name && this.processListS && this.processListS.length > 0
       },
       taskInstance () {
         if (this.taskInstances.length > 0) {
