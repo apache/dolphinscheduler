@@ -34,6 +34,11 @@
         <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
     </module>
 
+    <module name="RegexpSingleline">
+        <property name="format" value="System\.out\.println"/>
+        <property name="message" value="Prohibit invoking System.out.println in source code !"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename">
             <property name="severity" value="error"/>

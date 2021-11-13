@@ -671,7 +671,6 @@ public abstract class UpgradeDao {
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
                 long taskCode = SnowFlakeUtils.getInstance().nextId();
-                // System.out.println(taskCode);
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());

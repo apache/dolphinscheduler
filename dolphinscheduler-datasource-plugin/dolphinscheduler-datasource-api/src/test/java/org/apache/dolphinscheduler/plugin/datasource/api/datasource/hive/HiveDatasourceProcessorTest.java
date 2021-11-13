@@ -59,7 +59,6 @@ public class HiveDatasourceProcessorTest {
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
                 .createConnectionParams(hiveDataSourceParamDTO);
-        System.out.println(JSONUtils.toJsonString(connectionParams));
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142", connectionParams.getAddress());
     }
