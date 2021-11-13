@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 
 import java.util.Date;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-public class TaskGroupMapperTest {
+public class TaskGroupMapperTest extends BaseDaoTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupMapperTest.class);
 

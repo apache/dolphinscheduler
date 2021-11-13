@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import java.util.Date;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-public class TaskGroupQueueMapperTest {
+public class TaskGroupQueueMapperTest extends BaseDaoTest {
 
     @Autowired
     TaskGroupQueueMapper taskGroupQueueMapper;
