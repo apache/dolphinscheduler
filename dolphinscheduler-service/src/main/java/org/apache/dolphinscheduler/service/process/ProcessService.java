@@ -221,8 +221,6 @@ public class ProcessService {
 
     @Autowired
     private TaskGroupMapper taskGroupMapper;
-    @Autowired
-    private StateEventCallbackService stateEventCallbackService;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
