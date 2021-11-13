@@ -195,7 +195,7 @@ def test_process_definition_simple():
                 }
 
 
-def test_schedule_json_start_and_end_time():
+def test_schedule_json_none_schedule():
     """Test function schedule_json with None as schedule."""
     with ProcessDefinition(
         TEST_PROCESS_DEFINITION_NAME,
