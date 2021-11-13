@@ -195,18 +195,6 @@ def test_process_definition_simple():
                 }
 
 
-def test_schedule_json_none_schedule():
-    """Test function schedule_json with None as schedule."""
-    with ProcessDefinition(
-        TEST_PROCESS_DEFINITION_NAME,
-        schedule=None,
-    ) as pd:
-        assert pd.schedule_json is None
-
-
-# We freeze time here, because we test start_time with None, and if will get datetime.datetime.now. If we do
-# not freeze time, it will cause flaky test here.
-@freeze_time("2021-01-01")
 @pytest.mark.parametrize(
     "user_attrs",
     [
@@ -235,6 +223,18 @@ def test_set_process_definition_user_attr(user_attrs):
             ), f"Except attribute is {except_attr} but get {actual_attr}"
 
 
+def test_schedule_json_none_schedule():
+    """Test function schedule_json with None as schedule."""
+    with ProcessDefinition(
+        TEST_PROCESS_DEFINITION_NAME,
+        schedule=None,
+    ) as pd:
+        assert pd.schedule_json is None
+
+
+# We freeze time here, because we test start_time with None, and if will get datetime.datetime.now. If we do
+# not freeze time, it will cause flaky test here.
+@freeze_time("2021-01-01")
 @pytest.mark.parametrize(
     "start_time,end_time,expect_date",
     [
