@@ -195,6 +195,8 @@ def test_process_definition_simple():
                 }
 
 
+# We freeze time here, because we test start_time with None, and if will get datetime.datetime.now. If we do
+# not freeze time, it will cause flaky test here.
 @freeze_time("2021-01-01")
 @pytest.mark.parametrize(
     "user_attrs",
