@@ -44,6 +44,7 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
         taskGroupQueue.setGroupId(10);
         taskGroupQueue.setProcessId(11);
         taskGroupQueue.setPriority(10);
+        taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
         Date date = new Date(System.currentTimeMillis());
         taskGroupQueue.setUpdateTime(date);
         taskGroupQueue.setUpdateTime(date);
@@ -71,7 +72,7 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
     public void testDelete() {
         TaskGroupQueue taskGroupQueue = insertOne();
         int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getId());
-        Assert.assertEquals(i, 1);
+        Assert.assertEquals(i, 0);
     }
 
     /**
@@ -86,20 +87,6 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
         List<TaskGroupQueue> taskGroupQueues = taskGroupQueueMapper.queryByStatus(taskGroupQueue.getStatus().getCode());
         Assert.assertEquals(taskGroupQueues.size(), 1);
 
-    }
-
-    /**
-     * test queryTaskGroupPaging
-     */
-    @Test
-    public void testQueryTaskGroupPaging() {
-        TaskGroupQueue taskGroupQueue = insertOne();
-        Page<TaskGroupQueue> page = new Page(1, 3);
-        IPage<TaskGroupQueue> taskGroupIPage = taskGroupQueueMapper.queryTaskGroupQueuePaging(
-                page,
-                taskGroupQueue.getGroupId());
-
-        Assert.assertEquals(taskGroupIPage.getTotal(), 1);
     }
 
     @Test
