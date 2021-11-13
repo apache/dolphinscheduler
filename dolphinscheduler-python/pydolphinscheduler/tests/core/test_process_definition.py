@@ -18,7 +18,7 @@
 """Test process definition."""
 
 from datetime import datetime
-from pydolphinscheduler.utils.date import FMT_STD
+from pydolphinscheduler.utils.date import conv_to_schedule
 
 import pytest
 
@@ -30,6 +30,7 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import TaskParams
 from pydolphinscheduler.side import Tenant, Project, User
 from tests.testing.task import Task
+from freezegun import freeze_time
 
 TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
@@ -194,6 +195,7 @@ def test_process_definition_simple():
                 }
 
 
+@freeze_time("2021-01-01")
 @pytest.mark.parametrize(
     "user_attrs",
     [
@@ -266,7 +268,7 @@ def test_set_process_definition_user_attr(user_attrs):
             None,
             None,
             {
-                "start_time": datetime.now().strftime(FMT_STD),
+                "start_time": conv_to_schedule(datetime(2021, 1, 1)),
                 "end_time": "9999-12-31 23:59:59",
             },
         ),
