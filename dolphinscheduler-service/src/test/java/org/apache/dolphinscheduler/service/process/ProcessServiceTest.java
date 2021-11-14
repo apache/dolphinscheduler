@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -246,7 +246,7 @@ public class ProcessServiceTest {
         command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
-            + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
+            + CMD_PARAM_SUB_PROCESS_DEFINE_CODE + "\":\"222\"}");
         Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
 
         int definitionVersion = 1;

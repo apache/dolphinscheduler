@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_P
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 
@@ -537,7 +537,7 @@ public class ProcessService {
             for (TaskDefinition taskNode : taskNodeList) {
                 String parameter = taskNode.getTaskParams();
                 ObjectNode parameterJson = JSONUtils.parseObject(parameter);
-                if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_ID) != null) {
+                if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE) != null) {
                     SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionCode());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionCode(), ids);
@@ -1280,7 +1280,7 @@ public class ProcessService {
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
         Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
-        int childDefineCode = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
+        int childDefineCode = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);

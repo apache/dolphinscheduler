@@ -279,8 +279,8 @@ public class ExecutorServiceTest {
 
     @Test
     public void testStartCheckByProcessDefinedCode() {
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
+        List<Long> ids = new ArrayList<>();
+        ids.add(1L);
         Mockito.doNothing().when(processService).recurseFindSubProcessId(1, ids);
 
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
