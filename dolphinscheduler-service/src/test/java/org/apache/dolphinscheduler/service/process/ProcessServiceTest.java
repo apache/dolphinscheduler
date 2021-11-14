@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -128,7 +128,7 @@ public class ProcessServiceTest {
         parentInstance.setWarningGroupId(0);
 
         TaskInstance task = new TaskInstance();
-        task.setTaskParams("{\"processDefinitionId\":100}}");
+        task.setTaskParams("{\"processDefinitionCode\":10}}");
         task.setId(10);
         task.setTaskCode(1L);
         task.setTaskDefinitionVersion(1);
@@ -143,8 +143,9 @@ public class ProcessServiceTest {
         parentInstance.setHistoryCmd("START_PROCESS");
         parentInstance.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
+        processDefinition.setCode(10L);
         Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
+        Mockito.when(processDefineMapper.queryByCode(10L)).thenReturn(processDefinition);
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
@@ -246,7 +247,7 @@ public class ProcessServiceTest {
         command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
-            + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
+            + CMD_PARAM_SUB_PROCESS_DEFINE_CODE + "\":\"222\"}");
         Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
 
         int definitionVersion = 1;
@@ -442,14 +443,14 @@ public class ProcessServiceTest {
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
-        taskDefinitionLog1.setTaskParams("{\"processDefinitionId\": 123}");
+        taskDefinitionLog1.setTaskParams("{\"processDefinitionCode\": 123L}");
         taskDefinitionLogs.add(taskDefinitionLog1);
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
-        List<Integer> ids = new ArrayList<>();
-        processService.recurseFindSubProcessId(parentProcessDefineId, ids);
+        List<Long> ids = new ArrayList<>();
+        processService.recurseFindSubProcess(parentProcessDefineCode, ids);
 
-        Assert.assertEquals(1, ids.size());
+        Assert.assertEquals(0, ids.size());
     }
 
     @Test

@@ -29,7 +29,7 @@
           <el-option
                 v-for="city in processDefinitionList"
                 :key="city.code"
-                :value="city.id"
+                :value="city.code"
                 :label="city.name">
           </el-option>
         </el-select>
@@ -72,7 +72,7 @@
           return false
         }
         this.$emit('on-params', {
-          processDefinitionId: this.wdiCurr
+          processDefinitionCode: this.wdiCurr
         })
         return true
       },
@@ -85,8 +85,8 @@
       /**
        * Return the name according to the process definition id
        */
-      _handleName (id) {
-        return _.filter(this.processDefinitionList, v => id === v.id)[0].name
+      _handleName (code) {
+        return _.filter(this.processDefinitionList, v => code === v.code)[0].name
       },
       /**
        * Get all processDefinition list
@@ -101,7 +101,7 @@
     watch: {
       wdiCurr (val) {
         this.$emit('on-cache-params', {
-          processDefinitionId: this.wdiCurr
+          processDefinitionCode: this.wdiCurr
         })
       }
     },
@@ -124,10 +124,10 @@
         let o = this.backfillItem
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
-          this.wdiCurr = o.params.processDefinitionId
+          this.wdiCurr = o.params.processDefinitionCode
         } else {
           if (this.processDefinitionList.length) {
-            this.wdiCurr = this.processDefinitionList[0].id
+            this.wdiCurr = this.processDefinitionList[0].code
             this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
           }
         }
