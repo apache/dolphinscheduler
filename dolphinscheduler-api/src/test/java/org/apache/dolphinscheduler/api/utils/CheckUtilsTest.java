@@ -128,7 +128,7 @@ public class CheckUtilsTest {
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
 
-        subProcessParameters.setProcessDefinitionId(1234);
+        subProcessParameters.setProcessDefinitionCode(1234L);
         taskNode.setParams(JSONUtils.toJsonString(subProcessParameters));
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
