@@ -187,8 +187,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        int timeout,
                                                        String tenantCode,
                                                        String taskRelationJson,
-                                                       String taskDefinitionJson,
-                                                       ProcessExecutionTypeEnum executionType) {
+                                                       String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -504,8 +503,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        int timeout,
                                                        String tenantCode,
                                                        String taskRelationJson,
-                                                       String taskDefinitionJson,
-                                                       ProcessExecutionTypeEnum executionType) {
+                                                       String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
