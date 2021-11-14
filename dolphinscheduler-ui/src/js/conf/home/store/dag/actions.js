@@ -41,7 +41,8 @@ export default {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/${payload.code}/release`, {
         name: payload.name,
-        releaseState: payload.releaseState
+        releaseState: payload.releaseState,
+        releaseSchedule: payload.releaseSchedule
       }, res => {
         resolve(res)
       }).catch(e => {
@@ -313,7 +314,8 @@ export default {
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout,
-        releaseState: state.releaseState
+        releaseState: state.releaseState,
+        releaseSchedule: state.releaseSchedule
       }, res => {
         resolve(res)
         state.isEditDag = false

@@ -493,6 +493,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param tenantCode         tenantCode
      * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param executionType executionType
+     * @param releaseProcessDefinition releaseProcessDefinition
+     * @param releaseSchedule releaseSchedule
      * @return update result code
      */
     @Override
@@ -508,7 +511,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String tenantCode,
                                                        String taskRelationJson,
                                                        String taskDefinitionJson,
-                                                       ProcessExecutionTypeEnum executionType) {
+                                                       ProcessExecutionTypeEnum executionType,
+                                                       boolean releaseProcessDefinition,
+                                                       boolean releaseSchedule) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -559,7 +564,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
         processDefinition.setExecutionType(executionType);
-        return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
+        Map<String, Object> updateResult = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        if (releaseProcessDefinition) {
+            return releaseProcessDefinition(loginUser, projectCode, code, ReleaseState.ONLINE, releaseSchedule);
+        }
+        return updateResult;
     }
 
     private Map<String, Object> updateDagDefine(User loginUser,
@@ -702,11 +714,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param projectCode  project code
      * @param code         process definition code
      * @param releaseState release state
+     * @param releaseSchedule release schedule
      * @return release result code
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState, boolean releaseSchedule) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -726,24 +739,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             case ONLINE:
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
+                // release schedule if needed
+                if (releaseSchedule) {
+                    Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.OFFLINE, ReleaseState.ONLINE);
+                    if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
+                        return result;
+                    }
+                }
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
-                List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
-                        new long[]{processDefinition.getCode()}
-                );
-                if (updateProcess > 0 && scheduleList.size() == 1) {
-                    Schedule schedule = scheduleList.get(0);
-                    logger.info("set schedule offline, project id: {}, schedule id: {}, process definition code: {}", project.getId(), schedule.getId(), code);
-                    // set status
-                    schedule.setReleaseState(ReleaseState.OFFLINE);
-                    int updateSchedule = scheduleMapper.updateById(schedule);
-                    if (updateSchedule == 0) {
-                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
-                        throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                if (updateProcess > 0) {
+                    Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.ONLINE, ReleaseState.OFFLINE);
+                    if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
+                        return result;
                     }
-                    schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             default:

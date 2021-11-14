@@ -92,12 +92,15 @@
       <div class="submit">
         <template v-if="router.history.current.name === 'projects-definition-details'">
           <div class="lint-pt">
-            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
+            <el-checkbox :disabled="isDetails" v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Release process definition')}}</el-checkbox>
+            <el-checkbox v-if="releaseState === 'ONLINE'" :disabled="isDetails"
+                         v-model="releaseSchedule" size="small"
+                         :false-label="false" :true-label="true">{{$t('Release schedule')}}</el-checkbox>
           </div>
         </template>
         <template v-if="router.history.current.name === 'projects-instance-details'">
           <div class="lint-pt">
-            <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
+            <el-checkbox :disabled="isDetails" v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
           </div>
         </template>
         <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
@@ -129,6 +132,8 @@
         udpListCache: [],
         // Whether to go online the process definition
         releaseState: 'ONLINE',
+        // Release schedule or not
+        releaseSchedule: true,
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -179,6 +184,7 @@
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
         this.store.commit('dag/setReleaseState', this.releaseState)
+        this.store.commit('dag/setReleaseSchedule', this.releaseSchedule)
       },
       /**
        * submit
@@ -264,6 +270,9 @@
       }
     },
     watch: {
+      releaseState (val) {
+        this.releaseSchedule = val !== 'OFFLINE'
+      },
       checkedTimeout (val) {
         if (!val) {
           this.timeout = 0
@@ -279,6 +288,7 @@
       this.description = dag.description
       this.syncDefine = dag.syncDefine
       this.releaseState = dag.releaseState
+      this.releaseSchedule = dag.releaseSchedule
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {

@@ -51,9 +51,11 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
     /**
      * query schedule list by process definition codes
      * @param processDefineCodes processDefineCodes
+     * @param releaseStateCode releaseStateCode
      * @return schedule list
      */
-    List<Schedule> selectAllByProcessDefineArray(@Param("processDefineCodes") long[] processDefineCodes);
+    List<Schedule> selectAllByProcessDefineArray(@Param("processDefineCodes") long[] processDefineCodes,
+                                                 @Param("releaseStateCode") int releaseStateCode);
 
     /**
      * query schedule list by process definition code

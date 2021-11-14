@@ -221,6 +221,9 @@ public class ProcessDefinitionController extends BaseController {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param executionType execution type
+     * @param releaseState release state
+     * @param releaseSchedule release schedule
      * @return update result code
      */
     @ApiOperation(value = "update", notes = "UPDATE_PROCESS_DEFINITION_NOTES")
@@ -247,19 +250,11 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
-                                          @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
+                                          @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState,
+                                          @RequestParam(value = "releaseSchedule", required = false, defaultValue = "false") boolean releaseSchedule) {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name, code, description, globalParams,
-            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
-        //  If the update fails, the result will be returned directly
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataList(result);
-        }
-
-        //  Judge whether to go online after editing,0 means offline, 1 means online
-        if (releaseState == ReleaseState.ONLINE) {
-            result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
-        }
+            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType, releaseState == ReleaseState.ONLINE, releaseSchedule);
         return returnDataList(result);
     }
 
@@ -357,6 +352,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
+     * @param releaseSchedule release schedule
      * @return release result code
      */
     @ApiOperation(value = "release", notes = "RELEASE_PROCESS_DEFINITION_NOTES")
@@ -372,8 +368,9 @@ public class ProcessDefinitionController extends BaseController {
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable(value = "code", required = true) long code,
-                                           @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
-        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
+                                           @RequestParam(value = "releaseState", required = true) ReleaseState releaseState,
+                                           @RequestParam(value = "releaseSchedule", required = false, defaultValue = "false") boolean releaseSchedule) {
+        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState, releaseSchedule);
         return returnDataList(result);
     }
 

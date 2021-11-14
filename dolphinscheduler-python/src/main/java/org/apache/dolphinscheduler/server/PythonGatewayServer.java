@@ -216,9 +216,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE, false);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType, false, false);
         } else if (verifyStatus == Status.SUCCESS) {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
                 locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
@@ -234,7 +234,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE, false);
         return processDefinitionCode;
     }
 
@@ -258,13 +258,13 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         // create or update schedule
         int scheduleId;
         if (schedules.isEmpty()) {
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE, false);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = schedules.get(0).getId();
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE, false);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
@@ -283,7 +283,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
 
         // make sure process definition online
-        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(), ReleaseState.ONLINE);
+        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(), ReleaseState.ONLINE, false);
 
         executorService.execProcessInstance(user,
             project.getCode(),

@@ -99,6 +99,22 @@ public interface SchedulerService {
                                          ReleaseState scheduleStatus);
 
     /**
+     * set schedule online or offline
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @param queryState query state
+     * @param updatedState updated state
+     * @return publish result code
+     */
+    Map<String, Object> setScheduleState(User loginUser,
+                                         long projectCode,
+                                         long processDefinitionCode,
+                                         ReleaseState queryState,
+                                         ReleaseState updatedState);
+
+    /**
      * query schedule
      *
      * @param loginUser login user

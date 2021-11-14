@@ -164,6 +164,9 @@ public interface ProcessDefinitionService {
      * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
+     * @param executionType executionType
+     * @param releaseProcessDefinition releaseProcessDefinition
+     * @param releaseSchedule releaseSchedule
      * @return update result code
      */
     Map<String, Object> updateProcessDefinition(User loginUser,
@@ -177,7 +180,9 @@ public interface ProcessDefinitionService {
                                                 String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
-                                                ProcessExecutionTypeEnum executionType);
+                                                ProcessExecutionTypeEnum executionType,
+                                                boolean releaseProcessDefinition,
+                                                boolean releaseSchedule);
 
     /**
      * verify process definition name unique
@@ -210,12 +215,14 @@ public interface ProcessDefinitionService {
      * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
+     * @param releaseSchedule release schedule
      * @return release result code
      */
     Map<String, Object> releaseProcessDefinition(User loginUser,
                                                  long projectCode,
                                                  long code,
-                                                 ReleaseState releaseState);
+                                                 ReleaseState releaseState,
+                                                 boolean releaseSchedule);
 
     /**
      * batch export process definition by codes

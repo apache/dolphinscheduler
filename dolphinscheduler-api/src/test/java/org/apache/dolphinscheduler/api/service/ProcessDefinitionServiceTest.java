@@ -425,24 +425,24 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, projectCode,
-                6, ReleaseState.OFFLINE);
+                6, ReleaseState.OFFLINE, false);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.ONLINE);
+                loginUser, projectCode, 46, ReleaseState.ONLINE, false);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
 
         // project check auth success, processs definition online
         Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.ONLINE);
+                loginUser, projectCode, 46, ReleaseState.ONLINE, false);
         Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
 
         // release error code
         Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.getEnum(2));
+                loginUser, projectCode, 46, ReleaseState.getEnum(2), false);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
 
     }
@@ -609,7 +609,8 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
-                "", "", "", 0, "root", null, null, ProcessExecutionTypeEnum.PARALLEL);
+                "", "", "", 0, "root", null, null, ProcessExecutionTypeEnum.PARALLEL,
+                false, false);
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
 

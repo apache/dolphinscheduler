@@ -62,7 +62,7 @@
                 #{i}
             </foreach>
         </if>
-        and release_state = 1
+        and release_state = #{releaseStateCode}
     </select>
     <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select

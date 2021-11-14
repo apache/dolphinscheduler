@@ -90,6 +90,9 @@ export default {
   setReleaseState (state, payload) {
     state.releaseState = payload
   },
+  setReleaseSchedule (state, payload) {
+    state.releaseSchedule = payload
+  },
   /**
    * Whether to update the process definition
    */

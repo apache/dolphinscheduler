@@ -2033,10 +2033,11 @@ public class ProcessService {
      * find schedule list by process define codes.
      *
      * @param codes codes
+     * @param releaseStateCode releaseStateCode
      * @return schedule list
      */
-    public List<Schedule> selectAllByProcessDefineCode(long[] codes) {
-        return scheduleMapper.selectAllByProcessDefineArray(codes);
+    public List<Schedule> selectAllByProcessDefineCode(long[] codes, int releaseStateCode) {
+        return scheduleMapper.selectAllByProcessDefineArray(codes, releaseStateCode);
     }
 
     /**

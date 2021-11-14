@@ -71,11 +71,22 @@
             <el-tooltip :content="$t('Timing')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('online')" placement="top" :enterable="false">
-              <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle></el-button></span>
+            <el-tooltip :content="$t('online')" placement="top" :enterable="false" v-if="scope.row.releaseState === 'OFFLINE'">
+              <el-popconfirm
+                v-if="scope.row.scheduleReleaseState === 'OFFLINE'"
+                :confirmButtonText="$t('Yes')"
+                :cancelButtonText="$t('No')"
+                icon="el-icon-info"
+                :title="$t('Release schedule meanwhile?')"
+                @onConfirm="_poponline(scope.row, true)"
+                @onCancel="_poponline(scope.row, false)"
+              >
+                <el-button type="warning" size="mini" icon="el-icon-upload2" circle slot="reference"></el-button>
+              </el-popconfirm>
+              <span v-else><el-button type="warning" size="mini" icon="el-icon-upload2" @click="_poponline(scope.row, false)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('offline')" placement="top" :enterable="false">
-              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button></span>
+            <el-tooltip :content="$t('offline')" placement="top" :enterable="false" v-if="scope.row.releaseState === 'ONLINE'">
+              <span><el-button type="danger" size="mini" icon="el-icon-download" @click="_downline(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Copy Workflow')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" :disabled="scope.row.releaseState === 'ONLINE'"  icon="el-icon-document-copy" @click="_copyProcess(scope.row)" circle></el-button></span>
@@ -282,10 +293,11 @@
       /**
        * online
        */
-      _poponline (item) {
+      _poponline (item, releaseSchedule) {
         this._upProcessState({
           ...item,
-          releaseState: 'ONLINE'
+          releaseState: 'ONLINE',
+          releaseSchedule
         })
       },
       /**
