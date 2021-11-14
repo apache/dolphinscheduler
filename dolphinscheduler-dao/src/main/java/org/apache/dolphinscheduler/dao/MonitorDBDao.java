@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 
 /**
@@ -45,7 +45,7 @@ public class MonitorDBDao {
     public static final String VARIABLE_NAME = "variable_name";
 
     @Autowired
-    private DruidDataSource dataSource;
+    private HikariDataSource dataSource;
 
     /**
      * get current db performance

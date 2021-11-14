@@ -39,13 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(HiveDataSourceClient.class);
 
-    protected DruidDataSource oneSessionDataSource;
+    protected HikariDataSource oneSessionDataSource;
     private JdbcTemplate oneSessionJdbcTemplate;
     private UserGroupInformation ugi;
 
