@@ -86,7 +86,7 @@ public class WorkerRegistryClient {
 
     @PostConstruct
     public void initWorkRegistry() {
-        this.workerGroups = workerConfig.getWorkerGroups();
+        this.workerGroups = workerConfig.getGroups();
         this.startupTime = System.currentTimeMillis();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -97,7 +97,7 @@ public class WorkerRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
-        int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
+        int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
             registryClient.persistEphemeral(workerZKPath, "");
@@ -105,13 +105,13 @@ public class WorkerRegistryClient {
         }
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                workerConfig.getWorkerMaxCpuloadAvg(),
-                workerConfig.getWorkerReservedMemory(),
+                workerConfig.getMaxCpuLoadAvg(),
+                workerConfig.getReservedMemory(),
                 workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_TYPE,
                 registryClient,
-                workerConfig.getWorkerExecThreads(),
+                workerConfig.getExecThreads(),
                 workerManagerThread
         );
 

@@ -379,7 +379,9 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 
+    <build>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
+    </build>
 </project>

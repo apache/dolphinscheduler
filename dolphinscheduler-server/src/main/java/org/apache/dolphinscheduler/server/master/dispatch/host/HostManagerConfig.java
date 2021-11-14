@@ -42,21 +42,20 @@ public class HostManagerConfig {
 
     @Bean
     public HostManager hostManager() {
-        String hostSelector = masterConfig.getHostSelector();
-        HostSelector selector = HostSelector.of(hostSelector);
+        HostSelector selector = masterConfig.getHostSelector();
         HostManager hostManager;
         switch (selector) {
             case RANDOM:
                 hostManager = new RandomHostManager();
                 break;
-            case ROUNDROBIN:
+            case ROUND_ROBIN:
                 hostManager = new RoundRobinHostManager();
                 break;
-            case LOWERWEIGHT:
+            case LOWER_WEIGHT:
                 hostManager = new LowerWeightHostManager();
                 break;
             default:
-                throw new IllegalArgumentException("unSupport selector " + hostSelector);
+                throw new IllegalArgumentException("unSupport selector " + selector);
         }
         beanFactory.autowireBean(hostManager);
         return hostManager;

@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(ITaskProcessFactory.class)
 public class CommonTaskProcessFactory implements ITaskProcessFactory {
     @Override
     public String type() {

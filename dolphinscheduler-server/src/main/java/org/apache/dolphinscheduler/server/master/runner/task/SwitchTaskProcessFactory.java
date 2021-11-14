@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(ITaskProcessFactory.class)
 public class SwitchTaskProcessFactory implements ITaskProcessFactory {
 
     @Override

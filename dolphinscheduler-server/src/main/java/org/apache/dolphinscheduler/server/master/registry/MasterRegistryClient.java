@@ -356,10 +356,10 @@ public class MasterRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
-        int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
+        int masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-            masterConfig.getMasterMaxCpuloadAvg(),
-            masterConfig.getMasterReservedMemory(),
+            masterConfig.getMaxCpuLoadAvg(),
+            masterConfig.getReservedMemory(),
             Sets.newHashSet(getMasterPath()),
             Constants.MASTER_TYPE,
             registryClient);

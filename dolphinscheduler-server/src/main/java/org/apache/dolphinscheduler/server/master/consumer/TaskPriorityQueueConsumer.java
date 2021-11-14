@@ -89,7 +89,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         List<TaskPriority> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()) {
             try {
-                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
+                int fetchTaskNum = masterConfig.getDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
                     TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);

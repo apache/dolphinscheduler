@@ -85,8 +85,8 @@ public class DependentTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
 
         MasterConfig config = new MasterConfig();
-        config.setMasterTaskCommitRetryTimes(3);
-        config.setMasterTaskCommitInterval(1000);
+        config.setTaskCommitRetryTimes(3);
+        config.setTaskCommitInterval(1000);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processService = Mockito.mock(ProcessService.class);

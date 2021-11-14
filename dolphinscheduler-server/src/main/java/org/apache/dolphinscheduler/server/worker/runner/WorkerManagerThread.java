@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
@@ -37,6 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,11 +53,6 @@ public class WorkerManagerThread implements Runnable {
     private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
 
     /**
-     * worker config
-     */
-    private final WorkerConfig workerConfig;
-
-    /**
      * thread executor service
      */
     private final ExecutorService workerExecService;
@@ -65,12 +60,11 @@ public class WorkerManagerThread implements Runnable {
     /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
-    public WorkerManagerThread() {
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads());
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+    public WorkerManagerThread(WorkerConfig workerConfig) {
+        workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads());
     }
 
     /**
@@ -97,8 +91,8 @@ public class WorkerManagerThread implements Runnable {
      */
     public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
         workerExecuteQueue.stream()
-                .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
-                .forEach(workerExecuteQueue::remove);
+                          .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
+                          .forEach(workerExecuteQueue::remove);
         sendTaskKillResponse(taskInstanceId);
     }
 
@@ -143,7 +137,7 @@ public class WorkerManagerThread implements Runnable {
                 workerExecService.submit(taskExecuteThread);
             } catch (Exception e) {
                 logger.error("An unexpected interrupt is happened, "
-                        + "the exception will be ignored and this thread will continue to run", e);
+                    + "the exception will be ignored and this thread will continue to run", e);
             }
         }
     }

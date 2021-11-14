@@ -120,7 +120,7 @@ public class MasterSchedulerService extends Thread {
      * constructor of MasterSchedulerService
      */
     public void init() {
-        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
@@ -160,7 +160,7 @@ public class MasterSchedulerService extends Thread {
         logger.info("master scheduler started");
         while (Stopper.isRunning()) {
             try {
-                boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
+                boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (!runCheckFlag) {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
@@ -189,7 +189,7 @@ public class MasterSchedulerService extends Thread {
                         getLocalAddress(),
                         command,
                         processDefinitionCacheMaps);
-                if (!masterConfig.getMasterCacheProcessDefinition()
+                if (!masterConfig.isCacheProcessDefinition()
                         && processDefinitionCacheMaps.size() > 0) {
                     processDefinitionCacheMaps.clear();
                 }

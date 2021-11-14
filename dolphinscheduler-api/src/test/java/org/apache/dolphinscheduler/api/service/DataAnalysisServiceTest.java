@@ -190,10 +190,10 @@ public class DataAnalysisServiceTest {
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any())).thenReturn(
                 Collections.emptyList());
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
-        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").first().isEqualTo(0);
-        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList().hasSameSizeAs(
+        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").isEqualTo(0);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").asList().hasSameSizeAs(
                 ExecutionStatus.values());
-        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList().extracting(
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").asList().extracting(
                 "count").allMatch(count -> count.equals(0));
     }
 

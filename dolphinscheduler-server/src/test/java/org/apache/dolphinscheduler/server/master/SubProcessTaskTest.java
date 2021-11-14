@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,8 +61,8 @@ public class SubProcessTaskTest {
 
         MasterConfig config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
-        config.setMasterTaskCommitRetryTimes(3);
-        config.setMasterTaskCommitInterval(1000);
+        config.setTaskCommitRetryTimes(3);
+        config.setTaskCommitInterval(1000);
 
         PowerMockito.mockStatic(Stopper.class);
         PowerMockito.when(Stopper.isRunning()).thenReturn(true);

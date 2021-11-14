@@ -154,36 +154,6 @@ public class SchedulerServiceTest {
         //SUCCESS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        //OFFLINE
-        Mockito.when(quartzExecutors.deleteJob(null, null)).thenReturn(true);
-        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.OFFLINE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testDeleteSchedule() {
-
-        Mockito.when(quartzExecutors.deleteJob("1", "1")).thenReturn(true);
-        Mockito.when(quartzExecutors.buildJobGroupName(1)).thenReturn("1");
-        Mockito.when(quartzExecutors.buildJobName(1)).thenReturn("1");
-        boolean flag = true;
-        try {
-            schedulerService.deleteSchedule(1, 1);
-        } catch (Exception e) {
-            flag = false;
-        }
-        Assert.assertTrue(flag);
-
-    }
-
-    private Project getProject(String name) {
-        Project project = new Project();
-        project.setName(name);
-        project.setUserId(1);
-
-        return project;
     }
 
     private Project getProject(String name, long code) {
