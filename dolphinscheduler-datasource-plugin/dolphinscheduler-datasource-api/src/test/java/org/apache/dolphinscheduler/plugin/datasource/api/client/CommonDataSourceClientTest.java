@@ -34,11 +34,11 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest(value = {DruidDataSource.class, CommonDataSourceClient.class, JdbcDataSourceProvider.class, JdbcTemplate.class, Connection.class})
+@PrepareForTest(value = {HikariDataSource.class, CommonDataSourceClient.class, JdbcDataSourceProvider.class, JdbcTemplate.class, Connection.class})
 public class CommonDataSourceClientTest {
 
     @Mock

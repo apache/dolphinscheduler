@@ -81,7 +81,7 @@ public abstract class UpgradeDao {
 
     /**
      * get datasource
-     * @return DruidDataSource
+     * @return DataSource
      */
     public static DataSource getDataSource(){
         return ConnectionFactory.getInstance().getDataSource();

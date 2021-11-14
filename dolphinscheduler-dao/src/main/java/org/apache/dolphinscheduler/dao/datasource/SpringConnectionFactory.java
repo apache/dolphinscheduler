@@ -56,13 +56,13 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.google.common.collect.Lists;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * data source connection factory
@@ -106,7 +106,7 @@ public class SpringConnectionFactory {
     /**
      * get the data source
      *
-     * @return druid dataSource
+     * @return dataSource
      */
     @Bean(destroyMethod = "", name = "datasource")
     public DataSource dataSource() throws SQLException {
@@ -115,34 +115,31 @@ public class SpringConnectionFactory {
             initializeH2Datasource();
         }
 
-        DruidDataSource druidDataSource = new DruidDataSource();
+        HikariDataSource dataSource = new HikariDataSource();
 
-        druidDataSource.setDriverClassName(driverClassName);
-        druidDataSource.setUrl(PropertyUtils.getString(Constants.SPRING_DATASOURCE_URL));
-        druidDataSource.setUsername(PropertyUtils.getString(Constants.SPRING_DATASOURCE_USERNAME));
-        druidDataSource.setPassword(PropertyUtils.getString(Constants.SPRING_DATASOURCE_PASSWORD));
-        druidDataSource.setValidationQuery(PropertyUtils.getString(Constants.SPRING_DATASOURCE_VALIDATION_QUERY, "SELECT 1"));
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setJdbcUrl(PropertyUtils.getString(Constants.SPRING_DATASOURCE_URL));
+        dataSource.setUsername(PropertyUtils.getString(Constants.SPRING_DATASOURCE_USERNAME));
+        dataSource.setPassword(PropertyUtils.getString(Constants.SPRING_DATASOURCE_PASSWORD));
+        dataSource.setConnectionTestQuery(PropertyUtils.getString(Constants.SPRING_DATASOURCE_VALIDATION_QUERY, "SELECT 1"));
 
-        druidDataSource.setPoolPreparedStatements(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_POOL_PREPARED_STATEMENTS, true));
-        druidDataSource.setTestWhileIdle(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_TEST_WHILE_IDLE, true));
-        druidDataSource.setTestOnBorrow(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_BORROW, true));
-        druidDataSource.setTestOnReturn(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_RETURN, false));
-        druidDataSource.setKeepAlive(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_KEEP_ALIVE, true));
+        dataSource.setMinimumIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaximumPoolSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setConnectionTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_CONNECTION_TIMEOUT, 30000));
+        dataSource.setIdleTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_IDLE_TIMEOUT, 600000));
+        dataSource.setMaxLifetime(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_LIFE_TIME,  1800000));
+        dataSource.setValidationTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_VALIDATION_TIMEOUT, 5000));
+        dataSource.setLeakDetectionThreshold(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_LEAK_DETECTION_THRESHOLD, 0));
+        dataSource.setInitializationFailTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_INITIALIZATION_FAIL_TIMEOUT, 1));
 
-        druidDataSource.setMinIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
-        druidDataSource.setMaxActive(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
-        druidDataSource.setMaxWait(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_WAIT, 60000));
-        druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE, 20));
-        druidDataSource.setInitialSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_INITIAL_SIZE, 5));
-        druidDataSource.setTimeBetweenEvictionRunsMillis(PropertyUtils.getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_EVICTION_RUNS_MILLIS, 60000));
-        druidDataSource.setTimeBetweenConnectErrorMillis(PropertyUtils.getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_CONNECT_ERROR_MILLIS, 60000));
-        druidDataSource.setMinEvictableIdleTimeMillis(PropertyUtils.getLong(Constants.SPRING_DATASOURCE_MIN_EVICTABLE_IDLE_TIME_MILLIS, 300000));
-        druidDataSource.setValidationQueryTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT, 3));
-        //auto commit
-        druidDataSource.setDefaultAutoCommit(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT, true));
-        druidDataSource.init();
-        logger.info("Initialize Druid DataSource success");
-        return druidDataSource;
+        dataSource.setAutoCommit(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_IS_AUTOCOMMIT, true));
+
+        dataSource.addDataSourceProperty(Constants.CACHE_PREP_STMTS, PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_CACHE_PREP_STMTS, true));
+        dataSource.addDataSourceProperty(Constants.PREP_STMT_CACHE_SIZE, PropertyUtils.getInt(Constants.SPRING_DATASOURCE_PREP_STMT_CACHE_SIZE, 250));
+        dataSource.addDataSourceProperty(Constants.PREP_STMT_CACHE_SQL_LIMIT, PropertyUtils.getInt(Constants.SPRING_DATASOURCE_PREP_STMT_CACHE_SQL_LIMIT, 2048));
+
+        logger.info("Initialize DataSource DataSource success");
+        return dataSource;
     }
 
     private void initializeH2Datasource() {

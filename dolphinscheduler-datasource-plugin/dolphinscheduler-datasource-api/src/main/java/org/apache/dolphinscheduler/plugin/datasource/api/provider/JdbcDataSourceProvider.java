@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Jdbc Data Source Provider
@@ -34,51 +34,50 @@ public class JdbcDataSourceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcDataSourceProvider.class);
 
-    public static DruidDataSource createJdbcDataSource(BaseConnectionParam properties) {
-        logger.info("Creating DruidDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties) {
+        logger.info("Creating HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        HikariDataSource dataSource = new HikariDataSource();
 
-        DruidDataSource druidDataSource = new DruidDataSource();
+        dataSource.setDriverClassName(properties.getDriverClassName());
+        dataSource.setJdbcUrl(properties.getJdbcUrl());
+        dataSource.setUsername(properties.getUser());
+        dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        druidDataSource.setDriverClassName(properties.getDriverClassName());
-        druidDataSource.setUrl(properties.getJdbcUrl());
-        druidDataSource.setUsername(properties.getUser());
-        druidDataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
-
-        druidDataSource.setMinIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
-        druidDataSource.setMaxActive(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
-        druidDataSource.setTestOnBorrow(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_BORROW, false));
+        dataSource.setMinimumIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaximumPoolSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
         if (properties.getProps() != null) {
-            properties.getProps().forEach(druidDataSource::addConnectionProperty);
+            properties.getProps().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating DruidDataSource pool success.");
-        return druidDataSource;
+        logger.info("Creating HikariDataSource pool success.");
+        return dataSource;
     }
 
     /**
      * @return One Session Jdbc DataSource
      */
-    public static DruidDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties) {
-        logger.info("Creating OneSession DruidDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+    public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties) {
+        logger.info("Creating OneSession HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 
-        DruidDataSource druidDataSource = new DruidDataSource();
+        HikariDataSource dataSource = new HikariDataSource();
 
-        druidDataSource.setDriverClassName(properties.getDriverClassName());
-        druidDataSource.setUrl(properties.getJdbcUrl());
-        druidDataSource.setUsername(properties.getUser());
-        druidDataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
+        dataSource.setDriverClassName(properties.getDriverClassName());
+        dataSource.setJdbcUrl(properties.getJdbcUrl());
+        dataSource.setUsername(properties.getUser());
+        dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        druidDataSource.setMinIdle(1);
-        druidDataSource.setMaxActive(1);
-        druidDataSource.setTestOnBorrow(true);
+        dataSource.setMinimumIdle(1);
+        dataSource.setMaximumPoolSize(1);
+        dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
         if (properties.getProps() != null) {
-            properties.getProps().forEach(druidDataSource::addConnectionProperty);
+            properties.getProps().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating OneSession DruidDataSource pool success.");
-        return druidDataSource;
+        logger.info("Creating OneSession HikariDataSource pool success.");
+        return dataSource;
     }
 
 }

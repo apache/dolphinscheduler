@@ -14,24 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.quartz;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.quartz.utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.quartz.utils.ConnectionProvider;
+
+import com.zaxxer.hikari.HikariDataSource;
+
 /**
- * druid connection provider
+ * hikari connection provider
  */
-public class DruidConnectionProvider implements ConnectionProvider {
+public class HikariConnectionProvider implements ConnectionProvider {
 
-    private final DruidDataSource dataSource;
+    private final HikariDataSource dataSource;
 
-    public DruidConnectionProvider(){
-        this.dataSource = SpringApplicationContext.getBean(DruidDataSource.class);
+    public HikariConnectionProvider() {
+        this.dataSource = SpringApplicationContext.getBean(HikariDataSource.class);
     }
 
     @Override
@@ -40,7 +43,7 @@ public class DruidConnectionProvider implements ConnectionProvider {
     }
 
     @Override
-    public void shutdown() throws SQLException {
+    public void shutdown() {
         dataSource.close();
     }
 
