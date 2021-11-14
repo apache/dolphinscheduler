@@ -450,7 +450,7 @@ public class ProcessServiceTest {
         List<Long> ids = new ArrayList<>();
         processService.recurseFindSubProcess(parentProcessDefineCode, ids);
 
-        Assert.assertEquals(1, ids.size());
+        Assert.assertEquals(0, ids.size());
     }
 
     @Test
