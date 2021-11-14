@@ -465,10 +465,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        List<Long> ids = new ArrayList<>();
-        processService.recurseFindSubProcessId(processDefinition.getId(), ids);
-        if (!ids.isEmpty()) {
-            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(ids);
+        List<Long> codes = new ArrayList<>();
+        processService.recurseFindSubProcess(processDefinition.getCode(), codes);
+        if (!codes.isEmpty()) {
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codes);
             if (processDefinitionList != null) {
                 for (ProcessDefinition processDefinitionTmp : processDefinitionList) {
                     /**

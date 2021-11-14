@@ -529,7 +529,7 @@ public class ProcessService {
      * @param parentCode parentCode
      * @param ids ids
      */
-    public void recurseFindSubProcessId(long parentCode, List<Long> ids) {
+    public void recurseFindSubProcess(long parentCode, List<Long> ids) {
         List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentCode);
 
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
@@ -540,7 +540,7 @@ public class ProcessService {
                 if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE) != null) {
                     SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionCode());
-                    recurseFindSubProcessId(subProcessParam.getProcessDefinitionCode(), ids);
+                    recurseFindSubProcess(subProcessParam.getProcessDefinitionCode(), ids);
                 }
             }
         }

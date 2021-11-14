@@ -356,7 +356,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             }
             // check sub process definition release state
             List<Long> subProcessDefineIds = new ArrayList<>();
-            processService.recurseFindSubProcessId(processDefinition.getId(), subProcessDefineIds);
+            processService.recurseFindSubProcess(processDefinition.getId(), subProcessDefineIds);
             if (!subProcessDefineIds.isEmpty()) {
                 List<ProcessDefinition> subProcessDefinitionList =
                         processDefinitionMapper.queryByCodes(subProcessDefineIds);

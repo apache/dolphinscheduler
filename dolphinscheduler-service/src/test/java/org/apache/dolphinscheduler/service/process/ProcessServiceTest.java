@@ -447,7 +447,7 @@ public class ProcessServiceTest {
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
         List<Long> ids = new ArrayList<>();
-        processService.recurseFindSubProcessId(parentProcessDefineCode, ids);
+        processService.recurseFindSubProcess(parentProcessDefineCode, ids);
 
         Assert.assertEquals(1, ids.size());
     }
