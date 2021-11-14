@@ -143,7 +143,6 @@ public class ProcessServiceTest {
         parentInstance.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(10L);
-        Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
         Mockito.when(processDefineMapper.queryByCode(10L)).thenReturn(processDefinition);
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
@@ -347,7 +346,6 @@ public class ProcessServiceTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(parentProcessDefineCode);
         processDefinition.setVersion(parentProcessDefineVersion);
-        Mockito.when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(processDefinition);
 
         long postTaskCode = 2L;
         int postTaskVersion = 2;
@@ -357,14 +355,11 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
-            , parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
         taskDefinitionLog1.setTaskParams("{\"processDefinitionCode\": 123L}");
         taskDefinitionLogs.add(taskDefinitionLog1);
-        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
         List<Long> ids = new ArrayList<>();
         processService.recurseFindSubProcess(parentProcessDefineCode, ids);
