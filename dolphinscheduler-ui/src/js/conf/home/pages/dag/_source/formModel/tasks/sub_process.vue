@@ -29,7 +29,7 @@
           <el-option
                 v-for="city in processDefinitionList"
                 :key="city.code"
-                :value="city.id"
+                :value="city.code"
                 :label="city.name">
           </el-option>
         </el-select>
@@ -85,8 +85,8 @@
       /**
        * Return the name according to the process definition id
        */
-      _handleName (id) {
-        return _.filter(this.processDefinitionList, v => id === v.id)[0].name
+      _handleName (code) {
+        return _.filter(this.processDefinitionList, v => code === v.code)[0].name
       },
       /**
        * Get all processDefinition list
@@ -127,7 +127,7 @@
           this.wdiCurr = o.params.processDefinitionId
         } else {
           if (this.processDefinitionList.length) {
-            this.wdiCurr = this.processDefinitionList[0].id
+            this.wdiCurr = this.processDefinitionList[0].code
             this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
           }
         }
