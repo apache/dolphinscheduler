@@ -82,7 +82,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
     /**
      * get the data source
      *
-     * @return druid dataSource
+     * @return dataSource
      */
     private DataSource buildDataSource() throws SQLException {
 

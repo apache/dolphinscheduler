@@ -41,6 +41,6 @@ public class StandaloneServer {
             WorkerServer.class,
             AlertServer.class,
             PythonGatewayServer.class
-        ).profiles("h2").run(args);
+        ).profiles("h2", "api").run(args);
     }
 }
