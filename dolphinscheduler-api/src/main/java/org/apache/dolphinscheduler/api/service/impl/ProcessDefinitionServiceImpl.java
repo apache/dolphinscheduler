@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -33,8 +33,8 @@ import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -68,7 +68,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -621,9 +620,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * delete process definition by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code process definition code
+     * @param code        process definition code
      * @return delete result code
      */
     @Override
@@ -692,9 +691,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * release process definition: online / offline
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         process definition code
      * @param releaseState release state
      * @return release result code
      */
@@ -725,7 +724,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
-                    new long[]{processDefinition.getCode()}
+                        new long[]{processDefinition.getCode()}
                 );
                 if (updateProcess > 0 && scheduleList.size() == 1) {
                     Schedule schedule = scheduleList.get(0);
@@ -824,9 +823,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * import process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param file process metadata json file
+     * @param file        process metadata json file
      * @return import process
      */
     @Override
@@ -1034,9 +1033,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get task node details based on process definition
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectCode project code
-     * @param code process definition code
+     * @param code        process definition code
      * @return task node list
      */
     @Override
@@ -1063,9 +1062,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get task node details map based on process definition
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectCode project code
-     * @param codes define codes
+     * @param codes       define codes
      * @return task node list
      */
     @Override
@@ -1100,7 +1099,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * query process definition all by project code
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectCode project code
      * @return process definitions in the project
      */
@@ -1122,7 +1121,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * Encapsulates the TreeView structure
      *
-     * @param code process definition code
+     * @param code  process definition code
      * @param limit limit
      * @return tree view json data
      */
@@ -1196,16 +1195,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
                         Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
 
-                        int subProcessId = 0;
+                        long subProcessCode = 0L;
                         // if process is sub process, the return sub id, or sub id=0
                         if (taskInstance.isSubProcess()) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
-                            subProcessId = Integer.parseInt(JSONUtils.parseObject(
-                                taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
+                            subProcessCode = Integer.parseInt(JSONUtils.parseObject(
+                                taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_CODE).asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskCode(),
                             taskInstance.getTaskType(), taskInstance.getState().toString(), taskInstance.getStartTime(), taskInstance.getEndTime(),
-                            taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
+                            taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
                     }
                 }
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
@@ -1266,9 +1265,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * batch copy process definition
      *
-     * @param loginUser loginUser
-     * @param projectCode projectCode
-     * @param codes processDefinitionCodes
+     * @param loginUser         loginUser
+     * @param projectCode       projectCode
+     * @param codes             processDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     @Override
@@ -1289,9 +1288,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * batch move process definition
      *
-     * @param loginUser loginUser
-     * @param projectCode projectCode
-     * @param codes processDefinitionCodes
+     * @param loginUser         loginUser
+     * @param projectCode       projectCode
+     * @param codes             processDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     @Override
@@ -1390,7 +1389,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * switch the defined process definition version
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param code        process definition code
      * @param version     the version user want to switch
