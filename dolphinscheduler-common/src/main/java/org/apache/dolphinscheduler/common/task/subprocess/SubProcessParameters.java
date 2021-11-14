@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.common.task.subprocess;
+
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
@@ -29,11 +30,11 @@ public class SubProcessParameters extends AbstractParameters {
      */
     private long processDefinitionCode;
 
-    public void setProcessDefinitionCode(long processDefinitionCode){
+    public void setProcessDefinitionCode(long processDefinitionCode) {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public long getProcessDefinitionCode(){
+    public long getProcessDefinitionCode() {
         return this.processDefinitionCode;
     }
 
