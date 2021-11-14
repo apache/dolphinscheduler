@@ -78,11 +78,6 @@ public abstract class UpgradeDao {
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
-
-    /**
-     * get datasource
-     * @return DruidDataSource
-     */
     public static DataSource getDataSource(){
         return ConnectionFactory.getInstance().getDataSource();
     }
@@ -671,7 +666,6 @@ public abstract class UpgradeDao {
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
                 long taskCode = SnowFlakeUtils.getInstance().nextId();
-                // System.out.println(taskCode);
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());

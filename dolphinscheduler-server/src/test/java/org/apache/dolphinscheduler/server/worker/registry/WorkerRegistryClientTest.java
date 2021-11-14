@@ -71,7 +71,7 @@ public class WorkerRegistryClientTest {
 
     @Before
     public void before() {
-        given(workerConfig.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
+        given(workerConfig.getGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //scheduleAtFixedRate
         given(heartBeatExecutor.scheduleAtFixedRate(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(TimeUnit.class))).willReturn(null);
@@ -81,7 +81,6 @@ public class WorkerRegistryClientTest {
     @Test
     public void testRegistry() {
         //workerRegistryClient.initWorkRegistry();
-        // System.out.println(this.workerGroups.iterator());
         //Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
         //workerRegistryClient.registry();
        // workerRegistryClient.handleDeadServer();
