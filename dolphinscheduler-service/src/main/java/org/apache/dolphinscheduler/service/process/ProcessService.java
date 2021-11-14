@@ -330,18 +330,6 @@ public class ProcessService {
     }
 
     /**
-     * check thread num
-     *
-     * @param command command
-     * @param validThreadNum validThreadNum
-     * @return if thread is enough
-     */
-    private boolean checkThreadNum(Command command, int validThreadNum) {
-        int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionCode());
-        return validThreadNum >= commandThreadCount;
-    }
-
-    /**
      * insert one command
      *
      * @param command command
@@ -412,8 +400,8 @@ public class ProcessService {
     /**
      * get task node list by definitionId
      */
-    public List<TaskDefinition> getTaskNodeListByDefinitionId(Integer defineId) {
-        ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
+    public List<TaskDefinition> getTaskNodeListByDefinitionId(long defineCode) {
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.error("process define not exists");
             return new ArrayList<>();
@@ -536,27 +524,13 @@ public class ProcessService {
     }
 
     /**
-     * calculate sub process number in the process define.
-     *
-     * @param processDefinitionCode processDefinitionCode
-     * @return process thread num count
-     */
-    private Integer workProcessThreadNumCount(long processDefinitionCode) {
-        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
-
-        List<Integer> ids = new ArrayList<>();
-        recurseFindSubProcessId(processDefinition.getId(), ids);
-        return ids.size() + 1;
-    }
-
-    /**
      * recursive query sub process definition id by parent id.
      *
-     * @param parentId parentId
+     * @param parentCode parentCode
      * @param ids ids
      */
-    public void recurseFindSubProcessId(int parentId, List<Integer> ids) {
-        List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentId);
+    public void recurseFindSubProcessId(long parentCode, List<Long> ids) {
+        List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentCode);
 
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
@@ -565,8 +539,8 @@ public class ProcessService {
                 ObjectNode parameterJson = JSONUtils.parseObject(parameter);
                 if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_ID) != null) {
                     SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
-                    ids.add(subProcessParam.getProcessDefinitionId());
-                    recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(), ids);
+                    ids.add(subProcessParam.getProcessDefinitionCode());
+                    recurseFindSubProcessId(subProcessParam.getProcessDefinitionCode(), ids);
                 }
             }
         }
@@ -678,7 +652,6 @@ public class ProcessService {
         processInstance.setStartTime(new Date());
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
-        //processInstance.setProcessDefinitionId(command.getProcessDefinitionId());
         processInstance.setCommandParam(command.getCommandParam());
         processInstance.setCommandType(command.getCommandType());
         processInstance.setIsSubProcess(Flag.NO);
@@ -1307,8 +1280,8 @@ public class ProcessService {
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
         Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
-        int childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
-        ProcessDefinition subProcessDefinition = processDefineMapper.queryByDefineId(childDefineId);
+        int childDefineCode = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
+        ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);

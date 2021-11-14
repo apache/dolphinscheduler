@@ -323,7 +323,7 @@ public final class Constants {
 
     public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionCode";
 
     public static final String CMD_PARAM_START_NODES = "StartNodeList";
 

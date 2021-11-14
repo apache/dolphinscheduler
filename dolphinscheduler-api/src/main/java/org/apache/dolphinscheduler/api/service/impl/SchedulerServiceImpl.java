@@ -355,12 +355,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return result;
             }
             // check sub process definition release state
-            List<Integer> subProcessDefineIds = new ArrayList<>();
+            List<Long> subProcessDefineIds = new ArrayList<>();
             processService.recurseFindSubProcessId(processDefinition.getId(), subProcessDefineIds);
-            Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
             if (!subProcessDefineIds.isEmpty()) {
                 List<ProcessDefinition> subProcessDefinitionList =
-                        processDefinitionMapper.queryDefinitionListByIdList(idArray);
+                        processDefinitionMapper.queryByCodes(subProcessDefineIds);
                 if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()) {
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList) {
                         /**
