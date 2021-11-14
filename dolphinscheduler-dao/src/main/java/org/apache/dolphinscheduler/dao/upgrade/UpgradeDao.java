@@ -78,11 +78,6 @@ public abstract class UpgradeDao {
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
-
-    /**
-     * get datasource
-     * @return DataSource
-     */
     public static DataSource getDataSource(){
         return ConnectionFactory.getInstance().getDataSource();
     }

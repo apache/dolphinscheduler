@@ -114,7 +114,10 @@ public class WorkerServer implements IStoppable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
-        new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(WorkerServer.class)
+            .web(WebApplicationType.NONE)
+            .profiles("worker")
+            .run(args);
     }
 
     /**
