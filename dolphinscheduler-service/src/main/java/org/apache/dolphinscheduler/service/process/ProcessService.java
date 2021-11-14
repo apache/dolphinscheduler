@@ -400,7 +400,7 @@ public class ProcessService {
     /**
      * get task node list by definitionId
      */
-    public List<TaskDefinition> getTaskNodeListByDefinitionId(long defineCode) {
+    public List<TaskDefinition> getTaskNodeListByDefinition(long defineCode) {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.error("process define not exists");
@@ -530,7 +530,7 @@ public class ProcessService {
      * @param ids ids
      */
     public void recurseFindSubProcess(long parentCode, List<Long> ids) {
-        List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentCode);
+        List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinition(parentCode);
 
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
