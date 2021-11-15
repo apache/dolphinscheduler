@@ -152,7 +152,7 @@ public abstract class PluginParams {
 
         protected Boolean display;
 
-        public Builder(String name,
+        protected Builder(String name,
                        FormType formType,
                        String title) {
             requireNonNull(name, "name is null");
@@ -166,7 +166,7 @@ public abstract class PluginParams {
 
         //for json deserialize to POJO
         @JsonCreator
-        public Builder(@JsonProperty("field") String name,
+        protected Builder(@JsonProperty("field") String name,
                        @JsonProperty("type") FormType formType,
                        @JsonProperty("title") String title,
                        @JsonProperty("props") ParamsProps props,

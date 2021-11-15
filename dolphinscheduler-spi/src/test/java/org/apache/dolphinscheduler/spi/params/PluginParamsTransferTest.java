@@ -91,9 +91,9 @@ public class PluginParamsTransferTest {
         }
     }
 
-     /**
-     * Method: getAlpacajsJson(List<PluginParams> pluginParamsList)
-     */
+    /**
+    * Method: getAlpacajsJson(List<PluginParams> pluginParamsList)
+    */
     @Test
     public void testGetParamsJson() {
         List<PluginParams> paramsList = new ArrayList<>();
@@ -195,18 +195,18 @@ public class PluginParamsTransferTest {
 
         for (int i = 0; i < pluginParams.size(); i++) {
             PluginParams param = pluginParams.get(i);
-            Assert.assertEquals(param.getName(), name[i]);
-            Assert.assertEquals(param.getTitle(), name[i]);
+            Assert.assertEquals(name[i], param.getName());
+            Assert.assertEquals(name[i], param.getTitle());
             if (value[i] != null) {
-                Assert.assertEquals(param.getValue().toString(), value[i]);
+                Assert.assertEquals(value[i], param.getValue().toString());
             } else {
-                Assert.assertEquals(param.getValue(), null);
+                Assert.assertEquals(null, param.getValue());
             }
             if (validateRequired[i]) {
-                Assert.assertEquals(param.getValidateList().get(0).isRequired(), true);
-                Assert.assertEquals(param.getValidateList().get(0).getType(), i == 3 ? DataType.NUMBER.getDataType() : DataType.STRING.getDataType());
+                Assert.assertEquals(true, param.getValidateList().get(0).isRequired());
+                Assert.assertEquals(i == 3 ? DataType.NUMBER.getDataType() : DataType.STRING.getDataType(), param.getValidateList().get(0).getType());
             } else {
-                Assert.assertEquals(param.getValidateList(), null);
+                Assert.assertEquals(null, param.getValidateList());
             }
             
             Assert.assertEquals(type[i], param.getFormType());

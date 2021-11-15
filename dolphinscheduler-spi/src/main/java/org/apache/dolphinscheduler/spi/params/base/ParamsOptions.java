@@ -88,10 +88,14 @@ public class ParamsOptions {
         if ((this.value == null) ? (other.value != null) : !this.value.equals(other.value)) {
             return false;
         }
-        if (this.disabled != other.disabled) {
-            return false;
-        }
+        return this.disabled == other.disabled;
+    }
 
-        return true;
+    @Override
+    public int hashCode() {
+        int result=17;
+        result=31*result+(label != null ? label.hashCode():0);
+        result=31*result+(value != null ? value.hashCode():0);
+        return result;
     }
 }
