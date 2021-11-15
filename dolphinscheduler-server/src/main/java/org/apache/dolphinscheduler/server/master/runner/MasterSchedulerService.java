@@ -36,9 +36,13 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -91,6 +95,11 @@ public class MasterSchedulerService extends Thread {
     NettyExecutorManager nettyExecutorManager;
 
     /**
+     * master prepare exec service
+     */
+    private ThreadPoolExecutor masterPrepareExecService;
+
+    /**
      * master exec service
      */
     private ThreadPoolExecutor masterExecService;
@@ -120,6 +129,7 @@ public class MasterSchedulerService extends Thread {
      * constructor of MasterSchedulerService
      */
     public void init() {
+        this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Pre-Exec-Thread", masterConfig.getMasterPreExecThreads());
         this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
@@ -179,70 +189,92 @@ public class MasterSchedulerService extends Thread {
      * @throws Exception
      */
     private void scheduleProcess() throws Exception {
-
-        // make sure to scan and delete command  table in one transaction
-        Command command = findOneCommand();
-        if (command != null) {
-            logger.info("find one command: id: {}, type: {}", command.getId(), command.getCommandType());
-            try {
-                ProcessInstance processInstance = processService.handleCommand(logger,
-                        getLocalAddress(),
-                        command,
-                        processDefinitionCacheMaps);
-                if (!masterConfig.isCacheProcessDefinition()
-                        && processDefinitionCacheMaps.size() > 0) {
-                    processDefinitionCacheMaps.clear();
-                }
-                if (processInstance != null) {
-                    WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
-                            processInstance
-                            , processService
-                            , nettyExecutorManager
-                            , processAlertManager
-                            , masterConfig
-                            , taskTimeoutCheckList);
-
-                    this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
-                    if (processInstance.getTimeout() > 0) {
-                        this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
-                    }
-                    logger.info("handle command end, command {} process {} start...",
-                            command.getId(), processInstance.getId());
-                    masterExecService.execute(workflowExecuteThread);
-                }
-            } catch (Exception e) {
-                logger.error("scan command error ", e);
-                processService.moveToErrorCommand(command, e.toString());
-            }
-        } else {
+        List<Command> commands = findCommands();
+        if (CollectionUtils.isEmpty(commands)) {
             //indicate that no command ,sleep for 1s
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
         }
+
+        if (!masterConfig.isCacheProcessDefinition() && processDefinitionCacheMaps.size() > 0) {
+            processDefinitionCacheMaps.clear();
+        }
+
+        List<ProcessInstance> processInstances = command2ProcessInstance(commands);
+        for (ProcessInstance processInstance : processInstances) {
+            WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
+                    processInstance
+                    , processService
+                    , nettyExecutorManager
+                    , processAlertManager
+                    , masterConfig
+                    , taskTimeoutCheckList);
+
+            this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
+            if (processInstance.getTimeout() > 0) {
+                this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
+            }
+            masterExecService.execute(workflowExecuteThread);
+        }
     }
 
-    private Command findOneCommand() {
+    private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
+        List<ProcessInstance> processInstances = new ArrayList<>();
+        if (CollectionUtils.isEmpty(commands)) {
+            return processInstances;
+        }
+
+        CountDownLatch latch = new CountDownLatch(commands.size());
+        for (Command command : commands) {
+            this.masterPrepareExecService.execute(() -> {
+                try {
+                    ProcessInstance processInstance = processService.handleCommand(logger,
+                            getLocalAddress(),
+                            command,
+                            processDefinitionCacheMaps);
+                    processInstances.add(processInstance);
+
+                    logger.info("handle command command {} end, create process instance {}",
+                            command.getId(), processInstance.getId());
+                } catch (Exception e) {
+                    logger.error("scan command error ", e);
+                    processService.moveToErrorCommand(command, e.toString());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        try {
+            // make sure to finish handling command each time before next scan
+            latch.await();
+        } catch (InterruptedException e) {
+            logger.error("countDownLatch await error ", e);
+        }
+
+        return processInstances;
+    }
+
+    private List<Command> findCommands() {
         int pageNumber = 0;
-        Command result = null;
+        int pageSize = masterConfig.getMasterFetchCommandNum();
+        List<Command> result = new ArrayList<>();
         while (Stopper.isRunning()) {
             if (ServerNodeManager.MASTER_SIZE == 0) {
-                return null;
+                return result;
             }
-            List<Command> commandList = processService.findCommandPage(ServerNodeManager.MASTER_SIZE, pageNumber);
+            List<Command> commandList = processService.findCommandPage(pageSize, pageNumber);
             if (commandList.size() == 0) {
-                return null;
+                return result;
             }
             for (Command command : commandList) {
                 int slot = ServerNodeManager.getSlot();
                 if (ServerNodeManager.MASTER_SIZE != 0
                         && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
-                    result = command;
-                    break;
+                    result.add(command);
                 }
             }
-            if (result != null) {
-                logger.info("find command {}, slot:{} :",
-                        result.getId(),
-                        ServerNodeManager.getSlot());
+            if (CollectionUtils.isNotEmpty(result)) {
+                logger.info("find {} commands, slot:{}", result.size(), ServerNodeManager.getSlot());
                 break;
             }
             pageNumber += 1;
