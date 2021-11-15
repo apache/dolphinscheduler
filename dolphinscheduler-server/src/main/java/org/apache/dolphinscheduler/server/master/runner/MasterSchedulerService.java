@@ -193,6 +193,7 @@ public class MasterSchedulerService extends Thread {
         if (CollectionUtils.isEmpty(commands)) {
             //indicate that no command ,sleep for 1s
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+            return;
         }
 
         if (!masterConfig.isCacheProcessDefinition() && processDefinitionCacheMaps.size() > 0) {
