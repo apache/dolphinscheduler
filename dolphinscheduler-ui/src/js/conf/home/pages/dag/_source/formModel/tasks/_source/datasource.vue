@@ -33,6 +33,7 @@
                 v-model="datasource"
                 style="width: 288px;"
                 size="small"
+                 filterable
                 :disabled="isDetails">
         <el-option
                 v-for="city in datasourceList"
