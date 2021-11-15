@@ -1007,7 +1007,7 @@ public class WorkflowExecuteThread implements Runnable {
                 return true;
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
-                return readyToSubmitTaskQueue.size() == 0 || activeTaskProcessorMaps.size() == 0;
+                return readyToSubmitTaskQueue.size() == 0 && activeTaskProcessorMaps.size() == 0;
             }
         }
         return false;
