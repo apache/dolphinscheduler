@@ -185,8 +185,6 @@ public class MasterSchedulerService extends Thread {
     /**
      * 1. get command by slot
      * 2. donot handle command if slot is empty
-     *
-     * @throws Exception
      */
     private void scheduleProcess() throws Exception {
         List<Command> commands = findCommands();
@@ -201,7 +199,15 @@ public class MasterSchedulerService extends Thread {
         }
 
         List<ProcessInstance> processInstances = command2ProcessInstance(commands);
+        if (CollectionUtils.isEmpty(processInstances)) {
+            return;
+        }
+
         for (ProcessInstance processInstance : processInstances) {
+            if (processInstance == null) {
+                continue;
+            }
+
             WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                     processInstance
                     , processService
@@ -219,23 +225,31 @@ public class MasterSchedulerService extends Thread {
     }
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) {
-        List<ProcessInstance> processInstances = new ArrayList<>();
         if (CollectionUtils.isEmpty(commands)) {
-            return processInstances;
+            return null;
         }
 
+        List<ProcessInstance> processInstances = new ArrayList<>(commands.size());
         CountDownLatch latch = new CountDownLatch(commands.size());
-        for (Command command : commands) {
+        for (int i = 0; i < commands.size(); i++) {
+            int index = i;
             this.masterPrepareExecService.execute(() -> {
+                Command command = commands.get(index);
+                // slot check again
+                if (!slotCheck(command)) {
+                    return;
+                }
+
                 try {
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
                             command,
                             processDefinitionCacheMaps);
-                    processInstances.add(processInstance);
-
-                    logger.info("handle command command {} end, create process instance {}",
-                            command.getId(), processInstance.getId());
+                    if (processInstance != null) {
+                        processInstances.set(index, processInstance);
+                        logger.info("handle command command {} end, create process instance {}",
+                                command.getId(), processInstance.getId());
+                    }
                 } catch (Exception e) {
                     logger.error("scan command error ", e);
                     processService.moveToErrorCommand(command, e.toString());
@@ -268,9 +282,7 @@ public class MasterSchedulerService extends Thread {
                 return result;
             }
             for (Command command : commandList) {
-                int slot = ServerNodeManager.getSlot();
-                if (ServerNodeManager.MASTER_SIZE != 0
-                        && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
+                if (slotCheck(command)) {
                     result.add(command);
                 }
             }
@@ -281,6 +293,14 @@ public class MasterSchedulerService extends Thread {
             pageNumber += 1;
         }
         return result;
+    }
+
+    private boolean slotCheck(Command command) {
+        int slot = ServerNodeManager.getSlot();
+        if (ServerNodeManager.MASTER_SIZE != 0 && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
+            return true;
+        }
+        return false;
     }
 
     private String getLocalAddress() {
