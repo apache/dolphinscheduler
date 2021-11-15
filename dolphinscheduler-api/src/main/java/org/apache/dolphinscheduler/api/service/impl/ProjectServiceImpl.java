@@ -485,20 +485,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query all project list
      *
-     * @param loginUser user
      * @return project list
      */
     @Override
-    public Map<String, Object> queryAllProjectList(User loginUser) {
-        List<Project> projectList;
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            projectList = projectMapper.queryAllProject();
-        } else {
-            projectList = projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId());
-        }
+    public Map<String, Object> queryAllProjectList() {
+        List<Project>  projectList = projectMapper.queryAllProject();
 
-        Map<String, Object> result = new HashMap<>(16);
-
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.DATA_LIST, projectList);
         putMsg(result, Status.SUCCESS);
         return result;

@@ -129,7 +129,7 @@ public class ProjectControllerTest {
     public void testQueryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
-        Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
+        Mockito.when(projectService.queryAllProjectList()).thenReturn(result);
         Result response = projectController.queryAllProjectList(user);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }

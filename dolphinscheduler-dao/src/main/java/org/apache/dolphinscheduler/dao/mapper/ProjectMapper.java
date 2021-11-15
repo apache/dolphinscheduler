@@ -114,7 +114,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
     ProjectUser queryProjectWithUserByProcessInstanceId(@Param("processInstanceId") int processInstanceId);
 
     /**
-     * query all project,only admin user can use this method, Other users query all projects use {@link ProjectMapper#queryProjectCreatedAndAuthorizedByUserId(int)}
+     * query all project
      * @return projectList
      */
     List<Project> queryAllProject();
