@@ -836,10 +836,50 @@ export default {
       })
     })
   },
-  getTaskDefinitions ({ state }, payload) {
+  /**
+   * Query Task Definitions List Paging
+   */
+  getTaskDefinitionsList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete Task Definition by code
+   */
+  deleteTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.code}`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Save Task Definition
+   */
+  saveTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectCode}/task-definition`, {
+        taskDefinitionJson: JSON.stringify(payload.taskDefinitionJson)
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  updateTaskDefinition ({ state }, taskDefinition) {
+    return new Promise((resolve, reject) => {
+      io.put(`projects/${state.projectCode}/task-definition/${taskDefinition.code}`, {
+        taskDefinitionJsonObj: JSON.stringify(taskDefinition)
+      }, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })
