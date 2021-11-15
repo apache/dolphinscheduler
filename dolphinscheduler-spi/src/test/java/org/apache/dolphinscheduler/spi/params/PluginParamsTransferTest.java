@@ -18,14 +18,19 @@
 package org.apache.dolphinscheduler.spi.params;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.spi.params.checkbox.CheckboxParam;
+import org.apache.dolphinscheduler.spi.params.fswitch.SwitchParam;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +51,29 @@ public class PluginParamsTransferTest {
 
     @After
     public void after() throws Exception {
+    }
+
+    @Test
+    public void testParamsOptionsEqual() {
+        ParamsOptions pOptions1 = new ParamsOptions("table", "table", false);
+        assertNotEquals(null, pOptions1);
+        assertNotEquals("Not Equal", pOptions1);
+
+        ParamsOptions pOptions2 = new ParamsOptions("table", "table", false);
+        assertEquals(pOptions2, pOptions1);
+        assertEquals(pOptions1.hashCode(), pOptions2.hashCode());
+
+        ParamsOptions pOptions3 = new ParamsOptions(null, "table", false);
+        ParamsOptions pOptions4 = new ParamsOptions("table", null, false);
+        assertEquals(pOptions3, pOptions3);
+        assertEquals(pOptions4, pOptions4);
+        assertNotEquals(pOptions1, pOptions3);
+        assertNotEquals(pOptions1, pOptions4);
+
+        ParamsOptions pOptions5 = new ParamsOptions(null, "table", false);
+        ParamsOptions pOptions6 = new ParamsOptions("table", null, false);
+        assertEquals(pOptions3.hashCode(), pOptions5.hashCode());
+        assertEquals(pOptions4.hashCode(), pOptions6.hashCode());
     }
 
     @Test
@@ -163,6 +191,19 @@ public class PluginParamsTransferTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
+        CheckboxParam checkboxParam = new CheckboxParam.Builder("checkboxTest", "checkboxTest")
+                .build();
+
+        InputNumberParam inputNumberParam = new InputNumberParam.Builder("inputNumberTest", "inputNumberTest")
+                .build();
+
+        SelectParam selectParam = new SelectParam.Builder("selectTest", "selectTest")
+                .build();
+        
+        SwitchParam switchParam = new SwitchParam.Builder("switchTest", "switchTest")
+                .build();
+                
+
         paramsList.add(receivesParam);
         paramsList.add(receiveCcsParam);
         paramsList.add(mailSmtpHost);
@@ -176,6 +217,11 @@ public class PluginParamsTransferTest {
         paramsList.add(sslTrust);
         paramsList.add(showType);
 
+        paramsList.add(checkboxParam);
+        paramsList.add(inputNumberParam);
+        paramsList.add(selectParam);
+        paramsList.add(switchParam);
+
         String paramsJson = PluginParamsTransfer.transferParamsToJson(paramsList);
 
         List<PluginParams> pluginParams = PluginParamsTransfer.transferJsonToParamsList(paramsJson);
@@ -183,11 +229,17 @@ public class PluginParamsTransferTest {
 
         String input = FormType.INPUT.getFormType();
         String radio = FormType.RADIO.getFormType();
+        String checkbox = FormType.CHECKBOX.getFormType();
+        String inputNumber = FormType.INPUTNUMBER.getFormType();
+        String select = FormType.SELECT.getFormType();
+        String switchType = FormType.SWITCH.getFormType();
 
-        String[] name = new String[]{"field1", "field2", "field3", "field4", "field5", "field6", "field7", "field8", "field9", "field10", "field11", "showType"};
-        String[] value = new String[]{null, null, null, null, null, "true", null, null,"false", "false", "*", "table"};
-        Boolean[] validateRequired = new Boolean[]{true, false, true, true, true, true, false, false, true, true, true, true};
-        String[] type = new String[]{input, input, input, input, input, radio, input, input, radio, radio, input, radio};
+        String[] name = new String[]{"field1", "field2", "field3", "field4", "field5", "field6", "field7", "field8",
+                "field9", "field10", "field11", "showType", "checkboxTest", "inputNumberTest", "selectTest", "switchTest"};
+        String[] value = new String[]{null, null, null, null, null, "true", null, null,"false", "false", "*", "table", null, null, null, null};
+        Boolean[] validateRequired = new Boolean[]{true, false, true, true, true, true, false, false, true, true, true, true, false, false, false, false};
+        String[] type = new String[]{input, input, input, input, input, radio, input, input,
+                radio, radio, input, radio, checkbox, inputNumber, select, switchType};
 
         List<ParamsOptions> radioOptions = new ArrayList<ParamsOptions>();
         radioOptions.add(new ParamsOptions("YES", true, false));
