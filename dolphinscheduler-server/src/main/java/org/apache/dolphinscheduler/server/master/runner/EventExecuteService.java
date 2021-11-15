@@ -81,7 +81,7 @@ public class EventExecuteService extends Thread {
 
     public void init() {
 
-        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
+        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getExecThreads());
 
         listeningExecutorService = MoreExecutors.listeningDecorator(eventExecService);
         this.stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
