@@ -1209,7 +1209,10 @@ public class ProcessService {
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
         Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
-        int childDefineCode = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
+        long childDefineCode = 0L;
+        if (subProcessParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
+            childDefineCode = Long.parseLong(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
+        }
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
