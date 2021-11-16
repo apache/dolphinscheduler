@@ -90,6 +90,8 @@ jobs:
         with:
           python-version: 3.7
       - name: Install Development Dependences
-        run: pip install -r requirements_dev.txt
+        run: |
+          pip install -r requirements_dev.txt
+          pip install -e .
       - name: Run Tests && Check coverage
         run: coverage run && coverage report
