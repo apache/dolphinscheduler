@@ -50,6 +50,8 @@ jobs:
           python-version: 3.7
       - name: Install Development Dependences
         run: pip install -r requirements_dev.txt
+      - name: Run Isort Checking
+        run: isort --check .
       - name: Run Black Checking
         run: black --check .
       - name: Run Flake8 Checking
