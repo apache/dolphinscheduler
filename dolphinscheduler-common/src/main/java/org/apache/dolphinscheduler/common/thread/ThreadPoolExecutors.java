@@ -14,14 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.thread;
-
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.lang.management.ThreadInfo;
@@ -30,10 +24,16 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  *
- * 	thread pool's single instance
+ *  thread pool's single instance
  *
  */
 public class ThreadPoolExecutors {
@@ -42,24 +42,23 @@ public class ThreadPoolExecutors {
     private static Executor executor;
     private static volatile ThreadPoolExecutors threadPoolExecutors;
 
-    private ThreadPoolExecutors(){}
+    private ThreadPoolExecutors() {}
 
-
-    public static ThreadPoolExecutors getInstance(){
+    public static ThreadPoolExecutors getInstance() {
         return getInstance("thread_pool",0);
     }
 
-    public static ThreadPoolExecutors getInstance(String name, int maxThreads){
+    public static ThreadPoolExecutors getInstance(String name, int maxThreads) {
 
         if (null == threadPoolExecutors) {
 
             synchronized (ThreadPoolExecutors.class) {
 
-                if(null == threadPoolExecutors) {
+                if (null == threadPoolExecutors) {
                     threadPoolExecutors = new ThreadPoolExecutors();
                 }
-                if(null == executor) {
-                    executor = new Executor(null == name? "thread_pool" : name, maxThreads == 0? Runtime.getRuntime().availableProcessors() * 3 : maxThreads);
+                if (null == executor) {
+                    executor = new Executor(null == name ? "thread_pool" : name, maxThreads == 0 ?  Runtime.getRuntime().availableProcessors() * 3 : maxThreads);
                 }
             }
         }
@@ -82,7 +81,6 @@ public class ThreadPoolExecutors {
         }
     }
 
-
     public Future<?> submit(Runnable event) {
         Executor eventExecutor = getExecutor();
         if (eventExecutor == null) {
@@ -95,7 +93,6 @@ public class ThreadPoolExecutors {
 
     }
 
-
     public Future<?> submit(Callable<?> task) {
         Executor taskExecutor = getExecutor();
         if (taskExecutor == null) {
@@ -107,18 +104,14 @@ public class ThreadPoolExecutors {
         return null;
     }
 
-
-
     public void printStatus() {
         Executor printExecutor = getExecutor();
         printExecutor.getStatus().dumpInfo();
     }
 
-
     private Executor getExecutor() {
         return executor;
     }
-
 
     public void shutdown() {
         if (executor != null) {
@@ -129,7 +122,6 @@ public class ThreadPoolExecutors {
             }
         }
     }
-
 
     /**
      * Executor instance.
@@ -181,7 +173,6 @@ public class ThreadPoolExecutors {
             return  this.threadPoolExecutor.submit(event);
         }
 
-
         @Override
         public String toString() {
             return getClass().getSimpleName() + "-" + id + "-" + name;
@@ -203,7 +194,6 @@ public class ThreadPoolExecutors {
             return new ExecutorStatus(this, queuedEvents, running);
         }
     }
-
 
     /**
      * A subclass of ThreadPoolExecutor that keeps track of the Runnables that
@@ -242,7 +232,6 @@ public class ThreadPoolExecutors {
             return running;
         }
     }
-
 
     /**
      * A snapshot of the status of a particular executor. This includes the
@@ -292,7 +281,6 @@ public class ThreadPoolExecutors {
             out.flush();
         }
     }
-
 
     /**
      * The status of a particular event that is in the middle of being handled
