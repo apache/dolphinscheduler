@@ -45,12 +45,12 @@ public class EWeChatSenderTest {
     @Test
     public void testSend() {
         EWeChatSender eWeChatSender = new EWeChatSender(eWeChatConfig);
-        String title="start process success";
-        String content = "[{\"projectId\":1,\"projectName\":\"test\",\"owner\":\"admin\",\"processId\":17,\"processName\":\"test_wechat-1-20211110112316488\",\"processType\":\"START_PROCESS\",\"processState\":\"SUCCESS\",\"recovery\":\"NO\",\"runTimes\":1,\"processStartTime\":\"2021-11-10 11:23:16\",\"processEndTime\":\"2021-11-10 11:24:26\",\"processHost\":\"192.168.242.40:5678\",\"taskId\":0,\"retryTimes\":0}]";
+        String title = "start process success";
+        String content = "[{\"projectId\":1,\"projectName\":\"test\",\"owner\":\"admin\",\"processId\":17,\"processName\":\"test_wechat-1-20211110112316488\"}]";
         eWeChatSender.sendEWeChatMsg(title, content);
         eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_PROXY_ENABLE, "true");
         eWeChatSender = new EWeChatSender(eWeChatConfig);
         AlertResult alertResult = eWeChatSender.sendEWeChatMsg("title", "content test");
-        Assert.assertEquals("false",alertResult.getStatus());
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 }
