@@ -119,12 +119,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
             }
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
-            if (taskDefinition != null) {
-                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
-                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
-                return result;
-            }
         }
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
@@ -288,10 +282,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
-        TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        taskDefinitionLog.setUserId(loginUser.getId());
-        taskDefinitionLog.setUpdateTime(new Date());
-        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionLog);
+        TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        taskDefinitionUpdate.setUserId(loginUser.getId());
+        taskDefinitionUpdate.setUpdateTime(new Date());
+        taskDefinitionUpdate.setId(taskDefinition.getId());
+        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (switchVersion > 0) {
             result.put(Constants.DATA_LIST, taskCode);
             putMsg(result, Status.SUCCESS);
