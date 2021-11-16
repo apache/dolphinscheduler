@@ -596,4 +596,32 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * update process definition schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @param scheduleExpression scheduleExpression
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param workerGroup worker group
+     * @param processInstancePriority process instance priority
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> updateScheduleByProcessDefinitionCode(User loginUser,
+                                                                     long projectCode,
+                                                                     long processDefinitionCode,
+                                                                     String scheduleExpression,
+                                                                     WarningType warningType,
+                                                                     int warningGroupId,
+                                                                     FailureStrategy failureStrategy,
+                                                                     Priority processInstancePriority,
+                                                                     String workerGroup,
+                                                                     long environmentCode) {
+        return null;
+    }
 }

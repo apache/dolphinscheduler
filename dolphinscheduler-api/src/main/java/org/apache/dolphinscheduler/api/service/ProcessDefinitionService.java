@@ -332,5 +332,79 @@ public interface ProcessDefinitionService {
                                                        long code,
                                                        int version);
 
+    /**
+     * create empty process definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @return process definition code
+     */
+    Map<String, Object> createEmptyProcessDefinition(User loginUser,
+                                                     long projectCode,
+                                                     String name,
+                                                     String description,
+                                                     String globalParams,
+                                                     int timeout,
+                                                     String tenantCode,
+                                                     String scheduleJson,
+                                                     ProcessExecutionTypeEnum executionType);
+
+    /**
+     * update process definition basic info
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param code process definition code
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @param executionType executionType
+     * @return update result code
+     */
+    Map<String, Object> updateProcessDefinitionBasicInfo(User loginUser,
+                                                         long projectCode,
+                                                         String name,
+                                                         long code,
+                                                         String description,
+                                                         String globalParams,
+                                                         int timeout,
+                                                         String tenantCode,
+                                                         String scheduleJson,
+                                                         ProcessExecutionTypeEnum executionType);
+
+    /**
+     * release process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    Map<String, Object> releaseWorkflowAndSchedule(User loginUser,
+                                                   long projectCode,
+                                                   long code,
+                                                   ReleaseState releaseState);
+
+    /**
+     * delete process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @return update result code
+     */
+    Map<String, Object> deleteWorkflowAndSchedule(User loginUser,
+                                                  long projectCode,
+                                                  long code);
 }
 

@@ -280,6 +280,10 @@ public enum Status {
     QUERY_DETAIL_OF_TASK_DEFINITION_ERROR(50043, "query detail of task definition error", "查询任务详细信息错误"),
     QUERY_TASK_DEFINITION_LIST_PAGING_ERROR(50044, "query task definition list paging error", "分页查询任务定义列表错误"),
     TASK_DEFINITION_NAME_EXISTED(50045, "task definition name [{0}] already exists", "任务定义名称[{0}]已经存在"),
+    RELEASE_TASK_DEFINITION_ERROR(50046, "release task definition error", "上线任务错误"),
+    MOVE_PROCESS_TASK_RELATION_ERROR(50047, "move process task relation error", "移动任务到其他工作流错误"),
+    DELETE_TASK_PROCESS_RELATION_ERROR(50048, "delete process task relation error", "删除工作流任务关系错误"),
+    QUERY_TASK_PROCESS_RELATION_ERROR(50049, "query process task relation error", "查询工作流任务关系错误"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
