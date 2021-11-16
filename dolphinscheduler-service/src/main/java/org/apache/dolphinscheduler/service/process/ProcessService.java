@@ -218,6 +218,7 @@ public class ProcessService {
      * @param processDefinitionCacheMaps
      * @return process instance
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public ProcessInstance handleCommand(Logger logger, String host, Command command, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
         ProcessInstance processInstance = constructProcessInstance(command, host, processDefinitionCacheMaps);
         // cannot construct process instance, return null
@@ -305,6 +306,7 @@ public class ProcessService {
      * @param command command
      * @param message message
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
@@ -480,6 +482,7 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      * @return delete all sub process instance result
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public int deleteAllSubWorkProcessByParentId(int processInstanceId) {
 
         List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
@@ -498,6 +501,7 @@ public class ProcessService {
      *
      * @param processInstanceId processInstanceId
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public void removeTaskLogFile(Integer processInstanceId) {
         List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
         if (CollectionUtils.isEmpty(taskInstanceList)) {
@@ -555,6 +559,7 @@ public class ProcessService {
      * @param originCommand originCommand
      * @param processInstance processInstance
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance) {
 
         // sub process doesnot need to create wait command
@@ -1012,6 +1017,7 @@ public class ProcessService {
      *
      * @param subProcessInstance subProcessInstance
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public void setSubProcessParam(ProcessInstance subProcessInstance) {
         String cmdParam = subProcessInstance.getCommandParam();
         if (StringUtils.isEmpty(cmdParam)) {
@@ -1097,6 +1103,7 @@ public class ProcessService {
      * @param commitInterval
      * @return
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
 
         int retryTimes = 1;
@@ -1131,7 +1138,7 @@ public class ProcessService {
      * @param taskInstance taskInstance
      * @return task instance
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public TaskInstance submitTask(TaskInstance taskInstance) {
         ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         logger.info("start submit task : {}, instance id:{}, state: {}",
@@ -1216,6 +1223,7 @@ public class ProcessService {
      * @param parentProcessInstance parentProcessInstance
      * @param task task
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
         if (!task.isSubProcess()) {
             return;
@@ -1274,6 +1282,7 @@ public class ProcessService {
     /**
      * create sub work process command
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public Command createSubProcessCommand(ProcessInstance parentProcessInstance,
                                            ProcessInstance childInstance,
                                            ProcessInstanceMap instanceMap,
@@ -1364,6 +1373,7 @@ public class ProcessService {
      * @param processInstance processInstance
      * @return task instance
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus processInstanceState = processInstance.getState();
 
@@ -2221,6 +2231,7 @@ public class ProcessService {
     /**
      * switch process definition version to process definition log version
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
             return Constants.DEFINITION_FAILURE;
@@ -2239,6 +2250,7 @@ public class ProcessService {
         return result;
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
     public int switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
@@ -2270,6 +2282,7 @@ public class ProcessService {
         return StringUtils.join(resourceIds, ",");
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
     public int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
         Date now = new Date();
         List<TaskDefinitionLog> newTaskDefinitionLogs = new ArrayList<>();
@@ -2329,6 +2342,7 @@ public class ProcessService {
     /**
      * save processDefinition (including create or update processDefinition)
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean isFromProcessDefine) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
@@ -2351,6 +2365,7 @@ public class ProcessService {
     /**
      * save task relations
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                                 List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
