@@ -17,6 +17,7 @@
 
 # testting
 pytest~=6.2.5
+freezegun
 # code linting and formatting
 flake8
 flake8-docstrings

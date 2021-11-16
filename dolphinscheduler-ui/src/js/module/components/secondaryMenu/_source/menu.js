@@ -76,6 +76,12 @@ const menu = {
           path: 'history-task-record',
           id: 4,
           enabled: config.recordSwitch
+        },
+        {
+          name: `${i18n.$t('Task Definition')}`,
+          path: 'task-definition',
+          id: 5,
+          enabled: true
         }
       ]
     }
