@@ -63,7 +63,7 @@
         <if test="userId != 0">
             and (
             <if test="resIds != null and resIds.size() > 0">
-                and d.id in
+                d.id in
                 <foreach collection="resIds" item="i" open="(" close=") or" separator=",">
                     #{i}
                 </foreach>
