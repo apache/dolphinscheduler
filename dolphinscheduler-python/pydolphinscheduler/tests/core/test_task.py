@@ -97,26 +97,33 @@ def test_task_to_dict():
         assert task.to_dict() == expect
 
 
-@pytest.mark.parametrize(
-    "shift", ["<<", ">>"]
-)
+@pytest.mark.parametrize("shift", ["<<", ">>"])
 def test_two_tasks_shift(shift: str):
     """Test bit operator between tasks.
 
-    Here we test both `>>` and `<<` bit operator."""
+    Here we test both `>>` and `<<` bit operator.
+    """
     raw_script = "script"
-    upstream = testTask(name="upstream", task_type=shift, task_params=TaskParams(raw_script))
-    downstream = testTask(name="downstream", task_type=shift, task_params=TaskParams(raw_script))
+    upstream = testTask(
+        name="upstream", task_type=shift, task_params=TaskParams(raw_script)
+    )
+    downstream = testTask(
+        name="downstream", task_type=shift, task_params=TaskParams(raw_script)
+    )
     if shift == "<<":
         downstream << upstream
     elif shift == ">>":
         upstream >> downstream
     else:
         assert False, f"Unexpect bit operator type {shift}."
-    assert 1 == len(upstream._downstream_task_codes) and downstream.code in upstream._downstream_task_codes, \
-        f"Task downstream task attributes error, downstream codes size or specific code failed."
-    assert 1 == len(downstream._upstream_task_codes) and upstream.code in downstream._upstream_task_codes, \
-        f"Task upstream task attributes error, upstream codes size or upstream code failed."
+    assert (
+        1 == len(upstream._downstream_task_codes)
+        and downstream.code in upstream._downstream_task_codes
+    ), "Task downstream task attributes error, downstream codes size or specific code failed."
+    assert (
+        1 == len(downstream._upstream_task_codes)
+        and upstream.code in downstream._upstream_task_codes
+    ), "Task upstream task attributes error, upstream codes size or upstream code failed."
 
 
 @pytest.mark.parametrize(
@@ -126,22 +133,29 @@ def test_two_tasks_shift(shift: str):
         ("tasks << task", "downstream"),
         ("task >> tasks", "downstream"),
         ("tasks >> task", "upstream"),
-    ]
+    ],
 )
 def test_tasks_list_shift(dep_expr: str, flag: str):
     """Test bit operator between task and sequence of tasks.
 
-    Here we test both `>>` and `<<` bit operator."""
+    Here we test both `>>` and `<<` bit operator.
+    """
     reverse_dict = {
         "upstream": "downstream",
         "downstream": "upstream",
     }
     task_type = "dep_task_and_tasks"
     raw_script = "script"
-    task = testTask(name="upstream", task_type=task_type, task_params=TaskParams(raw_script))
+    task = testTask(
+        name="upstream", task_type=task_type, task_params=TaskParams(raw_script)
+    )
     tasks = [
-        testTask(name="downstream1", task_type=task_type, task_params=TaskParams(raw_script)),
-        testTask(name="downstream2", task_type=task_type, task_params=TaskParams(raw_script)),
+        testTask(
+            name="downstream1", task_type=task_type, task_params=TaskParams(raw_script)
+        ),
+        testTask(
+            name="downstream2", task_type=task_type, task_params=TaskParams(raw_script)
+        ),
     ]
 
     # Use build-in function eval to simply test case and reduce duplicate code
