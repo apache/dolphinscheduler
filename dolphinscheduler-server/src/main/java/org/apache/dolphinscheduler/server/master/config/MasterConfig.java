@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("master")
 public class MasterConfig {
     private int listenPort;
-    private int masterFetchCommandNum;
-    private int masterPreExecThreads;
+    private int fetchCommandNum;
+    private int preExecThreads;
     private int execThreads;
     private int execTaskNum;
     private int dispatchTaskNumber;
@@ -50,20 +50,20 @@ public class MasterConfig {
         this.listenPort = listenPort;
     }
 
-    public int getMasterFetchCommandNum() {
-        return masterFetchCommandNum;
+    public int getFetchCommandNum() {
+        return fetchCommandNum;
     }
 
-    public void setMasterFetchCommandNum(int masterFetchCommandNum) {
-        this.masterFetchCommandNum = masterFetchCommandNum;
+    public void setFetchCommandNum(int fetchCommandNum) {
+        this.fetchCommandNum = fetchCommandNum;
     }
 
-    public int getMasterPreExecThreads() {
-        return masterPreExecThreads;
+    public int getPreExecThreads() {
+        return preExecThreads;
     }
 
-    public void setMasterPreExecThreads(int masterPreExecThreads) {
-        this.masterPreExecThreads = masterPreExecThreads;
+    public void setPreExecThreads(int preExecThreads) {
+        this.preExecThreads = preExecThreads;
     }
 
     public int getExecThreads() {

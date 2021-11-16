@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -129,7 +130,7 @@ public class MasterSchedulerService extends Thread {
      * constructor of MasterSchedulerService
      */
     public void init() {
-        this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Pre-Exec-Thread", masterConfig.getMasterPreExecThreads());
+        this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Pre-Exec-Thread", masterConfig.getPreExecThreads());
         this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
@@ -229,7 +230,7 @@ public class MasterSchedulerService extends Thread {
             return null;
         }
 
-        List<ProcessInstance> processInstances = new ArrayList<>(commands.size());
+        ProcessInstance[] processInstances = new ProcessInstance[commands.size()];
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (int i = 0; i < commands.size(); i++) {
             int index = i;
@@ -237,6 +238,7 @@ public class MasterSchedulerService extends Thread {
                 Command command = commands.get(index);
                 // slot check again
                 if (!slotCheck(command)) {
+                    latch.countDown();
                     return;
                 }
 
@@ -246,7 +248,7 @@ public class MasterSchedulerService extends Thread {
                             command,
                             processDefinitionCacheMaps);
                     if (processInstance != null) {
-                        processInstances.set(index, processInstance);
+                        processInstances[index] = processInstance;
                         logger.info("handle command command {} end, create process instance {}",
                                 command.getId(), processInstance.getId());
                     }
@@ -266,12 +268,12 @@ public class MasterSchedulerService extends Thread {
             logger.error("countDownLatch await error ", e);
         }
 
-        return processInstances;
+        return Arrays.asList(processInstances);
     }
 
     private List<Command> findCommands() {
         int pageNumber = 0;
-        int pageSize = masterConfig.getMasterFetchCommandNum();
+        int pageSize = masterConfig.getFetchCommandNum();
         List<Command> result = new ArrayList<>();
         while (Stopper.isRunning()) {
             if (ServerNodeManager.MASTER_SIZE == 0) {
