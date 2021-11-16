@@ -21,9 +21,9 @@ spring:
 master:
   listen-port: 5678
   # master fetch command num
-  master-fetch-command-num: 10
+  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
-  master-pre-exec-threads: 10
+  pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
   exec-threads: 100
   # master execute task number in parallel per process instance
