@@ -53,3 +53,4 @@ dolphinscheduler-common/test
 __pycache__/
 build/
 *egg-info/
+.coverage
