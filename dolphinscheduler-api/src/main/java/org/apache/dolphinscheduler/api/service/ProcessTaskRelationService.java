@@ -77,14 +77,12 @@ public interface ProcessTaskRelationService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param preTaskCodes the pre task codes, sep ','
      * @param taskCode the post task code
      * @return delete result code
      */
     Map<String, Object> deleteUpstreamRelation(User loginUser,
                                                long projectCode,
-                                               long processDefinitionCode,
                                                String preTaskCodes,
                                                long taskCode);
 
@@ -93,14 +91,12 @@ public interface ProcessTaskRelationService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param postTaskCodes the post task codes, sep ','
      * @param taskCode the pre task code
      * @return delete result code
      */
     Map<String, Object> deleteDownstreamRelation(User loginUser,
                                                  long projectCode,
-                                                 long processDefinitionCode,
                                                  String postTaskCodes,
                                                  long taskCode);
 

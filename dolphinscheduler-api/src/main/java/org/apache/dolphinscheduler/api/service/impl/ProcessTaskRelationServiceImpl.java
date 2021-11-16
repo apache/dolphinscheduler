@@ -100,13 +100,12 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param preTaskCodes the pre task codes, sep ','
      * @param taskCode the post task code
      * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, long processDefinitionCode, String preTaskCodes, long taskCode) {
+    public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, String preTaskCodes, long taskCode) {
         return null;
     }
 
@@ -115,13 +114,12 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param postTaskCodes the post task codes, sep ','
      * @param taskCode the pre task code
      * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, long processDefinitionCode, String postTaskCodes, long taskCode) {
+    public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, String postTaskCodes, long taskCode) {
         return null;
     }
 

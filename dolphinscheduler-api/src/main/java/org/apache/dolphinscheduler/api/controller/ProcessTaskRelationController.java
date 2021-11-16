@@ -149,7 +149,6 @@ public class ProcessTaskRelationController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param preTaskCodes the pre task codes, sep ','
      * @param taskCode the post task code
      * @return delete result code
@@ -157,7 +156,6 @@ public class ProcessTaskRelationController extends BaseController {
     @ApiOperation(value = "deleteUpstreamRelation", notes = "DELETE_UPSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
         @ApiImplicitParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true, type = "String", example = "3,4"),
         @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
@@ -167,10 +165,9 @@ public class ProcessTaskRelationController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteUpstreamRelation(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                         @RequestParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true) long processDefinitionCode,
                                          @RequestParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true) String preTaskCodes,
                                          @PathVariable("taskCode") long taskCode) {
-        return returnDataList(processTaskRelationService.deleteUpstreamRelation(loginUser, projectCode, processDefinitionCode, preTaskCodes, taskCode));
+        return returnDataList(processTaskRelationService.deleteUpstreamRelation(loginUser, projectCode, preTaskCodes, taskCode));
     }
 
     /**
@@ -178,7 +175,6 @@ public class ProcessTaskRelationController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
      * @param postTaskCodes the post task codes, sep ','
      * @param taskCode the pre task code
      * @return delete result code
@@ -186,7 +182,6 @@ public class ProcessTaskRelationController extends BaseController {
     @ApiOperation(value = "deleteDownstreamRelation", notes = "DELETE_DOWNSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
         @ApiImplicitParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true, type = "String", example = "3,4"),
         @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
@@ -196,10 +191,9 @@ public class ProcessTaskRelationController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteDownstreamRelation(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true) long processDefinitionCode,
                                            @RequestParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true) String postTaskCodes,
                                            @PathVariable("taskCode") long taskCode) {
-        return returnDataList(processTaskRelationService.deleteDownstreamRelation(loginUser, projectCode, processDefinitionCode, postTaskCodes, taskCode));
+        return returnDataList(processTaskRelationService.deleteDownstreamRelation(loginUser, projectCode, postTaskCodes, taskCode));
     }
 
     /**
