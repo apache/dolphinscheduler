@@ -148,4 +148,29 @@ public interface SchedulerService {
      * @return the next five fire time
      */
     Map<String, Object> previewSchedule(User loginUser, String schedule);
+
+    /**
+     * update process definition schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @param scheduleExpression scheduleExpression
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param workerGroup worker group
+     * @param processInstancePriority process instance priority
+     * @return update result code
+     */
+    Map<String, Object> updateScheduleByProcessDefinitionCode(User loginUser,
+                                                              long projectCode,
+                                                              long processDefinitionCode,
+                                                              String scheduleExpression,
+                                                              WarningType warningType,
+                                                              int warningGroupId,
+                                                              FailureStrategy failureStrategy,
+                                                              Priority processInstancePriority,
+                                                              String workerGroup,
+                                                              long environmentCode);
 }
