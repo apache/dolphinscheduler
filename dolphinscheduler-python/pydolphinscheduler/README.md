@@ -132,6 +132,19 @@ To test locally, you could directly run pytest after set `PYTHONPATH`
 PYTHONPATH=src/ pytest
 ```
 
+We try to keep pydolphinscheduler usable through unit test coverage. 90% test coverage is our target, but for
+now, we require test coverage up to 85%, and each pull request leas than 85% would fail our CI step
+`Tests coverage`. We use [coverage][coverage] to check our test coverage, and you could check it locally by
+run command.
+
+```shell
+coverage run && coverage report
+```
+
+It would not only run unit test but also show each file coverage which cover rate less than 100%, and `TOTAL`
+line show you total coverage of you code. If your CI failed with coverage you could go and find some reason by
+this command output.
+
 <!-- content -->
 [pypi]: https://pypi.org/
 [dev-setup]: https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html
@@ -144,6 +157,7 @@ PYTHONPATH=src/ pytest
 [black]: https://black.readthedocs.io/en/stable/index.html
 [flake8]: https://flake8.pycqa.org/en/latest/index.html
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
+[coverage]: https://coverage.readthedocs.io/en/stable/
 <!-- badge -->
 [ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
