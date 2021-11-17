@@ -18,9 +18,10 @@
 """Test Task class function."""
 
 from unittest.mock import patch
+
 import pytest
 
-from pydolphinscheduler.core.task import TaskParams, TaskRelation, Task
+from pydolphinscheduler.core.task import Task, TaskParams, TaskRelation
 from tests.testing.task import Task as testTask
 
 

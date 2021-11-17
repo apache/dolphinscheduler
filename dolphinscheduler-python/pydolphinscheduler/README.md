@@ -21,6 +21,7 @@
 
 [![GitHub Build][ga-py-test]][ga]
 [![Code style: black][black-shield]][black-gh]
+[![Imports: isort][isort-shield]][isort-gh]
 
 pydolphinscheduler is python API for Apache DolphinScheduler, which allow you definition
 your workflow by python code, aka workflow-as-codes.
@@ -104,15 +105,19 @@ and would be implemented in the further.
 
 ### Code Style
 
-We use [Black][black] for code formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]
-or [IntelliJ IDEA][idea], maybe you could follow [Black-integration][black-editor] to configure them in your environment.
+We use [isort][isort] to automatically keep Python imports alphabetically, and use [Black][black] for code
+formatter and [Flake8][flake8] for pep8 checker. If you use [pycharm][pycharm]or [IntelliJ IDEA][idea],
+maybe you could follow [Black-integration][black-editor] to configure them in your environment.
 
-Our Python API CI would automatically run unittest when you submit pull request in GitHub, you could also run
-static check locally.
+Our Python API CI would automatically run code style checker and unittest when you submit pull request in
+GitHub, you could also run static check locally.
 
 ```shell
-# We recommend you run Black before Flake8, because Black could auto fix some code style issue
+# We recommend you run isort and Black before Flake8, because Black could auto fix some code style issue
 # but Flake8 just hint when code style not match pep8
+
+# Run Isort
+isort .
 
 # Run Black
 black .
@@ -158,8 +163,11 @@ this command output.
 [flake8]: https://flake8.pycqa.org/en/latest/index.html
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
+[isort]: https://pycqa.github.io/isort/index.html
 <!-- badge -->
 [ga-py-test]: https://github.com/apache/dolphinscheduler/actions/workflows/py-ci.yml/badge.svg?branch=dev
 [ga]: https://github.com/apache/dolphinscheduler/actions
 [black-shield]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-gh]: https://github.com/psf/black
+[isort-shield]: https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336
+[isort-gh]: https://pycqa.github.io/isort/

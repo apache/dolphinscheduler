@@ -17,8 +17,9 @@
 
 """Test utils.string module."""
 
-from pydolphinscheduler.utils.string import attr2camel, snake2camel, class_name2camel
 import pytest
+
+from pydolphinscheduler.utils.string import attr2camel, class_name2camel, snake2camel
 
 
 @pytest.mark.parametrize(

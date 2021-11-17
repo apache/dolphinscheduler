@@ -17,7 +17,7 @@
 
 """DolphinScheduler Base object."""
 
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 # from pydolphinscheduler.side.user import User
 from pydolphinscheduler.utils.string import attr2camel
