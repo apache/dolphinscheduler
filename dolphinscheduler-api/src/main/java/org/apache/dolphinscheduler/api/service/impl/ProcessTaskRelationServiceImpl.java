@@ -147,7 +147,6 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryUpstreamRelation(User loginUser, long projectCode, long taskCode) {
-
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -182,7 +181,6 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryDownstreamRelation(User loginUser, long projectCode, long taskCode) {
-
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);

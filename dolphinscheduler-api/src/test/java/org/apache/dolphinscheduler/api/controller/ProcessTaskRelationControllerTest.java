@@ -66,7 +66,7 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryUpstreamRelation() throws Exception  {
+    public void testQueryUpstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         PowerMockito.when(processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))

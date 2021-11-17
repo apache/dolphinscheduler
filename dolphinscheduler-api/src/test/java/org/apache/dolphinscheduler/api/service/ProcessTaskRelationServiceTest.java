@@ -101,7 +101,7 @@ public class ProcessTaskRelationServiceTest {
         }
     }
 
-    private List<ProcessTaskRelation> getProcessTaskRelationList(long taskCode){
+    private List<ProcessTaskRelation> getProcessTaskRelationList(long taskCode) {
         ProcessTaskRelation processTaskRelationUpstream0 = new ProcessTaskRelation();
         processTaskRelationUpstream0.setPostTaskCode(taskCode);
         ProcessTaskRelation processTaskRelationUpstream1 = new ProcessTaskRelation();
@@ -122,7 +122,7 @@ public class ProcessTaskRelationServiceTest {
     }
 
     @Test
-    public void testQueryDownstreamRelation(){
+    public void testQueryDownstreamRelation() {
         long projectCode = 1L;
         long taskCode = 2L;
 
@@ -143,7 +143,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode))
                 .thenReturn(takeDefinition);
 
-        List<ProcessTaskRelation> processTaskRelationList =  getProcessTaskRelationList(taskCode);
+        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskRelationList(taskCode);
 
         Mockito.when(processTaskRelationMapper.queryByTaskCode(taskCode))
                 .thenReturn(processTaskRelationList);
@@ -151,11 +151,11 @@ public class ProcessTaskRelationServiceTest {
         Map<String, Object> relation = processTaskRelationService
                 .queryDownstreamRelation(loginUser, projectCode, taskCode);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
-        Assert.assertEquals(2,((List)relation.get("data")).size());
+        Assert.assertEquals(2, ((List) relation.get("data")).size());
     }
 
     @Test
-    public void testQueryUpstreamRelation(){
+    public void testQueryUpstreamRelation() {
         long projectCode = 1L;
         long taskCode = 2L;
 
@@ -176,7 +176,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode))
                 .thenReturn(takeDefinition);
 
-        List<ProcessTaskRelation> processTaskRelationList =  getProcessTaskRelationList(taskCode);
+        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskRelationList(taskCode);
 
         Mockito.when(processTaskRelationMapper.queryByTaskCode(taskCode))
                 .thenReturn(processTaskRelationList);
@@ -184,6 +184,6 @@ public class ProcessTaskRelationServiceTest {
         Map<String, Object> relation = processTaskRelationService
                 .queryUpstreamRelation(loginUser, projectCode, taskCode);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
-        Assert.assertEquals(3,((List)relation.get("data")).size());
+        Assert.assertEquals(3, ((List) relation.get("data")).size());
     }
 }
