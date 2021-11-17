@@ -17,14 +17,25 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +61,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     /**
      * create process task relation
@@ -133,7 +147,29 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryUpstreamRelation(User loginUser, long projectCode, long taskCode) {
-        return null;
+
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        // check task exist in project
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null || taskDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
+            // check taskCode equal to postTaskCode
+            List<ProcessTaskRelation> upstreamRelationList = processTaskRelationList.stream().filter(processTask -> processTask.getPostTaskCode() == taskCode).collect(Collectors.toList());
+            result.put(Constants.DATA_LIST, upstreamRelationList);
+        } else {
+            result.put(Constants.DATA_LIST, new ArrayList<>());
+        }
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -146,6 +182,28 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryDownstreamRelation(User loginUser, long projectCode, long taskCode) {
-        return null;
+
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        // check task exist in project
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null || taskDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
+            // check taskCode equal to preTaskCode
+            List<ProcessTaskRelation> downstreamRelationList = processTaskRelationList.stream().filter(processTask -> processTask.getPreTaskCode() == taskCode).collect(Collectors.toList());
+            result.put(Constants.DATA_LIST, downstreamRelationList);
+        } else {
+            result.put(Constants.DATA_LIST, new ArrayList<>());
+        }
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 }
