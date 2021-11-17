@@ -17,13 +17,11 @@
 
 """Test utils.date module."""
 
-import pytest
 from datetime import datetime
-from pydolphinscheduler.utils.date import (
-    conv_from_str,
-    conv_to_schedule,
-    FMT_STD,
-)
+
+import pytest
+
+from pydolphinscheduler.utils.date import FMT_STD, conv_from_str, conv_to_schedule
 
 curr_date = datetime.now()
 
@@ -63,7 +61,14 @@ def test_conv_from_str_success(src: str, expect: datetime) -> None:
 
 
 @pytest.mark.parametrize(
-    "src", ["2021-01-01 010101", "2021:01:01", "202111", "20210101010101"]
+    "src",
+    [
+        "2021-01-01 010101",
+        "2021:01:01",
+        "202111",
+        "20210101010101",
+        "2021:01:01 01:01:01",
+    ],
 )
 def test_conv_from_str_not_impl(src: str) -> None:
     """Test function conv_from_str fail case."""
