@@ -347,6 +347,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
         } else {
+            if (taskDefinition.getVersion() == version) {
+                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
+                return result;
+            }
             int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
             if (delete > 0) {
                 putMsg(result, Status.SUCCESS);
