@@ -17,13 +17,11 @@
 
 """Test utils.date module."""
 
-import pytest
 from datetime import datetime
-from pydolphinscheduler.utils.date import (
-    conv_from_str,
-    conv_to_schedule,
-    FMT_STD,
-)
+
+import pytest
+
+from pydolphinscheduler.utils.date import FMT_STD, conv_from_str, conv_to_schedule
 
 curr_date = datetime.now()
 
