@@ -118,6 +118,7 @@ public class EventExecuteService extends Thread {
         for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecMaps.values()) {
             if (workflowExecuteThread.eventSize() == 0
                     || StringUtils.isEmpty(workflowExecuteThread.getKey())
+                    || !workflowExecuteThread.isStart()
                     || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
                 continue;
             }
