@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -53,6 +52,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 
 import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -80,6 +80,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.io.Files;
 
 /**
  * resources service impl
@@ -136,7 +137,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource directory {} has exist, can't recreate", fullName);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -208,7 +209,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // check resource name exists
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -246,12 +247,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * check resource is exists
      *
      * @param fullName  fullName
-     * @param userId    user id
      * @param type      type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String fullName, int userId, int type) {
-        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
+    private boolean checkResourceExists(String fullName, int type) {
+        Boolean existResource = resourcesMapper.existResource(fullName, type);
         return existResource == Boolean.TRUE;
     }
 
@@ -298,7 +298,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/") + 1),name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -330,8 +330,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!resource.isDirectory()) {
             //get the origin file suffix
-            String originSuffix = FileUtils.suffix(originFullName);
-            String suffix = FileUtils.suffix(fullName);
+            String originSuffix = Files.getFileExtension(originFullName);
+            String suffix = Files.getFileExtension(fullName);
             boolean suffixIsChanged = false;
             if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
                 suffixIsChanged = true;
@@ -474,8 +474,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             // file suffix
-            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-            String nameSuffix = FileUtils.suffix(name);
+            String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
+            String nameSuffix = Files.getFileExtension(name);
 
             // determine file suffix
             if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -576,8 +576,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
-        String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-        String nameSuffix = FileUtils.suffix(fullName);
+        String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
+        String nameSuffix = Files.getFileExtension(fullName);
 
         // determine file suffix
         if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -599,11 +599,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
-            try {
-                FileUtils.deleteFile(localFilename);
-            } catch (IOException ex) {
-                logger.error("delete local tmp file:{} error", localFilename, ex);
-            }
+            FileUtils.deleteFile(localFilename);
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -751,7 +747,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -772,7 +768,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     putMsg(result,Status.HDFS_OPERATION_ERROR);
                 }
             } else {
-                putMsg(result,Status.TENANT_NOT_EXIST);
+                putMsg(result,Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             }
         }
 
@@ -840,7 +836,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check preview or not by file suffix
-        String nameSuffix = FileUtils.suffix(resource.getAlias());
+        String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
@@ -1005,7 +1001,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check can edit by file suffix
-        String nameSuffix = FileUtils.suffix(resource.getAlias());
+        String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
@@ -1289,7 +1285,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("tenant not exists");
-            putMsg(result, Status.TENANT_NOT_EXIST);
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return null;
         }
         return tenant.getTenantCode();

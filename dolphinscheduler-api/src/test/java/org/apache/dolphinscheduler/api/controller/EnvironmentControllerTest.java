@@ -40,12 +40,8 @@ import org.springframework.util.MultiValueMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 
-/**
- * environment controller test
- */
 public class EnvironmentControllerTest extends AbstractControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(EnvironmentControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentControllerTest.class);
 
     private String environmentCode;
 
@@ -60,6 +56,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
         testCreateEnvironment();
     }
 
+    @Override
     @After
     public void after() throws Exception {
         testDeleteEnvironment();

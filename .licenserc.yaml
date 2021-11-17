@@ -27,7 +27,7 @@ header:
     - DISCLAIMER
     - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/ScriptRunner.java
     - mvnw.cmd
-    - sql/soft_version
+    - dolphinscheduler-dao/src/main/resources/sql/soft_version
     - .mvn
     - .gitattributes
     - '**/licenses/**/LICENSE-*'
@@ -42,7 +42,6 @@ header:
     - '**/NOTICE'
     - '**/node_modules/**'
     - '.github/actions/comment-on-issue/**'
-    - '.github/actions/lable-on-issue/**'
     - '.github/actions/reviewdog-setup/**'
     - '.github/actions/translate-on-issue/**'
 

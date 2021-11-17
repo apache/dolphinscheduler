@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -29,69 +30,44 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProcessDefinitionMapperTest {
-
+public class ProcessDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    QueueMapper queueMapper;
+    private QueueMapper queueMapper;
 
     @Autowired
-    TenantMapper tenantMapper;
+    private TenantMapper tenantMapper;
 
     @Autowired
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
+
+    private AtomicLong atomicLong = new AtomicLong(0);
 
     /**
      * insert
      *
      * @return ProcessDefinition
      */
-    private ProcessDefinition insertOne() {
+    private ProcessDefinition insertOne(String name) {
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setName("def 1");
-        processDefinition.setProjectCode(1010L);
-        processDefinition.setUserId(101);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
-        return processDefinition;
-    }
-
-    /**
-     * insert
-     *
-     * @return ProcessDefinition
-     */
-    private ProcessDefinition insertTwo() {
-        //insertOne
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setName("def 2");
+        processDefinition.setCode(atomicLong.getAndIncrement());
+        processDefinition.setName(name);
         processDefinition.setProjectCode(1010L);
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
@@ -106,7 +82,7 @@ public class ProcessDefinitionMapperTest {
     @Test
     public void testUpdate() {
         //insertOne
-        ProcessDefinition processDefinition = insertOne();
+        ProcessDefinition processDefinition = insertOne("def 1");
         //update
         processDefinition.setUpdateTime(new Date());
         int update = processDefinitionMapper.updateById(processDefinition);
@@ -118,7 +94,7 @@ public class ProcessDefinitionMapperTest {
      */
     @Test
     public void testDelete() {
-        ProcessDefinition processDefinition = insertOne();
+        ProcessDefinition processDefinition = insertOne("def 1");
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertEquals(1, delete);
     }
@@ -128,7 +104,7 @@ public class ProcessDefinitionMapperTest {
      */
     @Test
     public void testQuery() {
-        ProcessDefinition processDefinition = insertOne();
+        insertOne("def 1");
         //query
         List<ProcessDefinition> dataSources = processDefinitionMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
@@ -286,7 +262,7 @@ public class ProcessDefinitionMapperTest {
      */
     @Test
     public void testQueryDefineListPaging() {
-        ProcessDefinition processDefinition = insertOne();
+        insertOne("def 1");
         Page<ProcessDefinition> page = new Page(1, 3);
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L, true);
         Assert.assertNotEquals(processDefinitionIPage.getTotal(), 0);
@@ -297,7 +273,7 @@ public class ProcessDefinitionMapperTest {
      */
     @Test
     public void testQueryAllDefinitionList() {
-        ProcessDefinition processDefinition = insertOne();
+        insertOne("def 1");
         List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionList(1010L);
         Assert.assertNotEquals(processDefinitionIPage.size(), 0);
     }
@@ -308,8 +284,8 @@ public class ProcessDefinitionMapperTest {
     @Test
     public void testQueryDefinitionListByIdList() {
 
-        ProcessDefinition processDefinition = insertOne();
-        ProcessDefinition processDefinition1 = insertTwo();
+        ProcessDefinition processDefinition = insertOne("def 1");
+        ProcessDefinition processDefinition1 = insertOne("def 2");
 
         Integer[] array = new Integer[2];
         array[0] = processDefinition.getId();
@@ -336,7 +312,7 @@ public class ProcessDefinitionMapperTest {
         user.setUpdateTime(new Date());
         userMapper.insert(user);
 
-        ProcessDefinition processDefinition = insertOne();
+        ProcessDefinition processDefinition = insertOne("def 1");
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.updateById(processDefinition);
 
@@ -352,8 +328,7 @@ public class ProcessDefinitionMapperTest {
 
     @Test
     public void listResourcesTest() {
-        ProcessDefinition processDefinition = insertOne();
-        processDefinition.setResourceIds("3,5");
+        ProcessDefinition processDefinition = insertOne("def 1");
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         List<Map<String, Object>> maps = processDefinitionMapper.listResources();
         Assert.assertNotNull(maps);
@@ -361,8 +336,7 @@ public class ProcessDefinitionMapperTest {
 
     @Test
     public void listResourcesByUserTest() {
-        ProcessDefinition processDefinition = insertOne();
-        processDefinition.setResourceIds("3,5");
+        ProcessDefinition processDefinition = insertOne("def 1");
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         List<Map<String, Object>> maps = processDefinitionMapper.listResourcesByUser(processDefinition.getUserId());
         Assert.assertNotNull(maps);
@@ -370,7 +344,7 @@ public class ProcessDefinitionMapperTest {
 
     @Test
     public void listProjectIds() {
-        ProcessDefinition processDefinition = insertOne();
+        insertOne("def 1");
         List<Integer> projectIds = processDefinitionMapper.listProjectIds();
         Assert.assertNotNull(projectIds);
     }

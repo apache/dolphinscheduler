@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -42,11 +43,10 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
-import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -79,6 +79,7 @@ public class MasterRegistryClient {
     @Autowired
     private ProcessService processService;
 
+    @Autowired
     private RegistryClient registryClient;
 
     /**
@@ -104,12 +105,11 @@ public class MasterRegistryClient {
 
     public void init() {
         this.startupTime = System.currentTimeMillis();
-        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
     public void start() {
-        String nodeLock = registryClient.getMasterStartUpLockPath();
+        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
 
@@ -117,7 +117,7 @@ public class MasterRegistryClient {
             // master registry
             registry();
             String registryPath = getMasterPath();
-            registryClient.handleDeadServer(registryPath, NodeType.MASTER, Constants.DELETE_OP);
+            registryClient.handleDeadServer(Collections.singleton(registryPath), NodeType.MASTER, Constants.DELETE_OP);
 
             // init system node
 
@@ -143,7 +143,8 @@ public class MasterRegistryClient {
     }
 
     public void closeRegistry() {
-        unRegistry();
+        // TODO unsubscribe MasterRegistryDataListener
+        deregister();
     }
 
     /**
@@ -167,7 +168,7 @@ public class MasterRegistryClient {
                     return;
                 }
                 // handle dead server
-                registryClient.handleDeadServer(path, nodeType, Constants.ADD_OP);
+                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
             }
             //failover server
             if (failover) {
@@ -209,9 +210,9 @@ public class MasterRegistryClient {
     private String getFailoverLockPath(NodeType nodeType) {
         switch (nodeType) {
             case MASTER:
-                return registryClient.getMasterFailoverLockPath();
+                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
             case WORKER:
-                return registryClient.getWorkerFailoverLockPath();
+                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
             default:
                 return "";
         }
@@ -275,6 +276,7 @@ public class MasterRegistryClient {
      *
      * @param workerHost worker host
      * @param needCheckWorkerAlive need check worker alive
+     * @param checkOwner need check process instance owner
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive, boolean checkOwner) {
         logger.info("start worker[{}] failover ...", workerHost);
@@ -288,28 +290,28 @@ public class MasterRegistryClient {
 
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
             if (workerHost == null
-                    || !checkOwner
-                    || processInstance.getHost().equalsIgnoreCase(workerHost)) {
+                || !checkOwner
+                || processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
                 // only failover the task owned myself if worker down.
-                // failover master need handle worker at the same time
                 if (processInstance == null) {
                     logger.error("failover error, the process {} of task {} do not exists.",
-                            taskInstance.getProcessInstanceId(), taskInstance.getId());
+                        taskInstance.getProcessInstanceId(), taskInstance.getId());
                     continue;
                 }
                 taskInstance.setProcessInstance(processInstance);
 
                 TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                        .buildTaskInstanceRelatedInfo(taskInstance)
-                        .buildProcessInstanceRelatedInfo(processInstance)
-                        .create();
+                                                                                       .buildTaskInstanceRelatedInfo(taskInstance)
+                                                                                       .buildProcessInstanceRelatedInfo(processInstance)
+                                                                                       .create();
                 // only kill yarn job if exists , the local thread has exited
                 ProcessUtils.killYarnJob(taskExecutionContext);
 
                 taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
                 processService.saveTaskInstance(taskInstance);
+
                 if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
-                    return;
+                    continue;
                 }
                 WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecCacheManager.getByProcessInstanceId(processInstance.getId());
                 StateEvent stateEvent = new StateEvent();
@@ -348,52 +350,32 @@ public class MasterRegistryClient {
         logger.info("master failover end");
     }
 
-    public void blockAcquireMutex() {
-        registryClient.getLock(registryClient.getMasterLockPath());
-    }
-
-    public void releaseLock() {
-        registryClient.releaseLock(registryClient.getMasterLockPath());
-    }
-
     /**
      * registry
      */
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
-        int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
+        int masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                masterConfig.getMasterMaxCpuloadAvg(),
-                masterConfig.getMasterReservedMemory(),
-                Sets.newHashSet(getMasterPath()),
-                Constants.MASTER_TYPE,
-                registryClient);
+            masterConfig.getMaxCpuLoadAvg(),
+            masterConfig.getReservedMemory(),
+            Sets.newHashSet(getMasterPath()),
+            Constants.MASTER_TYPE,
+            registryClient);
 
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
-        registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());
+        registryClient.addConnectionStateListener(newState -> {
+            if (newState == ConnectionState.RECONNECTED || newState == ConnectionState.SUSPENDED) {
+                registryClient.persistEphemeral(localNodePath, "");
+            }
+        });
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
 
     }
 
-    class MasterRegistryConnectStateListener implements RegistryConnectListener {
-
-        @Override
-        public void notify(RegistryConnectState newState) {
-            if (RegistryConnectState.RECONNECTED == newState) {
-                registryClient.persistEphemeral(localNodePath, "");
-            }
-            if (RegistryConnectState.SUSPENDED == newState) {
-                registryClient.persistEphemeral(localNodePath, "");
-            }
-        }
-    }
-
-    /**
-     * remove registry info
-     */
-    public void unRegistry() {
+    public void deregister() {
         try {
             String address = getLocalAddress();
             String localNodePath = getMasterPath();

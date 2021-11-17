@@ -18,7 +18,7 @@
 name: Bug report
 title: "[Bug] [Module Name] Bug title "
 description: Problems and issues with code of Apache Dolphinscheduler
-labels: [ "bug" ]
+labels: [ "bug", "Waiting for reply" ]
 body:
   - type: markdown
     attributes:
@@ -89,6 +89,28 @@ body:
         Any relevant logs to include? Put them here inside fenced
         ``` ``` blocks or inside a collapsable details tag if it's too long:
         <details><summary>x.log</summary> lots of stuff </details>
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: Which version of Apache DolphinScheduler are you running?
+      options:
+        - dev
+        - 2.0.0-alpha
+        - 1.3.9
+        - 1.3.8
+        - 1.3.6
+        - 1.3.5
+        - 1.3.4
+        - 1.3.3
+        - 1.3.2
+        - 1.3.1
+        - 1.2.1
+        - 1.2.0
+        - 1.1.0(Not Apache Release)
+    validations:
+      required: true
 
   - type: checkboxes
     attributes:

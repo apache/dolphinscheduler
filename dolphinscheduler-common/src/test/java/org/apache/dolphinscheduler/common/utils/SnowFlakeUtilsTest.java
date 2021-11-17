@@ -17,17 +17,19 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.HashSet;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class SnowFlakeUtilsTest {
     @Test
-    public void testNextId() {
-        try {
-            for (int i = 0; i < 5; i++) {
-                System.out.println(SnowFlakeUtils.getInstance().nextId());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void testNoGenerateDuplicateId() throws SnowFlakeUtils.SnowFlakeException {
+        HashSet<Long> existsSnowFlakeId = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            Long currentId = SnowFlakeUtils.getInstance().nextId();
+            Assert.assertFalse(existsSnowFlakeId.contains(currentId));
+            existsSnowFlakeId.add(currentId);
         }
     }
 }

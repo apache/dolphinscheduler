@@ -37,6 +37,11 @@
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-meter</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <version>${curator.test}</version>
@@ -49,8 +54,25 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert</artifactId>
+            <artifactId>dolphinscheduler-alert-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-python</artifactId>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>*.yaml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

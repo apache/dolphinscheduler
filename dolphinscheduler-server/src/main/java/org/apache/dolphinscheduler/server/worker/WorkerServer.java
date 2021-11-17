@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.plugin.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -35,12 +36,6 @@ import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThr
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.spi.exception.PluginNotFoundException;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.MapUtils;
 
 import java.util.Set;
 
@@ -55,17 +50,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.facebook.presto.jdbc.internal.guava.collect.ImmutableList;
-
 /**
  * worker server
  */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                "org.apache.dolphinscheduler.server.master.*",
-                "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*"
-        })
+    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.master.*",
+        "org.apache.dolphinscheduler.server.monitor.*",
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
+    })
 })
 @EnableTransactionManagement
 public class WorkerServer implements IStoppable {
@@ -110,6 +104,7 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
+    @Autowired
     private TaskPluginManager taskPluginManager;
 
     /**
@@ -119,7 +114,10 @@ public class WorkerServer implements IStoppable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
-        new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(WorkerServer.class)
+            .web(WebApplicationType.NONE)
+            .profiles("worker")
+            .run(args);
     }
 
     /**
@@ -130,8 +128,6 @@ public class WorkerServer implements IStoppable {
         // alert-server client registry
         alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
 
-        // init task plugin
-        initTaskPlugin();
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
@@ -140,6 +136,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, new HostUpdateProcessor());
         this.nettyRemotingServer.start();
 
         // worker registry
@@ -160,7 +157,7 @@ public class WorkerServer implements IStoppable {
         // retry report task status
         this.retryReportTaskStatusThread.start();
 
-        /**
+        /*
          * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -170,32 +167,7 @@ public class WorkerServer implements IStoppable {
         }));
     }
 
-    // todo better
-    private void initTaskPlugin() {
-        taskPluginManager = new TaskPluginManager();
-        DolphinPluginManagerConfig taskPluginManagerConfig = new DolphinPluginManagerConfig();
-        taskPluginManagerConfig.setPlugins(workerConfig.getTaskPluginBinding());
-        if (StringUtils.isNotBlank(workerConfig.getTaskPluginDir())) {
-            taskPluginManagerConfig.setInstalledPluginsDir(workerConfig.getTaskPluginDir().trim());
-        }
-
-        if (StringUtils.isNotBlank(workerConfig.getMavenLocalRepository())) {
-            taskPluginManagerConfig.setMavenLocalRepository(workerConfig.getMavenLocalRepository().trim());
-        }
-
-        DolphinPluginLoader taskPluginLoader = new DolphinPluginLoader(taskPluginManagerConfig, ImmutableList.of(taskPluginManager));
-        try {
-            taskPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("Load Task Plugin Failed !", e);
-        }
-        if (MapUtils.isEmpty(taskPluginManager.getTaskChannelMap())) {
-            throw new PluginNotFoundException("Task Plugin Not Found,Please Check Config File");
-        }
-    }
-
     public void close(String cause) {
-
         try {
             // execute only once
             if (Stopper.isStopped()) {

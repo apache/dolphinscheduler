@@ -25,7 +25,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-task-spark</artifactId>
-    <packaging>dolphinscheduler-plugin</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -39,8 +39,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>dolphinscheduler-task-spark-${project.version}</finalName>
-    </build>
 </project>

@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -126,9 +127,10 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
-                                          @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson) {
+                                          @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                          @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name, description, globalParams,
-            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
+            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
         return returnDataList(result);
     }
 
@@ -244,10 +246,11 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                          @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name, code, description, globalParams,
-            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson);
+            locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -435,6 +438,24 @@ public class ProcessDefinitionController extends BaseController {
     public Result queryProcessDefinitionList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * query Process definition simple list
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return process definition list
+     */
+    @ApiOperation(value = "querySimpleList", notes = "QUERY_PROCESS_DEFINITION_SIMPLE_LIST_NOTES")
+    @GetMapping(value = "/simple-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProcessDefinitionSimpleList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionSimpleList(loginUser, projectCode);
         return returnDataList(result);
     }
 
@@ -678,4 +699,142 @@ public class ProcessDefinitionController extends BaseController {
         Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
         return returnDataList(result);
     }
+
+    /**
+     * create empty process definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @return process definition code
+     */
+    @ApiOperation(value = "createEmptyProcessDefinition", notes = "CREATE_EMPTY_PROCESS_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "Long", example = "123456789"),
+        @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String")
+    })
+    @PostMapping(value = "/empty")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result createEmptyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                               @RequestParam(value = "name", required = true) String name,
+                                               @RequestParam(value = "description", required = false) String description,
+                                               @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                               @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                               @RequestParam(value = "tenantCode", required = true) String tenantCode,
+                                               @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
+                                               @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
+        return returnDataList(processDefinitionService.createEmptyProcessDefinition(loginUser, projectCode, name, description, globalParams,
+            timeout, tenantCode, scheduleJson, executionType));
+    }
+
+    /**
+     * update process definition basic info
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param code process definition code
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @param executionType executionType
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    @ApiOperation(value = "updateBasicInfo", notes = "UPDATE_PROCESS_DEFINITION_BASIC_INFO_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
+        @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
+        @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
+        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
+    })
+    @PutMapping(value = "/{code}/basic-info")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result updateProcessDefinitionBasicInfo(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                   @RequestParam(value = "name", required = true) String name,
+                                                   @PathVariable(value = "code", required = true) long code,
+                                                   @RequestParam(value = "description", required = false) String description,
+                                                   @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                                   @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                                   @RequestParam(value = "tenantCode", required = true) String tenantCode,
+                                                   @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
+                                                   @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
+                                                   @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
+        Map<String, Object> result = processDefinitionService.updateProcessDefinitionBasicInfo(loginUser, projectCode, name, code, description, globalParams,
+            timeout, tenantCode, scheduleJson, executionType);
+        //  If the update fails, the result will be returned directly
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataList(result);
+        }
+
+        //  Judge whether to go online after editing,0 means offline, 1 means online
+        if (releaseState == ReleaseState.ONLINE) {
+            result = processDefinitionService.releaseWorkflowAndSchedule(loginUser, projectCode, code, releaseState);
+        }
+        return returnDataList(result);
+    }
+
+    /**
+     * release process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    @ApiOperation(value = "releaseWorkflowAndSchedule", notes = "RELEASE_WORKFLOW_SCHEDULE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, type = "Long"),
+        @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
+        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, dataType = "ReleaseState")
+    })
+    @PostMapping(value = "/{code}/release-workflow")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result releaseWorkflowAndSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                             @PathVariable(value = "code", required = true) long code,
+                                             @RequestParam(value = "releaseState", required = true, defaultValue = "OFFLINE") ReleaseState releaseState) {
+        return returnDataList(processDefinitionService.releaseWorkflowAndSchedule(loginUser, projectCode, code, releaseState));
+    }
+
+    /**
+     * delete process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @return update result code
+     */
+    @ApiOperation(value = "deleteWorkflowAndSchedule", notes = "DELETE_WORKFLOW_SCHEDULE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, type = "Long"),
+        @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789")
+    })
+    @DeleteMapping(value = "/{code}/delete-workflow")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result deleteWorkflowAndSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                            @PathVariable(value = "code", required = true) long code) {
+        return returnDataList(processDefinitionService.deleteWorkflowAndSchedule(loginUser, projectCode, code));
+    }
+
 }
