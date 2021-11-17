@@ -193,7 +193,7 @@ public class EventExecuteService extends Thread {
                 @Override
                 public void onFailure(Throwable throwable) {
                     logger.info("handle events {} failed.", processInstanceId);
-                    logger.info("handle events exception.", throwable);
+                    logger.info("handle events failed.", throwable);
                 }
             };
             Futures.addCallback(future, futureCallback, this.listeningExecutorService);
