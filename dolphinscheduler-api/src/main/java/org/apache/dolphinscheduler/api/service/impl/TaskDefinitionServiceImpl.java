@@ -443,4 +443,27 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         return null;
     }
+
+    /**
+     * check task definition and authorization
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @return true if the login user have permission to see the project and task actually exist in the project
+     */
+    public Map<String, Object> checkTaskDefinitionAndAuth(User loginUser, long projectCode, long taskCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        // check task exist in project
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition == null || taskDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
+        return result;
+    }
 }

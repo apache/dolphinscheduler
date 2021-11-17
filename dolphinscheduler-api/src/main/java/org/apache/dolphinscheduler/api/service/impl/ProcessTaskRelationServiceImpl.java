@@ -20,14 +20,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -63,7 +61,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     private UserMapper userMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionService taskDefinitionService;
 
     /**
      * create process task relation
@@ -147,16 +145,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryUpstreamRelation(User loginUser, long projectCode, long taskCode) {
-        Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Map<String, Object> result = taskDefinitionService.checkTaskDefinitionAndAuth(loginUser,projectCode,taskCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        // check task exist in project
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
-        if (taskDefinition == null || taskDefinition.getProjectCode() != projectCode) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
@@ -181,16 +171,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryDownstreamRelation(User loginUser, long projectCode, long taskCode) {
-        Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+
+        Map<String, Object> result = taskDefinitionService.checkTaskDefinitionAndAuth(loginUser,projectCode,taskCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        // check task exist in project
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
-        if (taskDefinition == null || taskDefinition.getProjectCode() != projectCode) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
