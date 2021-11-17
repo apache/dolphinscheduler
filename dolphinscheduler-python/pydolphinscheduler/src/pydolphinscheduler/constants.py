@@ -94,6 +94,7 @@ class Delimiter(str):
     BAR = "-"
     DASH = "/"
     COLON = ":"
+    UNDERSCORE = "_"
 
 
 class Time(str):
