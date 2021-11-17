@@ -33,7 +33,6 @@ it will instantiate and run all the task it have.
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
 
-
 with ProcessDefinition(
     name="tutorial",
     schedule="0 0 0 * * ? *",

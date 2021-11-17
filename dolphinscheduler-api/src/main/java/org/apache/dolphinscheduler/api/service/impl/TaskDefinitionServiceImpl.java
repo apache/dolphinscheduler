@@ -284,10 +284,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
-        TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        taskDefinitionLog.setUserId(loginUser.getId());
-        taskDefinitionLog.setUpdateTime(new Date());
-        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionLog);
+        TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        taskDefinitionUpdate.setUserId(loginUser.getId());
+        taskDefinitionUpdate.setUpdateTime(new Date());
+        taskDefinitionUpdate.setId(taskDefinition.getId());
+        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (switchVersion > 0) {
             result.put(Constants.DATA_LIST, taskCode);
             putMsg(result, Status.SUCCESS);
