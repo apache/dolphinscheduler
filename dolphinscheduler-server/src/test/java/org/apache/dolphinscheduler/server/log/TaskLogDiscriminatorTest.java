@@ -121,7 +121,7 @@ public class TaskLogDiscriminatorTest {
 
             }
         });
-        Assert.assertEquals("1/1/", result);
+        Assert.assertEquals("1/1-", result);
     }
 
     @Test
