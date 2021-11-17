@@ -18,6 +18,8 @@
 """Test process definition."""
 
 from datetime import datetime
+from typing import Any
+
 from pydolphinscheduler.utils.date import conv_to_schedule
 
 import pytest
@@ -133,6 +135,21 @@ def test__parse_datetime(val, expect):
         assert expect == pd._parse_datetime(
             val
         ), f"Function _parse_datetime with unexpect value by {val}."
+
+
+@pytest.mark.parametrize(
+    "val",
+    [
+        20210101,
+        (2021, 1, 1),
+        {"year": "2021", "month": "1", "day": 1},
+    ],
+)
+def test__parse_datetime_not_support_type(val: Any):
+    """Test process definition function _parse_datetime not support type error."""
+    with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
+        with pytest.raises(ValueError):
+            pd._parse_datetime(val)
 
 
 def test_process_definition_to_dict_without_task():

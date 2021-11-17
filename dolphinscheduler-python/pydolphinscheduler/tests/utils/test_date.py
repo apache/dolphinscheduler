@@ -63,7 +63,14 @@ def test_conv_from_str_success(src: str, expect: datetime) -> None:
 
 
 @pytest.mark.parametrize(
-    "src", ["2021-01-01 010101", "2021:01:01", "202111", "20210101010101"]
+    "src",
+    [
+        "2021-01-01 010101",
+        "2021:01:01",
+        "202111",
+        "20210101010101",
+        "2021:01:01 01:01:01",
+    ],
 )
 def test_conv_from_str_not_impl(src: str) -> None:
     """Test function conv_from_str fail case."""
