@@ -187,12 +187,13 @@ public class EventExecuteService extends Thread {
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                             processInstanceId, 0, workflowExecuteThread.getProcessInstance().getState(), processInstance.getId(), taskInstance.getId()
                     );
-
                     stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
                 }
 
                 @Override
                 public void onFailure(Throwable throwable) {
+                    logger.info("handle events {} failed.", processInstanceId);
+                    logger.info("handle events failed.", throwable);
                 }
             };
             Futures.addCallback(future, futureCallback, this.listeningExecutorService);
