@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,11 +41,13 @@ public class LogUtilsTest {
 
     @Test
     public void testGetTaskLogPath() {
+        Date firstSubmitTime = new Date();
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessInstanceId(100);
         taskExecutionContext.setTaskInstanceId(1000);
         taskExecutionContext.setProcessDefineCode(1L);
         taskExecutionContext.setProcessDefineVersion(1);
+        taskExecutionContext.setFirstSubmitTime(firstSubmitTime);
 
         Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
         Assert.assertNotNull(rootLogger);
@@ -60,7 +65,8 @@ public class LogUtilsTest {
 
         Path logPath = Paths.get(".").toAbsolutePath().getParent()
                 .resolve(logBase)
-                .resolve("1_1").resolve("100").resolve("1000.log");
+                .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD))
+                .resolve("1_1-100-1000.log");
         Assert.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
     }
 

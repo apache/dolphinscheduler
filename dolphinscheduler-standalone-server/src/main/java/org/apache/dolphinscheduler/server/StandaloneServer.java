@@ -24,10 +24,8 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 
 import org.apache.curator.test.TestingServer;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-@SpringBootApplication
 public class StandaloneServer {
     public static void main(String[] args) throws Exception {
         final TestingServer server = new TestingServer(true);
@@ -39,6 +37,6 @@ public class StandaloneServer {
             WorkerServer.class,
             AlertServer.class,
             PythonGatewayServer.class
-        ).profiles("h2").run(args);
+        ).profiles("master", "worker", "api", "alert", "h2", "standalone").run(args);
     }
 }
