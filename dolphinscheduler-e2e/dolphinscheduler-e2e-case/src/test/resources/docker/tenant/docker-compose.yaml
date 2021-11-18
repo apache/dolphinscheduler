@@ -19,7 +19,7 @@ version: "2.1"
 
 services:
   dolphinscheduler:
-    image: apache/dolphinscheduler:ci
+    image: dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:ci
     command: [ standalone-server ]
     expose:
       - 12345
