@@ -284,7 +284,10 @@ public enum Status {
     MOVE_PROCESS_TASK_RELATION_ERROR(50047, "move process task relation error", "移动任务到其他工作流错误"),
     DELETE_TASK_PROCESS_RELATION_ERROR(50048, "delete process task relation error", "删除工作流任务关系错误"),
     QUERY_TASK_PROCESS_RELATION_ERROR(50049, "query process task relation error", "查询工作流任务关系错误"),
-    PROCESS_VERSION_DELETE_ERROR(50050, "the version that the master table is using", "主表正在使用该版本"),
+    TASK_DEFINE_STATE_ONLINE(50050, "task definition {0} is already on line", "任务定义[{0}]已上线"),
+    TASK_HAS_DOWNSTREAM(50051, "Task [{0}] exists downstream dependence", "任务[{0}]存在下游依赖"),
+    MAIN_TABLE_USING_VERSION(50052, "the version that the master table is using", "主表正在使用该版本"),
+    PROCESS_VERSION_DELETE_ERROR(50053, "the version that the master table is using", "主表正在使用该版本"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
