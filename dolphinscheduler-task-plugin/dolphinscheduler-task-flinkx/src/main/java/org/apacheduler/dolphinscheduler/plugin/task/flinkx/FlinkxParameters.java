@@ -470,39 +470,39 @@ public class FlinkxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "FlinkxParameters{" +
-                "customConfig=" + customConfig +
-                ", json='" + json + '\'' +
-                ", polling=" + polling +
-                ", pollingInterval=" + pollingInterval +
-                ", increColumn='" + increColumn + '\'' +
-                ", startLocation='" + startLocation + '\'' +
-                ", writeMode=" + writeMode +
-                ", uniqueKey=" + uniqueKey +
-                ", deployMode='" + deployMode + '\'' +
-                ", dsType='" + dsType + '\'' +
-                ", dataSource=" + dataSource +
-                ", dtType='" + dtType + '\'' +
-                ", dataTarget=" + dataTarget +
-                ", sql='" + sql + '\'' +
-                ", sourceTable='" + sourceTable + '\'' +
-                ", sourceColumns=" + sourceColumns +
-                ", targetTable='" + targetTable + '\'' +
-                ", targetColumns=" + targetColumns +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                ", jobSpeedByte=" + jobSpeedByte +
-                ", jobSpeedChannel=" + jobSpeedChannel +
-                ", split=" + split +
-                ", splitPk=" + splitPk +
-                ", restore=" + restore +
-                ", stream=" + stream +
-                ", restoreColumnIndex=" + restoreColumnIndex +
-                ", restoreColumnName=" + restoreColumnName +
-                ", maxRowNumForCheckpoint=" + maxRowNumForCheckpoint +
-                ", sqlStatement=" + sqlStatement +
-                ", customSql='" + customSql + '\'' +
-                ", batchSize=" + batchSize +
-                '}';
+        return "FlinkxParameters{"
+                + "customConfig=" + customConfig
+                + ", json='" + json + '\''
+                + ", polling=" + polling
+                + ", pollingInterval=" + pollingInterval
+                + ", increColumn='" + increColumn + '\''
+                + ", startLocation='" + startLocation + '\''
+                + ", writeMode=" + writeMode
+                + ", uniqueKey=" + uniqueKey
+                + ", deployMode='" + deployMode + '\''
+                + ", dsType='" + dsType + '\''
+                + ", dataSource=" + dataSource
+                + ", dtType='" + dtType + '\''
+                + ", dataTarget=" + dataTarget
+                + ", sql='" + sql + '\''
+                + ", sourceTable='" + sourceTable + '\''
+                + ", sourceColumns=" + sourceColumns
+                + ", targetTable='" + targetTable + '\''
+                + ", targetColumns=" + targetColumns
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + ", jobSpeedByte=" + jobSpeedByte
+                + ", jobSpeedChannel=" + jobSpeedChannel
+                + ", split=" + split
+                + ", splitPk=" + splitPk
+                + ", restore=" + restore
+                + ", stream=" + stream
+                + ", restoreColumnIndex=" + restoreColumnIndex
+                + ", restoreColumnName=" + restoreColumnName
+                + ", maxRowNumForCheckpoint=" + maxRowNumForCheckpoint
+                + ", sqlStatement=" + sqlStatement
+                + ", customSql='" + customSql + '\''
+                + ", batchSize=" + batchSize
+                + '}';
     }
 }

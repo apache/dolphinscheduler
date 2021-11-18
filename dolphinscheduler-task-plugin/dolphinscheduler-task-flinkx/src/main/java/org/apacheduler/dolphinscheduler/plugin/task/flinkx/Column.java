@@ -69,9 +69,9 @@ public class Column implements Serializable {
 
     @Override
     public String toString() {
-        return "Column{" +
-                "name=" + name +
-                ", type=" + type +
-                '}';
+        return "Column{"
+                + "name=" + name
+                + ", type=" + type
+                + '}';
     }
 }

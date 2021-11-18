@@ -101,14 +101,14 @@ public class FlinkxTaskExecutionContext implements Serializable {
 
     @Override
     public String toString() {
-        return "FlinkxTaskExecutionContext{" +
-                "dataSourceId=" + dataSourceId +
-                ", sourcetype=" + sourcetype +
-                ", sourceConnectionParams='" + sourceConnectionParams + '\'' +
-                ", dataTargetId=" + dataTargetId +
-                ", targetType=" + targetType +
-                ", targetConnectionParams='" + targetConnectionParams + '\'' +
-                '}';
+        return "FlinkxTaskExecutionContext{"
+                + "dataSourceId=" + dataSourceId
+                + ", sourcetype=" + sourcetype
+                + ", sourceConnectionParams='" + sourceConnectionParams + '\''
+                + ", dataTargetId=" + dataTargetId
+                + ", targetType=" + targetType
+                + ", targetConnectionParams='" + targetConnectionParams + '\''
+                + '}';
     }
 
 }

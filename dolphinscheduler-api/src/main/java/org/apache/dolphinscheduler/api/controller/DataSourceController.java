@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FA
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
 import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_COLUMNS_BY_TABLE_NAME_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
@@ -351,7 +352,7 @@ public class DataSourceController extends BaseController {
     })
     @PostMapping(value = "/list-columns")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATASOURCE_ERROR)
+    @ApiException(QUERY_COLUMNS_BY_TABLE_NAME_ERROR)
     public Result queryDatasourceColumnsByTable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam("id") Integer id,
                                                 @RequestParam(value = "table") String table) {
