@@ -85,7 +85,7 @@ public class SubProcessTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(Mockito.any()))
+                .submitTask(processInstance, Mockito.any()))
                 .thenAnswer(t -> t.getArgument(0));
 
         TaskDefinition taskDefinition = new TaskDefinition();

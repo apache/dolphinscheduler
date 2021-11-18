@@ -1384,7 +1384,7 @@ public class ProcessService {
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-        taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
+        taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());
         }
@@ -1407,10 +1407,10 @@ public class ProcessService {
      * if all of above are not satisfied, return submit success
      *
      * @param taskInstance taskInstance
-     * @param processInstanceState processInstanceState
+     * @param processInstance processInstance
      * @return process instance state
      */
-    public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
+    public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance) {
         ExecutionStatus state = taskInstance.getState();
         // running, delayed or killed
         // the task already exists in task queue
@@ -1424,10 +1424,10 @@ public class ProcessService {
         }
         //return pasue /stop if process instance state is ready pause / stop
         // or return submit success
-        if (processInstanceState == ExecutionStatus.READY_PAUSE) {
+        if (processInstance.getState() == ExecutionStatus.READY_PAUSE) {
             state = ExecutionStatus.PAUSE;
-        } else if (processInstanceState == ExecutionStatus.READY_STOP
-                || !checkProcessStrategy(taskInstance)) {
+        } else if (processInstance.getState() == ExecutionStatus.READY_STOP
+            || !checkProcessStrategy(taskInstance, processInstance)) {
             state = ExecutionStatus.KILL;
         } else {
             state = ExecutionStatus.SUBMITTED_SUCCESS;
@@ -1441,8 +1441,7 @@ public class ProcessService {
      * @param taskInstance taskInstance
      * @return check strategy result
      */
-    private boolean checkProcessStrategy(TaskInstance taskInstance) {
-        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+    private boolean checkProcessStrategy(TaskInstance taskInstance, ProcessInstance processInstance) {
         FailureStrategy failureStrategy = processInstance.getFailureStrategy();
         if (failureStrategy == FailureStrategy.CONTINUE) {
             return true;
@@ -1536,39 +1535,15 @@ public class ProcessService {
     }
 
     /**
-     * package task instance，associate processInstance and processDefine
-     *
-     * @param taskInstId taskInstId
-     * @return task instance
+     * package task instance
      */
-    public TaskInstance getTaskInstanceDetailByTaskId(int taskInstId) {
-        // get task instance
-        TaskInstance taskInstance = findTaskInstanceById(taskInstId);
-        if (taskInstance == null) {
-            return null;
-        }
-        setTaskInstanceDetail(taskInstance);
-        return taskInstance;
-    }
-
-    /**
-     * package task instance，associate processInstance and processDefine
-     *
-     * @param taskInstance taskInstance
-     * @return task instance
-     */
-    public void setTaskInstanceDetail(TaskInstance taskInstance) {
-        // get process instance
-        ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-        // get process define
-        ProcessDefinition processDefine = findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+    public void packageTaskInstance(TaskInstance taskInstance, ProcessInstance processInstance) {
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setProcessDefine(processDefine);
-        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+        taskInstance.setProcessDefine(processInstance.getProcessDefinition());
+        TaskDefinition taskDefinition = this.findTaskDefinition(
                 taskInstance.getTaskCode(),
                 taskInstance.getTaskDefinitionVersion());
-        updateTaskDefinitionResources(taskDefinition);
+        this.updateTaskDefinitionResources(taskDefinition);
         taskInstance.setTaskDefine(taskDefinition);
     }
 
@@ -1577,7 +1552,7 @@ public class ProcessService {
      *
      * @param taskDefinition the given {@link TaskDefinition}
      */
-    private void updateTaskDefinitionResources(TaskDefinition taskDefinition) {
+    public void updateTaskDefinitionResources(TaskDefinition taskDefinition) {
         Map<String, Object> taskParameters = JSONUtils.parseObject(
                 taskDefinition.getTaskParams(),
                 new TypeReference<Map<String, Object>>() {
@@ -2044,15 +2019,14 @@ public class ProcessService {
     }
 
     /**
-     * query user queue by process instance id
+     * query user queue by process instance
      *
-     * @param processInstanceId processInstanceId
+     * @param processInstance processInstance
      * @return queue
      */
-    public String queryUserQueueByProcessInstanceId(int processInstanceId) {
+    public String queryUserQueueByProcessInstance(ProcessInstance processInstance) {
 
         String queue = "";
-        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         if (processInstance == null) {
             return queue;
         }

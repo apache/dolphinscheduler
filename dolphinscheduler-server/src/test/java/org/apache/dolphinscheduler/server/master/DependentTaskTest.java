@@ -102,7 +102,7 @@ public class DependentTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(Mockito.argThat(taskInstance -> taskInstance.getId() == 1000)))
+                .submitTask(processInstance, Mockito.argThat(taskInstance -> taskInstance.getId() == 1000)))
                 .thenAnswer(i -> taskInstance);
 
         // for DependentTaskExecThread.initTaskParameters
