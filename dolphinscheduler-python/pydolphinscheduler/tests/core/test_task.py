@@ -27,16 +27,14 @@ from tests.testing.task import Task as testTask
 
 def test_task_params_to_dict():
     """Test TaskParams object function to_dict."""
-    raw_script = "test_task_params_to_dict"
     expect = {
         "resourceList": [],
         "localParams": [],
-        "rawScript": raw_script,
         "dependence": {},
         "conditionResult": TaskParams.DEFAULT_CONDITION_RESULT,
         "waitStartTimeout": {},
     }
-    task_param = TaskParams(raw_script=raw_script)
+    task_param = TaskParams()
     assert task_param.to_dict() == expect
 
 
@@ -65,7 +63,6 @@ def test_task_to_dict():
     version = 1
     name = "test_task_to_dict"
     task_type = "test_task_to_dict_type"
-    raw_script = "test_task_params_to_dict"
     expect = {
         "code": code,
         "name": name,
@@ -76,7 +73,6 @@ def test_task_to_dict():
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "rawScript": raw_script,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
@@ -94,7 +90,7 @@ def test_task_to_dict():
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        task = Task(name=name, task_type=task_type, task_params=TaskParams(raw_script))
+        task = Task(name=name, task_type=task_type, task_params=TaskParams())
         assert task.to_dict() == expect
 
 
@@ -104,12 +100,11 @@ def test_two_tasks_shift(shift: str):
 
     Here we test both `>>` and `<<` bit operator.
     """
-    raw_script = "script"
     upstream = testTask(
-        name="upstream", task_type=shift, task_params=TaskParams(raw_script)
+        name="upstream", task_type=shift, task_params=TaskParams()
     )
     downstream = testTask(
-        name="downstream", task_type=shift, task_params=TaskParams(raw_script)
+        name="downstream", task_type=shift, task_params=TaskParams()
     )
     if shift == "<<":
         downstream << upstream
@@ -146,16 +141,15 @@ def test_tasks_list_shift(dep_expr: str, flag: str):
         "downstream": "upstream",
     }
     task_type = "dep_task_and_tasks"
-    raw_script = "script"
     task = testTask(
-        name="upstream", task_type=task_type, task_params=TaskParams(raw_script)
+        name="upstream", task_type=task_type, task_params=TaskParams()
     )
     tasks = [
         testTask(
-            name="downstream1", task_type=task_type, task_params=TaskParams(raw_script)
+            name="downstream1", task_type=task_type, task_params=TaskParams()
         ),
         testTask(
-            name="downstream2", task_type=task_type, task_params=TaskParams(raw_script)
+            name="downstream2", task_type=task_type, task_params=TaskParams()
         ),
     ]
 
