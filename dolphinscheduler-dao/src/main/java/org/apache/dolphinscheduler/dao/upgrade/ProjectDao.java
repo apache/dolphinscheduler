@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
