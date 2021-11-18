@@ -1087,25 +1087,24 @@ public class ProcessService {
 
     /**
      * retry submit task to db
+     *
+     * @param processInstance
+     * @param taskInstance
+     * @param commitRetryTimes
+     * @param commitInterval
+     * @return
      */
-    public TaskInstance submitTask(TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
-
+    public TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
         int retryTimes = 1;
-        boolean submitDB = false;
         TaskInstance task = null;
         while (retryTimes <= commitRetryTimes) {
             try {
-                if (!submitDB) {
-                    // submit task to db
-                    task = submitTask(taskInstance);
-                    if (task != null && task.getId() != 0) {
-                        submitDB = true;
-                        break;
-                    }
+                // submit task to db
+                task = submitTask(processInstance, taskInstance);
+                if (task != null && task.getId() != 0) {
+                    break;
                 }
-                if (!submitDB) {
-                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
-                }
+                logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
                 Thread.sleep(commitInterval);
             } catch (Exception e) {
                 logger.error("task commit to mysql failed", e);
@@ -1119,21 +1118,22 @@ public class ProcessService {
      * submit task to db
      * submit sub process to command
      *
+     * @param processInstance processInstance
      * @param taskInstance taskInstance
      * @return task instance
      */
     @Transactional(rollbackFor = Exception.class)
-    public TaskInstance submitTask(TaskInstance taskInstance) {
-        ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+    public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
         logger.info("start submit task : {}, instance id:{}, state: {}",
                 taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
         //submit to db
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if (task == null) {
             logger.error("end submit task to db error, task name:{}, process id:{} state: {} ",
-                    taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
-            return task;
+                taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
+            return null;
         }
+
         if (!task.getState().typeIsFinished()) {
             createSubWorkProcess(processInstance, task);
         }
@@ -1758,12 +1758,10 @@ public class ProcessService {
      * @param host host
      * @param executePath executePath
      * @param logPath logPath
-     * @param taskInstId taskInstId
      */
     public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
                                 String executePath,
-                                String logPath,
-                                int taskInstId) {
+                                String logPath) {
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
         taskInstance.setHost(host);
@@ -1787,14 +1785,12 @@ public class ProcessService {
      *
      * @param state state
      * @param endTime endTime
-     * @param taskInstId taskInstId
      * @param varPool varPool
      */
     public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
-                                int taskInstId,
                                 String varPool) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);

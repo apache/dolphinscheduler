@@ -172,8 +172,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     null,
-                    null,
-                    taskInstance.getId());
+                    null
+            );
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
