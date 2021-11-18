@@ -24,13 +24,11 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * EWeChatAlertChannelFactoryTest
  */
-@Ignore
 public class EWeChatAlertChannelFactoryTest {
 
     @Test
@@ -38,7 +36,7 @@ public class EWeChatAlertChannelFactoryTest {
         EWeChatAlertChannelFactory eWeChatAlertChannelFactory = new EWeChatAlertChannelFactory();
         List<PluginParams> params = eWeChatAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(7, params.size());
+        Assert.assertEquals(6, params.size());
     }
 
     @Test
