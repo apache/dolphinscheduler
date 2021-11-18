@@ -208,6 +208,15 @@ const router = new Router({
 
         },
         {
+          path: '/projects/:projectCode/task-definition',
+          name: 'task-definition',
+          component: resolve => require(['../pages/projects/pages/taskDefinition/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Task Definition')}`,
+            refreshInSwitchedTab: config.refreshInSwitchedTab
+          }
+        },
+        {
           path: '/projects/:projectCode/task-record',
           name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
@@ -544,15 +553,6 @@ const router = new Router({
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
             title: 'Rpcserver',
-            refreshInSwitchedTab: config.refreshInSwitchedTab
-          }
-        },
-        {
-          path: '/monitor/servers/zookeeper',
-          name: 'servers-zookeeper',
-          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
-          meta: {
-            title: 'Zookeeper',
             refreshInSwitchedTab: config.refreshInSwitchedTab
           }
         },

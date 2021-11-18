@@ -81,7 +81,7 @@ public class EventExecuteService extends Thread {
 
     public void init() {
 
-        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
+        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getExecThreads());
 
         listeningExecutorService = MoreExecutors.listeningDecorator(eventExecService);
         this.stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
@@ -118,6 +118,7 @@ public class EventExecuteService extends Thread {
         for (WorkflowExecuteThread workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             if (workflowExecuteThread.eventSize() == 0
                     || StringUtils.isEmpty(workflowExecuteThread.getKey())
+                    || !workflowExecuteThread.isStart()
                     || eventHandlerMap.containsKey(workflowExecuteThread.getKey())) {
                 continue;
             }
@@ -186,12 +187,13 @@ public class EventExecuteService extends Thread {
                     StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
                             processInstanceId, 0, workflowExecuteThread.getProcessInstance().getState(), processInstance.getId(), taskInstance.getId()
                     );
-
                     stateEventCallbackService.sendResult(address, port, stateEventChangeCommand.convert2Command());
                 }
 
                 @Override
                 public void onFailure(Throwable throwable) {
+                    logger.info("handle events {} failed.", processInstanceId);
+                    logger.info("handle events failed.", throwable);
                 }
             };
             Futures.addCallback(future, futureCallback, this.listeningExecutorService);

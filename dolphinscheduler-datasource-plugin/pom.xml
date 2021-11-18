@@ -39,12 +39,4 @@
         <module>dolphinscheduler-datasource-api</module>
         <module>dolphinscheduler-datasource-all</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
 </project>
