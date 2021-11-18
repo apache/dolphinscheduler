@@ -100,12 +100,8 @@ def test_two_tasks_shift(shift: str):
 
     Here we test both `>>` and `<<` bit operator.
     """
-    upstream = testTask(
-        name="upstream", task_type=shift, task_params=TaskParams()
-    )
-    downstream = testTask(
-        name="downstream", task_type=shift, task_params=TaskParams()
-    )
+    upstream = testTask(name="upstream", task_type=shift, task_params=TaskParams())
+    downstream = testTask(name="downstream", task_type=shift, task_params=TaskParams())
     if shift == "<<":
         downstream << upstream
     elif shift == ">>":
@@ -141,16 +137,10 @@ def test_tasks_list_shift(dep_expr: str, flag: str):
         "downstream": "upstream",
     }
     task_type = "dep_task_and_tasks"
-    task = testTask(
-        name="upstream", task_type=task_type, task_params=TaskParams()
-    )
+    task = testTask(name="upstream", task_type=task_type, task_params=TaskParams())
     tasks = [
-        testTask(
-            name="downstream1", task_type=task_type, task_params=TaskParams()
-        ),
-        testTask(
-            name="downstream2", task_type=task_type, task_params=TaskParams()
-        ),
+        testTask(name="downstream1", task_type=task_type, task_params=TaskParams()),
+        testTask(name="downstream2", task_type=task_type, task_params=TaskParams()),
     ]
 
     # Use build-in function eval to simply test case and reduce duplicate code

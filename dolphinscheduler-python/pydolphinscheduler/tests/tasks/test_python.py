@@ -64,8 +64,7 @@ def test_python_task_not_support_code(script_code):
             Python(name, script_code)
 
 
-def foo():
-    """Test function which will pass to Python Task type."""
+def foo():  # noqa: D103
     print("hello world.")
 
 
@@ -73,7 +72,11 @@ def foo():
     "name, script_code, raw",
     [
         ("string_define", 'print("hello world.")', 'print("hello world.")'),
-        ("function_define", foo, 'def foo():\n    print("hello world.")\n'),
+        (
+            "function_define",
+            foo,
+            'def foo():  # noqa: D103\n    print("hello world.")\n',
+        ),
     ],
 )
 def test_python_to_dict(name, script_code, raw):
