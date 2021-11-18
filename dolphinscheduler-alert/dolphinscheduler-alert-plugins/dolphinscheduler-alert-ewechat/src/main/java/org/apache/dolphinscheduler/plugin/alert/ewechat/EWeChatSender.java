@@ -72,7 +72,7 @@ public final class EWeChatSender {
             port = Integer.parseInt(config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PORT));
             proxy = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PROXY);
             user = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_USER);
-            password = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWORD);
+            password = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWD);
         }
     }
 

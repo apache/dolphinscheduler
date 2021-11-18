@@ -80,10 +80,11 @@ public final class EWeChatAlertChannelFactory implements AlertChannelFactory {
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false).build())
                         .build();
-        PasswordParam passwordParam = PasswordParam.newBuilder(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWORD, EWeChatParamsConstants.EWE_CHAT_PASSWORD)
+
+        PasswordParam proxyPassword = PasswordParam.newBuilder(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWD, EWeChatParamsConstants.EWE_CHAT_PASSWD)
                 .setPlaceholder("if enable use authentication, you need input password")
                 .build();
 
-        return Arrays.asList(webHookParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        return Arrays.asList(webHookParam, isEnableProxy, proxyParam, portParam, userParam, proxyPassword);
     }
 }

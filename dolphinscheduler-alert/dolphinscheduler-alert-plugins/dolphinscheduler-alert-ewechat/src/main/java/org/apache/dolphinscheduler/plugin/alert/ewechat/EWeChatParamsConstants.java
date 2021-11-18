@@ -43,8 +43,8 @@ public final class EWeChatParamsConstants {
 
     static final String NAME_EWE_CHAT_USER = "User";
 
-    static final String EWE_CHAT_PASSWORD = "$t('password')";
+    static final String EWE_CHAT_PASSWD = "$t('password')";
 
-    static final String NAME_EWE_CHAT_PASSWORD = "Password";
+    static final String NAME_EWE_CHAT_PASSWD = "Password";
 
 }

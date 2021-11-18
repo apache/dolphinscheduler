@@ -37,7 +37,7 @@ public class EWeChatSenderTest {
     public void initDingTalkConfig() {
         eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_WEB_HOOK, "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxx");
         eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_PROXY_ENABLE, "false");
-        eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWORD, "password");
+        eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWD, "passwd");
         eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_PORT, "9988");
         eWeChatConfig.put(EWeChatParamsConstants.NAME_EWE_CHAT_USER, "user1,user2");
     }
