@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.alert.ewechat;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.plugin.alert.ewechat.exception.EWeChatAlertException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -165,14 +164,11 @@ public final class EWeChatSender {
         }
 
         try {
-            CloseableHttpResponse response = httpClient.execute(httpPost);
             String resp;
-            try {
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
                 HttpEntity entity = response.getEntity();
                 resp = EntityUtils.toString(entity, "UTF-8");
                 EntityUtils.consume(entity);
-            } finally {
-                response.close();
             }
             logger.info("enterprise wechat send title :{},content : {}, resp: {}", title, content, resp);
             return resp;
@@ -185,7 +181,6 @@ public final class EWeChatSender {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         if (null == mapItemsList || mapItemsList.isEmpty()) {
             logger.error("itemsList is null");
-            throw new EWeChatAlertException("itemsList is null");
         }
 
         if (title.toLowerCase().contains(EWeChatAlertConstants.SUCCESS_FLAG)) {
@@ -208,32 +203,6 @@ public final class EWeChatSender {
             contents.append(t);
         }
         return contents.toString();
-    }
-
-    public String markdownShellByAlert(String title, String content) {
-        List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
-        if (null == mapItemsList || mapItemsList.isEmpty()) {
-            logger.error("itemsList is null");
-            throw new EWeChatAlertException("itemsList is null");
-        }
-        StringBuilder contents = new StringBuilder(200);
-        String pattern = " %-20s | %-40s |%n";
-        for (LinkedHashMap mapItems : mapItemsList) {
-            Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
-            Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
-            StringBuilder t = new StringBuilder();
-            t.append(EWeChatAlertConstants.FIRST_DASH);
-            t.append(String.format(EWeChatAlertConstants.ERROR_PATTERN, title));
-            t.append(EWeChatAlertConstants.DASH_BREAK);
-            while (iterator.hasNext()) {
-                Map.Entry<String, Object> entry = iterator.next();
-                t.append(String.format(pattern, entry.getKey(), entry.getValue()));
-            }
-            t.append(EWeChatAlertConstants.DASH_BREAK);
-            contents.append(t);
-        }
-        return contents.toString();
-
     }
 
     public static class EWeChatSendMsgResponse {
