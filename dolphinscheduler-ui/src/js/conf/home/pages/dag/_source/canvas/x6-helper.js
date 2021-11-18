@@ -17,12 +17,11 @@
 export const X6_NODE_NAME = 'dag-task'
 export const X6_EDGE_NAME = 'dag-edge'
 export const X6_PORT_OUT_NAME = 'dag-port-out'
-export const X6_PORT_IN_NAME = 'dag-port-in'
 
 const EDGE = '#999999'
-const BG_BLUE = 'rgba(40, 143, 255, 0.1)'
+const BG_BLUE = '#DFE9F7'
 const BG_WHITE = '#FFFFFF'
-const NODE_BORDER = '#e4e4e4'
+const NODE_BORDER = '#CCCCCC'
 const TITLE = '#333'
 const STROKE_BLUE = '#288FFF'
 
@@ -62,14 +61,14 @@ export const PORT_PROPS = {
         },
         'plus-text': {
           fontSize: 12,
-          fill: EDGE,
+          fill: NODE_BORDER,
           text: '+',
           textAnchor: 'middle',
           x: 0,
           y: 3
         },
         'circle-outer': {
-          stroke: EDGE,
+          stroke: NODE_BORDER,
           strokeWidth: 1,
           r: 6,
           fill: BG_WHITE
@@ -78,37 +77,7 @@ export const PORT_PROPS = {
           r: 4,
           fill: 'transparent'
         }
-      }
-    },
-    [X6_PORT_IN_NAME]: {
-      position: {
-        name: 'absolute',
-        args: {
-          x: 0,
-          y: 24
-        }
-      },
-      markup: [
-        {
-          tagName: 'g',
-          selector: 'body',
-          className: 'in-port-body',
-          children: [{
-            tagName: 'circle',
-            selector: 'circle',
-            className: 'circle'
-          }]
-        }
-      ],
-      attrs: {
-        body: {
-          magnet: true
-        },
-        circle: {
-          r: 4,
-          strokeWidth: 0,
-          fill: 'transparent'
-        }
+
       }
     }
   }
@@ -119,17 +88,15 @@ export const PORT_HIGHLIGHT_PROPS = {
     attrs: {
       'circle-outer': {
         stroke: STROKE_BLUE,
-        fill: BG_BLUE
-      },
-      'plus-text': {
-        fill: STROKE_BLUE
+        fill: BG_BLUE,
+        r: 8
       },
       'circle-inner': {
-        fill: STROKE_BLUE
+        fill: STROKE_BLUE,
+        r: 6
       }
     }
-  },
-  [X6_PORT_IN_NAME]: {}
+  }
 }
 
 export const NODE_STATUS_MARKUP = [{
@@ -154,7 +121,8 @@ export const NODE_PROPS = {
   markup: [
     {
       tagName: 'rect',
-      selector: 'body'
+      selector: 'body',
+      className: 'dag-task-body'
     },
     {
       tagName: 'image',
@@ -174,7 +142,8 @@ export const NODE_PROPS = {
       pointerEvents: 'visiblePainted',
       fill: BG_WHITE,
       stroke: NODE_BORDER,
-      strokeWidth: 1
+      strokeWidth: 1,
+      strokeDasharray: 'none'
     },
     image: {
       width: 30,
@@ -204,10 +173,6 @@ export const NODE_PROPS = {
       {
         id: X6_PORT_OUT_NAME,
         group: X6_PORT_OUT_NAME
-      },
-      {
-        id: X6_PORT_IN_NAME,
-        group: X6_PORT_IN_NAME
       }
     ]
   }
@@ -230,7 +195,7 @@ export const EDGE_PROPS = {
   attrs: {
     line: {
       stroke: EDGE,
-      strokeWidth: 0.8,
+      strokeWidth: 1,
       targetMarker: {
         tagName: 'path',
         fill: EDGE,
@@ -243,11 +208,9 @@ export const EDGE_PROPS = {
     name: 'rounded'
   },
   router: {
-    name: 'er',
+    name: 'manhattan',
     args: {
-      offset: 20,
-      min: 20,
-      direction: 'L'
+      endDirections: ['top', 'bottom', 'left']
     }
   },
   defaultLabel: {

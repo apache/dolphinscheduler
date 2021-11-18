@@ -200,7 +200,7 @@
       },
       chartFormat () {
         const canvas = this.getDagCanvasRef()
-        canvas.format()
+        canvas.showLayoutModal()
       },
       refreshTaskStatus () {
         this.dagChart.refreshTaskStatus()

@@ -29,6 +29,7 @@
       <div ref="minimap" class="minimap"></div>
       <context-menu ref="contextMenu" />
     </div>
+    <layout-config-modal ref="layoutModal" @submit="format" />
   </div>
 </template>
 
@@ -37,20 +38,20 @@
   import { Graph, DataUri } from '@antv/x6'
   import dagTaskbar from './taskbar.vue'
   import contextMenu from './contextMenu.vue'
+  import layoutConfigModal, { LAYOUT_TYPE } from './layoutConfigModal.vue'
   import {
     NODE_PROPS,
     EDGE_PROPS,
     PORT_PROPS,
     X6_NODE_NAME,
     X6_PORT_OUT_NAME,
-    X6_PORT_IN_NAME,
     X6_EDGE_NAME,
     NODE_HIGHLIGHT_PROPS,
     PORT_HIGHLIGHT_PROPS,
     EDGE_HIGHLIGHT_PROPS,
     NODE_STATUS_MARKUP
   } from './x6-helper'
-  import { DagreLayout } from '@antv/layout'
+  import { DagreLayout, GridLayout } from '@antv/layout'
   import { tasksType, tasksState } from '../config'
   import { mapActions, mapMutations, mapState } from 'vuex'
   import nodeStatus from './nodeStatus'
@@ -82,7 +83,8 @@
     inject: ['dagChart'],
     components: {
       dagTaskbar,
-      contextMenu
+      contextMenu,
+      layoutConfigModal
     },
     computed: {
       ...mapState('dag', ['tasks'])
@@ -134,9 +136,6 @@
             magnetConnectable: !!editable
           },
           connecting: {
-            snap: {
-              radius: 30
-            },
             // Whether multiple edges can be created between the same start node and end
             allowMulti: false,
             // Whether a point is allowed to connect to a blank position on the canvas
@@ -148,32 +147,14 @@
             // Whether edges are allowed to link to nodes
             allowNode: true,
             // Whether to allow edge links to ports
-            allowPort: true,
+            allowPort: false,
             // Whether all available ports or nodes are highlighted when you drag the edge
             highlight: true,
             createEdge () {
               return graph.createEdge({ shape: X6_EDGE_NAME })
             },
-            validateMagnet ({ magnet }) {
-              return magnet.getAttribute('port-group') !== X6_PORT_IN_NAME
-            },
             validateConnection (data) {
-              const { sourceCell, targetCell, sourceMagnet, targetMagnet } = data
-              // Connections can only be created from the output link post
-              if (
-                !sourceMagnet ||
-                sourceMagnet.getAttribute('port-group') !== X6_PORT_OUT_NAME
-              ) {
-                return false
-              }
-
-              // Can only be connected to the input link post
-              if (
-                !targetMagnet ||
-                targetMagnet.getAttribute('port-group') !== X6_PORT_IN_NAME
-              ) {
-                return false
-              }
+              const { sourceCell, targetCell } = data
 
               if (
                 sourceCell &&
@@ -278,6 +259,13 @@
             id: cell.id,
             label: labelName
           })
+        })
+        // Make sure the edge starts with node, not port
+        this.graph.on('edge:connected', ({ isNew, edge }) => {
+          if (isNew) {
+            const sourceNode = edge.getSourceNode()
+            edge.setSource(sourceNode)
+          }
         })
       },
       /**
@@ -512,38 +500,65 @@
           }
         )
       },
+      showLayoutModal () {
+        const layoutModal = this.$refs.layoutModal
+        if (layoutModal) {
+          layoutModal.show()
+        }
+      },
       /**
        * format
        * @desc Auto layout use @antv/layout
        */
-      format () {
-        const dagreLayout = new DagreLayout({
-          type: 'dagre',
-          rankdir: 'LR',
-          align: 'UL',
-          // Calculate the node spacing based on the edge label length
-          ranksepFunc: (d) => {
-            const edges = this.graph.getOutgoingEdges(d.id)
-            let max = 0
-            if (edges && edges.length > 0) {
-              edges.forEach((edge) => {
-                const edgeView = this.graph.findViewByCell(edge)
-                const labelWidth = +edgeView.findAttr(
-                  'width',
-                  _.get(edgeView, ['labelSelectors', '0', 'body'], null)
-                )
-                max = Math.max(max, labelWidth)
-              })
-            }
-            return 50 + max
-          },
-          nodesep: 50,
-          controlPoints: true
-        })
+      format (layoutConfig) {
+        let layoutFunc = null
+        if (layoutConfig.type === LAYOUT_TYPE.DAGRE) {
+          layoutFunc = new DagreLayout({
+            type: LAYOUT_TYPE.DAGRE,
+            rankdir: 'LR',
+            align: 'UL',
+            // Calculate the node spacing based on the edge label length
+            ranksepFunc: (d) => {
+              const edges = this.graph.getOutgoingEdges(d.id)
+              let max = 0
+              if (edges && edges.length > 0) {
+                edges.forEach((edge) => {
+                  const edgeView = this.graph.findViewByCell(edge)
+                  const labelWidth = +edgeView.findAttr(
+                    'width',
+                    _.get(edgeView, ['labelSelectors', '0', 'body'], null)
+                  )
+                  max = Math.max(max, labelWidth)
+                })
+              }
+              return layoutConfig.ranksep + max
+            },
+            nodesep: layoutConfig.nodesep,
+            controlPoints: true
+          })
+        } else if (layoutConfig.type === LAYOUT_TYPE.GRID) {
+          layoutFunc = new GridLayout({
+            type: LAYOUT_TYPE.GRID,
+            preventOverlap: true,
+            preventOverlapPadding: layoutConfig.padding,
+            sortBy: '_index',
+            rows: layoutConfig.rows || undefined,
+            cols: layoutConfig.cols || undefined,
+            nodeSize: 220
+          })
+        }
         const json = this.toJSON()
-        const nodes = json.cells.filter((cell) => cell.shape === X6_NODE_NAME)
+        const nodes = json.cells
+          .filter((cell) => cell.shape === X6_NODE_NAME)
+          .map((item) => {
+            return {
+              ...item,
+              // sort by code aesc
+              _index: -item.id
+            }
+          })
         const edges = json.cells.filter((cell) => cell.shape === X6_EDGE_NAME)
-        const newModel = dagreLayout.layout({
+        const newModel = layoutFunc.layout({
           nodes: nodes,
           edges: edges
         })
@@ -606,12 +621,10 @@
         return {
           shape: X6_EDGE_NAME,
           source: {
-            cell: sourceId,
-            port: X6_PORT_OUT_NAME
+            cell: sourceId
           },
           target: {
-            cell: targetId,
-            port: X6_PORT_IN_NAME
+            cell: targetId
           },
           labels: label ? [label] : undefined
         }

@@ -749,5 +749,10 @@ export default {
   users: '群员',
   Username: '用户名',
   showType: '内容展示类型',
-  'Please select a task type (required)': '请选择任务类型(必选)'
+  'Please select a task type (required)': '请选择任务类型(必选)',
+  layoutType: '布局类型',
+  gridLayout: '网格布局',
+  dagreLayout: '层次布局',
+  rows: '行数',
+  cols: '列数'
 }
