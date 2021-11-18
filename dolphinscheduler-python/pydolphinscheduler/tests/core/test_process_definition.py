@@ -231,7 +231,6 @@ def test_process_definition_simple_separate():
         if i > 0:
             pre_task = pd.get_one_task_by_name(f"task-{i - 1}")
             curr_task.set_upstream(pre_task)
-    print("q22")
     assert len(pd.tasks) == expect_tasks_num
     assert all(["task-" in task.name for task in pd.task_list])
 
