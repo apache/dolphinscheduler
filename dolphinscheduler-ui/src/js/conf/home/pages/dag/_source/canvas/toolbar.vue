@@ -27,6 +27,12 @@
     </el-tooltip>
     <textarea ref="textarea" cols="30" rows="10" class="transparent"></textarea>
     <div class="toolbar-left">
+      <el-tag
+        class="process-online-tag"
+        size="small"
+        v-if="dagChart.type === 'definition' && releaseState === 'ONLINE'"
+        >{{ $t("processOnline") }}</el-tag
+      >
       <el-tooltip
         :content="$t('View variables')"
         placement="bottom"
@@ -68,6 +74,22 @@
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
+        :content="$t('Refresh DAG status')"
+        placement="bottom"
+        v-if="dagChart.type === 'instance'"
+      >
+        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
+      </el-tooltip>
+      <el-tooltip
+        class="toolbar-operation"
+        :content="$t('Format DAG')"
+        placement="bottom"
+        v-if="!isDetails"
+      >
+        <i class="custom-ico graph-format" @click="chartFormat"></i>
+      </el-tooltip>
+      <el-tooltip
+        class="toolbar-operation last"
         :content="$t('Full Screen')"
         placement="bottom"
       >
@@ -79,21 +101,6 @@
           @click="toggleFullScreen"
         ></i>
       </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation"
-        :content="$t('Refresh DAG status')"
-        placement="bottom"
-        v-if="dagChart.type === 'instance'"
-      >
-        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
-      </el-tooltip>
-      <el-tooltip
-        class="toolbar-operation last"
-        :content="$t('Format DAG')"
-        placement="bottom"
-      >
-        <i class="custom-ico graph-format" @click="chartFormat"></i>
-      </el-tooltip>
       <el-button
         class="toolbar-el-btn"
         type="primary"
@@ -101,7 +108,7 @@
         v-if="dagChart.type === 'definition'"
         @click="showVersions"
         icon="el-icon-info"
-        >{{$t('Version Info')}}</el-button
+        >{{ $t("Version Info") }}</el-button
       >
       <el-button
         class="toolbar-el-btn"
@@ -125,7 +132,6 @@
         type="primary"
         icon="el-icon-switch-button"
         size="mini"
-        v-if="type === 'instance' || 'definition'"
         @click="returnToListPage"
       >
         {{ $t("Close") }}
@@ -147,9 +153,7 @@
       }
     },
     computed: {
-      ...mapState('dag', [
-        'isDetails'
-      ])
+      ...mapState('dag', ['isDetails', 'releaseState'])
     },
     methods: {
       getDagCanvasRef () {

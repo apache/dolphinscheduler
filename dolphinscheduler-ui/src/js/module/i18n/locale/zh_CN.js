@@ -754,5 +754,6 @@ export default {
   gridLayout: '网格布局',
   dagreLayout: '层次布局',
   rows: '行数',
-  cols: '列数'
+  cols: '列数',
+  processOnline: '已上线'
 }

@@ -40,21 +40,17 @@
   import contextMenu from './contextMenu.vue'
   import layoutConfigModal, { LAYOUT_TYPE } from './layoutConfigModal.vue'
   import {
-    NODE_PROPS,
-    EDGE_PROPS,
-    PORT_PROPS,
+    NODE,
+    EDGE,
     X6_NODE_NAME,
-    X6_PORT_OUT_NAME,
     X6_EDGE_NAME,
-    NODE_HIGHLIGHT_PROPS,
-    PORT_HIGHLIGHT_PROPS,
-    EDGE_HIGHLIGHT_PROPS,
     NODE_STATUS_MARKUP
   } from './x6-helper'
   import { DagreLayout, GridLayout } from '@antv/layout'
   import { tasksType, tasksState } from '../config'
   import { mapActions, mapMutations, mapState } from 'vuex'
   import nodeStatus from './nodeStatus'
+  import x6StyleMixin from './x6-style-mixin'
 
   export default {
     name: 'dag-canvas',
@@ -72,7 +68,9 @@
           x: 0,
           y: 0,
           type: ''
-        }
+        },
+        // the mouse over cell
+        hoverCell: null
       }
     },
     provide () {
@@ -80,6 +78,7 @@
         dagCanvas: this
       }
     },
+    mixins: [x6StyleMixin],
     inject: ['dagChart'],
     components: {
       dagTaskbar,
@@ -205,38 +204,14 @@
       registerX6Shape () {
         Graph.unregisterNode(X6_NODE_NAME)
         Graph.unregisterEdge(X6_EDGE_NAME)
-        Graph.registerNode(X6_NODE_NAME, { ...NODE_PROPS })
-        Graph.registerEdge(X6_EDGE_NAME, { ...EDGE_PROPS })
+        Graph.registerNode(X6_NODE_NAME, { ...NODE })
+        Graph.registerEdge(X6_EDGE_NAME, { ...EDGE })
       },
       /**
        * Bind grap event
        */
       bindGraphEvent () {
-        // nodes and edges hover
-        this.graph.on('cell:mouseenter', (data) => {
-          const { cell, e } = data
-          const isStatusIcon = (tagName) =>
-            tagName &&
-            (tagName.toLocaleLowerCase() === 'em' ||
-              tagName.toLocaleLowerCase() === 'body')
-          if (!isStatusIcon(e.target.tagName)) {
-            this.setHighlight(cell)
-          }
-        })
-        this.graph.on('cell:mouseleave', ({ cell }) => {
-          if (!this.graph.isSelected(cell)) {
-            this.resetHighlight(cell)
-          }
-        })
-        // select
-        this.graph.on('cell:selected', ({ cell }) => {
-          this.setHighlight(cell)
-        })
-        this.graph.on('cell:unselected', ({ cell }) => {
-          if (!this.graph.isSelected(cell)) {
-            this.resetHighlight(cell)
-          }
-        })
+        this.bindStyleEvent(this.graph)
         // right click
         this.graph.on('node:contextmenu', ({ x, y, cell }) => {
           const { left, top } = this.graph.getScrollbarPosition()
@@ -285,9 +260,6 @@
       setEdgeLabel (id, label) {
         const edge = this.graph.getCellById(id)
         edge.setLabels(label)
-        if (this.graph.isSelected(edge)) {
-          this.setEdgeHighlight(edge)
-        }
       },
       /**
        * @param {number} limit
@@ -334,94 +306,6 @@
           const truncation = this.truncateText(name, 18)
           node.attr('title/text', truncation)
           node.setData({ taskName: name })
-        }
-      },
-      /**
-       * Set node highlight
-       * @param {Node} node
-       */
-      setNodeHighlight (node) {
-        const url = require(`../images/task-icos/${node.data.taskType.toLocaleLowerCase()}_hover.png`)
-        node.setAttrs(NODE_HIGHLIGHT_PROPS.attrs)
-        node.setAttrByPath('image/xlink:href', url)
-        node.setPortProp(
-          X6_PORT_OUT_NAME,
-          'attrs',
-          PORT_HIGHLIGHT_PROPS[X6_PORT_OUT_NAME].attrs
-        )
-      },
-      /**
-       * Reset node style
-       * @param {Node} node
-       */
-      resetNodeStyle (node) {
-        const url = require(`../images/task-icos/${node.data.taskType.toLocaleLowerCase()}.png`)
-        node.setAttrs(NODE_PROPS.attrs)
-        node.setAttrByPath('image/xlink:href', url)
-        node.setPortProp(
-          X6_PORT_OUT_NAME,
-          'attrs',
-          PORT_PROPS.groups[X6_PORT_OUT_NAME].attrs
-        )
-      },
-      /**
-       * Set edge highlight
-       * @param {Edge} edge
-       */
-      setEdgeHighlight (edge) {
-        const labelName = this.getEdgeLabelName(edge)
-        edge.setAttrs(EDGE_HIGHLIGHT_PROPS.attrs)
-        edge.setLabels([
-          _.merge(
-            {
-              attrs: _.cloneDeep(EDGE_HIGHLIGHT_PROPS.defaultLabel.attrs)
-            },
-            {
-              attrs: { label: { text: labelName } }
-            }
-          )
-        ])
-      },
-      /**
-       * Reset edge style
-       * @param {Edge} edge
-       */
-      resetEdgeStyle (edge) {
-        const labelName = this.getEdgeLabelName(edge)
-        edge.setAttrs(EDGE_PROPS.attrs)
-        edge.setLabels([
-          {
-            ..._.merge(
-              {
-                attrs: _.cloneDeep(EDGE_PROPS.defaultLabel.attrs)
-              },
-              {
-                attrs: { label: { text: labelName } }
-              }
-            )
-          }
-        ])
-      },
-      /**
-       * Set cell highlight
-       * @param {Cell} cell
-       */
-      setHighlight (cell) {
-        if (cell.isEdge()) {
-          this.setEdgeHighlight(cell)
-        } else if (cell.isNode()) {
-          this.setNodeHighlight(cell)
-        }
-      },
-      /**
-       * Reset cell highlight
-       * @param {Cell} cell
-       */
-      resetHighlight (cell) {
-        if (cell.isEdge()) {
-          this.resetEdgeStyle(cell)
-        } else if (cell.isNode()) {
-          this.resetNodeStyle(cell)
         }
       },
       /**
@@ -511,6 +395,8 @@
        * @desc Auto layout use @antv/layout
        */
       format (layoutConfig) {
+        this.graph.cleanSelection()
+
         let layoutFunc = null
         if (layoutConfig.type === LAYOUT_TYPE.DAGRE) {
           layoutFunc = new DagreLayout({
@@ -701,7 +587,7 @@
         if (node) {
           // Destroy the previous dom
           node.removeMarkup()
-          node.setMarkup(NODE_PROPS.markup.concat(NODE_STATUS_MARKUP))
+          node.setMarkup(NODE.markup.concat(NODE_STATUS_MARKUP))
           const nodeView = this.graph.findViewByCell(node)
           const el = nodeView.find('div')[0]
           nodeStatus({

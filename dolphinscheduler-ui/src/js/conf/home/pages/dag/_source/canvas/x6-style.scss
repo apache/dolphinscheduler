@@ -30,22 +30,4 @@ $BG_WHITE: #ffffff;
       }
     }
   }
-
-  &.x6-node-selected {
-    .dag-task-body {
-      filter: drop-shadow(3px 3px 4px rgba(0, 0, 0, 0.2));
-      fill: $BG_WHITE;
-      stroke-width: 1.5;
-      stroke-dasharray: none;
-    }
-  }
-}
-
-.x6-edge[data-shape="dag-edge"] {
-  &.x6-edge-selected {
-    path ,rect{
-      filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
-      stroke-width: 2;
-    }
-  }
 }

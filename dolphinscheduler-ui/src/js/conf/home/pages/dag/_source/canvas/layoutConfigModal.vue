@@ -20,6 +20,7 @@
     :visible.sync="visible"
     width="500px"
     class="dag-layout-modal"
+    :append-to-body="true"
   >
     <el-form
       ref="form"

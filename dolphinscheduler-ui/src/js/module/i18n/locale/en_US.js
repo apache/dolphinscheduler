@@ -753,5 +753,6 @@ export default {
   gridLayout: 'Grid',
   dagreLayout: 'Dagre',
   rows: 'Rows',
-  cols: 'Cols'
+  cols: 'Cols',
+  processOnline: 'Online'
 }

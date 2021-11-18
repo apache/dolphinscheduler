@@ -18,14 +18,16 @@ export const X6_NODE_NAME = 'dag-task'
 export const X6_EDGE_NAME = 'dag-edge'
 export const X6_PORT_OUT_NAME = 'dag-port-out'
 
-const EDGE = '#999999'
+const EDGE_COLOR = '#999999'
 const BG_BLUE = '#DFE9F7'
 const BG_WHITE = '#FFFFFF'
 const NODE_BORDER = '#CCCCCC'
-const TITLE = '#333'
+const TITLE = '#333333'
 const STROKE_BLUE = '#288FFF'
+const NODE_SHADOW = 'drop-shadow(3px 3px 4px rgba(0, 0, 0, 0.2))'
+const EDGE_SHADOW = 'drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2))'
 
-export const PORT_PROPS = {
+export const PORT = {
   groups: {
     [X6_PORT_OUT_NAME]: {
       position: {
@@ -77,23 +79,40 @@ export const PORT_PROPS = {
           r: 4,
           fill: 'transparent'
         }
-
       }
     }
   }
 }
 
-export const PORT_HIGHLIGHT_PROPS = {
-  [X6_PORT_OUT_NAME]: {
-    attrs: {
-      'circle-outer': {
-        stroke: STROKE_BLUE,
-        fill: BG_BLUE,
-        r: 8
-      },
-      'circle-inner': {
-        fill: STROKE_BLUE,
-        r: 6
+export const PORT_HOVER = {
+  groups: {
+    [X6_PORT_OUT_NAME]: {
+      attrs: {
+        'circle-outer': {
+          stroke: STROKE_BLUE,
+          fill: BG_BLUE,
+          r: 8
+        },
+        'circle-inner': {
+          fill: STROKE_BLUE,
+          r: 6
+        }
+      }
+    }
+  }
+}
+
+export const PORT_SELECTED = {
+  groups: {
+    [X6_PORT_OUT_NAME]: {
+      attrs: {
+        'plus-text': {
+          fill: STROKE_BLUE
+        },
+        'circle-outer': {
+          stroke: STROKE_BLUE,
+          fill: BG_WHITE
+        }
       }
     }
   }
@@ -115,7 +134,7 @@ export const NODE_STATUS_MARKUP = [{
   ]
 }]
 
-export const NODE_PROPS = {
+export const NODE = {
   width: 220,
   height: 48,
   markup: [
@@ -143,7 +162,8 @@ export const NODE_PROPS = {
       fill: BG_WHITE,
       stroke: NODE_BORDER,
       strokeWidth: 1,
-      strokeDasharray: 'none'
+      strokeDasharray: 'none',
+      filter: 'none'
     },
     image: {
       width: 30,
@@ -168,7 +188,7 @@ export const NODE_PROPS = {
     }
   },
   ports: {
-    ...PORT_PROPS,
+    ...PORT,
     items: [
       {
         id: X6_PORT_OUT_NAME,
@@ -178,7 +198,7 @@ export const NODE_PROPS = {
   }
 }
 
-export const NODE_HIGHLIGHT_PROPS = {
+export const NODE_HOVER = {
   attrs: {
     body: {
       fill: BG_BLUE,
@@ -191,17 +211,33 @@ export const NODE_HIGHLIGHT_PROPS = {
   }
 }
 
-export const EDGE_PROPS = {
+export const NODE_SELECTED = {
+  attrs: {
+    body: {
+      filter: NODE_SHADOW,
+      fill: BG_WHITE,
+      stroke: STROKE_BLUE,
+      strokeDasharray: '5,2',
+      strokeWidth: '1.5'
+    },
+    title: {
+      fill: STROKE_BLUE
+    }
+  }
+}
+
+export const EDGE = {
   attrs: {
     line: {
-      stroke: EDGE,
+      stroke: EDGE_COLOR,
       strokeWidth: 1,
       targetMarker: {
         tagName: 'path',
-        fill: EDGE,
+        fill: EDGE_COLOR,
         strokeWidth: 0,
         d: 'M 6 -3 0 0 6 3 Z'
-      }
+      },
+      filter: 'none'
     }
   },
   connector: {
@@ -226,7 +262,7 @@ export const EDGE_PROPS = {
     ],
     attrs: {
       label: {
-        fill: EDGE,
+        fill: EDGE_COLOR,
         fontSize: 14,
         textAnchor: 'middle',
         textVerticalAnchor: 'middle',
@@ -235,7 +271,7 @@ export const EDGE_PROPS = {
       body: {
         ref: 'label',
         fill: BG_WHITE,
-        stroke: EDGE,
+        stroke: EDGE_COLOR,
         strokeWidth: 1,
         rx: 4,
         ry: 4,
@@ -255,13 +291,37 @@ export const EDGE_PROPS = {
   }
 }
 
-export const EDGE_HIGHLIGHT_PROPS = {
+export const EDGE_HOVER = {
   attrs: {
     line: {
       stroke: STROKE_BLUE,
       targetMarker: {
         fill: STROKE_BLUE
       }
+    }
+  },
+  defaultLabel: {
+    attrs: {
+      label: {
+        fill: STROKE_BLUE
+      },
+      body: {
+        fill: BG_WHITE,
+        stroke: STROKE_BLUE
+      }
+    }
+  }
+}
+
+export const EDGE_SELECTED = {
+  attrs: {
+    line: {
+      stroke: STROKE_BLUE,
+      targetMarker: {
+        fill: STROKE_BLUE
+      },
+      strokeWidth: 2,
+      filter: EDGE_SHADOW
     }
   },
   defaultLabel: {
