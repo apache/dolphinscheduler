@@ -108,6 +108,7 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(workerConfig);
 
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getFirstSubmitTime(),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),

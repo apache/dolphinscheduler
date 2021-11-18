@@ -350,7 +350,7 @@ public class DataSourceServiceTest {
         mysqlDatasourceParamDTO.setOther(other);
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(mysqlDatasourceParamDTO);
         String expected = "{\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/"
-                + "im\",\"driverClassName\":\"com.mysql.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
+                + "im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
@@ -362,7 +362,7 @@ public class DataSourceServiceTest {
         mysqlDatasourceParamDTO.setPassword("123456");
         connectionParam = DatasourceUtil.buildConnectionParams(mysqlDatasourceParamDTO);
         expected = "{\"user\":\"test\",\"password\":\"123456\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\","
-                + "\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.jdbc.Driver\",\"validationQuery\":\"select 1\"}";
+                + "\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
     }
 
