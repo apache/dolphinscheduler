@@ -1504,6 +1504,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
         } else {
+            if (processDefinition.getVersion() == version) {
+                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
+                return result;
+            }
             int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
             int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(processDefinition.getCode(), processDefinition.getVersion());
             if (deleteLog == 0 || deleteRelationLog == 0) {
