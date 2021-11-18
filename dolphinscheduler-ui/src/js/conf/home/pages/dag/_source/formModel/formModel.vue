@@ -416,6 +416,14 @@
             :backfill-item="backfillItem"
           >
           </m-waterdrop>
+          <m-flinkx
+            v-if="nodeData.taskType === 'FLINKX'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            ref="FLINKX"
+            :backfill-item="backfillItem"
+          >
+          </m-flinkx>
         </div>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
@@ -477,6 +485,7 @@
   import { findComponentDownward } from '@/module/util/'
   import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
   // import ReferenceFromTask from './_source/referenceFromTask.vue'
+  import mFlinkx from './tasks/flinkx'
 
   export default {
     name: 'form-model',
@@ -1042,7 +1051,8 @@
       mPriority,
       mWorkerGroups,
       mRelatedEnvironment,
-      mPreTasks
+      mPreTasks,
+      mFlinkx
     // ReferenceFromTask
     }
   }

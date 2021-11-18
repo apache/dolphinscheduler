@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.FlinkxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
@@ -226,6 +227,11 @@ public class TaskExecutionContext implements Serializable {
      * sqoop TaskExecutionContext
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    /**
+     * flinkx TaskExecutionContext
+     */
+    private FlinkxTaskExecutionContext flinkxTaskExecutionContext;
 
     /**
      * taskInstance varPool
@@ -563,6 +569,14 @@ public class TaskExecutionContext implements Serializable {
 
     public void setDryRun(int dryRun) {
         this.dryRun = dryRun;
+    }
+
+    public FlinkxTaskExecutionContext getFlinkxTaskExecutionContext() {
+        return flinkxTaskExecutionContext;
+    }
+
+    public void setFlinkxTaskExecutionContext(FlinkxTaskExecutionContext flinkxTaskExecutionContext) {
+        this.flinkxTaskExecutionContext = flinkxTaskExecutionContext;
     }
 
     @Override

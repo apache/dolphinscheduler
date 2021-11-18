@@ -327,6 +327,10 @@ const tasksType = {
   WATERDROP: {
     desc: 'WATERDROP',
     color: '#646465'
+  },
+  FLINKX: {
+    desc: 'FLINKX',
+    color: '#646465'
   }
 }
 

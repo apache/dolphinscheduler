@@ -251,6 +251,10 @@ const nodeStatusList = [
   }
 ]
 
+const integralType = [
+  'BIGINT', 'INT', 'LONG'
+]
+
 export {
   cycleList,
   dateValueList,
@@ -258,5 +262,6 @@ export {
   directList,
   sqlTypeList,
   positionList,
-  nodeStatusList
+  nodeStatusList,
+  integralType
 }

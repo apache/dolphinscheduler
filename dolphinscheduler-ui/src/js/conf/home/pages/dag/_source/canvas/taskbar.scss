@@ -111,6 +111,9 @@
           &.icos-switch {
             background-image: url("../images/task-icos/switch.png");
           }
+          &.icos-flinkx {
+            background-image: url("../images/task-icos/flinkx.png");
+          }
         }
 
         span {
@@ -170,6 +173,9 @@
             }
             &.icos-switch {
               background-image: url("../images/task-icos/switch_hover.png");
+            }
+            &.icos-flinkx {
+              background-image: url("../images/task-icos/flinkx_hover.png");
             }
           }
         }

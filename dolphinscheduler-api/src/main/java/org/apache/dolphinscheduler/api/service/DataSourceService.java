@@ -33,7 +33,7 @@ public interface DataSourceService {
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameter
      * @return create result code
      */
@@ -42,8 +42,8 @@ public interface DataSourceService {
     /**
      * updateProcessInstance datasource
      *
-     * @param loginUser login user
-     * @param id data source id
+     * @param loginUser       login user
+     * @param id              data source id
      * @param dataSourceParam data source params
      * @return update result code
      */
@@ -80,7 +80,7 @@ public interface DataSourceService {
     /**
      * verify datasource exists
      *
-     * @param name      datasource name
+     * @param name datasource name
      * @return true if data datasource not exists, otherwise return false
      */
     Result<Object> verifyDataSourceName(String name);
@@ -128,4 +128,14 @@ public interface DataSourceService {
      * @return authorized result code
      */
     Map<String, Object> authedDatasource(User loginUser, Integer userId);
+
+    /**
+     * query datasource columns By table name
+     *
+     * @param loginUser login user
+     * @param id        datasource id
+     * @param table     table name
+     * @return column info
+     */
+    Map<String, Object> queryDatasourceColumnsByTable(User loginUser, Integer id, String table);
 }

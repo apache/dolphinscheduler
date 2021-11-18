@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+import org.apache.dolphinscheduler.common.task.flinkx.FlinkxParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapReduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
@@ -88,6 +89,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, SwitchParameters.class);
             case "PIGEON":
                 return JSONUtils.parseObject(parameter, PigeonCommonParameters.class);
+            case "FLINKX":
+                return JSONUtils.parseObject(parameter, FlinkxParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);
                 return null;

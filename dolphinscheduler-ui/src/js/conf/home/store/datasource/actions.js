@@ -131,5 +131,14 @@ export default {
         reject(e)
       })
     })
+  },
+  getDatasourceColumns ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('datasources/list-columns', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

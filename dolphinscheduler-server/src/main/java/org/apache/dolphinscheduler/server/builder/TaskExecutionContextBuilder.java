@@ -27,12 +27,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.request.FlinkxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
 
 /**
- *  TaskExecutionContext builder
+ * TaskExecutionContext builder
  */
 public class TaskExecutionContextBuilder {
 
@@ -40,7 +41,7 @@ public class TaskExecutionContextBuilder {
         return new TaskExecutionContextBuilder();
     }
 
-    private TaskExecutionContext taskExecutionContext =  new TaskExecutionContext();
+    private TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
     /**
      * build taskInstance related info
@@ -159,6 +160,17 @@ public class TaskExecutionContextBuilder {
      */
     public TaskExecutionContext create() {
         return taskExecutionContext;
+    }
+
+    /**
+     * build flinkxTask related info
+     *
+     * @param flinkxTaskExecutionContext flinkxTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildFlinkxTaskRelatedInfo(FlinkxTaskExecutionContext flinkxTaskExecutionContext) {
+        taskExecutionContext.setFlinkxTaskExecutionContext(flinkxTaskExecutionContext);
+        return this;
     }
 
 }

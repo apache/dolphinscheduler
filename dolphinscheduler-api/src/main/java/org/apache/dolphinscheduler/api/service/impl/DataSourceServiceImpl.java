@@ -37,6 +37,10 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,7 +77,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameters
      * @return create result code
      */
@@ -121,7 +125,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return update result code
      */
     @Override
@@ -214,8 +218,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @Override
@@ -266,7 +270,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @Override
@@ -309,7 +313,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
@@ -350,7 +354,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -384,7 +388,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @Override
@@ -425,7 +429,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @Override
@@ -441,6 +445,52 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * query datasource columns By table name
+     *
+     * @param loginUser login user
+     * @param id        datasource id
+     * @param table     table name
+     * @return column info
+     */
+    @Override
+    public Map<String, Object> queryDatasourceColumnsByTable(User loginUser, Integer id, String table) {
+        Map<String, Object> result = new HashMap<>();
+        DataSource dataSource = dataSourceMapper.selectById(id);
+        if (dataSource == null) {
+            logger.error("resource id {} not exist", id);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        if (!hasPerm(loginUser, dataSource.getUserId())) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+        ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams());
+        List<ObjectNode> columns = new ArrayList<>();
+        String sql = String.format("select * from %s where 1=0 ", table);
+        try (Connection connection = DataSourceClientProvider.getInstance().getConnection(dataSource.getType(), connectionParam);
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet resultSet = stmt.executeQuery()) {
+            ResultSetMetaData md = resultSet.getMetaData();
+            int num = md.getColumnCount();
+            for (int i = 1; i <= num; i++) {
+                ObjectNode column = JSONUtils.createObjectNode();
+                column.put("name", md.getColumnName(i));
+                column.put("type", md.getColumnTypeName(i));
+                columns.add(column);
+            }
+            result.put(Constants.DATA_LIST, columns);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            putMsg(result, Status.QUERY_COLUMNS_BY_TABLE_NAME_ERROR);
+            return result;
+        }
+
     }
 
 }

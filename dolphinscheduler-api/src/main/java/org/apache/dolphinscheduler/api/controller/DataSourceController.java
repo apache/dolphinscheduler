@@ -79,7 +79,7 @@ public class DataSourceController extends BaseController {
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param dataSourceParam datasource param
      * @return create result code
      */
@@ -97,15 +97,15 @@ public class DataSourceController extends BaseController {
     /**
      * updateProcessInstance data source
      *
-     * @param loginUser login user
-     * @param id datasource id
+     * @param loginUser       login user
+     * @param id              datasource id
      * @param dataSourceParam datasource param
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
-        @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -122,12 +122,12 @@ public class DataSourceController extends BaseController {
      * query data source detail
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return data source detail
      */
     @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
     @GetMapping(value = "/{id}")
@@ -145,12 +145,12 @@ public class DataSourceController extends BaseController {
      * query datasource by type
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
@@ -167,15 +167,15 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -196,13 +196,13 @@ public class DataSourceController extends BaseController {
     /**
      * connect datasource
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param dataSourceParam datasource param
      * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
+            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
@@ -219,12 +219,12 @@ public class DataSourceController extends BaseController {
      * connection test
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return connect result code
      */
     @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
@@ -239,12 +239,12 @@ public class DataSourceController extends BaseController {
      * delete datasource by id
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return delete result
      */
     @ApiOperation(value = "deleteDataSource", notes = "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -259,12 +259,12 @@ public class DataSourceController extends BaseController {
      * verify datasource name
      *
      * @param loginUser login user
-     * @param name data source name
+     * @param name      data source name
      * @return true if data source name not exists.otherwise return false
      */
     @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -280,12 +280,12 @@ public class DataSourceController extends BaseController {
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -302,12 +302,12 @@ public class DataSourceController extends BaseController {
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -334,5 +334,28 @@ public class DataSourceController extends BaseController {
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+    }
+
+    /**
+     * query data source columns
+     *
+     * @param loginUser loginUser
+     * @param id        id
+     * @param table     table
+     * @return data source columns
+     */
+    @ApiOperation(value = "queryDatasourceColumnsByTable", notes = "QUERY_DATASOURCE_COLUMNS_BY_TABLE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "table", value = "DATA_SOURCE_TABLE", required = true, dataType = "String", example = "t_ds_project")
+    })
+    @PostMapping(value = "/list-columns")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_DATASOURCE_ERROR)
+    public Result queryDatasourceColumnsByTable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam("id") Integer id,
+                                                @RequestParam(value = "table") String table) {
+        Map<String, Object> result = dataSourceService.queryDatasourceColumnsByTable(loginUser, id, table);
+        return returnDataList(result);
     }
 }

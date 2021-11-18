@@ -225,6 +225,11 @@ public class TaskRequest {
      */
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
+    /**
+     * flinkx TaskExecutionContext
+     */
+    private FlinkxTaskExecutionContext flinkxTaskExecutionContext;
+
     public Map<String, String> getResources() {
         return resources;
     }
@@ -503,5 +508,13 @@ public class TaskRequest {
 
     public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
         this.procedureTaskExecutionContext = procedureTaskExecutionContext;
+    }
+
+    public FlinkxTaskExecutionContext getFlinkxTaskExecutionContext() {
+        return flinkxTaskExecutionContext;
+    }
+
+    public void setFlinkxTaskExecutionContext(FlinkxTaskExecutionContext flinkxTaskExecutionContext) {
+        this.flinkxTaskExecutionContext = flinkxTaskExecutionContext;
     }
 }
