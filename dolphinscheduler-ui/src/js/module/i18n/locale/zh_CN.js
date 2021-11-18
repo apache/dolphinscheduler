@@ -755,5 +755,6 @@ export default {
   dagreLayout: '层次布局',
   rows: '行数',
   cols: '列数',
-  processOnline: '已上线'
+  processOnline: '已上线',
+  searchNode: '搜索节点'
 }

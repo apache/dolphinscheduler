@@ -727,6 +727,22 @@
           const edge = this.genEdgeJSON(code, postCode)
           this.graph.addEdge(edge)
         })
+      },
+      /**
+       * Navigate to cell
+       * @param {string} taskName
+       */
+      navigateTo (taskName) {
+        const nodes = this.getNodes()
+        nodes.forEach(node => {
+          if (node.data.taskName === taskName) {
+            const id = node.id
+            const cell = this.graph.getCellById(id)
+            this.graph.scrollToCell(cell, { animation: { duration: 600 } })
+            this.graph.cleanSelection()
+            this.graph.select(cell)
+          }
+        })
       }
     }
   }

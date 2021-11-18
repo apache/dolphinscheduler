@@ -754,5 +754,6 @@ export default {
   dagreLayout: 'Dagre',
   rows: 'Rows',
   cols: 'Cols',
-  processOnline: 'Online'
+  processOnline: 'Online',
+  searchNode: 'Search Node'
 }

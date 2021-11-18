@@ -59,6 +59,34 @@
     <div class="toolbar-right">
       <el-tooltip
         class="toolbar-operation"
+        :content="$t('searchNode')"
+        placement="bottom"
+        v-if="!searchInputVisible"
+      >
+        <i
+          class="el-icon-search"
+          @click="showSearchInput"
+        ></i>
+      </el-tooltip>
+      <div
+        :class="{
+          'search-box': true,
+          'visible': searchInputVisible
+        }"
+      >
+        <el-input
+          v-model="searchText"
+          placeholder=""
+          prefix-icon="el-icon-search"
+          size="mini"
+          @keyup.enter.native="onSearch"
+          clearable
+          @blur="searchInputBlur"
+          ref="searchInput"
+        ></el-input>
+      </div>
+      <el-tooltip
+        class="toolbar-operation"
         :content="$t('Delete selected lines or nodes')"
         placement="bottom"
         v-if="!isDetails"
@@ -149,13 +177,28 @@
     inject: ['dagChart'],
     data () {
       return {
-        canvasRef: null
+        canvasRef: null,
+        searchText: '',
+        searchInputVisible: false
       }
     },
     computed: {
       ...mapState('dag', ['isDetails', 'releaseState'])
     },
     methods: {
+      onSearch () {
+        const canvas = this.getDagCanvasRef()
+        canvas.navigateTo(this.searchText)
+      },
+      showSearchInput () {
+        this.searchInputVisible = true
+        this.$refs.searchInput.focus()
+      },
+      searchInputBlur () {
+        if (!this.searchText) {
+          this.searchInputVisible = false
+        }
+      },
       getDagCanvasRef () {
         if (this.canvasRef) {
           return this.canvasRef
