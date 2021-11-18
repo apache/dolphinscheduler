@@ -63,7 +63,7 @@ public final class EWeChatSender {
 
     private String user;
 
-    private String password;
+    private String passwd;
 
     EWeChatSender(Map<String, String> config) {
         url = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_WEB_HOOK);
@@ -72,7 +72,7 @@ public final class EWeChatSender {
             port = Integer.parseInt(config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PORT));
             proxy = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PROXY);
             user = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_USER);
-            password = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWD);
+            passwd = config.get(EWeChatParamsConstants.NAME_EWE_CHAT_PASSWD);
         }
     }
 
@@ -157,7 +157,7 @@ public final class EWeChatSender {
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
-            httpClient = getProxyClient(proxy, port, user, password);
+            httpClient = getProxyClient(proxy, port, user, passwd);
             RequestConfig rcf = getProxyConfig(proxy, port);
             httpPost.setConfig(rcf);
         } else {
