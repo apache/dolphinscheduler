@@ -15,28 +15,33 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Task shell."""
+"""Task Python."""
+
+import inspect
+import types
+from typing import Any
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task, TaskParams
 
 
-class ShellTaskParams(TaskParams):
-    """Parameter only for shell task types."""
+class PythonTaskParams(TaskParams):
+    """Parameter only for Python task types."""
 
     def __init__(self, raw_script: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.raw_script = raw_script
 
 
-class Shell(Task):
-    """Task shell object, declare behavior for shell task to dolphinscheduler.
+class Python(Task):
+    """Task Python object, declare behavior for Python task to dolphinscheduler."""
 
-    TODO maybe we could use instance name to replace attribute `name`
-    which is simplify as `task_shell = Shell(command = "echo 1")` and
-    task.name assign to `task_shell`
-    """
-
-    def __init__(self, name: str, command: str, *args, **kwargs):
-        task_params = ShellTaskParams(raw_script=command)
-        super().__init__(name, TaskType.SHELL, task_params, *args, **kwargs)
+    def __init__(self, name: str, code: Any, *args, **kwargs):
+        if isinstance(code, str):
+            task_params = PythonTaskParams(raw_script=code)
+        elif isinstance(code, types.FunctionType):
+            py_function = inspect.getsource(code)
+            task_params = PythonTaskParams(raw_script=py_function)
+        else:
+            raise ValueError("Parameter code do not support % for now.", type(code))
+        super().__init__(name, TaskType.PYTHON, task_params, *args, **kwargs)
