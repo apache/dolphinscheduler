@@ -54,8 +54,8 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -2299,8 +2299,8 @@ public class ProcessService {
             taskDefinitionLog.setCreateTime(now);
             if (taskDefinitionLog.getCode() == 0) {
                 try {
-                    taskDefinitionLog.setCode(SnowFlakeUtils.getInstance().nextId());
-                } catch (SnowFlakeException e) {
+                    taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
+                } catch (CodeGenerateException e) {
                     logger.error("Task code get error, ", e);
                     return Constants.DEFINITION_FAILURE;
                 }
