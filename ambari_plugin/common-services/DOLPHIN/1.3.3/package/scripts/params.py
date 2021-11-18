@@ -57,7 +57,7 @@ dolphin_database_config['dolphin_database_type'] = dolphin_env_map['dolphin.data
 dolphin_database_config['dolphin_database_username'] = dolphin_env_map['dolphin.database.username']
 dolphin_database_config['dolphin_database_password'] = dolphin_env_map['dolphin.database.password']
 if 'mysql' == dolphin_database_config['dolphin_database_type']:
-    dolphin_database_config['dolphin_database_driver'] = 'com.mysql.jdbc.Driver'
+    dolphin_database_config['dolphin_database_driver'] = 'com.mysql.cj.jdbc.Driver'
     dolphin_database_config['driverDelegateClass'] = 'org.quartz.impl.jdbcjobstore.StdJDBCDelegate'
     dolphin_database_config['dolphin_database_url'] = 'jdbc:mysql://' + dolphin_env_map['dolphin.database.host'] \
                                                       + ':' + dolphin_env_map['dolphin.database.port'] \

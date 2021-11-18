@@ -28,7 +28,7 @@ DATABASE_DATABASE=dolphinscheduler
 DATABASE_PARAMS=characterEncoding=utf8
 # mysql
 # DATABASE_TYPE=mysql
-# DATABASE_DRIVER=com.mysql.jdbc.Driver
+# DATABASE_DRIVER=com.mysql.cj.jdbc.Driver
 # DATABASE_HOST=dolphinscheduler-mysql
 # DATABASE_PORT=3306
 # DATABASE_USERNAME=root
