@@ -757,5 +757,11 @@ export default {
   cols: '列数',
   processOnline: '已上线',
   searchNode: '搜索节点',
-  dagScale: '缩放'
+  dagScale: '缩放',
+  workflowName: '工作流名称',
+  scheduleStartTime: '定时开始时间',
+  scheduleEndTime: '定时结束时间',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: '工作流上线状态',
+  schedulePublishStatus: '定时上线状态'
 }
