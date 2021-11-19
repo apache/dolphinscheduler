@@ -81,7 +81,7 @@ public class SwitchTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(taskInstance))
+                .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
         // for MasterBaseTaskExecThread.call
         Mockito.when(processService

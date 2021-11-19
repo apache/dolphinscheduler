@@ -205,32 +205,10 @@ public class ProcessAlertManager {
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
 
-        if (Flag.YES == processInstance.getIsSubProcess()) {
+        if (!isNeedToSendWarning(processInstance)) {
             return;
         }
-        boolean sendWarnning = false;
-        WarningType warningType = processInstance.getWarningType();
-        switch (warningType) {
-            case ALL:
-                if (processInstance.getState().typeIsFinished()) {
-                    sendWarnning = true;
-                }
-                break;
-            case SUCCESS:
-                if (processInstance.getState().typeIsSuccess()) {
-                    sendWarnning = true;
-                }
-                break;
-            case FAILURE:
-                if (processInstance.getState().typeIsFailure()) {
-                    sendWarnning = true;
-                }
-                break;
-            default:
-        }
-        if (!sendWarnning) {
-            return;
-        }
+
         Alert alert = new Alert();
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
@@ -242,6 +220,39 @@ public class ProcessAlertManager {
         alert.setCreateTime(new Date());
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
+    }
+
+    /**
+     * check if need to be send warning
+     *
+     * @param processInstance
+     * @return
+     */
+    public boolean isNeedToSendWarning(ProcessInstance processInstance) {
+        if (Flag.YES == processInstance.getIsSubProcess()) {
+            return false;
+        }
+        boolean sendWarning = false;
+        WarningType warningType = processInstance.getWarningType();
+        switch (warningType) {
+            case ALL:
+                if (processInstance.getState().typeIsFinished()) {
+                    sendWarning = true;
+                }
+                break;
+            case SUCCESS:
+                if (processInstance.getState().typeIsSuccess()) {
+                    sendWarning = true;
+                }
+                break;
+            case FAILURE:
+                if (processInstance.getState().typeIsFailure()) {
+                    sendWarning = true;
+                }
+                break;
+            default:
+        }
+        return sendWarning;
     }
 
     /**

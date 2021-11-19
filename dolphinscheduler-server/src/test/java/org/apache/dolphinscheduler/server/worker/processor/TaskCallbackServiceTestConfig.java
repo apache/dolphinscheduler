@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.mockito.Mockito;
@@ -57,11 +56,6 @@ public class TaskCallbackServiceTestConfig {
     @Bean
     public AlertMapper alertMapper() {
         return Mockito.mock(AlertMapper.class);
-    }
-
-    @Bean
-    public TaskInstanceCacheManagerImpl taskInstanceCacheManagerImpl() {
-        return Mockito.mock(TaskInstanceCacheManagerImpl.class);
     }
 
     @Bean

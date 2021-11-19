@@ -72,7 +72,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
         if (this.taskInstance == null) {
             return false;

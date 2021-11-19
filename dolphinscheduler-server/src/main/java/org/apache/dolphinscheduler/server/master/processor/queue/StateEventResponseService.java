@@ -133,6 +133,15 @@ public class StateEventResponseService {
             }
 
             WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            switch (stateEvent.getType()) {
+                case TASK_STATE_CHANGE:
+                    workflowExecuteThread.refreshTaskInstance(stateEvent.getTaskInstanceId());
+                    break;
+                case PROCESS_STATE_CHANGE:
+                    workflowExecuteThread.refreshProcessInstance(stateEvent.getProcessInstanceId());
+                    break;
+                default:
+            }
             workflowExecuteThread.addStateEvent(stateEvent);
             writeResponse(stateEvent, ExecutionStatus.SUCCESS);
         } catch (Exception e) {
