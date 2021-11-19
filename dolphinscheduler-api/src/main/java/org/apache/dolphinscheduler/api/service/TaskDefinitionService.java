@@ -170,14 +170,4 @@ public interface TaskDefinitionService {
                                              long projectCode,
                                              long code,
                                              ReleaseState releaseState);
-
-
-    /**
-     * check task definition and authorization
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @return true if the login user have permission to see the project and task actually exist in the project
-     */
-    Map<String, Object> checkTaskDefinitionAndAuth(User loginUser, long projectCode, long taskCode);
 }
