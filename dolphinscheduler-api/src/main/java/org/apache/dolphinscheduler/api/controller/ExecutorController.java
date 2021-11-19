@@ -99,7 +99,7 @@ public class ExecutorController extends BaseController {
         @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
         @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
-        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "default"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
         @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8")
     })
