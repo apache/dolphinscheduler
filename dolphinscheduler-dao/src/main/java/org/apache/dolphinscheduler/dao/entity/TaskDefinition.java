@@ -452,16 +452,7 @@ public class TaskDefinition {
             && timeoutFlag == that.timeoutFlag
             && timeoutNotifyStrategy == that.timeoutNotifyStrategy
             && Objects.equals(resourceIds, that.resourceIds)
-            && environmentCode == that.environmentCode
-            && version == that.version
-            && projectCode == that.projectCode
-            && code == that.code;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, version, description, projectCode, taskType, taskParams, flag, taskPriority, workerGroup, environmentCode, failRetryTimes,
-                failRetryInterval, timeoutFlag, timeoutNotifyStrategy, timeout, delayTime, resourceIds, code);
+            && environmentCode == that.environmentCode;
     }
 
     @Override
