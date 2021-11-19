@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -105,6 +106,62 @@ public class ProcessTaskRelationServiceTest {
         } else {
             result.put(Constants.MSG, status.getMsg());
         }
+    }
+
+    private TaskDefinitionLog buildTaskDefinitionLog(long projectCode, long code, int version) {
+
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog() {
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof TaskDefinitionLog)) {
+                    return false;
+                }
+                TaskDefinitionLog that = (TaskDefinitionLog) o;
+                return getCode() == that.getCode()
+                        && getVersion() == that.getVersion()
+                        && getProjectCode() == that.getProjectCode();
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(getCode(), getVersion(), getProjectCode());
+            }
+        };
+        taskDefinitionLog.setProjectCode(projectCode);
+        taskDefinitionLog.setCode(code);
+        taskDefinitionLog.setVersion(version);
+        return taskDefinitionLog;
+    }
+
+    private TaskDefinition buildTaskDefinition(long projectCode, long code, int version) {
+
+        TaskDefinition taskDefinition = new TaskDefinition() {
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof TaskDefinition)) {
+                    return false;
+                }
+                TaskDefinition that = (TaskDefinition) o;
+                return getCode() == that.getCode()
+                        && getVersion() == that.getVersion()
+                        && getProjectCode() == that.getProjectCode();
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(getCode(), getVersion(), getProjectCode());
+            }
+        };
+        taskDefinition.setProjectCode(projectCode);
+        taskDefinition.setCode(code);
+        taskDefinition.setVersion(version);
+        return taskDefinition;
     }
 
     private List<ProcessTaskRelation> getProcessTaskUpstreamRelationList(long projectCode, long taskCode) {
@@ -178,10 +235,10 @@ public class ProcessTaskRelationServiceTest {
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = new TaskDefinition();
-                        taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinition.setCode(processTaskRelation.getPostTaskCode());
-                        taskDefinition.setVersion(processTaskRelation.getPostTaskVersion());
+                        TaskDefinition taskDefinition = buildTaskDefinition(
+                                processTaskRelation.getProjectCode(),
+                                processTaskRelation.getPostTaskCode(),
+                                processTaskRelation.getPostTaskVersion());
                         return taskDefinition;
                     })
                     .collect(Collectors.toSet());
@@ -189,10 +246,11 @@ public class ProcessTaskRelationServiceTest {
             Set<TaskDefinitionLog> taskDefinitionLogSet = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-                        taskDefinitionLog.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinitionLog.setCode(processTaskRelation.getPostTaskCode());
-                        taskDefinitionLog.setVersion(processTaskRelation.getPostTaskVersion());
+                        TaskDefinitionLog taskDefinitionLog = buildTaskDefinitionLog(
+                                processTaskRelation.getProjectCode(),
+                                processTaskRelation.getPostTaskCode(),
+                                processTaskRelation.getPostTaskVersion()
+                        );
                         return taskDefinitionLog;
                     })
                     .collect(Collectors.toSet());
@@ -229,10 +287,10 @@ public class ProcessTaskRelationServiceTest {
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = new TaskDefinition();
-                        taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinition.setCode(processTaskRelation.getPreTaskCode());
-                        taskDefinition.setVersion(processTaskRelation.getPreTaskVersion());
+                        TaskDefinition taskDefinition = buildTaskDefinition(
+                                processTaskRelation.getProjectCode(),
+                                processTaskRelation.getPreTaskCode(),
+                                processTaskRelation.getPreTaskVersion());
                         return taskDefinition;
                     })
                     .collect(Collectors.toSet());
@@ -240,10 +298,10 @@ public class ProcessTaskRelationServiceTest {
             Set<TaskDefinitionLog> taskDefinitionLogSet = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-                        taskDefinitionLog.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinitionLog.setCode(processTaskRelation.getPreTaskCode());
-                        taskDefinitionLog.setVersion(processTaskRelation.getPreTaskVersion());
+                        TaskDefinitionLog taskDefinitionLog = buildTaskDefinitionLog(
+                                processTaskRelation.getProjectCode(),
+                                processTaskRelation.getPreTaskCode(),
+                                processTaskRelation.getPreTaskVersion());
                         return taskDefinitionLog;
                     })
                     .collect(Collectors.toSet());

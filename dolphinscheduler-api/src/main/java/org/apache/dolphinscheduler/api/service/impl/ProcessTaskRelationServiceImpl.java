@@ -36,6 +36,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -160,7 +161,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = new TaskDefinition();
+                        TaskDefinition taskDefinition = buildTaskDefinition();
                         taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
                         taskDefinition.setCode(processTaskRelation.getPreTaskCode());
                         taskDefinition.setVersion(processTaskRelation.getPreTaskVersion());
@@ -196,7 +197,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = new TaskDefinition();
+                        TaskDefinition taskDefinition = buildTaskDefinition();
                         taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
                         taskDefinition.setCode(processTaskRelation.getPostTaskCode());
                         taskDefinition.setVersion(processTaskRelation.getPostTaskVersion());
@@ -209,4 +210,34 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * build task definition
+     *
+     * @return task definition
+     */
+    private TaskDefinition buildTaskDefinition() {
+
+        return new TaskDefinition() {
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof TaskDefinition)) {
+                    return false;
+                }
+                TaskDefinition that = (TaskDefinition) o;
+                return getCode() == that.getCode()
+                        && getVersion() == that.getVersion()
+                        && getProjectCode() == that.getProjectCode();
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(getCode(), getVersion(), getProjectCode());
+            }
+        };
+    }
+
 }
