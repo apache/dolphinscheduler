@@ -63,21 +63,15 @@ public class CodeGenerateUtils {
         if (nowtMillisecond == recordMillisecond) {
             lowDigit = (lowDigit + 1) & MAX_LOW_DIGIT;
             if (lowDigit == 0L) {
-                nowtMillisecond = getNextMillisecond();
+                while (nowtMillisecond <= recordMillisecond) {
+                    nowtMillisecond = systemMillisecond();
+                }
             }
         } else {
             lowDigit = 0L;
         }
         recordMillisecond = nowtMillisecond;
         return (nowtMillisecond - START_TIMESTAMP) << HIGH_DIGIT_LEFT | machineHash << MIDDLE_LEFT | lowDigit;
-    }
-
-    private long getNextMillisecond() {
-        long mill = systemMillisecond();
-        while (mill <= recordMillisecond) {
-            mill = systemMillisecond();
-        }
-        return mill;
     }
 
     private long systemMillisecond() {
