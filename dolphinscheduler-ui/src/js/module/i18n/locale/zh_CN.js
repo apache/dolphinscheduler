@@ -763,5 +763,5 @@ export default {
   scheduleEndTime: '定时结束时间',
   crontabExpression: 'Crontab',
   workflowPublishStatus: '工作流上线状态',
-  schedulePublishStatus: '定时上线状态'
+  schedulePublishStatus: '定时状态'
 }
