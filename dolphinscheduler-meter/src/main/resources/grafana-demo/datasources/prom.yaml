@@ -15,20 +15,8 @@
 # limitations under the License.
 #
 
-spring:
-  application:
-    name: standalone-server
-
-server:
-  port: 12345
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  server:
-    port: 8080
-  metrics:
-    tags:
-      application: ${spring.application.name}
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prom:9090
