@@ -22,7 +22,11 @@ import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceIm
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -30,7 +34,11 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -99,7 +107,7 @@ public class ProcessTaskRelationServiceTest {
         }
     }
 
-    private List<ProcessTaskRelation> getProcessTaskUpstreamRelationList(long projectCode,long taskCode) {
+    private List<ProcessTaskRelation> getProcessTaskUpstreamRelationList(long projectCode, long taskCode) {
         ProcessTaskRelation processTaskRelationUpstream0 = new ProcessTaskRelation();
         processTaskRelationUpstream0.setPostTaskCode(taskCode);
         processTaskRelationUpstream0.setPreTaskVersion(1);
@@ -162,8 +170,6 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         List<ProcessTaskRelation> processTaskRelationList = getProcessTaskDownstreamRelationList(projectCode,taskCode);
-
-        System.out.println(processTaskRelationList.size());
 
         Mockito.when(processTaskRelationMapper.queryDownstreamByCode(projectCode,taskCode))
                 .thenReturn(processTaskRelationList);
