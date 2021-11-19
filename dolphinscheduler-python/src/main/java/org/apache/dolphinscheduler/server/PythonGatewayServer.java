@@ -36,7 +36,7 @@ import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -150,18 +150,18 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws SnowFlakeUtils.SnowFlakeException {
+    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
         if (project == null) {
-            result.put("code", SnowFlakeUtils.getInstance().nextId());
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), taskName);
         if (taskDefinition == null) {
-            result.put("code", SnowFlakeUtils.getInstance().nextId());
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
         } else {
             result.put("code", taskDefinition.getCode());

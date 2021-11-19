@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 
 import java.sql.Connection;
@@ -110,7 +110,7 @@ public class ProcessDefinitionDao {
                 processDefinition.setId(rs.getInt(1));
                 long code = rs.getLong(2);
                 if (code == 0L) {
-                    code = SnowFlakeUtils.getInstance().nextId();
+                    code = CodeGenerateUtils.getInstance().genCode();
                 }
                 processDefinition.setCode(code);
                 processDefinition.setVersion(Constants.VERSION_FIRST);
