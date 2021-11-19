@@ -40,10 +40,10 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -222,8 +222,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         long processDefinitionCode;
         try {
-            processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
-        } catch (SnowFlakeException e) {
+            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        } catch (CodeGenerateException e) {
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
             return result;
         }
@@ -874,8 +874,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
-            processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
-        } catch (SnowFlakeException e) {
+            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+        } catch (CodeGenerateException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
@@ -894,10 +894,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
             try {
-                long code = SnowFlakeUtils.getInstance().nextId();
+                long code = CodeGenerateUtils.getInstance().genCode();
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
-            } catch (SnowFlakeException e) {
+            } catch (CodeGenerateException e) {
                 logger.error("Task code get error, ", e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
@@ -1363,8 +1363,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
                 try {
-                    processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
-                } catch (SnowFlakeException e) {
+                    processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+                } catch (CodeGenerateException e) {
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }

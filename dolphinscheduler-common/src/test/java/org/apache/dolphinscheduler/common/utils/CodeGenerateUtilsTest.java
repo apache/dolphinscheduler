@@ -22,14 +22,14 @@ import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SnowFlakeUtilsTest {
+public class CodeGenerateUtilsTest {
     @Test
-    public void testNoGenerateDuplicateId() throws SnowFlakeUtils.SnowFlakeException {
-        HashSet<Long> existsSnowFlakeId = new HashSet<>();
+    public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
+        HashSet<Long> existsCode = new HashSet<>();
         for (int i = 0; i < 100; i++) {
-            Long currentId = SnowFlakeUtils.getInstance().nextId();
-            Assert.assertFalse(existsSnowFlakeId.contains(currentId));
-            existsSnowFlakeId.add(currentId);
+            Long currentCode = CodeGenerateUtils.getInstance().genCode();
+            Assert.assertFalse(existsCode.contains(currentCode));
+            existsCode.add(currentCode);
         }
     }
 }
