@@ -41,9 +41,9 @@
       graphGrid.setOption(
         graphGridOption(
           this.locations.map(item => {
-            item.crontab = item.crontab ? item.crontab : '-'
-            item.scheduleEndTime = item.scheduleEndTime ? item.scheduleEndTime : '-'
-            item.scheduleStartTime = item.scheduleStartTime ? item.scheduleStartTime : '-'
+            item.crontab = item.crontab !== null ? item.crontab : '-'
+            item.scheduleEndTime = item.scheduleEndTime !== null ? item.scheduleEndTime : '-'
+            item.scheduleStartTime = item.scheduleStartTime !== null ? item.scheduleStartTime : '-'
             return item
           }),
           this.connects,
