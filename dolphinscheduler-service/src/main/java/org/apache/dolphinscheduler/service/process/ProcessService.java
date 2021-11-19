@@ -101,8 +101,8 @@ import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -1088,12 +1088,6 @@ public class ProcessService {
 
     /**
      * retry submit task to db
-     *
-     * @param processInstance
-     * @param taskInstance
-     * @param commitRetryTimes
-     * @param commitInterval
-     * @return
      */
     public TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes, int commitInterval) {
         int retryTimes = 1;
@@ -1131,7 +1125,7 @@ public class ProcessService {
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if (task == null) {
             logger.error("end submit task to db error, task name:{}, process id:{} state: {} ",
-                taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
+                    taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
             return null;
         }
 
@@ -1428,7 +1422,7 @@ public class ProcessService {
         if (processInstance.getState() == ExecutionStatus.READY_PAUSE) {
             state = ExecutionStatus.PAUSE;
         } else if (processInstance.getState() == ExecutionStatus.READY_STOP
-            || !checkProcessStrategy(taskInstance, processInstance)) {
+                || !checkProcessStrategy(taskInstance, processInstance)) {
             state = ExecutionStatus.KILL;
         } else {
             state = ExecutionStatus.SUBMITTED_SUCCESS;
