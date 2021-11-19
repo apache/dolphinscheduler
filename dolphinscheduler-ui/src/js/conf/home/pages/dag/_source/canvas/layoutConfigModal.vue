@@ -94,15 +94,15 @@
 </script>
 <style lang="scss" scoped>
 .dag-layout-modal {
-  /deep/ .el-dialog__header {
+  ::v-deep .el-dialog__header {
     border-bottom: solid 1px #d4d4d4;
   }
 
-  /deep/ .dag-layout-form {
+  ::v-deep .dag-layout-form {
     margin-top: 20px;
   }
 
-  /deep/ .el-radio {
+  ::v-deep .el-radio {
     margin-bottom: 0;
   }
 
