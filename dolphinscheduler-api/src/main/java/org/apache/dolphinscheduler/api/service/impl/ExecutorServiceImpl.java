@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -58,6 +57,7 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -409,7 +409,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param loginUser           login user
      * @param instanceId          instance id
      * @param processDefinitionCode process definition code
-     * @param version
+     * @param processVersion
      * @param commandType         command type
      * @return insert result code
      */
@@ -465,11 +465,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        List<Integer> ids = new ArrayList<>();
-        processService.recurseFindSubProcessId(processDefinition.getId(), ids);
-        Integer[] idArray = ids.toArray(new Integer[ids.size()]);
-        if (!ids.isEmpty()) {
-            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
+        List<Long> codes = new ArrayList<>();
+        processService.recurseFindSubProcess(processDefinition.getCode(), codes);
+        if (!codes.isEmpty()) {
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codes);
             if (processDefinitionList != null) {
                 for (ProcessDefinition processDefinitionTmp : processDefinitionList) {
                     /**
@@ -533,7 +532,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         if (!StringUtils.isEmpty(startNodeList)) {
-            cmdParam.put(CMD_PARAM_START_NODE_NAMES, startNodeList);
+            cmdParam.put(CMD_PARAM_START_NODES, startNodeList);
         }
         if (warningType != null) {
             command.setWarningType(warningType);

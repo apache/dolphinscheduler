@@ -28,7 +28,7 @@ DATABASE_DATABASE=dolphinscheduler
 DATABASE_PARAMS=characterEncoding=utf8
 # mysql
 # DATABASE_TYPE=mysql
-# DATABASE_DRIVER=com.mysql.jdbc.Driver
+# DATABASE_DRIVER=com.mysql.cj.jdbc.Driver
 # DATABASE_HOST=dolphinscheduler-mysql
 # DATABASE_PORT=3306
 # DATABASE_USERNAME=root
@@ -39,7 +39,6 @@ DATABASE_PARAMS=characterEncoding=utf8
 #============================================================================
 # Registry
 #============================================================================
-REGISTRY_PLUGIN_DIR=lib/plugin/registry
 REGISTRY_PLUGIN_NAME=zookeeper
 REGISTRY_SERVERS=dolphinscheduler-zookeeper:2181
 
@@ -110,7 +109,6 @@ ALERT_LISTEN_HOST=dolphinscheduler-alert
 # Alert Server
 #============================================================================
 ALERT_SERVER_OPTS=-Xms512m -Xmx512m -Xmn256m
-ALERT_PLUGIN_DIR=lib/plugin/alert
 
 #============================================================================
 # Api Server

@@ -20,11 +20,12 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,14 +70,6 @@ public class MonitorServiceTest {
     public  void testQueryMaster() {
         //TODO need zk
         /*Map<String,Object> result = monitorService.queryMaster(null);*/
-        /*logger.info(result.toString());*/
-        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
-    }
-
-    @Test
-    public  void testQueryZookeeperState() {
-        //TODO need zk
-        /*Map<String,Object> result = monitorService.queryZookeeperState(null);*/
         /*logger.info(result.toString());*/
         /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
     }

@@ -148,7 +148,7 @@ public class ProcessDefinitionDao {
                     pstmt.setLong(1, processDefinition.getCode());
                     long projectCode = processDefinition.getProjectCode();
                     if (String.valueOf(projectCode).length() <= 10) {
-                        Integer projectId = Integer.getInteger(String.valueOf(projectCode));
+                        Integer projectId = Integer.parseInt(String.valueOf(projectCode));
                         if (projectIdCodeMap.containsKey(projectId)) {
                             projectCode = projectIdCodeMap.get(projectId);
                             processDefinition.setProjectCode(projectCode);

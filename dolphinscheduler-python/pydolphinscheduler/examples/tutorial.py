@@ -33,8 +33,12 @@ it will instantiate and run all the task it have.
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
 
-
-with ProcessDefinition(name="tutorial", tenant="tenant_exists") as pd:
+with ProcessDefinition(
+    name="tutorial",
+    schedule="0 0 0 * * ? *",
+    start_time="2021-01-01",
+    tenant="tenant_exists",
+) as pd:
     task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
     task_child_one = Shell(name="task_child_one", command="echo 'child one'")
     task_child_two = Shell(name="task_child_two", command="echo 'child two'")

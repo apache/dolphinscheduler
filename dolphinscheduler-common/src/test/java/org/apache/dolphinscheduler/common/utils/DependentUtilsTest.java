@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.model.DateInterval;
-import org.apache.dolphinscheduler.common.shell.ShellExecutorTest;
 import org.apache.dolphinscheduler.common.utils.dependent.DependentDateUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DependentUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(ShellExecutorTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DependentUtilsTest.class);
 
     @Test
     public void getDependResultForRelation() {

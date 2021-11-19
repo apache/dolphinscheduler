@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.Executors;
@@ -73,6 +74,7 @@ public class WorkerRegistryClient {
      */
     private ScheduledExecutorService heartBeatExecutor;
 
+    @Autowired
     private RegistryClient registryClient;
 
     /**
@@ -84,9 +86,8 @@ public class WorkerRegistryClient {
 
     @PostConstruct
     public void initWorkRegistry() {
-        this.workerGroups = workerConfig.getWorkerGroups();
+        this.workerGroups = workerConfig.getGroups();
         this.startupTime = System.currentTimeMillis();
-        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
@@ -96,7 +97,7 @@ public class WorkerRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
-        int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
+        int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
             registryClient.persistEphemeral(workerZKPath, "");
@@ -104,13 +105,13 @@ public class WorkerRegistryClient {
         }
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
-                workerConfig.getWorkerMaxCpuloadAvg(),
-                workerConfig.getWorkerReservedMemory(),
+                workerConfig.getMaxCpuLoadAvg(),
+                workerConfig.getReservedMemory(),
                 workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_TYPE,
                 registryClient,
-                workerConfig.getWorkerExecThreads(),
+                workerConfig.getExecThreads(),
                 workerManagerThread
         );
 
@@ -121,7 +122,7 @@ public class WorkerRegistryClient {
     /**
      * remove registry info
      */
-    public void unRegistry() {
+    public void unRegistry() throws IOException {
         try {
             String address = getLocalAddress();
             Set<String> workerZkPaths = getWorkerZkPaths();
@@ -161,7 +162,7 @@ public class WorkerRegistryClient {
         return workerPaths;
     }
 
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
+    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
         registryClient.handleDeadServer(nodeSet, nodeType, opType);
     }
 

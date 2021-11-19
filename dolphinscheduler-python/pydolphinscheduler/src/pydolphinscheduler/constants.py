@@ -38,6 +38,7 @@ class ProcessDefinitionDefault:
     USER_STATE: int = 1
     QUEUE: str = "queuePythonGateway"
     WORKER_GROUP: str = "default"
+    TIME_ZONE: str = "Asia/Shanghai"
 
 
 class TaskPriority(str):
@@ -85,3 +86,27 @@ class JavaGatewayDefault(str):
     RESULT_STATUS_SUCCESS = "SUCCESS"
 
     RESULT_DATA = "data"
+
+
+class Delimiter(str):
+    """Constants for delimiter."""
+
+    BAR = "-"
+    DASH = "/"
+    COLON = ":"
+    UNDERSCORE = "_"
+
+
+class Time(str):
+    """Constants for date."""
+
+    FMT_STD_DATE = "%Y-%m-%d"
+    LEN_STD_DATE = 10
+
+    FMT_DASH_DATE = "%Y/%m/%d"
+
+    FMT_SHORT_DATE = "%Y%m%d"
+    LEN_SHORT_DATE = 8
+
+    FMT_STD_TIME = "%H:%M:%S"
+    FMT_NO_COLON_TIME = "%H%M%S"

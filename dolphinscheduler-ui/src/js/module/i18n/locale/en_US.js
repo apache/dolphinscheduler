@@ -711,6 +711,15 @@ export default {
   'The condition content cannot be empty': 'The condition content cannot be empty',
   'Reference from': 'Reference from',
   'No more...': 'No more...',
+  'Task Definition': 'Task Definition',
+  'Create task': 'Create task',
+  'Task Type': 'Task Type',
+  'Process execute type': 'Process execute type',
+  parallel: 'parallel',
+  'Serial wait': 'Serial wait',
+  'Serial discard': 'Serial discard',
+  'Serial priority': 'Serial priority',
+  'Recover serial wait': 'Recover serial wait',
   IsEnableProxy: 'Enable Proxy',
   WebHook: 'WebHook',
   Keyword: 'Keyword',
@@ -738,5 +747,6 @@ export default {
   agentId: 'AgentId',
   users: 'Users',
   Username: 'Username',
-  showType: 'Show Type'
+  showType: 'Show Type',
+  'Please select a task type (required)': 'Please select a task type (required)'
 }

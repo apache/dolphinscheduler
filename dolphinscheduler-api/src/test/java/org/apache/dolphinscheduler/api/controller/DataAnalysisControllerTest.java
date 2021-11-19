@@ -47,11 +47,11 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
     @MockBean
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
 
     @Test
     public void testCountTaskState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
@@ -72,7 +72,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCountProcessInstanceState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("startDate","2019-12-01 00:00:00");
@@ -92,7 +92,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCountDefinitionByUser() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId","16");

@@ -711,6 +711,15 @@ export default {
   'The condition content cannot be empty': '条件内容不能为空',
   'Reference from': '使用已有任务',
   'No more...': '没有更多了...',
+  'Task Definition': '任务定义',
+  'Create task': '创建任务',
+  'Task Type': '任务类型',
+  'Process execute type': '执行策略',
+  parallel: '并行',
+  'Serial wait': '串行等待',
+  'Serial discard': '串行抛弃',
+  'Serial priority': '串行优先',
+  'Recover serial wait': '串行恢复',
   IsEnableProxy: '启用代理',
   WebHook: 'Web钩子',
   Keyword: '密钥',
@@ -739,5 +748,6 @@ export default {
   agentId: '应用ID',
   users: '群员',
   Username: '用户名',
-  showType: '内容展示类型'
+  showType: '内容展示类型',
+  'Please select a task type (required)': '请选择任务类型(必选)'
 }
