@@ -23,7 +23,7 @@
       :content="$t('Copy name')"
       placement="bottom"
     >
-      <i class="el-icon-copy-document" @click="copyName"></i>
+      <em class="el-icon-copy-document" @click="copyName"></em>
     </el-tooltip>
     <textarea ref="textarea" cols="30" rows="10" class="transparent"></textarea>
     <div class="toolbar-left">
@@ -38,22 +38,22 @@
         placement="bottom"
         class="toolbar-operation"
       >
-        <i
+        <em
           class="custom-ico view-variables"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleVariableView"
-        ></i>
+        ></em>
       </el-tooltip>
       <el-tooltip
         :content="$t('Startup parameter')"
         placement="bottom"
         class="toolbar-operation"
       >
-        <i
+        <em
           class="custom-ico startup-parameters"
           v-if="$route.name === 'projects-instance-details'"
           @click="toggleParamView"
-        ></i>
+        ></em>
       </el-tooltip>
     </div>
     <div class="toolbar-right">
@@ -63,10 +63,10 @@
         placement="bottom"
         v-if="!searchInputVisible"
       >
-        <i
+        <em
           class="el-icon-search"
           @click="showSearchInput"
-        ></i>
+        ></em>
       </el-tooltip>
       <div
         :class="{
@@ -91,14 +91,14 @@
         placement="bottom"
         v-if="!isDetails"
       >
-        <i class="el-icon-delete" @click="removeCells"></i>
+        <em class="el-icon-delete" @click="removeCells"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
         :content="$t('Download')"
         placement="bottom"
       >
-        <i class="el-icon-download" @click="downloadPNG"></i>
+        <em class="el-icon-download" @click="downloadPNG"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
@@ -106,7 +106,7 @@
         placement="bottom"
         v-if="dagChart.type === 'instance'"
       >
-        <i class="el-icon-refresh" @click="refreshTaskStatus"></i>
+        <em class="el-icon-refresh" @click="refreshTaskStatus"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation"
@@ -114,20 +114,20 @@
         placement="bottom"
         v-if="!isDetails"
       >
-        <i class="custom-ico graph-format" @click="chartFormat"></i>
+        <em class="custom-ico graph-format" @click="chartFormat"></em>
       </el-tooltip>
       <el-tooltip
         class="toolbar-operation last"
         :content="$t('Full Screen')"
         placement="bottom"
       >
-        <i
+        <em
           :class="[
             'custom-ico',
             dagChart.fullScreen ? 'full-screen-close' : 'full-screen-open',
           ]"
           @click="toggleFullScreen"
-        ></i>
+        ></em>
       </el-tooltip>
       <el-button
         class="toolbar-el-btn"

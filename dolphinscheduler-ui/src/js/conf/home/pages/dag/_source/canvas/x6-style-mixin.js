@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import {
   NODE,
   EDGE,
@@ -41,8 +42,8 @@ export default {
         const { cell, e } = data
         const isStatusIcon = (tagName) =>
           tagName &&
-                  (tagName.toLocaleLowerCase() === 'em' ||
-                    tagName.toLocaleLowerCase() === 'body')
+          (tagName.toLocaleLowerCase() === 'em' ||
+            tagName.toLocaleLowerCase() === 'body')
         if (!isStatusIcon(e.target.tagName)) {
           this.hoverCell = cell
           this.updateCellStyle(cell, graph)
@@ -82,13 +83,22 @@ export default {
       const nodeSelected = _.merge(_.cloneDeep(NODE.attrs), NODE_SELECTED.attrs)
 
       let img = null
-      let nodeAttrs = isHover ? nodeHover : isSelected ? nodeSelected : NODE.attrs
-      let portAttrs = isHover ? _.merge(portDefault, portHover) : isSelected ? _.merge(portDefault, portSelected) : portDefault
+      let nodeAttrs = null
+      let portAttrs = null
 
       if (isHover || isSelected) {
         img = require(`../images/task-icos/${node.data.taskType.toLocaleLowerCase()}_hover.png`)
+        if (isHover) {
+          nodeAttrs = nodeHover
+          portAttrs = _.merge(portDefault, portHover)
+        } else {
+          nodeAttrs = nodeSelected
+          portAttrs = _.merge(portDefault, portSelected)
+        }
       } else {
         img = require(`../images/task-icos/${node.data.taskType.toLocaleLowerCase()}.png`)
+        nodeAttrs = NODE.attrs
+        portAttrs = portDefault
       }
       node.setAttrByPath('image/xlink:href', img)
       node.setAttrs(nodeAttrs)
@@ -107,10 +117,15 @@ export default {
       const isHover = edge === this.hoverCell
       const isSelected = graph.isSelected(edge)
       const labelName = this.getEdgeLabelName ? this.getEdgeLabelName(edge) : ''
-      const edgeHover = _.cloneDeep(EDGE_HOVER)
-      const edgeDefault = _.cloneDeep(EDGE)
-      const edgeSelected = _.cloneDeep(EDGE_SELECTED)
-      const edgeProps = isHover ? _.merge(edgeDefault, edgeHover) : isSelected ? _.merge(edgeDefault, edgeSelected) : edgeDefault
+      let edgeProps = null
+
+      if (isHover) {
+        edgeProps = _.merge(_.cloneDeep(EDGE), EDGE_HOVER)
+      } else if (isSelected) {
+        edgeProps = _.merge(_.cloneDeep(EDGE), EDGE_SELECTED)
+      } else {
+        edgeProps = _.cloneDeep(EDGE)
+      }
 
       edge.setAttrs(edgeProps.attrs)
       edge.setLabels([
