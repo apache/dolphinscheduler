@@ -17,23 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-/**
- * host selector
- */
 public enum HostSelector {
-
     RANDOM,
 
-    ROUNDROBIN,
+    ROUND_ROBIN,
 
-    LOWERWEIGHT;
-
-    public static HostSelector of(String selector) {
-        for (HostSelector hs : values()) {
-            if (hs.name().equalsIgnoreCase(selector)) {
-                return hs;
-            }
-        }
-        throw new IllegalArgumentException("invalid host selector : " + selector);
-    }
+    LOWER_WEIGHT
 }

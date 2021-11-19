@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
@@ -53,8 +54,6 @@ public class ConnectionFactory extends SpringConnectionFactory {
 
     private ConnectionFactory() {
         try {
-            init();
-            dataSource = buildDataSource();
             sqlSessionFactory = getSqlSessionFactory();
             sqlSessionTemplate = getSqlSessionTemplate();
         } catch (Exception e) {
@@ -75,18 +74,9 @@ public class ConnectionFactory extends SpringConnectionFactory {
 
     private DataSource dataSource;
 
+    // TODO remove
     public DataSource getDataSource() {
         return dataSource;
-    }
-
-    /**
-     * get the data source
-     *
-     * @return druid dataSource
-     */
-    private DataSource buildDataSource() throws SQLException {
-
-        return dataSource();
     }
 
     /**
@@ -95,7 +85,8 @@ public class ConnectionFactory extends SpringConnectionFactory {
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
-    private SqlSessionFactory getSqlSessionFactory() throws Exception {
+    @Bean
+    public SqlSessionFactory getSqlSessionFactory() throws Exception {
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
 
         Environment environment = new Environment("development", transactionFactory, getDataSource());
