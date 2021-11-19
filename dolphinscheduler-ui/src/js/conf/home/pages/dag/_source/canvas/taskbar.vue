@@ -24,6 +24,9 @@
         <draggable-box
           :key="taskType.name"
           @onDragstart="(e) => $emit('on-drag-start', e, taskType)"
+          :class="{
+            disabled: isDetails
+          }"
         >
           <div class="task-item">
             <em :class="`icos-${taskType.name.toLocaleLowerCase()}`"></em>
@@ -38,6 +41,7 @@
 <script>
   import draggableBox from './draggableBox.vue'
   import { tasksType } from '../config.js'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'dag-taskbar',
@@ -55,6 +59,11 @@
       return {
         tasksTypeList
       }
+    },
+    computed: {
+      ...mapState('dag', [
+        'isDetails'
+      ])
     }
   }
 </script>

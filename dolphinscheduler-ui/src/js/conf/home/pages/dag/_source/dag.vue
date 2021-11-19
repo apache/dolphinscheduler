@@ -60,6 +60,10 @@
     </el-dialog>
     <edge-edit-model ref="edgeEditModel" />
     <el-drawer :visible.sync="versionDrawer" size="" :with-header="false">
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width: 0px; height: 0px; overflow: hidden">
+        <el-input type="text" />
+      </div>
       <m-versions
         :versionData="versionData"
         :isInstance="type === 'instance'"
@@ -187,7 +191,6 @@
     },
     beforeDestroy () {
       this.resetParams()
-
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },

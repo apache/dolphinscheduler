@@ -420,7 +420,7 @@
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           ref="preTasks"
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1 && !fromTaskDefinition"
+          v-if="!fromTaskDefinition"
           :code="code"
         />
       </div>

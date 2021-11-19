@@ -133,6 +133,8 @@ export default {
         state.version = res.data.processDefinition.version
         // name
         state.name = res.data.processDefinition.name
+        // releaseState
+        state.releaseState = res.data.processDefinition.releaseState
         // description
         state.description = res.data.processDefinition.description
         // taskRelationJson
@@ -145,7 +147,6 @@ export default {
         state.timeout = res.data.processDefinition.timeout
         // executionType
         state.executionType = res.data.processDefinition.executionType
-        // tenantId
         // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
@@ -167,6 +168,7 @@ export default {
           'timeout',
           'environmentCode'
         ]))
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
