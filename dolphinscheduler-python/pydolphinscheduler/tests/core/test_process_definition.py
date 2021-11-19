@@ -175,7 +175,7 @@ def test_process_definition_simple():
     expect_tasks_num = 5
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         for i in range(expect_tasks_num):
-            task_params = TaskParams(raw_script=f"test-raw-script-{i}")
+            task_params = TaskParams()
             curr_task = Task(
                 name=f"task-{i}", task_type=f"type-{i}", task_params=task_params
             )
