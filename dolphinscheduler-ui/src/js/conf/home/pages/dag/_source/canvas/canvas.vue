@@ -27,6 +27,18 @@
     >
       <div ref="paper" class="paper"></div>
       <div ref="minimap" class="minimap"></div>
+      <div class="scale-slider">
+        <span class="scale-title">{{$t('dagScale')}}</span>
+        <el-slider
+          v-model="scale"
+          vertical
+          :max="2"
+          :min="0.2"
+          :step="0.2"
+          :marks="SCALE_MARKS"
+          @input='scaleChange'
+        />
+      </div>
       <context-menu ref="contextMenu" />
     </div>
     <layout-config-modal ref="layoutModal" @submit="format" />
@@ -52,6 +64,12 @@
   import nodeStatus from './nodeStatus'
   import x6StyleMixin from './x6-style-mixin'
 
+  const SCALE_MARKS = {
+    0.2: '0.2',
+    1: '1',
+    2: '2'
+  }
+
   export default {
     name: 'dag-canvas',
     data () {
@@ -69,8 +87,9 @@
           y: 0,
           type: ''
         },
-        // the mouse over cell
-        hoverCell: null
+        // The canvas scale
+        scale: 1,
+        SCALE_MARKS
       }
     },
     provide () {
@@ -119,6 +138,14 @@
             movable: true,
             showNodeSelectionBox: false
           },
+          scaling: {
+            min: 0.2,
+            max: 2
+          },
+          mousewheel: {
+            enabled: true,
+            modifiers: ['ctrl', 'meta']
+          },
           scroller: true,
           grid: {
             size: 10,
@@ -127,7 +154,10 @@
           snapline: true,
           minimap: {
             enabled: true,
-            container: minimap
+            container: minimap,
+            scalable: false,
+            width: 200,
+            height: 120
           },
           interacting: {
             edgeLabelMovable: false,
@@ -194,6 +224,7 @@
             }
           }
         }))
+
         this.registerX6Shape()
         this.bindGraphEvent()
         this.originalScrollPosition = graph.getScrollbarPosition()
@@ -212,6 +243,10 @@
        */
       bindGraphEvent () {
         this.bindStyleEvent(this.graph)
+        // update scale bar
+        this.graph.on('scale', ({ sx }) => {
+          this.scale = sx
+        })
         // right click
         this.graph.on('node:contextmenu', ({ x, y, cell }) => {
           const { left, top } = this.graph.getScrollbarPosition()
@@ -734,7 +769,7 @@
        */
       navigateTo (taskName) {
         const nodes = this.getNodes()
-        nodes.forEach(node => {
+        nodes.forEach((node) => {
           if (node.data.taskName === taskName) {
             const id = node.id
             const cell = this.graph.getCellById(id)
@@ -743,6 +778,12 @@
             this.graph.select(cell)
           }
         })
+      },
+      /**
+       * Canvas scale
+       */
+      scaleChange (val) {
+        this.graph.zoomTo(val)
       }
     }
   }

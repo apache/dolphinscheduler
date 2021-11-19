@@ -755,5 +755,6 @@ export default {
   rows: 'Rows',
   cols: 'Cols',
   processOnline: 'Online',
-  searchNode: 'Search Node'
+  searchNode: 'Search Node',
+  dagScale: 'Scale'
 }

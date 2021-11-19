@@ -756,5 +756,6 @@ export default {
   rows: '行数',
   cols: '列数',
   processOnline: '已上线',
-  searchNode: '搜索节点'
+  searchNode: '搜索节点',
+  dagScale: '缩放'
 }
