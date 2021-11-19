@@ -402,7 +402,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     protostuff-api 1.7.2: https://github.com/protostuff/protostuff/protostuff-api Apache-2.0
     protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
     prometheus client_java(simpleclient) 0.12.0: https://github.com/prometheus/client_java, Apache 2.0
-    snowflake snowflake-2010: https://github.com/twitter-archive/snowflake/blob/snowflake-2010, Apache 2.0
+    snowflake snowflake-2010: https://github.com/twitter-archive/snowflake/tree/snowflake-2010, Apache 2.0
 
 ========================================================================
 BSD licenses
