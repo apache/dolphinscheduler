@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
+import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -470,7 +471,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams());
         List<ObjectNode> columns = new ArrayList<>();
-        String sql = String.format("select * from %s where 1=0 ", table);
+        String sql;
+        if (CheckUtils.checkSqlInjection(table)){
+            putMsg(result, Status.COMMIT_TABLE_NAME_ERROR);
+            return result;
+        } else {
+            sql = String.format("select * from %s where 1=0 ", table);
+        }
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(dataSource.getType(), connectionParam);
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet resultSet = stmt.executeQuery()) {

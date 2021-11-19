@@ -245,6 +245,11 @@ public final class Constants {
     public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
+     * check sql injection
+     */
+    public static final Pattern REGEX_SQL_INJECTION = Pattern.compile("(?<=[\\s|\\(]|^)(select|update|union|and|or|delete|insert|trancate|char|into|substr|ascii|declare|exec|count|master|drop|execute)(?=([\\s|\\)])|$)",Pattern.CASE_INSENSITIVE);
+
+    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2;
