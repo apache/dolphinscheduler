@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.HashSet;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-public class SnowFlakeUtilsTest {
+public class CodeGenerateUtilsTest {
     @Test
-    public void testNextId() {
-        try {
-            for (int i = 0; i < 100; i++) {
-                Thread.sleep(1);
-                System.out.println(SnowFlakeUtils.getInstance().nextId());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
+        HashSet<Long> existsCode = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            Long currentCode = CodeGenerateUtils.getInstance().genCode();
+            Assert.assertFalse(existsCode.contains(currentCode));
+            existsCode.add(currentCode);
         }
     }
 }
