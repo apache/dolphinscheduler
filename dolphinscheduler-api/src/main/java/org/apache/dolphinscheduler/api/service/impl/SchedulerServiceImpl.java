@@ -57,6 +57,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.quartz.CronExpression;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +97,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private Scheduler scheduler;
 
     /**
      * save schedule
@@ -349,12 +355,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return result;
             }
             // check sub process definition release state
-            List<Integer> subProcessDefineIds = new ArrayList<>();
-            processService.recurseFindSubProcessId(processDefinition.getId(), subProcessDefineIds);
-            Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
-            if (!subProcessDefineIds.isEmpty()) {
+            List<Long> subProcessDefineCodes = new ArrayList<>();
+            processService.recurseFindSubProcess(processDefinition.getCode(), subProcessDefineCodes);
+            if (!subProcessDefineCodes.isEmpty()) {
                 List<ProcessDefinition> subProcessDefinitionList =
-                        processDefinitionMapper.queryDefinitionListByIdList(idArray);
+                        processDefinitionMapper.queryByCodes(subProcessDefineCodes);
                 if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()) {
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList) {
                         /**
@@ -400,7 +405,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new ServiceException(result.get(Constants.MSG).toString());
+            throw new ServiceException(result.get(Constants.MSG).toString(), e);
         }
 
         putMsg(result, Status.SUCCESS);
@@ -478,7 +483,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void setSchedule(int projectId, Schedule schedule) {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
 
-        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, projectId, schedule);
+        QuartzExecutors.getInstance().addJob(scheduler, ProcessScheduleJob.class, projectId, schedule);
     }
 
     /**
@@ -495,11 +500,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         String jobName = QuartzExecutors.buildJobName(scheduleId);
         String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
 
-        if (!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)) {
-            logger.warn("set offline failure:projectId:{},scheduleId:{}", projectId, scheduleId);
-            throw new ServiceException("set offline failure");
+        JobKey jobKey = new JobKey(jobName, jobGroupName);
+        try {
+            if (scheduler.checkExists(jobKey)) {
+                logger.info("Try to delete job: {}, group name: {},", jobName, jobGroupName);
+                scheduler.deleteJob(jobKey);
+            }
+        } catch (SchedulerException e) {
+            logger.error("Failed to delete job: {}", jobKey);
+            throw new ServiceException("Failed to delete job: " + jobKey);
         }
-
     }
 
     /**
@@ -596,5 +606,33 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         result.put(Constants.DATA_LIST, selfFireDateList.stream().map(DateUtils::dateToString));
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * update process definition schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @param scheduleExpression scheduleExpression
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param workerGroup worker group
+     * @param processInstancePriority process instance priority
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> updateScheduleByProcessDefinitionCode(User loginUser,
+                                                                     long projectCode,
+                                                                     long processDefinitionCode,
+                                                                     String scheduleExpression,
+                                                                     WarningType warningType,
+                                                                     int warningGroupId,
+                                                                     FailureStrategy failureStrategy,
+                                                                     Priority processInstancePriority,
+                                                                     String workerGroup,
+                                                                     long environmentCode) {
+        return null;
     }
 }

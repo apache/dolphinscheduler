@@ -32,11 +32,9 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
 import javax.annotation.PostConstruct;
 
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,61 +48,39 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  *  master server
  */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                "org.apache.dolphinscheduler.server.worker.*",
-                "org.apache.dolphinscheduler.server.monitor.*",
-                "org.apache.dolphinscheduler.server.log.*"
-        })
+    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.worker.*",
+        "org.apache.dolphinscheduler.server.monitor.*",
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
+    })
 })
 @EnableTransactionManagement
 public class MasterServer implements IStoppable {
-
-    /**
-     * logger of MasterServer
-     */
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
-    /**
-     * master config
-     */
     @Autowired
     private MasterConfig masterConfig;
 
-    /**
-     * spring application context
-     * only use it for initialization
-     */
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
-    /**
-     * netty remote server
-     */
     private NettyRemotingServer nettyRemotingServer;
 
-    /**
-     * zk master client
-     */
     @Autowired
     private MasterRegistryClient masterRegistryClient;
 
-    /**
-     * scheduler service
-     */
     @Autowired
     private MasterSchedulerService masterSchedulerService;
 
     @Autowired
     private EventExecuteService eventExecuteService;
 
-    /**
-     * master server startup, not use web service
-     *
-     * @param args arguments
-     */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
-        new SpringApplicationBuilder(MasterServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(MasterServer.class)
+            .profiles("master")
+            .web(WebApplicationType.NONE).run(args);
     }
 
     /**
@@ -129,34 +105,14 @@ public class MasterServer implements IStoppable {
 
         this.eventExecuteService.init();
         this.eventExecuteService.start();
-        // scheduler start
         this.masterSchedulerService.init();
-
         this.masterSchedulerService.start();
 
-        // start QuartzExecutors
-        // what system should do if exception
-        try {
-            logger.info("start Quartz server...");
-            QuartzExecutors.getInstance().start();
-        } catch (Exception e) {
-            try {
-                QuartzExecutors.getInstance().shutdown();
-            } catch (SchedulerException e1) {
-                logger.error("QuartzExecutors shutdown failed : " + e1.getMessage(), e1);
-            }
-            logger.error("start Quartz failed", e);
-        }
-
-        /**
-         * register hooks, which are called before the process exits
-         */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
                 close("shutdownHook");
             }
         }));
-
     }
 
     /**
@@ -187,13 +143,6 @@ public class MasterServer implements IStoppable {
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.masterRegistryClient.closeRegistry();
-            // close quartz
-            try {
-                QuartzExecutors.getInstance().shutdown();
-                logger.info("Quartz service stopped");
-            } catch (Exception e) {
-                logger.warn("Quartz service stopped exception:{}", e.getMessage());
-            }
             // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
             springApplicationContext.close();
         } catch (Exception e) {

@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,8 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 
 public class LogUtils {
 
+    public static final String LOG_TAILFIX = ".log";
+
     private LogUtils() throws IllegalStateException {
         throw new IllegalStateException("Utility class");
     }
@@ -39,30 +44,39 @@ public class LogUtils {
     /**
      * get task log path
      */
-    public static String getTaskLogPath(Long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+    public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+        // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log
+        final String taskLogFileName = new StringBuilder(String.valueOf(processDefineCode))
+            .append(Constants.UNDERLINE)
+            .append(processDefineVersion)
+            .append(Constants.SUBTRACT_CHAR)
+            .append(processInstanceId)
+            .append(Constants.SUBTRACT_CHAR)
+            .append(taskInstanceId)
+            .append(LOG_TAILFIX)
+            .toString();
         // Optional.map will be skipped if null
         return Optional.of(LoggerFactory.getILoggerFactory())
-                .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
-                .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
-                .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
-                .map(TaskLogDiscriminator::getLogBase)
-                .map(e -> Paths.get(e)
-                        .toAbsolutePath()
-                        .resolve(processDefineCode + "_" + processDefineVersion)
-                        .resolve(String.valueOf(processInstanceId))
-                        .resolve(taskInstanceId + ".log"))
-                .map(Path::toString)
-                .orElse("");
+            .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
+            .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
+            .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
+            .map(TaskLogDiscriminator::getLogBase)
+            .map(e -> Paths.get(e)
+                .toAbsolutePath()
+                .resolve(DateUtils.format(firstSubmitTime,Constants.YYYYMMDD))
+                .resolve(taskLogFileName))
+            .map(Path::toString)
+            .orElse("");
     }
 
     /**
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(),taskExecutionContext.getProcessDefineCode(),
+            taskExecutionContext.getProcessDefineVersion(),
+            taskExecutionContext.getProcessInstanceId(),
+            taskExecutionContext.getTaskInstanceId());
     }
 
 }

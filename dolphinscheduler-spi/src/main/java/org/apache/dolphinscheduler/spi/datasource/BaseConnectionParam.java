@@ -23,19 +23,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-/**
- * The base model of connection param
- * <p>
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickhouseConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2ConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkConnectionParam}
- * {@link org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerConnectionParam}
- */
 @JsonInclude(Include.NON_NULL)
 public abstract class BaseConnectionParam implements ConnectionParam {
 

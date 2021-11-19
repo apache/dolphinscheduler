@@ -21,130 +21,16 @@ workDir=`cd ${workDir};pwd`
 
 source ${workDir}/conf/config/install_config.conf
 
-charEscape(){
-    inputParam=$1
-    if [[ $1 =~ '@' ]]; then
-        tmp=$(echo inputParam | sed "s/@/\\\\@/g")
-        inputParam=${tmp}
-    fi
-    echo "$inputParam"
-}
-
-# 1.replace file
-echo "1.replace file"
-
-txt=""
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    txt="''"
-fi
-
-datasourceDriverClassname="com.mysql.jdbc.Driver"
-if [ $dbtype == "postgresql" ];then
-  datasourceDriverClassname="org.postgresql.Driver"
-fi
-
-# Change configuration in conf/config/dolphinscheduler_env.sh
-javaHome=$(charEscape ${javaHome})
-sed -i ${txt} "s@^export JAVA_HOME=.*@export JAVA_HOME=${javaHome}@g" conf/env/dolphinscheduler_env.sh
-
-# Change configuration in conf/datasource.properties
-datasourceDriverClassname=$(charEscape ${datasourceDriverClassname})
-sed -i ${txt} "s@^spring.datasource.driver-class-name=.*@spring.datasource.driver-class-name=${datasourceDriverClassname}@g" conf/datasource.properties
-
-dbtype=$(charEscape ${dbtype})
-dbhost=$(charEscape ${dbhost})
-dbname=$(charEscape ${dbname})
-sed -i ${txt} "s@^spring.datasource.url=.*@spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true@g" conf/datasource.properties
-
-username=$(charEscape ${username})
-sed -i ${txt} "s@^spring.datasource.username=.*@spring.datasource.username=${username}@g" conf/datasource.properties
-
-password=$(charEscape ${password})
-sed -i ${txt} "s@^spring.datasource.password=.*@spring.datasource.password=${password}@g" conf/datasource.properties
-
-# Change configuration in conf/common.properties
-dataBasedirPath=$(charEscape ${dataBasedirPath})
-sed -i ${txt} "s@^data.basedir.path=.*@data.basedir.path=${dataBasedirPath}@g" conf/common.properties
-
-resourceStorageType=$(charEscape ${resourceStorageType})
-sed -i ${txt} "s@^resource.storage.type=.*@resource.storage.type=${resourceStorageType}@g" conf/common.properties
-
-resourceUploadPath=$(charEscape ${resourceUploadPath})
-sed -i ${txt} "s@^resource.upload.path=.*@resource.upload.path=${resourceUploadPath}@g" conf/common.properties
-
-kerberosStartUp=$(charEscape ${kerberosStartUp})
-sed -i ${txt} "s@^hadoop.security.authentication.startup.state=.*@hadoop.security.authentication.startup.state=${kerberosStartUp}@g" conf/common.properties
-
-krb5ConfPath=$(charEscape ${krb5ConfPath})
-sed -i ${txt} "s@^java.security.krb5.conf.path=.*@java.security.krb5.conf.path=${krb5ConfPath}@g" conf/common.properties
-
-keytabUserName=$(charEscape ${keytabUserName})
-sed -i ${txt} "s@^login.user.keytab.username=.*@login.user.keytab.username=${keytabUserName}@g" conf/common.properties
-
-keytabPath=$(charEscape ${keytabPath})
-sed -i ${txt} "s@^login.user.keytab.path=.*@login.user.keytab.path=${keytabPath}@g" conf/common.properties
-
-kerberosExpireTime=$(charEscape ${kerberosExpireTime})
-sed -i ${txt} "s@^kerberos.expire.time=.*@kerberos.expire.time=${kerberosExpireTime}@g" conf/common.properties
-
-hdfsRootUser=$(charEscape ${hdfsRootUser})
-sed -i ${txt} "s@^hdfs.root.user=.*@hdfs.root.user=${hdfsRootUser}@g" conf/common.properties
-
-defaultFS=$(charEscape ${defaultFS})
-sed -i ${txt} "s@^fs.defaultFS=.*@fs.defaultFS=${defaultFS}@g" conf/common.properties
-
-s3Endpoint=$(charEscape ${s3Endpoint})
-sed -i ${txt} "s@^fs.s3a.endpoint=.*@fs.s3a.endpoint=${s3Endpoint}@g" conf/common.properties
-
-s3AccessKey=$(charEscape ${s3AccessKey})
-sed -i ${txt} "s@^fs.s3a.access.key=.*@fs.s3a.access.key=${s3AccessKey}@g" conf/common.properties
-
-s3SecretKey=$(charEscape ${s3SecretKey})
-sed -i ${txt} "s@^fs.s3a.secret.key=.*@fs.s3a.secret.key=${s3SecretKey}@g" conf/common.properties
-
-resourceManagerHttpAddressPort=$(charEscape ${resourceManagerHttpAddressPort})
-sed -i ${txt} "s@^resource.manager.httpaddress.port=.*@resource.manager.httpaddress.port=${resourceManagerHttpAddressPort}@g" conf/common.properties
-
-yarnHaIps=$(charEscape ${yarnHaIps})
-sed -i ${txt} "s@^yarn.resourcemanager.ha.rm.ids=.*@yarn.resourcemanager.ha.rm.ids=${yarnHaIps}@g" conf/common.properties
-
-singleYarnIp=$(charEscape ${singleYarnIp})
-sed -i ${txt} "s@^yarn.application.status.address=.*@yarn.application.status.address=http://${singleYarnIp}:%s/ws/v1/cluster/apps/%s@g" conf/common.properties
-sed -i ${txt} "s@^yarn.job.history.status.address=.*@yarn.job.history.status.address=http://${singleYarnIp}:19888/ws/v1/history/mapreduce/jobs/%s@g" conf/common.properties
-
-sudoEnable=$(charEscape ${sudoEnable})
-sed -i ${txt} "s@^sudo.enable=.*@sudo.enable=${sudoEnable}@g" conf/common.properties
-
-# The following configurations may be commented, so ddd #* to ensure sed work correct
-# Change configuration in conf/worker.properties
-workerTenantAutoCreate=$(charEscape ${workerTenantAutoCreate})
-alertServer=$(charEscape ${alertServer})
-sed -i ${txt} "s@^#*worker.tenant.auto.create=.*@worker.tenant.auto.create=${workerTenantAutoCreate}@g" conf/worker.properties
-sed -i ${txt} "s@^#*alert.listen.host=.*@alert.listen.host=${alertServer}@g" conf/worker.properties
-
-# Change configuration in conf/application-api.properties
-apiServerPort=$(charEscape ${apiServerPort})
-sed -i ${txt} "s@^#*server.port=.*@server.port=${apiServerPort}@g" conf/application-api.properties
-
-# Change configuration in conf/registry.properties
-registryServers=$(charEscape ${registryServers})
-registryPluginDir=$(charEscape ${registryPluginDir})
-registryPluginName=$(charEscape ${registryPluginName})
-sed -i ${txt} "s@^#*registry.servers=.*@registry.servers=${registryServers}@g" conf/registry.properties
-sed -i ${txt} "s@^#*registry.plugin.dir=.*@registry.plugin.dir=${installPath}/${registryPluginDir}@g" conf/registry.properties
-sed -i ${txt} "s@^#*registry.plugin.name=.*@registry.plugin.name=${registryPluginName}@g" conf/registry.properties
-
-# 2.create directory
-echo "2.create directory"
+# 1.create directory
+echo "1.create directory"
 
 if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
   sudo chown -R $deployUser:$deployUser $installPath
 fi
 
-# 3.scp resources
-echo "3.scp resources"
+# 2.scp resources
+echo "2.scp resources"
 sh ${workDir}/script/scp-hosts.sh
 if [ $? -eq 0 ];then
 	echo 'scp copy completed'
@@ -153,14 +39,14 @@ else
 	exit 1
 fi
 
-# 4.stop server
-echo "4.stop server"
+# 3.stop server
+echo "3.stop server"
 sh ${workDir}/script/stop-all.sh
 
-# 5.delete zk node
-echo "5.delete zk node"
+# 4.delete zk node
+echo "4.delete zk node"
 sh ${workDir}/script/remove-zk-node.sh $zkRoot
 
-# 6.startup
-echo "6.startup"
+# 5.startup
+echo "5.startup"
 sh ${workDir}/script/start-all.sh
