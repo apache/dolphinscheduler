@@ -58,7 +58,6 @@ public class MysqlDatasourceProcessorTest {
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(mysqlDatasourceParamDTO);
-        System.out.println(JSONUtils.toJsonString(connectionParams));
         Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
         Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
     }
@@ -75,7 +74,7 @@ public class MysqlDatasourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
+        Assert.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test

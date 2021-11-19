@@ -29,10 +29,10 @@ CREATE TABLE QRTZ_JOB_DETAILS
     JOB_GROUP         varchar(200) NOT NULL,
     DESCRIPTION       varchar(250) DEFAULT NULL,
     JOB_CLASS_NAME    varchar(250) NOT NULL,
-    IS_DURABLE        varchar(1)   NOT NULL,
-    IS_NONCONCURRENT  varchar(1)   NOT NULL,
-    IS_UPDATE_DATA    varchar(1)   NOT NULL,
-    REQUESTS_RECOVERY varchar(1)   NOT NULL,
+    IS_DURABLE        boolean      NOT NULL,
+    IS_NONCONCURRENT  boolean      NOT NULL,
+    IS_UPDATE_DATA    boolean      NOT NULL,
+    REQUESTS_RECOVERY boolean      NOT NULL,
     JOB_DATA          blob,
     PRIMARY KEY (SCHED_NAME, JOB_NAME, JOB_GROUP)
 );
@@ -133,8 +133,8 @@ CREATE TABLE QRTZ_FIRED_TRIGGERS
     STATE             varchar(16)  NOT NULL,
     JOB_NAME          varchar(200) DEFAULT NULL,
     JOB_GROUP         varchar(200) DEFAULT NULL,
-    IS_NONCONCURRENT  varchar(1)   DEFAULT NULL,
-    REQUESTS_RECOVERY varchar(1)   DEFAULT NULL,
+    IS_NONCONCURRENT  boolean      DEFAULT NULL,
+    REQUESTS_RECOVERY boolean      DEFAULT NULL,
     PRIMARY KEY (SCHED_NAME, ENTRY_ID)
 );
 
@@ -231,8 +231,8 @@ CREATE TABLE QRTZ_SIMPROP_TRIGGERS
     LONG_PROP_2   bigint(20) DEFAULT NULL,
     DEC_PROP_1    decimal(13, 4) DEFAULT NULL,
     DEC_PROP_2    decimal(13, 4) DEFAULT NULL,
-    BOOL_PROP_1   varchar(1)     DEFAULT NULL,
-    BOOL_PROP_2   varchar(1)     DEFAULT NULL,
+    BOOL_PROP_1   boolean        DEFAULT NULL,
+    BOOL_PROP_2   boolean        DEFAULT NULL,
     PRIMARY KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP),
     CONSTRAINT QRTZ_SIMPROP_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP) REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP)
 );
@@ -312,26 +312,26 @@ CREATE TABLE t_ds_alertgroup
 DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command
 (
-    id                        int(11) NOT NULL AUTO_INCREMENT,
-    command_type              tinyint(4) DEFAULT NULL,
-    process_definition_code   bigint(20) DEFAULT NULL,
-    command_param             text,
-    task_depend_type          tinyint(4) DEFAULT NULL,
-    failure_strategy          tinyint(4) DEFAULT '0',
-    warning_type              tinyint(4) DEFAULT '0',
-    warning_group_id          int(11) DEFAULT NULL,
-    schedule_time             datetime DEFAULT NULL,
-    start_time                datetime DEFAULT NULL,
-    executor_id               int(11) DEFAULT NULL,
-    update_time               datetime DEFAULT NULL,
-    process_instance_priority int(11) DEFAULT NULL,
-    worker_group              varchar(64),
-    environment_code          bigint(20) DEFAULT '-1',
-    dry_run                   int NULL DEFAULT 0,
-    process_instance_id       int(11) DEFAULT 0,
+    id                         int(11) NOT NULL AUTO_INCREMENT,
+    command_type               tinyint(4) DEFAULT NULL,
+    process_definition_code    bigint(20) DEFAULT NULL,
+    command_param              text,
+    task_depend_type           tinyint(4) DEFAULT NULL,
+    failure_strategy           tinyint(4) DEFAULT '0',
+    warning_type               tinyint(4) DEFAULT '0',
+    warning_group_id           int(11) DEFAULT NULL,
+    schedule_time              datetime DEFAULT NULL,
+    start_time                 datetime DEFAULT NULL,
+    executor_id                int(11) DEFAULT NULL,
+    update_time                datetime DEFAULT NULL,
+    process_instance_priority  int(11) DEFAULT NULL,
+    worker_group               varchar(64),
+    environment_code           bigint(20) DEFAULT '-1',
+    dry_run                    int NULL DEFAULT 0,
+    process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
     PRIMARY KEY (id),
-    KEY                       priority_id_index (process_instance_priority, id)
+    KEY                        priority_id_index (process_instance_priority, id)
 );
 
 -- ----------------------------
@@ -366,24 +366,24 @@ CREATE TABLE t_ds_datasource
 DROP TABLE IF EXISTS t_ds_error_command;
 CREATE TABLE t_ds_error_command
 (
-    id                        int(11) NOT NULL,
-    command_type              tinyint(4) DEFAULT NULL,
-    executor_id               int(11) DEFAULT NULL,
-    process_definition_code   bigint(20) DEFAULT NULL,
-    command_param             text,
-    task_depend_type          tinyint(4) DEFAULT NULL,
-    failure_strategy          tinyint(4) DEFAULT '0',
-    warning_type              tinyint(4) DEFAULT '0',
-    warning_group_id          int(11) DEFAULT NULL,
-    schedule_time             datetime DEFAULT NULL,
-    start_time                datetime DEFAULT NULL,
-    update_time               datetime DEFAULT NULL,
-    process_instance_priority int(11) DEFAULT NULL,
-    worker_group              varchar(64),
-    environment_code          bigint(20) DEFAULT '-1',
-    message                   text,
-    dry_run                   int NULL DEFAULT 0,
-    process_instance_id       int(11) DEFAULT 0,
+    id                         int(11) NOT NULL,
+    command_type               tinyint(4) DEFAULT NULL,
+    executor_id                int(11) DEFAULT NULL,
+    process_definition_code    bigint(20) DEFAULT NULL,
+    command_param              text,
+    task_depend_type           tinyint(4) DEFAULT NULL,
+    failure_strategy           tinyint(4) DEFAULT '0',
+    warning_type               tinyint(4) DEFAULT '0',
+    warning_group_id           int(11) DEFAULT NULL,
+    schedule_time              datetime DEFAULT NULL,
+    start_time                 datetime DEFAULT NULL,
+    update_time                datetime DEFAULT NULL,
+    process_instance_priority  int(11) DEFAULT NULL,
+    worker_group               varchar(64),
+    environment_code           bigint(20) DEFAULT '-1',
+    message                    text,
+    dry_run                    int NULL DEFAULT 0,
+    process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
     PRIMARY KEY (id)
 );

@@ -39,14 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private static final Logger logger = LoggerFactory.getLogger(HiveDataSourceClient.class);
 
-    protected DruidDataSource oneSessionDataSource;
-    private JdbcTemplate oneSessionJdbcTemplate;
+    protected HikariDataSource oneSessionDataSource;
     private UserGroupInformation ugi;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam) {
@@ -61,7 +60,6 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
         super.initClient(baseConnectionParam);
         this.oneSessionDataSource = JdbcDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam);
-        this.oneSessionJdbcTemplate = new JdbcTemplate(oneSessionDataSource);
         logger.info("Init {} success.", getClass().getName());
     }
 
@@ -110,6 +108,5 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
         this.oneSessionDataSource.close();
         this.oneSessionDataSource = null;
-        this.oneSessionJdbcTemplate = null;
     }
 }
