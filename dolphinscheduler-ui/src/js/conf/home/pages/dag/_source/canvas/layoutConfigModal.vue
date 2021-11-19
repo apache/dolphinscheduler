@@ -30,8 +30,8 @@
     >
       <el-form-item :label="$t('layoutType')">
         <el-radio-group v-model="form.type">
-          <el-radio label="grid">{{$t('gridLayout')}}</el-radio>
-          <el-radio label="dagre">{{$t('dagreLayout')}}</el-radio>
+          <el-radio label="grid">{{ $t("gridLayout") }}</el-radio>
+          <el-radio label="dagre">{{ $t("dagreLayout") }}</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item :label="$t('rows')" v-if="form.type === LAYOUT_TYPE.GRID">
@@ -48,11 +48,12 @@
           size="small"
         ></el-input-number>
       </el-form-item>
-      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button size="small" @click="close">{{$t('Cancel')}}</el-button>
-      <el-button size="small" type="primary" @click="submit">{{$t('Confirm')}}</el-button>
+      <el-button size="small" @click="close">{{ $t("Cancel") }}</el-button>
+      <el-button size="small" type="primary" @click="submit">{{
+        $t("Confirm")
+      }}</el-button>
     </span>
   </el-dialog>
 </template>
