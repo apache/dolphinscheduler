@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PropertyUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
     private static final Properties properties = new Properties();
@@ -75,7 +76,8 @@ public class PropertyUtils {
      * @return property value  with upper case
      */
     public static String getUpperCaseString(String key) {
-        return properties.getProperty(key.trim()).toUpperCase();
+        String val = getString(key);
+        return StringUtils.isEmpty(val) ? val : val.toUpperCase();
     }
 
     /**
@@ -86,8 +88,8 @@ public class PropertyUtils {
      * @return property value
      */
     public static String getString(String key, String defaultVal) {
-        String val = properties.getProperty(key.trim());
-        return val == null ? defaultVal : val;
+        String val = getString(key);
+        return StringUtils.isEmpty(val) ? defaultVal : val;
     }
 
     /**
@@ -107,7 +109,7 @@ public class PropertyUtils {
      */
     public static int getInt(String key, int defaultValue) {
         String value = getString(key);
-        if (value == null) {
+        if (StringUtils.isEmpty(value)) {
             return defaultValue;
         }
 
@@ -126,12 +128,7 @@ public class PropertyUtils {
      * @return property value
      */
     public static boolean getBoolean(String key) {
-        String value = properties.getProperty(key.trim());
-        if (null != value) {
-            return Boolean.parseBoolean(value);
-        }
-
-        return false;
+        return getBoolean(key, false);
     }
 
     /**
@@ -142,14 +139,44 @@ public class PropertyUtils {
      * @return property value
      */
     public static Boolean getBoolean(String key, boolean defaultValue) {
-        String value = properties.getProperty(key.trim());
-        if (null != value) {
-            return Boolean.parseBoolean(value);
+        String value = getString(key);
+        return StringUtils.isEmpty(value) ? defaultValue : Boolean.parseBoolean(value);
+    }
+
+    /**
+     * get property long value
+     *
+     * @param key key
+     * @param defaultValue default value
+     * @return property value
+     */
+    public static long getLong(String key, long defaultValue) {
+        String value = getString(key);
+        if (StringUtils.isEmpty(value)) {
+            return defaultValue;
         }
 
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            logger.info(e.getMessage(), e);
+        }
         return defaultValue;
     }
 
+    /**
+     * @param key key
+     * @return property value
+     */
+    public static long getLong(String key) {
+        return getLong(key, -1);
+    }
+
+    /**
+     * set value
+     * @param key key
+     * @param value value
+     */
     public static void setValue(String key, String value) {
         properties.setProperty(key, value);
     }
