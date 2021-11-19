@@ -29,6 +29,7 @@ from pydolphinscheduler.constants import (
 )
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import TaskParams
+from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.utils.date import conv_to_schedule
 from tests.testing.task import Task
@@ -147,7 +148,7 @@ def test__parse_datetime(val, expect):
 def test__parse_datetime_not_support_type(val: Any):
     """Test process definition function _parse_datetime not support type error."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
-        with pytest.raises(ValueError):
+        with pytest.raises(PyDSParamException, match="Do not support value type.*?"):
             pd._parse_datetime(val)
 
 
