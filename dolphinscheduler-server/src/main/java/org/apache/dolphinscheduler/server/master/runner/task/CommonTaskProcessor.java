@@ -65,7 +65,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;

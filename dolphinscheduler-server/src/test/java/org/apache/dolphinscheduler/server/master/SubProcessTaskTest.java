@@ -74,6 +74,8 @@ public class SubProcessTaskTest {
         Mockito.when(applicationContext.getBean(AlertDao.class)).thenReturn(alertDao);
 
         processInstance = getProcessInstance();
+        TaskInstance taskInstance = getTaskInstance();
+
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
                 .thenReturn(processInstance);
@@ -85,7 +87,7 @@ public class SubProcessTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(Mockito.any()))
+                .submitTask(processInstance, taskInstance))
                 .thenAnswer(t -> t.getArgument(0));
 
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -145,6 +147,12 @@ public class SubProcessTaskTest {
         processInstance.setWarningGroupId(0);
         processInstance.setName("S");
         return processInstance;
+    }
+
+    private TaskInstance getTaskInstance() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1000);
+        return taskInstance;
     }
 
     private ProcessInstance getSubProcessInstance(ExecutionStatus executionStatus) {
