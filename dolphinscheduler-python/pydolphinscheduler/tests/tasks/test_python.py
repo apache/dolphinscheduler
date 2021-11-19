@@ -15,14 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test Task shell."""
+"""Test Task python."""
 
 
 from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.tasks.shell import Shell, ShellTaskParams
+from pydolphinscheduler.tasks.python import Python, PythonTaskParams
 
 
 @pytest.mark.parametrize(
@@ -35,32 +35,65 @@ from pydolphinscheduler.tasks.shell import Shell, ShellTaskParams
         ("condition_result", "condition_result"),
     ],
 )
-def test_shell_task_params_attr_setter(name, value):
-    """Test shell task parameters."""
-    raw_script = "echo shell task parameter"
-    shell_task_params = ShellTaskParams(raw_script)
-    assert raw_script == shell_task_params.raw_script
-    setattr(shell_task_params, name, value)
-    assert value == getattr(shell_task_params, name)
+def test_python_task_params_attr_setter(name, value):
+    """Test python task parameters."""
+    command = 'print("hello world.")'
+    python_task_params = PythonTaskParams(command)
+    assert command == python_task_params.raw_script
+    setattr(python_task_params, name, value)
+    assert value == getattr(python_task_params, name)
 
 
-def test_shell_to_dict():
-    """Test task shell function to_dict."""
+@pytest.mark.parametrize(
+    "script_code",
+    [
+        123,
+        ("print", "hello world"),
+    ],
+)
+def test_python_task_not_support_code(script_code):
+    """Test python task parameters."""
+    name = "not_support_code_type"
     code = 123
     version = 1
-    name = "test_shell_to_dict"
-    command = "echo test shell"
+    with patch(
+        "pydolphinscheduler.core.task.Task.gen_code_and_version",
+        return_value=(code, version),
+    ):
+        with pytest.raises(ValueError, match="Parameter code do not support .*?"):
+            Python(name, script_code)
+
+
+def foo():  # noqa: D103
+    print("hello world.")
+
+
+@pytest.mark.parametrize(
+    "name, script_code, raw",
+    [
+        ("string_define", 'print("hello world.")', 'print("hello world.")'),
+        (
+            "function_define",
+            foo,
+            'def foo():  # noqa: D103\n    print("hello world.")\n',
+        ),
+    ],
+)
+def test_python_to_dict(name, script_code, raw):
+    """Test task python function to_dict."""
+    code = 123
+    version = 1
     expect = {
         "code": code,
         "name": name,
         "version": 1,
         "description": None,
         "delayTime": 0,
-        "taskType": "SHELL",
+        "taskType": "PYTHON",
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "rawScript": command,
+            "rawScript": raw,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
@@ -78,5 +111,5 @@ def test_shell_to_dict():
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        shell = Shell(name, command)
+        shell = Python(name, script_code)
         assert shell.to_dict() == expect
