@@ -18,20 +18,16 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
-import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.net.InetSocketAddress;
 import java.util.Date;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -39,7 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import io.netty.channel.Channel;
 
 /**
- *  task ack processor test
+ * task ack processor test
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class, TaskResponseEvent.class})
@@ -47,7 +43,6 @@ public class TaskAckProcessorTest {
 
     private TaskAckProcessor taskAckProcessor;
     private TaskResponseService taskResponseService;
-    private TaskInstanceCacheManagerImpl taskInstanceCacheManager;
     private ProcessService processService;
     private TaskExecuteAckCommand taskExecuteAckCommand;
     private TaskResponseEvent taskResponseEvent;
@@ -59,9 +54,6 @@ public class TaskAckProcessorTest {
 
         taskResponseService = PowerMockito.mock(TaskResponseService.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskResponseService.class)).thenReturn(taskResponseService);
-
-        taskInstanceCacheManager = PowerMockito.mock(TaskInstanceCacheManagerImpl.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class)).thenReturn(taskInstanceCacheManager);
 
         processService = PowerMockito.mock(ProcessService.class);
         PowerMockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
