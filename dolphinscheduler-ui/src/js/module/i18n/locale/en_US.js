@@ -756,5 +756,11 @@ export default {
   cols: 'Cols',
   processOnline: 'Online',
   searchNode: 'Search Node',
-  dagScale: 'Scale'
+  dagScale: 'Scale',
+  workflowName: 'Workflow Name',
+  scheduleStartTime: 'Schedule Start Time',
+  scheduleEndTime: 'Schedule End Time',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: 'Workflow Publish Status',
+  schedulePublishStatus: 'Schedule Publish Status'
 }
