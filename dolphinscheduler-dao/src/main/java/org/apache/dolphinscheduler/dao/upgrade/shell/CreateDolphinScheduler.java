@@ -15,16 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.upgrade.shell;
+package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * create DolphinScheduler
  *
  */
+@EnableAutoConfiguration
+@ComponentScan(value = {
+		"org.apache.dolphinscheduler.dao"
+})
 public class CreateDolphinScheduler {
 
 	private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
@@ -34,7 +43,11 @@ public class CreateDolphinScheduler {
 	 * @param args args
 	 */
 	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+		ConfigurableApplicationContext context =
+				new SpringApplicationBuilder(CreateDolphinScheduler.class)
+				.web(WebApplicationType.NONE)
+				.run(args);
+		DolphinSchedulerManager dolphinSchedulerManager = context.getBean(DolphinSchedulerManager.class);
 		try {
 			dolphinSchedulerManager.initDolphinScheduler();
 			logger.info("init DolphinScheduler finished");
