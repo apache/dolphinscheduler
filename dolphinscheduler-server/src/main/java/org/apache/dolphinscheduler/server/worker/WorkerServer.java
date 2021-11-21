@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -126,7 +127,7 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         // alert-server client registry
-        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
+        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), PropertyUtils.getInt(Constants.ALERT_RPC_PORT, 50052));
 
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
