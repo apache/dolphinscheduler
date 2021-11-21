@@ -748,5 +748,19 @@ export default {
   users: 'Users',
   Username: 'Username',
   showType: 'Show Type',
-  'Please select a task type (required)': 'Please select a task type (required)'
+  'Please select a task type (required)': 'Please select a task type (required)',
+  layoutType: 'Layout Type',
+  gridLayout: 'Grid',
+  dagreLayout: 'Dagre',
+  rows: 'Rows',
+  cols: 'Cols',
+  processOnline: 'Online',
+  searchNode: 'Search Node',
+  dagScale: 'Scale',
+  workflowName: 'Workflow Name',
+  scheduleStartTime: 'Schedule Start Time',
+  scheduleEndTime: 'Schedule End Time',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: 'Workflow Publish Status',
+  schedulePublishStatus: 'Schedule Publish Status'
 }
