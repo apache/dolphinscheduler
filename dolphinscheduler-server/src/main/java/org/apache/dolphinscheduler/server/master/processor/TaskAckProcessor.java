@@ -24,14 +24,9 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
-import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
-import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,18 +47,8 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private final TaskResponseService taskResponseService;
 
-    /**
-     * taskInstance cache manager
-     */
-    private final TaskInstanceCacheManager taskInstanceCacheManager;
-
     public TaskAckProcessor() {
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
-        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
-    }
-
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
-        this.taskResponseService.init(processInstanceExecMaps);
     }
 
     /**
@@ -77,8 +62,6 @@ public class TaskAckProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
         TaskExecuteAckCommand taskAckCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteAckCommand.class);
         logger.info("taskAckCommand : {}", taskAckCommand);
-
-        taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
 
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 

@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -35,6 +34,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -320,8 +320,25 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param tenantCode tenant code
      * @return ture if the tenant code exists, otherwise return false
      */
-    private boolean checkTenantExists(String tenantCode) {
+    public boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
         return existTenant == Boolean.TRUE;
+    }
+
+    /**
+     * query tenant by tenant code
+     *
+     * @param tenantCode tenant code
+     * @return tenant detail information
+     */
+    @Override
+    public Map<String, Object> queryByTenantCode(String tenantCode) {
+        Map<String, Object> result = new HashMap<>();
+        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+        if (tenant != null) {
+            result.put(Constants.DATA_LIST, tenant);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
     }
 }

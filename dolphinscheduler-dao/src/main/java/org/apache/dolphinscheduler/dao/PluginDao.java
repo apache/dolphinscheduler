@@ -19,30 +19,20 @@ package org.apache.dolphinscheduler.dao;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PluginDao extends AbstractBaseDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class PluginDao {
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
-
-    @Override
-    protected void init() {
-        pluginDefineMapper = ConnectionFactory.getInstance().getMapper(PluginDefineMapper.class);
-    }
 
     /**
      * check plugin define table exist
@@ -75,7 +65,10 @@ public class PluginDao extends AbstractBaseDao {
 
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (CollectionUtils.isEmpty(pluginDefineList)) {
-            return pluginDefineMapper.insert(pluginDefine);
+            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
+                return pluginDefine.getId();
+            }
+            throw new IllegalStateException("Failed to insert plugin definition");
         }
         PluginDefine currPluginDefine = pluginDefineList.get(0);
         if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {

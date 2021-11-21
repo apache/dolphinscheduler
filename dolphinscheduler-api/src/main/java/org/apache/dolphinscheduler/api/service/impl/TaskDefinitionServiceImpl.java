@@ -18,15 +18,18 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -118,22 +121,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
             }
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskDefinitionLog.getName());
-            if (taskDefinition != null) {
-                logger.error("task definition name {} already exists", taskDefinitionLog.getName());
-                putMsg(result, Status.TASK_DEFINITION_NAME_EXISTED, taskDefinitionLog.getName());
-                return result;
-            }
         }
-        if (processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs)) {
-            Map<String, Object> resData = new HashMap<>();
-            resData.put("total", taskDefinitionLogs.size());
-            resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, resData);
-        } else {
+        int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs);
+        if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
+        Map<String, Object> resData = new HashMap<>();
+        resData.put("total", taskDefinitionLogs.size());
+        resData.put("code", StringUtils.join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, resData);
         return result;
     }
 
@@ -165,12 +163,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     /**
      * delete task definition
-     *
+     * Only offline and no downstream dependency can be deleted
      * @param loginUser login user
      * @param projectCode project code
      * @param taskCode task code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -179,13 +176,22 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (taskCode == 0) {
+            putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+            return result;
+        }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition.getFlag() == Flag.YES) {
+            putMsg(result, Status.TASK_DEFINE_STATE_ONLINE, taskCode);
+            return result;
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryDownstreamByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
-            Set<Long> processDefinitionCodes = processTaskRelationList
+            Set<Long> postTaskCodes = processTaskRelationList
                 .stream()
-                .map(ProcessTaskRelation::getProcessDefinitionCode)
+                .map(ProcessTaskRelation::getPostTaskCode)
                 .collect(Collectors.toSet());
-            putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, StringUtils.join(processDefinitionCodes, ","));
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(postTaskCodes, ","));
             return result;
         }
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
@@ -254,8 +260,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setCreateTime(now);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
         if ((update & insert) != 1) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-            return result;
+            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS, update);
@@ -287,10 +293,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
-        TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        taskDefinitionLog.setUserId(loginUser.getId());
-        taskDefinitionLog.setUpdateTime(new Date());
-        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionLog);
+        TaskDefinitionLog taskDefinitionUpdate = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        taskDefinitionUpdate.setUserId(loginUser.getId());
+        taskDefinitionUpdate.setUpdateTime(new Date());
+        taskDefinitionUpdate.setId(taskDefinition.getId());
+        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (switchVersion > 0) {
             result.put(Constants.DATA_LIST, taskCode);
             putMsg(result, Status.SUCCESS);
@@ -340,6 +347,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
         } else {
+            if (taskDefinition.getVersion() == version) {
+                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
+                return result;
+            }
             int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
             if (delete > 0) {
                 putMsg(result, Status.SUCCESS);
@@ -410,7 +421,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> genTaskCodeList(User loginUser, Integer genNum) {
+    public Map<String, Object> genTaskCodeList(Integer genNum) {
         Map<String, Object> result = new HashMap<>();
         if (genNum == null || genNum < 1 || genNum > 100) {
             logger.error("the genNum must be great than 1 and less than 100");
@@ -420,9 +431,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < genNum; i++) {
-                taskCodes.add(SnowFlakeUtils.getInstance().nextId());
+                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
-        } catch (SnowFlakeException e) {
+        } catch (CodeGenerateException e) {
             logger.error("Task code get error, ", e);
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
         }
@@ -430,5 +441,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // return processDefinitionCode
         result.put(Constants.DATA_LIST, taskCodes);
         return result;
+    }
+
+    /**
+     * release task definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code task definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+        return null;
     }
 }

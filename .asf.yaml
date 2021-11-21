@@ -36,12 +36,14 @@ github:
     - data-schedule
   enabled_merge_buttons:
     squash: true
-    merge: true
+    merge: false
     rebase: false
   protected_branches:
     dev:
       required_status_checks:
-        strict: true
+        contexts:
+          - Build
+          - Unit Test
       required_pull_request_reviews:
         dismiss_stale_reviews: true
         required_approving_review_count: 1

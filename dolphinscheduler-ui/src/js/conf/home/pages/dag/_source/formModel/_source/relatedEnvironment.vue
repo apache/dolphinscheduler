@@ -49,6 +49,9 @@
       },
       workerGroup: {
         type: String
+      },
+      isNewCreate: {
+        type: Boolean
       }
     },
     model: {
@@ -70,6 +73,7 @@
       },
       _initEnvironmentOptions (workerGroup) {
         this.environmentOptions = []
+        this.selectedValue = ''
         if (this.environmentList && workerGroup) {
           this.environmentList.forEach(item => {
             if (item.workerGroups && item.workerGroups.length > 0) {
@@ -85,10 +89,11 @@
 
         if (this.environmentOptions.length > 0) {
           /// default to select this environment when only have one environment
-          if (this.environmentOptions.length === 1 && this.selectedValue === '') {
+          /// automatically select only when creating a new task
+          if (this.isNewCreate && this.environmentOptions.length === 1 && this.selectedValue === '') {
             this.selectedValue = this.environmentOptions[0].code
-            this.$emit('environmentCodeEvent', this.selectedValue)
           }
+          this.$emit('environmentCodeEvent', this.selectedValue)
         } else {
           this.selectedValue = ''
           this.$emit('environmentCodeEvent', this.selectedValue)
@@ -104,17 +109,10 @@
       }
     },
     created () {
-      let stateEnvironmentList = this.store.state.security.environmentListAll || []
-
-      if (stateEnvironmentList.length && stateEnvironmentList.length > 0) {
-        this.environmentList = stateEnvironmentList
+      this._getEnvironmentAll().then(res => {
+        this.environmentList = res
         this._initEnvironmentOptions(this.workerGroup)
-      } else {
-        this._getEnvironmentAll().then(res => {
-          this.environmentList = res
-          this._initEnvironmentOptions(this.workerGroup)
-        })
-      }
+      })
     }
   }
 </script>

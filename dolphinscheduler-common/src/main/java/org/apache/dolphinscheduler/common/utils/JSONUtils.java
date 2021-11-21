@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -231,24 +232,14 @@ public class JSONUtils {
     public static String getNodeString(String json, String nodeName) {
         try {
             JsonNode rootNode = objectMapper.readTree(json);
-            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+            JsonNode jsonNode = rootNode.findValue(nodeName);
+            if (Objects.isNull(jsonNode)) {
+                return "";
+            }
+            return jsonNode.isTextual() ? jsonNode.asText() : jsonNode.toString();
         } catch (JsonProcessingException e) {
             return "";
         }
-    }
-    
-    /**
-     * json to map
-     *
-     * @param json json
-     * @param classK classK
-     * @param classV classV
-     * @param <K> K
-     * @param <V> V
-     * @return to map
-     */
-    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
     }
 
     /**

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -151,11 +152,22 @@ public interface TaskDefinitionService {
     /**
      * gen task code list
      *
-     * @param loginUser login user
      * @param genNum gen num
      * @return task code list
      */
-    Map<String, Object> genTaskCodeList(User loginUser,
-                                        Integer genNum);
+    Map<String, Object> genTaskCodeList(Integer genNum);
 
+    /**
+     * release task definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code task definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    Map<String, Object> releaseTaskDefinition(User loginUser,
+                                             long projectCode,
+                                             long code,
+                                             ReleaseState releaseState);
 }

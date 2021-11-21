@@ -21,9 +21,10 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILU
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.TASK_LOG_INFO_FORMAT;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.plugin.task.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
@@ -32,10 +33,11 @@ import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskRequest;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
+import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -44,7 +46,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -60,14 +61,14 @@ public class ProcedureTask extends AbstractTaskExecutor {
     /**
      * taskExecutionContext
      */
-    private ProcedureTaskRequest taskExecutionContext;
+    private TaskRequest taskExecutionContext;
 
     /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
      */
-    public ProcedureTask(ProcedureTaskRequest taskExecutionContext) {
+    public ProcedureTask(TaskRequest taskExecutionContext) {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
@@ -101,10 +102,10 @@ public class ProcedureTask extends AbstractTaskExecutor {
             DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
             ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
-                    taskExecutionContext.getConnectionParams());
+                    taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
             // get jdbc connection
-            connection = DatasourceUtil.getConnection(dbType, connectionParam);
+            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
@@ -142,10 +143,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
      */
     private void printOutParameter(CallableStatement stmt,
                                    Map<Integer, Property> outParameterMap) throws SQLException {
-        Iterator<Map.Entry<Integer, Property>> iter = outParameterMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Integer, Property> en = iter.next();
-
+        for (Map.Entry<Integer, Property> en : outParameterMap.entrySet()) {
             int index = en.getKey();
             Property property = en.getValue();
             String prop = property.getProp();

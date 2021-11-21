@@ -31,7 +31,7 @@
 
     <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
         select tepd.code as work_flow_code,tepd.name as work_flow_name,
-               "" as source_work_flow_code,
+               '' as source_work_flow_code,
                 tepd.release_state as work_flow_publish_status,
                 tes.start_time as schedule_start_time,
                 tes.end_time as schedule_end_time,
@@ -40,6 +40,26 @@
         from t_ds_process_definition tepd
         left join t_ds_schedules tes on tepd.code = tes.process_definition_code
         where tepd.project_code = #{projectCode} and tepd.code = #{workFlowCode}
+    </select>
+
+    <select id="queryWorkFlowLineageByLineage" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.code as work_flow_code,tepd.name as work_flow_name,
+               '' as source_work_flow_code,
+                tepd.release_state as work_flow_publish_status,
+                tes.start_time as schedule_start_time,
+                tes.end_time as schedule_end_time,
+                tes.crontab as crontab,
+                tes.release_state as schedule_publish_status
+        from t_ds_process_definition tepd
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
+        where 1=1
+        <if test="processLineages != null and processLineages.size != 0">
+            and
+            <foreach collection="processLineages" index="index" item="item" open="(" separator=" or " close=")">
+                (tepd.project_code = #{item.projectCode}
+                and tepd.code = #{item.processDefinitionCode})
+            </foreach>
+        </if>
     </select>
 
     <select id="queryProcessLineage" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
@@ -56,7 +76,7 @@
         where pd.project_code = #{projectCode}
     </select>
 
-    <select id="queryCodeRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
+    <select id="queryProcessLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
         select project_code,
                post_task_code,
                post_task_version,
@@ -67,7 +87,5 @@
          from t_ds_process_task_relation
          where project_code = #{projectCode}
                 and process_definition_code = #{processDefinitionCode}
-                and post_task_code = #{taskCode}
-                and post_task_version = #{taskVersion}
     </select>
 </mapper>

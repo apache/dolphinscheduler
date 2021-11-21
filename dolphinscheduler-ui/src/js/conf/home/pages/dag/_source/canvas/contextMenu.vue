@@ -35,6 +35,9 @@
     <menu-item :disabled="readOnly" @on-click="onDelete">
       {{ $t("Delete") }}
     </menu-item>
+    <menu-item v-if="dagChart.type === 'instance'" :disabled="!logMenuVisible" @on-click="showLog">
+      {{ $t('View log') }}
+    </menu-item>
   </div>
 </template>
 
@@ -72,6 +75,12 @@
       },
       readOnly () {
         return this.isDetails
+      },
+      logMenuVisible () {
+        if (this.dagChart.taskInstances.length > 0) {
+          return !!this.dagChart.taskInstances.find(taskInstance => taskInstance.taskCode === this.currentTask.code)
+        }
+        return true
       }
     },
     mounted () {
@@ -95,7 +104,7 @@
         this.currentTask = { ...this.currentTask, ...task }
       },
       onStart () {
-        this.dagChart.startRunning(this.currentTask.name)
+        this.dagChart.startRunning(this.currentTask.code)
       },
       onEdit () {
         this.dagChart.openFormModel(this.currentTask.code, this.currentTask.type)
@@ -135,6 +144,9 @@
       },
       onDelete () {
         this.dagCanvas.removeNode(this.currentTask.code)
+      },
+      showLog () {
+        this.dagChart.showLogDialog(this.currentTask.code)
       },
       show (x = 0, y = 0) {
         this.dagCanvas.lockScroller()

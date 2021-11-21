@@ -238,6 +238,15 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
+    /**
+     * serial queue next processInstanceId
+     */
+    private int nextProcessInstanceId;
+
+    /**
+     * dry run flag
+     */
+    private int dryRun;
 
     public ProcessInstance() {
 
@@ -503,6 +512,14 @@ public class ProcessInstance {
         this.environmentCode = environmentCode;
     }
 
+    public int getDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(int dryRun) {
+        this.dryRun = dryRun;
+    }
+
     /**
      * add command to history
      *
@@ -668,6 +685,9 @@ public class ProcessInstance {
             + ", processDefinitionVersion='"
             + processDefinitionVersion
             + '\''
+            + ", dryRun='"
+            + dryRun
+            + '\''
             + '}';
     }
 
@@ -690,4 +710,11 @@ public class ProcessInstance {
         return Objects.hash(id);
     }
 
+    public int getNextProcessInstanceId() {
+        return nextProcessInstanceId;
+    }
+
+    public void setNextProcessInstanceId(int nextProcessInstanceId) {
+        this.nextProcessInstanceId = nextProcessInstanceId;
+    }
 }

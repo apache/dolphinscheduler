@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * upgrade manager
@@ -83,9 +85,8 @@ public class DolphinSchedulerManager {
 
     /**
      * upgrade DolphinScheduler
-     * @throws Exception if error throws Exception
      */
-    public void upgradeDolphinScheduler() throws Exception{
+    public void upgradeDolphinScheduler() {
 
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
@@ -119,10 +120,11 @@ public class DolphinSchedulerManager {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     } else if ("1.3.2".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerResourceList();
+                    } else if ("2.0.0".equals(schemaVersion)) {
+                        upgradeDao.upgradeDolphinSchedulerTo200(schemaDir);
                     }
                     version = schemaVersion;
                 }
-
             }
         }
 

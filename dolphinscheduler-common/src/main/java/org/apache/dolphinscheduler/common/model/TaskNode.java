@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -133,6 +134,10 @@ public class TaskNode {
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String switchResult;
+
+    @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+    @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    private String waitStartTimeout;
 
     /**
      * task instance priority
@@ -389,18 +394,20 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.toMap(this.params, String.class, Object.class);
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+
         if (taskParams == null) {
             taskParams = new HashMap<>();
         }
         taskParams.put(Constants.CONDITION_RESULT, this.conditionResult);
         taskParams.put(Constants.DEPENDENCE, this.dependence);
         taskParams.put(Constants.SWITCH_RESULT, this.switchResult);
+        taskParams.put(Constants.WAIT_START_TIMEOUT, this.waitStartTimeout);
         return JSONUtils.toJsonString(taskParams);
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.toMap(taskParams, String.class, Object.class);
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }
@@ -449,5 +456,13 @@ public class TaskNode {
 
     public void setSwitchResult(String switchResult) {
         this.switchResult = switchResult;
+    }
+
+    public String getWaitStartTimeout() {
+        return this.waitStartTimeout;
+    }
+
+    public void setWaitStartTimeout(String waitStartTimeout) {
+        this.waitStartTimeout = waitStartTimeout;
     }
 }

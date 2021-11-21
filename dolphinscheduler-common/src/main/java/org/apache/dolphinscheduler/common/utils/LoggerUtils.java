@@ -24,8 +24,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,12 +72,14 @@ public class LoggerUtils {
      * @return task id format
      */
     public static String buildTaskId(String affix,
+                                     Date firstSubmitTime,
                                      Long processDefineCode,
                                      int processDefineVersion,
                                      int processInstId,
                                      int taskId) {
-        // - [taskAppId=TASK-798_1-4084-15210]
-        return String.format(" - %s%s-%s_%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, processDefineCode, processDefineVersion, processInstId, taskId);
+        // - [taskAppId=TASK-20211107-798_1-4084-15210]
+        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD);
+        return String.format(" - %s%s-%s-%s_%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
@@ -124,25 +126,4 @@ public class LoggerUtils {
         }
         return "";
     }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , String error) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(e.getMessage(), e));
-    }
-
-    public static void logError(Optional<Logger> optionalLogger
-            , String error, Throwable e) {
-        optionalLogger.ifPresent((Logger logger) -> logger.error(error, e));
-    }
-
-    public static void logInfo(Optional<Logger> optionalLogger
-            , String info) {
-        optionalLogger.ifPresent((Logger logger) -> logger.info(info));
-    }
-
 }

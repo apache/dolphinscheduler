@@ -24,6 +24,10 @@
       :with-header="false"
       :wrapperClosable="false"
     >
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width: 0px; height: 0px; overflow: hidden">
+        <el-input type="text" />
+      </div>
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
@@ -56,6 +60,10 @@
     </el-dialog>
     <edge-edit-model ref="edgeEditModel" />
     <el-drawer :visible.sync="versionDrawer" size="" :with-header="false">
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width: 0px; height: 0px; overflow: hidden">
+        <el-input type="text" />
+      </div>
       <m-versions
         :versionData="versionData"
         :isInstance="type === 'instance'"
@@ -65,6 +73,13 @@
         @closeVersion="closeVersion"
       ></m-versions>
     </el-drawer>
+    <m-log
+        v-if="type === 'instance' && logDialog"
+        :item="logTaskInstance"
+        source='dag'
+        :task-instance-id="logTaskInstance.id"
+        @close="closeLogDialog"
+    ></m-log>
   </div>
 </template>
 
@@ -78,6 +93,7 @@
   import mStart from '../../projects/pages/definition/pages/list/_source/start.vue'
   import edgeEditModel from './canvas/edgeEditModel.vue'
   import mVersions from '../../projects/pages/definition/pages/list/_source/versions.vue'
+  import mLog from './formModel/log.vue'
 
   const DEFAULT_NODE_DATA = {
     id: null,
@@ -95,7 +111,8 @@
       mUdp,
       mStart,
       edgeEditModel,
-      mVersions
+      mVersions,
+      mLog
     },
     provide () {
       return {
@@ -134,14 +151,21 @@
           pageSize: null
         },
         // the task status refresh timer
-        statusTimer: null
+        statusTimer: null,
+        // the process instance id
+        instanceId: -1,
+        // log dialog
+        logDialog: false,
+        logTaskInstance: null,
+        taskInstances: []
       }
     },
     mounted () {
       this.setIsEditDag(false)
 
       if (this.type === 'instance') {
-        this.definitionCode = this.$route.query.code
+        this.instanceId = this.$route.params.id
+        this.definitionCode = this.$route.query.code || this.code
       } else if (this.type === 'definition') {
         this.definitionCode = this.$route.params.code
       }
@@ -167,7 +191,6 @@
     },
     beforeDestroy () {
       this.resetParams()
-
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -179,7 +202,8 @@
         'name',
         'isDetails',
         'projectCode',
-        'version'
+        'version',
+        'code'
       ])
     },
     methods: {
@@ -287,61 +311,63 @@
             tasks: tasks,
             locations: locations
           })
-        }).then((res) => {
-          if (this.verifyConditions(res.tasks)) {
-            this.loading(true)
-            const definitionCode = this.definitionCode
-            if (definitionCode) {
-              // Edit
-              return this[
-                this.type === 'instance' ? 'updateInstance' : 'updateDefinition'
-              ](definitionCode)
-                .then((res) => {
-                  this.$message({
-                    message: res.msg,
-                    type: 'success',
-                    offset: 80
-                  })
-                  if (this.type === 'instance') {
-                    this.$router.push({
-                      path: `/projects/${this.projectCode}/instance/list`
-                    })
-                  } else {
-                    this.$router.push({
-                      path: `/projects/${this.projectCode}/definition/list`
-                    })
-                  }
-                })
-                .catch((e) => {
-                  this.$message.error(e.msg || '')
-                })
-                .finally((e) => {
-                  this.loading(false)
-                })
-            } else {
-              // Create
-              return this.saveDAGchart()
-                .then((res) => {
-                  this.$message.success(res.msg)
-                  // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
-                  if (sourceType !== 'affirm') {
-                    // Jump process definition
-                    this.$router.push({ name: 'projects-definition-list' })
-                  }
-                })
-                .catch((e) => {
-                  this.setName('')
-                  this.$message.error(e.msg || '')
-                })
-                .finally((e) => {
-                  this.loading(false)
-                })
-            }
-          }
-        }).catch((err) => {
-          let msg = typeof err === 'string' ? err : (err.msg || '')
-          this.$message.error(msg)
         })
+          .then((res) => {
+            if (this.verifyConditions(res.tasks)) {
+              this.loading(true)
+              const isEdit = !!this.definitionCode
+              if (isEdit) {
+                const methodName = this.type === 'instance' ? 'updateInstance' : 'updateDefinition'
+                const methodParam = this.type === 'instance' ? this.instanceId : this.definitionCode
+                // Edit
+                return this[methodName](methodParam)
+                  .then((res) => {
+                    this.$message({
+                      message: res.msg,
+                      type: 'success',
+                      offset: 80
+                    })
+                    if (this.type === 'instance') {
+                      this.$router.push({
+                        path: `/projects/${this.projectCode}/instance/list`
+                      })
+                    } else {
+                      this.$router.push({
+                        path: `/projects/${this.projectCode}/definition/list`
+                      })
+                    }
+                  })
+                  .catch((e) => {
+                    this.$message.error(e.msg || '')
+                  })
+                  .finally((e) => {
+                    this.loading(false)
+                  })
+              } else {
+                // Create
+                return this.saveDAGchart()
+                  .then((res) => {
+                    this.$message.success(res.msg)
+                    // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
+                    if (sourceType !== 'affirm') {
+                      // Jump process definition
+                      this.$router.push({ name: 'projects-definition-list' })
+                    }
+                  })
+                  .catch((e) => {
+                    this.setName('')
+                    this.$message.error(e.msg || '')
+                  })
+                  .finally((e) => {
+                    this.loading(false)
+                  })
+              }
+            }
+          })
+          .catch((err) => {
+            let msg = typeof err === 'string' ? err : err.msg || ''
+            this.$message.error(msg)
+          })
       },
       verifyConditions (value) {
         let tasks = value
@@ -425,31 +451,35 @@
           tasksMap[task.code] = task
         })
 
-        const headEdges = tasks.filter(task => !preTaskMap[task.code]).map((task) => {
-          return {
-            name: '',
-            preTaskCode: 0,
-            preTaskVersion: 0,
-            postTaskCode: task.code,
-            postTaskVersion: task.version || 0,
-            // conditionType and conditionParams are reserved
-            conditionType: 0,
-            conditionParams: {}
-          }
-        })
+        const headEdges = tasks
+          .filter((task) => !preTaskMap[task.code])
+          .map((task) => {
+            return {
+              name: '',
+              preTaskCode: 0,
+              preTaskVersion: 0,
+              postTaskCode: task.code,
+              postTaskVersion: task.version || 0,
+              // conditionType and conditionParams are reserved
+              conditionType: 0,
+              conditionParams: {}
+            }
+          })
 
-        return edges.map(edge => {
-          return {
-            name: edge.label,
-            preTaskCode: edge.sourceId,
-            preTaskVersion: tasksMap[edge.sourceId].version || 0,
-            postTaskCode: edge.targetId,
-            postTaskVersion: tasksMap[edge.targetId].version || 0,
-            // conditionType and conditionParams are reserved
-            conditionType: 0,
-            conditionParams: {}
-          }
-        }).concat(headEdges)
+        return edges
+          .map((edge) => {
+            return {
+              name: edge.label,
+              preTaskCode: edge.sourceId,
+              preTaskVersion: tasksMap[edge.sourceId].version || 0,
+              postTaskCode: edge.targetId,
+              postTaskVersion: tasksMap[edge.targetId].version || 0,
+              // conditionType and conditionParams are reserved
+              conditionType: 0,
+              conditionParams: {}
+            }
+          })
+          .concat(headEdges)
       },
       backfill () {
         const tasks = this.tasks
@@ -463,28 +493,31 @@
        */
       returnToPrevProcess () {
         let $name = this.$route.name.split('-')
-        let subProcessCodes = this.$route.query.subProcessCodes
-        let codes = subProcessCodes.split(',')
-        const last = codes.pop()
+        let subs = this.$route.query.subs
+        let ids = subs.split(',')
+        const last = ids.pop()
         this.$router.push({
-          path: `/${$name[0]}/${this.projectId}/${$name[1]}/list/${last}`,
-          query: codes.length > 0 ? { subProcessCodes: codes.join(',') } : null
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${last}`,
+          query: ids.length > 0 ? { subs: ids.join(',') } : null
         })
       },
-      toSubProcess ({ subProcessCode, fromThis }) {
-        let subProcessCodes = []
-        let getIds = this.$route.query.subProcessCodes
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.definitionCode)
-          subProcessCodes = newId
+      toSubProcess ({ subProcessCode, subInstanceId }) {
+        const tarIdentifier =
+          this.type === 'instance' ? subInstanceId : subProcessCode
+        const curIdentifier =
+          this.type === 'instance' ? this.instanceId : this.definitionCode
+        let subs = []
+        let olds = this.$route.query.subs
+        if (olds) {
+          subs = olds.split(',')
+          subs.push(curIdentifier)
         } else {
-          subProcessCodes.push(this.definitionCode)
+          subs.push(curIdentifier)
         }
         let $name = this.$route.name.split('-')
         this.$router.push({
-          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${subProcessCode}`,
-          query: { subProcessCodes: subProcessCodes.join(',') }
+          path: `/${$name[0]}/${this.projectCode}/${$name[1]}/list/${tarIdentifier}`,
+          query: { subs: subs.join(',') }
         })
       },
       seeHistory (taskName) {
@@ -524,6 +557,7 @@
             this.$message(this.$t('Refresh status succeeded'))
             const { taskList } = res.data
             if (taskList) {
+              this.taskInstances = taskList
               taskList.forEach((taskInstance) => {
                 this.$refs.canvas.setNodeStatus({
                   code: taskInstance.taskCode,
@@ -590,42 +624,67 @@
         this.switchProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
-        }).then(res => {
-          this.$message.success($t('Switch Version Successfully'))
-          this.closeVersion()
-          this.definitionDetails.init()
-        }).catch(e => {
-          this.$message.error(e.msg || '')
         })
+          .then((res) => {
+            this.$message.success($t('Switch Version Successfully'))
+            this.closeVersion()
+            this.definitionDetails.init()
+          })
+          .catch((e) => {
+            this.$message.error(e.msg || '')
+          })
       },
       getProcessVersions ({ pageNo, pageSize, processDefinitionCode }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
           code: processDefinitionCode
-        }).then(res => {
-          this.versionData.processDefinitionVersions = res.data.totalList
-          this.versionData.total = res.data.total
-          this.versionData.pageSize = res.data.pageSize
-          this.versionData.pageNo = res.data.currentPage
-        }).catch(e => {
-          this.$message.error(e.msg || '')
         })
+          .then((res) => {
+            this.versionData.processDefinitionVersions = res.data.totalList
+            this.versionData.total = res.data.total
+            this.versionData.pageSize = res.data.pageSize
+            this.versionData.pageNo = res.data.currentPage
+          })
+          .catch((e) => {
+            this.$message.error(e.msg || '')
+          })
       },
       deleteProcessVersion ({ version, processDefinitionCode }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           code: processDefinitionCode
-        }).then(res => {
-          this.$message.success(res.msg || '')
-          this.getProcessVersions({
-            pageNo: 1,
-            pageSize: 10,
-            processDefinitionCode: processDefinitionCode
-          })
-        }).catch(e => {
-          this.$message.error(e.msg || '')
         })
+          .then((res) => {
+            this.$message.success(res.msg || '')
+            this.getProcessVersions({
+              pageNo: 1,
+              pageSize: 10,
+              processDefinitionCode: processDefinitionCode
+            })
+          })
+          .catch((e) => {
+            this.$message.error(e.msg || '')
+          })
+      },
+      /**
+       * Log dialog
+       */
+      closeLogDialog () {
+        this.logDialog = false
+        this.logTaskInstance = null
+      },
+      showLogDialog (taskDefinitionCode) {
+        const taskInstance = this.taskInstances.find(taskInstance => {
+          return taskInstance.taskCode === taskDefinitionCode
+        })
+        if (taskInstance) {
+          this.logTaskInstance = {
+            id: taskInstance.id,
+            type: taskInstance.taskType
+          }
+          this.logDialog = true
+        }
       }
     }
   }

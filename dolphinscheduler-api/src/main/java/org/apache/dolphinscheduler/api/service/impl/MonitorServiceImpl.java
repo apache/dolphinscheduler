@@ -19,14 +19,14 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +48,9 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Autowired
     private MonitorDBDao monitorDBDao;
 
+    @Autowired
+    private RegistryClient registryClient;
+
     /**
      * query database state
      *
@@ -55,7 +58,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return data base state
      */
     @Override
-    public Map<String,Object> queryDatabaseState(User loginUser) {
+    public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
         List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
@@ -74,34 +77,15 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return master information list
      */
     @Override
-    public Map<String,Object> queryMaster(User loginUser) {
+    public Map<String, Object> queryMaster(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
 
         List<Server> masterServers = getServerListFromRegistry(true);
         result.put(Constants.DATA_LIST, masterServers);
-        putMsg(result,Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    @Override
-    public Map<String,Object> queryZookeeperState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-
-        List<ZookeeperRecord> zookeeperRecordList = RegistryCenterUtils.zookeeperInfoList();
-
-        result.put(Constants.DATA_LIST, zookeeperRecordList);
         putMsg(result, Status.SUCCESS);
 
         return result;
-
     }
 
     /**
@@ -111,46 +95,48 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return worker information list
      */
     @Override
-    public Map<String,Object> queryWorker(User loginUser) {
+    public Map<String, Object> queryWorker(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
         List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
-                .stream()
-                .map((Server server) -> {
-                    WorkerServerModel model = new WorkerServerModel();
-                    model.setId(server.getId());
-                    model.setHost(server.getHost());
-                    model.setPort(server.getPort());
-                    model.setZkDirectories(Sets.newHashSet(server.getZkDirectory()));
-                    model.setResInfo(server.getResInfo());
-                    model.setCreateTime(server.getCreateTime());
-                    model.setLastHeartbeatTime(server.getLastHeartbeatTime());
-                    return model;
-                })
-                .collect(Collectors.toList());
+            .stream()
+            .map((Server server) -> {
+                WorkerServerModel model = new WorkerServerModel();
+                model.setId(server.getId());
+                model.setHost(server.getHost());
+                model.setPort(server.getPort());
+                model.setZkDirectories(Sets.newHashSet(server.getZkDirectory()));
+                model.setResInfo(server.getResInfo());
+                model.setCreateTime(server.getCreateTime());
+                model.setLastHeartbeatTime(server.getLastHeartbeatTime());
+                return model;
+            })
+            .collect(Collectors.toList());
 
         Map<String, WorkerServerModel> workerHostPortServerMapping = workerServers
-                .stream()
-                .collect(Collectors.toMap(
-                    (WorkerServerModel worker) -> {
-                        String[] s = worker.getZkDirectories().iterator().next().split("/");
-                        return s[s.length - 1];
-                    }
-                    , Function.identity()
-                    , (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
-                        oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
-                        return oldOne;
-                    }));
+            .stream()
+            .collect(Collectors.toMap(
+                (WorkerServerModel worker) -> {
+                    String[] s = worker.getZkDirectories().iterator().next().split("/");
+                    return s[s.length - 1];
+                }
+                , Function.identity()
+                , (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
+                    oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
+                    return oldOne;
+                }));
 
         result.put(Constants.DATA_LIST, workerHostPortServerMapping.values());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
 
     @Override
     public List<Server> getServerListFromRegistry(boolean isMaster) {
-        return isMaster ? RegistryCenterUtils.getMasterServers() : RegistryCenterUtils.getWorkerServers();
+        return isMaster
+            ? registryClient.getServerList(NodeType.MASTER)
+            : registryClient.getServerList(NodeType.WORKER);
     }
 
 }

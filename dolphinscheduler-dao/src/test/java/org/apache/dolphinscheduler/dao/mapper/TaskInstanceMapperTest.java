@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -41,33 +42,24 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback
-public class TaskInstanceMapperTest {
+public class TaskInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
-    TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    ProcessInstanceMapper processInstanceMapper;
-
-    @Autowired
-    ProcessInstanceMapMapper processInstanceMapMapper;
-
-    private int processInstanceId;
+    private ProcessInstanceMapper processInstanceMapper;
 
     @Before
     public void before() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningGroupId(0);
         processInstance.setCommandParam("");
+        processInstance.setProcessDefinitionCode(1L);
         processInstanceMapper.insert(processInstance);
-        processInstanceId = processInstance.getId();
     }
 
     /**
@@ -276,6 +268,27 @@ public class TaskInstanceMapperTest {
     }
 
     /**
+     * test query by task instance id and code
+     */
+    @Test
+    public void testQueryByInstanceIdAndCode() {
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId());
+        task.setHost("111.111.11.11");
+        taskInstanceMapper.updateById(task);
+
+        TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(
+            task.getProcessInstanceId(),
+            task.getTaskCode()
+        );
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertNotEquals(taskInstance, null);
+    }
+
+    /**
      * test count task instance
      */
     @Test
@@ -291,7 +304,6 @@ public class TaskInstanceMapperTest {
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
         processDefinitionMapper.insert(definition);
-        //task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
 
         int countTask = taskInstanceMapper.countTask(
@@ -327,7 +339,6 @@ public class TaskInstanceMapperTest {
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
         processDefinitionMapper.insert(definition);
-        //task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
 
 

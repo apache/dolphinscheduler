@@ -65,8 +65,8 @@ public class ConditionsTaskTest {
 
         MasterConfig config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
-        config.setMasterTaskCommitRetryTimes(3);
-        config.setMasterTaskCommitInterval(1000);
+        config.setTaskCommitRetryTimes(3);
+        config.setTaskCommitInterval(1000);
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
@@ -89,7 +89,7 @@ public class ConditionsTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(taskInstance))
+                .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
         // for MasterBaseTaskExecThread.call
         Mockito.when(processService
@@ -140,7 +140,7 @@ public class ConditionsTaskTest {
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
         DependentItem dependentItem = new DependentItem();
-        dependentItem.setDepTasks("1");
+        dependentItem.setDepTaskCode(11L);
         dependentItem.setStatus(ExecutionStatus.SUCCESS);
 
         DependentTaskModel dependentTaskModel = new DependentTaskModel();

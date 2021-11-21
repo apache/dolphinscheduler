@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+
 import java.util.Map;
 import java.util.Objects;
 
 /**
- *  task priority info
+ * task priority info
  */
 public class TaskPriority implements Comparable<TaskPriority> {
 
@@ -46,6 +48,11 @@ public class TaskPriority implements Comparable<TaskPriority> {
     private int taskId;
 
     /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
+    /**
      * groupName
      */
     private String groupName;
@@ -55,7 +62,14 @@ public class TaskPriority implements Comparable<TaskPriority> {
      */
     private Map<String, String> context;
 
-    public TaskPriority(){}
+    /**
+     * checkpoint
+     */
+    private long checkpoint;
+
+    public TaskPriority() {
+        this.checkpoint = System.currentTimeMillis();
+    }
 
     public TaskPriority(int processInstancePriority,
                         int processInstanceId,
@@ -66,6 +80,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.taskInstancePriority = taskInstancePriority;
         this.taskId = taskId;
         this.groupName = groupName;
+        this.checkpoint = System.currentTimeMillis();
     }
 
     public int getProcessInstancePriority() {
@@ -116,6 +131,22 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.context = context;
     }
 
+    public TaskExecutionContext getTaskExecutionContext() {
+        return taskExecutionContext;
+    }
+
+    public void setTaskExecutionContext(TaskExecutionContext taskExecutionContext) {
+        this.taskExecutionContext = taskExecutionContext;
+    }
+
+    public long getCheckpoint() {
+        return checkpoint;
+    }
+
+    public void setCheckpoint(long checkpoint) {
+        this.checkpoint = checkpoint;
+    }
+
     @Override
     public int compareTo(TaskPriority other) {
         if (this.getProcessInstancePriority() > other.getProcessInstancePriority()) {
@@ -159,7 +190,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         }
         TaskPriority that = (TaskPriority) o;
         return processInstancePriority == that.processInstancePriority
-                &&  processInstanceId == that.processInstanceId
+                && processInstanceId == that.processInstanceId
                 && taskInstancePriority == that.taskInstancePriority
                 && taskId == that.taskId
                 && Objects.equals(groupName, that.groupName);

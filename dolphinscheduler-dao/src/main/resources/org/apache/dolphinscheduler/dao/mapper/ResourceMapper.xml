@@ -63,7 +63,7 @@
         <if test="userId != 0">
             and (
             <if test="resIds != null and resIds.size() > 0">
-                and d.id in
+                d.id in
                 <foreach collection="resIds" item="i" open="(" close=") or" separator=",">
                     #{i}
                 </foreach>
@@ -178,11 +178,18 @@
         </foreach>
     </select>
 
-    <select id="existResource" resultType="java.lang.Boolean">
+    <select id="existResourceByUser" resultType="java.lang.Boolean">
         select 1
         from t_ds_resources
         where full_name = #{fullName}
         and type = #{type}
         and user_id = #{userId} limit 1
+    </select>
+
+    <select id="existResource" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_resources
+        where full_name = #{fullName}
+        and type = #{type} limit 1
     </select>
 </mapper>

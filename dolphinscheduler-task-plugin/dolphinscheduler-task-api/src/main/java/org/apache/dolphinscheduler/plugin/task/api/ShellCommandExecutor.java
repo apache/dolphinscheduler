@@ -21,13 +21,14 @@ import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -54,13 +55,13 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      * @param taskRequest taskRequest
      * @param logger logger
      */
-    public ShellCommandExecutor(Consumer<List<String>> logHandler,
+    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                 TaskRequest taskRequest,
                                 Logger logger) {
         super(logHandler, taskRequest, logger);
     }
 
-    public ShellCommandExecutor(List<String> logBuffer) {
+    public ShellCommandExecutor(LinkedBlockingQueue<String> logBuffer) {
         super(logBuffer);
     }
 
@@ -93,18 +94,25 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             if (OSUtils.isWindows()) {
                 sb.append("@echo off\n");
                 sb.append("cd /d %~dp0\n");
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
+                if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskRequest.getEnvFile() != null) {
+                        sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
+                    }
                 }
             } else {
                 sb.append("#!/bin/sh\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
+                } else {
+                    if (taskRequest.getEnvFile() != null) {
+                        sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                    }
                 }
             }
-
             sb.append(execCommand);
             logger.info("command : {}", sb);
 

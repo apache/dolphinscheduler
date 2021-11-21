@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.python;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
@@ -27,6 +29,15 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParamUtils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,17 +51,11 @@ public class PythonTask extends AbstractTaskExecutor {
     private PythonParameters pythonParameters;
 
     /**
-     * task dir
+     * shell command executor
      */
-    private String taskDir;
-
-    /**
-     * python command executor
-     */
-    private PythonCommandExecutor pythonCommandExecutor;
+    private ShellCommandExecutor shellCommandExecutor;
 
     private TaskRequest taskRequest;
-
 
     /**
      * constructor
@@ -61,7 +66,7 @@ public class PythonTask extends AbstractTaskExecutor {
         super(taskRequest);
         this.taskRequest = taskRequest;
 
-        this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
                 logger);
     }
@@ -91,24 +96,31 @@ public class PythonTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws Exception {
         try {
-            // construct process
-            String command = buildCommand();
-            TaskResponse taskResponse = pythonCommandExecutor.run(command);
+            // generate the content of this python script
+            String pythonScriptContent = buildPythonScriptContent();
+            // generate the file path of this python script
+            String pythonScriptFile = buildPythonCommandFilePath();
+
+            // create this file
+            createPythonCommandFileIfNotExists(pythonScriptContent,pythonScriptFile);
+            String command = "python " + pythonScriptFile;
+
+            TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(pythonCommandExecutor.getVarPool());
+            setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("run python task error",e);
+            throw new TaskException("run python task error", e);
         }
     }
 
     @Override
     public void cancelApplication(boolean cancelApplication) throws Exception {
         // cancel process
-        pythonCommandExecutor.cancelApplication();
+        shellCommandExecutor.cancelApplication();
     }
 
     @Override
@@ -149,24 +161,63 @@ public class PythonTask extends AbstractTaskExecutor {
     }
 
     /**
-     * build command
+     * create python command file if not exists
+     *
+     * @param pythonScript exec python script
+     * @param pythonScriptFile python script file
+     * @throws IOException io exception
+     */
+    protected void createPythonCommandFileIfNotExists(String pythonScript, String pythonScriptFile) throws IOException {
+        logger.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
+
+        if (!Files.exists(Paths.get(pythonScriptFile))) {
+            logger.info("generate python script file:{}", pythonScriptFile);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("#-*- encoding=utf8 -*-\n");
+
+            sb.append("\n\n");
+            sb.append(pythonScript);
+            logger.info(sb.toString());
+
+            // write data to file
+            FileUtils.writeStringToFile(new File(pythonScriptFile),
+                sb.toString(),
+                StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * build python command file path
+     *
+     * @return python command file path
+     */
+    protected String buildPythonCommandFilePath() {
+        return String.format("%s/py_%s.py", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
+    }
+
+    /**
+     * build python script content
+     *
      * @return raw python script
      * @throws Exception exception
      */
-    private String buildCommand() throws Exception {
+    private String buildPythonScriptContent() throws Exception {
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest,pythonParameters);
-        if (paramsMap != null){
-            rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+        Map<String, Property> paramsMap = ParamUtils.convert(taskRequest, pythonParameters);
+        if (MapUtils.isEmpty(paramsMap)) {
+            paramsMap = new HashMap<>();
         }
+        if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
+            paramsMap.putAll(taskRequest.getParamsMap());
+        }
+        rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
 
         logger.info("raw python script : {}", pythonParameters.getRawScript());
-        logger.info("task dir : {}", taskDir);
 
         return rawPythonScript;
     }
-
 
 }

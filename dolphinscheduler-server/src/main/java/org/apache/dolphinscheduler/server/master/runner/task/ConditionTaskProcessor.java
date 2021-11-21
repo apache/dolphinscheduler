@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,9 +63,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     /**
      * complete task map
      */
-    private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
+    private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
     MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     private TaskDefinition taskDefinition;
@@ -74,7 +72,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
         if (this.taskInstance == null) {
             return false;
@@ -84,6 +82,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         );
 
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
@@ -92,7 +91,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
         logger.info("dependent task start");
-        endTask();
         return true;
     }
 
@@ -105,6 +103,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     public void run() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
+            endTask();
         } else {
             endTask();
         }
@@ -146,7 +145,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
@@ -161,7 +160,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
         for (TaskInstance task : taskInstances) {
-            completeTaskList.putIfAbsent(task.getName(), task.getState());
+            completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
 
         List<DependResult> modelResultList = new ArrayList<>();
@@ -183,18 +182,18 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     private DependResult getDependResultForItem(DependentItem item) {
 
         DependResult dependResult = DependResult.SUCCESS;
-        if (!completeTaskList.containsKey(item.getDepTasks())) {
-            logger.info("depend item: {} have not completed yet.", item.getDepTasks());
+        if (!completeTaskList.containsKey(item.getDepTaskCode())) {
+            logger.info("depend item: {} have not completed yet.", item.getDepTaskCode());
             dependResult = DependResult.FAILED;
             return dependResult;
         }
-        ExecutionStatus executionStatus = completeTaskList.get(item.getDepTasks());
+        ExecutionStatus executionStatus = completeTaskList.get(item.getDepTaskCode());
         if (executionStatus != item.getStatus()) {
-            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTasks(), item.getStatus(), executionStatus);
+            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
         logger.info("dependent item complete {} {},{}",
-                Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
+                Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
         return dependResult;
     }
 

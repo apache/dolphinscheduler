@@ -81,7 +81,7 @@ export default {
    */
   deleteProcessDefinitionVersion ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versiond/${payload.version}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-definition/${payload.code}/versions/${payload.version}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -133,6 +133,8 @@ export default {
         state.version = res.data.processDefinition.version
         // name
         state.name = res.data.processDefinition.name
+        // releaseState
+        state.releaseState = res.data.processDefinition.releaseState
         // description
         state.description = res.data.processDefinition.description
         // taskRelationJson
@@ -143,7 +145,9 @@ export default {
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
         state.timeout = res.data.processDefinition.timeout
-        // tenantId
+        // executionType
+        state.executionType = res.data.processDefinition.executionType
+        // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
         state.tasks = res.data.taskDefinitionList.map(task => _.pick(task, [
@@ -161,8 +165,10 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -239,6 +245,8 @@ export default {
         state.globalParams = processDefinition.globalParamList
         // timeout
         state.timeout = processDefinition.timeout
+        // executionType
+        state.executionType = processDefinition.executionType
         // tenantCode
         state.tenantCode = res.data.tenantCode || 'default'
         // tasks info
@@ -257,7 +265,8 @@ export default {
           'failRetryInterval',
           'timeoutFlag',
           'timeoutNotifyStrategy',
-          'timeout'
+          'timeout',
+          'environmentCode'
         ]))
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
@@ -280,6 +289,7 @@ export default {
         taskDefinitionJson: JSON.stringify(state.tasks),
         taskRelationJson: JSON.stringify(state.connects),
         tenantCode: state.tenantCode,
+        executionType: state.executionType,
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout
@@ -301,6 +311,7 @@ export default {
         taskDefinitionJson: JSON.stringify(state.tasks),
         taskRelationJson: JSON.stringify(state.connects),
         tenantCode: state.tenantCode,
+        executionType: state.executionType,
         description: _.trim(state.description),
         globalParams: JSON.stringify(state.globalParams),
         timeout: state.timeout,
@@ -316,19 +327,16 @@ export default {
   /**
    * Process instance update
    */
-  updateInstance ({ state }, payload) {
+  updateInstance ({ state }, instanceId) {
     return new Promise((resolve, reject) => {
-      const data = {
-        globalParams: state.globalParams,
-        tasks: state.tasks,
-        tenantId: state.tenantId,
-        timeout: state.timeout
-      }
-      io.put(`projects/${state.projectCode}/process-instances/${payload}`, {
-        processInstanceJson: JSON.stringify(data),
+      io.put(`projects/${state.projectCode}/process-instances/${instanceId}`, {
+        syncDefine: state.syncDefine,
+        globalParams: JSON.stringify(state.globalParams),
         locations: JSON.stringify(state.locations),
-        connects: JSON.stringify(state.connects),
-        syncDefine: state.syncDefine
+        taskDefinitionJson: JSON.stringify(state.tasks),
+        taskRelationJson: JSON.stringify(state.connects),
+        tenantCode: state.tenantCode,
+        timeout: state.timeout
       }, res => {
         resolve(res)
         state.isEditDag = false
@@ -346,7 +354,7 @@ export default {
         resolve()
         return
       }
-      io.get(`projects/${state.projectCode}/process-definition/list`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-definition/simple-list`, payload, res => {
         state.processListS = res.data
         resolve(res.data)
       }).catch(res => {
@@ -375,7 +383,7 @@ export default {
         resolve()
         return
       }
-      io.get('projects/list', payload, res => {
+      io.get('projects/created-and-authed', payload, res => {
         state.projectListS = res.data
         resolve(res.data)
       }).catch(res => {
@@ -384,11 +392,11 @@ export default {
     })
   },
   /**
-   * Get a list of process definitions by project id
+   * Get a list of process definitions by project code
    */
-  getProcessByProjectCode ({ state }, payload) {
+  getProcessByProjectCode ({ state }, code) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/all`, payload, res => {
+      io.get(`projects/${code}/process-definition/all`, res => {
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -606,7 +614,7 @@ export default {
    */
   deleteInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`projects/${state.projectCode}/process-instances/${payload.code}`, {}, res => {
+      io.delete(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -688,7 +696,7 @@ export default {
    */
   getViewvariables ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-instances/${payload.code}/view-variables`, payload, res => {
+      io.get(`projects/${state.projectCode}/process-instances/${payload.processInstanceId}/view-variables`, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -724,7 +732,7 @@ export default {
    */
   forceTaskSuccess ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectCode}/task-instances/${payload.code}/force-success`, payload, res => {
+      io.post(`projects/${state.projectCode}/task-instances/${payload.taskInstanceId}/force-success`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -830,10 +838,50 @@ export default {
       })
     })
   },
-  getTaskDefinitions ({ state }, payload) {
+  /**
+   * Query Task Definitions List Paging
+   */
+  getTaskDefinitionsList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete Task Definition by code
+   */
+  deleteTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.code}`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Save Task Definition
+   */
+  saveTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectCode}/task-definition`, {
+        taskDefinitionJson: JSON.stringify(payload.taskDefinitionJson)
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  updateTaskDefinition ({ state }, taskDefinition) {
+    return new Promise((resolve, reject) => {
+      io.put(`projects/${state.projectCode}/task-definition/${taskDefinition.code}`, {
+        taskDefinitionJsonObj: JSON.stringify(taskDefinition)
+      }, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

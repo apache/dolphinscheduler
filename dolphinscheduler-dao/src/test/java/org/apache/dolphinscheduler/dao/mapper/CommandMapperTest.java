@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -43,27 +44,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- *  command mapper test
+ * command mapper test
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class CommandMapperTest {
+public class CommandMapperTest extends BaseDaoTest {
 
     @Autowired
-    CommandMapper commandMapper;
+    private CommandMapper commandMapper;
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * test insert
@@ -147,7 +139,7 @@ public class CommandMapperTest {
 
         createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        Command actualCommand = commandMapper.getOneToRun();
+        List<Command> actualCommand = commandMapper.queryCommandPage(1,0);
 
         assertNotNull(actualCommand);
     }
@@ -259,6 +251,8 @@ public class CommandMapperTest {
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setProcessInstanceId(0);
+        command.setProcessDefinitionVersion(0);
         commandMapper.insert(command);
 
         return command;

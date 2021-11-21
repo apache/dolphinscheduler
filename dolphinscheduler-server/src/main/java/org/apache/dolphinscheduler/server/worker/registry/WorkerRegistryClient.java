@@ -24,16 +24,16 @@ import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Date;
+import java.io.IOException;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.Executors;
@@ -64,24 +64,30 @@ public class WorkerRegistryClient {
     private WorkerConfig workerConfig;
 
     /**
+     * worker manager
+     */
+    @Autowired
+    private WorkerManagerThread workerManagerThread;
+
+    /**
      * heartbeat executor
      */
     private ScheduledExecutorService heartBeatExecutor;
 
+    @Autowired
     private RegistryClient registryClient;
 
     /**
-     * worker start time
+     * worker startup time, ms
      */
-    private String startTime;
+    private long startupTime;
 
     private Set<String> workerGroups;
 
     @PostConstruct
     public void initWorkRegistry() {
-        this.workerGroups = workerConfig.getWorkerGroups();
-        this.startTime = DateUtils.dateToString(new Date());
-        this.registryClient = RegistryClient.getInstance();
+        this.workerGroups = workerConfig.getGroups();
+        this.startupTime = System.currentTimeMillis();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
@@ -91,20 +97,23 @@ public class WorkerRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
-        int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
+        int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
             registryClient.persistEphemeral(workerZKPath, "");
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
-                workerConfig.getWorkerMaxCpuloadAvg(),
-                workerConfig.getWorkerReservedMemory(),
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
+                workerConfig.getMaxCpuLoadAvg(),
+                workerConfig.getReservedMemory(),
                 workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_TYPE,
-                registryClient);
+                registryClient,
+                workerConfig.getExecThreads(),
+                workerManagerThread
+        );
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
@@ -113,16 +122,23 @@ public class WorkerRegistryClient {
     /**
      * remove registry info
      */
-    public void unRegistry() {
-        String address = getLocalAddress();
-        Set<String> workerZkPaths = getWorkerZkPaths();
-        for (String workerZkPath : workerZkPaths) {
-            registryClient.remove(workerZkPath);
-            logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
+    public void unRegistry() throws IOException {
+        try {
+            String address = getLocalAddress();
+            Set<String> workerZkPaths = getWorkerZkPaths();
+            for (String workerZkPath : workerZkPaths) {
+                registryClient.remove(workerZkPath);
+                logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
+            }
+        } catch (Exception ex) {
+            logger.error("remove worker zk path exception", ex);
         }
+
         this.heartBeatExecutor.shutdownNow();
         logger.info("heartbeat executor shutdown");
+
         registryClient.close();
+        logger.info("registry client closed");
     }
 
     /**
@@ -131,11 +147,10 @@ public class WorkerRegistryClient {
     public Set<String> getWorkerZkPaths() {
         Set<String> workerPaths = Sets.newHashSet();
         String address = getLocalAddress();
-        String workerZkPathPrefix = REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
         for (String workGroup : this.workerGroups) {
             StringJoiner workerPathJoiner = new StringJoiner(SINGLE_SLASH);
-            workerPathJoiner.add(workerZkPathPrefix);
+            workerPathJoiner.add(REGISTRY_DOLPHINSCHEDULER_WORKERS);
             if (StringUtils.isEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
             }
@@ -147,7 +162,7 @@ public class WorkerRegistryClient {
         return workerPaths;
     }
 
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
+    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) {
         registryClient.handleDeadServer(nodeSet, nodeType, opType);
     }
 
