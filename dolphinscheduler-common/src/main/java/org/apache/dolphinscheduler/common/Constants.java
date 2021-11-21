@@ -766,4 +766,5 @@ public final class Constants {
      * dry run flag
      */
     public static final int DRY_RUN_FLAG_NO = 0;
+    public static final int DRY_RUN_FLAG_YES = 1;
 }
