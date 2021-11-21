@@ -219,4 +219,4 @@ The text of each license is the standard Apache 2.0 license.
     DolphinPluginClassLoader from https://github.com/prestosql/presto Apache 2.0
     DolphinPluginDiscovery from https://github.com/prestosql/presto Apache 2.0
     DolphinPluginLoader from https://github.com/prestosql/presto Apache 2.0
-
+    CodeGenerateUtils from https://github.com/twitter-archive/snowflake/tree/snowflake-2010 Apache 2.0

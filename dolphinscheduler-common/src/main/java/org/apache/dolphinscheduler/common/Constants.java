@@ -34,40 +34,6 @@ public final class Constants {
     }
 
     /**
-     * quartz config
-     */
-    public static final String ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS = "org.quartz.jobStore.driverDelegateClass";
-    public static final String ORG_QUARTZ_SCHEDULER_INSTANCENAME = "org.quartz.scheduler.instanceName";
-    public static final String ORG_QUARTZ_SCHEDULER_INSTANCEID = "org.quartz.scheduler.instanceId";
-    public static final String ORG_QUARTZ_SCHEDULER_MAKESCHEDULERTHREADDAEMON = "org.quartz.scheduler.makeSchedulerThreadDaemon";
-    public static final String ORG_QUARTZ_JOBSTORE_USEPROPERTIES = "org.quartz.jobStore.useProperties";
-    public static final String ORG_QUARTZ_THREADPOOL_CLASS = "org.quartz.threadPool.class";
-    public static final String ORG_QUARTZ_THREADPOOL_THREADCOUNT = "org.quartz.threadPool.threadCount";
-    public static final String ORG_QUARTZ_THREADPOOL_MAKETHREADSDAEMONS = "org.quartz.threadPool.makeThreadsDaemons";
-    public static final String ORG_QUARTZ_THREADPOOL_THREADPRIORITY = "org.quartz.threadPool.threadPriority";
-    public static final String ORG_QUARTZ_JOBSTORE_CLASS = "org.quartz.jobStore.class";
-    public static final String ORG_QUARTZ_JOBSTORE_TABLEPREFIX = "org.quartz.jobStore.tablePrefix";
-    public static final String ORG_QUARTZ_JOBSTORE_ISCLUSTERED = "org.quartz.jobStore.isClustered";
-    public static final String ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD = "org.quartz.jobStore.misfireThreshold";
-    public static final String ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL = "org.quartz.jobStore.clusterCheckinInterval";
-    public static final String ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK = "org.quartz.jobStore.acquireTriggersWithinLock";
-    public static final String ORG_QUARTZ_JOBSTORE_DATASOURCE = "org.quartz.jobStore.dataSource";
-    public static final String ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS = "org.quartz.dataSource.myDs.connectionProvider.class";
-
-    /**
-     * quartz config default value
-     */
-    public static final String QUARTZ_TABLE_PREFIX = "QRTZ_";
-    public static final String QUARTZ_MISFIRETHRESHOLD = "60000";
-    public static final String QUARTZ_CLUSTERCHECKININTERVAL = "5000";
-    public static final String QUARTZ_DATASOURCE = "myDs";
-    public static final String QUARTZ_THREADCOUNT = "25";
-    public static final String QUARTZ_THREADPRIORITY = "5";
-    public static final String QUARTZ_INSTANCENAME = "DolphinScheduler";
-    public static final String QUARTZ_INSTANCEID = "AUTO";
-    public static final String QUARTZ_ACQUIRETRIGGERSWITHINLOCK = "true";
-
-    /**
      * common properties path
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
@@ -75,8 +41,6 @@ public final class Constants {
     /**
      * alter properties
      */
-    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
-    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
     public static final int ALERT_RPC_PORT = 50052;
 
     /**
@@ -117,8 +81,6 @@ public final class Constants {
      * hadoop configuration
      */
     public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
-
-    public static final String HADOOP_RM_STATE_STANDBY = "STANDBY";
 
     public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
 
@@ -166,11 +128,6 @@ public final class Constants {
     public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
 
     /**
-     * python home
-     */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
-
-    /**
      * resource.view.suffixs
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
@@ -193,11 +150,6 @@ public final class Constants {
     public static final String STRING_TRUE = "true";
 
     /**
-     * string false
-     */
-    public static final String STRING_FALSE = "false";
-
-    /**
      * resource storage type
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
@@ -213,11 +165,6 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
-     * SPACE " "
-     */
-    public static final String SPACE = " ";
-
-    /**
      * SINGLE_SLASH /
      */
     public static final String SINGLE_SLASH = "/";
@@ -228,34 +175,19 @@ public final class Constants {
     public static final String DOUBLE_SLASH = "//";
 
     /**
-     * SINGLE_QUOTES "'"
-     */
-    public static final String SINGLE_QUOTES = "'";
-    /**
-     * DOUBLE_QUOTES "\""
-     */
-    public static final String DOUBLE_QUOTES = "\"";
-
-    /**
-     * SEMICOLON ;
-     */
-    public static final String SEMICOLON = ";";
-
-    /**
      * EQUAL SIGN
      */
     public static final String EQUAL_SIGN = "=";
-    /**
-     * AT SIGN
-     */
-    public static final String AT_SIGN = "@";
-
 
     /**
      * date format of yyyy-MM-dd HH:mm:ss
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * date format of yyyyMMdd
+     */
+    public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss
@@ -313,14 +245,9 @@ public final class Constants {
     public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
-     * default display rows
-     */
-    public static final int DEFAULT_DISPLAY_ROWS = 10;
-
-    /**
      * read permission
      */
-    public static final int READ_PERMISSION = 2 * 1;
+    public static final int READ_PERMISSION = 2;
 
 
     /**
@@ -350,32 +277,10 @@ public final class Constants {
      */
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
 
-
-    /**
-     * master cpu load
-     */
-    public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
-
-    /**
-     * worker cpu load
-     */
-    public static final int DEFAULT_WORKER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
-
     /**
      * worker host weight
      */
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
-
-    /**
-     * default log cache rows num,output when reach the number
-     */
-    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
-
-    /**
-     * log flush interval?output when reach the interval
-     */
-    public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
-
 
     /**
      * time unit secong to minutes
@@ -398,21 +303,14 @@ public final class Constants {
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
-    /**
-     * datasource configuration path
-     */
-    public static final String DATASOURCE_PROPERTIES = "/datasource-%s.properties";
-
     public static final String COMMON_TASK_TYPE = "common";
 
     public static final String DEFAULT = "default";
-    public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
-    public static final String THREAD_NAME_GATEWAY_SERVER = "Gateway-Server";
 
     /**
      * command parameter keys
@@ -429,9 +327,7 @@ public final class Constants {
 
     public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
-
-    public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_CODE = "processDefinitionCode";
 
     public static final String CMD_PARAM_START_NODES = "StartNodeList";
 
@@ -454,56 +350,6 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
-
-    /**
-     * data source config
-     */
-
-    public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
-
-    public static final String SPRING_DATASOURCE_URL = "spring.datasource.url";
-
-    public static final String SPRING_DATASOURCE_USERNAME = "spring.datasource.username";
-
-    public static final String SPRING_DATASOURCE_PASSWORD = "spring.datasource.password";
-
-    public static final String SPRING_DATASOURCE_CONNECTION_TIMEOUT = "spring.datasource.connectionTimeout";
-
-    public static final String SPRING_DATASOURCE_MIN_IDLE = "spring.datasource.minIdle";
-
-    public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
-
-    public static final String SPRING_DATASOURCE_IDLE_TIMEOUT = "spring.datasource.idleTimeout";
-
-    public static final String SPRING_DATASOURCE_MAX_LIFE_TIME = "spring.datasource.maxLifetime";
-
-    public static final String SPRING_DATASOURCE_VALIDATION_TIMEOUT = "spring.datasource.validationTimeout";
-
-    public static final String SPRING_DATASOURCE_VALIDATION_QUERY = "spring.datasource.validationQuery";
-
-    public static final String SPRING_DATASOURCE_LEAK_DETECTION_THRESHOLD = "spring.datasource.leakDetectionThreshold";
-
-    public static final String SPRING_DATASOURCE_INITIALIZATION_FAIL_TIMEOUT = "spring.datasource.initializationFailTimeout";
-
-    public static final String SPRING_DATASOURCE_IS_AUTOCOMMIT = "spring.datasource.isAutoCommit";
-
-    public static final String SPRING_DATASOURCE_CACHE_PREP_STMTS = "spring.datasource.cachePrepStmts";
-
-    public static final String SPRING_DATASOURCE_PREP_STMT_CACHE_SIZE = "spring.datasource.prepStmtCacheSize";
-
-    public static final String SPRING_DATASOURCE_PREP_STMT_CACHE_SQL_LIMIT = "spring.datasource.prepStmtCacheSqlLimit";
-
-    public static final String CACHE_PREP_STMTS = "cachePrepStmts";
-
-    public static final String PREP_STMT_CACHE_SIZE = "prepStmtCacheSize";
-
-    public static final String PREP_STMT_CACHE_SQL_LIMIT = "prepStmtCacheSqlLimit";
-
-    public static final String QUARTZ_PROPERTIES_PATH = "quartz.properties";
-
-    /**
-     * sleep time
-     */
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
@@ -537,73 +383,9 @@ public final class Constants {
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.name=name
-     */
-    public static final String MR_NAME = "mapreduce.job.name";
-
-    /**
-     * -D mapreduce.job.queuename=queuename
-     */
-    public static final String MR_QUEUE = "mapreduce.job.queuename";
-
-
-    /**
-     * spark params constant
-     */
-    public static final String MASTER = "--master";
-
-    public static final String DEPLOY_MODE = "--deploy-mode";
-
-    /**
-     * --class CLASS_NAME
-     */
-    public static final String MAIN_CLASS = "--class";
-
-    /**
-     * --driver-cores NUM
-     */
-    public static final String DRIVER_CORES = "--driver-cores";
-
-    /**
-     * --driver-memory MEM
-     */
-    public static final String DRIVER_MEMORY = "--driver-memory";
-
-    /**
-     * --num-executors NUM
-     */
-    public static final String NUM_EXECUTORS = "--num-executors";
-
-    /**
-     * --executor-cores NUM
-     */
-    public static final String EXECUTOR_CORES = "--executor-cores";
-
-    /**
-     * --executor-memory MEM
-     */
-    public static final String EXECUTOR_MEMORY = "--executor-memory";
-
-    /**
-     * --name NAME
-     */
-    public static final String SPARK_NAME = "--name";
-
-    /**
-     * --queue QUEUE
-     */
-    public static final String SPARK_QUEUE = "--queue";
-
-
-    /**
      * exit code success
      */
     public static final int EXIT_CODE_SUCCESS = 0;
-
-    /**
-     * exit code kill
-     */
-    public static final int EXIT_CODE_KILL = 137;
 
     /**
      * exit code failure
@@ -644,16 +426,6 @@ public final class Constants {
      * system date(yyyymmdd) yesterday
      */
     public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
-
-    /**
-     * the absolute path of current executing task
-     */
-    public static final String PARAMETER_TASK_EXECUTE_PATH = "system.task.execute.path";
-
-    /**
-     * the instance id of current task
-     */
-    public static final String PARAMETER_TASK_INSTANCE_ID = "system.task.instance.id";
 
     /**
      * ACCEPTED
@@ -756,7 +528,6 @@ public final class Constants {
     public static final String SUBTRACT_STRING = "-";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
-    public static final String LOCAL_PARAMS_LIST = "localParamsList";
     public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
@@ -764,9 +535,7 @@ public final class Constants {
     public static final String SWITCH_RESULT = "switchResult";
     public static final String WAIT_START_TIMEOUT = "waitStartTimeout";
     public static final String DEPENDENCE = "dependence";
-    public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
-    public static final String RWXR_XR_X = "rwxr-xr-x";
     public static final String QUEUE = "queue";
     public static final String QUEUE_NAME = "queueName";
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
@@ -782,7 +551,6 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final String DEPENDENT_ALL = "ALL";
     public static final long DEPENDENT_ALL_TASK_CODE = 0;
 
 
@@ -841,28 +609,6 @@ public final class Constants {
      * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
-
-    /**
-     * hive conf
-     */
-    public static final String HIVE_CONF = "hiveconf:";
-
-    /**
-     * flink
-     */
-    public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
-    public static final String FLINK_RUN_MODE = "-m";
-    public static final String FLINK_YARN_SLOT = "-ys";
-    public static final String FLINK_APP_NAME = "-ynm";
-    public static final String FLINK_QUEUE = "-yqu";
-    public static final String FLINK_TASK_MANAGE = "-yn";
-
-    public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
-    public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_MAIN_CLASS = "-c";
-    public static final String FLINK_PARALLELISM = "-p";
-    public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
-
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
         ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
@@ -933,74 +679,20 @@ public final class Constants {
 
     public static final String SESSION_ID = "sessionId";
 
-    public static final String PASSWORD_DEFAULT = "******";
-
     /**
      * locale
      */
     public static final String LOCALE_LANGUAGE = "language";
 
     /**
-     * driver
-     */
-    public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
-    public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
-    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-    public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
-    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
-
-
-    /**
-     * validation Query
-     */
-    public static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
-    public static final String MYSQL_VALIDATION_QUERY = "select 1";
-    public static final String HIVE_VALIDATION_QUERY = "select 1";
-    public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
-    public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
-    public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
-    public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
-    public static final String PRESTO_VALIDATION_QUERY = "select 1";
-
-    /**
      * database type
      */
     public static final String MYSQL = "MYSQL";
-    public static final String POSTGRESQL = "POSTGRESQL";
     public static final String HIVE = "HIVE";
-    public static final String SPARK = "SPARK";
-    public static final String CLICKHOUSE = "CLICKHOUSE";
-    public static final String ORACLE = "ORACLE";
-    public static final String SQLSERVER = "SQLSERVER";
-    public static final String DB2 = "DB2";
-    public static final String PRESTO = "PRESTO";
-
-    /**
-     * jdbc url
-     */
-    public static final String JDBC_MYSQL = "jdbc:mysql://";
-    public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
-    public static final String JDBC_HIVE_2 = "jdbc:hive2://";
-    public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
-    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
-    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
-    public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
-    public static final String JDBC_DB2 = "jdbc:db2://";
-    public static final String JDBC_PRESTO = "jdbc:presto://";
-
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
-    public static final String JDBC_URL = "jdbcUrl";
-    public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
-    public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
-    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
-    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
-    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
     /**
      * session timeout
@@ -1009,9 +701,6 @@ public final class Constants {
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
-    public static final String RECEIVERS = "receivers";
-    public static final String RECEIVERS_CC = "receiversCc";
-
 
     /**
      * dataSource sensitive param
@@ -1022,14 +711,6 @@ public final class Constants {
      * default worker group
      */
     public static final String DEFAULT_WORKER_GROUP = "default";
-
-    public static final Integer TASK_INFO_LENGTH = 5;
-
-    /**
-     * new
-     * schedule time
-     */
-    public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
     /**
      * authorize writable perm
      */
@@ -1079,21 +760,10 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    /**
-     * snow flake, data center id, this id must be greater than 0 and less than 32
-     */
-    public static final String SNOW_FLAKE_DATA_CENTER_ID = "data.center.id";
-
-    /**
-     * docker & kubernetes
-     */
-    public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
     public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag
      */
     public static final int DRY_RUN_FLAG_NO = 0;
-    public static final int DRY_RUN_FLAG_YES = 1;
-
 }

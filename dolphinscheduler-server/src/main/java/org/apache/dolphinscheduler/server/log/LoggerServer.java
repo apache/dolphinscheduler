@@ -73,12 +73,7 @@ public class LoggerServer {
     public void start()  {
         this.server.start();
         logger.info("logger server started, listening on port : {}", Constants.RPC_PORT);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                LoggerServer.this.stop();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(LoggerServer.this::stop));
     }
 
     /**

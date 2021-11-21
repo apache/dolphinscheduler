@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -115,9 +115,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setUpdateTime(new Date());
         long code = 0L;
         try {
-            code = SnowFlakeUtils.getInstance().nextId();
+            code = CodeGenerateUtils.getInstance().genCode();
             env.setCode(code);
-        } catch (SnowFlakeException e) {
+        } catch (CodeGenerateException e) {
             logger.error("Environment code get error, ", e);
         }
         if (code == 0L) {

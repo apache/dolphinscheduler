@@ -25,11 +25,11 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -78,11 +78,6 @@ public abstract class UpgradeDao {
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
-
-    /**
-     * get datasource
-     * @return DataSource
-     */
     public static DataSource getDataSource(){
         return ConnectionFactory.getInstance().getDataSource();
     }
@@ -642,6 +637,7 @@ public abstract class UpgradeDao {
                 ObjectNode task = (ObjectNode) tasks.path(i);
                 ObjectNode param = (ObjectNode) task.get("params");
                 TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+                String taskType = task.get("type").asText();
                 if (param != null) {
                     JsonNode resourceJsonNode = param.get("resourceList");
                     if (resourceJsonNode != null && !resourceJsonNode.isEmpty()) {
@@ -650,6 +646,13 @@ public abstract class UpgradeDao {
                         taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, Constants.COMMA));
                     } else {
                         taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
+                    }
+                    if (TaskType.SUB_PROCESS.getDesc().equals(taskType)) {
+                        JsonNode jsonNodeDefinitionId = param.get("processDefinitionId");
+                        if (jsonNodeDefinitionId != null) {
+                            param.put("processDefinitionCode", processDefinitionMap.get(jsonNodeDefinitionId.asInt()).getCode());
+                            param.remove("processDefinitionId");
+                        }
                     }
                     param.put("conditionResult", task.get("conditionResult"));
                     param.put("dependence", task.get("dependence"));
@@ -663,14 +666,14 @@ public abstract class UpgradeDao {
                 }
                 taskDefinitionLog.setDescription(task.get("description").asText());
                 taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
-                taskDefinitionLog.setTaskType(task.get("type").asText());
-                taskDefinitionLog.setFailRetryInterval(task.get("retryInterval").asInt());
-                taskDefinitionLog.setFailRetryTimes(task.get("maxRetryTimes").asInt());
+                taskDefinitionLog.setTaskType(taskType);
+                taskDefinitionLog.setFailRetryInterval(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 1 : task.get("retryInterval").asInt());
+                taskDefinitionLog.setFailRetryTimes(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 0 : task.get("maxRetryTimes").asInt());
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
                 String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
-                long taskCode = SnowFlakeUtils.getInstance().nextId();
+                long taskCode = CodeGenerateUtils.getInstance().genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());

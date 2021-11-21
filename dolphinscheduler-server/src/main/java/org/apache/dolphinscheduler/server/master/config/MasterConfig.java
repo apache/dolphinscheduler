@@ -17,51 +17,30 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource(value = "master.properties")
+@EnableConfigurationProperties
+@ConfigurationProperties("master")
 public class MasterConfig {
-
-    @Value("${master.listen.port:5678}")
     private int listenPort;
-
-    @Value("${master.exec.threads:100}")
-    private int masterExecThreads;
-
-    @Value("${master.exec.task.num:20}")
-    private int masterExecTaskNum;
-
-    @Value("${master.dispatch.task.num:3}")
-    private int masterDispatchTaskNumber;
-
-    @Value("${master.host.selector:LowerWeight}")
-    private String hostSelector;
-
-    @Value("${master.heartbeat.interval:10}")
-    private int masterHeartbeatInterval;
-
-    @Value("${master.state.wheel.interval:5}")
+    private int fetchCommandNum;
+    private int preExecThreads;
+    private int execThreads;
+    private int execTaskNum;
+    private int dispatchTaskNumber;
+    private HostSelector hostSelector;
+    private int heartbeatInterval;
+    private int taskCommitRetryTimes;
+    private int taskCommitInterval;
     private int stateWheelInterval;
-
-    @Value("${master.task.commit.retryTimes:5}")
-    private int masterTaskCommitRetryTimes;
-
-    @Value("${master.task.commit.interval:1000}")
-    private int masterTaskCommitInterval;
-
-    @Value("${master.max.cpuload.avg:-1}")
-    private double masterMaxCpuloadAvg;
-
-    @Value("${master.reserved.memory:0.3}")
-    private double masterReservedMemory;
-
-    @Value("${master.cache.process.definition:true}")
-    private boolean masterCacheProcessDefinition;
+    private double maxCpuLoadAvg;
+    private double reservedMemory;
+    private boolean cacheProcessDefinition;
 
     public int getListenPort() {
         return listenPort;
@@ -71,95 +50,107 @@ public class MasterConfig {
         this.listenPort = listenPort;
     }
 
-    public String getHostSelector() {
+    public int getFetchCommandNum() {
+        return fetchCommandNum;
+    }
+
+    public void setFetchCommandNum(int fetchCommandNum) {
+        this.fetchCommandNum = fetchCommandNum;
+    }
+
+    public int getPreExecThreads() {
+        return preExecThreads;
+    }
+
+    public void setPreExecThreads(int preExecThreads) {
+        this.preExecThreads = preExecThreads;
+    }
+
+    public int getExecThreads() {
+        return execThreads;
+    }
+
+    public void setExecThreads(int execThreads) {
+        this.execThreads = execThreads;
+    }
+
+    public int getExecTaskNum() {
+        return execTaskNum;
+    }
+
+    public void setExecTaskNum(int execTaskNum) {
+        this.execTaskNum = execTaskNum;
+    }
+
+    public int getDispatchTaskNumber() {
+        return dispatchTaskNumber;
+    }
+
+    public void setDispatchTaskNumber(int dispatchTaskNumber) {
+        this.dispatchTaskNumber = dispatchTaskNumber;
+    }
+
+    public HostSelector getHostSelector() {
         return hostSelector;
     }
 
-    public void setHostSelector(String hostSelector) {
+    public void setHostSelector(HostSelector hostSelector) {
         this.hostSelector = hostSelector;
     }
 
-    public int getMasterExecThreads() {
-        return masterExecThreads;
+    public int getHeartbeatInterval() {
+        return heartbeatInterval;
     }
 
-    public void setMasterExecThreads(int masterExecThreads) {
-        this.masterExecThreads = masterExecThreads;
+    public void setHeartbeatInterval(int heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 
-    public int getMasterExecTaskNum() {
-        return masterExecTaskNum;
+    public int getTaskCommitRetryTimes() {
+        return taskCommitRetryTimes;
     }
 
-    public void setMasterExecTaskNum(int masterExecTaskNum) {
-        this.masterExecTaskNum = masterExecTaskNum;
+    public void setTaskCommitRetryTimes(int taskCommitRetryTimes) {
+        this.taskCommitRetryTimes = taskCommitRetryTimes;
     }
 
-    public int getMasterHeartbeatInterval() {
-        return masterHeartbeatInterval;
+    public int getTaskCommitInterval() {
+        return taskCommitInterval;
     }
 
-    public void setMasterHeartbeatInterval(int masterHeartbeatInterval) {
-        this.masterHeartbeatInterval = masterHeartbeatInterval;
-    }
-
-    public int getMasterTaskCommitRetryTimes() {
-        return masterTaskCommitRetryTimes;
-    }
-
-    public void setMasterTaskCommitRetryTimes(int masterTaskCommitRetryTimes) {
-        this.masterTaskCommitRetryTimes = masterTaskCommitRetryTimes;
-    }
-
-    public int getMasterTaskCommitInterval() {
-        return masterTaskCommitInterval;
-    }
-
-    public void setMasterTaskCommitInterval(int masterTaskCommitInterval) {
-        this.masterTaskCommitInterval = masterTaskCommitInterval;
-    }
-
-    public double getMasterMaxCpuloadAvg() {
-        if (masterMaxCpuloadAvg == -1) {
-            return Constants.DEFAULT_MASTER_CPU_LOAD;
-        }
-        return masterMaxCpuloadAvg;
-    }
-
-    public void setMasterMaxCpuloadAvg(double masterMaxCpuloadAvg) {
-        this.masterMaxCpuloadAvg = masterMaxCpuloadAvg;
-    }
-
-    public double getMasterReservedMemory() {
-        return masterReservedMemory;
-    }
-
-    public void setMasterReservedMemory(double masterReservedMemory) {
-        this.masterReservedMemory = masterReservedMemory;
-    }
-
-    public int getMasterDispatchTaskNumber() {
-        return masterDispatchTaskNumber;
-    }
-
-    public void setMasterDispatchTaskNumber(int masterDispatchTaskNumber) {
-        this.masterDispatchTaskNumber = masterDispatchTaskNumber;
+    public void setTaskCommitInterval(int taskCommitInterval) {
+        this.taskCommitInterval = taskCommitInterval;
     }
 
     public int getStateWheelInterval() {
-        return this.stateWheelInterval;
+        return stateWheelInterval;
     }
 
     public void setStateWheelInterval(int stateWheelInterval) {
         this.stateWheelInterval = stateWheelInterval;
     }
 
-    public boolean getMasterCacheProcessDefinition() {
-        return masterCacheProcessDefinition;
+    public double getMaxCpuLoadAvg() {
+        return maxCpuLoadAvg > 0 ? maxCpuLoadAvg : Runtime.getRuntime().availableProcessors() * 2;
     }
 
-    public void setMasterCacheProcessDefinition(boolean masterCacheProcessDefinition) {
-        this.masterCacheProcessDefinition = masterCacheProcessDefinition;
+    public void setMaxCpuLoadAvg(double maxCpuLoadAvg) {
+        this.maxCpuLoadAvg = maxCpuLoadAvg;
     }
 
+    public double getReservedMemory() {
+        return reservedMemory;
+    }
+
+    public void setReservedMemory(double reservedMemory) {
+        this.reservedMemory = reservedMemory;
+    }
+
+    public boolean isCacheProcessDefinition() {
+        return cacheProcessDefinition;
+    }
+
+    public void setCacheProcessDefinition(boolean cacheProcessDefinition) {
+        this.cacheProcessDefinition = cacheProcessDefinition;
+    }
 }
