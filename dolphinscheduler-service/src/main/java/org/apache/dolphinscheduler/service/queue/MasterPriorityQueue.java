@@ -18,11 +18,10 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +37,7 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
      */
     private PriorityBlockingQueue<Server> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE, new ServerComparator());
 
-    private HashMap<String, Integer> hostIndexMap = new HashMap<>();
+    private Map<String, Integer> hostIndexMap = new ConcurrentHashMap<>();
 
     @Override
     public void put(Server serverInfo) {
@@ -83,17 +82,17 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
         int index = 0;
         while (iterator.hasNext()) {
             Server server = iterator.next();
-            hostIndexMap.put(server.getHost(), index);
+            hostIndexMap.put(NetUtils.getAddr(server.getHost(), server.getPort()), index);
             index += 1;
         }
 
     }
 
-    public int getIndex(String host) {
-        if (!hostIndexMap.containsKey(host)) {
+    public int getIndex(String address) {
+        if (!hostIndexMap.containsKey(address)) {
             return -1;
         }
-        return hostIndexMap.get(host);
+        return hostIndexMap.get(address);
     }
 
     /**

@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -45,10 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -106,6 +104,9 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private RegistryClient registryClient;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     /**
      * eg : /node/worker/group/127.0.0.1:xxx
      */
@@ -125,7 +126,7 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private AlertDao alertDao;
 
-    public static volatile List<Integer> SLOT_LIST = new ArrayList<>();
+    public static volatile List<Integer> SLOT_LIST = new CopyOnWriteArrayList<>();
 
     public static volatile Integer MASTER_SIZE = 0;
 
@@ -336,10 +337,10 @@ public class ServerNodeManager implements InitializingBean {
             this.masterNodes.addAll(nodes);
             this.masterPriorityQueue.clear();
             this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(NetUtils.getHost());
+            int index = masterPriorityQueue.getIndex(NetUtils.getAddr(masterConfig.getListenPort()));
             if (index >= 0) {
                 MASTER_SIZE = nodes.size();
-                SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getHost()));
+                SLOT_LIST.add(masterPriorityQueue.getIndex(NetUtils.getAddr(masterConfig.getListenPort())));
             }
             logger.info("update master nodes, master size: {}, slot: {}",
                     MASTER_SIZE, SLOT_LIST.toString()
