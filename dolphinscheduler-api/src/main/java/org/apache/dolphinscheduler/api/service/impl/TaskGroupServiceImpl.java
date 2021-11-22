@@ -89,7 +89,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup( name, description,
+        TaskGroup taskGroup = new TaskGroup(name, description,
                 groupSize, loginUser.getId());
         int insert = taskGroupMapper.insert(taskGroup);
         logger.info("insert result:", insert);

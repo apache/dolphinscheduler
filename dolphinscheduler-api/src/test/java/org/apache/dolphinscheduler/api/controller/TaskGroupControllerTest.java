@@ -57,8 +57,6 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Object data = result.getData();
-        System.out.println(data);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
@@ -77,8 +75,6 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Object data = result.getData();
-        System.out.println(data);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
@@ -97,8 +93,6 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Object data = result.getData();
-        System.out.println(data);
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
