@@ -65,15 +65,15 @@ class TaskParams(ObjectJsonBase):
 
     def __init__(
         self,
-        raw_script: str,
         local_params: Optional[List] = None,
         resource_list: Optional[List] = None,
         dependence: Optional[Dict] = None,
         wait_start_timeout: Optional[Dict] = None,
         condition_result: Optional[Dict] = None,
+        *args,
+        **kwargs,
     ):
-        super().__init__()
-        self.raw_script = raw_script
+        super().__init__(*args, **kwargs)
         self.local_params = local_params or []
         self.resource_list = resource_list or []
         self.dependence = dependence or {}

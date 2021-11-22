@@ -82,4 +82,22 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByTaskCode(@Param("taskCode") long taskCode);
+
+    /**
+     * query upstream process task relation by taskCode
+     *
+     * @param projectCode projectCode
+     * @param taskCode    taskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+
+    /**
+     * query downstream process task relation by taskCode
+     *
+     * @param projectCode projectCode
+     * @param taskCode    taskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
 }
