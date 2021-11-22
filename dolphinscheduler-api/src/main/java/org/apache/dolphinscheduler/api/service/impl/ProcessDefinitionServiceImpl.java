@@ -40,10 +40,10 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -222,8 +222,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         long processDefinitionCode;
         try {
-            processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
-        } catch (SnowFlakeException e) {
+            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        } catch (CodeGenerateException e) {
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
             return result;
         }
@@ -874,8 +874,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
-            processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
-        } catch (SnowFlakeException e) {
+            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+        } catch (CodeGenerateException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
@@ -894,10 +894,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
             try {
-                long code = SnowFlakeUtils.getInstance().nextId();
+                long code = CodeGenerateUtils.getInstance().genCode();
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
-            } catch (SnowFlakeException e) {
+            } catch (CodeGenerateException e) {
                 logger.error("Task code get error, ", e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
@@ -1364,8 +1364,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
                 try {
-                    processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
-                } catch (SnowFlakeException e) {
+                    processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+                } catch (CodeGenerateException e) {
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
@@ -1510,6 +1510,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
         } else {
+            if (processDefinition.getVersion() == version) {
+                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
+                return result;
+            }
             int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
             int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(processDefinition.getCode(), processDefinition.getVersion());
             if (deleteLog == 0 || deleteRelationLog == 0) {
@@ -1519,5 +1523,87 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    /**
+     * create empty process definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @return process definition code
+     */
+    @Override
+    public Map<String, Object> createEmptyProcessDefinition(User loginUser,
+                                                            long projectCode,
+                                                            String name,
+                                                            String description,
+                                                            String globalParams,
+                                                            int timeout,
+                                                            String tenantCode,
+                                                            String scheduleJson,
+                                                            ProcessExecutionTypeEnum executionType) {
+        return null;
+    }
+
+    /**
+     * update process definition basic info
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param code process definition code
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param scheduleJson scheduleJson
+     * @param executionType executionType
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> updateProcessDefinitionBasicInfo(User loginUser,
+                                                                long projectCode,
+                                                                String name,
+                                                                long code,
+                                                                String description,
+                                                                String globalParams,
+                                                                int timeout,
+                                                                String tenantCode,
+                                                                String scheduleJson,
+                                                                ProcessExecutionTypeEnum executionType) {
+        return null;
+    }
+
+    /**
+     * release process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> releaseWorkflowAndSchedule(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+        return null;
+    }
+
+    /**
+     * delete process definition and schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> deleteWorkflowAndSchedule(User loginUser, long projectCode, long code) {
+        return null;
     }
 }

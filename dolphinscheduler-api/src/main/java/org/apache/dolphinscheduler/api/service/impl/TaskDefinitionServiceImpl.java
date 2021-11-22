@@ -25,9 +25,11 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -161,7 +163,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     /**
      * delete task definition
-     *
+     * Only offline and no downstream dependency can be deleted
      * @param loginUser login user
      * @param projectCode project code
      * @param taskCode task code
@@ -174,13 +176,22 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (taskCode == 0) {
+            putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+            return result;
+        }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (taskDefinition.getFlag() == Flag.YES) {
+            putMsg(result, Status.TASK_DEFINE_STATE_ONLINE, taskCode);
+            return result;
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryDownstreamByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
-            Set<Long> processDefinitionCodes = processTaskRelationList
+            Set<Long> postTaskCodes = processTaskRelationList
                 .stream()
-                .map(ProcessTaskRelation::getProcessDefinitionCode)
+                .map(ProcessTaskRelation::getPostTaskCode)
                 .collect(Collectors.toSet());
-            putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, StringUtils.join(processDefinitionCodes, ","));
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(postTaskCodes, ","));
             return result;
         }
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
@@ -336,6 +347,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
         } else {
+            if (taskDefinition.getVersion() == version) {
+                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
+                return result;
+            }
             int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
             if (delete > 0) {
                 putMsg(result, Status.SUCCESS);
@@ -416,9 +431,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < genNum; i++) {
-                taskCodes.add(SnowFlakeUtils.getInstance().nextId());
+                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
-        } catch (SnowFlakeException e) {
+        } catch (CodeGenerateException e) {
             logger.error("Task code get error, ", e);
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
         }
@@ -426,5 +441,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // return processDefinitionCode
         result.put(Constants.DATA_LIST, taskCodes);
         return result;
+    }
+
+    /**
+     * release task definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code task definition code
+     * @param releaseState releaseState
+     * @return update result code
+     */
+    @Override
+    public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+        return null;
     }
 }

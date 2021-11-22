@@ -161,8 +161,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @return TaskExecutionContext
      */
     protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance) {
-        processService.setTaskInstanceDetail(taskInstance);
-
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
 
@@ -172,12 +170,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     null,
-                    null,
-                    taskInstance.getId());
+                    null
+            );
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
+        String userQueue = processService.queryUserQueueByProcessInstance(taskInstance.getProcessInstance());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setResources(getResourceFullNames(taskInstance));
