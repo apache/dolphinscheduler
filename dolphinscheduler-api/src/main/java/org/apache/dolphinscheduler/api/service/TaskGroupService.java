@@ -36,7 +36,7 @@ public interface TaskGroupService {
      * @return the result code and msg
      */
     Map<String, Object> createTaskGroup(User loginUser, String name,
-                                        String description, Integer groupSize);
+                                        String description, int groupSize);
 
     /**
      * update the task group
@@ -47,8 +47,8 @@ public interface TaskGroupService {
      * @param groupSize   task group total size
      * @return the result code and msg
      */
-    Map<String, Object> updateTaskGroup(User loginUser, Integer id, String name,
-                                        String description, Integer groupSize);
+    Map<String, Object> updateTaskGroup(User loginUser, int id, String name,
+                                        String description, int groupSize);
 
     /**
      * get task group status
@@ -56,7 +56,7 @@ public interface TaskGroupService {
      * @param id task group id
      * @return the result code and msg
      */
-    boolean isTheTaskGroupAvailable(Integer id);
+    boolean isTheTaskGroupAvailable(int id);
 
     /**
      * query all task group by user id
@@ -66,7 +66,7 @@ public interface TaskGroupService {
      * @param pageSize  page size
      * @return the result code and msg
      */
-    Map<String, Object> queryAllTaskGroup(User loginUser, Integer pageNo, Integer pageSize);
+    Map<String, Object> queryAllTaskGroup(User loginUser, int pageNo, int pageSize);
 
     /**
      * query all task group by status
@@ -77,7 +77,7 @@ public interface TaskGroupService {
      * @param status    status
      * @return the result code and msg
      */
-    Map<String, Object> queryTaskGroupByStatus(User loginUser, Integer pageNo, Integer pageSize, Integer status);
+    Map<String, Object> queryTaskGroupByStatus(User loginUser, int pageNo, int pageSize, int status);
 
     /**
      * query all task group by name
@@ -88,7 +88,7 @@ public interface TaskGroupService {
      * @param name      name
      * @return the result code and msg
      */
-    Map<String, Object> queryTaskGroupByName(User loginUser, Integer pageNo, Integer pageSize, String name);
+    Map<String, Object> queryTaskGroupByName(User loginUser, int pageNo, int pageSize, String name);
 
     /**
      * query all task group by id
@@ -97,7 +97,7 @@ public interface TaskGroupService {
      * @param id        id
      * @return the result code and msg
      */
-    Map<String, Object> queryTaskGroupById(User loginUser, Integer id);
+    Map<String, Object> queryTaskGroupById(User loginUser, int id);
 
     /**
      * query
@@ -110,7 +110,7 @@ public interface TaskGroupService {
      * @param status    status
      * @return the result code and msg
      */
-    Map<String, Object> doQuery(User loginUser, Integer pageNo, Integer pageSize, Integer userId, String name, Integer status);
+    Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, int status);
 
     /**
      * close a task group
@@ -119,7 +119,7 @@ public interface TaskGroupService {
      * @param id        task group id
      * @return the result code and msg
      */
-    Map<String, Object> closeTaskGroup(User loginUser, Integer id);
+    Map<String, Object> closeTaskGroup(User loginUser, int id);
 
     /**
      * start a task group
@@ -128,7 +128,7 @@ public interface TaskGroupService {
      * @param id        task group id
      * @return the result code and msg
      */
-    Map<String, Object> startTaskGroup(User loginUser, Integer id);
+    Map<String, Object> startTaskGroup(User loginUser, int id);
 
     /**
      * wake a task manually
@@ -136,5 +136,5 @@ public interface TaskGroupService {
      * @param taskId task id
      * @return result
      */
-    Map<String, Object> wakeTaskcompulsively(User loginUser, Integer taskId);
+    Map<String, Object> wakeTaskcompulsively(User loginUser, int taskId);
 }

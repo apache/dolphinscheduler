@@ -42,10 +42,10 @@
         </include>
         from t_ds_task_group_queue
         <where>
-            <if test="groupId != null">
+            <if test="groupId != 0">
                 and group_id = #{groupId}
             </if>
-            <if test="processId != null">
+            <if test="processId != 0">
                 and process_id = #{processId}
             </if>
         </where>
@@ -57,7 +57,7 @@
         </include>
         from t_ds_task_group_queue
         <where>
-            <if test="status != null">
+            <if test="status != 0">
                 and status = #{status}
             </if>
         </where>
@@ -71,7 +71,7 @@
     <update id="updateStatusByTaskId">
         update t_ds_task_group_queue
         <set>
-            <if test="status != null">
+            <if test="status != 0">
                 status = #{status},
             </if>
         </set>
@@ -82,6 +82,12 @@
         update t_ds_task_group_queue
                set in_queue = #{inQueue}
         where id = #{id}
+    </update>
+
+    <update id="updateForceStart">
+        update t_ds_task_group_queue
+               set force_start = #{forceStart}
+        where task_id = #{taskId}
     </update>
 
     <update id="updateInQueueLimit1">

@@ -246,7 +246,7 @@ public class TaskGroupController extends BaseController {
     }
 
     /**
-     * wake a task group compulsively
+     * force start task without task group
      *
      * @param loginUser login user
      * @param taskId    task id
@@ -261,7 +261,7 @@ public class TaskGroupController extends BaseController {
     @ApiException(START_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result wakeCompulsively(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "taskId", required = false) Integer taskId) {
+                                   @RequestParam(value = "taskId") Integer taskId) {
         Map<String, Object> result = taskGroupService.wakeTaskcompulsively(loginUser, taskId);
         return returnDataList(result);
     }

@@ -35,8 +35,8 @@ public interface TaskGroupQueueService {
 
      * @return tasks list
      */
-    Map<String, Object> queryTasksByGroupId(User loginUser, Integer groupId, Integer pageNo,
-                                            Integer pageSize);
+    Map<String, Object> queryTasksByGroupId(User loginUser, int groupId, int pageNo,
+                                            int pageSize);
 
     /**
      * query tasks in task group queue by project id
@@ -46,8 +46,8 @@ public interface TaskGroupQueueService {
      * @param processId process id
      * @return tasks list
      */
-    Map<String, Object> queryTasksByProcessId(User loginUser, Integer pageNo,
-                                              Integer pageSize, Integer processId);
+    Map<String, Object> queryTasksByProcessId(User loginUser, int pageNo,
+                                              int pageSize, int processId);
 
     /**
      * query all tasks in task group queue
@@ -56,12 +56,14 @@ public interface TaskGroupQueueService {
      * @param pageSize page size
      * @return tasks list
      */
-    Map<String, Object> queryAllTasks(User loginUser, Integer pageNo, Integer pageSize);
+    Map<String, Object> queryAllTasks(User loginUser, int pageNo, int pageSize);
 
     /**
      * delete by task id
      * @param taskId task id
      * @return TaskGroupQueue entity
      */
-    boolean deleteByTaskId(Integer taskId);
+    boolean deleteByTaskId(int taskId);
+
+    void forceStartTask(int taskId,int forceStart);
 }

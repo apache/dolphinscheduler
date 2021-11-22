@@ -40,10 +40,10 @@
         </include>
         from t_ds_task_group
         <where>
-            <if test="userId != null">
+            <if test="userId != 0">
                 and user_id = #{userId}
             </if>
-            <if test="status != null">
+            <if test="status != 0">
                 and status = #{status}
             </if>
             <if test="name != null and name != '' ">

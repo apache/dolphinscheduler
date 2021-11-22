@@ -79,6 +79,8 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     void updateInQueue(@Param("inQueue") int inQueue, @Param("id") int id);
 
+    void updateForceStart(@Param("taskId") int taskId, @Param("forceStart") int forceStart);
+
     int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue
             , @Param("groupId") int id, @Param("status") int status);
 

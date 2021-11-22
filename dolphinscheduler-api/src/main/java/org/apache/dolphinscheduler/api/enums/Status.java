@@ -333,7 +333,7 @@ public enum Status {
 
     TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
-    TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组正在被使用或已经被关闭"),
+    TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
     TASK_GROUP_FULL(130004,"task group is full","任务组已经满了"),
     TASK_GROUP_USED_SIZE_ERROR(130005,"the used size number of task group is dirty","任务组使用的容量发生了变化"),
     TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"relase task group queue failed","任务组资源释放时出现了错误"),

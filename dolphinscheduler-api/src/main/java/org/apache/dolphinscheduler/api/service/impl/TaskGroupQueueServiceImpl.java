@@ -61,8 +61,8 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByGroupId(User loginUser, Integer groupId, Integer pageNo, Integer pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, null, groupId);
+    public Map<String, Object> queryTasksByGroupId(User loginUser, int groupId, int pageNo, int pageSize) {
+        return this.doQuery(loginUser, pageNo, pageSize, groupId);
     }
 
     /**
@@ -75,8 +75,8 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByProcessId(User loginUser, Integer pageNo, Integer pageSize, Integer processId) {
-        return this.doQuery(loginUser, pageNo, pageSize, null, processId);
+    public Map<String, Object> queryTasksByProcessId(User loginUser, int pageNo, int pageSize, int processId) {
+        return this.doQuery(loginUser, pageNo, pageSize,  processId);
     }
 
     /**
@@ -88,13 +88,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryAllTasks(User loginUser, Integer pageNo, Integer pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, null, null);
+    public Map<String, Object> queryAllTasks(User loginUser, int pageNo, int pageSize) {
+        return this.doQuery(loginUser, pageNo, pageSize,  0);
     }
 
-    public Map<String, Object> doQuery(User loginUser, Integer pageNo, Integer pageSize,
-                                       Integer groupId,
-                                       Integer processId) {
+    public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize,
+                                       int groupId) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -121,7 +120,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      */
 
     @Override
-    public boolean deleteByTaskId(Integer taskId) {
+    public boolean deleteByTaskId(int taskId) {
         return taskGroupQueueMapper.deleteByTaskId(taskId) == 1;
+    }
+
+    @Override
+    public void forceStartTask(int taskId,int forceStart) {
+        taskGroupQueueMapper.updateForceStart(taskId,forceStart);
     }
 }

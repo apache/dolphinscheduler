@@ -22,10 +22,11 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,36 +89,18 @@ public class TaskGroupQueueServiceTest {
         return taskGroupQueue;
     }
 
-    private List<TaskGroupQueue> getList() {
-        List<TaskGroupQueue> list = new ArrayList<>();
-        list.add(getTaskGroupQueue());
-        return list;
-    }
-
     @Test
-    public void testQueryProjectListPaging() {
-
+    public void testDoQuery() {
+        User user = getLoginUser();
         IPage<TaskGroupQueue> page = new Page<>(1, 10);
-        page.setRecords(getList());
-        User loginUser = getLoginUser();
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(null))).thenReturn(page);
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(1))).thenReturn(page);
-
-        // query all
-        Map<String, Object> result = taskGroupQueueService.queryAllTasks(loginUser, 1, 10);
+        page.setTotal(1L);
+        List<TaskGroupQueue> records = new ArrayList<>();
+        records.add(getTaskGroupQueue());
+        page.setRecords(records);
+        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(page, 1)).thenReturn(page);
+        Map<String, Object> result = taskGroupQueueService.doQuery(user, 1, 1, 10);
         PageInfo<TaskGroupQueue> pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
-        List<TaskGroupQueue> lists = pageInfo.getTotalList();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
-        // by project id
-        result = taskGroupQueueService.queryTasksByProcessId(loginUser, 1, 10, 1);
-        pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
-        lists = pageInfo.getTotalList();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
-
-        // by group id
-        result = taskGroupQueueService.queryTasksByGroupId(loginUser, 1, 10, 1);
-        pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
-        lists = pageInfo.getTotalList();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
+
 }
