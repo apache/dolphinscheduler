@@ -75,4 +75,21 @@
         from t_ds_process_task_relation
         WHERE pre_task_code = #{taskCode}
     </select>
+
+    <select id="queryDownstreamByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and pre_task_code = #{taskCode}
+    </select>
+
+    <select id="queryUpstreamByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+    </select>
+
 </mapper>
