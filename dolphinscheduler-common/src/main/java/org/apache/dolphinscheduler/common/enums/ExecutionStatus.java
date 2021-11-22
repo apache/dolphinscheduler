@@ -42,6 +42,7 @@ public enum ExecutionStatus {
      * 11 waiting depend node complete
      * 12 delay execution
      * 13 forced success
+     * 14 serial wait
      */
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
