@@ -17,19 +17,21 @@
 
 """DolphinScheduler ObjectJsonBase, TaskParams and Task object."""
 
-from typing import Optional, List, Dict, Set, Union, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
-    TaskPriority,
     ProcessDefinitionDefault,
     TaskFlag,
+    TaskPriority,
     TaskTimeoutFlag,
 )
 from pydolphinscheduler.core.base import Base
-from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.process_definition import ProcessDefinitionContext
+from pydolphinscheduler.core.process_definition import (
+    ProcessDefinition,
+    ProcessDefinitionContext,
+)
 from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.utils.string import snake2camel, class_name2camel
+from pydolphinscheduler.utils.string import class_name2camel, snake2camel
 
 
 class ObjectJsonBase:
@@ -63,15 +65,15 @@ class TaskParams(ObjectJsonBase):
 
     def __init__(
         self,
-        raw_script: str,
         local_params: Optional[List] = None,
         resource_list: Optional[List] = None,
         dependence: Optional[Dict] = None,
         wait_start_timeout: Optional[Dict] = None,
         condition_result: Optional[Dict] = None,
+        *args,
+        **kwargs,
     ):
-        super().__init__()
-        self.raw_script = raw_script
+        super().__init__(*args, **kwargs)
         self.local_params = local_params or []
         self.resource_list = resource_list or []
         self.dependence = dependence or {}

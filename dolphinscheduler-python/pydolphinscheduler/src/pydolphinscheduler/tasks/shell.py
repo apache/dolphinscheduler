@@ -21,6 +21,14 @@ from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task, TaskParams
 
 
+class ShellTaskParams(TaskParams):
+    """Parameter only for shell task types."""
+
+    def __init__(self, raw_script: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.raw_script = raw_script
+
+
 class Shell(Task):
     """Task shell object, declare behavior for shell task to dolphinscheduler.
 
@@ -29,8 +37,6 @@ class Shell(Task):
     task.name assign to `task_shell`
     """
 
-    def __init__(
-        self, name: str, command: str, task_type: str = TaskType.SHELL, *args, **kwargs
-    ):
-        task_params = TaskParams(raw_script=command)
-        super().__init__(name, task_type, task_params, *args, **kwargs)
+    def __init__(self, name: str, command: str, *args, **kwargs):
+        task_params = ShellTaskParams(raw_script=command)
+        super().__init__(name, TaskType.SHELL, task_params, *args, **kwargs)
