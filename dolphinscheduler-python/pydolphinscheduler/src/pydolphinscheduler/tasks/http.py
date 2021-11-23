@@ -21,6 +21,7 @@ from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.exceptions import PyDSParamException
 
 
 class HttpMethod:
@@ -67,11 +68,13 @@ class HttpTaskParams(TaskParams):
         super().__init__(*args, **kwargs)
         self.url = url
         if not hasattr(HttpMethod, http_method):
-            raise ValueError("Parameter http_method %s not support.", http_method)
+            raise PyDSParamException(
+                "Parameter http_method %s not support.", http_method
+            )
         self.http_method = http_method
         self.http_params = http_params or []
         if not hasattr(HttpCheckCondition, http_check_condition):
-            raise ValueError(
+            raise PyDSParamException(
                 "Parameter http_check_condition %s not support.", http_check_condition
             )
         self.http_check_condition = http_check_condition
@@ -79,7 +82,7 @@ class HttpTaskParams(TaskParams):
             http_check_condition != HttpCheckCondition.STATUS_CODE_DEFAULT
             and condition is None
         ):
-            raise ValueError(
+            raise PyDSParamException(
                 "Parameter condition must provider if http_check_condition not equal to STATUS_CODE_DEFAULT"
             )
         self.condition = condition
