@@ -103,6 +103,10 @@ public class ResponseFuture {
         return FUTURE_TABLE.get(opaque);
     }
 
+    public void removeFuture(){
+        FUTURE_TABLE.remove(opaque);
+    }
+
     /**
      *  whether timeout
      * @return timeout
