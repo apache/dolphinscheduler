@@ -120,12 +120,25 @@
         </if>
     </select>
 
-    <select id="countUpstreamByCode" resultType="java.lang.Integer">
-        select
-        count(0)
+    <select id="countUpstreamByCodeGroupByProcessDefinitionCode" resultType="java.lang.Integer">
+        select process_definition_code,
+               count(0)
         from t_ds_process_task_relation
         WHERE project_code = #{projectCode}
-        and post_task_code = #{taskCode}
+          and post_task_code = #{taskCode}
+        group by process_definition_code
     </select>
+
+    <update id="batchUpdateProcessTaskRelationPreTaskCode" parameterType="java.util.List">
+        <foreach collection="processTaskRelationList" item="processTaskRelation" index="index" open="" close="" separator=";">
+            update t_ds_process_task_relation
+            <set>
+                pre_task_code=#{processTaskRelation.preTaskCode}
+            </set>
+            <where>
+                WHERE id = #{processTaskRelation.id}
+            </where>
+        </foreach>
+    </update>
 
 </mapper>

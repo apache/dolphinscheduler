@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -296,35 +297,59 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             return Status.SUCCESS;
         }
-        List<Integer> ids = processTaskRelationList.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(ids)) {
-            return Status.SUCCESS;
-        }
-        // count upstream relation
-        Integer count = processTaskRelationMapper.countUpstreamByCode(projectCode, taskCode);
-        // just delete all
-        if (count > processTaskRelationList.size()) {
-            int delete = processTaskRelationMapper.deleteBatchIds(ids);
-            if (delete < 0) {
-                return Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-            }
-            return Status.SUCCESS;
-        }
-        // handle count == processTaskRelationList.size()
-        // task first one to update
-        ProcessTaskRelation processTaskRelation = processTaskRelationList.get(0);
-        ids.remove(Integer.valueOf(processTaskRelation.getId()));
+        Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = new HashMap<>();
+        Map<Long, List<Integer>> idsGroupByProcessDefinitionCode = new HashMap<>();
+        processTaskRelationList.stream().forEach(
+                o -> {
+                    if (!processTaskRelationListGroupByProcessDefinitionCode.containsKey(o.getProcessDefinitionCode())) {
+                        processTaskRelationListGroupByProcessDefinitionCode.put(o.getProcessDefinitionCode(), new ArrayList<>());
+                    }
+                    processTaskRelationListGroupByProcessDefinitionCode.get(o.getProcessDefinitionCode()).add(o);
+                    if (!idsGroupByProcessDefinitionCode.containsKey(o.getProcessDefinitionCode())) {
+                        idsGroupByProcessDefinitionCode.put(o.getProcessDefinitionCode(), new ArrayList<>());
+                    }
+                    idsGroupByProcessDefinitionCode.get(o.getProcessDefinitionCode()).add(o.getId());
+                }
+        );
+        // count upstream relation group by process definition code
+        List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = processTaskRelationMapper.countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, taskCode);
+
+        List<Integer> deletes = new ArrayList<>();
+        List<ProcessTaskRelation> updates = new ArrayList<>();
+
+        countListGroupByProcessDefinitionCode.stream().forEach(
+                processDefinitionCodeUpstreamCountMap -> {
+                    processDefinitionCodeUpstreamCountMap.entrySet().stream().forEach(
+                            o -> {
+                                Long processDefinitionCode = o.getKey();
+                                Integer count = o.getValue();
+                                List<ProcessTaskRelation> processTaskRelationList1 = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
+                                List<Integer> ids1 = idsGroupByProcessDefinitionCode.get(processDefinitionCode);
+                                if (count <= ids1.size()) {
+                                    ProcessTaskRelation processTaskRelation = processTaskRelationList1.get(0);
+                                    ids1.remove(Integer.valueOf(processTaskRelation.getId()));
+                                    if (processTaskRelation.getPreTaskCode() != 0) {
+                                        processTaskRelation.setPreTaskCode(0);
+                                        updates.add(processTaskRelation);
+                                    }
+                                }
+                                if (!ids1.isEmpty()) {
+                                    deletes.addAll(ids1);
+                                }
+                            }
+                    );
+                }
+        );
+
         int update = 0;
-        if (processTaskRelation.getPreTaskCode() != 0) {
-            processTaskRelation.setPreTaskCode(0);
-            update = processTaskRelationMapper.updateById(processTaskRelation);
+        if (!updates.isEmpty()) {
+            update = processTaskRelationMapper.batchUpdateProcessTaskRelationPreTaskCode(updates);
         }
-        // batch delete others
         int delete = 0;
-        if (!ids.isEmpty()) {
-            delete = processTaskRelationMapper.deleteBatchIds(ids);
+        if (!deletes.isEmpty()) {
+            delete = processTaskRelationMapper.deleteBatchIds(deletes);
         }
-        if (delete < 0 || update < 0) {
+        if (update < 0 || delete < 0) {
             return Status.DELETE_TASK_PROCESS_RELATION_ERROR;
         }
         return Status.SUCCESS;
