@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
+import org.apache.dolphinscheduler.api.dto.ScheduleDto;
+import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -33,9 +35,7 @@ import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -1538,6 +1538,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition code
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> createEmptyProcessDefinition(User loginUser,
                                                             long projectCode,
                                                             String name,
@@ -1547,7 +1548,95 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String tenantCode,
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        // check whether the new process define name exist
+        ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+        if (definition != null) {
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
+            return result;
+        }
+
+        int tenantId = -1;
+        if (!Constants.DEFAULT.equals(tenantCode)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                putMsg(result, Status.TENANT_NOT_EXIST);
+                return result;
+            }
+            tenantId = tenant.getId();
+        }
+        long processDefinitionCode;
+        try {
+            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        } catch (CodeGenerateException e) {
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
+            return result;
+        }
+        ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
+                globalParams, "", timeout, loginUser.getId(), tenantId);
+        processDefinition.setExecutionType(executionType);
+        result = createEmptyDagDefine(loginUser, processDefinition);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        if (scheduleJson==null||scheduleJson.trim().isEmpty()){
+            return result;
+        }
+        // save dag schedule
+        Map<String, Object> scheduleResult = createDagSchedule(loginUser, projectCode, processDefinitionCode, scheduleJson);
+        if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return scheduleResult;
+        }
+        return result;
+    }
+
+    private Map<String, Object> createEmptyDagDefine(User loginUser, ProcessDefinition processDefinition) {
+        Map<String, Object> result = new HashMap<>();
+        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, true);
+        if (insertVersion == 0) {
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
+        }
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, processDefinition);
+        return result;
+    }
+
+    private Map<String, Object> createDagSchedule(User loginUser,
+                                                  long projectCode,
+                                                  long processDefinitionCode,
+                                                  String scheduleJson) {
+        Map<String, Object> result = new HashMap<>();
+        ScheduleDto scheduleDto = JSONUtils.parseObject(scheduleJson, ScheduleDto.class);
+        ScheduleParam schedule = scheduleDto.getSchedule();
+        FailureStrategy failureStrategy = scheduleDto.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleDto.getFailureStrategy(); // 默认：CONTINUE
+        WarningType warningType = scheduleDto.getWarningType() == null ? WarningType.NONE : scheduleDto.getWarningType(); // 默认：NONE
+        Priority processInstancePriority = scheduleDto.getProcessInstancePriority() == null ? Priority.MEDIUM : scheduleDto.getProcessInstancePriority(); // 默认：MEDIUM
+        Integer warningGroupId = scheduleDto.getWarningGroupId() == null ? 1 : scheduleDto.getWarningGroupId(); // 默认：1
+        String workerGroup = scheduleDto.getWorkerGroup() == null ? "default" : scheduleDto.getWorkerGroup(); // 默认：default
+        Long environmentCode = scheduleDto.getEnvironmentCode() == null ? -1 : scheduleDto.getEnvironmentCode(); // 默认：-1
+        if (schedule == null) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "工作流定时");
+            return result;
+        }
+        return schedulerService.insertSchedule(
+                loginUser,
+                projectCode,
+                processDefinitionCode,
+                JSONUtils.toJsonString(schedule),
+                warningType,
+                warningGroupId,
+                failureStrategy,
+                processInstancePriority,
+                workerGroup,
+                environmentCode);
     }
 
     /**
