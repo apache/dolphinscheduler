@@ -17,6 +17,7 @@
 
 """DolphinScheduler ObjectJsonBase, TaskParams and Task object."""
 
+import logging
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
@@ -162,6 +163,11 @@ class Task(Base):
             and self.code not in self.process_definition.tasks
         ):
             self.process_definition.add_task(self)
+        else:
+            logging.warning(
+                "Task code %d already in process definition, prohibit re-add task.",
+                self.code,
+            )
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:

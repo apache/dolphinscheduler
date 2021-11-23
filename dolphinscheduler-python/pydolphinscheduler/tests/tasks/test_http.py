@@ -21,6 +21,7 @@ from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.tasks.http import (
     Http,
     HttpCheckCondition,
@@ -64,7 +65,7 @@ def test_attr_exists(class_name, attrs):
 def test_http_task_param_not_support_param(param):
     """Test HttpTaskParams not support parameter."""
     url = "https://www.apache.org"
-    with pytest.raises(ValueError, match="Parameter .*?"):
+    with pytest.raises(PyDSParamException, match="Parameter .*?"):
         HttpTaskParams(url, **param)
 
 

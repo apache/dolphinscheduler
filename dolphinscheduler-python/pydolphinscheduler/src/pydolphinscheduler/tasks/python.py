@@ -23,6 +23,7 @@ from typing import Any
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.exceptions import PyDSParamException
 
 
 class PythonTaskParams(TaskParams):
@@ -43,5 +44,7 @@ class Python(Task):
             py_function = inspect.getsource(code)
             task_params = PythonTaskParams(raw_script=py_function)
         else:
-            raise ValueError("Parameter code do not support % for now.", type(code))
+            raise PyDSParamException(
+                "Parameter code do not support % for now.", type(code)
+            )
         super().__init__(name, TaskType.PYTHON, task_params, *args, **kwargs)
