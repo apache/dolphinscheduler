@@ -22,10 +22,13 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -55,6 +58,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private CacheNotifyService cacheNotifyService;
 
     /**
      * query queue list
@@ -221,6 +227,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueObj.setUpdateTime(now);
 
         queueMapper.updateById(queueObj);
+
+        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.QUEUE, queueObj).convert2Command());
 
         putMsg(result, Status.SUCCESS);
 

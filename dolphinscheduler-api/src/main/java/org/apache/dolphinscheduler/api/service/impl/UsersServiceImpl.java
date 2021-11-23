@@ -26,7 +26,10 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -117,6 +120,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private CacheNotifyService cacheNotifyService;
 
 
     /**
@@ -474,6 +480,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // updateProcessInstance user
         userMapper.updateById(user);
+        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -523,6 +531,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         accessTokenMapper.deleteAccessTokenByUserId(id);
         
         userMapper.deleteById(id);
+        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -1066,6 +1076,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
+
+        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);

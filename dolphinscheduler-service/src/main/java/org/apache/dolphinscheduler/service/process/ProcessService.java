@@ -101,6 +101,8 @@ import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.cache.TenantCacheProxy;
+import org.apache.dolphinscheduler.service.cache.UserCacheProxy;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -125,6 +127,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,7 +150,7 @@ public class ProcessService {
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
-    private UserMapper userMapper;
+    private UserCacheProxy userCacheProxy;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -186,7 +189,7 @@ public class ProcessService {
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantCacheProxy tenantCacheProxy;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -725,7 +728,7 @@ public class ProcessService {
     public Tenant getTenantForProcess(int tenantId, int userId) {
         Tenant tenant = null;
         if (tenantId >= 0) {
-            tenant = tenantMapper.queryById(tenantId);
+            tenant = tenantCacheProxy.queryById(tenantId);
         }
 
         if (userId == 0) {
@@ -733,8 +736,8 @@ public class ProcessService {
         }
 
         if (tenant == null) {
-            User user = userMapper.selectById(userId);
-            tenant = tenantMapper.queryById(user.getTenantId());
+            User user = userCacheProxy.selectById(userId);
+            tenant = tenantCacheProxy.queryById(user.getTenantId());
         }
         return tenant;
     }
@@ -1950,11 +1953,11 @@ public class ProcessService {
             return StringUtils.EMPTY;
         }
         int userId = resourceList.get(0).getUserId();
-        User user = userMapper.selectById(userId);
+        User user = userCacheProxy.selectById(userId);
         if (Objects.isNull(user)) {
             return StringUtils.EMPTY;
         }
-        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        Tenant tenant = tenantCacheProxy.queryById(user.getTenantId());
         if (Objects.isNull(tenant)) {
             return StringUtils.EMPTY;
         }
@@ -2024,7 +2027,7 @@ public class ProcessService {
         if (processInstance == null) {
             return queue;
         }
-        User executor = userMapper.selectById(processInstance.getExecutorId());
+        User executor = userCacheProxy.selectById(processInstance.getExecutorId());
         if (executor != null) {
             queue = executor.getQueue();
         }
@@ -2135,7 +2138,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId) {
-        return userMapper.selectById(userId);
+        return userCacheProxy.selectById(userId);
     }
 
     /**
