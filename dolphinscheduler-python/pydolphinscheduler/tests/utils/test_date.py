@@ -72,5 +72,7 @@ def test_conv_from_str_success(src: str, expect: datetime) -> None:
 )
 def test_conv_from_str_not_impl(src: str) -> None:
     """Test function conv_from_str fail case."""
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(
+        NotImplementedError, match=".*? could not be convert to datetime for now."
+    ):
         conv_from_str(src)
