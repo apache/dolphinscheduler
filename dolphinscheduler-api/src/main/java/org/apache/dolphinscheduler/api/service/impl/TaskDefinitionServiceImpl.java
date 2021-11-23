@@ -483,10 +483,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 break;
             case ONLINE:
                 String resourceIds = taskDefinition.getResourceIds();
-                if (StringUtils.isBlank(resourceIds)) {
-                    taskDefinition.setFlag(Flag.YES);
-                    taskDefinitionMapper.updateById(taskDefinition);
-                } else {
+                if (StringUtils.isNotBlank(resourceIds)) {
                     Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
                     PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resourceIdArray,loginUser.getId(),logger);
                     try {
@@ -497,6 +494,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         return result;
                     }
                 }
+                taskDefinition.setFlag(Flag.YES);
+                taskDefinitionMapper.updateById(taskDefinition);
                 break;
             default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
