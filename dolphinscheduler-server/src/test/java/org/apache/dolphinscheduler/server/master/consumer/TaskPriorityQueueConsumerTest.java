@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -34,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -76,8 +76,6 @@ public class TaskPriorityQueueConsumerTest {
         tenant.setUpdateTime(new Date());
 
         Mockito.doReturn(tenant).when(processService).getTenantForProcess(1, 2);
-
-        Mockito.doReturn("default").when(processService).queryUserQueueByProcessInstanceId(1);
     }
 
     @Test
@@ -101,7 +99,6 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
@@ -129,7 +126,6 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
@@ -171,7 +167,6 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
@@ -211,7 +206,6 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
@@ -271,7 +265,6 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
@@ -310,7 +303,6 @@ public class TaskPriorityQueueConsumerTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority();
@@ -342,7 +334,6 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");

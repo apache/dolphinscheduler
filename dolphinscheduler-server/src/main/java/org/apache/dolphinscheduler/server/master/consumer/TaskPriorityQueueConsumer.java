@@ -89,7 +89,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         List<TaskPriority> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()) {
             try {
-                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
+                int fetchTaskNum = masterConfig.getDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
                     TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
@@ -130,14 +130,16 @@ public class TaskPriorityQueueConsumer extends Thread {
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
             ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 
-            if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
-                // when task finish, ignore this task, there is no need to dispatch anymore
-                return true;
-            } else {
-                result = dispatcher.dispatch(executionContext);
+            if (isTaskNeedToCheck(taskPriority)) {
+                if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
+                    // when task finish, ignore this task, there is no need to dispatch anymore
+                    return true;
+                }
             }
+
+            result = dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage(),e);
+            logger.error("dispatch error: {}", e.getMessage(), e);
         }
         return result;
     }
@@ -152,5 +154,19 @@ public class TaskPriorityQueueConsumer extends Thread {
     public Boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
+    }
+
+    /**
+     * check if task need to check state, if true, refresh the checkpoint
+     * @param taskPriority
+     * @return
+     */
+    private boolean isTaskNeedToCheck(TaskPriority taskPriority) {
+        long now = System.currentTimeMillis();
+        if (now - taskPriority.getCheckpoint() > Constants.SECOND_TIME_MILLIS) {
+            taskPriority.setCheckpoint(now);
+            return true;
+        }
+        return false;
     }
 }

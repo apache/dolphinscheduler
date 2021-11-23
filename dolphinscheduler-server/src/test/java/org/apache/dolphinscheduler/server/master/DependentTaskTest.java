@@ -85,14 +85,15 @@ public class DependentTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
 
         MasterConfig config = new MasterConfig();
-        config.setMasterTaskCommitRetryTimes(3);
-        config.setMasterTaskCommitInterval(1000);
+        config.setTaskCommitRetryTimes(3);
+        config.setTaskCommitInterval(1000);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         processInstance = getProcessInstance();
+        taskInstance = getTaskInstance();
 
         // for MasterBaseTaskExecThread.call
         // for DependentTaskExecThread.waitTaskQuit
@@ -102,7 +103,7 @@ public class DependentTaskTest {
 
         // for MasterBaseTaskExecThread.submit
         Mockito.when(processService
-                .submitTask(Mockito.argThat(taskInstance -> taskInstance.getId() == 1000)))
+                .submitTask(processInstance, taskInstance))
                 .thenAnswer(i -> taskInstance);
 
         // for DependentTaskExecThread.initTaskParameters
@@ -344,6 +345,12 @@ public class DependentTaskTest {
         processInstance.setId(100);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         return processInstance;
+    }
+
+    private TaskInstance getTaskInstance() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1000);
+        return taskInstance;
     }
 
     /**
