@@ -70,6 +70,7 @@ class TaskType(str):
     SHELL = "SHELL"
     HTTP = "HTTP"
     PYTHON = "PYTHON"
+    SQL = "SQL"
 
 
 class DefaultTaskCodeNum(str):
