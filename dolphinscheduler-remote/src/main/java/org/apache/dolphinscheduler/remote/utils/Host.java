@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.utils;
+
+import static org.apache.dolphinscheduler.common.Constants.COLON;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -39,38 +42,20 @@ public class Host implements Serializable {
      */
     private int port;
 
-    /**
-     * weight
-     */
-    private int weight;
-
-    /**
-     * workGroup
-     */
-    private String workGroup;
-
     public Host() {
     }
 
     public Host(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
-    public Host(String ip, int port, int weight) {
-        this.ip = ip;
-        this.port = port;
-        this.address = ip + ":" + port;
-        this.weight = weight;
-    }
-
-    public Host(String ip, int port, int weight,String workGroup) {
-        this.ip = ip;
-        this.port = port;
-        this.address = ip + ":" + port;
-        this.weight = weight;
-        this.workGroup=workGroup;
+    public Host(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
+        this.address = address;
     }
 
     public String getAddress() {
@@ -78,6 +63,9 @@ public class Host implements Serializable {
     }
 
     public void setAddress(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
         this.address = address;
     }
 
@@ -87,15 +75,7 @@ public class Host implements Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
-        this.address = ip + ":" + port;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
+        this.address = ip + COLON + port;
     }
 
     public int getPort() {
@@ -104,15 +84,7 @@ public class Host implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
-        this.address = ip + ":" + port;
-    }
-
-    public String getWorkGroup() {
-        return workGroup;
-    }
-
-    public void setWorkGroup(String workGroup) {
-        this.workGroup = workGroup;
+        this.address = ip + COLON + port;
     }
 
     /**
@@ -122,21 +94,25 @@ public class Host implements Serializable {
      * @return host
      */
     public static Host of(String address) {
+        String[] parts = splitAddress(address);
+        return new Host(parts[0], Integer.parseInt(parts[1]));
+    }
+
+    /**
+     * address convert host
+     *
+     * @param address address
+     * @return host
+     */
+    public static String[] splitAddress(String address) {
         if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
-        String[] parts = address.split(":");
-        if (parts.length < 2) {
+        String[] parts = address.split(COLON);
+        if (parts.length != 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
-        Host host = null;
-        if (parts.length == 2) {
-            host = new Host(parts[0], Integer.parseInt(parts[1]));
-        }
-        if (parts.length == 3) {
-            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-        }
-        return host;
+        return parts;
     }
 
     /**
@@ -146,8 +122,17 @@ public class Host implements Serializable {
      * @return old version is true , otherwise is false
      */
     public static Boolean isOldVersion(String address) {
-        String[] parts = address.split(":");
-        return parts.length != 2 && parts.length != 3;
+        String[] parts = address.split(COLON);
+        return parts.length != 2;
+    }
+
+    @Override
+    public String toString() {
+        return "Host{"
+                + "address='" + address + '\''
+                + ", ip='" + ip + '\''
+                + ", port=" + port
+                + '}';
     }
 
     @Override
@@ -159,18 +144,11 @@ public class Host implements Serializable {
             return false;
         }
         Host host = (Host) o;
-        return Objects.equals(getAddress(), host.getAddress());
+        return port == host.port && Objects.equals(address, host.address) && Objects.equals(ip, host.ip);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAddress());
-    }
-
-    @Override
-    public String toString() {
-        return "Host{" +
-                "address='" + address + '\'' +
-                '}';
+        return Objects.hash(address, ip, port);
     }
 }

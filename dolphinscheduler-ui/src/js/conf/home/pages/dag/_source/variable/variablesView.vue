@@ -18,23 +18,23 @@
   <div class="variable-model">
     <template v-if="list">
       <div class="list">
-        <div class="name"><em class="fa ans-icon-code"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</strong></div>
+        <div class="name"><em class="ri-code-s-slash-line"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</strong></div>
         <div class="var-cont">
           <template v-for="(item,$index) in list.globalParams">
-            <x-button
-                    size="xsmall"
-                    type="ghost"
+            <el-button
+                    size="mini"
+                    type="primary"
                     @click="_copy('gbudp-' + $index)"
                     :key="$index"
                     :data-clipboard-text="item.prop + ' = ' +item.value"
                     :class="'gbudp-' + $index">
               <strong style="color: #2A455B;">{{item.prop}}</strong> = {{item.value}}
-            </x-button>
+            </el-button>
           </template>
         </div>
       </div>
       <div class="list" style="height: 30px;">
-        <div class="name"><em class="fa ans-icon-code"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</strong></div>
+        <div class="name"><em class="ri-code-s-slash-line"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</strong></div>
         <div class="var-cont">
           &nbsp;
         </div>
@@ -43,7 +43,7 @@
         <div class="task-name">Task({{$index}})：{{key}}</div>
         <div class="var-cont" v-if="item.localParamsList.length">
           <template v-for="(el,index) in item.localParamsList">
-            <x-button size="xsmall" type="ghost" :key="index" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el,item.taskType)" :class="'copy-part-' + index">
+            <el-button size="mini" type="primary" :key="index" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el,item.taskType)" :class="'copy-part-' + index">
               <span v-for="(e,k,i) in el" :key="i">
                 <template v-if="item.taskType === 'SQL' || item.taskType === 'PROCEDURE'">
                   <template v-if="(k !== 'direct' && k !== 'type')">
@@ -54,7 +54,7 @@
                   <strong style="color: #2A455B;">{{k}}</strong> = {{e}}
                 </template>
               </span>
-            </x-button>
+            </el-button>
           </template>
         </div>
       </div>

@@ -17,19 +17,32 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.enums.Event;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
+import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import io.netty.channel.Channel;
 
 /**
  * task manager
@@ -45,8 +58,7 @@ public class TaskResponseService {
     /**
      * attemptQueue
      */
-    private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>(5000);
-
+    private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>();
 
     /**
      * process service
@@ -59,23 +71,29 @@ public class TaskResponseService {
      */
     private Thread taskResponseWorker;
 
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @PostConstruct
-    public void start(){
+    public void start() {
         this.taskResponseWorker = new TaskResponseWorker();
-        this.taskResponseWorker.setName("TaskResponseWorker");
+        this.taskResponseWorker.setName("StateEventResponseWorker");
         this.taskResponseWorker.start();
     }
 
     @PreDestroy
-    public void stop(){
-        this.taskResponseWorker.interrupt();
-        if(!eventQueue.isEmpty()){
-            List<TaskResponseEvent> remainEvents = new ArrayList<>(eventQueue.size());
-            eventQueue.drainTo(remainEvents);
-            for(TaskResponseEvent event : remainEvents){
-                this.persist(event);
+    public void stop() {
+        try {
+            this.taskResponseWorker.interrupt();
+            if (!eventQueue.isEmpty()) {
+                List<TaskResponseEvent> remainEvents = new ArrayList<>(eventQueue.size());
+                eventQueue.drainTo(remainEvents);
+                for (TaskResponseEvent event : remainEvents) {
+                    this.persist(event);
+                }
             }
+        } catch (Exception e) {
+            logger.error("stop error:", e);
         }
     }
 
@@ -84,15 +102,14 @@ public class TaskResponseService {
      *
      * @param taskResponseEvent taskResponseEvent
      */
-    public void addResponse(TaskResponseEvent taskResponseEvent){
+    public void addResponse(TaskResponseEvent taskResponseEvent) {
         try {
             eventQueue.put(taskResponseEvent);
         } catch (InterruptedException e) {
-            logger.error("put task : {} error :{}", taskResponseEvent,e);
+            logger.error("put task : {} error :{}", taskResponseEvent, e);
             Thread.currentThread().interrupt();
         }
     }
-
 
     /**
      * task worker thread
@@ -102,50 +119,114 @@ public class TaskResponseService {
         @Override
         public void run() {
 
-            while (Stopper.isRunning()){
+            while (Stopper.isRunning()) {
                 try {
                     // if not task , blocking here
                     TaskResponseEvent taskResponseEvent = eventQueue.take();
                     persist(taskResponseEvent);
-                } catch (InterruptedException e){
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     break;
-                } catch (Exception e){
-                    logger.error("persist task error",e);
+                } catch (Exception e) {
+                    logger.error("persist task error", e);
                 }
             }
-            logger.info("TaskResponseWorker stopped");
+            logger.info("StateEventResponseWorker stopped");
         }
     }
 
     /**
      * persist  taskResponseEvent
+     *
      * @param taskResponseEvent taskResponseEvent
      */
-    private void persist(TaskResponseEvent taskResponseEvent){
-        TaskResponseEvent.Event event = taskResponseEvent.getEvent();
+    private void persist(TaskResponseEvent taskResponseEvent) {
+        Event event = taskResponseEvent.getEvent();
+        int taskInstanceId = taskResponseEvent.getTaskInstanceId();
+        int processInstanceId = taskResponseEvent.getProcessInstanceId();
 
-        switch (event){
+        TaskInstance taskInstance;
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        if (workflowExecuteThread != null && workflowExecuteThread.checkTaskInstanceById(taskInstanceId)) {
+            taskInstance = workflowExecuteThread.getTaskInstance(taskInstanceId);
+        } else {
+            taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        }
+
+        switch (event) {
             case ACK:
-                processService.changeTaskState(taskResponseEvent.getState(),
-                        taskResponseEvent.getStartTime(),
-                        taskResponseEvent.getWorkerAddress(),
-                        taskResponseEvent.getExecutePath(),
-                        taskResponseEvent.getLogPath(),
-                        taskResponseEvent.getTaskInstanceId());
+                handleAckEvent(taskResponseEvent, taskInstance);
                 break;
             case RESULT:
-                processService.changeTaskState(taskResponseEvent.getState(),
-                        taskResponseEvent.getEndTime(),
-                        taskResponseEvent.getProcessId(),
-                        taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getTaskInstanceId());
+                handleResultEvent(taskResponseEvent, taskInstance);
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
+
+        if (workflowExecuteThread != null) {
+            StateEvent stateEvent = new StateEvent();
+            stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
+            stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+            stateEvent.setExecutionStatus(taskResponseEvent.getState());
+            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+            workflowExecuteThread.addStateEvent(stateEvent);
+        }
     }
 
-    public BlockingQueue<TaskResponseEvent> getEventQueue() {
-        return eventQueue;
+    /**
+     * handle ack event
+     * @param taskResponseEvent
+     * @param taskInstance
+     */
+    private void handleAckEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
+        Channel channel = taskResponseEvent.getChannel();
+        try {
+            if (taskInstance != null) {
+                if (taskInstance.getState().typeIsFinished()) {
+                    logger.warn("task is finish, ack is meaningless, taskInstanceId:{}, state:{}", taskInstance.getId(), taskInstance.getState());
+                } else {
+                    processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
+                            taskResponseEvent.getStartTime(),
+                            taskResponseEvent.getWorkerAddress(),
+                            taskResponseEvent.getExecutePath(),
+                            taskResponseEvent.getLogPath()
+                    );
+                }
+            }
+            // if taskInstance is null (maybe deleted) or finish. retry will be meaningless . so ack success
+            DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+            channel.writeAndFlush(taskAckCommand.convert2Command());
+        } catch (Exception e) {
+            logger.error("worker ack master error", e);
+            DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
+            channel.writeAndFlush(taskAckCommand.convert2Command());
+        }
+    }
+
+    /**
+     * handle result event
+     * @param taskResponseEvent
+     * @param taskInstance
+     */
+    private void handleResultEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
+        Channel channel = taskResponseEvent.getChannel();
+        try {
+            if (taskInstance != null) {
+                processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
+                        taskResponseEvent.getEndTime(),
+                        taskResponseEvent.getProcessId(),
+                        taskResponseEvent.getAppIds(),
+                        taskResponseEvent.getVarPool()
+                );
+            }
+            // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
+            DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+            channel.writeAndFlush(taskResponseCommand.convert2Command());
+        } catch (Exception e) {
+            logger.error("worker response master error", e);
+            DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), -1);
+            channel.writeAndFlush(taskResponseCommand.convert2Command());
+        }
     }
 }

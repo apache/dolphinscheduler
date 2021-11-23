@@ -19,6 +19,8 @@ const merge = require('webpack-merge')
 const { assetsDir, baseConfig } = require('./config')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressPlugin = require('progress-bar-webpack-plugin')
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const portfinder = require('portfinder')
 const getEnv = require('env-parse').getEnv
 
 const config = merge.smart(baseConfig, {
@@ -30,9 +32,10 @@ const config = merge.smart(baseConfig, {
     hot: true,
     contentBase: assetsDir,
     publicPath: baseConfig.output.publicPath,
-    port: getEnv('DEV_PORT', 8888),
     host: getEnv('DEV_HOST', 'localhost'),
+    port: getEnv('DEV_PORT', 8888),
     noInfo: false,
+    overlay: { warnings: false, errors: true },
     historyApiFallback: true,
     disableHostCheck: true,
     proxy: {
@@ -42,12 +45,12 @@ const config = merge.smart(baseConfig, {
         changeOrigin: true
       }
     },
-    progress: false,
-    quiet: false,
+    progress: true,
+    quiet: true,
     stats: {
       colors: true
     },
-    clientLogLevel: 'none'
+    clientLogLevel: 'warning'
   },
   plugins: [
     new ProgressPlugin(),
@@ -57,4 +60,36 @@ const config = merge.smart(baseConfig, {
   mode: 'development'
 })
 
-module.exports = config
+module.exports = new Promise((resolve, reject) => {
+  portfinder.basePort = process.env.PORT || config.devServer.port
+  portfinder.getPort((err, port) => {
+    if (err) {
+      reject(err)
+    } else {
+      // publish the new Port, necessary for e2e tests
+      process.env.PORT = port
+      // add port to devServer config
+      config.devServer.port = port
+      // Add FriendlyErrorsPlugin
+      config.plugins.push(new FriendlyErrorsPlugin({
+        compilationSuccessInfo: {
+          messages: [`Your application is running here: http://${config.devServer.host}:${port}`],
+        },
+        onErrors: () => {
+          const notifier = require('node-notifier')
+          return (severity, errors) => {
+            if (severity !== 'error') return
+            const error = errors[0]
+            const filename = error.file && error.file.split('!').pop()
+            notifier.notify({
+              title: packageConfig.name,
+              message: severity + ': ' + error.name,
+              subtitle: filename || ''
+            })
+          }
+        }
+      }))
+      resolve(config)
+    }
+  })
+})

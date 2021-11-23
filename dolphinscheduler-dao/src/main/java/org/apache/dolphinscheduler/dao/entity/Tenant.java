@@ -43,11 +43,6 @@ public class Tenant {
     private String tenantCode;
 
     /**
-     * tenant name
-     */
-    private String tenantName;
-
-    /**
      * description
      */
     private String description;
@@ -97,14 +92,6 @@ public class Tenant {
         this.tenantCode = tenantCode;
     }
 
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-
     public int getQueueId() {
         return queueId;
     }
@@ -150,7 +137,6 @@ public class Tenant {
         return "Tenant{" +
                 "id=" + id +
                 ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
                 ", queueId=" + queueId +
                 ", queueName='" + queueName + '\'' +
                 ", queue='" + queue + '\'' +

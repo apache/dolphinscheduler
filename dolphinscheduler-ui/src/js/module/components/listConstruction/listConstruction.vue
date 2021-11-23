@@ -18,6 +18,7 @@
   <div class="home-main list-construction-model">
     <div class="content-title">
       <span>{{title}}</span>
+      <slot name="operation"></slot>
     </div>
     <div class="conditions-box">
       <slot name="conditions">

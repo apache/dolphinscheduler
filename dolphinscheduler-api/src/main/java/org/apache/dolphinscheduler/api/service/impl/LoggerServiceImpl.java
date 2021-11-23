@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -21,13 +22,12 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -40,8 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.primitives.Bytes;
+
 /**
- * log service
+ * logger service impl
  */
 @Service
 public class LoggerServiceImpl implements LoggerService {
@@ -77,6 +79,7 @@ public class LoggerServiceImpl implements LoggerService {
      * @param limit limit
      * @return log string data
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Result<String> queryLog(int taskInstId, int skipLineNum, int limit) {
 
@@ -116,6 +119,7 @@ public class LoggerServiceImpl implements LoggerService {
      * @param taskInstId task instance id
      * @return log byte array
      */
+    @Override
     public byte[] getLogBytes(int taskInstId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
@@ -126,10 +130,9 @@ public class LoggerServiceImpl implements LoggerService {
                 taskInstance.getLogPath(),
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
-        return ArrayUtils.addAll(head,
+        return Bytes.concat(head,
                 logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath()));
     }
-
 
     /**
      * get host

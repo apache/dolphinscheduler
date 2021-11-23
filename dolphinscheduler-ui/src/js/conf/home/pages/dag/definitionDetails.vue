@@ -37,12 +37,17 @@
         releaseState: ''
       }
     },
+    provide () {
+      return {
+        definitionDetails: this
+      }
+    },
     mixins: [disabledState],
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),
-      ...mapActions('dag', ['getProcessList','getProjectList', 'getResourcesList', 'getProcessDetails','getResourcesListJar']),
-      ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
+      ...mapActions('dag', ['getProjectList', 'getResourcesList', 'getProcessDetails', 'getResourcesListJar']),
+      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
       /**
        * init
        */
@@ -53,9 +58,7 @@
         // Promise Get node needs data
         Promise.all([
           // Node details
-          this.getProcessDetails(this.$route.params.id),
-          // get process definition
-          this.getProcessList(),
+          this.getProcessDetails(this.$route.params.code),
           // get project
           this.getProjectList(),
           // get resource
@@ -64,11 +67,13 @@
           this.getResourcesListJar(),
           // get worker group list
           this.getWorkerGroupsAll(),
+          // get alarm group list
+          this.getAlarmGroupsAll(),
           this.getTenantList()
         ]).then((data) => {
           let item = data[0]
-          this.setIsDetails(item.releaseState === 'ONLINE')
-          this.releaseState = item.releaseState
+          this.setIsDetails(item.processDefinition.releaseState === 'ONLINE')
+          this.releaseState = item.processDefinition.releaseState
           this.isLoading = false
           // Whether to pop up the box?
           Affirm.init(this.$root)
@@ -80,7 +85,7 @@
        * Redraw (refresh operation)
        */
       _reset () {
-        this.getProcessDetails(this.$route.params.id).then(res => {
+        this.getProcessDetails(this.$route.params.code).then(res => {
           let item = res
           this.setIsDetails(item.releaseState === 'ONLINE')
           this.releaseState = item.releaseState
@@ -89,7 +94,7 @@
     },
     watch: {
       // Listening for routing changes
-      '$route': {
+      $route: {
         deep: true,
         handler () {
           this.init()

@@ -48,9 +48,3 @@
     components: {}
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .apiserver-model {
-
-  }
-</style>

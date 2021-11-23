@@ -17,103 +17,38 @@
 <template>
   <div class="list-model zookeeper-list">
     <div class="table-box">
-      <table>
-        <tr>
-          <th>
-            <span>{{$t('#')}}</span>
-          </th>
-          <th>
-            <span>{{$t('host')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Number of connections')}}</span>
-          </th>
-          <th>
-            <span>watches {{$t('Number')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Sent')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Received')}}</span>
-          </th>
-          <th>
-            <span>leader/follower</span>
-          </th>
-          <th>
-            <span>{{$t('Min latency')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Avg latency')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Max latency')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Node count')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Query time')}}</span>
-          </th>
-          <th style="text-align: center">
-            <span>{{$t('Node self-test status')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="$index">
-          <td>
-            <span>{{$index + 1}}</span>
-          </td>
-          <td>
-            <span>
-              {{item.hostname}}
-            </span>
-          </td>
-          <td><span>{{item.connections}}</span></td>
-          <td>
-            <span>{{item.watches}}</span>
-          </td>
-          <td>
-            <span>{{item.sent}}</span>
-          </td>
-          <td>
-            <span>{{item.received}}</span>
-          </td>
-          <td><span>{{item.mode}}</span></td>
-          <td>
-            <span>{{item.minLatency}}</span>
-          </td>
-          <td>
-            <span>{{item.avgLatency}}</span>
-          </td>
-          <td>
-            <span>{{item.maxLatency}}</span>
-          </td>
-          <td>
-            <span>{{item.nodeCount}}</span>
-          </td>
-          <td>
-            <span v-if="item.date">{{item.date | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="hostname" :label="$t('host')" min-width="130"></el-table-column>
+        <el-table-column prop="connections" :label="$t('Number of connections')"></el-table-column>
+        <el-table-column prop="watches" :label="'watches'+$t('Number')"></el-table-column>
+        <el-table-column prop="sent" :label="$t('Sent')"></el-table-column>
+        <el-table-column prop="received" :label="$t('Received')"></el-table-column>
+        <el-table-column prop="mode" label="leader/follower" min-width="100"></el-table-column>
+        <el-table-column prop="minLatency" :label="$t('Min latency')"></el-table-column>
+        <el-table-column prop="avgLatency" :label="$t('Avg latency')"></el-table-column>
+        <el-table-column prop="maxLatency" :label="$t('Max latency')"></el-table-column>
+        <el-table-column prop="nodeCount" :label="$t('Node count')"></el-table-column>
+        <el-table-column :label="$t('Query time')" min-width="130">
+          <template slot-scope="scope">
+            <span>{{scope.row.date | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Node self-test status')" min-width="90">
+          <template slot-scope="scope">
             <span class="state">
-              <em class="ans-icon-success-solid success" v-if="item.state"></em>
-              <em class="ans-icon-fail-solid error" v-else></em>
+              <em class="el-icon-success success" v-if="scope.row.state"></em>
+              <em class="el-icon-error error" v-else></em>
             </span>
-          </td>
-        </tr>
-      </table>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 <script>
   export default {
     name: 'zookeeper-list',
-    data () {
-      return {
-        list: []
-      }
-    },
     props: {
       list: Array
     }
@@ -137,4 +72,3 @@
     }
   }
 </style>
-

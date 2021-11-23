@@ -80,21 +80,19 @@ body{
       //background: #f8fbfe;
     }
     .conditions-model {
-      height: 50px;
-      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
       .left {
-        position: absolute;
-        left: 12px;
-        top: 13px;
+        margin-left: 12px;
       }
       .right {
-        position: absolute;
-        right: 8px;
-        top: 13px;
-        .from-box {
+        margin-right: 8px;
+        > .form-box {
           .list {
             float: right;
-            margin-right: 4px;
+            margin: 3px 4px 3px 0;
           }
         }
       }
@@ -102,6 +100,9 @@ body{
   }
   .main-layout-model {
     &.dag-screen {
+      .m-top {
+        position: unset;
+      }
       .m-bottom {
         z-index: 2;
       }
@@ -206,7 +207,10 @@ button[disabled='disabled'] {
   border-radius: 3px;
 }
 
-
+.el-dialog__wrapper .el-dialog {
+  display: table;
+  width: auto;
+}
 
 
 article,aside,blockquote,body,button,code,dd,details,div,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul {
@@ -352,8 +356,15 @@ body::-webkit-scrollbar-thumb {
 .f-f18 {
 	font-size:18px
 }
-
-
-
-
-
+.vue-treeselect__multi-value {
+  max-height: 200px;
+  overflow: auto;
+}
+.el-dialog__body {
+  padding: 10px;
+}
+.el-dialog__header {
+  .el-dialog__headerbtn {
+    right: 10px;
+  }
+}

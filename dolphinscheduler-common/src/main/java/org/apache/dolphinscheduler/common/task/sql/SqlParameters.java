@@ -14,14 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Sql/Hql parameter
@@ -50,6 +59,16 @@ public class SqlParameters extends AbstractParameters {
     private int sqlType;
 
     /**
+     * send email
+     */
+    private Boolean sendEmail;
+
+    /**
+     * display rows
+     */
+    private int displayRows;
+
+    /**
      * udf list
      */
     private String udfs;
@@ -75,19 +94,23 @@ public class SqlParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
+     * groupId
+     */
+    private int groupId;
+    /**
      * title
      */
     private String title;
 
-    /**
-     * receivers
-     */
-    private String receivers;
+    private int limit;
 
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 
     public String getType() {
         return type;
@@ -129,6 +152,22 @@ public class SqlParameters extends AbstractParameters {
         this.sqlType = sqlType;
     }
 
+    public Boolean getSendEmail() {
+        return sendEmail;
+    }
+
+    public void setSendEmail(Boolean sendEmail) {
+        this.sendEmail = sendEmail;
+    }
+
+    public int getDisplayRows() {
+        return displayRows;
+    }
+
+    public void setDisplayRows(int displayRows) {
+        this.displayRows = displayRows;
+    }
+
     public String getShowType() {
         return showType;
     }
@@ -153,21 +192,6 @@ public class SqlParameters extends AbstractParameters {
         this.title = title;
     }
 
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
     public List<String> getPreStatements() {
         return preStatements;
     }
@@ -184,9 +208,17 @@ public class SqlParameters extends AbstractParameters {
         this.postStatements = postStatements;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
     @Override
     public boolean checkParameters() {
-        return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
+        return datasource != 0 && !StringUtils.isEmpty(type) && !StringUtils.isEmpty(sql);
     }
 
     @Override
@@ -195,20 +227,69 @@ public class SqlParameters extends AbstractParameters {
     }
 
     @Override
+    public void dealOutParam(String result) {
+        if (CollectionUtils.isEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
+            return;
+        }
+        List<Map<String, String>> sqlResult = getListMapByString(result);
+        if (CollectionUtils.isEmpty(sqlResult)) {
+            return;
+        }
+        //if sql return more than one line
+        if (sqlResult.size() > 1) {
+            Map<String, List<String>> sqlResultFormat = new HashMap<>();
+            //init sqlResultFormat
+            Set<String> keySet = sqlResult.get(0).keySet();
+            for (String key : keySet) {
+                sqlResultFormat.put(key, new ArrayList<>());
+            }
+            for (Map<String, String> info : sqlResult) {
+                info.forEach((key, value) -> {
+                    sqlResultFormat.get(key).add(value);
+                });
+            }
+            for (Property info : outProperty) {
+                if (info.getType() == DataType.LIST) {
+                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    varPool.add(info);
+                }
+            }
+        } else {
+            //result only one line
+            Map<String, String> firstRow = sqlResult.get(0);
+            for (Property info : outProperty) {
+                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                varPool.add(info);
+            }
+        }
+
+    }
+
+    @Override
     public String toString() {
-        return "SqlParameters{" +
-                "type='" + type + '\'' +
-                ", datasource=" + datasource +
-                ", sql='" + sql + '\'' +
-                ", sqlType=" + sqlType +
-                ", udfs='" + udfs + '\'' +
-                ", showType='" + showType + '\'' +
-                ", connParams='" + connParams + '\'' +
-                ", title='" + title + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                '}';
+        return "SqlParameters{"
+                + "type='" + type + '\''
+                + ", datasource=" + datasource
+                + ", sql='" + sql + '\''
+                + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
+                + ", limit=" + limit
+                + ", udfs='" + udfs + '\''
+                + ", showType='" + showType + '\''
+                + ", connParams='" + connParams + '\''
+                + ", groupId='" + groupId + '\''
+                + ", title='" + title + '\''
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + '}';
     }
 }

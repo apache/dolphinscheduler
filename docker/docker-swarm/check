@@ -15,21 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-echo "------ dolphinscheduler check - server - status -------"
-sleep 60
-server_num=$(docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml top | grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
-if [ $server_num -eq 5 ]
-then
-    echo "Server all start successfully"
-else
-    echo "Server start failed "$server_num
-    exit 1
-fi
-ready=`curl http://127.0.0.1:8888/dolphinscheduler/login -d 'userName=admin&userPassword=dolphinscheduler123' -v | grep "login success" | wc -l`
-if [ $ready -eq 1 ]
-then
-    echo "Servers is ready"
-else
-    echo "Servers is not ready"
-    exit 1
-fi
+
+echo "------- check server status -------"
+cd $(dirname $0)
+until [ $(docker-compose top | grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l) -eq 5 ]; do
+    counter=$((counter+1))
+    if [ $counter -eq 30 ]; then
+        echo "error: all servers start failed"
+        exit 1
+    fi
+    echo "waiting for all servers started ..."
+    sleep 5
+done
+echo "all servers start successfully"
+
+counter=0
+until docker logs docker-swarm_dolphinscheduler-api_1 2>&1 | grep '0.0.0.0:12345' &>/dev/null; do
+    counter=$((counter+1))
+    if [ $counter -eq 30 ]; then
+        echo "error: api server is not ready"
+        exit 1
+    fi
+    echo "waiting for api server ready ..."
+    sleep 5
+done
+echo "api server is ready"

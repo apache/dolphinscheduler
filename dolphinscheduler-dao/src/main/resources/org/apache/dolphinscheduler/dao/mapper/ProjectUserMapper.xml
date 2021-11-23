@@ -18,6 +18,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper">
+    <sql id="baseSql">
+        id, user_id, project_id, perm, create_time, update_time
+    </sql>
     <delete id="deleteProjectRelation">
         delete from t_ds_relation_project_user
         where 1=1
@@ -27,10 +30,11 @@
         </if>
     </delete>
     <select id="queryProjectRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
-      select *
-      from t_ds_relation_project_user
-      where project_id = #{projectId}
-      and user_id = #{userId}
-      limit 1
+        select
+        <include refid="baseSql"/>
+        from t_ds_relation_project_user
+        where project_id = #{projectId}
+        and user_id = #{userId}
+        limit 1
     </select>
 </mapper>

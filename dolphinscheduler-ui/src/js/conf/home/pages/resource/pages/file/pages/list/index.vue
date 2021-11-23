@@ -19,11 +19,11 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
-            <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
-          </x-button-group>
+          <el-button-group size="small" >
+            <el-button size="mini" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</el-button>
+            <el-button size="mini" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</el-button>
+            <el-button size="mini" @click="_uploading">{{$t('Upload Files')}}</el-button>
+          </el-button-group>
         </template>
       </m-conditions>
     </template>
@@ -32,7 +32,16 @@
         <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!fileResourcesList.length && total<=0">
@@ -92,15 +101,15 @@
         this.searchParams.pageSize = val
       },
       _getList (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.fileResourcesList = res.totalList
             this.total = res.total
@@ -115,7 +124,7 @@
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate () {
+      _onUpdate () {
         this._debounceGET()
       }
     },
@@ -129,10 +138,9 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     beforeDestroy () {
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }

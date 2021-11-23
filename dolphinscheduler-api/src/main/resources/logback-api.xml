@@ -31,12 +31,12 @@
 
     <!-- api server logback config start -->
     <appender name="APILOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/dolphinscheduler-api-server.log</file>
+        <file>${log.base}/dolphinscheduler-api.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-api-server.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.base}/dolphinscheduler-api.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
             <maxFileSize>64MB</maxFileSize>
         </rollingPolicy>
@@ -55,7 +55,6 @@
 
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="APILOGFILE"/>
     </root>
 

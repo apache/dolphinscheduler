@@ -17,68 +17,40 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th>
-            <span>{{$t('#')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Task Name')}}</span>
-          </th>
-          <th width="66">
-            <span>{{$t('Task Date')}}</span>
-          </th>
-          <th width="150">
-            <span>{{$t('Start Time')}}</span>
-          </th>
-          <th width="150">
-            <span>{{$t('End Time')}}</span>
-          </th>
-          <th width="134">
-            <span>{{$t('Duration')}}(s)</span>
-          </th>
-          <th>
-            <span>{{$t('Source Table')}}</span>
-          </th>
-          <th width="100">
-            <span>{{$t('Record Number')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Target Table')}}</span>
-          </th>
-          <th width="100">
-            <span>{{$t('Record Number')}}</span>
-          </th>
-          <th width="88">
-            <span>{{$t('State')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td>
-            <span class="ellipsis"  data-toggle="tooltip" data-container="body" :title="_rtTooltip(item.procName)" data-html="true">{{item.procName}}</span>
-          </td>
-          <td><span>{{item.procDate}}</span></td>
-          <td>
-            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td><span>{{item.duration}}</span></td>
-          <td><span class="ellipsis" data-toggle="tooltip" data-container="body" :title="_rtTooltip(item.sourceTab)" data-html="true">{{item.sourceTab}}</span></td>
-          <td>
-            <span>{{item.sourceRowCount}}</span>
-          </td>
-          <td><span class="ellipsis" data-toggle="tooltip" data-container="body" :title="_rtTooltip(item.targetTab)" data-html="true">{{item.targetTab}}</span></td>
-          <td><span>{{item.targetRowCount}}</span></td>
-          <td><span>{{item.note}}</span></td>
-        </tr>
-      </table>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column :label="$t('Task Name')" min-width="100">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.procName }}</p>
+              <div slot="reference" class="name-wrapper">
+                {{ scope.row.procName }}
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Task Date')">
+          <template slot-scope="scope">
+            <span>{{scope.row.procDate | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Start Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.startTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('End Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.endTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="description" :label="$t('Duration')+'(s)'"></el-table-column>
+        <el-table-column prop="sourceTab" :label="$t('Source Table')"></el-table-column>
+        <el-table-column prop="sourceRowCount" :label="$t('Record Number')"></el-table-column>
+        <el-table-column prop="targetTab" :label="$t('Target Table')"></el-table-column>
+        <el-table-column prop="targetRowCount" :label="$t('Record Number')"></el-table-column>
+        <el-table-column prop="note" :label="$t('State')"></el-table-column>
+      </el-table>
     </div>
   </div>
 </template>

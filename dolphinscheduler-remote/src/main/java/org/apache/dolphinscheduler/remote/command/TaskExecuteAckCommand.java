@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
- *  execute task request command
+ * execute task request command
  */
 public class TaskExecuteAckCommand implements Serializable {
 
@@ -33,9 +35,14 @@ public class TaskExecuteAckCommand implements Serializable {
     private int taskInstanceId;
 
     /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
      * startTime
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -107,27 +114,36 @@ public class TaskExecuteAckCommand implements Serializable {
     }
 
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_EXECUTE_ACK);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
     @Override
     public String toString() {
-        return "TaskExecuteAckCommand{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", startTime=" + startTime +
-                ", host='" + host + '\'' +
-                ", status=" + status +
-                ", logPath='" + logPath + '\'' +
-                ", executePath='" + executePath + '\'' +
-                '}';
+        return "TaskExecuteAckCommand{"
+                + "taskInstanceId=" + taskInstanceId
+                + ", startTime=" + startTime
+                + ", host='" + host + '\''
+                + ", status=" + status
+                + ", logPath='" + logPath + '\''
+                + ", executePath='" + executePath + '\''
+                + ", processInstanceId='" + processInstanceId + '\''
+                + '}';
+    }
+
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 }

@@ -25,10 +25,10 @@ tar -zxf dolphinscheduler-dist/target/apache-dolphinscheduler*-bin.tar.gz --stri
 # licenses
 echo '=== Self modules: ' && ./mvnw --batch-mode --quiet -Dexec.executable='echo' -Dexec.args='${project.artifactId}-${project.version}.jar' exec:exec | tee self-modules.txt
 
-echo '=== Distributed dependencies: ' && ls dist/lib | tee all-dependencies.txt
+echo '=== Distributed dependencies: ' && find dist/lib -name "*.jar" -exec basename {} \; | uniq | sort | tee all-dependencies.txt
 
 # Exclude all self modules(jars) to generate all third-party dependencies
-echo '=== Third party dependencies: ' && grep -vf self-modules.txt all-dependencies.txt | tee third-party-dependencies.txt
+echo '=== Third party dependencies: ' && grep -vf self-modules.txt all-dependencies.txt | uniq | sort | tee third-party-dependencies.txt
 
 # 1. Compare the third-party dependencies with known dependencies, expect that all third-party dependencies are KNOWN
 # and the exit code of the command is 0, otherwise we should add its license to LICENSE file and add the dependency to

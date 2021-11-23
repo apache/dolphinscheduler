@@ -15,17 +15,36 @@
 # limitations under the License.
 #
 
-** Please be patient while the chart is being deployed **
+** Please be patient while the chart DolphinScheduler {{ .Chart.AppVersion }} is being deployed **
 
-1. Get the Dolphinscheduler URL by running:
+Access DolphinScheduler UI URL by:
 
 {{- if .Values.ingress.enabled }}
 
-  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "dolphinscheduler.fullname" . }} -o jsonpath='{.spec.rules[0].host}')
-  echo "Dolphinscheduler URL: http://$HOSTNAME/"
+  DolphinScheduler UI URL: http{{ if .Values.ingress.tls.enabled }}s{{ end }}://{{ .Values.ingress.host }}/dolphinscheduler
 
-{{- else }}
+{{- else if eq .Values.api.service.type "ClusterIP" }}
 
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-api 12345:12345
+
+  DolphinScheduler UI URL: http://127.0.0.1:12345/dolphinscheduler
+
+{{- else if eq .Values.api.service.type "NodePort" }}
+
+  NODE_IP=$(kubectl get no -n {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  NODE_PORT=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}")
+  echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
+
+  DolphinScheduler UI URL: http://$NODE_IP:$NODE_PORT/dolphinscheduler
+
+{{- else if eq .Values.api.service.type "LoadBalancer" }}
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status of by running 'kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -w'
+
+  SERVICE_IP=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:12345/dolphinscheduler
+
+  DolphinScheduler UI URL: http://$SERVICE_IP:12345/dolphinscheduler
 
 {{- end }}

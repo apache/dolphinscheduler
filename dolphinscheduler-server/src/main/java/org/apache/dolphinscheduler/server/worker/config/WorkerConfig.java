@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,42 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.config;
 
 import java.util.Set;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource(value = "worker.properties")
+@EnableConfigurationProperties
+@ConfigurationProperties("worker")
 public class WorkerConfig {
-
-    @Value("${worker.exec.threads:100}")
-    private int workerExecThreads;
-
-    @Value("${worker.heartbeat.interval:10}")
-    private int workerHeartbeatInterval;
-
-    @Value("${worker.fetch.task.num:3}")
-    private int workerFetchTaskNum;
-
-    @Value("${worker.max.cpuload.avg:-1}")
-    private int workerMaxCpuloadAvg;
-
-    @Value("${worker.reserved.memory:0.3}")
-    private double workerReservedMemory;
-
-    @Value("#{'${worker.groups:default}'.split(',')}")
-    private Set<String> workerGroups;
-
-    @Value("${worker.listen.port: 1234}")
     private int listenPort;
-
-    @Value("${worker.weight:100}")
-    private int weight;
+    private int execThreads;
+    private int heartbeatInterval;
+    private int hostWeight;
+    private boolean tenantAutoCreate;
+    private int maxCpuLoadAvg;
+    private double reservedMemory;
+    private Set<String> groups;
+    private String alertListenHost;
 
     public int getListenPort() {
         return listenPort;
@@ -60,63 +45,67 @@ public class WorkerConfig {
         this.listenPort = listenPort;
     }
 
-    public Set<String> getWorkerGroups() {
-        return workerGroups;
+    public int getExecThreads() {
+        return execThreads;
     }
 
-    public void setWorkerGroups(Set<String> workerGroups) {
-        this.workerGroups = workerGroups;
+    public void setExecThreads(int execThreads) {
+        this.execThreads = execThreads;
     }
 
-    public int getWorkerExecThreads() {
-        return workerExecThreads;
+    public int getHeartbeatInterval() {
+        return heartbeatInterval;
     }
 
-    public void setWorkerExecThreads(int workerExecThreads) {
-        this.workerExecThreads = workerExecThreads;
+    public void setHeartbeatInterval(int heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 
-    public int getWorkerHeartbeatInterval() {
-        return workerHeartbeatInterval;
+    public int getHostWeight() {
+        return hostWeight;
     }
 
-    public void setWorkerHeartbeatInterval(int workerHeartbeatInterval) {
-        this.workerHeartbeatInterval = workerHeartbeatInterval;
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
     }
 
-    public int getWorkerFetchTaskNum() {
-        return workerFetchTaskNum;
+    public boolean isTenantAutoCreate() {
+        return tenantAutoCreate;
     }
 
-    public void setWorkerFetchTaskNum(int workerFetchTaskNum) {
-        this.workerFetchTaskNum = workerFetchTaskNum;
+    public void setTenantAutoCreate(boolean tenantAutoCreate) {
+        this.tenantAutoCreate = tenantAutoCreate;
     }
 
-    public double getWorkerReservedMemory() {
-        return workerReservedMemory;
+    public int getMaxCpuLoadAvg() {
+        return maxCpuLoadAvg > 0 ? maxCpuLoadAvg : Runtime.getRuntime().availableProcessors() * 2;
     }
 
-    public void setWorkerReservedMemory(double workerReservedMemory) {
-        this.workerReservedMemory = workerReservedMemory;
+    public void setMaxCpuLoadAvg(int maxCpuLoadAvg) {
+        this.maxCpuLoadAvg = maxCpuLoadAvg;
     }
 
-    public int getWorkerMaxCpuloadAvg() {
-        if (workerMaxCpuloadAvg == -1){
-            return Constants.DEFAULT_WORKER_CPU_LOAD;
-        }
-        return workerMaxCpuloadAvg;
+    public double getReservedMemory() {
+        return reservedMemory;
     }
 
-    public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
-        this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    public void setReservedMemory(double reservedMemory) {
+        this.reservedMemory = reservedMemory;
     }
 
-
-    public int getWeight() {
-        return weight;
+    public Set<String> getGroups() {
+        return groups;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setGroups(Set<String> groups) {
+        this.groups = groups;
+    }
+
+    public String getAlertListenHost() {
+        return alertListenHost;
+    }
+
+    public void setAlertListenHost(String alertListenHost) {
+        this.alertListenHost = alertListenHost;
     }
 }

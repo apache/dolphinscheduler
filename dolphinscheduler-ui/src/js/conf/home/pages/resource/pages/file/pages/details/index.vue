@@ -21,11 +21,14 @@
         <h2>
           <span>{{name}}</span>
           <div class="down">
-            <em class="ans-icon-download" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile"></em>
+            <em class="el-icon-download" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile"></em>
             <em>{{size}}</em>
+            &nbsp;&nbsp;
+            <em class="el-icon-circle-close" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="close()"></em>
+            &nbsp;&nbsp;
           </div>
         </h2>
-        <template v-if="isNoType">
+        <template v-if="isViewType">
 
           <div class="code-mirror-model" v-if="!msg">
             <textarea id="code-details-mirror" name="code-details-mirror"></textarea>
@@ -34,7 +37,7 @@
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
 
         </template>
-        <template v-if="!isNoType">
+        <template v-if="!isViewType">
           <m-no-type></m-no-type>
         </template>
       </div>
@@ -64,7 +67,7 @@
     data () {
       return {
         name: '',
-        isNoType: true,
+        isViewType: true,
         isLoading: false,
         filtTypeArr: filtTypeArr,
         loadingIndex: 0,
@@ -80,10 +83,11 @@
       _go () {
         this.$router.push({ name: 'file' })
       },
+      close () {
+        this.$router.go(-1)
+      },
       _downloadFile () {
-        downloadFile('/dolphinscheduler/resources/download', {
-          id: this.$route.params.id
-        })
+        downloadFile(`resources/${this.$route.params.id}/download`)
       },
       _getViewResources () {
         this.isLoading = true
@@ -124,8 +128,8 @@
 
         this._getViewResources()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * down
@@ -137,8 +141,8 @@
 
         this._getViewResources()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * off handle
@@ -191,10 +195,10 @@
       let a = fileName.substring(i, fileName.length)
       this.mode = handlerSuffix[a]
       this.size = bytesToSize(parseInt(fileSize))
-      this.isNoType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
+      this.isViewType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
     },
     mounted () {
-      if (this.isNoType) {
+      if (this.isViewType) {
         // get data
         this._getViewResources()
       }
@@ -232,7 +236,7 @@
         position: absolute;
         right: 0;
         top: 0;
-        >i {
+        >em {
           font-size: 20px;
           color: #2d8cf0;
           cursor: pointer;

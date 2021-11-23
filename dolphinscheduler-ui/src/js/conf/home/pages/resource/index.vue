@@ -25,8 +25,7 @@
   export default {
     name: 'resource-index',
     components: { mSecondaryMenu },
-    mounted() {
-      this.$modal.destroy()
-    },
+    mounted () {
+    }
   }
 </script>

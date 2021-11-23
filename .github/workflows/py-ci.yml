@@ -1,0 +1,99 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Python API
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'dolphinscheduler-python/**'
+  pull_request:
+    paths:
+      - 'dolphinscheduler-python/**'
+
+defaults:
+  run:
+    working-directory: dolphinscheduler-python/pydolphinscheduler
+
+jobs:
+  sanity:
+    name: Sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+  lint:
+    name: Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Development Dependences
+        run: pip install -r requirements_dev.txt
+      - name: Run Isort Checking
+        run: isort --check .
+      - name: Run Black Checking
+        run: black --check .
+      - name: Run Flake8 Checking
+        run: flake8
+  pytest:
+    name: Pytest
+    needs:
+      - lint
+      - sanity
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-18.04, macOS-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies & pydolphinscheduler
+        run: |
+          pip install -r requirements.txt -r requirements_dev.txt
+          pip install -e .
+      - name: Run tests
+        run: |
+          pytest
+  coverage:
+    name: Tests coverage
+    needs:
+      - pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Development Dependences
+        run: |
+          pip install -r requirements_dev.txt
+          pip install -e .
+      - name: Run Tests && Check coverage
+        run: coverage run && coverage report

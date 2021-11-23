@@ -17,15 +17,36 @@
 <template>
   <m-layout>
     <m-nav slot="top"></m-nav>
-    <router-view slot="bottom"></router-view>
+    <router-view slot="bottom" v-if="isRenderRouterView"></router-view>
   </m-layout>
 </template>
 
 <script>
+  import visibility from '@/module/visibility'
   import mLayout from '@/module/components/layout/layout'
   import mNav from '@/module/components/nav/nav'
   export default {
     name: 'app',
+    data () {
+      return {
+        isRenderRouterView: true
+      }
+    },
+    methods: {
+      reload () {
+        this.isRenderRouterView = false
+        this.$nextTick(() => {
+          this.isRenderRouterView = true
+        })
+      }
+    },
+    mounted () {
+      visibility.change((evt, hidden) => {
+        if (hidden === false && this.$route.meta.refreshInSwitchedTab) {
+          this.reload()
+        }
+      })
+    },
     components: { mLayout, mNav }
   }
 </script>

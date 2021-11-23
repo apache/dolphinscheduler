@@ -14,60 +14,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
-
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ResourceMapperTest {
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+public class ResourceMapperTest extends BaseDaoTest {
 
     @Autowired
-    ResourceMapper resourceMapper;
+    private ResourceMapper resourceMapper;
 
     @Autowired
-    ResourceUserMapper resourceUserMapper;
+    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
-    TenantMapper tenantMapper;
+    private TenantMapper tenantMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     /**
      * insert
+     *
      * @return Resource
      */
-    private Resource insertOne(){
+    private Resource insertOne() {
         //insertOne
         Resource resource = new Resource();
         resource.setAlias("ut-resource");
@@ -76,16 +73,20 @@ public class ResourceMapperTest {
         resource.setDirectory(false);
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
-        resourceMapper.insert(resource);
+        int status = resourceMapper.insert(resource);
+        if (status != 1) {
+            Assert.fail("insert data error");
+        }
         return resource;
     }
 
     /**
      * create resource by user
+     *
      * @param user user
      * @return Resource
      */
-    private Resource createResource(User user,boolean isDirectory,ResourceType resourceType,int pid,String alias,String fullName){
+    private Resource createResource(User user, boolean isDirectory, ResourceType resourceType, int pid, String alias, String fullName) {
         //insertOne
         Resource resource = new Resource();
         resource.setDirectory(isDirectory);
@@ -93,19 +94,23 @@ public class ResourceMapperTest {
         resource.setAlias(alias);
         resource.setFullName(fullName);
         resource.setUserId(user.getId());
-        resourceMapper.insert(resource);
+        int status = resourceMapper.insert(resource);
+        if (status != 1) {
+            Assert.fail("insert data error");
+        }
         return resource;
     }
 
     /**
      * create resource by user
+     *
      * @param user user
      * @return Resource
      */
-    private Resource createResource(User user){
+    private Resource createResource(User user) {
         //insertOne
-        String alias = String.format("ut-resource-%s",user.getUserName());
-        String fullName = String.format("/%s",alias);
+        String alias = String.format("ut-resource-%s", user.getUserName());
+        String fullName = String.format("/%s", alias);
 
         Resource resource = createResource(user, false, ResourceType.FILE, -1, alias, fullName);
         return resource;
@@ -113,9 +118,10 @@ public class ResourceMapperTest {
 
     /**
      * create user
+     *
      * @return User
      */
-    private User createGeneralUser(String userName){
+    private User createGeneralUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -124,15 +130,20 @@ public class ResourceMapperTest {
         user.setCreateTime(new Date());
         user.setTenantId(1);
         user.setUpdateTime(new Date());
-        userMapper.insert(user);
+        int status = userMapper.insert(user);
+
+        if (status != 1) {
+            Assert.fail("insert data error");
+        }
         return user;
     }
 
     /**
      * create resource user
+     *
      * @return ResourcesUser
      */
-    private ResourcesUser createResourcesUser(Resource resource,User user){
+    private ResourcesUser createResourcesUser(Resource resource, User user) {
         //insertOne
         ResourcesUser resourcesUser = new ResourcesUser();
         resourcesUser.setCreateTime(new Date());
@@ -145,16 +156,17 @@ public class ResourceMapperTest {
     }
 
     @Test
-    public void testInsert(){
+    public void testInsert() {
         Resource resource = insertOne();
         assertNotNull(resource.getId());
-        assertThat(resource.getId(),greaterThan(0));
+        assertThat(resource.getId(), greaterThan(0));
     }
+
     /**
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Resource resource = insertOne();
         resource.setCreateTime(new Date());
@@ -167,7 +179,7 @@ public class ResourceMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Resource resourceMap = insertOne();
         int delete = resourceMapper.deleteById(resourceMap.getId());
         Assert.assertEquals(1, delete);
@@ -222,17 +234,19 @@ public class ResourceMapperTest {
                 0,
                 -1,
                 resource.getType().ordinal(),
-                ""
+                "",
+                new ArrayList<>()
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
                 1110,
                 -1,
                 resource.getType().ordinal(),
-                ""
+                "",
+                null
         );
-        Assert.assertNotEquals(resourceIPage.getTotal(), 0);
-        Assert.assertNotEquals(resourceIPage1.getTotal(), 0);
+        Assert.assertEquals(resourceIPage.getTotal(), 0);
+        Assert.assertEquals(resourceIPage1.getTotal(), 0);
 
     }
 
@@ -243,7 +257,8 @@ public class ResourceMapperTest {
     public void testQueryResourceListAuthored() {
         Resource resource = insertOne();
 
-        List<Resource> resources = resourceMapper.queryAuthorizedResourceList(resource.getUserId());
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         ResourcesUser resourcesUser = new ResourcesUser();
 
@@ -252,7 +267,8 @@ public class ResourceMapperTest {
         resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         resourceUserMapper.insert(resourcesUser);
 
-        List<Resource> resources1 = resourceMapper.queryAuthorizedResourceList(1110);
+        List<Integer> resIds1 = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(1110, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources1 = CollectionUtils.isEmpty(resIds1) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds1);
 
         Assert.assertEquals(0, resources.size());
         Assert.assertNotEquals(0, resources1.size());
@@ -266,7 +282,8 @@ public class ResourceMapperTest {
     public void testQueryAuthorizedResourceList() {
         Resource resource = insertOne();
 
-        List<Resource> resources = resourceMapper.queryAuthorizedResourceList(resource.getUserId());
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         resourceMapper.deleteById(resource.getId());
         Assert.assertEquals(0, resources.size());
@@ -290,32 +307,42 @@ public class ResourceMapperTest {
     @Test
     public void testQueryTenantCodeByResourceName() {
 
-
         Tenant tenant = new Tenant();
-        tenant.setTenantName("ut tenant ");
         tenant.setTenantCode("ut tenant code for resource");
-        tenantMapper.insert(tenant);
+        int tenantInsertStatus = tenantMapper.insert(tenant);
+
+        if (tenantInsertStatus != 1) {
+            Assert.fail("insert tenant data error");
+        }
 
         User user = new User();
         user.setTenantId(tenant.getId());
         user.setUserName("ut user");
-        userMapper.insert(user);
+        int userInsertStatus = userMapper.insert(user);
+
+        if (userInsertStatus != 1) {
+            Assert.fail("insert user data error");
+        }
 
         Resource resource = insertOne();
         resource.setUserId(user.getId());
-        resourceMapper.updateById(resource);
+        int userUpdateStatus = resourceMapper.updateById(resource);
+        if (userUpdateStatus != 1) {
+            Assert.fail("update user data error");
+        }
 
-        String resource1 = resourceMapper.queryTenantCodeByResourceName(
-                resource.getFullName(),ResourceType.FILE.ordinal()
-        );
+        List<Resource> resourceList = resourceMapper.queryResource(resource.getFullName(), ResourceType.FILE.ordinal());
 
+        int resourceUserId = resourceList.get(0).getUserId();
+        User resourceUser = userMapper.selectById(resourceUserId);
+        Tenant resourceTenant = tenantMapper.selectById(resourceUser.getTenantId());
 
-        Assert.assertEquals("ut tenant code for resource", resource1);
+        Assert.assertEquals("ut tenant code for resource", resourceTenant.getTenantCode());
 
     }
 
     @Test
-    public void testListAuthorizedResource(){
+    public void testListAuthorizedResource() {
         // create a general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
@@ -328,35 +355,34 @@ public class ResourceMapperTest {
 
         List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
 
-        Assert.assertEquals(generalUser2.getId(),resource.getUserId());
+        Assert.assertEquals(generalUser2.getId(), resource.getUserId());
         Assert.assertFalse(resources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resNames)));
 
-
-
         // authorize object unauthorizedResource to generalUser
-        createResourcesUser(unauthorizedResource,generalUser2);
+        createResourcesUser(unauthorizedResource, generalUser2);
         List<Resource> authorizedResources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
-        Assert.assertTrue(authorizedResources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resNames)));
+        Assert.assertTrue(authorizedResources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resource.getFullName())));
 
     }
 
     @Test
-    public void deleteIdsTest(){
+    public void deleteIdsTest() {
         // create a general user
         User generalUser1 = createGeneralUser("user1");
+        User generalUser = createGeneralUser("user");
 
-        Resource resource = createResource(generalUser1);
+        Resource resource = createResource(generalUser);
         Resource resource1 = createResource(generalUser1);
 
         List<Integer> resourceList = new ArrayList<>();
         resourceList.add(resource.getId());
         resourceList.add(resource1.getId());
         int result = resourceMapper.deleteIds(resourceList.toArray(new Integer[resourceList.size()]));
-        Assert.assertEquals(result,2);
+        Assert.assertEquals(result, 2);
     }
 
     @Test
-    public void queryResourceListAuthoredTest(){
+    public void queryResourceListAuthoredTest() {
         // create a general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
@@ -364,24 +390,39 @@ public class ResourceMapperTest {
         Resource resource = createResource(generalUser1);
         createResourcesUser(resource, generalUser2);
 
-        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 0);
+        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
         Assert.assertNotNull(resourceList);
 
-        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 4);
+        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
         Assert.assertFalse(resourceList.contains(resource));
     }
 
     @Test
-    public void batchUpdateResourceTest(){
+    public void batchUpdateResourceTest() {
         // create a general user
         User generalUser1 = createGeneralUser("user1");
         // create resource
         Resource resource = createResource(generalUser1);
-        resource.setFullName(String.format("%s-update",resource.getFullName()));
+        resource.setFullName(String.format("%s-update", resource.getFullName()));
         resource.setUpdateTime(new Date());
         List<Resource> resourceList = new ArrayList<>();
         resourceList.add(resource);
         int result = resourceMapper.batchUpdateResource(resourceList);
-        Assert.assertTrue(result>0);
+        if (result != resourceList.size()) {
+            Assert.fail("batch update resource  data error");
+        }
+    }
+
+    @Test
+    public void existResourceTest() {
+        String fullName = "/ut-resource";
+        int userId = 111;
+        int type = ResourceType.FILE.getCode();
+        Assert.assertNull(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertNull(resourceMapper.existResource(fullName, type));
+        insertOne();
+        Assert.assertTrue(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assert.assertTrue(resourceMapper.existResource(fullName, type));
     }
 }
+

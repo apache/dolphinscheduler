@@ -32,9 +32,9 @@
     <conversionRule conversionWord="messsage"
                     converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-        </filter>
+        </filter> -->
         <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
             <key>taskAppId</key>

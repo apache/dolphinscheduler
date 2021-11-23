@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.conditions;
 
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
@@ -21,6 +22,7 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConditionsParameters extends AbstractParameters {
@@ -35,7 +37,6 @@ public class ConditionsParameters extends AbstractParameters {
     // node list to run when failed
     private List<String> failedNode;
 
-
     @Override
     public boolean checkParameters() {
         return true;
@@ -43,7 +44,7 @@ public class ConditionsParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<DependentTaskModel> getDependTaskList() {
@@ -77,4 +78,12 @@ public class ConditionsParameters extends AbstractParameters {
     public void setFailedNode(List<String> failedNode) {
         this.failedNode = failedNode;
     }
+
+    public String getConditionResult() {
+        return "{"
+            + "\"successNode\": [\"" + successNode.get(0)
+            + "\"],\"failedNode\": [\"" + failedNode.get(0)
+            + "\"]}";
+    }
+
 }

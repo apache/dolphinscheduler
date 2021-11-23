@@ -17,31 +17,26 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
-import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
-import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import com.google.common.base.Preconditions;
+
+import io.netty.channel.Channel;
 
 /**
- *  task ack processor
+ * task ack processor
  */
 public class TaskAckProcessor implements NettyRequestProcessor {
 
@@ -52,35 +47,21 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private final TaskResponseService taskResponseService;
 
-    /**
-     * taskInstance cache manager
-     */
-    private final TaskInstanceCacheManager taskInstanceCacheManager;
-
-
-    /**
-     * processService
-     */
-    private ProcessService processService;
-
-    public TaskAckProcessor(){
+    public TaskAckProcessor() {
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
-        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     /**
      * task ack process
+     *
      * @param channel channel channel
      * @param command command TaskExecuteAckCommand
      */
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteAckCommand taskAckCommand = JsonSerializer.deserialize(command.getBody(), TaskExecuteAckCommand.class);
+        TaskExecuteAckCommand taskAckCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteAckCommand.class);
         logger.info("taskAckCommand : {}", taskAckCommand);
-
-        taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
 
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 
@@ -92,19 +73,11 @@ public class TaskAckProcessor implements NettyRequestProcessor {
                 workerAddress,
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
-                taskAckCommand.getTaskInstanceId());
+                taskAckCommand.getTaskInstanceId(),
+                channel,
+                taskAckCommand.getProcessInstanceId());
 
         taskResponseService.addResponse(taskResponseEvent);
-
-        while (Stopper.isRunning()){
-            TaskInstance taskInstance = processService.findTaskInstanceById(taskAckCommand.getTaskInstanceId());
-
-            if (taskInstance != null && ackStatus.typeIsRunning()){
-                break;
-            }
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-        }
-
     }
 
 }

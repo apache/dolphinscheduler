@@ -15,47 +15,47 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit queue') : $t('Create queue')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="queueName"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="mini"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Queue value')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="queue"
                     maxlength="60"
-                    :placeholder="$t('Please enter queue value')"
-                    autocomplete="off">
-            </x-input>
+                    size="mini"
+                    :placeholder="$t('Please enter queue value')">
+            </el-input>
           </template>
         </m-list-box-f>
 
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -88,27 +88,25 @@
         let $then = (res) => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }
 
         let $catch = (e) => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         }
 
         if (this.item) {
-          this.$refs['popup'].spinnerLoading = true
-          this.store.dispatch(`security/updateQueueQ`, param).then(res => {
+          this.$refs.popover.spinnerLoading = true
+          this.store.dispatch('security/updateQueueQ', param).then(res => {
             $then(res)
           }).catch(e => {
             $catch(e)
           })
         } else {
           this._verifyName(param).then(() => {
-            this.$refs['popup'].spinnerLoading = true
-            this.store.dispatch(`security/createQueueQ`, param).then(res => {
+            this.$refs.popover.spinnerLoading = true
+            this.store.dispatch('security/createQueueQ', param).then(res => {
               $then(res)
             }).catch(e => {
               $catch(e)
@@ -119,11 +117,11 @@
         }
       },
       _verification () {
-        if (!this.queueName.replace(/\s*/g,"")) {
+        if (!this.queueName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.queue.replace(/\s*/g,"")) {
+        if (!this.queue.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter queue value')}`)
           return false
         }
@@ -131,12 +129,15 @@
       },
       _verifyName (param) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch(`security/verifyQueueQ`, param).then(res => {
+          this.store.dispatch('security/verifyQueueQ', param).then(res => {
             resolve()
           }).catch(e => {
             reject(e)
           })
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {
@@ -150,6 +151,6 @@
     mounted () {
 
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>

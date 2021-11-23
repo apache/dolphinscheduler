@@ -19,7 +19,7 @@
 </template>
 <script>
   import echarts from 'echarts'
-  import { mapActions, mapState, mapMutations } from 'vuex'
+  import { mapState } from 'vuex'
   import graphGridOption from './graphGridOption'
 
   export default {
@@ -28,29 +28,40 @@
       return {}
     },
     props: {
-      id: String,
-      locations: Array,
-      connects: Array,
       isShowLabel: Boolean
     },
     methods: {
       init () {
-      },
+      }
     },
     created () {
     },
     mounted () {
       const graphGrid = echarts.init(this.$refs['graph-grid'])
-      graphGrid.setOption(graphGridOption(this.locations, this.connects, this.sourceWorkFlowId, this.isShowLabel), true)
+      graphGrid.setOption(
+        graphGridOption(
+          this.locations.map(item => {
+            item.crontab = item.crontab !== null ? item.crontab : '-'
+            item.scheduleEndTime = item.scheduleEndTime !== null ? item.scheduleEndTime : '-'
+            item.scheduleStartTime = item.scheduleStartTime !== null ? item.scheduleStartTime : '-'
+            return item
+          }),
+          this.connects,
+          this.sourceWorkFlowCode,
+          this.isShowLabel
+        ),
+        true
+      )
       graphGrid.on('click', (params) => {
-      // Jump to the definition page
-        this.$router.push({ path: `/projects/definition/list/${params.data.id}`})
-      });
+        // Jump to the definition page
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/list/${params.data.code}` })
+      })
     },
     components: {},
     computed: {
-      ...mapState('kinship', ['locations', 'connects', 'sourceWorkFlowId'])
-    },
+      ...mapState('dag', ['projectCode']),
+      ...mapState('kinship', ['locations', 'connects', 'sourceWorkFlowCode'])
+    }
   }
 </script>
 

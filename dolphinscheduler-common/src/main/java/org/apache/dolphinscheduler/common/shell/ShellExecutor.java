@@ -140,8 +140,8 @@ public class ShellExecutor extends AbstractShell {
         String line = "";
         while ( (nRead = lines.read(buf, 0, buf.length)) > 0 ) {
             line = new String(buf,0,nRead);
+            output.append(line);
         }
-        output.append(line);
     }
 
     /**

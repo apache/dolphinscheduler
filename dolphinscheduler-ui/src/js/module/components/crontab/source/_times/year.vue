@@ -16,45 +16,45 @@
  */
 <template>
   <div class="year-model">
-    <div class="v-crontab-from-model">
-      <x-radio-group v-model="radioYear" vertical>
+    <div class="v-crontab-form-model">
+      <el-radio-group v-model="radioYear" vertical size="mini">
         <div class="list-box">
-          <x-radio label="everyYear">
+          <el-radio label="everyYear">
             <span class="text">{{$t('每一年')}}</span>
-          </x-radio>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="intervalYear">
+          <el-radio label="intervalYear">
             <span class="text">{{$t('每隔')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-            <span class="text">{{$t('年执行 从')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('年执行 从')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-            <span class="text">{{$t('年开始')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('年开始')}}</span>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="specificYear">
+          <el-radio label="specificYear">
             <span class="text">{{$t('具体年数(可多选)')}}</span>
-            <x-select multiple :placeholder="$t('请选择具体年数')" v-model="specificYearVal" @on-change="onspecificYears">
-              <x-option
+            <el-select multiple :placeholder="$t('请选择具体年数')" size="mini" v-model="specificYearVal" @change="onspecificYears">
+              <el-option
                       v-for="item in selectYearList"
                       :key="item.value"
                       :value="item.value"
                       :label="item.label">
-              </x-option>
-            </x-select>
-          </x-radio>
+              </el-option>
+            </el-select>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="cycleYear">
+          <el-radio label="cycleYear">
             <span class="text">{{$t('周期从')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-            <span class="text">{{$t('到')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('到')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-            <span class="text">{{$t('年')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('年')}}</span>
+          </el-radio>
         </div>
-      </x-radio-group>
+      </el-radio-group>
     </div>
   </div>
 </template>
@@ -71,7 +71,7 @@
       return {
         yearValue: '*',
         radioYear: 'everyYear',
-        selectYearList: selectList['year'],
+        selectYearList: selectList.year,
         intervalPerformVal: 1,
         intervalStartVal: 2019,
         specificYearVal: [],

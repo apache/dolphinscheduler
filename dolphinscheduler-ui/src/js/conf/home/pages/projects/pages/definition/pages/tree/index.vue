@@ -16,26 +16,31 @@
  */
 <template>
   <m-list-construction :title="$t('TreeView')">
+    <template slot="operation">
+      <span style=" float: right; padding-right:50px">
+        <em class="el-icon-back" style="font-size:20px " data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="_close()"></em>
+      </span>
+    </template>
     <template slot="conditions"></template>
     <template slot="content">
       <div class="tree-view-index-model">
         <div class="tree-limit-select">
-          <x-select v-model="limit" style="width: 70px;" @on-change="_onChangeSelect">
-            <x-option
+          <el-select v-model="limit" style="width: 70px;" @change="_onChangeSelect" size="small">
+            <el-option
                     v-for="city in [{value:25},{value:50},{value:75},{value:100}]"
                     :key="city.value"
                     :value="city.value"
                     :label="city.value">
-            </x-option>
-          </x-select>
-          <x-button
+            </el-option>
+          </el-select>
+          <el-button
                   @click="_rtTasksDag"
-                  v-if="$route.query.subProcessIds"
+                  v-if="$route.query.subProcessCodes"
                   type="primary"
-                  size="default"
-                  icon="ans-icon-arrow-to-left">
+                  size="small"
+                  icon="el-icon-d-arrow-left">
             {{$t('Return_1')}}
-          </x-button>
+          </el-button>
         </div>
         <div class="tasks-color">
           <div class="toolbar-color-sp">
@@ -43,7 +48,7 @@
               <span>Node Type</span>
             </a>
             <a href="javascript:" v-for="(k,v) in tasksType" :key="v">
-              <em class="ans-icon-circle-solid" :style="{color:k.color}"></em>
+              <em class="el-icon-user-solid" :style="{color:k.color}"></em>
               <span>{{v}}</span>
             </a>
           </div>
@@ -52,7 +57,7 @@
               <span>{{$t('Task Status')}}</span>
             </a>
             <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
-              <em class="ans-icon-rect-solid" :style="{color:item.color}"></em>
+              <em class="ri-checkbox-blank-fill" :style="{color:item.color}"></em>
               <span>{{item.desc}}</span>
             </a>
           </div>
@@ -71,13 +76,12 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import Tree from './_source/tree'
   import { uuid } from '@/module/util'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -101,6 +105,9 @@
     props: {},
     methods: {
       ...mapActions('dag', ['getViewTree']),
+      _close () {
+        this.$router.go(-1)
+      },
       /**
        * get tree data
        */
@@ -110,7 +117,7 @@
         Tree.reset()
 
         this.getViewTree({
-          processId: this.$route.params.id,
+          code: this.$route.params.code,
           limit: this.limit
         }).then(res => {
           let data = _.cloneDeep(res)
@@ -153,40 +160,40 @@
        * Return to the previous child node
        */
       _rtTasksDag () {
-        let getIds = this.$route.query.subProcessIds
-        let idsArr = getIds.split(',')
-        let ids = idsArr.slice(0, idsArr.length - 1)
-        let id = idsArr[idsArr.length - 1]
+        let subProcessCodes = this.$route.query.subProcessCodes
+        let codeList = subProcessCodes.split(',')
+        let codes = codeList.slice(0, codeList.length - 1)
+        let code = codeList[codeList.length - 1]
         let query = {}
 
-        if (id !== idsArr[0]) {
-          query = { subProcessIds: ids.join(',') }
+        if (code !== codeList[0]) {
+          query = { subProcessCodes: codes.join(',') }
         }
-        this.$router.push({ path: `/projects/definition/tree/${id}`, query: query })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/tree/${code}`, query: query })
       },
       /**
        * Subprocess processing
-       * @param subProcessId 子流程Id
+       * @param subProcessCode 子流程Code
        */
-      _subProcessHandle (subProcessId) {
-        let subProcessIds = []
-        let getIds = this.$route.query.subProcessIds
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.$route.params.id)
-          subProcessIds = newId
+      _subProcessHandle (subProcessCode) {
+        let subProcessCodes = []
+        let codes = this.$route.query.subProcessCodes
+        if (codes) {
+          let newCode = codes.split(',')
+          newCode.push(this.$route.params.code)
+          subProcessCodes = newCode
         } else {
-          subProcessIds.push(this.$route.params.id)
+          subProcessCodes.push(this.$route.params.code)
         }
-        this.$router.push({ path: `/projects/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
+        this.$router.push({ path: `/projects/${this.projectCode}/definition/tree/${subProcessCode}`, query: { subProcessCodes: subProcessCodes.join(',') } })
       },
       _onChangeSelect (o) {
-        this.limit = o.value
+        this.limit = o
         this._getViewTree()
       }
     },
     watch: {
-      '$route.params.id' () {
+      '$route.params.code' () {
         this._getViewTree()
       }
     },
@@ -195,7 +202,10 @@
     },
     mounted () {
     },
-    components: { mSpin, mSecondaryMenu, mListConstruction, mNoData }
+    computed: {
+      ...mapState('dag', ['projectCode'])
+    },
+    components: { mSpin, mListConstruction, mNoData }
   }
 </script>
 
@@ -256,6 +266,5 @@
       }
     }
   }
-
 
 </style>

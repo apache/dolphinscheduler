@@ -20,24 +20,25 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 import java.util.Collection;
 
 /**
- *  lower weight round robin
+ * lower weight round robin
  */
-public class LowerWeightRoundRobin extends AbstractSelector<HostWeight>{
+public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
 
     /**
      * select
+     *
      * @param sources sources
      * @return HostWeight
      */
     @Override
-    public HostWeight doSelect(Collection<HostWeight> sources){
-        int totalWeight = 0;
-        int lowWeight = 0;
+    public HostWeight doSelect(Collection<HostWeight> sources) {
+        double totalWeight = 0;
+        double lowWeight = 0;
         HostWeight lowerNode = null;
         for (HostWeight hostWeight : sources) {
             totalWeight += hostWeight.getWeight();
             hostWeight.setCurrentWeight(hostWeight.getCurrentWeight() + hostWeight.getWeight());
-            if (lowerNode == null || lowWeight > hostWeight.getCurrentWeight() ) {
+            if (lowerNode == null || lowWeight > hostWeight.getCurrentWeight()) {
                 lowerNode = hostWeight;
                 lowWeight = hostWeight.getCurrentWeight();
             }

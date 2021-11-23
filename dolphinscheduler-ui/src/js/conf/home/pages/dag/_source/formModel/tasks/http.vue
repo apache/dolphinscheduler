@@ -19,30 +19,32 @@
     <m-list-box>
       <div slot="text">{{$t('Http Url')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
           :autosize="{minRows:2}"
           :disabled="isDetails"
           type="textarea"
+          size="small"
           v-model="url"
           :placeholder="$t('Please Enter Http Url')"
           autocomplete="off">
-        </x-input>
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Http Method')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
           style="width: 150px;"
+          size="small"
           v-model="httpMethod"
           :disabled="isDetails">
-          <x-option
+          <el-option
             v-for="city in httpMethodList"
             :key="city.code"
             :value="city.code"
             :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
@@ -59,65 +61,57 @@
     <m-list-box>
       <div slot="text">{{$t('Http Check Condition')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
           style="width: 230px;"
+          size="small"
           v-model="httpCheckCondition"
           :disabled="isDetails">
-          <x-option
+          <el-option
             v-for="city in httpCheckConditionList"
             :key="city.code"
             :value="city.code"
             :label="city.value">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Http Condition')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
           :autosize="{minRows:2}"
           :disabled="isDetails"
           type="textarea"
+          size="small"
           v-model="condition"
-          :placeholder="$t('Please Enter Http Condition')"
-          autocomplete="off">
-        </x-input>
+          :placeholder="$t('Please Enter Http Condition')">
+        </el-input>
       </div>
     </m-list-box>
-
-
-    <m-list-box  >
+    <m-list-box>
       <div slot="text">{{$t('Timeout Settings')}}</div>
       <div slot="content">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch
-              v-model="timeoutSettings"
-              :disabled="isDetails"
-            ></x-switch>
+            <el-switch size="small" v-model="timeoutSettings" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
     </m-list-box>
-
-    <div class="clearfix list" v-if = "timeoutSettings" >
-      <div class="text-box">
-        <span>{{$t('Connect Timeout')}}</span>
-      </div>
-      <div class="cont-box">
-        <span  class="label-box"  style="width: 193px;display: inline-block;" >
-          <x-input v-model='connectTimeout' maxlength="7" />
+    <m-list-box v-if="timeoutSettings">
+      <div slot="text">{{$t('Connect Timeout')}}</div>
+      <div slot="content">
+        <span  class="label-box" style="width: 193px;display: inline-block;">
+          <el-input size="small" v-model='connectTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
         <span class="text-b">{{$t('Socket Timeout')}}</span>
-        <span  class="label-box" style="width: 193px;display: inline-block;" >
-          <x-input v-model='socketTimeout' maxlength="7" />
+        <span  class="label-box" style="width: 193px;display: inline-block;">
+          <el-input size="small" v-model='socketTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
       </div>
-    </div>
-
+    </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -144,8 +138,8 @@
     data () {
       return {
         timeoutSettings: false,
-        connectTimeout : 60000 ,
-        socketTimeout :  60000 ,
+        connectTimeout: 60000,
+        socketTimeout: 60000,
 
         url: '',
         condition: '',
@@ -154,7 +148,7 @@
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
-        httpCheckConditionList: cookies.get('language') == 'en_US'? [{ code: 'STATUS_CODE_DEFAULT',value:'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM',value:'Custom response code' }, { code: 'BODY_CONTAINS',value:'Content includes' }, { code: 'BODY_NOT_CONTAINS',value:'Content does not contain' }]:[{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
+        httpCheckConditionList: cookies.get('language') === 'en_US' ? [{ code: 'STATUS_CODE_DEFAULT', value: 'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM', value: 'Custom response code' }, { code: 'BODY_CONTAINS', value: 'Content includes' }, { code: 'BODY_NOT_CONTAINS', value: 'Content does not contain' }] : [{ code: 'STATUS_CODE_DEFAULT', value: '默认响应码200' }, { code: 'STATUS_CODE_CUSTOM', value: '自定义响应码' }, { code: 'BODY_CONTAINS', value: '内容包含' }, { code: 'BODY_NOT_CONTAINS', value: '内容不包含' }]
       }
     },
     props: {
@@ -205,8 +199,8 @@
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
           condition: this.condition,
-          connectTimeout : this.connectTimeout ,
-          socketTimeout : this.socketTimeout
+          connectTimeout: this.connectTimeout,
+          socketTimeout: this.socketTimeout
         })
         return true
       }
@@ -220,8 +214,8 @@
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
           condition: this.condition,
-          connectTimeout : this.connectTimeout ,
-          socketTimeout : this.socketTimeout
+          connectTimeout: this.connectTimeout,
+          socketTimeout: this.socketTimeout
         }
       }
     },
@@ -231,32 +225,32 @@
        * @param val
        */
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this.$emit('on-cache-params', val)
       }
     },
     created () {
-        let o = this.backfillItem
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.url = o.params.url || ''
-          this.httpMethod = o.params.httpMethod || 'GET'
-          this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
-          this.condition = o.params.condition || ''
-          this.connectTimeout = o.params.connectTimeout
-          this.socketTimeout = o.params.socketTimeout
-          if(this.connectTimeout != 60000 || this.socketTimeout != 60000 ){
-            this.timeoutSettings = true
-          }
-          // backfill localParams
-          let localParams = o.params.localParams || []
-          if (localParams.length) {
-            this.localParams = localParams
-          }
-          let httpParams = o.params.httpParams || []
-          if (httpParams.length) {
-            this.httpParams = httpParams
-          }
+      let o = this.backfillItem
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.url = o.params.url || ''
+        this.httpMethod = o.params.httpMethod || 'GET'
+        this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
+        this.condition = o.params.condition || ''
+        this.connectTimeout = o.params.connectTimeout
+        this.socketTimeout = o.params.socketTimeout
+        if (this.connectTimeout !== 60000 || this.socketTimeout !== 60000) {
+          this.timeoutSettings = true
         }
+        // backfill localParams
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
+        let httpParams = o.params.httpParams || []
+        if (httpParams.length) {
+          this.httpParams = httpParams
+        }
+      }
     },
     mounted () {
     },

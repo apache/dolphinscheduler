@@ -15,28 +15,18 @@
 * limitations under the License.
 */
 <template>
-  <div class="sql-model">
-
+  <div class="sqoop-model">
     <m-list-box>
       <div slot="text">{{$t('Custom Job')}}</div>
       <div slot="content">
-        <x-switch
-          v-model="isCustomTask"
-          @on-click="_onSwitch"
-          :disabled="isDetails"
-        >
-        </x-switch>
+        <el-switch size="small" v-model="isCustomTask" @change="_onSwitch" :disabled="isDetails"></el-switch>
       </div>
     </m-list-box>
     <m-list-box v-show="isCustomTask">
       <div slot="text">{{$t('Custom Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
-          <textarea
-            id="code-shell-mirror"
-            name="code-shell-mirror"
-            style="opacity: 0;">
-          </textarea>
+        <div class="form-mirror">
+          <textarea id="code-shell-mirror" name="code-shell-mirror" style="opacity: 0;"></textarea>
         </div>
       </div>
     </m-list-box>
@@ -44,29 +34,25 @@
       <m-list-box>
         <div slot="text">{{$t('Sqoop Job Name')}}</div>
         <div slot="content">
-          <x-input
-            :disabled="isDetails"
-            type="text"
-            v-model="jobName"
-            :placeholder="$t('Please enter Job Name(required)')">
-          </x-input>
+          <el-input :disabled="isDetails" size="small" type="text" v-model="jobName" :placeholder="$t('Please enter Job Name(required)')"></el-input>
         </div>
       </m-list-box>
       <m-list-box>
         <div slot="text">{{$t('Direct')}}</div>
         <div slot="content">
-          <x-select
+          <el-select
             style="width: 130px;"
+            size="small"
             v-model="modelType"
             :disabled="isDetails"
-            @on-change="_handleModelTypeChange">
-            <x-option
+            @change="_handleModelTypeChange">
+            <el-option
               v-for="city in modelTypeList"
               :key="city.code"
               :value="city.code"
               :label="city.code">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </m-list-box>
       <m-list-box>
@@ -91,174 +77,168 @@
           </m-local-params>
         </div>
       </m-list-box>
-
-      <template>
+      <m-list-box>
+        <div slot="text" style="font-weight:bold">{{$t('Data Source')}}</div>
+      </m-list-box>
+      <hr style="margin-left: 60px;">
+      <m-list-box>
+        <div slot="text">{{$t('Type')}}</div>
+        <div slot="content">
+          <el-select
+            style="width: 130px;"
+            size="small"
+            v-model="sourceType"
+            :disabled="isDetails"
+            @change="_handleSourceTypeChange">
+            <el-option
+              v-for="city in sourceTypeList"
+              :key="city.code"
+              :value="city.code"
+              :label="city.code">
+            </el-option>
+          </el-select>
+        </div>
+      </m-list-box>
+      <template v-if="sourceType === 'MYSQL'">
         <m-list-box>
-          <div slot="text" style="font-weight:bold">{{$t('Data Source')}}</div>
-        </m-list-box>
-        <hr style="margin-left: 60px;">
-        <m-list-box>
-          <div slot="text">{{$t('Type')}}</div>
+          <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
-            <x-select
-              style="width: 130px;"
-              v-model="sourceType"
-              :disabled="isDetails"
-              @on-change="_handleSourceTypeChange">
-              <x-option
-                v-for="city in sourceTypeList"
-                :key="city.code"
-                :value="city.code"
-                :label="city.code">
-              </x-option>
-            </x-select>
+            <m-datasource
+              ref="refSourceDs"
+              @on-dsData="_onSourceDsData"
+              :data="{type:sourceMysqlParams.srcType,
+                    typeList: [{id: 0, code: 'MYSQL', disabled: false}],
+                    datasource:sourceMysqlParams.srcDatasource }"
+            >
+            </m-datasource>
           </div>
         </m-list-box>
-
-        <template v-if="sourceType ==='MYSQL'">
-
+        <m-list-box>
+          <div slot="text">{{$t('ModelType')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType">
+              <el-radio label="0">{{$t('Form')}}</el-radio>
+              <el-radio label="1">SQL</el-radio>
+            </el-radio-group>
+          </div>
+        </m-list-box>
+        <template v-if="sourceMysqlParams.srcQueryType === '0'">
           <m-list-box>
-            <div slot="text">{{$t('Datasource')}}</div>
+            <div slot="text">{{$t('Table')}}</div>
             <div slot="content">
-              <m-datasource
-                ref="refSourceDs"
-                @on-dsData="_onSourceDsData"
-                :data="{type:sourceMysqlParams.srcType,
-                      typeList: [{id: 0, code: 'MYSQL', disabled: false}],
-                      datasource:sourceMysqlParams.srcDatasource }"
-              >
-              </m-datasource>
+              <el-input
+                :disabled="isDetails"
+                type="text"
+                size="small"
+                v-model="sourceMysqlParams.srcTable"
+                :placeholder="$t('Please enter Mysql Table(required)')">
+              </el-input>
             </div>
           </m-list-box>
-
           <m-list-box>
-            <div slot="text">{{$t('ModelType')}}</div>
+            <div slot="text">{{$t('ColumnType')}}</div>
             <div slot="content">
-              <x-radio-group v-model="srcQueryType" @on-change="_handleQueryType">
-                <x-radio label="0">{{$t('Form')}}</x-radio>
-                <x-radio label="1">SQL</x-radio>
-              </x-radio-group>
+              <el-radio-group v-model="sourceMysqlParams.srcColumnType" size="small" style="vertical-align: sub;">
+                <el-radio label="0">{{$t('All Columns')}}</el-radio>
+                <el-radio label="1">{{$t('Some Columns')}}</el-radio>
+              </el-radio-group>
             </div>
           </m-list-box>
-
-          <template v-if="sourceMysqlParams.srcQueryType=='0'">
-
-            <m-list-box>
-              <div slot="text">{{$t('Table')}}</div>
-              <div slot="content">
-                <x-input
-                  :disabled="isDetails"
-                  type="text"
-                  v-model="sourceMysqlParams.srcTable"
-                  :placeholder="$t('Please enter Mysql Table(required)')">
-                </x-input>
-              </div>
-            </m-list-box>
-
-            <m-list-box>
-              <div slot="text">{{$t('ColumnType')}}</div>
-              <div slot="content">
-                <x-radio-group v-model="sourceMysqlParams.srcColumnType">
-                  <x-radio label="0">{{$t('All Columns')}}</x-radio>
-                  <x-radio label="1">{{$t('Some Columns')}}</x-radio>
-                </x-radio-group>
-              </div>
-            </m-list-box>
-
-            <m-list-box v-if="sourceMysqlParams.srcColumnType=='1'">
-              <div slot="text">{{$t('Column')}}</div>
-              <div slot="content">
-                <x-input
-                  :disabled="isDetails"
-                  type="text"
-                  v-model="sourceMysqlParams.srcColumns"
-                  :placeholder="$t('Please enter Columns (Comma separated)')">
-                </x-input>
-              </div>
-            </m-list-box>
-          </template>
+          <m-list-box v-if="sourceMysqlParams.srcColumnType === '1'">
+            <div slot="text">{{$t('Column')}}</div>
+            <div slot="content">
+              <el-input
+                :disabled="isDetails"
+                type="text"
+                size="small"
+                v-model="sourceMysqlParams.srcColumns"
+                :placeholder="$t('Please enter Columns (Comma separated)')">
+              </el-input>
+            </div>
+          </m-list-box>
         </template>
       </template>
-
-      <template v-if="sourceType=='HIVE'">
+      <template v-if="sourceType === 'HIVE'">
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hiveDatabase"
               :placeholder="$t('Please enter Hive Database(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hiveTable"
               :placeholder="$t('Please enter Hive Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Keys')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hivePartitionKey"
               :placeholder="$t('Please enter Hive Partition Keys')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Values')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hivePartitionValue"
               :placeholder="$t('Please enter Hive Partition Values')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </template>
-
-      <template v-if="sourceType=='HDFS'">
+      <template v-if="sourceType === 'HDFS'">
         <m-list-box>
           <div slot="text">{{$t('Export Dir')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHdfsParams.exportDir"
               :placeholder="$t('Please enter Export Dir(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </template>
-
-    <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
-      <div slot="text">{{$t('SQL Statement')}}</div>
-      <div slot="content">
-        <div class="from-mirror">
-          <textarea
-                  id="code-sqoop-mirror"
-                  name="code-sqoop-mirror"
-                  style="opacity: 0;">
-          </textarea>
-          <a class="ans-modal-box-max">
-            <em class="ans-icon-max" @click="setEditorVal"></em>
-          </a>
-        </div>
-      </div>
-    </m-list-box>
-
-      <template>
-        <m-list-box v-show="sourceType === 'MYSQL'">
+      <template v-if="sourceType === 'MYSQL'">
+        <m-list-box v-show="srcQueryType === '1'">
+          <div slot="text">{{$t('SQL Statement')}}</div>
+          <div slot="content">
+            <div class="form-mirror">
+              <textarea
+                      id="code-sqoop-mirror"
+                      name="code-sqoop-mirror"
+                      style="opacity: 0;">
+              </textarea>
+              <a class="ans-modal-box-max">
+                <em class="el-icon-full-screen" @click="setEditorVal"></em>
+              </a>
+            </div>
+          </div>
+        </m-list-box>
+        <m-list-box>
           <div slot="text">{{$t('Map Column Hive')}}</div>
           <div slot="content">
             <m-local-params
@@ -269,7 +249,7 @@
             </m-local-params>
           </div>
         </m-list-box>
-        <m-list-box v-show="sourceType === 'MYSQL'">
+        <m-list-box>
           <div slot="text">{{$t('Map Column Java')}}</div>
           <div slot="content">
             <m-local-params
@@ -281,167 +261,174 @@
           </div>
         </m-list-box>
       </template>
-
       <m-list-box>
         <div slot="text" style="font-weight:bold">{{$t('Data Target')}}</div>
       </m-list-box>
       <hr style="margin-left: 60px;">
-
       <m-list-box>
         <div slot="text">{{$t('Type')}}</div>
         <div slot="content">
-          <x-select
+          <el-select
             style="width: 130px;"
+            size="small"
             v-model="targetType"
             :disabled="isDetails">
-            <x-option
+            <el-option
               v-for="city in targetTypeList"
               :key="city.code"
               :value="city.code"
               :label="city.code">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </m-list-box>
-      <div v-show="targetType==='HIVE'">
+      <template v-if="targetType === 'HIVE'">
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hiveDatabase"
               :placeholder="$t('Please enter Hive Database(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hiveTable"
               :placeholder="$t('Please enter Hive Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('CreateHiveTable')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.createHiveTable"></x-switch>
+            <el-switch v-model="targetHiveParams.createHiveTable" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('DropDelimiter')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.dropDelimiter"></x-switch>
+            <el-switch v-model="targetHiveParams.dropDelimiter" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('OverWriteSrc')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.hiveOverWrite"></x-switch>
+            <el-switch v-model="targetHiveParams.hiveOverWrite" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('ReplaceDelimiter')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.replaceDelimiter"
               :placeholder="$t('Please enter Replace Delimiter')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Keys')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hivePartitionKey"
               :placeholder="$t('Please enter Hive Partition Keys')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Values')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hivePartitionValue"
               :placeholder="$t('Please enter Hive Partition Values')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
-      </div>
-      <div v-show="targetType==='HDFS'">
+      </template>
+      <template v-if="targetType === 'HDFS'">
         <m-list-box>
           <div slot="text">{{$t('Target Dir')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.targetPath"
               :placeholder="$t('Please enter Target Dir(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('DeleteTargetDir')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHdfsParams.deleteTargetDir"></x-switch>
+            <el-switch v-model="targetHdfsParams.deleteTargetDir" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('CompressionCodec')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.compressionCodec">
-              <x-radio label="snappy">snappy</x-radio>
-              <x-radio label="lzo">lzo</x-radio>
-              <x-radio label="gzip">gzip</x-radio>
-              <x-radio label="">no</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetHdfsParams.compressionCodec" size="small">
+              <el-radio label="snappy">snappy</el-radio>
+              <el-radio label="lzo">lzo</el-radio>
+              <el-radio label="gzip">gzip</el-radio>
+              <el-radio label="">no</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FileType')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.fileType">
-              <x-radio label="--as-avrodatafile">avro</x-radio>
-              <x-radio label="--as-sequencefile">sequence</x-radio>
-              <x-radio label="--as-textfile">text</x-radio>
-              <x-radio label="--as-parquetfile">parquet</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetHdfsParams.fileType" size="small">
+              <el-radio label="--as-avrodatafile">avro</el-radio>
+              <el-radio label="--as-sequencefile">sequence</el-radio>
+              <el-radio label="--as-textfile">text</el-radio>
+              <el-radio label="--as-parquetfile">parquet</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.fieldsTerminated"
               :placeholder="$t('Please enter Fields Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('LinesTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.linesTerminated"
               :placeholder="$t('Please enter Lines Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
-      </div>
-      <div v-show="targetType==='MYSQL'">
+      </template>
+      <template v-if="targetType === 'MYSQL'">
         <m-list-box>
           <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
@@ -458,85 +445,89 @@
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetTable"
               :placeholder="$t('Please enter Mysql Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Column')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetColumns"
               :placeholder="$t('Please enter Columns (Comma separated)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.fieldsTerminated"
               :placeholder="$t('Please enter Fields Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('LinesTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.linesTerminated"
               :placeholder="$t('Please enter Lines Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('IsUpdate')}}</div>
           <div slot="content">
-            <x-switch v-model="targetMysqlParams.isUpdate"></x-switch>
+            <el-switch v-model="targetMysqlParams.isUpdate" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box v-show="targetMysqlParams.isUpdate">
           <div slot="text">{{$t('UpdateKey')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetUpdateKey"
               :placeholder="$t('Please enter Update Key')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box v-show="targetMysqlParams.isUpdate">
           <div slot="text">{{$t('UpdateMode')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetMysqlParams.targetUpdateMode">
-              <x-radio label="updateonly">{{$t('OnlyUpdate')}}</x-radio>
-              <x-radio label="allowinsert">{{$t('AllowInsert')}}</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetMysqlParams.targetUpdateMode" size="small">
+              <el-radio label="updateonly">{{$t('OnlyUpdate')}}</el-radio>
+              <el-radio label="allowinsert">{{$t('AllowInsert')}}</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
-
-      </div>
+      </template>
       <m-list-box>
         <div slot="text">{{$t('Concurrency')}}</div>
         <div slot="content">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="text"
+            size="small"
             v-model="concurrency"
             :placeholder="$t('Please enter Concurrency')">
-
-          </x-input>
+          </el-input>
         </div>
       </m-list-box>
     </template>
@@ -551,6 +542,12 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -599,105 +596,106 @@
         /**
          * mysql query type
          */
-        srcQueryType:'1',
+        srcQueryType: '1',
         /**
          * source data source
          */
-        srcDatasource:'',
+        srcDatasource: '',
         /**
          * target data source
          */
-        targetDatasource:'',
+        targetDatasource: '',
         /**
          * concurrency
          */
-        concurrency:1,
+        concurrency: 1,
         /**
          * default job type
          */
-        jobType:'TEMPLATE',
+        jobType: 'TEMPLATE',
         /**
          * direct model type
          */
-        modelType:'import',
+        modelType: 'import',
 
         modelTypeList: [{ code: 'import' }, { code: 'export' }],
 
         sourceTypeList: [
           {
-            code: "MYSQL"
-          },
-        ],
-
-        targetTypeList:[
-          {
-            code:"HIVE"
-          },
-          {
-            code:"HDFS"
+            code: 'MYSQL'
           }
         ],
 
-        sourceType:"MYSQL",
-        targetType:"HDFS",
+        targetTypeList: [
+          {
+            code: 'HIVE'
+          },
+          {
+            code: 'HDFS'
+          }
+        ],
 
-        sourceMysqlParams:{
-          srcType:"MYSQL",
-          srcDatasource:"",
-          srcTable:"",
-          srcQueryType:"1",
-          srcQuerySql:'',
-          srcColumnType:"0",
-          srcColumns:"",
-          srcConditionList:[],
-          mapColumnHive:[],
-          mapColumnJava:[]
+        sourceType: 'MYSQL',
+        targetType: 'HDFS',
+
+        sourceMysqlParams: {
+          srcType: 'MYSQL',
+          srcDatasource: '',
+          srcTable: '',
+          srcQueryType: '1',
+          srcQuerySql: '',
+          srcColumnType: '0',
+          srcColumns: '',
+          srcConditionList: [],
+          mapColumnHive: [],
+          mapColumnJava: []
         },
 
-        sourceHdfsParams:{
-          exportDir:""
+        sourceHdfsParams: {
+          exportDir: ''
         },
 
-        sourceHiveParams:{
-          hiveDatabase:"",
-          hiveTable:"",
-          hivePartitionKey:"",
-          hivePartitionValue:""
+        sourceHiveParams: {
+          hiveDatabase: '',
+          hiveTable: '',
+          hivePartitionKey: '',
+          hivePartitionValue: ''
         },
 
-        targetHdfsParams:{
-          targetPath:"",
-          deleteTargetDir:true,
-          fileType:"--as-avrodatafile",
-          compressionCodec:"snappy",
-          fieldsTerminated:"",
-          linesTerminated:"",
+        targetHdfsParams: {
+          targetPath: '',
+          deleteTargetDir: true,
+          fileType: '--as-avrodatafile',
+          compressionCodec: 'snappy',
+          fieldsTerminated: '',
+          linesTerminated: ''
         },
 
-        targetMysqlParams:{
-          targetType:"MYSQL",
-          targetDatasource:"",
-          targetTable:"",
-          targetColumns:"",
-          fieldsTerminated:"",
-          linesTerminated:"",
-          preQuery:"",
-          isUpdate:false,
-          targetUpdateKey:"",
-          targetUpdateMode:"allowinsert"
+        targetMysqlParams: {
+          targetType: 'MYSQL',
+          targetDatasource: '',
+          targetTable: '',
+          targetColumns: '',
+          fieldsTerminated: '',
+          linesTerminated: '',
+          preQuery: '',
+          isUpdate: false,
+          targetUpdateKey: '',
+          targetUpdateMode: 'allowinsert'
         },
 
-        targetHiveParams:{
-          hiveDatabase:"",
-          hiveTable:"",
-          createHiveTable:false,
-          dropDelimiter:false,
-          hiveOverWrite:true,
-          replaceDelimiter:"",
-          hivePartitionKey:"",
-          hivePartitionValue:""
-
-        }
+        targetHiveParams: {
+          hiveDatabase: '',
+          hiveTable: '',
+          createHiveTable: false,
+          dropDelimiter: false,
+          hiveOverWrite: true,
+          replaceDelimiter: '',
+          hivePartitionKey: '',
+          hivePartitionValue: ''
+        },
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -705,129 +703,130 @@
       backfillItem: Object
     },
     methods: {
-      setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
-
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    // this.$modal.destroy()
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+      setEditorVal () {
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
       },
-      _handleQueryType(o){
+      getSriptBoxValue (val) {
+        editor.setValue(val)
+      },
+      _onSwitch (is) {
+        if (is) {
+          this.jobType = 'CUSTOM'
+          this.isCustomTask = true
+          setTimeout(() => {
+            this._handlerShellEditor()
+          }, 200)
+        } else {
+          this.jobType = 'TEMPLATE'
+          this.isCustomTask = false
+          if (this.srcQueryType === '1') {
+            setTimeout(() => {
+              this._handlerEditor()
+            }, 200)
+          }
+        }
+      },
+      _handleQueryType (o) {
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
         this._getTargetTypeList(this.sourceType)
         this.targetType = this.targetTypeList[0].code
+        if (this.srcQueryType === '1') {
+          setTimeout(() => {
+            this._handlerEditor()
+          }, 200)
+        }
       },
 
-      _handleModelTypeChange(a){
-        this._getSourceTypeList(a.label)
+      _handleModelTypeChange (a) {
+        this._getSourceTypeList(a)
         this.sourceType = this.sourceTypeList[0].code
-        this._handleSourceTypeChange({label: this.sourceType, value: this.sourceType})
+        this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
       },
 
-      _handleSourceTypeChange(a){
+      _handleSourceTypeChange (a) {
         this._getTargetTypeList(a.label)
         this.targetType = this.targetTypeList[0].code
       },
 
-      _getSourceTypeList(data){
-        switch(data){
+      _getSourceTypeList (data) {
+        switch (data) {
           case 'import':
             this.sourceTypeList = [
               {
-                code:"MYSQL"
-              },
+                code: 'MYSQL'
+              }
             ]
-            break;
+            break
           case 'export':
             this.sourceTypeList = [
               {
-                code: "HDFS"
+                code: 'HDFS'
               },
               {
-                code: "HIVE"
+                code: 'HIVE'
               }
             ]
-            break;
+            break
           default:
             this.sourceTypeList = [
               {
-                code:"MYSQL"
+                code: 'MYSQL'
               },
               {
-                code:"HIVE"
+                code: 'HIVE'
               },
               {
-                code:"HDFS"
+                code: 'HDFS'
               }
             ]
-            break;
+            break
         }
       },
 
-      _getTargetTypeList(data){
-        switch(data){
+      _getTargetTypeList (data) {
+        switch (data) {
           case 'MYSQL':
-            if (this.srcQueryType === "1") {
+            if (this.srcQueryType === '1') {
               this.targetTypeList = [
                 {
-                  code: "HDFS"
+                  code: 'HDFS'
                 }]
             } else {
               this.targetTypeList = [
                 {
-                  code: "HIVE"
+                  code: 'HIVE'
                 },
                 {
-                  code: "HDFS"
+                  code: 'HDFS'
                 }
               ]
             }
-            break;
+            break
           case 'HDFS':
             this.targetTypeList = [
               {
-                code:"MYSQL"
+                code: 'MYSQL'
               }
             ]
-            break;
+            break
           case 'HIVE':
             this.targetTypeList = [
               {
-                code:"MYSQL"
+                code: 'MYSQL'
               }
             ]
-            break;
+            break
           default:
             this.targetTypeList = [
               {
-                code:"HIVE"
+                code: 'HIVE'
               },
               {
-                code:"HDFS"
+                code: 'HDFS'
               }
             ]
-            break;
+            break
         }
       },
 
@@ -858,26 +857,26 @@
       /**
        * stringify the source params
        */
-      _handleSourceParams() {
-        var params = null
-        switch(this.sourceType){
-          case "MYSQL":
-            this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === "1" && editor ?
-              editor.getValue() : this.sourceMysqlParams.srcQuerySql
+      _handleSourceParams () {
+        let params = null
+        switch (this.sourceType) {
+          case 'MYSQL':
+            this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === '1' && editor
+              ? editor.getValue() : this.sourceMysqlParams.srcQuerySql
             params = JSON.stringify(this.sourceMysqlParams)
-            break;
-          case "ORACLE":
+            break
+          case 'ORACLE':
             params = JSON.stringify(this.sourceOracleParams)
-            break;
-          case "HDFS":
+            break
+          case 'HDFS':
             params = JSON.stringify(this.sourceHdfsParams)
-            break;
-          case "HIVE":
+            break
+          case 'HIVE':
             params = JSON.stringify(this.sourceHiveParams)
-            break;
+            break
           default:
-            params = "";
-            break;
+            params = ''
+            break
         }
         return params
       },
@@ -885,21 +884,21 @@
       /**
        * stringify the target params
        */
-      _handleTargetParams() {
-        var params = null
-        switch(this.targetType){
-          case "HIVE":
+      _handleTargetParams () {
+        let params = null
+        switch (this.targetType) {
+          case 'HIVE':
             params = JSON.stringify(this.targetHiveParams)
-            break;
-          case "HDFS":
+            break
+          case 'HDFS':
             params = JSON.stringify(this.targetHdfsParams)
-            break;
-          case "MYSQL":
+            break
+          case 'MYSQL':
             params = JSON.stringify(this.targetMysqlParams)
-            break;
+            break
           default:
-            params = "";
-            break;
+            params = ''
+            break
         }
 
         return params
@@ -908,46 +907,45 @@
       /**
        * get source params by source type
        */
-      _getSourceParams(data) {
-        switch(this.sourceType){
-          case "MYSQL":
+      _getSourceParams (data) {
+        switch (this.sourceType) {
+          case 'MYSQL':
             this.sourceMysqlParams = JSON.parse(data)
             this.srcDatasource = this.sourceMysqlParams.srcDatasource
-            break;
-          case "ORACLE":
+            break
+          case 'ORACLE':
             this.sourceOracleParams = JSON.parse(data)
-            break;
-          case "HDFS":
+            break
+          case 'HDFS':
             this.sourceHdfsParams = JSON.parse(data)
-            break;
-          case "HIVE":
+            break
+          case 'HIVE':
             this.sourceHiveParams = JSON.parse(data)
-            break;
+            break
           default:
-            break;
+            break
         }
       },
 
       /**
        * get target params by target type
        */
-      _getTargetParams(data) {
-        switch(this.targetType){
-          case "HIVE":
+      _getTargetParams (data) {
+        switch (this.targetType) {
+          case 'HIVE':
             this.targetHiveParams = JSON.parse(data)
-            break;
-          case "HDFS":
+            break
+          case 'HDFS':
             this.targetHdfsParams = JSON.parse(data)
-            break;
-          case "MYSQL":
+            break
+          case 'MYSQL':
             this.targetMysqlParams = JSON.parse(data)
             this.targetDatasource = this.targetMysqlParams.targetDatasource
-            break;
+            break
           default:
-            break;
+            break
         }
       },
-
 
       /**
        * verification
@@ -962,7 +960,7 @@
             this.$message.warning(`${i18n.$t('Please enter Custom Shell(required)')}`)
             return false
           }
-          sqoopParams['customShell'] = shellEditor.getValue()
+          sqoopParams.customShell = shellEditor.getValue()
         } else {
           if (!this.jobName) {
             this.$message.warning(`${i18n.$t('Please enter Job Name(required)')}`)
@@ -970,7 +968,7 @@
           }
 
           switch (this.sourceType) {
-            case "MYSQL":
+            case 'MYSQL':
               if (!this.$refs.refSourceDs._verifDatasource()) {
                 return false
               }
@@ -979,84 +977,84 @@
                   this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
                   return false
                 }
-                this.sourceMysqlParams.srcTable = ""
-                this.sourceMysqlParams.srcColumnType = "0"
-                this.sourceMysqlParams.srcColumns = ""
+                this.sourceMysqlParams.srcTable = ''
+                this.sourceMysqlParams.srcColumnType = '0'
+                this.sourceMysqlParams.srcColumns = ''
               } else {
-                if (this.sourceMysqlParams.srcTable === "") {
+                if (this.sourceMysqlParams.srcTable === '') {
                   this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
                   return false
                 }
-                this.sourceMysqlParams.srcQuerySql = ""
-                if (this.sourceMysqlParams.srcColumnType === "1" && this.sourceMysqlParams.srcColumns === "") {
+                this.sourceMysqlParams.srcQuerySql = ''
+                if (this.sourceMysqlParams.srcColumnType === '1' && this.sourceMysqlParams.srcColumns === '') {
                   this.$message.warning(`${i18n.$t('Please enter Columns (Comma separated)')}`)
                   return false
                 }
-                if (this.sourceMysqlParams.srcColumnType === "0") {
-                  this.sourceMysqlParams.srcColumns = ""
+                if (this.sourceMysqlParams.srcColumnType === '0') {
+                  this.sourceMysqlParams.srcColumns = ''
                 }
               }
 
-              break;
-            case "HDFS":
-              if (this.sourceHdfsParams.exportDir === "") {
+              break
+            case 'HDFS':
+              if (this.sourceHdfsParams.exportDir === '') {
                 this.$message.warning(`${i18n.$t('Please enter Export Dir(required)')}`)
                 return false
               }
-              break;
-            case "HIVE":
-              if (this.sourceHiveParams.hiveDatabase === "") {
+              break
+            case 'HIVE':
+              if (this.sourceHiveParams.hiveDatabase === '') {
                 this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
                 return false
               }
-              if (this.sourceHiveParams.hiveTable === "") {
+              if (this.sourceHiveParams.hiveTable === '') {
                 this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
                 return false
               }
-              break;
+              break
             default:
-              break;
+              break
           }
 
           switch (this.targetType) {
-            case "HIVE":
-              if (this.targetHiveParams.hiveDatabase === "") {
+            case 'HIVE':
+              if (this.targetHiveParams.hiveDatabase === '') {
                 this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
                 return false
               }
-              if (this.targetHiveParams.hiveTable === "") {
+              if (this.targetHiveParams.hiveTable === '') {
                 this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
                 return false
               }
-              break;
-            case "HDFS":
-              if (this.targetHdfsParams.targetPath === "") {
+              break
+            case 'HDFS':
+              if (this.targetHdfsParams.targetPath === '') {
                 this.$message.warning(`${i18n.$t('Please enter Target Dir(required)')}`)
                 return false
               }
-              break;
-            case "MYSQL":
+              break
+            case 'MYSQL':
               if (!this.$refs.refTargetDs._verifDatasource()) {
                 return false
               }
 
-              if (this.targetMysqlParams.targetTable === "") {
+              if (this.targetMysqlParams.targetTable === '') {
                 this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
                 return false
               }
-              break;
+              break
             default:
-              break;
+              break
           }
-          sqoopParams['jobName'] = this.jobName
-          sqoopParams['hadoopCustomParams'] = this.hadoopCustomParams
-          sqoopParams['sqoopAdvancedParams'] = this.sqoopAdvancedParams
-          sqoopParams['concurrency'] = this.concurrency
-          sqoopParams['modelType'] = this.modelType
-          sqoopParams['sourceType'] = this.sourceType
-          sqoopParams['targetType'] = this.targetType
-          sqoopParams['targetParams'] = this._handleTargetParams()
-          sqoopParams['sourceParams'] = this._handleSourceParams()
+          sqoopParams.jobName = this.jobName
+          sqoopParams.hadoopCustomParams = this.hadoopCustomParams
+          sqoopParams.sqoopAdvancedParams = this.sqoopAdvancedParams
+          sqoopParams.concurrency = this.concurrency
+          sqoopParams.modelType = this.modelType
+          sqoopParams.sourceType = this.sourceType
+          sqoopParams.targetType = this.targetType
+          sqoopParams.targetParams = this._handleTargetParams()
+          sqoopParams.sourceParams = this._handleSourceParams()
         }
 
         // storage
@@ -1147,14 +1145,14 @@
 
       _cacheParams () {
         this.$emit('on-cache-params', {
-          concurrency:this.concurrency,
-          modelType:this.modelType,
-          sourceType:this.sourceType,
-          targetType:this.targetType,
-          sourceParams:this._handleSourceParams(),
-          targetParams:this._handleTargetParams(),
-          localParams:this.localParams
-        });
+          concurrency: this.concurrency,
+          modelType: this.modelType,
+          sourceType: this.sourceType,
+          targetType: this.targetType,
+          sourceParams: this._handleSourceParams(),
+          targetParams: this._handleTargetParams(),
+          localParams: this.localParams
+        })
       },
 
       _destroyEditor () {
@@ -1176,13 +1174,11 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val==0) {
+        if (val === 0) {
           this.showType = []
         }
-        if (val != 0) {
+        if (val !== 0) {
           this.title = ''
-          this.receivers = []
-          this.receiversCc = []
         }
       },
       // Listening data source
@@ -1191,7 +1187,7 @@
           this.connParams = ''
         }
       },
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
         this._cacheParams()
       }
@@ -1253,32 +1249,20 @@
     computed: {
       cacheParams () {
         return {
-          concurrency:this.concurrency,
-          modelType:this.modelType,
-          sourceType:this.sourceType,
-          targetType:this.targetType,
-          localParams:this.localParams,
-          sourceMysqlParams:this.sourceMysqlParams,
-          sourceHdfsParams:this.sourceHdfsParams,
-          sourceHiveParams:this.sourceHiveParams,
-          targetHdfsParams:this.targetHdfsParams,
-          targetMysqlParams:this.targetMysqlParams,
-          targetHiveParams:this.targetHiveParams
+          concurrency: this.concurrency,
+          modelType: this.modelType,
+          sourceType: this.sourceType,
+          targetType: this.targetType,
+          localParams: this.localParams,
+          sourceMysqlParams: this.sourceMysqlParams,
+          sourceHdfsParams: this.sourceHdfsParams,
+          sourceHiveParams: this.sourceHiveParams,
+          targetHdfsParams: this.targetHdfsParams,
+          targetMysqlParams: this.targetMysqlParams,
+          targetHiveParams: this.targetHiveParams
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams}
+    components: { mListBox, mDatasource, mLocalParams, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .requiredIcon {
-    color: #ff0000;
-    padding-right: 4px;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>
-

@@ -19,7 +19,15 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create Datasource')}}</x-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create Datasource')}}</el-button>
+          <el-dialog
+            :title="item ?($t('Edit')+$t('Datasource')) : ($t('Create')+$t('Datasource'))"
+            v-if="dialogVisible"
+            :visible.sync="dialogVisible"
+            width="auto"
+            :append-to-body="true">
+            <m-create-data-source :item="item" @onUpdate="onUpdate" @close="close"></m-create-data-source>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -27,7 +35,16 @@
       <template v-if="datasourcesList.length || total>0">
         <m-list @on-update="_onUpdate" :datasources-list="datasourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!datasourcesList.length && total<=0">
@@ -66,7 +83,10 @@
           pageNo: 1,
           // Search value
           searchVal: ''
-        }
+
+        },
+        dialogVisible: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -77,30 +97,15 @@
        * create data source
        */
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateDataSource, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.dialogVisible = true
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.dialogVisible = false
+      },
+      close () {
+        this.dialogVisible = false
       },
       /**
        * page
@@ -124,8 +129,8 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getDatasourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.datasourcesList = []
             this.datasourcesList = res.totalList
@@ -138,7 +143,7 @@
       },
       _onUpdate () {
         this._debounceGET('false')
-      },
+      }
     },
     watch: {
       // router
@@ -151,6 +156,6 @@
     },
     mounted () {
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData, mCreateDataSource }
   }
 </script>

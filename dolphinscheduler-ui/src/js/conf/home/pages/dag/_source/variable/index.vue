@@ -37,7 +37,7 @@
       }
     },
     watch: {
-      '$route': {
+      $route: {
         deep: true,
         handler () {
           this.isActive = false

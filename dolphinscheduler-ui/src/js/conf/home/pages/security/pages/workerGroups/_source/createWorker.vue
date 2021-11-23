@@ -15,47 +15,43 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit worker group') : $t('Create worker group')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close"
+          style="width: 700px;">
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
+                    size="mini"
                     :placeholder="$t('Please enter group name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>IP</template>
+          <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
-            <x-input
-                    :autosize="{ minRows: 4, maxRows: 6 }"
-                    type="textarea"
-                    v-model="ipList"
-                    :placeholder="$t('Please enter the IP address separated by commas')">
-            </x-input>
-            <div class="ipt-tip">
-              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
-            </div>
+            <treeselect :options="this.workerAddressList" v-model="addrList" :multiple="true" :placeholder="$t('Please select the worker addresses')"></treeselect>
           </template>
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
   export default {
     name: 'create-warning',
@@ -64,11 +60,12 @@
         store,
         id: 0,
         name: '',
-        ipList: ''
+        addrList: []
       }
     },
     props: {
-      item: Object
+      item: Object,
+      workerAddressList: Object
     },
     methods: {
       _ok () {
@@ -77,28 +74,14 @@
           this._submit()
         }
       },
-      checkIsIps(ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',');
-        for(let i=0;i<valdata.length;i++){
-            if(reg.test(valdata[i])== false){
-                return false;
-            }
-        }
-        return true
-      },
       _verification () {
         // group name
         if (!this.name) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
-          return false
-        }
-        if(!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        if (!this.addrList.length) {
+          this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
           return false
         }
         return true
@@ -107,22 +90,23 @@
         let param = {
           id: this.id,
           name: this.name,
-          ipList: this.ipList
+          addrList: this.addrList.join(',')
         }
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
-        this.store.dispatch(`security/saveWorkerGroups`, param).then(res => {
+        this.$refs.popover.spinnerLoading = true
+        this.store.dispatch('security/saveWorkerGroups', param).then(res => {
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
-          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},
@@ -130,20 +114,11 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.ipList = this.item.ipList
+        this.addrList = this.item.addrList.split(',')
       }
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .create-worker-model {
-    .ipt-tip {
-      color: #999;
-      padding-top: 4px;
-      display: block;
-    }
-  }
-</style>

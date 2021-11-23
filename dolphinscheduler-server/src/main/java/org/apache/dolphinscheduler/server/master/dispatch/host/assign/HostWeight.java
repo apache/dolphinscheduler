@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 /**
@@ -30,44 +31,55 @@ public class HostWeight {
 
     private final int LOAD_AVERAGE_FACTOR = 70;
 
-    private final Host host;
+    private final HostWorker hostWorker;
 
-    private final int weight;
+    private final double weight;
 
-    private int currentWeight;
+    private double currentWeight;
 
-    public HostWeight(Host host, double cpu, double memory, double loadAverage) {
-        this.weight = calculateWeight(cpu, memory, loadAverage);
-        this.host = host ;
-        this.currentWeight = weight ;
+    public HostWeight(HostWorker hostWorker, double cpu, double memory, double loadAverage, long startTime) {
+        this.hostWorker = hostWorker;
+        this.weight = calculateWeight(cpu, memory, loadAverage, startTime);
+        this.currentWeight = this.weight;
     }
 
-    public int getCurrentWeight() {
-        return currentWeight;
-    }
-
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setCurrentWeight(int currentWeight) {
+    public double getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
     }
 
+    public HostWorker getHostWorker() {
+        return hostWorker;
+    }
+
     public Host getHost() {
-        return host;
+        return (Host)hostWorker;
     }
 
     @Override
     public String toString() {
-        return "HostWeight{" +
-                "host=" + host +
-                ", weight=" + weight +
-                ", currentWeight=" + currentWeight +
-                '}';
+        return "HostWeight{"
+            + "hostWorker=" + hostWorker
+            + ", weight=" + weight
+            + ", currentWeight=" + currentWeight
+            + '}';
     }
 
-    private int calculateWeight(double cpu, double memory, double loadAverage){
-        return (int)(cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
+    private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {
+        double calculatedWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
+        long uptime = System.currentTimeMillis() - startTime;
+        if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
+            // If the warm-up is not over, add the weight
+            return calculatedWeight * Constants.WARM_UP_TIME / uptime;
+        }
+        return calculatedWeight;
     }
+
 }

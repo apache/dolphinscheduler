@@ -16,9 +16,9 @@
  */
 <template>
   <div class="input-number-model">
-    <x-button type="ghost" @click="onReduce()" :disabled="(value < (min + 1))"><span class="bt-text">-</span></x-button>
-    <x-input v-model="value" placeholder=" " @on-blur="onBlur"></x-input>
-    <x-button type="ghost" @click="onIncrease()" :disabled="(value > (max - 1))"><span class="bt-text">+</span></x-button>
+    <el-button type="primary" size="mini" @click="onReduce()" :disabled="(value < (min + 1))"><span>-</span></el-button>
+    <el-input v-model="value" size="mini" placeholder=" " @blur="onBlur"></el-input>
+    <el-button type="primary" size="mini" @click="onIncrease()" :disabled="(value > (max - 1))"><span>+</span></el-button>
   </div>
 </template>
 <script>
@@ -100,8 +100,7 @@
   .input-number-model {
     display: inline-block;
     button{
-      background: #f5f7fa;
-      padding: 8px 10px;
+      padding: 6px 10px;
       position: relative;
       .bt-text {
         font-size: 18px;

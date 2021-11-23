@@ -18,7 +18,7 @@
   <div class="starting-params-dag-index">
     <template v-if="isView && isActive">
        <div class="box">
-         <p class="box-hd"><em class="fa ans-icon-arrow-circle-right"></em><strong>{{$t('Startup parameter')}}</strong></p>
+         <p class="box-hd"><em class="ri-terminal-line"></em><strong>{{$t('Startup parameter')}}</strong></p>
          <ul class="box-bd">
            <li><span class="tab">{{$t('Startup type')}}：</span><span class="content">{{_rtRunningType(startupParam.commandType)}}</span></li>
            <li><span class="tab">{{$t('Complement range')}}：</span><span class="content" v-if="startupParam.commandParam && startupParam.commandParam.complementStartDate">{{startupParam.commandParam.complementStartDate}}-{{startupParam.commandParam.complementEndDate}}</span><span class="content" v-else>-</span></li>
@@ -26,19 +26,18 @@
            <li><span class="tab">{{$t('Process priority')}}：</span><span class="content">{{startupParam.processInstancePriority}}</span></li>
            <li><span class="tab">{{$t('Worker group')}}：</span><span class="content" v-if="workerGroupList.length">{{startupParam.workerGroup}}</span></li>
            <li><span class="tab">{{$t('Notification strategy')}}：</span><span class="content">{{_rtWarningType(startupParam.warningType)}}</span></li>
-           <li><span class="tab">{{$t('Notification group')}}：</span><span class="content" v-if="notifyGroupList.length">{{_rtNotifyGroupName(startupParam.warningGroupId)}}</span></li>
-           <li><span class="tab">{{$t('Recipient')}}：</span><span class="content">{{startupParam.receivers || '-'}}</span></li>
-           <li><span class="tab">{{$t('Cc')}}：</span><span class="content">{{startupParam.receiversCc || '-'}}</span></li>
+           <li><span class="tab">{{$t('Alarm group')}}：</span><span class="content" v-if="notifyGroupList.length">{{_rtNotifyGroupName(startupParam.warningGroupId)}}</span></li>
          </ul>
        </div>
     </template>
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import store from '@/conf/home/store'
   import { runningType } from '@/conf/home/pages/dag/_source/config'
   import { warningTypeList } from '@/conf/home/pages/projects/pages/definition/pages/list/_source/util'
- 
+
   export default {
     name: 'starting-params-dag-index',
     data () {
@@ -69,16 +68,16 @@
         return '-'
       },
       _rtWorkerGroupName (id) {
-        let o =  _.filter(this.workerGroupList, v => v.id === id)
+        let o = _.filter(this.workerGroupList, v => v.id === id)
         if (o && o.length) {
           return o[0].name
         }
         return '-'
       },
       _getNotifyGroupList () {
-          this.store.dispatch('dag/getNotifyGroupList').then(res => {
-            this.notifyGroupList = res
-          })
+        this.store.dispatch('dag/getNotifyGroupList').then(res => {
+          this.notifyGroupList = res
+        })
       },
       _getWorkerGroupList () {
         let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
@@ -92,7 +91,7 @@
       }
     },
     watch: {
-      '$route': {
+      $route: {
         deep: true,
         handler () {
           this.isActive = false

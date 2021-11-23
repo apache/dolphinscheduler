@@ -24,12 +24,12 @@
 
     <div class="v-crontab-model">
       <div class="clearfix v-crontab-tab">
-        <a href="javascript:" :class="tabVal === 'second' ?' active' :''" @click="onTab('second')"><em class="ans-icon-calendar"></em><span>{{$t('秒')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'minute' ?' active' :''" @click="onTab('minute')"><em class="ans-icon-calendar"></em><span>{{$t('分')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'hour' ?' active' :''" @click="onTab('hour')"><em class="ans-icon-calendar"></em><span>{{$t('时')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'day' ?' active' :''" @click="onTab('day')"><em class="ans-icon-calendar"></em><span>{{$t('天')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'month' ?' active' :''" @click="onTab('month')"><em class="ans-icon-calendar"></em><span>{{$t('月')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'year' ?' active' :''" @click="onTab('year')"><em class="ans-icon-calendar"></em><span>{{$t('年')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'second' ?' active' :''" @click="onTab('second')"><em class="el-icon-date"></em><span>{{$t('秒')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'minute' ?' active' :''" @click="onTab('minute')"><em class="el-icon-date"></em><span>{{$t('分')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'hour' ?' active' :''" @click="onTab('hour')"><em class="el-icon-date"></em><span>{{$t('时')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'day' ?' active' :''" @click="onTab('day')"><em class="el-icon-date"></em><span>{{$t('天')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'month' ?' active' :''" @click="onTab('month')"><em class="el-icon-date"></em><span>{{$t('月')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'year' ?' active' :''" @click="onTab('year')"><em class="el-icon-date"></em><span>{{$t('年')}}</span></a>
       </div>
       <div class="v-crontab-content">
         <template v-if="tabVal === 'second'">
@@ -161,7 +161,7 @@
 <style lang="scss">
   @import "index";
   .v-crontab {
-    width: 640px;
+    width: 780px;
     border:1px solid #e4e7ed;
     background: #fff;
     border-radius: 4px;

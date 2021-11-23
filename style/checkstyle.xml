@@ -6,9 +6,7 @@
   The ASF licenses this file to You under the Apache License, Version 2.0
   (the "License"); you may not use this file except in compliance with
   the License.  You may obtain a copy of the License at
-
        http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,9 +29,14 @@
         <property name="eachLine" value="true"/>
     </module>
 
-    <module name="SuppressionFilter">
-        <property name="file" value="${checkstyle.suppressions.file}" default="checkstyle-suppressions.xml"/>
-        <property name="optional" value="true"/>
+    <module name="LineLength">
+        <property name="max" value="200"/>
+        <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+    </module>
+
+    <module name="RegexpSingleline">
+        <property name="format" value="System\.out\.println"/>
+        <property name="message" value="Prohibit invoking System.out.println in source code !"/>
     </module>
 
     <module name="TreeWalker">
@@ -73,11 +76,6 @@
             <property name="allowEscapesForControlCharacters" value="true"/>
             <property name="allowByTailComment" value="true"/>
             <property name="allowNonPrintableEscapes" value="true"/>
-        </module>
-
-        <module name="LineLength">
-            <property name="max" value="200"/>
-            <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
         </module>
 
         <module name="EmptyBlock">
@@ -197,14 +195,13 @@
         <module name="IllegalImport">
             <property name="regexp" value="true"/>
             <property name="illegalPkgs"
-              value="^com\.google\.api\.client\.repackaged,
+                      value="^com\.google\.api\.client\.repackaged,
                       ^avro\.shaded, ^org\.apache\.hadoop\.hbase\.shaded,
                       ^org\.apache\.hadoop\.shaded,
                       ^javax\.ws\.rs\.ext,
                       ^cc\.concurrent\.mango\.util\.concurrent,
                       ^org\.apache\.curator-test\.shaded,
                       ^com\.sun\.istack,
-                      ^org\.apache\.commons\.lang,
                       ^org\.jetbrains\.annotations,
                       ^jline\.internal,
                       ^com\.cronutils\.utils,
@@ -214,7 +211,7 @@
                       ^io\.reactivex\.annotations,
                       ^org\.codehaus\.jackson"/>
             <property name="illegalClasses"
-              value="^java\.util\.logging\.Logging,
+                      value="^java\.util\.logging\.Logging,
                       ^sun\.misc\.BASE64Encoder,
                       ^sun\.misc\.BASE64Decoder,
                       ^jdk\.internal\.jline\.internal\.Nullable"/>

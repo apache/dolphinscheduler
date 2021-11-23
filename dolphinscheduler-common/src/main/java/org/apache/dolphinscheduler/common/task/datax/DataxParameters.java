@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.datax;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DataX parameter
@@ -88,6 +90,16 @@ public class DataxParameters extends AbstractParameters {
      * speed record count
      */
     private int jobSpeedRecord;
+
+    /**
+     * Xms memory
+     */
+    private int xms;
+
+    /**
+     * Xmx memory
+     */
+    private int xmx;
 
     public int getCustomConfig() {
         return customConfig;
@@ -185,15 +197,31 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
+    public int getXms() {
+        return xms;
+    }
+
+    public void setXms(int xms) {
+        this.xms = xms;
+    }
+
+    public int getXmx() {
+        return xmx;
+    }
+
+    public void setXmx(int xmx) {
+        this.xmx = xmx;
+    }
+
     @Override
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0
                     && dataTarget != 0
-                    && StringUtils.isNotEmpty(sql)
-                    && StringUtils.isNotEmpty(targetTable);
+                    && !StringUtils.isEmpty(sql)
+                    && !StringUtils.isEmpty(targetTable);
         } else {
-            return StringUtils.isNotEmpty(json);
+            return !StringUtils.isEmpty(json);
         }
     }
 
@@ -204,19 +232,21 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{" +
-                "customConfig=" + customConfig +
-                ", json='" + json + '\'' +
-                ", dsType='" + dsType + '\'' +
-                ", dataSource=" + dataSource +
-                ", dtType='" + dtType + '\'' +
-                ", dataTarget=" + dataTarget +
-                ", sql='" + sql + '\'' +
-                ", targetTable='" + targetTable + '\'' +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                ", jobSpeedByte=" + jobSpeedByte +
-                ", jobSpeedRecord=" + jobSpeedRecord +
-                '}';
+        return "DataxParameters{"
+                + "customConfig=" + customConfig
+                + ", json='" + json + '\''
+                + ", dsType='" + dsType + '\''
+                + ", dataSource=" + dataSource
+                + ", dtType='" + dtType + '\''
+                + ", dataTarget=" + dataTarget
+                + ", sql='" + sql + '\''
+                + ", targetTable='" + targetTable + '\''
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + ", jobSpeedByte=" + jobSpeedByte
+                + ", jobSpeedRecord=" + jobSpeedRecord
+                + ", xms=" + xms
+                + ", xmx=" + xmx
+                + '}';
     }
 }

@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Assert;
 import org.junit.Test;
@@ -184,7 +184,7 @@ public class HadoopUtilsTest {
         }
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void getApplicationUrl() throws Exception {
         String application_1516778421218_0042 = hadoopUtils.getApplicationUrl("application_1529051418016_0167");
         logger.info(application_1516778421218_0042);

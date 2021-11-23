@@ -16,19 +16,20 @@
  */
 <template>
   <div class="resource-list-model">
-    <x-select multiple
+    <el-select multiple
               v-model="value"
               filterable
+              size="small"
               :disabled="isDetails"
               :placeholder="$t('Please select resources')"
               style="width: 100%;">
-      <x-option
+      <el-option
               v-for="city in resList"
               :key="city.code"
               :value="city.code"
               :label="city.code">
-      </x-option>
-    </x-select>
+      </el-option>
+    </el-select>
   </div>
 </template>
 <script>

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.model;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -23,37 +24,44 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
  * dependent item
  */
 public class DependentItem {
-
-    private int definitionId;
-    private String depTasks;
+    private long projectCode;
+    private long definitionCode;
+    private long depTaskCode;
     private String cycle;
     private String dateValue;
     private DependResult dependResult;
     private ExecutionStatus status;
 
-
-    public String getKey(){
-        return String.format("%d-%s-%s-%s",
-                getDefinitionId(),
-                getDepTasks(),
+    public String getKey() {
+        return String.format("%d-%d-%s-%s",
+                getDefinitionCode(),
+                getDepTaskCode(),
                 getCycle(),
                 getDateValue());
     }
 
-    public int getDefinitionId() {
-        return definitionId;
+    public long getProjectCode() {
+        return projectCode;
     }
 
-    public void setDefinitionId(int definitionId) {
-        this.definitionId = definitionId;
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
     }
 
-    public String getDepTasks() {
-        return depTasks;
+    public long getDefinitionCode() {
+        return definitionCode;
     }
 
-    public void setDepTasks(String depTasks) {
-        this.depTasks = depTasks;
+    public void setDefinitionCode(long definitionCode) {
+        this.definitionCode = definitionCode;
+    }
+
+    public long getDepTaskCode() {
+        return depTaskCode;
+    }
+
+    public void setDepTaskCode(long depTaskCode) {
+        this.depTaskCode = depTaskCode;
     }
 
     public String getCycle() {

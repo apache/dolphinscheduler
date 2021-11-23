@@ -23,11 +23,11 @@
     <div class="conditions-box">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFileFolder/${searchParams.id}`})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</x-button>
-            <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
-          </x-button-group>
+          <el-button-group>
+            <el-button  size="mini" @click="() => $router.push({path: `/resource/file/subFileFolder/${searchParams.id}`})">{{$t('Create folder')}}</el-button>
+            <el-button size="mini" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</el-button>
+            <el-button size="mini" @click="_uploading">{{$t('Upload Files')}}</el-button>
+          </el-button-group>
         </template>
       </m-conditions>
     </div>
@@ -36,7 +36,16 @@
         <m-list @on-update="_onUpdate" @on-updateList="_updateList" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!fileResourcesList.length && total<=0">
@@ -57,7 +66,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'resource-list-index-FILE',
@@ -80,12 +88,12 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('resource', ['getResourcesListP','getResourceId']),
+      ...mapActions('resource', ['getResourcesListP', 'getResourceId']),
       /**
        * File Upload
        */
       _uploading () {
-        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE',this.searchParams.id)
+        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE', this.searchParams.id)
       },
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -98,15 +106,16 @@
         this.searchParams.pageSize = val
       },
       _getList (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
+        this.searchParams.id = this.$route.params.id
         this.getResourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.fileResourcesList = res.totalList
             this.total = res.total
@@ -122,20 +131,20 @@
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate () {
+      _onUpdate () {
         this.searchParams.id = this.$route.params.id
         this._debounceGET()
       },
-      _ckOperation(index) {
-        let breadName =''
+      _ckOperation (index) {
+        let breadName = ''
         this.breadList.forEach((item, i) => {
-          if(i<=index) {
-            breadName = breadName+'/'+item
+          if (i <= index) {
+            breadName = breadName + '/' + item
           }
         })
         this.transferApi(breadName)
       },
-      transferApi(api) {
+      transferApi (api) {
         this.getResourceId({
           type: 'FILE',
           fullName: api
@@ -163,12 +172,11 @@
       let dir = localStore.getItem('currentDir').split('/')
       dir.shift()
       this.breadList = dir
-      this.$modal.destroy()
     },
     beforeDestroy () {
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
-    components: { mListConstruction, mConditions, mList, mSpin, mNoData }
+    components: { mConditions, mList, mSpin, mNoData }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

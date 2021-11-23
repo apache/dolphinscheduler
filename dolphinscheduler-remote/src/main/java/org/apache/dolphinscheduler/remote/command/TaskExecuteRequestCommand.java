@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
@@ -50,18 +51,18 @@ public class TaskExecuteRequestCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
 
     @Override
     public String toString() {
-        return "TaskExecuteRequestCommand{" +
-                "taskExecutionContext='" + taskExecutionContext + '\'' +
-                '}';
+        return "TaskExecuteRequestCommand{"
+                + "taskExecutionContext='" + taskExecutionContext + '\''
+                + '}';
     }
 }

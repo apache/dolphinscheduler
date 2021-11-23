@@ -20,8 +20,7 @@
 <script>
   export default {
     name: 'file-manage-index',
-    mounted() {
-      this.$modal.destroy()
-    },
+    mounted () {
+    }
   }
 </script>

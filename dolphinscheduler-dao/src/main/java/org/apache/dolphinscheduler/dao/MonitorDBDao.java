@@ -16,67 +16,57 @@
  */
 package org.apache.dolphinscheduler.dao;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.utils.MysqlPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgrePerformance;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-/**
- * database state dao
- */
 @Component
 public class MonitorDBDao {
 
-    private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
     public static final String VARIABLE_NAME = "variable_name";
 
     @Autowired
-    private DruidDataSource dataSource;
+    private DataSource dataSource;
 
-
-    /**
-     * get current db performance
-     * @return MonitorRecord
-     */
-    public MonitorRecord getCurrentDbPerformance(){
-        MonitorRecord monitorRecord = null;
-        Connection conn = null;
-        try{
-            conn = dataSource.getConnection();
-            String driverClassName = dataSource.getDriverClassName();
-            if(driverClassName.contains(DbType.MYSQL.toString().toLowerCase())){
+    private MonitorRecord getCurrentDbPerformance() {
+        try (final Connection conn = dataSource.getConnection()) {
+            String driverClassName = DriverManager.getDriver(conn.getMetaData().getURL()).getClass().getName();
+            if (driverClassName.contains(DbType.MYSQL.toString().toLowerCase())) {
                 return new MysqlPerformance().getMonitorRecord(conn);
-            } else if(driverClassName.contains(DbType.POSTGRESQL.toString().toLowerCase())){
+            } else if (driverClassName.contains(DbType.POSTGRESQL.toString().toLowerCase())) {
                 return new PostgrePerformance().getMonitorRecord(conn);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("SQLException: {}", e.getMessage(), e);
-        }finally {
-            ConnectionUtils.releaseResource(conn);
         }
-        return monitorRecord;
+        return null;
     }
 
     /**
      * query database state
+     *
      * @return MonitorRecord list
      */
     public List<MonitorRecord> queryDatabaseState() {
         List<MonitorRecord> list = new ArrayList<>(1);
 
         MonitorRecord monitorRecord = getCurrentDbPerformance();
-        if(monitorRecord != null){
+        if (monitorRecord != null) {
             list.add(monitorRecord);
         }
         return list;

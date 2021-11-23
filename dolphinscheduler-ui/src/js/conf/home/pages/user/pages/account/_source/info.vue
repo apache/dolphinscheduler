@@ -43,7 +43,7 @@
     <m-list-box-f v-ps="['GENERAL_USER']">
       <template slot="name">{{$t('Tenant')}}</template>
       <template slot="content">
-        <span class="sp1">{{userInfo.tenantName}}</span>
+        <span class="sp1">{{userInfo.tenantCode}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f v-ps="['GENERAL_USER']">
@@ -67,57 +67,51 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" >{{$t('Edit')}}</x-button>
+        <el-button type="primary" size="small" round @click="_edit()" >{{$t('Edit')}}</el-button>
+        <el-dialog
+          :title="item ? $t('Edit User') : $t('Create User')"
+          v-if="createUserDialog"
+          :visible.sync="createUserDialog"
+          width="auto">
+          <m-create-user :item="item" :from-user-info="true" @onUpdate="onUpdate" @close="close"></m-create-user>
+        </el-dialog>
       </template>
     </m-list-box-f>
   </div>
 </template>
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapActions, mapState, mapMutations } from 'vuex'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 
   export default {
     name: 'user-info',
     data () {
-      return {}
+      return {
+        createUserDialog: false,
+        item: {}
+      }
     },
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
+      ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
       _edit () {
-        let item = this.userInfo
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateUser, {
-              on: {
-                onUpdate (param) {
-                  self.setUserInfo({
-                    userName: param.userName,
-                    userPassword: param.userPassword,
-                    email: param.email,
-                    phone: param.phone
-                  })
-                  modal.remove()
-                },
-                close () {
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
+        this.item = this.userInfo
+        this.createUserDialog = true
+      },
+      onUpdate (param) {
+        this.setUserInfo(param)
+        this.getUserInfo().finally(() => {
+          this.createUserDialog = false
         })
+      },
+
+      close () {
+        this.createUserDialog = false
       }
     },
     watch: {},
@@ -128,7 +122,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mListBoxF }
+    components: { mListBoxF, mCreateUser }
   }
 </script>
 
@@ -137,12 +131,10 @@
     padding-top: 30px;
     .list-box-f {
       .text {
-        width: 200px;
         font-size: 14px;
         color: #888;
       }
       .cont {
-        width: calc(100% - 210px);
         margin-left: 10px;
         .sp1 {
           font-size: 14px;
