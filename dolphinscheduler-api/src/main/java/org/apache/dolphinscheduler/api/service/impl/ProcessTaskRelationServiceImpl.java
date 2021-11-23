@@ -298,17 +298,12 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return Status.SUCCESS;
         }
         Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = new HashMap<>();
-        Map<Long, List<Integer>> idsGroupByProcessDefinitionCode = new HashMap<>();
         processTaskRelationList.stream().forEach(
                 o -> {
                     if (!processTaskRelationListGroupByProcessDefinitionCode.containsKey(o.getProcessDefinitionCode())) {
                         processTaskRelationListGroupByProcessDefinitionCode.put(o.getProcessDefinitionCode(), new ArrayList<>());
                     }
                     processTaskRelationListGroupByProcessDefinitionCode.get(o.getProcessDefinitionCode()).add(o);
-                    if (!idsGroupByProcessDefinitionCode.containsKey(o.getProcessDefinitionCode())) {
-                        idsGroupByProcessDefinitionCode.put(o.getProcessDefinitionCode(), new ArrayList<>());
-                    }
-                    idsGroupByProcessDefinitionCode.get(o.getProcessDefinitionCode()).add(o.getId());
                 }
         );
         // count upstream relation group by process definition code
@@ -318,27 +313,24 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         List<ProcessTaskRelation> updates = new ArrayList<>();
 
         countListGroupByProcessDefinitionCode.stream().forEach(
-                processDefinitionCodeUpstreamCountMap -> {
-                    processDefinitionCodeUpstreamCountMap.entrySet().stream().forEach(
-                            o -> {
-                                Long processDefinitionCode = o.getKey();
-                                Integer count = o.getValue();
-                                List<ProcessTaskRelation> processTaskRelationList1 = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
-                                List<Integer> ids1 = idsGroupByProcessDefinitionCode.get(processDefinitionCode);
-                                if (count <= ids1.size()) {
-                                    ProcessTaskRelation processTaskRelation = processTaskRelationList1.get(0);
-                                    ids1.remove(Integer.valueOf(processTaskRelation.getId()));
-                                    if (processTaskRelation.getPreTaskCode() != 0) {
-                                        processTaskRelation.setPreTaskCode(0);
-                                        updates.add(processTaskRelation);
+                processDefinitionCodeUpstreamCountMap ->
+                        processDefinitionCodeUpstreamCountMap.entrySet().stream().forEach(
+                                o -> {
+                                    Long processDefinitionCode = o.getKey();
+                                    Integer count = o.getValue();
+                                    List<ProcessTaskRelation> processTaskRelationList1 = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
+                                    if (count <= processTaskRelationList1.size()) {
+                                        ProcessTaskRelation processTaskRelation = processTaskRelationList1.remove(0);
+                                        if (processTaskRelation.getPreTaskCode() != 0) {
+                                            processTaskRelation.setPreTaskCode(0);
+                                            updates.add(processTaskRelation);
+                                        }
+                                    }
+                                    if (!processTaskRelationList1.isEmpty()) {
+                                        deletes.addAll(processTaskRelationList1.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList()));
                                     }
                                 }
-                                if (!ids1.isEmpty()) {
-                                    deletes.addAll(ids1);
-                                }
-                            }
-                    );
-                }
+                        )
         );
 
         int update = 0;
