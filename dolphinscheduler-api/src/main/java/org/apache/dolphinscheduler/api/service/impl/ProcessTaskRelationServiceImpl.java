@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -297,15 +296,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             return Status.SUCCESS;
         }
-        Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = new HashMap<>();
-        processTaskRelationList.stream().forEach(
-                o -> {
-                    if (!processTaskRelationListGroupByProcessDefinitionCode.containsKey(o.getProcessDefinitionCode())) {
-                        processTaskRelationListGroupByProcessDefinitionCode.put(o.getProcessDefinitionCode(), new ArrayList<>());
-                    }
-                    processTaskRelationListGroupByProcessDefinitionCode.get(o.getProcessDefinitionCode()).add(o);
-                }
-        );
+        Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = processTaskRelationList.stream()
+                .collect(Collectors.groupingBy(ProcessTaskRelation::getProcessDefinitionCode));
         // count upstream relation group by process definition code
         List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = processTaskRelationMapper.countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, taskCode);
 
