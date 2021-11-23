@@ -322,7 +322,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         // batch delete others
         int delete = 0;
-        if (ids.size() > 0) {
+        if (!ids.isEmpty()) {
             delete = processTaskRelationMapper.deleteBatchIds(ids);
         }
         if (delete < 0 || update < 0) {
