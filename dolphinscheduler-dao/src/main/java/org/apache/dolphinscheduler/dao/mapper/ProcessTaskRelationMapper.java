@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -100,4 +101,35 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+
+    /**
+     * query task relation by codes
+     *
+     * @param projectCode   projectCode
+     * @param taskCode      taskCode
+     * @param postTaskCodes postTaskCodes list
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryDownstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("postTaskCodes") Long[] postTaskCodes);
+
+    /**
+     * query task relation by codes
+     *
+     * @param projectCode  projectCode
+     * @param taskCode     taskCode
+     * @param preTaskCodes preTaskCode list
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("preTaskCodes") Long[] preTaskCodes);
+
+
+    /**
+     * count upstream by codes
+     *
+     * @param projectCode projectCode
+     * @param taskCodes    taskCode
+     * @return upstream count list
+     */
+    List<Map<Long,Integer>> countUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCodes") Long[]  taskCodes);
+
 }

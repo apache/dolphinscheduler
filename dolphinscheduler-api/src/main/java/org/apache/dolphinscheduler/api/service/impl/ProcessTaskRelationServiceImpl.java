@@ -45,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
+
 /**
  * process task relation service impl
  */
@@ -114,29 +116,70 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete task upstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser    login user
+     * @param projectCode  project code
      * @param preTaskCodes the pre task codes, sep ','
-     * @param taskCode the post task code
+     * @param taskCode     the post task code
      * @return delete result code
      */
     @Override
     public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, String preTaskCodes, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        if (org.apache.commons.lang.StringUtils.isEmpty(preTaskCodes)) {
+            return result;
+        }
+        Set<Long> preTaskCodesSet = Lists.newArrayList(preTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
+        Status status = deleteUpstreamRelation(projectCode, preTaskCodesSet.toArray(new Long[0]), taskCode);
+        if (status != Status.SUCCESS) {
+            putMsg(result, status);
+        }
+        return result;
     }
 
     /**
      * delete task downstream relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser     login user
+     * @param projectCode   project code
      * @param postTaskCodes the post task codes, sep ','
-     * @param taskCode the pre task code
+     * @param taskCode      the pre task code
      * @return delete result code
      */
     @Override
     public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, String postTaskCodes, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        if (org.apache.commons.lang.StringUtils.isEmpty(postTaskCodes)) {
+            return result;
+        }
+        Set<Long> postTaskCodesSet = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
+        List<Long> deleteFailedCodeList = new ArrayList<>();
+        postTaskCodesSet.stream().forEach(
+                postTaskCode -> {
+                    try {
+                        Status status = deleteUpstreamRelation(projectCode, new Long[]{taskCode}, postTaskCode);
+                        if (Status.SUCCESS != status) {
+                            deleteFailedCodeList.add(postTaskCode);
+                        }
+                    } catch (Exception e) {
+                        deleteFailedCodeList.add(postTaskCode);
+                    }
+
+                }
+        );
+        if (!deleteFailedCodeList.isEmpty()) {
+            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR, String.join(",", deleteFailedCodeList.stream().map(o -> o + "").collect(Collectors.toList())));
+        }
+        return result;
     }
 
     /**
@@ -240,4 +283,51 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         };
     }
 
+    /**
+     * delete upstream relation
+     *
+     * @param projectCode   project code
+     * @param postTaskCodes post task codes
+     * @param taskCode      pre task code
+     * @return status
+     */
+    private Status deleteUpstreamRelation(long projectCode, Long[] postTaskCodes, long taskCode) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, postTaskCodes);
+        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+            return Status.SUCCESS;
+        }
+        // count upstream relation
+        List<Map<Long, Integer>> upstreamRelationCountList = processTaskRelationMapper.countUpstreamByCodes(projectCode, new Long[]{taskCode});
+        if (CollectionUtils.isEmpty(upstreamRelationCountList)) {
+            return Status.SUCCESS;
+        }
+        Integer count = upstreamRelationCountList.get(0).get(taskCode);
+        List<Integer> ids = processTaskRelationList.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList());
+        // just delete all
+        if (count > processTaskRelationList.size()) {
+            int delete = processTaskRelationMapper.deleteBatchIds(ids);
+            if (delete < 0) {
+                return Status.DELETE_TASK_PROCESS_RELATION_ERROR;
+            }
+            return Status.SUCCESS;
+        }
+        // handle count == processTaskRelationList.size()
+        // task first one to update
+        ProcessTaskRelation processTaskRelation = processTaskRelationList.get(0);
+        ids.remove(Integer.valueOf(processTaskRelation.getId()));
+        int update = 0;
+        if (processTaskRelation.getPreTaskCode() != 0) {
+            processTaskRelation.setPreTaskCode(0);
+            update = processTaskRelationMapper.updateById(processTaskRelation);
+        }
+        // batch delete others
+        int delete = 0;
+        if (ids.size() > 0) {
+            delete = processTaskRelationMapper.deleteBatchIds(ids);
+        }
+        if (delete < 0 || update < 0) {
+            return Status.DELETE_TASK_PROCESS_RELATION_ERROR;
+        }
+        return Status.SUCCESS;
+    }
 }
