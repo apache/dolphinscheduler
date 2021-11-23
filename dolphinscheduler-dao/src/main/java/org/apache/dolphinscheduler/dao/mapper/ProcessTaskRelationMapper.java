@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -130,6 +129,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCodes    taskCode
      * @return upstream count list
      */
-    List<Map<Long,Integer>> countUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCodes") Long[]  taskCodes);
+    Integer countUpstreamByCode(@Param("projectCode") long projectCode, @Param("taskCodes")  long taskCodes);
 
 }

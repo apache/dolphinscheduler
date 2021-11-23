@@ -286,23 +286,22 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete upstream relation
      *
-     * @param projectCode   project code
-     * @param postTaskCodes post task codes
-     * @param taskCode      pre task code
+     * @param projectCode  project code
+     * @param preTaskCodes pre task codes
+     * @param taskCode     pre task code
      * @return status
      */
-    private Status deleteUpstreamRelation(long projectCode, Long[] postTaskCodes, long taskCode) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, postTaskCodes);
+    private Status deleteUpstreamRelation(long projectCode, Long[] preTaskCodes, long taskCode) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, preTaskCodes);
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             return Status.SUCCESS;
         }
-        // count upstream relation
-        List<Map<Long, Integer>> upstreamRelationCountList = processTaskRelationMapper.countUpstreamByCodes(projectCode, new Long[]{taskCode});
-        if (CollectionUtils.isEmpty(upstreamRelationCountList)) {
+        List<Integer> ids = processTaskRelationList.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(ids)) {
             return Status.SUCCESS;
         }
-        Integer count = upstreamRelationCountList.get(0).get(taskCode);
-        List<Integer> ids = processTaskRelationList.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList());
+        // count upstream relation
+        Integer count = processTaskRelationMapper.countUpstreamByCode(projectCode, taskCode);
         // just delete all
         if (count > processTaskRelationList.size()) {
             int delete = processTaskRelationMapper.deleteBatchIds(ids);
