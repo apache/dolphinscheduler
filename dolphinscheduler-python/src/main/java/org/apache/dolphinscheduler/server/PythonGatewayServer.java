@@ -365,6 +365,12 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         }
     }
 
+    /**
+     * Get datasource by given datasource name. It return map contain datasource id, type, name.
+     * Useful in Python API create sql task which need datasource information.
+     *
+     * @param datasourceName   user who create or update schedule
+     */
     public Map<String, Object> getDatasourceInfo(String datasourceName) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
@@ -384,7 +390,6 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         }
         return result;
     }
-
 
     @PostConstruct
     public void run() {
