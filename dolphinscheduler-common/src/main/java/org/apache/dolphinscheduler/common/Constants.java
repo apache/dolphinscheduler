@@ -39,9 +39,9 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
-     * alter properties
+     * alert properties
      */
-    public static final String ALERT_RPC_PORT = "alter.rpc.port";
+    public static final String ALERT_RPC_PORT = "alert.rpc.port";
 
     /**
      * registry properties
