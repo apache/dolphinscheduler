@@ -90,7 +90,7 @@ public class CacheNotifyService {
      * @return netty remote channel
      */
     private NettyRemoteChannel getRemoteChannel(Host host) {
-        NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host.getAddress());
+        NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host);
         if (nettyRemoteChannel != null) {
             if (nettyRemoteChannel.isActive()) {
                 return nettyRemoteChannel;
