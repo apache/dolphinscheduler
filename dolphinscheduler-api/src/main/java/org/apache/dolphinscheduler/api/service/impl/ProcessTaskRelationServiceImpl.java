@@ -292,16 +292,17 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @return status
      */
     private Status deleteUpstreamRelation(long projectCode, Long[] preTaskCodes, long taskCode) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, preTaskCodes);
-        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+        List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, preTaskCodes);
+        if (CollectionUtils.isEmpty(upstreamList)) {
             return Status.SUCCESS;
         }
-        Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = processTaskRelationList.stream()
+        Map<Long, List<ProcessTaskRelation>> processTaskRelationListGroupByProcessDefinitionCode = upstreamList.stream()
                 .collect(Collectors.groupingBy(ProcessTaskRelation::getProcessDefinitionCode));
         // count upstream relation group by process definition code
-        List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = processTaskRelationMapper.countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, taskCode);
+        List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = processTaskRelationMapper
+                .countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, processTaskRelationListGroupByProcessDefinitionCode.keySet().toArray(new Long[0]), taskCode);
 
-        List<Integer> deletes = new ArrayList<>();
+        List<ProcessTaskRelation> deletes = new ArrayList<>();
         List<ProcessTaskRelation> updates = new ArrayList<>();
 
         countListGroupByProcessDefinitionCode.stream().forEach(
@@ -310,16 +311,17 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                                 o -> {
                                     Long processDefinitionCode = o.getKey();
                                     Integer count = o.getValue();
-                                    List<ProcessTaskRelation> processTaskRelationList1 = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
-                                    if (count <= processTaskRelationList1.size()) {
-                                        ProcessTaskRelation processTaskRelation = processTaskRelationList1.remove(0);
+                                    List<ProcessTaskRelation> processTaskRelationList = processTaskRelationListGroupByProcessDefinitionCode.get(processDefinitionCode);
+                                    if (count <= processTaskRelationList.size()) {
+                                        ProcessTaskRelation processTaskRelation = processTaskRelationList.remove(0);
                                         if (processTaskRelation.getPreTaskCode() != 0) {
                                             processTaskRelation.setPreTaskCode(0);
+                                            processTaskRelation.setPreTaskVersion(0);
                                             updates.add(processTaskRelation);
                                         }
                                     }
-                                    if (!processTaskRelationList1.isEmpty()) {
-                                        deletes.addAll(processTaskRelationList1.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList()));
+                                    if (!processTaskRelationList.isEmpty()) {
+                                        deletes.addAll(processTaskRelationList);
                                     }
                                 }
                         )
@@ -327,11 +329,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
 
         int update = 0;
         if (!updates.isEmpty()) {
-            update = processTaskRelationMapper.batchUpdateProcessTaskRelationPreTaskCode(updates);
+            update = processTaskRelationMapper.batchUpdateProcessTaskRelationPreTask(updates);
         }
         int delete = 0;
         if (!deletes.isEmpty()) {
-            delete = processTaskRelationMapper.deleteBatchIds(deletes);
+            delete = processTaskRelationMapper.deleteBatchIds(deletes.stream().map(ProcessTaskRelation::getId).collect(Collectors.toList()));
         }
         if (update < 0 || delete < 0) {
             return Status.DELETE_TASK_PROCESS_RELATION_ERROR;
