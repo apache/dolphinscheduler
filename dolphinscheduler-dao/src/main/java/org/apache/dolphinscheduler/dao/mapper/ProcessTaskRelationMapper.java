@@ -122,7 +122,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("preTaskCodes") Long[] preTaskCodes);
 
-
     /**
      * count upstream by codes
      *
@@ -131,7 +130,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processDefinitionCodes    processDefinitionCodes
      * @return upstream count list group by process definition code
      */
-    List<Map<Long,Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode, @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode")  long taskCode);
+    List<Map<Long, Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
+                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode") long taskCode);
 
     /**
      * batch update process task relation pre task
@@ -140,4 +140,26 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return update num
      */
     int batchUpdateProcessTaskRelationPreTask(@Param("processTaskRelationList") List<ProcessTaskRelation> processTaskRelationList);
+
+    /**
+     * query by code
+     *
+     * @param projectCode           projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryByCode(@Param("projectCode") long projectCode,
+                                          @Param("processDefinitionCode") long processDefinitionCode,
+                                          @Param("preTaskCode") long preTaskCode,
+                                          @Param("postTaskCode") long postTaskCode);
+
+    /**
+     * delete process task relation
+     *
+     * @param processTaskRelationLog  processTaskRelationLog
+     * @return int
+     */
+    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
 }
