@@ -31,7 +31,6 @@ import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.MeterRegistry;
 
 @Configuration
-@Profile("meter")
 @EnableAspectJAutoProxy
 @EnableAutoConfiguration
 public class MeterConfiguration {

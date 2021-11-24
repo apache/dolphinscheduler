@@ -61,9 +61,6 @@ export DOLPHINSCHEDULER_OPTS="-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSiz
 
 export dbtype=${dbtype:-"h2"}
 export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-"default"}
-if [ "$METER_ENABLED" = "true" ]; then
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},meter"
-fi
 
 if [ "$command" = "api-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml"

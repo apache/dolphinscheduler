@@ -18,3 +18,15 @@
 spring:
   application:
     name: alert-server
+
+server:
+  port: 50053
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

@@ -15,20 +15,30 @@
 # limitations under the License.
 #
 
-spring:
-  application:
-    name: standalone-server
+version: '2.1'
 
-server:
-  port: 12345
+services:
+  prom:
+    image: prom/prometheus
+    networks: [ test ]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  server:
-    port: 8080
-  metrics:
-    tags:
-      application: ${spring.application.name}
+  grafana:
+    image: grafana/grafana
+    networks: [ test ]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: true
+    volumes:
+      - ../grafana:/dashboards:ro
+      - ./datasources:/etc/grafana/provisioning/datasources:ro
+      - ./dashboards/provisioning.yaml:/etc/grafana/provisioning/dashboards/provisioning.yaml:ro
+
+networks:
+  test:

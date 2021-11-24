@@ -37,7 +37,15 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -53,6 +61,7 @@
                 <configuration>
                     <excludes>
                         <exclude>grafana/</exclude>
+                        <exclude>grafana-demo/</exclude>
                         <exclude>*.yaml</exclude>
                     </excludes>
                 </configuration>

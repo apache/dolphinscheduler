@@ -15,13 +15,9 @@
 # limitations under the License.
 #
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  server:
-    port: 5679
-  metrics:
-    tags:
-      application: ${spring.application.name}
+apiVersion: 1
+providers:
+  - name: general
+    folder: 'DolphinScheduler'
+    options:
+      path: /dashboards

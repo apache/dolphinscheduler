@@ -45,3 +45,15 @@ master:
   reserved-memory: 0.3
   # master cache process definition, default: true
   cache-process-definition: true
+
+server:
+  port: 5679
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
