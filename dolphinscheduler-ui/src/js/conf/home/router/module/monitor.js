@@ -96,7 +96,7 @@ const monitor = [
       {
         path: '/monitor/audit/log',
         name: 'audit-log',
-        component: resolve => require(['../pages/monitor/pages/log/index'], resolve),
+        component: resolve => require(['../../pages/monitor/pages/log/index'], resolve),
         meta: {
           title: 'audit-log',
           refreshInSwitchedTab: config.refreshInSwitchedTab

@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,17 +109,11 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
         Page<AuditLog> page = new Page<>(pageNo, pageSize);
         IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(page, moduleArray, opsArray, userName, projectName, processName, start, end);
-        List<AuditLog> logList = logIPage.getRecords();
+        List<AuditLog> logList = logIPage != null ? logIPage.getRecords() : new ArrayList<>();
         PageInfo<AuditDto> pageInfo = new PageInfo<>(pageNo, pageSize);
-        if (CollectionUtils.isEmpty(logList)) {
-            pageInfo.setTotal(0);
-            pageInfo.setTotalList(new ArrayList<>());
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        List<AuditDto> auditDtos = CollectionUtils.transformToList(logList, this::transformAuditLog);
-        pageInfo.setTotal(auditDtos.size());
+
+        List<AuditDto> auditDtos = logList.stream().map(this::transformAuditLog).collect(Collectors.toList());
+        pageInfo.setTotal((int) (auditDtos != null ? auditDtos.size() : 0L));
         pageInfo.setTotalList(auditDtos);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
