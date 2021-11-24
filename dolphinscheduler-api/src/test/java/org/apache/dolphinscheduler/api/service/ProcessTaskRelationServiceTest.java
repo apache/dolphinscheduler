@@ -22,14 +22,19 @@ import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceIm
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -49,6 +54,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
 
 /**
  * process task instance relation service test
@@ -70,6 +77,15 @@ public class ProcessTaskRelationServiceTest {
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     /**
      * get Mock Admin User
@@ -208,6 +224,58 @@ public class ProcessTaskRelationServiceTest {
         processTaskRelationList.add(processTaskRelationDownstream1);
         processTaskRelationList.add(processTaskRelationDownstream2);
         return processTaskRelationList;
+    }
+
+    private ProcessDefinition getProcessDefinition() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setId(1);
+        processDefinition.setProjectCode(1L);
+        processDefinition.setName("test_pdf");
+        processDefinition.setTenantId(1);
+        processDefinition.setDescription("");
+        processDefinition.setCode(1L);
+        return processDefinition;
+    }
+
+    private TaskDefinition getTaskDefinition() {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(1L);
+        taskDefinition.setCode(1L);
+        taskDefinition.setVersion(1);
+        return taskDefinition;
+    }
+
+    @Test
+    public void testCreateProcessTaskRelation() {
+        long projectCode = 1L;
+        long processDefinitionCode = 1L;
+        long preTaskCode = 0L;
+        long postTaskCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
+        Mockito.when(processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode)).thenReturn(Lists.newArrayList());
+        Mockito.when(taskDefinitionMapper.queryByCode(postTaskCode)).thenReturn(getTaskDefinition());
+        List<ProcessTaskRelationLog> processTaskRelationList = Lists.newArrayList();
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(projectCode);
+        processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
+        processTaskRelationLog.setPreTaskCode(0L);
+        processTaskRelationLog.setPreTaskVersion(0);
+        processTaskRelationLog.setPostTaskCode(postTaskCode);
+        processTaskRelationLog.setPostTaskVersion(1);
+        processTaskRelationList.add(processTaskRelationLog);
+        Mockito.when(processTaskRelationMapper.batchInsert(processTaskRelationList)).thenReturn(1);
+        Mockito.when(processTaskRelationLogMapper.batchInsert(processTaskRelationList)).thenReturn(1);
     }
 
     @Test
