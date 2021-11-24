@@ -127,7 +127,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * count upstream by codes
      *
      * @param projectCode projectCode
-     * @param taskCodes    taskCode
+     * @param taskCode    taskCode
+     * @param processDefinitionCodes    processDefinitionCodes
      * @return upstream count list group by process definition code
      */
     List<Map<Long,Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode, @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode")  long taskCode);
