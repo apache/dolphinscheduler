@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -130,7 +131,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if (org.apache.commons.lang.StringUtils.isEmpty(preTaskCodes)) {
+        if (StringUtils.isEmpty(preTaskCodes)) {
+            putMsg(result,Status.DATA_IS_NULL,"preTaskCodes");
             return result;
         }
         Set<Long> preTaskCodesSet = Lists.newArrayList(preTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
@@ -158,7 +160,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if (org.apache.commons.lang.StringUtils.isEmpty(postTaskCodes)) {
+        if (StringUtils.isEmpty(postTaskCodes)) {
+            putMsg(result,Status.DATA_IS_NULL,"postTaskCodes");
             return result;
         }
         Set<Long> postTaskCodesSet = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
