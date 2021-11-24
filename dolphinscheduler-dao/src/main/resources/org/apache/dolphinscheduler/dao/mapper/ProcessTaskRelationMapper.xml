@@ -92,6 +92,62 @@
         and post_task_code = #{taskCode}
     </select>
 
+    <select id="queryDownstreamByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and pre_task_code = #{taskCode}
+        <if test="postTaskCodes != null and postTaskCodes.length != 0">
+            and post_task_code in
+            <foreach collection="postTaskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryUpstreamByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+        <if test="preTaskCodes != null and preTaskCodes.length != 0">
+            and pre_task_code in
+            <foreach collection="preTaskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="countUpstreamByCodeGroupByProcessDefinitionCode" resultType="java.lang.Integer">
+        select process_definition_code,
+        count(0)
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+        <if test="processDefinitionCodes != null and processDefinitionCodes.length != 0">
+            and process_definition_code in
+            <foreach collection="processDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        group by process_definition_code
+    </select>
+
+    <update id="batchUpdateProcessTaskRelationPreTask" parameterType="java.util.List">
+        <foreach collection="processTaskRelationList" item="processTaskRelation" index="index" open="" close="" separator=";">
+            update t_ds_process_task_relation
+            <set>
+                pre_task_code=#{processTaskRelation.preTaskCode},
+                pre_task_version=#{processTaskRelation.preTaskVersion}
+            </set>
+            <where>
+                WHERE id = #{processTaskRelation.id}
+            </where>
+        </foreach>
+    </update>
+
     <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>
