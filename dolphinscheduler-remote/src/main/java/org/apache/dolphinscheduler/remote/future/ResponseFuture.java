@@ -105,7 +105,7 @@ public class ResponseFuture {
         return FUTURE_TABLE.get(opaque);
     }
 
-    public void removeFuture(){
+    public void removeFuture() {
         FUTURE_TABLE.remove(opaque);
     }
 
