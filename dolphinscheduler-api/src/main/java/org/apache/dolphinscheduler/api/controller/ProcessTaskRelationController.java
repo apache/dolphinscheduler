@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.MOVE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
@@ -28,6 +29,9 @@ import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -85,7 +89,15 @@ public class ProcessTaskRelationController extends BaseController {
                                             @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
                                             @RequestParam(name = "preTaskCode", required = true) long preTaskCode,
                                             @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
-        return returnDataList(processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode));
+        Map<String, Object> result = new HashMap<>();
+        if (postTaskCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "postTaskCode");
+        } else if (processDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+        } else {
+            result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode);
+        }
+        return returnDataList(result);
     }
 
     /**
