@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -77,10 +76,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return create result code
      * @throws Exception exception
      */
@@ -142,7 +141,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -161,11 +160,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser  login user
-     * @param id         tenant id
+     * @param loginUser login user
+     * @param id tenant id
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return update result code
      * @throws Exception exception
      */
@@ -221,7 +220,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenantMapper.updateById(tenant);
 
         // notify master to expire cache
-        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
 
         result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.MSG, Status.SUCCESS.getMsg());
@@ -283,7 +282,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
 
         // notify master to expire cache
-        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
 
         putMsg(result, Status.SUCCESS);
         return result;

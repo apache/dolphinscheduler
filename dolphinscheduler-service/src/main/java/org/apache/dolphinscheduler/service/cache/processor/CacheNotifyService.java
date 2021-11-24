@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.cache.config.CacheConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +49,9 @@ public class CacheNotifyService {
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    private CacheConfig cacheConfig;
 
     /**
      * remote channels
@@ -106,11 +110,15 @@ public class CacheNotifyService {
     }
 
     /**
-     * send result
+     * send result to master
      *
      * @param command command
      */
-    public void sendResult(Command command) {
+    public void notifyMaster(Command command) {
+        if (!cacheConfig.isCacheEnable()) {
+            return;
+        }
+
         logger.info("send result, command:{}", command.toString());
 
         List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
@@ -124,11 +132,7 @@ public class CacheNotifyService {
             if (nettyRemoteChannel == null) {
                 continue;
             }
-            try {
-                nettyRemoteChannel.writeAndFlush(command).wait();
-            } catch (InterruptedException e) {
-                logger.error("nettyRemoteChannel send error", e);
-            }
+            nettyRemoteChannel.writeAndFlush(command);
         }
     }
 }

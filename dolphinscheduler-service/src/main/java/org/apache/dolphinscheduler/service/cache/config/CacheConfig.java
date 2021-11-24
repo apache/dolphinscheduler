@@ -1,39 +1,38 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.service.cache.config;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.RegistryFactory;
-import org.apache.dolphinscheduler.registry.api.RegistryFactoryLoader;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.SpringCacheAnnotationParser;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
-import org.springframework.cache.interceptor.CacheOperationInvocationContext;
-import org.springframework.cache.interceptor.CacheResolver;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.stereotype.Component;
 
 /**
  * cache config
  */
-@Configuration
+@Component
 public class CacheConfig extends CachingConfigurerSupport {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -62,50 +61,6 @@ public class CacheConfig extends CachingConfigurerSupport {
         start();
     }
 
-    /**
-     * cache manager for tenant
-     * @return
-     */
-    @Bean
-    public CacheManager tenantCacheManager() {
-        if (!cacheEnable) {
-            return null;
-        }
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(this.tenantExpire, TimeUnit.MINUTES)
-                .maximumSize(this.tenantMaxSize));
-        return cacheManager;
-    }
-
-    /**
-     * cache manager for user
-     * @return
-     */
-    @Bean
-    public CacheManager userCacheManager() {
-        if (!cacheEnable) {
-            return null;
-        }
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(this.userExpire, TimeUnit.MINUTES)
-                .maximumSize(this.userMaxSize));
-        return cacheManager;
-    }
-
-    /**
-     * cache resolver
-     * @return
-     */
-    @Bean
-    public CacheResolver cacheResolver() {
-        MultiCacheManagerResolver cacheResolver = new MultiCacheManagerResolver(this.cacheEnable);
-        cacheResolver.setTenantCacheManager(tenantCacheManager());
-        cacheResolver.setUserCacheManager(userCacheManager());
-        return cacheResolver;
-    }
-
     private void start() {
         if (isStarted.compareAndSet(false, true)) {
             PropertyUtils.loadPropertyFile(CACHE_CONFIG_FILE_PATH);
@@ -122,5 +77,25 @@ public class CacheConfig extends CachingConfigurerSupport {
             this.userExpire = Integer.parseInt(cacheConfig.get(USER_EXPIRE));
             this.userMaxSize = Integer.parseInt(cacheConfig.get(USER_MAX_SIZE));
         }
+    }
+
+    public boolean isCacheEnable() {
+        return cacheEnable;
+    }
+
+    public int getTenantExpire() {
+        return tenantExpire;
+    }
+
+    public int getTenantMaxSize() {
+        return tenantMaxSize;
+    }
+
+    public int getUserExpire() {
+        return userExpire;
+    }
+
+    public int getUserMaxSize() {
+        return userMaxSize;
     }
 }

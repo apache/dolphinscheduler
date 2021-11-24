@@ -95,7 +95,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -228,7 +228,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         queueMapper.updateById(queueObj);
 
-        cacheNotifyService.sendResult(new CacheExpireCommand(CacheType.QUEUE, queueObj).convert2Command());
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.QUEUE, queueObj).convert2Command());
 
         putMsg(result, Status.SUCCESS);
 
@@ -238,7 +238,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     /**
      * verify queue and queueName
      *
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
@@ -327,7 +327,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param newQueue new queue name
      * @return true if need to update user
      */
-    private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
+    private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
         return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
 

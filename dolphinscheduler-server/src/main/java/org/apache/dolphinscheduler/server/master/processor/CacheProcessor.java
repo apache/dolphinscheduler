@@ -17,16 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
-import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.cache.impl.CacheProxyFactory;
 
@@ -58,6 +53,6 @@ public class CacheProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", cacheExpireCommand);
 
-        cacheProxyFactory.getCacheProxy(cacheExpireCommand.getCacheType()).cacheExpire(cacheExpireCommand.getUpdateObj());
+        cacheProxyFactory.getCacheProxy(cacheExpireCommand.getCacheType()).cacheExpire(cacheExpireCommand.getUpdateObjClass(), cacheExpireCommand.getUpdateObjJson());
     }
 }
