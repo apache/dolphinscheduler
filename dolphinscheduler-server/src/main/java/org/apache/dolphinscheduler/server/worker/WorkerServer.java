@@ -45,7 +45,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -116,7 +115,6 @@ public class WorkerServer implements IStoppable {
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
         new SpringApplicationBuilder(WorkerServer.class)
-            .web(WebApplicationType.NONE)
             .profiles("worker")
             .run(args);
     }
