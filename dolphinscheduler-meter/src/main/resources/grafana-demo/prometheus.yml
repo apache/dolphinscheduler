@@ -15,20 +15,17 @@
 # limitations under the License.
 #
 
-spring:
-  application:
-    name: standalone-server
-
-server:
-  port: 12345
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  server:
-    port: 8080
-  metrics:
-    tags:
-      application: ${spring.application.name}
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+rule_files:
+scrape_configs:
+  - job_name: 'DolphinScheduler'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - 'host.docker.internal:5679' # Change the address to the address of DolphinScheduler master server
+          - 'host.docker.internal:1235' # Change the address to the address of DolphinScheduler worker server
+          - 'host.docker.internal:50053' # Change the address to the address of DolphinScheduler alert server
+          - 'host.docker.internal:8080' # Change the address to the DolphinScheduler standalone server
