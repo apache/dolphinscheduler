@@ -47,6 +47,8 @@ public class MultiCacheManagerResolver implements CacheResolver {
 
     private CacheManager userCacheManager;
 
+    private CacheManager tenantCacheManager;
+
     public void setUserCacheManager(CacheManager userCacheManager) {
         this.userCacheManager = userCacheManager;
     }
@@ -54,8 +56,6 @@ public class MultiCacheManagerResolver implements CacheResolver {
     public void setTenantCacheManager(CacheManager tenantCacheManager) {
         this.tenantCacheManager = tenantCacheManager;
     }
-
-    private CacheManager tenantCacheManager;
 
     MultiCacheManagerResolver(boolean enableCache) {
         this.enableCache = enableCache;

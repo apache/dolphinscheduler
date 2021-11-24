@@ -26,14 +26,13 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.stereotype.Component;
 
 /**
  * cache config
  */
 @Component
-public class CacheConfig extends CachingConfigurerSupport {
+public class CacheConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

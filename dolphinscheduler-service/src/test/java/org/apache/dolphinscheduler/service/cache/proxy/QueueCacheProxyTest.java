@@ -19,23 +19,16 @@ package org.apache.dolphinscheduler.service.cache.proxy;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.cache.QueueCacheProxy;
-import org.apache.dolphinscheduler.service.cache.UserCacheProxy;
 import org.apache.dolphinscheduler.service.cache.impl.QueueCacheProxyImpl;
-import org.apache.dolphinscheduler.service.cache.impl.UserCacheProxyImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;

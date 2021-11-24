@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * multi cache manager
  */
 @Configuration
-public class MultiCacheManager {
+public class MultiCacheManager extends CachingConfigurerSupport {
 
     @Autowired
     private CacheConfig cacheConfig;
