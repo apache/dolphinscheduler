@@ -25,12 +25,13 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchReader;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import java.util.Arrays;
+
+import com.google.common.base.Strings;
 
 /**
  * HiveReader
@@ -55,7 +56,7 @@ public class HiveReader implements BatchReader {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-        if (StringUtils.isEmpty(config.getString(SQL))) {
+        if (Strings.isNullOrEmpty(config.getString(SQL))) {
             config.put(SQL,"select * from " + config.getString(DATABASE) + "." + config.getString(TABLE));
         }
     }

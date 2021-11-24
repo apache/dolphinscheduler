@@ -48,11 +48,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testReplaceNRTtoUnderline() {
-        assertEquals("result_1", StringUtils.replaceNRTtoUnderline("result\n1"));
-    }
-
-    @Test
     public void testTrim() {
         assertEquals("result", StringUtils.trim(" result "));
     }
@@ -60,21 +55,6 @@ public class StringUtilsTest {
     @Test
     public void testEqualsIgnoreCase() {
         assertTrue(StringUtils.equalsIgnoreCase("Str1", "str1"));
-    }
-
-    @Test
-    public void testSubstringBefore() {
-        assertEquals("a", StringUtils.substringBefore("a@b", "@"));
-    }
-
-    @Test
-    public void testSubstringAfter() {
-        assertEquals("b", StringUtils.substringAfter("a@b", "@"));
-    }
-
-    @Test
-    public void testStrDigitToLong() {
-        assertEquals(1L, StringUtils.strDigitToLong("1", 0L));
     }
 
     @Test

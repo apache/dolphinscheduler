@@ -32,11 +32,11 @@ import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.UPDATE_TIME;
 import static org.apache.dolphinscheduler.spi.utils.Constants.YYYY_MM_DD_HH_MM_SS;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkArgsUtils;
-import org.apache.dolphinscheduler.plugin.task.util.CommonUtils;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;

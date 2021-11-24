@@ -180,6 +180,10 @@
           }
         }
       }
+
+      &.disabled{
+        cursor: default
+      }
     }
   }
 }

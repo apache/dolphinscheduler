@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.data.quality.config;
 
-import org.apache.dolphinscheduler.data.quality.utils.Preconditions;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
-
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 /**
  * DataQualityConfiguration
@@ -100,7 +99,7 @@ public class DataQualityConfiguration implements IConfig {
 
     @Override
     public void validate() {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(name), "name should not be empty");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name should not be empty");
 
         Preconditions.checkArgument(envConfig != null, "env config should not be empty");
 

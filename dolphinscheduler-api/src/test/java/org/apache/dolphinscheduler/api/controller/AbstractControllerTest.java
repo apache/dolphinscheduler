@@ -24,18 +24,25 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,6 +55,7 @@ import org.springframework.web.context.WebApplicationContext;
 @ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
+@Ignore
 public class AbstractControllerTest {
 
     public static final String SESSION_ID = "sessionId";
@@ -102,6 +110,16 @@ public class AbstractControllerTest {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    @Configuration
+    @Profile(ProfileType.H2)
+    public static class RegistryServer {
+        @PostConstruct
+        public void startEmbedRegistryServer() throws Exception {
+            final TestingServer server = new TestingServer(true);
+            System.setProperty("registry.servers", server.getConnectString());
         }
     }
 }

@@ -33,7 +33,7 @@ public class SparkApplicationTestBase {
     protected SparkRuntimeEnvironment sparkRuntimeEnvironment;
 
     @Before
-    public void before() {
+    public void init() {
         Map<String,Object> config = new HashMap<>();
         config.put("spark.app.name","data quality test");
         config.put("spark.sql.crossJoin.enabled","true");

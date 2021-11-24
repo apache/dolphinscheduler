@@ -19,21 +19,22 @@
 
 from unittest.mock import patch
 
-from pydolphinscheduler.core.task import TaskParams, TaskRelation, Task
+import pytest
+
+from pydolphinscheduler.core.task import Task, TaskParams, TaskRelation
+from tests.testing.task import Task as testTask
 
 
 def test_task_params_to_dict():
     """Test TaskParams object function to_dict."""
-    raw_script = "test_task_params_to_dict"
     expect = {
         "resourceList": [],
         "localParams": [],
-        "rawScript": raw_script,
         "dependence": {},
         "conditionResult": TaskParams.DEFAULT_CONDITION_RESULT,
         "waitStartTimeout": {},
     }
-    task_param = TaskParams(raw_script=raw_script)
+    task_param = TaskParams()
     assert task_param.to_dict() == expect
 
 
@@ -62,7 +63,6 @@ def test_task_to_dict():
     version = 1
     name = "test_task_to_dict"
     task_type = "test_task_to_dict_type"
-    raw_script = "test_task_params_to_dict"
     expect = {
         "code": code,
         "name": name,
@@ -73,7 +73,6 @@ def test_task_to_dict():
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "rawScript": raw_script,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
@@ -91,5 +90,65 @@ def test_task_to_dict():
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        task = Task(name=name, task_type=task_type, task_params=TaskParams(raw_script))
+        task = Task(name=name, task_type=task_type, task_params=TaskParams())
         assert task.to_dict() == expect
+
+
+@pytest.mark.parametrize("shift", ["<<", ">>"])
+def test_two_tasks_shift(shift: str):
+    """Test bit operator between tasks.
+
+    Here we test both `>>` and `<<` bit operator.
+    """
+    upstream = testTask(name="upstream", task_type=shift, task_params=TaskParams())
+    downstream = testTask(name="downstream", task_type=shift, task_params=TaskParams())
+    if shift == "<<":
+        downstream << upstream
+    elif shift == ">>":
+        upstream >> downstream
+    else:
+        assert False, f"Unexpect bit operator type {shift}."
+    assert (
+        1 == len(upstream._downstream_task_codes)
+        and downstream.code in upstream._downstream_task_codes
+    ), "Task downstream task attributes error, downstream codes size or specific code failed."
+    assert (
+        1 == len(downstream._upstream_task_codes)
+        and upstream.code in downstream._upstream_task_codes
+    ), "Task upstream task attributes error, upstream codes size or upstream code failed."
+
+
+@pytest.mark.parametrize(
+    "dep_expr, flag",
+    [
+        ("task << tasks", "upstream"),
+        ("tasks << task", "downstream"),
+        ("task >> tasks", "downstream"),
+        ("tasks >> task", "upstream"),
+    ],
+)
+def test_tasks_list_shift(dep_expr: str, flag: str):
+    """Test bit operator between task and sequence of tasks.
+
+    Here we test both `>>` and `<<` bit operator.
+    """
+    reverse_dict = {
+        "upstream": "downstream",
+        "downstream": "upstream",
+    }
+    task_type = "dep_task_and_tasks"
+    task = testTask(name="upstream", task_type=task_type, task_params=TaskParams())
+    tasks = [
+        testTask(name="downstream1", task_type=task_type, task_params=TaskParams()),
+        testTask(name="downstream2", task_type=task_type, task_params=TaskParams()),
+    ]
+
+    # Use build-in function eval to simply test case and reduce duplicate code
+    eval(dep_expr)
+    direction_attr = f"_{flag}_task_codes"
+    reverse_direction_attr = f"_{reverse_dict[flag]}_task_codes"
+    assert 2 == len(getattr(task, direction_attr))
+    assert [t.code in getattr(task, direction_attr) for t in tasks]
+
+    assert all([1 == len(getattr(t, reverse_direction_attr)) for t in tasks])
+    assert all([task.code in getattr(t, reverse_direction_attr) for t in tasks])

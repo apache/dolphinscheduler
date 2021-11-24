@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.data.quality.flow.writer;
 
 import org.apache.dolphinscheduler.data.quality.config.WriterConfig;
+import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
 import org.apache.dolphinscheduler.data.quality.flow.batch.writer.WriterFactory;
 
@@ -33,7 +34,7 @@ import org.junit.Test;
 public class WriterFactoryTest {
 
     @Test
-    public void testWriterGenerate() {
+    public void testWriterGenerate() throws DataQualityException {
 
         List<WriterConfig> writerConfigs = new ArrayList<>();
         WriterConfig writerConfig = new WriterConfig();
@@ -42,13 +43,10 @@ public class WriterFactoryTest {
         writerConfigs.add(writerConfig);
 
         int flag = 0;
-        try {
-            List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null,writerConfigs);
-            if (writers != null && writers.size() >= 1) {
-                flag = 1;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null,writerConfigs);
+        if (writers != null && writers.size() >= 1) {
+            flag = 1;
         }
 
         Assert.assertEquals(1,flag);

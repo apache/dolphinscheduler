@@ -49,7 +49,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert</artifactId>
+            <artifactId>dolphinscheduler-alert-server</artifactId>
         </dependency>
 
         <dependency>
@@ -333,7 +333,7 @@
                                     <sources>
                                         <source>
                                             <location>
-                                                ${basedir}/../sql
+                                                ${basedir}/../dolphinscheduler-dao/src/main/resources/sql
                                             </location>
                                             <includes>
                                                 <include>**/*.*</include>
@@ -341,7 +341,7 @@
                                         </source>
                                         <source>
                                             <location>
-                                                ${basedir}/../sql
+                                                ${basedir}/../dolphinscheduler-dao/src/main/resources/sql
                                             </location>
                                             <includes>
                                                 <include>soft_version</include>
@@ -384,7 +384,9 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 
+    <build>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
+    </build>
 </project>

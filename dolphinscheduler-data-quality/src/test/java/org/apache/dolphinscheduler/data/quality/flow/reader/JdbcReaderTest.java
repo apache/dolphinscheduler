@@ -43,7 +43,7 @@ public class JdbcReaderTest extends FlowTestBase {
 
     @Before
     public void before() {
-        super.before();
+        super.init();
         createConnectorTable();
     }
 

@@ -18,7 +18,7 @@
 """Test pydolphinscheduler java gateway."""
 
 
-from py4j.java_gateway import java_import, JavaGateway
+from py4j.java_gateway import JavaGateway, java_import
 
 
 def test_gateway_connect():

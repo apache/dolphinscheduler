@@ -269,7 +269,7 @@
 
       targetTableChange () {
         this._updateSelectFieldOptions(
-          'dag/getTableColumsByIdAndName',
+          'dag/getTableColumnsByIdAndName',
           'target_table',
           'target_table',
           { datasourceId: this.fApi.getValue('target_datasource_id'), tableName: this.fApi.getValue('target_table') },
@@ -278,7 +278,7 @@
 
       srcTableChange () {
         this._updateSelectFieldOptions(
-          'dag/getTableColumsByIdAndName',
+          'dag/getTableColumnsByIdAndName',
           'src_table',
           'src_table',
           { datasourceId: this.fApi.getValue('src_datasource_id'), tableName: this.fApi.getValue('src_table') },
@@ -379,13 +379,13 @@
               'target_table', [])
 
             this._updateSelectFieldOptions(
-              'dag/getTableColumsByIdAndName',
+              'dag/getTableColumnsByIdAndName',
               item, 'target_table',
               { datasourceId: this.inputEntryValueMap.target_datasource_id, tableName: this.inputEntryValueMap[item] },
               'target_field', [])
 
             this._updateSelectFieldOptions(
-              'dag/getTableColumsByIdAndName',
+              'dag/getTableColumnsByIdAndName',
               item, 'src_table',
               { datasourceId: this.inputEntryValueMap.src_datasource_id, tableName: this.inputEntryValueMap[item] },
               'src_field', [])

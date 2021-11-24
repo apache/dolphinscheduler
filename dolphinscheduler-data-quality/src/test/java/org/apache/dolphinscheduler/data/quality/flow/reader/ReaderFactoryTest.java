@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.data.quality.Constants.URL;
 import static org.apache.dolphinscheduler.data.quality.Constants.USER;
 
 import org.apache.dolphinscheduler.data.quality.config.ReaderConfig;
+import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchReader;
 import org.apache.dolphinscheduler.data.quality.flow.batch.reader.ReaderFactory;
 
@@ -42,7 +43,7 @@ import org.junit.Test;
 public class ReaderFactoryTest {
 
     @Test
-    public void testConnectorGenerate() {
+    public void testConnectorGenerate() throws DataQualityException {
 
         List<ReaderConfig> readerConfigs = new ArrayList<>();
         ReaderConfig readerConfig = new ReaderConfig();
@@ -58,13 +59,10 @@ public class ReaderFactoryTest {
         readerConfigs.add(readerConfig);
 
         int flag = 0;
-        try {
-            List<BatchReader> readers = ReaderFactory.getInstance().getReaders(null,readerConfigs);
-            if (readers != null && readers.size() >= 1) {
-                flag = 1;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        List<BatchReader> readers = ReaderFactory.getInstance().getReaders(null,readerConfigs);
+        if (readers != null && readers.size() >= 1) {
+            flag = 1;
         }
 
         Assert.assertEquals(1,flag);

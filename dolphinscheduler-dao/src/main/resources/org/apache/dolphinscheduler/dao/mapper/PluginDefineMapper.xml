@@ -38,6 +38,7 @@
         select *
         from t_ds_plugin_define
         where plugin_name = #{pluginName} and plugin_type = #{pluginType}
+        limit 1
     </select>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">

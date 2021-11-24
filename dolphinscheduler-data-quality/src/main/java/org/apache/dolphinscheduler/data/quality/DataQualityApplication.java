@@ -25,10 +25,11 @@ import org.apache.dolphinscheduler.data.quality.config.EnvConfig;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 /**
  * DataQualityApplication
@@ -57,7 +58,7 @@ public class DataQualityApplication {
         EnvConfig envConfig = dataQualityConfiguration.getEnvConfig();
         Config config = new Config(envConfig.getConfig());
         config.put("type",envConfig.getType());
-        if (StringUtils.isEmpty(config.getString(SPARK_APP_NAME))) {
+        if (Strings.isNullOrEmpty(config.getString(SPARK_APP_NAME))) {
             config.put(SPARK_APP_NAME,dataQualityConfiguration.getName());
         }
 

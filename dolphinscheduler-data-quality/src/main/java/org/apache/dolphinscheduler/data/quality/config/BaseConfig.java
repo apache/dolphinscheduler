@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.data.quality.config;
 
-import org.apache.dolphinscheduler.data.quality.utils.Preconditions;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
-
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 /**
  * BaseConfig
@@ -61,7 +60,7 @@ public class BaseConfig implements IConfig {
 
     @Override
     public void validate() {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(type), "type should not be empty");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(type), "type should not be empty");
         Preconditions.checkArgument(config != null, "config should not be empty");
     }
 }

@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +78,10 @@ public class AlertGroupServiceTest {
 
     @Test
     public void testListPaging() {
-        IPage<AlertGroupVo> page = new Page<>(1, 10);
+        IPage<AlertGroup> page = new Page<>(1, 10);
         page.setTotal(1L);
-        page.setRecords(getAlertGroupVoList());
-        Mockito.when(alertGroupMapper.queryAlertGroupVo(any(Page.class), eq(groupName))).thenReturn(page);
+        page.setRecords(getList());
+        Mockito.when(alertGroupMapper.queryAlertGroupPage(any(Page.class), eq(groupName))).thenReturn(page);
         User user = new User();
         // no operate
         Result result = alertGroupService.listPaging(user, groupName, 1, 10);
@@ -91,7 +91,7 @@ public class AlertGroupServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         result = alertGroupService.listPaging(user, groupName, 1, 10);
         logger.info(result.toString());
-        PageInfo<AlertGroupVo> pageInfo = (PageInfo<AlertGroupVo>) result.getData();
+        PageInfo<AlertGroup> pageInfo = (PageInfo<AlertGroup>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
     }
@@ -215,25 +215,6 @@ public class AlertGroupServiceTest {
         alertGroup.setId(1);
         alertGroup.setGroupName(groupName);
         return alertGroup;
-    }
-
-    /**
-     * get AlertGroupVo list
-     */
-    private List<AlertGroupVo> getAlertGroupVoList() {
-        List<AlertGroupVo> alertGroupVos = new ArrayList<>();
-        alertGroupVos.add(getAlertGroupVoEntity());
-        return alertGroupVos;
-    }
-
-    /**
-     * get AlertGroupVo entity
-     */
-    private AlertGroupVo getAlertGroupVoEntity() {
-        AlertGroupVo alertGroupVo = new AlertGroupVo();
-        alertGroupVo.setId(1);
-        alertGroupVo.setGroupName(groupName);
-        return alertGroupVo;
     }
 
 }

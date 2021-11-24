@@ -59,8 +59,7 @@ import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.URL;
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.USER;
 
-import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
@@ -68,6 +67,7 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.BaseConfig;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.EnvConfig;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.MappingColumn;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import org.apache.dolphinscheduler.spi.task.dq.utils.Md5Utils;

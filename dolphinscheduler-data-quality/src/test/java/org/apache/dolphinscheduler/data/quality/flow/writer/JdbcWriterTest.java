@@ -43,7 +43,7 @@ public class JdbcWriterTest extends FlowTestBase {
 
     @Before
     public void before() {
-        super.before();
+        super.init();
         createWriterTable();
     }
 

@@ -32,12 +32,13 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import java.util.Arrays;
+
+import com.google.common.base.Strings;
 
 /**
  * JdbcWriter
@@ -62,14 +63,14 @@ public class JdbcWriter implements BatchWriter {
 
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
-        if (StringUtils.isEmpty(config.getString(SAVE_MODE))) {
+        if (Strings.isNullOrEmpty(config.getString(SAVE_MODE))) {
             config.put(SAVE_MODE,APPEND);
         }
     }
 
     @Override
     public void write(Dataset<Row> data, SparkRuntimeEnvironment env) {
-        if (!StringUtils.isBlank(config.getString(SQL))) {
+        if (!Strings.isNullOrEmpty(config.getString(SQL))) {
             data = env.sparkSession().sql(config.getString(SQL));
         }
 

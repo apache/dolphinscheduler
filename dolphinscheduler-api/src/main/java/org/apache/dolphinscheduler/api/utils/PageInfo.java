@@ -51,6 +51,10 @@ public class PageInfo<T> {
      */
     private Integer pageNo;
 
+    public PageInfo() {
+        
+    }
+
     public PageInfo(Integer currentPage, Integer pageSize) {
         if (currentPage == null) {
             currentPage = 1;

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 
 /**
  * JsonUtil
@@ -54,17 +55,8 @@ public class JsonUtils {
         throw new UnsupportedOperationException("Construct JSONUtils");
     }
 
-    public static String toJson(Object object) {
-        try {
-            return MAPPER.writeValueAsString(object);
-        } catch (Exception e) {
-            logger.error("object to json exception!", e);
-        }
-        return null;
-    }
-    
     public static <T> T fromJson(String json, Class<T> clazz) {
-        if (StringUtils.isEmpty(json)) {
+        if (Strings.isNullOrEmpty(json)) {
             return null;
         }
 

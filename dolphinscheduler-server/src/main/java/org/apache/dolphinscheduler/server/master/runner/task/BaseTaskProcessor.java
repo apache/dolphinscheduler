@@ -33,7 +33,6 @@ import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants
 import static org.apache.dolphinscheduler.spi.task.dq.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -47,14 +46,11 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -69,6 +65,7 @@ import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ConnectorType;
 import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
@@ -81,7 +78,8 @@ import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 
-import java.sql.SQLException;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +92,9 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.google.common.base.Enums;
+import com.google.common.base.Strings;
+import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
@@ -112,8 +112,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
-    protected SpringConnectionFactory springConnectionFactory =
-                        SpringApplicationContext.getBean(SpringConnectionFactory.class);
+    protected javax.sql.DataSource defaultDataSource =
+                        SpringApplicationContext.getBean(javax.sql.DataSource.class);
 
     /**
      * pause task, common tasks donot need this.
@@ -195,8 +195,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @return TaskExecutionContext
      */
     protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance) {
-        processService.setTaskInstanceDetail(taskInstance);
-
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
 
@@ -210,7 +208,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
+        String userQueue = processService.queryUserQueueByProcessInstance(taskInstance.getProcessInstance());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setResources(getResourceFullNames(taskInstance));
@@ -418,23 +416,19 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     public DataSource getDefaultDataSource() {
         DataSource dataSource = new DataSource();
 
-        try {
-            DruidDataSource druidDataSource = (DruidDataSource)springConnectionFactory.dataSource();
-            dataSource.setUserName(druidDataSource.getUsername());
-            JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(druidDataSource.getUrl());
-            if (jdbcInfo != null) {
-                Properties properties = new Properties();
-                properties.setProperty(USER,druidDataSource.getUsername());
-                properties.setProperty(PASSWORD,druidDataSource.getPassword());
-                properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-                properties.setProperty(ADDRESS,jdbcInfo.getAddress());
-                properties.setProperty(OTHER,jdbcInfo.getParams());
-                properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
-                dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
-                dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
-            }
-        } catch (SQLException e) {
-            logger.error("can not get data source error , {}", e.getMessage());
+        HikariDataSource hikariDataSource = (HikariDataSource)defaultDataSource;
+        dataSource.setUserName(hikariDataSource.getUsername());
+        JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
+        if (jdbcInfo != null) {
+            Properties properties = new Properties();
+            properties.setProperty(USER,hikariDataSource.getUsername());
+            properties.setProperty(PASSWORD,hikariDataSource.getPassword());
+            properties.setProperty(DATABASE, jdbcInfo.getDatabase());
+            properties.setProperty(ADDRESS,jdbcInfo.getAddress());
+            properties.setProperty(OTHER,jdbcInfo.getParams());
+            properties.setProperty(JDBC_URL,jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
+            dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
         }
 
         return dataSource;
@@ -499,8 +493,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         sqlTaskExecutionContext.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
 
         // whether udf type
-        boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
-                && !StringUtils.isEmpty(sqlParameters.getUdfs());
+        boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(sqlParameters.getType())).isPresent()
+            && !StringUtils.isEmpty(sqlParameters.getUdfs());
 
         if (udfTypeFlag) {
             String[] udfFunIds = sqlParameters.getUdfs().split(",");

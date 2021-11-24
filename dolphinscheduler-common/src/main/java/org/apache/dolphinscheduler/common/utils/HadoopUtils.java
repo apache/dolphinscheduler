@@ -73,6 +73,7 @@ public class HadoopUtils implements Closeable {
     public static final String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
     public static final String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
     public static final String jobHistoryAddress = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
+    public static final int HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE = PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088);
 
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
@@ -211,8 +212,7 @@ public class HadoopUtils implements Closeable {
         if (logger.isDebugEnabled()) {
             logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         }
-        String activeResourceManagerPort = String.valueOf(PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088));
-        return String.format(appUrl, activeResourceManagerPort, applicationId);
+        return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
     }
 
     public String getJobHistoryUrl(String applicationId) {
@@ -591,7 +591,7 @@ public class HadoopUtils implements Closeable {
     public static String getAppAddress(String appAddress, String rmHa) {
 
         //get active ResourceManager
-        String activeRM = YarnHAAdminUtils.getAcitveRMName(rmHa);
+        String activeRM = YarnHAAdminUtils.getActiveRMName(rmHa);
 
         if (StringUtils.isEmpty(activeRM)) {
             return null;
@@ -635,13 +635,11 @@ public class HadoopUtils implements Closeable {
         /**
          * get active resourcemanager
          */
-        public static String getAcitveRMName(String rmIds) {
+        public static String getActiveRMName(String rmIds) {
 
             String[] rmIdArr = rmIds.split(Constants.COMMA);
 
-            int activeResourceManagerPort = PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088);
-
-            String yarnUrl = "http://%s:" + activeResourceManagerPort + "/ws/v1/cluster/info";
+            String yarnUrl = "http://%s:" + HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE + "/ws/v1/cluster/info";
 
             try {
 

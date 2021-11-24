@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
 import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
-import org.apache.dolphinscheduler.data.quality.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.spark.sql.DataFrameWriter;
@@ -35,6 +34,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Strings;
 
 /**
  * BaseFileWriter
@@ -69,7 +70,7 @@ public abstract class BaseFileWriter implements BatchWriter {
 
     protected ValidateResult checkConfigImpl(List<String> allowedUri) {
 
-        if (Boolean.TRUE.equals(config.has(PATH)) && StringUtils.isNotEmpty(config.getString(PATH))) {
+        if (Boolean.TRUE.equals(config.has(PATH)) && !Strings.isNullOrEmpty(config.getString(PATH))) {
             String dir = config.getString(PATH);
             if (dir.startsWith("/") || uriInAllowedSchema(dir, allowedUri)) {
                 return new ValidateResult(true, "");

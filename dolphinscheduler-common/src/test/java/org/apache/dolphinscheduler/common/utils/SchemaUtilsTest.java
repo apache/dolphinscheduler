@@ -16,6 +16,12 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,10 +29,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ LoggerFactory.class, FileUtils.class })
@@ -105,7 +107,8 @@ public class SchemaUtilsTest {
         List<String> real = SchemaUtils.getAllSchemaList();
         List<String> expect = Arrays.asList("1.0.1_schema", "1.0.2_schema",
                 "1.1.0_schema", "1.2.0_schema");
-        Assert.assertTrue(CollectionUtils.isEqualCollection(real, expect));
+        boolean result = isEqualCollection(real, expect);
+        Assert.assertTrue(result);
 
         //normal
         files = new File[0];

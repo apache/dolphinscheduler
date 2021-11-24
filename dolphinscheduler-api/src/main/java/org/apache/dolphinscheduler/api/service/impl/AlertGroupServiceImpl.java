@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -116,12 +115,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        Page<AlertGroupVo> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroupVo> alertGroupVoIPage = alertGroupMapper.queryAlertGroupVo(page, searchVal);
-        PageInfo<AlertGroupVo> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        pageInfo.setTotal((int) alertGroupVoIPage.getTotal());
-        pageInfo.setTotalList(alertGroupVoIPage.getRecords());
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
+        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
+                page, searchVal);
+        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) alertGroupIPage.getTotal());
+        pageInfo.setTotalList(alertGroupIPage.getRecords());
         result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);

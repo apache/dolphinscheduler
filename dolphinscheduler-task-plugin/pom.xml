@@ -43,6 +43,4 @@
         <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
     </modules>
-
-
 </project>

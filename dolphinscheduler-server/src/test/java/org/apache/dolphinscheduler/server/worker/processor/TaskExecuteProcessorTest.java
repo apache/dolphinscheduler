@@ -84,7 +84,7 @@ public class TaskExecuteProcessorTest {
         // init task execution context
         taskExecutionContext = getTaskExecutionContext();
         workerConfig = new WorkerConfig();
-        workerConfig.setWorkerExecThreads(1);
+        workerConfig.setExecThreads(1);
         workerConfig.setListenPort(1234);
         command = new Command();
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
@@ -108,6 +108,7 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(workerConfig);
 
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getFirstSubmitTime(),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
@@ -120,7 +121,7 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(workerManager);
 
         PowerMockito.mockStatic(ThreadUtils.class);
-        PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads()))
+        PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()))
                 .thenReturn(workerExecService);
 
         PowerMockito.mockStatic(JsonSerializer.class);
