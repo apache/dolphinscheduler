@@ -57,4 +57,12 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
      */
     int deleteByCode(@Param("processCode") long processCode,
                      @Param("processVersion") int processVersion);
+
+    /**
+     * delete process task relation
+     *
+     * @param processTaskRelationLog  processTaskRelationLog
+     * @return int
+     */
+    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
 }

@@ -100,4 +100,26 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+
+    /**
+     * query by code
+     *
+     * @param projectCode           projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryByCode(@Param("projectCode") long projectCode,
+                                          @Param("processDefinitionCode") long processDefinitionCode,
+                                          @Param("preTaskCode") long preTaskCode,
+                                          @Param("postTaskCode") long postTaskCode);
+
+    /**
+     * delete process task relation
+     *
+     * @param processTaskRelationLog  processTaskRelationLog
+     * @return int
+     */
+    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
 }
