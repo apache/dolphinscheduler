@@ -38,3 +38,15 @@ worker:
     - default
   # alert server listen host
   alert-listen-host: localhost
+
+server:
+  port: 1235
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
