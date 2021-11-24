@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -100,4 +101,65 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+
+    /**
+     * query task relation by codes
+     *
+     * @param projectCode   projectCode
+     * @param taskCode      taskCode
+     * @param postTaskCodes postTaskCodes list
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryDownstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("postTaskCodes") Long[] postTaskCodes);
+
+    /**
+     * query task relation by codes
+     *
+     * @param projectCode  projectCode
+     * @param taskCode     taskCode
+     * @param preTaskCodes preTaskCode list
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("preTaskCodes") Long[] preTaskCodes);
+
+    /**
+     * count upstream by codes
+     *
+     * @param projectCode projectCode
+     * @param taskCode    taskCode
+     * @param processDefinitionCodes    processDefinitionCodes
+     * @return upstream count list group by process definition code
+     */
+    List<Map<Long, Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
+                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode") long taskCode);
+
+    /**
+     * batch update process task relation pre task
+     *
+     * @param processTaskRelationList process task relation list
+     * @return update num
+     */
+    int batchUpdateProcessTaskRelationPreTask(@Param("processTaskRelationList") List<ProcessTaskRelation> processTaskRelationList);
+
+    /**
+     * query by code
+     *
+     * @param projectCode           projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryByCode(@Param("projectCode") long projectCode,
+                                          @Param("processDefinitionCode") long processDefinitionCode,
+                                          @Param("preTaskCode") long preTaskCode,
+                                          @Param("postTaskCode") long postTaskCode);
+
+    /**
+     * delete process task relation
+     *
+     * @param processTaskRelationLog  processTaskRelationLog
+     * @return int
+     */
+    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
 }
