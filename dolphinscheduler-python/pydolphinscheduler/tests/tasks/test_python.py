@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.tasks.python import Python, PythonTaskParams
 
 
@@ -60,7 +61,9 @@ def test_python_task_not_support_code(script_code):
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        with pytest.raises(ValueError, match="Parameter code do not support .*?"):
+        with pytest.raises(
+            PyDSParamException, match="Parameter code do not support .*?"
+        ):
             Python(name, script_code)
 
 
