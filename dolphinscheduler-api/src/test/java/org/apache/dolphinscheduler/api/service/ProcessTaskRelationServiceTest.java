@@ -170,15 +170,18 @@ public class ProcessTaskRelationServiceTest {
         processTaskRelationUpstream0.setPreTaskVersion(1);
         processTaskRelationUpstream0.setProjectCode(projectCode);
         processTaskRelationUpstream0.setPreTaskCode(123);
+        processTaskRelationUpstream0.setProcessDefinitionCode(123);
         ProcessTaskRelation processTaskRelationUpstream1 = new ProcessTaskRelation();
         processTaskRelationUpstream1.setPostTaskCode(taskCode);
         processTaskRelationUpstream1.setPreTaskVersion(1);
         processTaskRelationUpstream1.setPreTaskCode(123);
+        processTaskRelationUpstream0.setProcessDefinitionCode(124);
         processTaskRelationUpstream1.setProjectCode(projectCode);
         ProcessTaskRelation processTaskRelationUpstream2 = new ProcessTaskRelation();
         processTaskRelationUpstream2.setPostTaskCode(taskCode);
         processTaskRelationUpstream2.setPreTaskVersion(2);
         processTaskRelationUpstream1.setPreTaskCode(123);
+        processTaskRelationUpstream0.setProcessDefinitionCode(125);
         processTaskRelationUpstream2.setProjectCode(projectCode);
         List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
         processTaskRelationList.add(processTaskRelationUpstream0);
@@ -313,5 +316,81 @@ public class ProcessTaskRelationServiceTest {
                 .queryUpstreamRelation(loginUser, projectCode, taskCode);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
         Assert.assertEquals(2, ((List) relation.get("data")).size());
+    }
+
+    @Test
+    public void testDeleteDownstreamRelation() {
+        long projectCode = 1L;
+        long taskCode = 2L;
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskUpstreamRelationList(projectCode, taskCode);
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, new Long[]{123L})).thenReturn(processTaskRelationList);
+        List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = new ArrayList<>();
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(123L, 2);
+            }
+        });
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(124L, 1);
+            }
+        });
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(125L, 3);
+            }
+        });
+        Mockito.when(processTaskRelationMapper.countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, new Long[]{123L, 124L, 125L}, 2)).thenReturn(countListGroupByProcessDefinitionCode);
+        Mockito.when(processTaskRelationMapper.batchUpdateProcessTaskRelationPreTask(new ArrayList())).thenReturn(3);
+        Mockito.when(processTaskRelationMapper.deleteBatchIds(new ArrayList())).thenReturn(3);
+        Map<String, Object> result1 = processTaskRelationService.deleteDownstreamRelation(loginUser, projectCode, "123", taskCode);
+        Assert.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testDeleteUpstreamRelation() {
+        long projectCode = 1L;
+        long taskCode = 2L;
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskUpstreamRelationList(projectCode, taskCode);
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCodes(projectCode, taskCode, new Long[]{123L})).thenReturn(processTaskRelationList);
+        List<Map<Long, Integer>> countListGroupByProcessDefinitionCode = new ArrayList<>();
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(123L, 2);
+            }
+        });
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(124L, 1);
+            }
+        });
+        countListGroupByProcessDefinitionCode.add(new HashMap<Long, Integer>() {
+            {
+                put(125L, 3);
+            }
+        });
+        Mockito.when(processTaskRelationMapper.countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, new Long[]{123L, 124L, 125L}, 2)).thenReturn(countListGroupByProcessDefinitionCode);
+        Mockito.when(processTaskRelationMapper.batchUpdateProcessTaskRelationPreTask(new ArrayList())).thenReturn(3);
+        Mockito.when(processTaskRelationMapper.deleteBatchIds(new ArrayList())).thenReturn(3);
+        Map<String, Object> result1 = processTaskRelationService.deleteUpstreamRelation(loginUser, projectCode, "123", taskCode);
+        Assert.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
     }
 }
