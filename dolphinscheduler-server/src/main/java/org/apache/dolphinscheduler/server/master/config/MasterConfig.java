@@ -31,7 +31,6 @@ public class MasterConfig {
     private int fetchCommandNum;
     private int preExecThreads;
     private int execThreads;
-    private int execTaskNum;
     private int dispatchTaskNumber;
     private HostSelector hostSelector;
     private int heartbeatInterval;
@@ -72,14 +71,6 @@ public class MasterConfig {
 
     public void setExecThreads(int execThreads) {
         this.execThreads = execThreads;
-    }
-
-    public int getExecTaskNum() {
-        return execTaskNum;
-    }
-
-    public void setExecTaskNum(int execTaskNum) {
-        this.execTaskNum = execTaskNum;
     }
 
     public int getDispatchTaskNumber() {

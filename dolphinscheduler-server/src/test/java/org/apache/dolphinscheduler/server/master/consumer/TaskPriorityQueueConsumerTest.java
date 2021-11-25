@@ -307,7 +307,7 @@ public class TaskPriorityQueueConsumerTest {
 
         TaskPriority taskPriority = new TaskPriority();
         taskPriority.setTaskId(1);
-        boolean res = taskPriorityQueueConsumer.dispatch(taskPriority);
+        boolean res = taskPriorityQueueConsumer.dispatchTask(taskPriority);
 
         Assert.assertFalse(res);
     }
