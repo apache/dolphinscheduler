@@ -210,7 +210,7 @@
                                             </location>
                                             <includes>
                                                 <include>config/*.*</include>
-                                                <include>**/*.xml</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
