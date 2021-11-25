@@ -19,16 +19,17 @@
 
 import json
 from datetime import datetime
-from typing import Optional, List, Dict, Set, Any
+from typing import Any, Dict, List, Optional, Set
 
 from pydolphinscheduler.constants import (
-    ProcessDefinitionReleaseState,
     ProcessDefinitionDefault,
+    ProcessDefinitionReleaseState,
 )
 from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.side import Tenant, Project, User
-from pydolphinscheduler.utils.date import conv_from_str, conv_to_schedule, MAX_DATETIME
+from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
 class ProcessDefinitionContext:
@@ -166,7 +167,7 @@ class ProcessDefinition(Base):
         elif isinstance(val, str):
             return conv_from_str(val)
         else:
-            raise ValueError("Do not support value type %s for now", type(val))
+            raise PyDSParamException("Do not support value type %s for now", type(val))
 
     @property
     def start_time(self) -> Any:
@@ -271,7 +272,7 @@ class ProcessDefinition(Base):
     def get_task(self, code: str) -> "Task":  # noqa: F821
         """Get task object from process definition by given code."""
         if code not in self.tasks:
-            raise ValueError(
+            raise PyDSTaskNoFoundException(
                 "Task with code %s can not found in process definition %",
                 (code, self.name),
             )
@@ -294,7 +295,7 @@ class ProcessDefinition(Base):
         """
         tasks = self.get_tasks_by_name(name)
         if not tasks:
-            raise ValueError(f"Can not find task with name {name}.")
+            raise PyDSTaskNoFoundException(f"Can not find task with name {name}.")
         return tasks.pop()
 
     def run(self):

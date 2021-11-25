@@ -20,6 +20,10 @@ spring:
 
 master:
   listen-port: 5678
+  # master fetch command num
+  fetch-command-num: 10
+  # master prepare execute thread number to limit handle commands in parallel
+  pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
   exec-threads: 100
   # master execute task number in parallel per process instance
@@ -41,3 +45,15 @@ master:
   reserved-memory: 0.3
   # master cache process definition, default: true
   cache-process-definition: true
+
+server:
+  port: 5679
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

@@ -38,3 +38,12 @@ spring:
       max-request-size: 1024MB
   messages:
     basename: i18n/messages
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

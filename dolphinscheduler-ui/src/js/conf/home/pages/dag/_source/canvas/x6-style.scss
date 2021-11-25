@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-$STROKE_BLUE: #288FFF;
-$BG_WHITE: #FFFFFF;
+$STROKE_BLUE: #288fff;
+$BG_WHITE: #ffffff;
 
-.x6-node[data-shape="dag-task"]{
-  .in-port-body{
-    &.adsorbed,&.available{
-      .circle {
-        stroke: $STROKE_BLUE;
-        stroke-width: 4;
-        fill: $BG_WHITE;
+.x6-node[data-shape="dag-task"] {
+  &.available {
+    .dag-task-body {
+      stroke: $STROKE_BLUE;
+      stroke-width: 1;
+      stroke-dasharray: 5, 2;
+    }
+    &.adsorbed {
+      .dag-task-body {
+        stroke-width: 3;
       }
     }
   }

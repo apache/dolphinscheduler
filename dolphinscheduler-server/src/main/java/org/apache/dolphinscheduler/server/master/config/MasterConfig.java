@@ -28,8 +28,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("master")
 public class MasterConfig {
     private int listenPort;
+    private int fetchCommandNum;
+    private int preExecThreads;
     private int execThreads;
-    private int execTaskNum;
     private int dispatchTaskNumber;
     private HostSelector hostSelector;
     private int heartbeatInterval;
@@ -48,20 +49,28 @@ public class MasterConfig {
         this.listenPort = listenPort;
     }
 
+    public int getFetchCommandNum() {
+        return fetchCommandNum;
+    }
+
+    public void setFetchCommandNum(int fetchCommandNum) {
+        this.fetchCommandNum = fetchCommandNum;
+    }
+
+    public int getPreExecThreads() {
+        return preExecThreads;
+    }
+
+    public void setPreExecThreads(int preExecThreads) {
+        this.preExecThreads = preExecThreads;
+    }
+
     public int getExecThreads() {
         return execThreads;
     }
 
     public void setExecThreads(int execThreads) {
         this.execThreads = execThreads;
-    }
-
-    public int getExecTaskNum() {
-        return execTaskNum;
-    }
-
-    public void setExecTaskNum(int execTaskNum) {
-        this.execTaskNum = execTaskNum;
     }
 
     public int getDispatchTaskNumber() {

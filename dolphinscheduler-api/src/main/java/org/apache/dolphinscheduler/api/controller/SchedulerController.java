@@ -308,4 +308,47 @@ public class SchedulerController extends BaseController {
         Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
         return returnDataList(result);
     }
+
+    /**
+     * update process definition schedule
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
+     * @param schedule scheduler
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param workerGroup worker group
+     * @param processInstancePriority process instance priority
+     * @return update result code
+     */
+    @ApiOperation(value = "updateScheduleByProcessDefinitionCode", notes = "UPDATE_SCHEDULE_BY_PROCESS_DEFINITION_CODE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "12345678"),
+        @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
+        @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
+        @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
+        @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long"),
+    })
+    @PutMapping("/{code}")
+    @ApiException(UPDATE_SCHEDULE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result updateScheduleByProcessDefinitionCode(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                        @PathVariable(value = "code") long processDefinitionCode,
+                                                        @RequestParam(value = "schedule") String schedule,
+                                                        @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+                                                        @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
+                                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") long environmentCode,
+                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
+        Map<String, Object> result = schedulerService.updateScheduleByProcessDefinitionCode(loginUser, projectCode, processDefinitionCode, schedule,
+            warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+        return returnDataList(result);
+    }
 }

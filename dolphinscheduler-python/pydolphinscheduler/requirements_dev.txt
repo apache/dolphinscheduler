@@ -18,7 +18,10 @@
 # testting
 pytest~=6.2.5
 freezegun
+# Test coverage
+coverage
 # code linting and formatting
 flake8
 flake8-docstrings
 flake8-black
+isort

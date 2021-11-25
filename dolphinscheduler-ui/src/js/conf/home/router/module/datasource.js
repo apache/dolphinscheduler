@@ -15,21 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+import i18n from '@/module/i18n/index.js'
 
-import java.util.HashSet;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-public class SnowFlakeUtilsTest {
-    @Test
-    public void testNoGenerateDuplicateId() throws SnowFlakeUtils.SnowFlakeException {
-        HashSet<Long> existsSnowFlakeId = new HashSet<>();
-        for (int i = 0; i < 100; i++) {
-            Long currentId = SnowFlakeUtils.getInstance().nextId();
-            Assert.assertFalse(existsSnowFlakeId.contains(currentId));
-            existsSnowFlakeId.add(currentId);
+const datasource = [
+  {
+    path: '/datasource',
+    name: 'datasource',
+    component: resolve => require(['../../pages/datasource'], resolve),
+    meta: {
+      title: `${i18n.$t('Datasource')}`
+    },
+    redirect: {
+      name: 'datasource-list'
+    },
+    children: [
+      {
+        path: '/datasource/list',
+        name: 'datasource-list',
+        component: resolve => require(['../../pages/datasource/pages/list'], resolve),
+        meta: {
+          title: `${i18n.$t('Datasource')}`
         }
-    }
-}
+      }
+    ]
+  }
+]
+
+export default datasource

@@ -36,7 +36,8 @@ import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -124,6 +126,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     @Autowired
     private ScheduleMapper scheduleMapper;
 
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
+
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
         {
@@ -150,18 +155,18 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws SnowFlakeUtils.SnowFlakeException {
+    public Map<String, Long> getCodeAndVersion(String projectName, String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
         if (project == null) {
-            result.put("code", SnowFlakeUtils.getInstance().nextId());
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(project.getCode(), taskName);
         if (taskDefinition == null) {
-            result.put("code", SnowFlakeUtils.getInstance().nextId());
+            result.put("code", CodeGenerateUtils.getInstance().genCode());
             result.put("version", 0L);
         } else {
             result.put("code", taskDefinition.getCode());
@@ -254,16 +259,16 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                         long processDefinitionCode,
                                         String schedule,
                                         String workerGroup) {
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
+        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         // create or update schedule
         int scheduleId;
-        if (schedules.isEmpty()) {
+        if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
-            scheduleId = schedules.get(0).getId();
+            scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
@@ -358,6 +363,32 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
             usersService.createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
         }
+    }
+
+    /**
+     * Get datasource by given datasource name. It return map contain datasource id, type, name.
+     * Useful in Python API create sql task which need datasource information.
+     *
+     * @param datasourceName   user who create or update schedule
+     */
+    public Map<String, Object> getDatasourceInfo(String datasourceName) {
+        Map<String, Object> result = new HashMap<>();
+        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
+        if (dataSourceList.size() > 1) {
+            String msg = String.format("Get more than one datasource by name %s", datasourceName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        } else if (dataSourceList.size() == 0) {
+            String msg = String.format("Can not find any datasource by name %s", datasourceName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        } else {
+            DataSource dataSource = dataSourceList.get(0);
+            result.put("id", dataSource.getId());
+            result.put("type", dataSource.getType().name());
+            result.put("name", dataSource.getName());
+        }
+        return result;
     }
 
     @PostConstruct

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -135,19 +136,21 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
-        // local execute path
-        String execLocalPath = getExecLocalPath(taskExecutionContext);
-        logger.info("task instance local execute path : {}", execLocalPath);
-        taskExecutionContext.setExecutePath(execLocalPath);
+        if (Constants.DRY_RUN_FLAG_NO == taskExecutionContext.getDryRun()) {
+            // local execute path
+            String execLocalPath = getExecLocalPath(taskExecutionContext);
+            logger.info("task instance local execute path : {}", execLocalPath);
+            taskExecutionContext.setExecutePath(execLocalPath);
 
-        try {
-            FileUtils.createWorkDirIfAbsent(execLocalPath);
-            if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
-                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+            try {
+                FileUtils.createWorkDirIfAbsent(execLocalPath);
+                if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+                    OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+                }
+            } catch (Throwable ex) {
+                logger.error("create execLocalPath: {}", execLocalPath, ex);
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             }
-        } catch (Throwable ex) {
-            logger.error("create execLocalPath: {}", execLocalPath, ex);
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
 
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
