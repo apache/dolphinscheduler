@@ -209,12 +209,12 @@ public class ScheduleMapperTest {
      * test query by process definition id
      */
     @Test
-    public void queryByProcessDefinitionId() {
+    public void queryByProcessDefinitionCode() {
         Schedule schedule = insertOne();
         schedule.setProcessDefinitionCode(12345);
         scheduleMapper.updateById(schedule);
 
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(schedule.getProcessDefinitionCode());
-        Assert.assertNotEquals(schedules.size(), 0);
+        Schedule schedules = scheduleMapper.queryByProcessDefinitionCode(schedule.getProcessDefinitionCode());
+        Assert.assertNotNull(schedules);
     }
 }

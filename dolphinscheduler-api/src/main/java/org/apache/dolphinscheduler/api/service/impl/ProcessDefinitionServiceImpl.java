@@ -659,21 +659,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // get the timing according to the process definition
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(code);
-        if (!schedules.isEmpty() && schedules.size() > 1) {
-            logger.warn("scheduler num is {},Greater than 1", schedules.size());
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
-            return result;
-        } else if (schedules.size() == 1) {
-            Schedule schedule = schedules.get(0);
-            if (schedule.getReleaseState() == ReleaseState.OFFLINE) {
-                int delete = scheduleMapper.deleteById(schedule.getId());
+        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(code);
+        if (scheduleObj != null) {
+            if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
+                int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
                     putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                     throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                 }
-            } else if (schedule.getReleaseState() == ReleaseState.ONLINE) {
-                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, schedule.getId());
+            }
+            if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getId());
                 return result;
             }
         }
@@ -810,12 +806,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return DagDataSchedule
      */
     public DagDataSchedule exportProcessDagData(ProcessDefinition processDefinition) {
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode());
+        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode());
         DagDataSchedule dagDataSchedule = new DagDataSchedule(processService.genDagData(processDefinition));
-        if (!schedules.isEmpty()) {
-            Schedule schedule = schedules.get(0);
-            schedule.setReleaseState(ReleaseState.OFFLINE);
-            dagDataSchedule.setSchedule(schedule);
+        if (scheduleObj != null) {
+            scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+            dagDataSchedule.setSchedule(scheduleObj);
         }
         return dagDataSchedule;
     }
