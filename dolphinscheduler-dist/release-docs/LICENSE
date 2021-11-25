@@ -225,6 +225,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-sdk-java 1.7.4: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk/1.7.4, Apache 2.0
     bonecp 0.8.0.RELEASE: https://github.com/wwadge/bonecp, Apache 2.0
     byte-buddy 1.9.16: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.9.16, Apache 2.0
+    caffeine 2.9.2: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine/2.9.2, Apache 2.0
     classmate 1.5.1: https://mvnrepository.com/artifact/com.fasterxml/classmate/1.5.1, Apache 2.0
     clickhouse-jdbc 0.1.52: https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc/0.1.52, Apache 2.0
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
