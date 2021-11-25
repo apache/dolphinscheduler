@@ -18,32 +18,46 @@
 package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-/**
- * create DolphinScheduler
- *
- */
+@ComponentScan(value = "org.apache.dolphinscheduler.dao")
+@EnableAutoConfiguration(exclude = {QuartzAutoConfiguration.class})
 public class CreateDolphinScheduler {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(CreateDolphinScheduler.class)
+            .profiles("shell-create", "shell-cli")
+            .web(WebApplicationType.NONE)
+            .run(args);
+    }
 
-	private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
+    @Component
+    @Profile("shell-create")
+    static class CreateRunner implements CommandLineRunner {
+        private static final Logger logger = LoggerFactory.getLogger(CreateRunner.class);
 
-	/**
-	 * create dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		try {
-			dolphinSchedulerManager.initDolphinScheduler();
-			logger.info("init DolphinScheduler finished");
-			dolphinSchedulerManager.upgradeDolphinScheduler();
-			logger.info("upgrade DolphinScheduler finished");
-			logger.info("create DolphinScheduler success");
-		} catch (Exception e) {
-			logger.error("create DolphinScheduler failed",e);
-		}
+        private final DolphinSchedulerManager dolphinSchedulerManager;
 
-	}
+        CreateRunner(DolphinSchedulerManager dolphinSchedulerManager) {
+            this.dolphinSchedulerManager = dolphinSchedulerManager;
+        }
+
+        @Override
+        public void run(String... args) throws Exception {
+            dolphinSchedulerManager.initDolphinScheduler();
+            logger.info("init DolphinScheduler finished");
+            dolphinSchedulerManager.upgradeDolphinScheduler();
+            logger.info("upgrade DolphinScheduler finished");
+            logger.info("create DolphinScheduler success");
+        }
+    }
 }

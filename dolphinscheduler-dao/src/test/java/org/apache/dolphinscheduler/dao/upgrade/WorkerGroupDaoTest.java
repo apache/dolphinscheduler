@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
-
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
@@ -25,21 +23,17 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class WorkerGroupDaoTest {
+    @Autowired
     protected DataSource dataSource;
 
     @BeforeClass
     public static void setupClass() {
         System.setProperty("spring.profiles.active", "h2");
-    }
-
-    @Before
-    public void setup() {
-        dataSource = getDataSource();
     }
 
     @Test

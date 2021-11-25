@@ -17,26 +17,43 @@
 package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-/**
- * init DolphinScheduler
- *
- */
+@ComponentScan(value = "org.apache.dolphinscheduler.dao")
+@EnableAutoConfiguration(exclude = {QuartzAutoConfiguration.class})
 public class InitDolphinScheduler {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(InitDolphinScheduler.class)
+            .profiles("shell-init", "shell-cli")
+            .web(WebApplicationType.NONE)
+            .run(args);
+    }
 
-	private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
+    @Component
+    @Profile("shell-init")
+    static class InitRunner implements CommandLineRunner {
+        private static final Logger logger = LoggerFactory.getLogger(InitRunner.class);
 
-	/**
-	 * init dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		Thread.currentThread().setName("manager-InitDolphinScheduler");
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		dolphinSchedulerManager.initDolphinScheduler();
-		logger.info("init DolphinScheduler finished");
-		
-	}
+        private final DolphinSchedulerManager dolphinSchedulerManager;
+
+        InitRunner(DolphinSchedulerManager dolphinSchedulerManager) {
+            this.dolphinSchedulerManager = dolphinSchedulerManager;
+        }
+
+        @Override
+        public void run(String... args) throws Exception {
+            dolphinSchedulerManager.initDolphinScheduler();
+            logger.info("init DolphinScheduler finished");
+        }
+    }
 }
