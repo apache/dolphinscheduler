@@ -66,10 +66,10 @@ public class TaskNodeRelation {
 
     @Override
     public String toString() {
-        return "TaskNodeRelation{" +
-              "startNode='" + startNode + '\'' +
-              ", endNode='" + endNode + '\'' +
-              '}';
+        return "TaskNodeRelation{"
+                + "startNode='" + startNode + '\''
+                + ", endNode='" + endNode + '\''
+                + '}';
     }
 
     @Override

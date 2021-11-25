@@ -41,9 +41,9 @@ public class HttpProperty {
     }
 
     public HttpProperty(String prop, HttpParametersType httpParametersType, String value) {
-      this.prop = prop;
-      this.httpParametersType = httpParametersType;
-      this.value = value;
+        this.prop = prop;
+        this.httpParametersType = httpParametersType;
+        this.value = value;
     }
 
     /**
@@ -53,7 +53,7 @@ public class HttpProperty {
      * @see HttpProperty#prop
      */
     public String getProp() {
-      return prop;
+        return prop;
     }
 
     /**
@@ -63,7 +63,7 @@ public class HttpProperty {
      * @see HttpProperty#prop
      */
     public void setProp(String prop) {
-      this.prop = prop;
+        this.prop = prop;
     }
 
     /**
@@ -73,7 +73,7 @@ public class HttpProperty {
      * @see HttpProperty#value
      */
     public String getValue() {
-      return value;
+        return value;
     }
 
     /**
@@ -83,42 +83,41 @@ public class HttpProperty {
      * @see HttpProperty#value
      */
     public void setValue(String value) {
-      this.value = value;
+        this.value = value;
     }
 
     public HttpParametersType getHttpParametersType() {
-      return httpParametersType;
+        return httpParametersType;
     }
 
     public void setHttpParametersType(HttpParametersType httpParametersType) {
-      this.httpParametersType = httpParametersType;
+        this.httpParametersType = httpParametersType;
     }
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) {
-          return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-          return false;
-      }
-      HttpProperty property = (HttpProperty) o;
-      return Objects.equals(prop, property.prop) &&
-              Objects.equals(value, property.value);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        HttpProperty property = (HttpProperty) o;
+        return Objects.equals(prop, property.prop)
+                && Objects.equals(value, property.value);
     }
-
 
     @Override
     public int hashCode() {
-      return Objects.hash(prop, value);
+        return Objects.hash(prop, value);
     }
 
     @Override
     public String toString() {
-      return "HttpProperty{" +
-              "prop='" + prop + '\'' +
-              ", httpParametersType=" + httpParametersType +
-              ", value='" + value + '\'' +
-              '}';
+        return "HttpProperty{"
+              + "prop='" + prop + '\''
+              + ", httpParametersType=" + httpParametersType
+              + ", value='" + value + '\''
+              + '}';
     }
 }

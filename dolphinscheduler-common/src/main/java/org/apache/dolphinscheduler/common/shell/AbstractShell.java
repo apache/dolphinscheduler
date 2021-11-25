@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.shell;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +30,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A base class for running a Unix command.
@@ -187,7 +187,9 @@ public abstract class AbstractShell {
         try {
             errThread.start();
             inThread.start();
-        } catch (IllegalStateException ise) { }
+        } catch (IllegalStateException ise) {
+            logger.warn("Illegal while starting the error and in thread", ise);
+        }
         try {
             // parse the output
             exitCode = process.waitFor();

@@ -130,11 +130,11 @@ public class Property implements Serializable {
 
     @Override
     public String toString() {
-        return "Property{" +
-              "prop='" + prop + '\'' +
-              ", direct=" + direct +
-              ", type=" + type +
-              ", value='" + value + '\'' +
-              '}';
+        return "Property{"
+                + "prop='" + prop + '\''
+                + ", direct=" + direct
+                + ", type=" + type
+                + ", value='" + value + '\''
+                + '}';
     }
 }
