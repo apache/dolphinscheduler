@@ -56,8 +56,7 @@ public class CacheNotifyServiceTest {
 
     @Mock
     private RegistryClient registryClient;
-
-
+    
     @Test
     public void testNotifyMaster() {
         User user1 = new User();
