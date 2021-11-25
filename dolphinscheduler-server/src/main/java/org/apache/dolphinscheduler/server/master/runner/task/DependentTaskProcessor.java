@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -41,6 +42,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -86,13 +89,20 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
+
+        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+            processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion(),
+            taskInstance.getProcessInstanceId(),
+            taskInstance.getId()));
+
         taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
+            taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
         taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+            processInstance.getProcessDefinitionVersion(),
+            taskInstance.getProcessInstanceId(),
+            taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -120,13 +130,13 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     @Override
     protected boolean taskTimeout() {
         TaskTimeoutStrategy taskTimeoutStrategy =
-                taskDefinition.getTimeoutNotifyStrategy();
+            taskDefinition.getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
+            && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
         logger.info("dependent task {} timeout, strategy {} ",
-                taskInstance.getId(), taskTimeoutStrategy.getDescp());
+            taskInstance.getId(), taskTimeoutStrategy.getDescp());
         result = DependResult.FAILED;
         endTask();
         return true;
