@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.service.cache.config.CacheConfig;
+//import org.apache.dolphinscheduler.service.cache.config.CacheConfig;
 import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -58,8 +58,6 @@ public class CacheNotifyServiceTest {
     @Mock
     private RegistryClient registryClient;
 
-    @Mock
-    private CacheConfig cacheConfig;
 
     @Test
     public void testNotifyMaster() {
@@ -82,7 +80,6 @@ public class CacheNotifyServiceTest {
         serverList.add(server);
 
         Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(serverList);
-        Mockito.when(cacheConfig.isCacheEnable()).thenReturn(true);
 
         cacheNotifyService.notifyMaster(cacheExpireCommand);
 

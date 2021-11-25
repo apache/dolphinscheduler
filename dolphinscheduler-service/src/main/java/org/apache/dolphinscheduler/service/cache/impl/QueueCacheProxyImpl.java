@@ -29,7 +29,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheResolver = "cacheResolver", cacheNames = "user")
 public class QueueCacheProxyImpl implements QueueCacheProxy {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

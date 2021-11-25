@@ -17,6 +17,13 @@
 spring:
   application:
     name: master-server
+  cache:
+    type: caffeine
+    cache-names:
+      - tenant
+      - user
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=300s
 
 master:
   listen-port: 5678

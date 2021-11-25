@@ -32,7 +32,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheResolver = "cacheResolver", cacheNames = "user")
+@CacheConfig(cacheNames = "user")
 public class UserCacheProxyImpl implements UserCacheProxy {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

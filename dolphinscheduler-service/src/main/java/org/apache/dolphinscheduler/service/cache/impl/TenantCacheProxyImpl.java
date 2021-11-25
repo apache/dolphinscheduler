@@ -32,7 +32,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheResolver = "cacheResolver", cacheNames = "tenant")
+@CacheConfig(cacheNames = "tenant")
 public class TenantCacheProxyImpl implements TenantCacheProxy {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -49,6 +49,7 @@ public class TenantCacheProxyImpl implements TenantCacheProxy {
     @Override
     @Cacheable(sync = true)
     public Tenant queryById(int tenantId) {
+        logger.info("tenant cache proxy, tenantId:{}", tenantId);
         return tenantMapper.queryById(tenantId);
     }
 
