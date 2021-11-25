@@ -58,9 +58,9 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
     /**
      * query schedule list by process definition code
      * @param processDefinitionCode processDefinitionCode
-     * @return schedule list
+     * @return schedule
      */
-    List<Schedule> queryByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+    Schedule queryByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
     /**
      * query schedule list by process definition code

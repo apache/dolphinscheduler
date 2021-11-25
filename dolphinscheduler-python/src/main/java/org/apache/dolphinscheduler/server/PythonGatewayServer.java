@@ -259,16 +259,16 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                         long processDefinitionCode,
                                         String schedule,
                                         String workerGroup) {
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
+        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         // create or update schedule
         int scheduleId;
-        if (schedules.isEmpty()) {
+        if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
-            scheduleId = schedules.get(0).getId();
+            scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
