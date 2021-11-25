@@ -21,7 +21,7 @@ const dataquality = [
   {
     path: '/dataquality',
     name: 'dataquality',
-    component: resolve => require(['../pages/dataquality/index'], resolve),
+    component: resolve => require(['../../pages/dataquality/index'], resolve),
     meta: {
       title: `${i18n.$t('DataQuality')}`
     },
@@ -32,7 +32,7 @@ const dataquality = [
       {
         path: '/dataquality/result',
         name: 'data-quality-result',
-        component: resolve => require(['../pages/dataquality/pages/result/index'], resolve),
+        component: resolve => require(['../../pages/dataquality/pages/result/index'], resolve),
         meta: {
           title: `${i18n.$t('DataQuality Result')}`
         }
@@ -40,7 +40,7 @@ const dataquality = [
       {
         path: '/dataquality/rule',
         name: 'data-quality-rule',
-        component: resolve => require(['../pages/dataquality/pages/rule/index'], resolve),
+        component: resolve => require(['../../pages/dataquality/pages/rule/index'], resolve),
         meta: {
           title: `${i18n.$t('DataQuality Rule')}`
         }
