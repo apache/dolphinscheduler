@@ -204,6 +204,7 @@ spring-boot-starter-json-2.5.6.jar
 spring-boot-starter-logging-2.5.6.jar
 spring-boot-starter-quartz-2.5.6.jar
 spring-boot-starter-web-2.5.6.jar
+spring-boot-starter-cache-2.5.6.jar
 spring-context-5.3.12.jar
 spring-context-support-5.3.12.jar
 spring-core-5.3.12.jar

@@ -370,6 +370,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-boot-starter-logging 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging/2.5.6, Apache 2.0
     spring-boot-starter-quartz 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.5.6, Apache 2.0
     spring-boot-starter-web 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.5.6, Apache 2.0
+    spring-boot-starter-cache 2.5.6: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache/2.5.6, Apache 2.0
     spring-context 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.12, Apache 2.0
     spring-context-support 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.12, Apache 2.0
     spring-core 5.3.12: https://mvnrepository.com/artifact/org.springframework/spring-core, Apache 2.0
