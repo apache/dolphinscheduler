@@ -51,7 +51,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * project service test
  **/
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TaskGroupServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceTest.class);
@@ -130,7 +130,8 @@ public class TaskGroupServiceTest {
         IPage<TaskGroup> page = new Page<>(1, 10);
         page.setRecords(getList());
         User loginUser = getLoginUser();
-        Mockito.when(taskGroupMapper.queryTaskGroupPaging(page, 1, null, 0)).thenReturn(page);
+        Mockito.when(taskGroupMapper.queryTaskGroupPaging(Mockito.any(Page.class), Mockito.eq(10),
+                Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
 
         // query all
         Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, 1, 10);
@@ -143,7 +144,7 @@ public class TaskGroupServiceTest {
 
         User loginUser = getLoginUser();
         TaskGroup taskGroup = getTaskGroup();
-        taskGroup.setStatus(Flag.YES.getCode());
+        taskGroup.setStatus(Flag.NO.getCode());
         // Task group status error
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         Map<String, Object> result = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);

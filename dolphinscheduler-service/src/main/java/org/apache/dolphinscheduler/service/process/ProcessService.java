@@ -2513,6 +2513,7 @@ public class ProcessService {
     }
 
     /**
+     * the first time (when submit the task ) get the resource of the task group
      * @param taskId    task id
      * @param taskName
      * @param groupId
@@ -2557,6 +2558,11 @@ public class ProcessService {
         return false;
     }
 
+    /**
+     *  try to get the task group resource(when other task release the resource)
+     * @param taskGroupQueue
+     * @return
+     */
     public boolean robTaskGroupResouce(TaskGroupQueue taskGroupQueue) {
         TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupQueue.getGroupId());
         int affectedCount = taskGroupMapper.updateTaskGroupResource(taskGroup.getId(),taskGroupQueue.getId(),
@@ -2606,7 +2612,7 @@ public class ProcessService {
                 taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
             }
         } catch (Exception e) {
-            logger.info("error:{}",e);
+            logger.error("release the task group error",e);
         }
         logger.info("updateTask:{}",taskInstance.getName());
         changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);

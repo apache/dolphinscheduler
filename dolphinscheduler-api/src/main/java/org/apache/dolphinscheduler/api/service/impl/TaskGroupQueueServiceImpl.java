@@ -106,7 +106,6 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         pageInfo.setTotalList(taskGroupQueue.getRecords());
 
         result.put(Constants.DATA_LIST, pageInfo);
-        logger.info("select result:{}", taskGroupQueue);
         putMsg(result, Status.SUCCESS);
 
         return result;

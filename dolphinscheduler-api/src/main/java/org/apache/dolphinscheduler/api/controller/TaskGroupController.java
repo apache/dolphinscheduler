@@ -87,8 +87,6 @@ public class TaskGroupController extends BaseController {
                                   @RequestParam("name") String name,
                                   @RequestParam("description") String description,
                                   @RequestParam("groupSize") Integer groupSize) {
-        User user = new User();
-
         Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, name, description, groupSize);
         return returnDataList(result);
     }

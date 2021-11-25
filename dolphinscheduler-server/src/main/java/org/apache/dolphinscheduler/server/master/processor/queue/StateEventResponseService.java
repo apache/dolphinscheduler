@@ -149,7 +149,7 @@ public class StateEventResponseService {
         }
     }
 
-    public void addEnent2WorkflowExecute(StateEvent stateEvent) {
+    public void addEvent2WorkflowExecute(StateEvent stateEvent) {
         WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         workflowExecuteThread.addStateEvent(stateEvent);
     }

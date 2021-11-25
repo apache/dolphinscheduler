@@ -60,7 +60,7 @@ public class TaskEventProcessor implements NettyRequestProcessor {
         stateEvent.setTaskInstanceId(taskEventChangeCommand.getTaskInstanceId());
         stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
         logger.info("received command : {}", stateEvent);
-        stateEventResponseService.addEnent2WorkflowExecute(stateEvent);
+        stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
     }
 
 }
