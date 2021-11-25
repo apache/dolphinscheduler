@@ -39,15 +39,11 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-/**
- *  master server
- */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
     @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
         "org.apache.dolphinscheduler.server.worker.*",
@@ -81,7 +77,7 @@ public class MasterServer implements IStoppable {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         new SpringApplicationBuilder(MasterServer.class)
             .profiles("master")
-            .web(WebApplicationType.NONE).run(args);
+            .run(args);
     }
 
     /**

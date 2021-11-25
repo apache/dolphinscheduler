@@ -87,7 +87,6 @@ public class WorkflowExecuteThreadTest {
 
         applicationContext = mock(ApplicationContext.class);
         config = new MasterConfig();
-        config.setExecTaskNum(1);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
