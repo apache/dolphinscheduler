@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
-import org.apache.dolphinscheduler.api.dto.ScheduleDto;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
@@ -1586,9 +1585,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if (scheduleJson==null||scheduleJson.trim().isEmpty()){
+        if (scheduleJson == null || scheduleJson.trim().isEmpty()) {
             return result;
         }
+
         // save dag schedule
         Map<String, Object> scheduleResult = createDagSchedule(loginUser, projectCode, processDefinitionCode, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
@@ -1613,24 +1613,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                   long projectCode,
                                                   long processDefinitionCode,
                                                   String scheduleJson) {
-        Map<String, Object> result = new HashMap<>();
-        ScheduleDto scheduleDto = JSONUtils.parseObject(scheduleJson, ScheduleDto.class);
-        ScheduleParam schedule = scheduleDto.getSchedule();
-        FailureStrategy failureStrategy = scheduleDto.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleDto.getFailureStrategy(); // 默认：CONTINUE
-        WarningType warningType = scheduleDto.getWarningType() == null ? WarningType.NONE : scheduleDto.getWarningType(); // 默认：NONE
-        Priority processInstancePriority = scheduleDto.getProcessInstancePriority() == null ? Priority.MEDIUM : scheduleDto.getProcessInstancePriority(); // 默认：MEDIUM
-        Integer warningGroupId = scheduleDto.getWarningGroupId() == null ? 1 : scheduleDto.getWarningGroupId(); // 默认：1
-        String workerGroup = scheduleDto.getWorkerGroup() == null ? "default" : scheduleDto.getWorkerGroup(); // 默认：default
-        Long environmentCode = scheduleDto.getEnvironmentCode() == null ? -1 : scheduleDto.getEnvironmentCode(); // 默认：-1
-        if (schedule == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "工作流定时");
-            return result;
-        }
+        Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
+        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy(); // 默认：CONTINUE
+        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType(); // 默认：NONE
+        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority(); // 默认：MEDIUM
+        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId(); // 默认：1
+        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup(); // 默认：default
+        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode(); // 默认：-1
+
+        ScheduleParam param = new ScheduleParam();
+        param.setStartTime(schedule.getStartTime());
+        param.setEndTime(schedule.getEndTime());
+        param.setCrontab(schedule.getCrontab());
+        param.setTimezoneId(schedule.getTimezoneId());
+
         return schedulerService.insertSchedule(
                 loginUser,
                 projectCode,
                 processDefinitionCode,
-                JSONUtils.toJsonString(schedule),
+                JSONUtils.toJsonString(param),
                 warningType,
                 warningGroupId,
                 failureStrategy,
@@ -1709,7 +1710,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if (scheduleJson == null || scheduleJson.trim().isEmpty()){
+        if (scheduleJson == null || scheduleJson.trim().isEmpty()) {
             return result;
         }
         // update dag schedule
@@ -1744,24 +1745,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                   long projectCode,
                                                   long processDefinitionCode,
                                                   String scheduleJson) {
-        Map<String, Object> result = new HashMap<>();
-        ScheduleDto scheduleDto = JSONUtils.parseObject(scheduleJson, ScheduleDto.class);
-        ScheduleParam schedule = scheduleDto.getSchedule();
-        FailureStrategy failureStrategy = scheduleDto.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleDto.getFailureStrategy(); // 默认：CONTINUE
-        WarningType warningType = scheduleDto.getWarningType() == null ? WarningType.NONE : scheduleDto.getWarningType(); // 默认：NONE
-        Priority processInstancePriority = scheduleDto.getProcessInstancePriority() == null ? Priority.MEDIUM : scheduleDto.getProcessInstancePriority(); // 默认：MEDIUM
-        Integer warningGroupId = scheduleDto.getWarningGroupId() == null ? 1 : scheduleDto.getWarningGroupId(); // 默认：1
-        String workerGroup = scheduleDto.getWorkerGroup() == null ? "default" : scheduleDto.getWorkerGroup(); // 默认：default
-        Long environmentCode = scheduleDto.getEnvironmentCode() == null ? -1 : scheduleDto.getEnvironmentCode(); // 默认：-1
-        if (schedule == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "工作流定时");
-            return result;
-        }
+        Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
+        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy(); // 默认：CONTINUE
+        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType(); // 默认：NONE
+        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority(); // 默认：MEDIUM
+        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId(); // 默认：1
+        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup(); // 默认：default
+        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode(); // 默认：-1
+
+        ScheduleParam param = new ScheduleParam();
+        param.setStartTime(schedule.getStartTime());
+        param.setEndTime(schedule.getEndTime());
+        param.setCrontab(schedule.getCrontab());
+        param.setTimezoneId(schedule.getTimezoneId());
+
         return schedulerService.updateScheduleByProcessDefinitionCode(
                 loginUser,
                 projectCode,
                 processDefinitionCode,
-                JSONUtils.toJsonString(schedule),
+                JSONUtils.toJsonString(param),
                 warningType,
                 warningGroupId,
                 failureStrategy,
