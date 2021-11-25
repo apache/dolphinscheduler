@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-//import org.apache.dolphinscheduler.service.cache.config.CacheConfig;
 import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 

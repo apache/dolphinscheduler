@@ -18,12 +18,13 @@ spring:
   application:
     name: master-server
   cache:
+    # default enable cache, you can disable by `type: none`
     type: caffeine
     cache-names:
       - tenant
       - user
     caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s
+      spec: maximumSize=100,expireAfterWrite=60s,recordStats
 
 master:
   listen-port: 5678

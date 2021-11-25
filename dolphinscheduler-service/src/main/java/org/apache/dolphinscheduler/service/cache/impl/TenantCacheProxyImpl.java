@@ -49,7 +49,7 @@ public class TenantCacheProxyImpl implements TenantCacheProxy {
     @Override
     @Cacheable(sync = true)
     public Tenant queryById(int tenantId) {
-        logger.info("tenant cache proxy, tenantId:{}", tenantId);
+        logger.debug("tenant cache proxy, tenantId:{}", tenantId);
         return tenantMapper.queryById(tenantId);
     }
 
