@@ -17,53 +17,25 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
-import org.apache.dolphinscheduler.common.Constants;
-
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource(value = "worker.properties")
+@EnableConfigurationProperties
+@ConfigurationProperties("worker")
 public class WorkerConfig {
-
-    @Value("${worker.listen.port:1234}")
     private int listenPort;
-
-    @Value("${worker.exec.threads:100}")
-    private int workerExecThreads;
-
-    @Value("${worker.heartbeat.interval:10}")
-    private int workerHeartbeatInterval;
-
-    @Value("${worker.host.weight:100}")
+    private int execThreads;
+    private int heartbeatInterval;
     private int hostWeight;
-
-    @Value("${worker.tenant.auto.create:false}")
-    private boolean workerTenantAutoCreate;
-
-    @Value("${worker.max.cpuload.avg:-1}")
-    private int workerMaxCpuloadAvg;
-
-    @Value("${worker.reserved.memory:0.3}")
-    private double workerReservedMemory;
-
-    @Value("#{'${worker.groups:default}'.split(',')}")
-    private Set<String> workerGroups;
-
-    @Value("${alert.listen.host:localhost}")
+    private boolean tenantAutoCreate;
+    private int maxCpuLoadAvg;
+    private double reservedMemory;
+    private Set<String> groups;
     private String alertListenHost;
-
-    @Value("${task.plugin.dir:}")
-    private String taskPluginDir;
-
-    @Value("${maven.local.repository:}")
-    private String mavenLocalRepository;
-
-    @Value("${task.plugin.binding:}")
-    private String taskPluginBinding;
 
     public int getListenPort() {
         return listenPort;
@@ -73,55 +45,20 @@ public class WorkerConfig {
         this.listenPort = listenPort;
     }
 
-    public Set<String> getWorkerGroups() {
-        return workerGroups;
+    public int getExecThreads() {
+        return execThreads;
     }
 
-    public void setWorkerGroups(Set<String> workerGroups) {
-        this.workerGroups = workerGroups;
+    public void setExecThreads(int execThreads) {
+        this.execThreads = execThreads;
     }
 
-    public int getWorkerExecThreads() {
-        return workerExecThreads;
+    public int getHeartbeatInterval() {
+        return heartbeatInterval;
     }
 
-    public void setWorkerExecThreads(int workerExecThreads) {
-        this.workerExecThreads = workerExecThreads;
-    }
-
-    public int getWorkerHeartbeatInterval() {
-        return workerHeartbeatInterval;
-    }
-
-    public void setWorkerHeartbeatInterval(int workerHeartbeatInterval) {
-        this.workerHeartbeatInterval = workerHeartbeatInterval;
-    }
-
-    public boolean getWorkerTenantAutoCreate() {
-        return workerTenantAutoCreate;
-    }
-
-    public void setWorkerTenantAutoCreate(boolean workerTenantAutoCreate) {
-        this.workerTenantAutoCreate = workerTenantAutoCreate;
-    }
-
-    public double getWorkerReservedMemory() {
-        return workerReservedMemory;
-    }
-
-    public void setWorkerReservedMemory(double workerReservedMemory) {
-        this.workerReservedMemory = workerReservedMemory;
-    }
-
-    public int getWorkerMaxCpuloadAvg() {
-        if (workerMaxCpuloadAvg == -1) {
-            return Constants.DEFAULT_WORKER_CPU_LOAD;
-        }
-        return workerMaxCpuloadAvg;
-    }
-
-    public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
-        this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    public void setHeartbeatInterval(int heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 
     public int getHostWeight() {
@@ -132,35 +69,43 @@ public class WorkerConfig {
         this.hostWeight = hostWeight;
     }
 
+    public boolean isTenantAutoCreate() {
+        return tenantAutoCreate;
+    }
+
+    public void setTenantAutoCreate(boolean tenantAutoCreate) {
+        this.tenantAutoCreate = tenantAutoCreate;
+    }
+
+    public int getMaxCpuLoadAvg() {
+        return maxCpuLoadAvg > 0 ? maxCpuLoadAvg : Runtime.getRuntime().availableProcessors() * 2;
+    }
+
+    public void setMaxCpuLoadAvg(int maxCpuLoadAvg) {
+        this.maxCpuLoadAvg = maxCpuLoadAvg;
+    }
+
+    public double getReservedMemory() {
+        return reservedMemory;
+    }
+
+    public void setReservedMemory(double reservedMemory) {
+        this.reservedMemory = reservedMemory;
+    }
+
+    public Set<String> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<String> groups) {
+        this.groups = groups;
+    }
+
     public String getAlertListenHost() {
         return alertListenHost;
     }
 
     public void setAlertListenHost(String alertListenHost) {
         this.alertListenHost = alertListenHost;
-    }
-
-    public String getTaskPluginDir() {
-        return taskPluginDir;
-    }
-
-    public void setTaskPluginDir(String taskPluginDir) {
-        this.taskPluginDir = taskPluginDir;
-    }
-
-    public String getMavenLocalRepository() {
-        return mavenLocalRepository;
-    }
-
-    public void setMavenLocalRepository(String mavenLocalRepository) {
-        this.mavenLocalRepository = mavenLocalRepository;
-    }
-
-    public String getTaskPluginBinding() {
-        return taskPluginBinding;
-    }
-
-    public void setTaskPluginBinding(String taskPluginBinding) {
-        this.taskPluginBinding = taskPluginBinding;
     }
 }

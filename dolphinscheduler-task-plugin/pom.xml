@@ -42,6 +42,4 @@
         <module>dolphinscheduler-task-procedure</module>
         <module>dolphinscheduler-task-pigeon</module>
     </modules>
-
-
 </project>

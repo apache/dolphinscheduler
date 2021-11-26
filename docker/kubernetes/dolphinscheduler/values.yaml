@@ -22,7 +22,7 @@
 timezone: "Asia/Shanghai"
 
 image:
-  repository: "apache/dolphinscheduler"
+  repository: "dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler"
   tag: "2.0.0-SNAPSHOT"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
@@ -299,7 +299,6 @@ alert:
   ## Configmap
   configmap:
     ALERT_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-    ALERT_PLUGIN_DIR: "lib/plugin/alert"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

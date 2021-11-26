@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -69,7 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public abstract class UpgradeDao extends AbstractBaseDao {
+public abstract class UpgradeDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
@@ -78,16 +78,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
-
-    @Override
-    protected void init() {
-
-    }
-
-    /**
-     * get datasource
-     * @return DruidDataSource
-     */
     public static DataSource getDataSource(){
         return ConnectionFactory.getInstance().getDataSource();
     }
@@ -214,7 +204,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
         String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
             conn = dataSource.getConnection();
@@ -648,6 +637,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 ObjectNode task = (ObjectNode) tasks.path(i);
                 ObjectNode param = (ObjectNode) task.get("params");
                 TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+                String taskType = task.get("type").asText();
                 if (param != null) {
                     JsonNode resourceJsonNode = param.get("resourceList");
                     if (resourceJsonNode != null && !resourceJsonNode.isEmpty()) {
@@ -656,6 +646,13 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                         taskDefinitionLog.setResourceIds(StringUtils.join(resourceIds, Constants.COMMA));
                     } else {
                         taskDefinitionLog.setResourceIds(StringUtils.EMPTY);
+                    }
+                    if (TaskType.SUB_PROCESS.getDesc().equals(taskType)) {
+                        JsonNode jsonNodeDefinitionId = param.get("processDefinitionId");
+                        if (jsonNodeDefinitionId != null) {
+                            param.put("processDefinitionCode", processDefinitionMap.get(jsonNodeDefinitionId.asInt()).getCode());
+                            param.remove("processDefinitionId");
+                        }
                     }
                     param.put("conditionResult", task.get("conditionResult"));
                     param.put("dependence", task.get("dependence"));
@@ -669,15 +666,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 }
                 taskDefinitionLog.setDescription(task.get("description").asText());
                 taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
-                taskDefinitionLog.setTaskType(task.get("type").asText());
-                taskDefinitionLog.setFailRetryInterval(task.get("retryInterval").asInt());
-                taskDefinitionLog.setFailRetryTimes(task.get("maxRetryTimes").asInt());
+                taskDefinitionLog.setTaskType(taskType);
+                taskDefinitionLog.setFailRetryInterval(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 1 : task.get("retryInterval").asInt());
+                taskDefinitionLog.setFailRetryTimes(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 0 : task.get("maxRetryTimes").asInt());
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
                 String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
-                long taskCode = SnowFlakeUtils.getInstance().nextId();
-                // System.out.println(taskCode);
+                long taskCode = CodeGenerateUtils.getInstance().genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());

@@ -18,15 +18,18 @@
 """Module process definition, core class for workflow define."""
 
 import json
-from typing import Optional, List, Dict, Set
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set
 
 from pydolphinscheduler.constants import (
-    ProcessDefinitionReleaseState,
     ProcessDefinitionDefault,
+    ProcessDefinitionReleaseState,
 )
 from pydolphinscheduler.core.base import Base
+from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.side import Tenant, Project, User
+from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
 class ProcessDefinitionContext:
@@ -83,6 +86,10 @@ class ProcessDefinition(Base):
         self,
         name: str,
         description: Optional[str] = None,
+        schedule: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        timezone: Optional[str] = ProcessDefinitionDefault.TIME_ZONE,
         user: Optional[str] = ProcessDefinitionDefault.USER,
         project: Optional[str] = ProcessDefinitionDefault.PROJECT,
         tenant: Optional[str] = ProcessDefinitionDefault.TENANT,
@@ -93,6 +100,10 @@ class ProcessDefinition(Base):
         param: Optional[List] = None,
     ):
         super().__init__(name, description)
+        self.schedule = schedule
+        self._start_time = start_time
+        self._end_time = end_time
+        self.timezone = timezone
         self._user = user
         self._project = project
         self._tenant = tenant
@@ -144,10 +155,39 @@ class ProcessDefinition(Base):
             ProcessDefinitionDefault.USER_PWD,
             ProcessDefinitionDefault.USER_EMAIL,
             ProcessDefinitionDefault.USER_PHONE,
-            ProcessDefinitionDefault.TENANT,
-            ProcessDefinitionDefault.QUEUE,
+            self._tenant,
+            self._queue,
             ProcessDefinitionDefault.USER_STATE,
         )
+
+    @staticmethod
+    def _parse_datetime(val: Any) -> Any:
+        if val is None or isinstance(val, datetime):
+            return val
+        elif isinstance(val, str):
+            return conv_from_str(val)
+        else:
+            raise PyDSParamException("Do not support value type %s for now", type(val))
+
+    @property
+    def start_time(self) -> Any:
+        """Get attribute start_time."""
+        return self._parse_datetime(self._start_time)
+
+    @start_time.setter
+    def start_time(self, val) -> None:
+        """Set attribute start_time."""
+        self._start_time = val
+
+    @property
+    def end_time(self) -> Any:
+        """Get attribute end_time."""
+        return self._parse_datetime(self._end_time)
+
+    @end_time.setter
+    def end_time(self, val) -> None:
+        """Set attribute end_time."""
+        self._end_time = val
 
     @property
     def task_definition_json(self) -> List[Dict]:
@@ -165,6 +205,25 @@ class ProcessDefinition(Base):
         else:
             self._handle_root_relation()
             return [tr.to_dict() for tr in self._task_relations]
+
+    @property
+    def schedule_json(self) -> Optional[Dict]:
+        """Get schedule parameter json object. This is requests from java gateway interface."""
+        if not self.schedule:
+            return None
+        else:
+            start_time = conv_to_schedule(
+                self.start_time if self.start_time else datetime.now()
+            )
+            end_time = conv_to_schedule(
+                self.end_time if self.end_time else MAX_DATETIME
+            )
+            return {
+                "startTime": start_time,
+                "endTime": end_time,
+                "crontab": self.schedule,
+                "timezoneId": self.timezone,
+            }
 
     # TODO inti DAG's tasks are in the same location with default {x: 0, y: 0}
     @property
@@ -213,7 +272,7 @@ class ProcessDefinition(Base):
     def get_task(self, code: str) -> "Task":  # noqa: F821
         """Get task object from process definition by given code."""
         if code not in self.tasks:
-            raise ValueError(
+            raise PyDSTaskNoFoundException(
                 "Task with code %s can not found in process definition %",
                 (code, self.name),
             )
@@ -236,7 +295,7 @@ class ProcessDefinition(Base):
         """
         tasks = self.get_tasks_by_name(name)
         if not tasks:
-            raise ValueError(f"Can not find task with name {name}.")
+            raise PyDSTaskNoFoundException(f"Can not find task with name {name}.")
         return tasks.pop()
 
     def run(self):
@@ -274,6 +333,7 @@ class ProcessDefinition(Base):
             self.name,
             str(self.description) if self.description else "",
             str(self.param) if self.param else None,
+            json.dumps(self.schedule_json) if self.schedule_json else None,
             json.dumps(self.task_location),
             self.timeout,
             self.worker_group,
