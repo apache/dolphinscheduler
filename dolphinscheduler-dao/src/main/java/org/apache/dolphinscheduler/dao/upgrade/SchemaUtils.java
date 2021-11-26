@@ -15,55 +15,48 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.dao.upgrade;
+
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+
+import com.google.common.base.Strings;
 
 /**
  * Metadata related common classes
  */
 public class SchemaUtils {
-
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
-    private static final Pattern p = Pattern.compile("\\s*|\t|\r|\n");
 
     private SchemaUtils() {
         throw new UnsupportedOperationException("Construct SchemaUtils");
     }
 
-    /**
-     * Gets upgradable schemas for all upgrade directories
-     *
-     * @return all schema list
-     */
-    public static List<String> getAllSchemaList() {
-        List<String> schemaDirList = new ArrayList<>();
-        File[] schemaDirArr = FileUtils.getAllDir("sql/upgrade");
+    public static List<String> getAllSchemaList() throws IOException {
+        final File[] schemaDirArr = new ClassPathResource("sql/upgrade").getFile().listFiles();
+
         if (schemaDirArr == null || schemaDirArr.length == 0) {
-            return null;
+            return Collections.emptyList();
         }
 
-        for (File file : schemaDirArr) {
-            schemaDirList.add(file.getName());
-        }
-
-        schemaDirList.sort((o1, o2) -> {
+        return Arrays.stream(schemaDirArr).map(File::getName).sorted((o1, o2) -> {
             try {
-                String dir1 = String.valueOf(o1);
-                String dir2 = String.valueOf(o2);
-                String version1 = dir1.split("_")[0];
-                String version2 = dir2.split("_")[0];
+                String version1 = o1.split("_")[0];
+                String version2 = o2.split("_")[0];
+
                 if (version1.equals(version2)) {
                     return 0;
                 }
@@ -73,14 +66,11 @@ public class SchemaUtils {
                 }
 
                 return -1;
-
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
-        });
-
-        return schemaDirList;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -115,11 +105,12 @@ public class SchemaUtils {
      *
      * @return current software version
      */
-    public static String getSoftVersion() {
+    public static String getSoftVersion() throws IOException {
+        final ClassPathResource softVersionFile = new ClassPathResource("sql/soft_version");
         String softVersion;
         try {
-            softVersion = FileUtils.readFile2Str(new FileInputStream("sql/soft_version"));
-            softVersion = replaceBlank(softVersion);
+            softVersion = FileUtils.readFile2Str(softVersionFile.getInputStream());
+            softVersion = Strings.nullToEmpty(softVersion).replaceAll("\\s+|\r|\n", "");
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
@@ -127,19 +118,4 @@ public class SchemaUtils {
         return softVersion;
     }
 
-    /**
-     * Strips the string of space carriage returns and tabs
-     *
-     * @param str string
-     * @return string removed blank
-     */
-    public static String replaceBlank(String str) {
-        String dest = "";
-        if (str != null) {
-
-            Matcher m = p.matcher(str);
-            dest = m.replaceAll("");
-        }
-        return dest;
-    }
 }
