@@ -141,9 +141,7 @@
     },
     created () {
       let o = this.backfillItem
-      console.log(o)
       let dependentResult = this.dependResult || {}
-      console.log(dependentResult)
       // Does not represent an empty object backfill
       if (!_.isEmpty(o)) {
         this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
