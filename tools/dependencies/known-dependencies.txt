@@ -237,3 +237,5 @@ hive-shims:2.1.0
 hive-shims-0.23:2.1.0
 hive-shims-common:2.1.0
 hive-shims-scheduler:2.1.0
+hadoop-yarn-server-resourcemanager-2.6.0.jar
+hadoop-yarn-server-applicationhistoryservice-2.6.0.jar
