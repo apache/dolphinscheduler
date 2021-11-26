@@ -128,7 +128,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return execute process instance code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> execProcessInstance(User loginUser, long projectCode,
                                                    long processDefinitionCode, String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
