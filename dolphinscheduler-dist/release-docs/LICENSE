@@ -453,6 +453,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     hive-shims-scheduler 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-scheduler/2.1.0, Apache 2.0
     hadoop-yarn-server-applicationhistoryservice 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-applicationhistoryservice/2.6.0, Apache 2.0
     hadoop-yarn-server-resourcemanager 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-resourcemanager/2.6.0, Apache 2.0
+    hadoop-yarn-server-web-proxy 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-web-proxy/2.6.0, Apache 2.0
 
 ========================================================================
 EPL licenses
