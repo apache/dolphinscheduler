@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * date interval class
  */
 public class DateInterval {
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date endTime;
 
-    public DateInterval(Date beginTime, Date endTime){
+    public DateInterval(Date beginTime, Date endTime) {
         this.startTime = beginTime;
         this.endTime = endTime;
-
     }
 
     @Override
@@ -44,8 +44,8 @@ public class DateInterval {
             return true;
         } else {
             DateInterval that = (DateInterval) obj;
-            return startTime.equals(that.startTime) &&
-                    endTime.equals(that.endTime);
+            return startTime.equals(that.startTime)
+                    && endTime.equals(that.endTime);
         }
     }
 

@@ -22,8 +22,8 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

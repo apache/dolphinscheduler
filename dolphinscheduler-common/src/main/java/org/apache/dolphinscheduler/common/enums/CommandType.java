@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+package org.apache.dolphinscheduler.common.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * command types
@@ -54,7 +55,7 @@ public enum CommandType {
     RECOVER_SERIAL_WAIT(11, "recover serial wait"),
     ;
 
-    CommandType(int code, String descp){
+    CommandType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -78,7 +79,6 @@ public enum CommandType {
             COMMAND_TYPE_MAP.put(commandType.code,commandType);
         }
     }
-
 
     public static CommandType of(Integer status) {
         if (COMMAND_TYPE_MAP.containsKey(status)) {

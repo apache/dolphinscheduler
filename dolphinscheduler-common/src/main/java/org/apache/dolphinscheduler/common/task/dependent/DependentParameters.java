@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.dependent;
 
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
@@ -28,8 +29,6 @@ public class DependentParameters extends AbstractParameters {
 
     private List<DependentTaskModel> dependTaskList;
     private DependentRelation relation;
-
-
 
     @Override
     public boolean checkParameters() {

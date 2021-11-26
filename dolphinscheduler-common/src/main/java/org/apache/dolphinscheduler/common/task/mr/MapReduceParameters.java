@@ -70,7 +70,6 @@ public class MapReduceParameters extends AbstractParameters {
      */
     private ProgramType programType;
 
-
     public String getMainClass() {
         return mainClass;
     }
