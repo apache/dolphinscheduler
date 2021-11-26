@@ -90,6 +90,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         }
 
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+            processInstance.getScheduleTime(),
             processInstance.getProcessDefinitionCode(),
             processInstance.getProcessDefinitionVersion(),
             taskInstance.getProcessInstanceId(),
