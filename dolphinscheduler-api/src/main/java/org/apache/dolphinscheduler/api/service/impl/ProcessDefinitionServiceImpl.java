@@ -1614,12 +1614,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                   long processDefinitionCode,
                                                   String scheduleJson) {
         Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
-        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy(); // 默认：CONTINUE
-        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType(); // 默认：NONE
-        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority(); // 默认：MEDIUM
-        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId(); // 默认：1
-        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup(); // 默认：default
-        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode(); // 默认：-1
+        // set default value
+        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
+        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType();
+        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
+        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId();
+        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup();
+        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode();
 
         ScheduleParam param = new ScheduleParam();
         param.setStartTime(schedule.getStartTime());
@@ -1746,12 +1747,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                   long processDefinitionCode,
                                                   String scheduleJson) {
         Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
-        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy(); // 默认：CONTINUE
-        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType(); // 默认：NONE
-        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority(); // 默认：MEDIUM
-        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId(); // 默认：1
-        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup(); // 默认：default
-        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode(); // 默认：-1
+        // set default value
+        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
+        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType();
+        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
+        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId();
+        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup();
+        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode();
 
         ScheduleParam param = new ScheduleParam();
         param.setStartTime(schedule.getStartTime());
