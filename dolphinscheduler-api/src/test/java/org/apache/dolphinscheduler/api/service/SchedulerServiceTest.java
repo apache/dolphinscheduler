@@ -153,7 +153,7 @@ public class SchedulerServiceTest {
 
         //SUCCESS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS, result.get(Constants.STATUS));
     }
 
     private Project getProject(String name, long code) {
