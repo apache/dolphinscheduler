@@ -25,11 +25,20 @@ echo "init env variables"
 #============================================================================
 # Database
 #============================================================================
-export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+# export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_PORT=${DATABASE_PORT:-"5432"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
+# transform params to SPRING_DATASOURCE_XXX
+[ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_URL="jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_PARAMS}"
+[ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
+[ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+# export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
 
-# export SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-"jdbc:postgresql://localhost:5432/dolphinscheduler}
-# export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME:-"root"}
-# export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 
 #============================================================================
 # Registry
