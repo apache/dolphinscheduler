@@ -273,7 +273,7 @@ public class MasterSchedulerService extends Thread {
 
     private List<Command> findCommands() {
         int pageNumber = 0;
-        int pageSize = masterConfig.getFetchCommandNum();
+        int pageSize = masterConfig.getFetchCommandNum() * ServerNodeManager.MASTER_SIZE;
         List<Command> result = new ArrayList<>();
         while (Stopper.isRunning()) {
             if (ServerNodeManager.MASTER_SIZE == 0) {
