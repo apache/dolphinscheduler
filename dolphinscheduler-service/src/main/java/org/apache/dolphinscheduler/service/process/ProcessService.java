@@ -218,7 +218,7 @@ public class ProcessService {
      * @param command found command
      * @return process instance
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public ProcessInstance handleCommand(Logger logger, String host, Command command, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
         ProcessInstance processInstance = constructProcessInstance(command, host, processDefinitionCacheMaps);
         // cannot construct process instance, return null
