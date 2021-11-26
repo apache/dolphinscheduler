@@ -32,25 +32,20 @@ fi
 # 2.scp resources
 echo "2.scp resources"
 sh ${workDir}/script/scp-hosts.sh
-if [ $? -eq 0 ]
-then
+if [ $? -eq 0 ];then
 	echo 'scp copy completed'
 else
 	echo 'scp copy failed to exit'
 	exit 1
 fi
 
-
 # 3.stop server
 echo "3.stop server"
 sh ${workDir}/script/stop-all.sh
 
-
 # 4.delete zk node
 echo "4.delete zk node"
-
 sh ${workDir}/script/remove-zk-node.sh $zkRoot
-
 
 # 5.startup
 echo "5.startup"
