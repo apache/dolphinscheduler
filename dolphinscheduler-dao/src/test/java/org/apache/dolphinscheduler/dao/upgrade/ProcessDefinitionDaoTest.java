@@ -17,25 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("h2")
 public class ProcessDefinitionDaoTest {
-    static DataSource dataSource;
+    @Autowired
+    private DataSource dataSource;
     final ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
-
-    @BeforeClass
-    public static void seuUp() {
-        System.setProperty("spring.profiles.active", "h2");
-        dataSource = getDataSource();
-    }
 
     @Test
     public void testQueryAllProcessDefinition() {

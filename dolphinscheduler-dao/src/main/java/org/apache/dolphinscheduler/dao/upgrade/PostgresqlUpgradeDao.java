@@ -17,44 +17,40 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * postgresql upgrade dao
- */
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+@Service
+@Profile("shell-cli")
 public class PostgresqlUpgradeDao extends UpgradeDao {
-
     public static final Logger logger = LoggerFactory.getLogger(PostgresqlUpgradeDao.class);
-    private static final String SCHEMA = getSchema();
 
-    /**
-     * postgresql upgrade dao holder
-     */
-    private static class PostgresqlUpgradeDaoHolder {
-        private static final PostgresqlUpgradeDao INSTANCE = new PostgresqlUpgradeDao();
+    private PostgresqlUpgradeDao(DataSource dataSource) {
+        super(dataSource);
     }
 
-    /**
-     * PostgresqlUpgradeDao Constructor
-     */
-    private PostgresqlUpgradeDao() {
+    @Override
+    protected String initSqlPath() {
+        return "create/release-1.2.0_schema/postgresql";
     }
 
-    public static final PostgresqlUpgradeDao getInstance() {
-        return PostgresqlUpgradeDaoHolder.INSTANCE;
+    @Override
+    protected DbType getDbType() {
+        return DbType.POSTGRESQL;
     }
 
-    /**
-     * getSchema
-     * @return schema
-     */
-    public static String getSchema(){
+    public String getSchema() {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet resultSet = null;
@@ -62,14 +58,14 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
             conn = dataSource.getConnection();
             pstmt = conn.prepareStatement("select current_schema()");
             resultSet = pstmt.executeQuery();
-            while (resultSet.next()){
-                if(resultSet.isFirst()){
+            while (resultSet.next()) {
+                if (resultSet.isFirst()) {
                     return resultSet.getString(1);
                 }
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(resultSet, pstmt, conn);
         }
@@ -79,6 +75,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
 
     /**
      * determines whether a table exists
+     *
      * @param tableName tableName
      * @return if table exist return true，else return false
      */
@@ -89,12 +86,12 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         try {
             conn = dataSource.getConnection();
 
-            rs = conn.getMetaData().getTables(conn.getCatalog(), SCHEMA, tableName, null);
+            rs = conn.getMetaData().getTables(conn.getCatalog(), getSchema(), tableName, null);
 
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(rs, conn);
         }
@@ -103,21 +100,22 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
 
     /**
      * determines whether a field exists in the specified table
+     *
      * @param tableName tableName
      * @param columnName columnName
-     * @return  if column name exist return true，else return false
+     * @return if column name exist return true，else return false
      */
     @Override
-    public boolean isExistsColumn(String tableName,String columnName) {
+    public boolean isExistsColumn(String tableName, String columnName) {
         Connection conn = null;
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
-            rs = conn.getMetaData().getColumns(conn.getCatalog(), SCHEMA,tableName,columnName);
+            rs = conn.getMetaData().getColumns(conn.getCatalog(), getSchema(), tableName, columnName);
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(rs, conn);
 
