@@ -54,7 +54,7 @@ import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
-import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;

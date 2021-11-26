@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.impl;
+package org.apache.dolphinscheduler.service.cache.processor.impl;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.UserCacheProxy;
+import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,30 +32,33 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheNames = "user")
-public class UserCacheProxyImpl implements UserCacheProxy {
+@CacheConfig(cacheNames = "tenant")
+public class TenantCacheProcessorImpl implements TenantCacheProcessor {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private UserMapper userMapper;
+    private TenantMapper tenantMapper;
 
     @Override
     @CacheEvict
-    public void update(int userId) {
+    public void update(int tenantId) {
         // just evict cache
     }
 
     @Override
     @Cacheable(sync = true)
-    public User selectById(int userId) {
-        return userMapper.selectById(userId);
+    public Tenant queryById(int tenantId) {
+        logger.debug("tenant cache proxy, tenantId:{}", tenantId);
+        return tenantMapper.queryById(tenantId);
     }
 
     @Override
     public void cacheExpire(Class updateObjClass, String updateObjJson) {
-        User user = (User) JSONUtils.parseObject(updateObjJson, updateObjClass);
-        if (user == null) {
+        Tenant updateTenant = (Tenant) JSONUtils.parseObject(updateObjJson, updateObjClass);
+        if (updateTenant == null) {
             return;
         }
-        SpringApplicationContext.getBean(UserCacheProxy.class).update(user.getId());
+        SpringApplicationContext.getBean(TenantCacheProcessor.class).update(updateTenant.getId());
     }
 }

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.impl;
+package org.apache.dolphinscheduler.service.cache.processor.impl;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.service.cache.BaseCacheProxy;
-import org.apache.dolphinscheduler.service.cache.QueueCacheProxy;
-import org.apache.dolphinscheduler.service.cache.TenantCacheProxy;
-import org.apache.dolphinscheduler.service.cache.UserCacheProxy;
+import org.apache.dolphinscheduler.service.cache.processor.BaseCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.QueueCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.UserCacheProcessor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,27 +32,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CacheProxyFactory {
+public class CacheProcessorFactory {
 
     @Autowired
-    private TenantCacheProxy tenantCacheProxy;
+    private TenantCacheProcessor tenantCacheProcessor;
 
     @Autowired
-    private UserCacheProxy userCacheProxy;
+    private UserCacheProcessor userCacheProcessor;
 
     @Autowired
-    private QueueCacheProxy queueCacheProxy;
+    private QueueCacheProcessor queueCacheProcessor;
 
-    Map<CacheType, BaseCacheProxy> cacheProxyMap = new ConcurrentHashMap<>();
+    Map<CacheType, BaseCacheProcessor> cacheProcessorMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init() {
-        cacheProxyMap.put(CacheType.TENANT, tenantCacheProxy);
-        cacheProxyMap.put(CacheType.USER, userCacheProxy);
-        cacheProxyMap.put(CacheType.QUEUE, queueCacheProxy);
+        cacheProcessorMap.put(CacheType.TENANT, tenantCacheProcessor);
+        cacheProcessorMap.put(CacheType.USER, userCacheProcessor);
+        cacheProcessorMap.put(CacheType.QUEUE, queueCacheProcessor);
     }
 
-    public BaseCacheProxy getCacheProxy(CacheType cacheType) {
-        return cacheProxyMap.get(cacheType);
+    public BaseCacheProcessor getCacheProcessor(CacheType cacheType) {
+        return cacheProcessorMap.get(cacheType);
     }
 }

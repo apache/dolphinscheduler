@@ -15,36 +15,45 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.impl;
+package org.apache.dolphinscheduler.service.cache.processor.impl;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.QueueCacheProxy;
+import org.apache.dolphinscheduler.service.cache.processor.UserCacheProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-public class QueueCacheProxyImpl implements QueueCacheProxy {
+@CacheConfig(cacheNames = "user")
+public class UserCacheProcessorImpl implements UserCacheProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
-    @CacheEvict(cacheNames = "user", allEntries = true)
-    public void expireAllUserCache() {
+    @CacheEvict
+    public void update(int userId) {
         // just evict cache
-        logger.debug("expire all user cache");
+    }
+
+    @Override
+    @Cacheable(sync = true)
+    public User selectById(int userId) {
+        return userMapper.selectById(userId);
     }
 
     @Override
     public void cacheExpire(Class updateObjClass, String updateObjJson) {
-        Queue updateQueue = (Queue) JSONUtils.parseObject(updateObjJson, updateObjClass);
-        if (updateQueue == null) {
+        User user = (User) JSONUtils.parseObject(updateObjJson, updateObjClass);
+        if (user == null) {
             return;
         }
-        SpringApplicationContext.getBean(QueueCacheProxy.class).expireAllUserCache();
+        SpringApplicationContext.getBean(UserCacheProcessor.class).update(user.getId());
     }
 }

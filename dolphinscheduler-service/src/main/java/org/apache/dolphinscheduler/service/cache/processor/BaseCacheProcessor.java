@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache;
+package org.apache.dolphinscheduler.service.cache.processor;
 
-public interface BaseCacheProxy {
+public interface BaseCacheProcessor{
     void cacheExpire(Class updateObjClass, String updateObjJson);
 }

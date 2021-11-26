@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.proxy;
+package org.apache.dolphinscheduler.service.cache.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.TenantCacheProxy;
-import org.apache.dolphinscheduler.service.cache.impl.TenantCacheProxyImpl;
+import org.apache.dolphinscheduler.service.cache.processor.impl.TenantCacheProcessorImpl;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,13 +41,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class})
-public class TenantCacheProxyTest {
+public class TenantCacheProcessorTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private TenantCacheProxyImpl tenantCacheProxy;
+    private TenantCacheProcessorImpl tenantCacheProcessor;
 
     @Mock
     private TenantMapper tenantMapper;
@@ -56,7 +55,7 @@ public class TenantCacheProxyTest {
     @Before
     public void before() {
         PowerMockito.mockStatic(SpringApplicationContext.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TenantCacheProxy.class)).thenReturn(tenantCacheProxy);
+        PowerMockito.when(SpringApplicationContext.getBean(TenantCacheProcessor.class)).thenReturn(tenantCacheProcessor);
     }
 
     @Test
@@ -66,7 +65,7 @@ public class TenantCacheProxyTest {
         tenant1.setDescription("test1");
 
         Mockito.when(tenantMapper.queryById(100)).thenReturn(tenant1);
-        Assert.assertEquals(tenant1, tenantCacheProxy.queryById(100));
+        Assert.assertEquals(tenant1, tenantCacheProcessor.queryById(100));
     }
 
     @Test
@@ -74,6 +73,6 @@ public class TenantCacheProxyTest {
         Tenant tenant1 = new Tenant();
         tenant1.setId(100);
         tenant1.setDescription("test1");
-        tenantCacheProxy.cacheExpire(Tenant.class, JSONUtils.toJsonString(tenant1));
+        tenantCacheProcessor.cacheExpire(Tenant.class, JSONUtils.toJsonString(tenant1));
     }
 }

@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache;
+package org.apache.dolphinscheduler.service.cache.processor;
 
-public interface QueueCacheProxy extends BaseCacheProxy {
-    public void expireAllUserCache();
+import org.apache.dolphinscheduler.dao.entity.User;
+
+public interface UserCacheProcessor extends BaseCacheProcessor {
+    void update(int userId);
+
+    User selectById(int userId);
 }

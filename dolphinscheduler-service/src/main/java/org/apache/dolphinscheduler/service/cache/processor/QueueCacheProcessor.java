@@ -15,12 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache;
+package org.apache.dolphinscheduler.service.cache.processor;
 
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-
-public interface TenantCacheProxy extends BaseCacheProxy {
-    void update(int tenantId);
-
-    Tenant queryById(int tenantId);
+public interface QueueCacheProcessor extends BaseCacheProcessor{
+    public void expireAllUserCache();
 }

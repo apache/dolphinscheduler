@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.proxy;
+package org.apache.dolphinscheduler.service.cache.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.UserCacheProxy;
-import org.apache.dolphinscheduler.service.cache.impl.UserCacheProxyImpl;
+import org.apache.dolphinscheduler.service.cache.processor.impl.QueueCacheProcessorImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -42,36 +37,24 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class})
-public class UserCacheProxyTest {
+public class QueueCacheProcessorTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private UserCacheProxyImpl userCacheProxy;
-
-    @Mock
-    private UserMapper userMapper;
+    private QueueCacheProcessorImpl queueCacheProcessor;
 
     @Before
     public void before() {
         PowerMockito.mockStatic(SpringApplicationContext.class);
-        PowerMockito.when(SpringApplicationContext.getBean(UserCacheProxy.class)).thenReturn(userCacheProxy);
-    }
-
-    @Test
-    public void testQueryById() {
-        User user1 = new User();
-        user1.setId(100);
-
-        Mockito.when(userMapper.selectById(100)).thenReturn(user1);
-        Assert.assertEquals(user1, userCacheProxy.selectById(100));
+        PowerMockito.when(SpringApplicationContext.getBean(QueueCacheProcessor.class)).thenReturn(queueCacheProcessor);
     }
 
     @Test
     public void testCacheExpire() {
-        User user = new User();
-        user.setId(100);
-        userCacheProxy.cacheExpire(User.class, JSONUtils.toJsonString(user));
+        Queue queue = new Queue();
+        queue.setId(100);
+        queueCacheProcessor.cacheExpire(Queue.class, JSONUtils.toJsonString(queue));
     }
 }

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.impl.CacheProxyFactory;
+import org.apache.dolphinscheduler.service.cache.processor.impl.CacheProcessorFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +39,10 @@ public class CacheProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(CacheProcessor.class);
 
-    private CacheProxyFactory cacheProxyFactory;
+    private CacheProcessorFactory cacheProcessorFactory;
 
     public CacheProcessor() {
-        this.cacheProxyFactory = SpringApplicationContext.getBean(CacheProxyFactory.class);
+        this.cacheProcessorFactory = SpringApplicationContext.getBean(CacheProcessorFactory.class);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class CacheProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", cacheExpireCommand);
 
-        cacheProxyFactory.getCacheProxy(cacheExpireCommand.getCacheType()).cacheExpire(cacheExpireCommand.getUpdateObjClass(), cacheExpireCommand.getUpdateObjJson());
+        cacheProcessorFactory.getCacheProcessor(cacheExpireCommand.getCacheType()).cacheExpire(cacheExpireCommand.getUpdateObjClass(), cacheExpireCommand.getUpdateObjJson());
     }
 }

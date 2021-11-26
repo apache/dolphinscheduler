@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.TenantCacheProxy;
-import org.apache.dolphinscheduler.service.cache.impl.CacheProxyFactory;
-import org.apache.dolphinscheduler.service.cache.impl.TenantCacheProxyImpl;
+import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.impl.CacheProcessorFactory;
+import org.apache.dolphinscheduler.service.cache.processor.impl.TenantCacheProcessorImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,20 +48,20 @@ public class CacheProcessorTest {
     private CacheProcessor cacheProcessor;
 
     @InjectMocks
-    private TenantCacheProxyImpl tenantCacheProxy;
+    private TenantCacheProcessorImpl tenantCacheProcessor;
 
     @Mock
     private Channel channel;
 
     @Mock
-    private CacheProxyFactory cacheProxyFactory;
+    private CacheProcessorFactory cacheProcessorFactory;
 
     @Before
     public void before() {
         PowerMockito.mockStatic(SpringApplicationContext.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TenantCacheProxy.class)).thenReturn(tenantCacheProxy);
-        PowerMockito.when(SpringApplicationContext.getBean(CacheProxyFactory.class)).thenReturn(cacheProxyFactory);
-        Mockito.when(cacheProxyFactory.getCacheProxy(CacheType.TENANT)).thenReturn(tenantCacheProxy);
+        PowerMockito.when(SpringApplicationContext.getBean(TenantCacheProcessor.class)).thenReturn(tenantCacheProcessor);
+        PowerMockito.when(SpringApplicationContext.getBean(CacheProcessorFactory.class)).thenReturn(cacheProcessorFactory);
+        Mockito.when(cacheProcessorFactory.getCacheProcessor(CacheType.TENANT)).thenReturn(tenantCacheProcessor);
         cacheProcessor = new CacheProcessor();
     }
 

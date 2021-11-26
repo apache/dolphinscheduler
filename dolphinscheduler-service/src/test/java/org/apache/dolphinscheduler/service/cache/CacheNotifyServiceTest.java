@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.service.cache.processor.CacheNotifyService;
+import org.apache.dolphinscheduler.service.cache.service.impl.CacheNotifyServiceImpl;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
@@ -52,11 +52,11 @@ public class CacheNotifyServiceTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private CacheNotifyService cacheNotifyService;
+    private CacheNotifyServiceImpl cacheNotifyService;
 
     @Mock
     private RegistryClient registryClient;
-    
+
     @Test
     public void testNotifyMaster() {
         User user1 = new User();

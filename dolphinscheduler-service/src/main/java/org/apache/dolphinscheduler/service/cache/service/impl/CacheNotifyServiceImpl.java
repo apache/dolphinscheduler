@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.processor;
+package org.apache.dolphinscheduler.service.cache.service.impl;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,9 +43,9 @@ import io.netty.channel.Channel;
  * cache notify service
  */
 @Service
-public class CacheNotifyService {
+public class CacheNotifyServiceImpl implements CacheNotifyService {
 
-    private final Logger logger = LoggerFactory.getLogger(CacheNotifyService.class);
+    private final Logger logger = LoggerFactory.getLogger(CacheNotifyServiceImpl.class);
 
     @Autowired
     private RegistryClient registryClient;
@@ -59,7 +60,7 @@ public class CacheNotifyService {
      */
     private final NettyRemotingClient nettyRemotingClient;
 
-    public CacheNotifyService() {
+    public CacheNotifyServiceImpl() {
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
@@ -110,6 +111,7 @@ public class CacheNotifyService {
      *
      * @param command command
      */
+    @Override
     public void notifyMaster(Command command) {
         logger.info("send result, command:{}", command.toString());
 
