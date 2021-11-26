@@ -85,15 +85,6 @@ public class StandaloneServer {
     private static void startRegistry() throws Exception {
         final TestingServer server = new TestingServer(true);
         System.setProperty("registry.servers", server.getConnectString());
-
-        final Path registryPath = Paths.get(
-                StandaloneServer.class.getProtectionDomain().getCodeSource().getLocation().getPath(),
-                "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml"
-        ).toAbsolutePath();
-        if (Files.exists(registryPath)) {
-            System.setProperty("registry.plugin.binding", registryPath.toString());
-            System.setProperty("registry.plugin.dir", "");
-        }
     }
 
     private static void startDatabase() throws IOException, SQLException {
