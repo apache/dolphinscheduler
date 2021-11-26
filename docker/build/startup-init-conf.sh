@@ -26,10 +26,19 @@ echo "init env variables"
 # Database
 #============================================================================
 export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
+export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
+export DATABASE_PORT=${DATABASE_PORT:-"5432"}
+export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
+export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
+export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
+export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
+# transform params to SPRING_DATASOURCE_XXX
+export SPRING_DATASOURCE_URL="jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_PARAMS}"
+export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
+export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
 
-# export SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-"jdbc:postgresql://localhost:5432/dolphinscheduler}
-# export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME:-"root"}
-# export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 
 #============================================================================
 # Registry
