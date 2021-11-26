@@ -20,10 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
-import org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
@@ -31,15 +28,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
@@ -47,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,9 +48,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
@@ -85,27 +74,6 @@ public class TaskDefinitionServiceImplTest {
     private ProcessTaskRelationMapper processTaskRelationMapper;
     ;
 
-    @InjectMocks
-    private TaskGroupServiceImpl taskGroupService;
-
-    @Mock
-    private TaskGroupQueueService taskGroupQueueService;
-
-    @Mock
-    private TaskGroupMapper taskGroupMapper;
-
-    @Mock
-    private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Mock
-    private UserMapper userMapper;
-
-    private String taskGroupName = "TaskGroupServiceTest";
-
-    private String taskGroupDesc = "this is a task group";
-
-    private String userName = "taskGroupServiceTest";
-
     @Test
     public void createTaskDefinition() {
         long projectCode = 1L;
@@ -122,16 +90,16 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         String createTaskDefinitionJson = "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
-                + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
-                + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
-                + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
-                + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
-                + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
         List<TaskDefinitionLog> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinitionLog.class);
         Mockito.when(processService.saveTaskDefine(loginUser, projectCode, taskDefinitions)).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
+            .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
     }
@@ -139,12 +107,12 @@ public class TaskDefinitionServiceImplTest {
     @Test
     public void updateTaskDefinition() {
         String taskDefinitionJson = "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
-                + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
-                + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
-                + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
-                + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
-                + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
         long projectCode = 1L;
         long taskCode = 1L;
 
@@ -185,10 +153,10 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), taskName))
-                .thenReturn(new TaskDefinition());
+            .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-                .queryTaskDefinitionByName(loginUser, projectCode, taskName);
+            .queryTaskDefinitionByName(loginUser, projectCode, taskName);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -208,12 +176,12 @@ public class TaskDefinitionServiceImplTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Mockito.when(processTaskRelationMapper.queryByTaskCode(Mockito.anyLong()))
-                .thenReturn(new ArrayList<>());
+            .thenReturn(new ArrayList<>());
         Mockito.when(taskDefinitionMapper.deleteByCode(Mockito.anyLong()))
-                .thenReturn(1);
+            .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-                .deleteTaskDefinitionByCode(loginUser, projectCode, Mockito.anyLong());
+            .deleteTaskDefinitionByCode(loginUser, projectCode, Mockito.anyLong());
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -236,13 +204,13 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
 
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version))
-                .thenReturn(new TaskDefinitionLog());
+            .thenReturn(new TaskDefinitionLog());
 
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode))
-                .thenReturn(new TaskDefinition());
+            .thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(new TaskDefinitionLog())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .switchVersion(loginUser, projectCode, taskCode, version);
+            .switchVersion(loginUser, projectCode, taskCode, version);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -274,26 +242,26 @@ public class TaskDefinitionServiceImplTest {
     @Test
     public void checkJson() {
         String taskDefinitionJson = "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
-                + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
-                + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
-                + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
-                + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
-                + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
+            + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+            + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
+            + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+            + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
+            + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
+            + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         Assert.assertFalse(taskDefinitionLogs.isEmpty());
         String taskJson = "[{\"name\":\"shell1\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
-                + "\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},"
-                + "\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\","
-                + "\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"},{\"name\":\"shell2\",\"description\":\"\","
-                + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 2\",\"conditionResult\":{\"successNode\""
-                + ":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
-                + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
+            + "\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},"
+            + "\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\","
+            + "\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"},{\"name\":\"shell2\",\"description\":\"\","
+            + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 2\",\"conditionResult\":{\"successNode\""
+            + ":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
+            + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
         taskDefinitionLogs = JSONUtils.toList(taskJson, TaskDefinitionLog.class);
         Assert.assertFalse(taskDefinitionLogs.isEmpty());
         String taskParams = "{\"resourceList\":[],\"localParams\":[{\"prop\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
-                + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
-                + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
+            + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
+            + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
         ShellParameters parameters = JSONUtils.parseObject(taskParams, ShellParameters.class);
         Assert.assertNotNull(parameters);
         String params = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
@@ -343,99 +311,4 @@ public class TaskDefinitionServiceImplTest {
         Map<String, Object> failResult = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, taskCode, ReleaseState.getEnum(2));
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failResult.get(Constants.STATUS));
     }
-
-    /**
-     * create admin user
-     */
-    private User getLoginUser() {
-        User loginUser = new User();
-        loginUser.setUserType(UserType.ADMIN_USER);
-        loginUser.setUserName(userName);
-        loginUser.setId(1);
-        return loginUser;
-    }
-
-    private TaskGroup getTaskGroup() {
-        TaskGroup taskGroup = new TaskGroup(taskGroupName, taskGroupDesc,
-                100, 1);
-        return taskGroup;
-    }
-
-    private List<TaskGroup> getList() {
-        List<TaskGroup> list = new ArrayList<>();
-        list.add(getTaskGroup());
-        return list;
-    }
-
-    @Test
-    public void testCreate() {
-        User loginUser = getLoginUser();
-        TaskGroup taskGroup = getTaskGroup();
-        Mockito.when(taskGroupMapper.insert(taskGroup)).thenReturn(1);
-        Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, taskGroupName, taskGroupDesc, 100);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testQueryById() {
-        User loginUser = getLoginUser();
-        TaskGroup taskGroup = getTaskGroup();
-        Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
-        Map<String, Object> result = taskGroupService.queryTaskGroupById(loginUser, 1);
-        Assert.assertNotNull(result.get(Constants.DATA_LIST));
-    }
-
-    @Test
-    public void testQueryProjectListPaging() {
-
-        IPage<TaskGroup> page = new Page<>(1, 10);
-        page.setRecords(getList());
-        User loginUser = getLoginUser();
-        Mockito.when(taskGroupMapper.queryTaskGroupPaging(Mockito.any(Page.class), Mockito.eq(10),
-                Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
-
-        // query all
-        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, 1, 10);
-        PageInfo<TaskGroup> pageInfo = (PageInfo<TaskGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertNotNull(pageInfo.getTotalList());
-    }
-
-    @Test
-    public void testUpdate() {
-
-        User loginUser = getLoginUser();
-        TaskGroup taskGroup = getTaskGroup();
-        taskGroup.setStatus(Flag.NO.getCode());
-        // Task group status error
-        Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
-        Map<String, Object> result = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        taskGroup.setStatus(0);
-    }
-
-    @Test
-    public void testCloseAndStart() {
-
-        User loginUser = getLoginUser();
-        TaskGroup taskGroup = getTaskGroup();
-        Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
-
-        //close failed
-        Map<String, Object> result1 = taskGroupService.closeTaskGroup(loginUser, 1);
-        Assert.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testWakeTaskFroceManually() {
-
-        TreeMap<Integer, Integer> tm = new TreeMap<>();
-        tm.put(1, 1);
-        Map<String, Object> map1 = taskGroupService.wakeTaskcompulsively(getLoginUser(), 1);
-        Assert.assertEquals(Status.SUCCESS, map1.get(Constants.STATUS));
-
-    }
-
 }
