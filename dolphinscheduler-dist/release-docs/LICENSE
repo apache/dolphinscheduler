@@ -403,6 +403,13 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
     prometheus client_java(simpleclient) 0.12.0: https://github.com/prometheus/client_java, Apache 2.0
     snowflake snowflake-2010: https://github.com/twitter-archive/snowflake/tree/snowflake-2010, Apache 2.0
+    hive-shims 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-shims/2.1.0, Apache 2.0
+    hive-shims-0.23 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-0.23/2.1.0, Apache 2.0
+    hive-shims-common 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-common/2.1.0, Apache 2.0
+    hive-shims-scheduler 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-scheduler/2.1.0, Apache 2.0
+    hadoop-yarn-server-applicationhistoryservice 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-applicationhistoryservice/2.6.0, Apache 2.0
+    hadoop-yarn-server-resourcemanager 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-resourcemanager/2.6.0, Apache 2.0
+    hadoop-yarn-server-web-proxy 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-web-proxy/2.6.0, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -447,13 +454,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
     transaction-api 1.1: https://mvnrepository.com/artifact/javax.transaction/transaction-api/1.1, CDDL 1.0
     javax.el 3.0.0: https://mvnrepository.com/artifact/org.glassfish/javax.el/3.0.0, CDDL and GPL and GPL 2.0
-    hive-shims 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-shims/2.1.0, Apache 2.0
-    hive-shims-0.23 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-0.23/2.1.0, Apache 2.0
-    hive-shims-common 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-common/2.1.0, Apache 2.0
-    hive-shims-scheduler 2.1.0: https://mvnrepository.com/artifact/org.apache.hive.shims/hive-shims-scheduler/2.1.0, Apache 2.0
-    hadoop-yarn-server-applicationhistoryservice 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-applicationhistoryservice/2.6.0, Apache 2.0
-    hadoop-yarn-server-resourcemanager 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-resourcemanager/2.6.0, Apache 2.0
-    hadoop-yarn-server-web-proxy 2.6.0: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-web-proxy/2.6.0, Apache 2.0
 
 ========================================================================
 EPL licenses
