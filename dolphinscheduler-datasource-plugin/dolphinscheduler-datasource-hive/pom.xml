@@ -289,10 +289,6 @@
                     <groupId>org.antlr</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hive-shims</artifactId>
-                    <groupId>org.apache.hive</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>jsp-api</artifactId>
                     <groupId>javax.servlet</groupId>
                 </exclusion>
