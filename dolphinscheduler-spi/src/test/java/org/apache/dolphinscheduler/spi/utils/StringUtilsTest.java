@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.spi.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -33,8 +34,18 @@ public class StringUtilsTest {
     }
 
     @Test
+    public void testIsEmpty2() {
+        assertFalse(StringUtils.isEmpty("123"));
+    }
+
+    @Test
     public void testIsNotEmpty() {
         assertTrue(StringUtils.isNotEmpty("cs"));
+    }
+
+    @Test
+    public void testIsNotEmpty2() {
+        assertFalse(StringUtils.isNotEmpty(""));
     }
 
     @Test
@@ -43,8 +54,18 @@ public class StringUtilsTest {
     }
 
     @Test
+    public void testIsBlank2() {
+        assertFalse(StringUtils.isBlank("123"));
+    }
+
+    @Test
     public void testIsNotBlank() {
         assertTrue(StringUtils.isNotBlank("cs"));
+    }
+
+    @Test
+    public void testIsNotBlank2() {
+        assertFalse(StringUtils.isNotBlank(""));
     }
 
     @Test
@@ -53,8 +74,18 @@ public class StringUtilsTest {
     }
 
     @Test
+    public void testTrim2() {
+        assertEquals("", StringUtils.trim(""));
+    }
+
+    @Test
     public void testEqualsIgnoreCase() {
         assertTrue(StringUtils.equalsIgnoreCase("Str1", "str1"));
+    }
+
+    @Test
+    public void testEqualsIgnoreCase2() {
+        assertFalse(StringUtils.equalsIgnoreCase("str1", null));
     }
 
     @Test
