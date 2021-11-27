@@ -71,7 +71,7 @@ public class AuditPublishService {
      *  subscribers execute the message processor method
      */
     private void doPublish() {
-        AuditMessage message;
+        AuditMessage message = null;
         while (true) {
             try {
                 message = auditMessageQueue.take();
@@ -83,8 +83,9 @@ public class AuditPublishService {
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error("consume audit message failed {}.", e);
+                logger.error("consume audit message failed {}.", message, e);
                 Thread.currentThread().interrupt();
+                break;
             }
         }
     }

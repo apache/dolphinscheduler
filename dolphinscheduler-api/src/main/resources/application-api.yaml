@@ -47,3 +47,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+audit:
+  audit-global-control-switch: true
