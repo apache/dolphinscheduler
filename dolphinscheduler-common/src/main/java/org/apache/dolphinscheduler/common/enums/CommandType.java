@@ -54,7 +54,7 @@ public enum CommandType {
     RECOVER_WAITING_THREAD(10, "recover waiting thread"),
     RECOVER_SERIAL_WAIT(11, "recover serial wait");
 
-    CommandType(int code, String descp){
+    CommandType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -78,7 +78,6 @@ public enum CommandType {
             COMMAND_TYPE_MAP.put(commandType.code,commandType);
         }
     }
-
 
     public static CommandType of(Integer status) {
         if (COMMAND_TYPE_MAP.containsKey(status)) {

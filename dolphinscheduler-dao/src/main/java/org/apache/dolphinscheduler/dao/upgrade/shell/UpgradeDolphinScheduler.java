@@ -17,31 +17,43 @@
 package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-/**
- * upgrade DolphinScheduler
- */
+@ComponentScan(value = "org.apache.dolphinscheduler.dao")
+@EnableAutoConfiguration(exclude = {QuartzAutoConfiguration.class})
 public class UpgradeDolphinScheduler {
-	private static final Logger logger = LoggerFactory.getLogger(UpgradeDolphinScheduler.class);
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(UpgradeDolphinScheduler.class)
+            .profiles("shell-upgrade", "shell-cli")
+            .web(WebApplicationType.NONE)
+            .run(args);
+    }
 
-	/**
-	 * upgrade dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		try {
-			dolphinSchedulerManager.upgradeDolphinScheduler();
-			logger.info("upgrade DolphinScheduler success");
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			logger.info("Upgrade DolphinScheduler failed");
-			throw new RuntimeException(e);
-		}
-	}
-	
-	
-	
+    @Component
+    @Profile("shell-upgrade")
+    static class UpgradeRunner implements CommandLineRunner {
+        private static final Logger logger = LoggerFactory.getLogger(UpgradeRunner.class);
+
+        private final DolphinSchedulerManager dolphinSchedulerManager;
+
+        UpgradeRunner(DolphinSchedulerManager dolphinSchedulerManager) {
+            this.dolphinSchedulerManager = dolphinSchedulerManager;
+        }
+
+        @Override
+        public void run(String... args) throws Exception {
+            dolphinSchedulerManager.upgradeDolphinScheduler();
+            logger.info("upgrade DolphinScheduler success");
+        }
+    }
 }
