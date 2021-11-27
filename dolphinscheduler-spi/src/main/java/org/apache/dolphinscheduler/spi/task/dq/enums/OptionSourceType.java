@@ -28,7 +28,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum OptionSourceType {
     /**
      * 0-default
-     * 1-datasource
+     * 1-datasource_id
+     * 2-datasource_type
+     * 3-comparison_type
      */
     DEFAULT(0,"default"),
     DATASOURCE_ID(1,"datasource_id"),
