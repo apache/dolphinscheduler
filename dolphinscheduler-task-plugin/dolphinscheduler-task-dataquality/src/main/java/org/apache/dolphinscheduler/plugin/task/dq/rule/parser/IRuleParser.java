@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionCont
 import java.util.Map;
 
 /**
- * IRuleParser
+ * IRuleParser is a component that actually converts input parameters to DataQualityConfiguration
  */
 public interface IRuleParser {
 

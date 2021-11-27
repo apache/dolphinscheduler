@@ -40,7 +40,8 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * RuleManager
+ * RuleManager is responsible for parsing the input parameters to the DataQualityConfiguration
+ * And DataQualityConfiguration will be used in DataQualityApplication
  */
 public class RuleManager {
 

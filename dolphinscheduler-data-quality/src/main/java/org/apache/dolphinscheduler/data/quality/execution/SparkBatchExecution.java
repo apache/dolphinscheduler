@@ -33,7 +33,7 @@ import org.apache.spark.sql.Row;
 import java.util.List;
 
 /**
- * SparkBatchExecution
+ * SparkBatchExecution is responsible for executing readers、transformers and writers
  */
 public class SparkBatchExecution implements Execution<BatchReader, BatchTransformer, BatchWriter> {
 

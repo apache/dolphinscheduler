@@ -43,20 +43,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataQualityResultOperator {
 
-    /**
-     * logger
-     */
     private final Logger logger = LoggerFactory.getLogger(DataQualityResultOperator.class);
 
-    /**
-     * process service
-     */
     @Autowired
     private ProcessService processService;
 
     @Autowired
     private ProcessAlertManager alertManager;
 
+    /**
+     * When the task type is data quality, it will get the statistics value、comparison value、
+     * threshold、check type、operator and failure strategy，use the formula that
+     * {check type} {operator} {threshold} to get dqc result . If result is failure, it will alert or block
+     * @param taskResponseEvent
+     * @param taskInstance
+     */
     public void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
 
@@ -64,6 +65,7 @@ public class DataQualityResultOperator {
                     processService.findProcessInstanceDetailById(
                             Integer.parseInt(String.valueOf(taskInstance.getProcessInstanceId())));
 
+            // when the task is failure or cancel, will delete the execute result and statistics value
             if (taskResponseEvent.getState().typeIsFailure()
                     || taskResponseEvent.getState().typeIsCancel()) {
                 processService.deleteDqExecuteResultByTaskInstanceId(taskInstance.getId());
@@ -82,6 +84,13 @@ public class DataQualityResultOperator {
         }
     }
 
+    /**
+     * get the data quality check result
+     * and if the result is failure that will alert or block
+     * @param taskResponseEvent
+     * @param dqExecuteResult
+     * @param processInstance
+     */
     private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent,
                                       DqExecuteResult dqExecuteResult,
                                       ProcessInstance processInstance) {
@@ -109,6 +118,11 @@ public class DataQualityResultOperator {
         processService.updateDqExecuteResultState(dqExecuteResult);
     }
 
+    /**
+     * It is used to judge whether the result of the data quality task is failed
+     * @param dqExecuteResult
+     * @return
+     */
     private boolean isFailure(DqExecuteResult dqExecuteResult) {
         CheckType checkType = CheckType.of(dqExecuteResult.getCheckType());
 

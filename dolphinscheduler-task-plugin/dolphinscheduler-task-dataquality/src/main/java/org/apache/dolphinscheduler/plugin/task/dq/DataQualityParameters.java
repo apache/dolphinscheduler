@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DataQualityParameters extends AbstractParameters {
 
-    private static  final Logger logger = LoggerFactory.getLogger(DataQualityParameters.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataQualityParameters.class);
 
     /**
      * rule id

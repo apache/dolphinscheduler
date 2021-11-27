@@ -55,7 +55,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DataQualityTask
+ * In DataQualityTask, the input parameters will be converted into DataQualityConfiguration,
+ * which will be converted into a string as the parameter of DataQualityApplication,
+ * and DataQualityApplication is spark application
  */
 public class DataQualityTask extends AbstractYarnTask {
 
@@ -75,7 +77,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info(" data quality task params {}", dqTaskExecutionContext.getTaskParams());
+        logger.info("data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
         dataQualityParameters = JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
 
@@ -170,7 +172,7 @@ public class DataQualityTask extends AbstractYarnTask {
             command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
         }
 
-        logger.info("spark task command: {}", command);
+        logger.info("data quality task command: {}", command);
 
         return command;
     }

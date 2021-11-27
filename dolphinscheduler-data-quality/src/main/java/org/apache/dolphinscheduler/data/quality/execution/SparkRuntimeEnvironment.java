@@ -23,7 +23,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
 /**
- * SparkRuntimeEnvironment
+ * The SparkRuntimeEnvironment is responsible for creating SparkSession and SparkExecution
  */
 public class SparkRuntimeEnvironment {
 

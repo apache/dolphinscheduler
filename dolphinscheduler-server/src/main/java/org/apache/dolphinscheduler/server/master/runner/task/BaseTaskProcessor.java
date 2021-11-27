@@ -361,6 +361,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(ruleInputEntryList));
         dataQualityTaskExecutionContext.setExecuteSqlList(JSONUtils.toJsonString(executeSqlList));
 
+        // set the path used to store data quality task check error data
         dataQualityTaskExecutionContext.setHdfsPath(
                 PropertyUtils.getString(Constants.FS_DEFAULTFS)
                 + PropertyUtils.getString(
@@ -373,6 +374,15 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         setStatisticsValueWriterConfig(dataQualityTaskExecutionContext);
     }
 
+    /**
+     * It is used to get comparison params, the param contains
+     * comparison name、comparison table and execute sql.
+     * When the type is fixed_value, params will be null.
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     * @param ruleInputEntryList
+     * @param executeSqlList
+     */
     private void setComparisonParams(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
                                      Map<String, String> config,
                                      List<DqRuleInputEntry> ruleInputEntryList,
@@ -414,6 +424,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
     }
 
+    /**
+     * The default datasource is used to get the dolphinscheduler datasource info,
+     * and the info will be used in StatisticsValueConfig and WriterConfig
+     * @return DataSource
+     */
     public DataSource getDefaultDataSource() {
         DataSource dataSource = new DataSource();
 
@@ -435,6 +450,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return dataSource;
     }
 
+    /**
+     * The StatisticsValueWriterConfig will be used in DataQualityApplication that
+     * writes the statistics value into dolphin scheduler datasource
+     * @param dataQualityTaskExecutionContext
+     */
     private void setStatisticsValueWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DataSource dataSource = getDefaultDataSource();
         ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
@@ -444,6 +464,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         dataQualityTaskExecutionContext.setStatisticsValueTable("t_ds_dq_task_statistics_value");
     }
 
+    /**
+     * The WriterConfig will be used in DataQualityApplication that
+     * writes the data quality check result into dolphin scheduler datasource
+     * @param dataQualityTaskExecutionContext
+     */
     private void setWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DataSource dataSource = getDefaultDataSource();
         ConnectorType writerConnectorType = ConnectorType.of(dataSource.getType().isHive() ? 1 : 0);
@@ -453,6 +478,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
     }
 
+    /**
+     * The TargetConfig will be used in DataQualityApplication that
+     * get the data which be used to compare to src value
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     */
     private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
         if (StringUtils.isNotEmpty(config.get(TARGET_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(TARGET_DATASOURCE_ID)));
@@ -466,6 +497,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
     }
 
+    /**
+     * The SourceConfig will be used in DataQualityApplication that
+     * get the data which be used to get the statistics value
+     * @param dataQualityTaskExecutionContext
+     * @param config
+     */
     private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
         if (StringUtils.isNotEmpty(config.get(SRC_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(SRC_DATASOURCE_ID)));

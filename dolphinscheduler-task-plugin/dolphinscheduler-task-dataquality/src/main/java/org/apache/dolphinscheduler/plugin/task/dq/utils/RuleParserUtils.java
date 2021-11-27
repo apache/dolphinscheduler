@@ -105,6 +105,7 @@ public class RuleParserUtils {
 
         List<BaseConfig> readerConfigList = new ArrayList<>();
 
+        //all the rule need the source config
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getSourceConnectorType())) {
             BaseConnectionParam sourceDataSource =
                     (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
@@ -129,6 +130,7 @@ public class RuleParserUtils {
             readerConfigList.add(sourceBaseConfig);
         }
 
+        // MultiTableAccuracyRule need the target config
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getTargetConnectorType())) {
             BaseConnectionParam targetDataSource =
                     (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
@@ -426,7 +428,7 @@ public class RuleParserUtils {
         return writerConfigList;
     }
 
-    public static List<DqRuleExecuteSql> getExecuteSqlListByType(
+    public static List<DqRuleExecuteSql> getExecuteSqlListByType (
             List<DqRuleExecuteSql> allExecuteSqlList, ExecuteSqlType executeSqlType) {
         if (CollectionUtils.isEmpty(allExecuteSqlList)) {
             return allExecuteSqlList;
