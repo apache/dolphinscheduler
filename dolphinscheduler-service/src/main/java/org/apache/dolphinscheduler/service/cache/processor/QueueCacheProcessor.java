@@ -17,6 +17,6 @@
 
 package org.apache.dolphinscheduler.service.cache.processor;
 
-public interface QueueCacheProcessor extends BaseCacheProcessor{
+public interface QueueCacheProcessor extends BaseCacheProcessor {
     public void expireAllUserCache();
 }

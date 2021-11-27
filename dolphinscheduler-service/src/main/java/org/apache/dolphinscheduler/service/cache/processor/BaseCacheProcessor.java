@@ -17,6 +17,6 @@
 
 package org.apache.dolphinscheduler.service.cache.processor;
 
-public interface BaseCacheProcessor{
+public interface BaseCacheProcessor {
     void cacheExpire(Class updateObjClass, String updateObjJson);
 }
