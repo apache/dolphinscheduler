@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceParamDTO;
@@ -46,7 +48,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -56,6 +60,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * data source service test
@@ -73,6 +80,13 @@ public class DataSourceServiceTest {
 
     @Mock
     private DataSourceUserMapper datasourceUserMapper;
+
+    @Before
+    public void before() {
+        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(new MybatisConfiguration(), "");
+        TableInfoHelper.initTableInfo(mapperBuilderAssistant, DataSource.class);
+        TableInfoHelper.initTableInfo(mapperBuilderAssistant, DatasourceUser.class);
+    }
 
     public void createDataSourceTest() {
         User loginUser = getAdminUser();
@@ -364,6 +378,28 @@ public class DataSourceServiceTest {
         expected = "{\"user\":\"test\",\"password\":\"123456\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\","
                 + "\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
+    }
+
+    @Test
+    public void testQueryOwnedData() {
+        Mockito.when(dataSourceMapper.selectList(any())).thenReturn(getDataSourceList());
+
+        Map<String, Object> result = dataSourceService.queryOwnedData(1);
+        List<DataSource> dataSources = (List<DataSource>) result.get(Constants.DATA_LIST);
+        assertThat(dataSources.stream().map(DataSource::getName)).containsExactly("test");
+    }
+
+    @Test
+    public void testTransferOwnedData() {
+        Mockito.when(dataSourceMapper.selectList(any())).thenReturn(getDataSourceList());
+        Mockito.when(dataSourceMapper.update(any(), any())).thenReturn(0);
+
+        Map<String, Object> result = dataSourceService.transferOwnedData(1, 2, Lists.newArrayList(1));
+        assertThat(result.get(Constants.STATUS)).isEqualTo(Status.TRANSFER_DATASOURCE_ERROR);
+
+        Mockito.when(dataSourceMapper.update(any(), any())).thenReturn(1);
+        result = dataSourceService.transferOwnedData(1, 2, Lists.newArrayList(1));
+        assertThat(result.get(Constants.STATUS)).isEqualTo(Status.SUCCESS);
     }
 
     /**

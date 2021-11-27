@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -44,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -441,6 +443,64 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * query datasource list created by user
+     *
+     * @param userId user id
+     * @return datasource list
+     */
+    @Override
+    public List<DataSource> queryCreatedByUser(int userId) {
+        return dataSourceMapper.selectList(Wrappers.<DataSource>lambdaQuery().eq(DataSource::getUserId, userId));
+    }
+
+    /**
+     * transfer datasource list owned by the user
+     *
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @return transfer result code
+     */
+    @Override
+    public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<DataSource> dataSources = dataSourceMapper.selectList(Wrappers.<DataSource>lambdaQuery()
+                .eq(DataSource::getUserId, transferredUserId)
+                .in(DataSource::getId, transferredIds)
+        );
+        Set<Integer> realDataSourceIds = dataSources.stream().map(DataSource::getId).collect(Collectors.toSet());
+        // update datasource owner
+        int updatedDatasourceNum = dataSourceMapper.update(null, Wrappers.<DataSource>lambdaUpdate()
+                .set(DataSource::getUserId, receivedUserId)
+                .set(DataSource::getUpdateTime, new Date())
+                .in(DataSource::getId, realDataSourceIds)
+        );
+        if (updatedDatasourceNum != realDataSourceIds.size()) {
+            putMsg(result, Status.TRANSFER_DATASOURCE_ERROR);
+            return result;
+        }
+        // delete datasource user relation if exist
+        datasourceUserMapper.delete(Wrappers.<DatasourceUser>lambdaQuery()
+                .eq(DatasourceUser::getUserId, receivedUserId)
+                .in(DatasourceUser::getDatasourceId, realDataSourceIds)
+        );
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * return the datasource type
+     *
+     * @return transfer data type
+     */
+    @Override
+    public TransferDataType transferDataType() {
+        return TransferDataType.DATASOURCE;
     }
 
 }

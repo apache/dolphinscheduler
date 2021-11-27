@@ -25,8 +25,8 @@ import java.util.Map;
 
 /**
  * project service
- **/
-public interface ProjectService {
+ */
+public interface ProjectService extends TransferableService {
 
     /**
      * create project

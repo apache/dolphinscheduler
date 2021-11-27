@@ -339,8 +339,16 @@ public enum Status {
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(1200012, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(1200013,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
-            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中");
+            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
 
+    TRANSFER_SERVICE_MISMATCH(125000, "transfer service mismatch", "转移服务不匹配"),
+    QUERY_OWNER_DATA_ERROR(125001, "query owned data error", "查询拥有的数据失败"),
+    TRANSFER_OWNED_DATA_ERROR(125010, "transfer owned data error", "转移拥有的数据失败"),
+    TRANSFER_PROJECT_ERROR(125011, "transfer project error", "转移项目失败"),
+    TRANSFER_RESOURCE_ERROR(125012, "transfer resource error", "转移项目失败"),
+    TRANSFER_DATASOURCE_ERROR(125013, "transfer datasource error", "转移项目失败"),
+    TRANSFER_UDF_FUNCTION_ERROR(125014, "transfer udf function error", "转移项目失败"),
+    ;
 
     private final int code;
     private final String enMsg;

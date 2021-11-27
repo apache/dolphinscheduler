@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * resources service
  */
-public interface ResourcesService {
+public interface ResourcesService extends TransferableService {
 
     /**
      * create directory

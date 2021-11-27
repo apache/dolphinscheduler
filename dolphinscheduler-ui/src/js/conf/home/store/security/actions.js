@@ -255,6 +255,38 @@ export default {
   },
 
   /**
+   * get owned data
+   * @param {number} payload.userId
+   * @param {string} payload.transferDataType
+   */
+  getOwnedData ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('users/owned-data', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * transfer owned data
+   * @param {number} payload.transferredUserId
+   * @param {number} payload.receivedUserId
+   * @param {number[]} payload.transferredIds
+   * @param {string} payload.transferDataType
+   */
+  transferOwnedData ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('users/transfer-data', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
    * Query user details
    * @param "userId":int
    */

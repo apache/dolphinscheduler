@@ -17,58 +17,37 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.ALIAS;
-import static org.apache.dolphinscheduler.common.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.Constants.JAR;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
+import org.apache.dolphinscheduler.api.utils.ResourceUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-
-import org.apache.commons.beanutils.BeanMap;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,10 +56,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.io.Files;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * resources service impl
@@ -1354,6 +1337,110 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private List<Resource> queryResourceList(Integer userId, int perm) {
         List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
         return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
+    }
+
+    /**
+     * query all resource component list created by user
+     *
+     * @param userId user id
+     * @return resource component list
+     */
+    @Override
+    public List<ResourceComponent> queryCreatedByUser(int userId) {
+        List<Resource> resourceList = resourcesMapper.queryResourceList(null, userId, -1);
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return Collections.emptyList();
+        }
+        Visitor visitor = new ResourceTreeVisitor(resourceList);
+        return visitor.visit().getChildren();
+    }
+
+    /**
+     * transfer resource list owned by the user
+     *
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @return transfer result code
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<Resource> resources = resourcesMapper.selectList(Wrappers.<Resource>lambdaQuery()
+                .eq(Resource::getUserId, transferredUserId)
+                .in(Resource::getId, transferredIds)
+        );
+        Set<Integer> realResourceIds = resources.stream().map(Resource::getId).collect(Collectors.toSet());
+        // update resource owner
+        int updatedResourceNum = resourcesMapper.update(null, Wrappers.<Resource>lambdaUpdate()
+                .set(Resource::getUserId, receivedUserId)
+                .set(Resource::getUpdateTime, new Date())
+                .in(Resource::getId, realResourceIds)
+        );
+        if (updatedResourceNum != realResourceIds.size()) {
+            putMsg(result, Status.TRANSFER_RESOURCE_ERROR);
+            return result;
+        }
+        // delete project user relation if exist
+        resourceUserMapper.delete(Wrappers.<ResourcesUser>lambdaQuery()
+                .eq(ResourcesUser::getUserId, receivedUserId)
+                .in(ResourcesUser::getResourcesId, realResourceIds)
+        );
+
+        // copy resource file
+        copyResourceFiles(resources, transferredUserId, receivedUserId);
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * return the resource type
+     *
+     * @return transfer data type
+     */
+    @Override
+    public TransferDataType transferDataType() {
+        return TransferDataType.RESOURCE;
+    }
+
+    /**
+     * copy resource files
+     *
+     * @param resourceList resource list
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     */
+    private void copyResourceFiles(List<Resource> resourceList, int transferredUserId, int receivedUserId) {
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return;
+        }
+        Map<Integer, User> userById = userMapper.selectByIds(Lists.newArrayList(transferredUserId, receivedUserId))
+                .stream().collect(Collectors.toMap(User::getId, Function.identity()));
+        if (!userById.containsKey(transferredUserId)) {
+            throw new ServiceException(Status.USER_NOT_EXIST, transferredUserId);
+        }
+        if (!userById.containsKey(receivedUserId)) {
+            throw new ServiceException(Status.USER_NOT_EXIST, receivedUserId);
+        }
+        Map<Integer, String> tenantCodeById = tenantMapper.selectBatchIds(userById.values().stream().map(User::getTenantId).collect(Collectors.toSet())).stream()
+                .collect(Collectors.toMap(Tenant::getId, Tenant::getTenantCode));
+        String transferredUserTenantCode = tenantCodeById.get(userById.get(transferredUserId).getTenantId());
+        String receivedUserTenantCode = tenantCodeById.get(userById.get(receivedUserId).getTenantId());
+        if (StringUtils.isBlank(transferredUserTenantCode) || StringUtils.isBlank(receivedUserTenantCode) ||
+                Objects.equals(transferredUserTenantCode, receivedUserTenantCode)) {
+            return;
+        }
+        try {
+            ResourceUtils.copyResourceFiles(resourceList, HadoopUtils.getHdfsResDir(transferredUserTenantCode),
+                    HadoopUtils.getHdfsResDir(receivedUserTenantCode));
+        } catch (IOException e) {
+            logger.error("Copy resource files failed! transferredUserTenantCode: {}, receivedUserTenantCode: {}, resources: {}", transferredUserTenantCode,
+                    receivedUserTenantCode, resourceList.stream().map(Resource::getFileName).collect(Collectors.toSet()), e);
+            throw new ServiceException(Status.TRANSFER_OWNED_DATA_ERROR);
+        }
     }
 
 }

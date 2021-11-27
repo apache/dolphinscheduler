@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -48,6 +50,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +62,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,10 +112,14 @@ public class UsersServiceTest {
     @Mock
     private ProjectMapper projectMapper;
 
+    @Spy
+    private final List<TransferableService> transferableServices = Lists.newArrayList(new MockProjectTransferableServiceImpl());
+
     private String queueName = "UsersServiceTestQueue";
 
     @Before
     public void before() {
+
     }
 
     @After
@@ -604,6 +612,60 @@ public class UsersServiceTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
+    }
+
+    @Test
+    public void testQueryOwnedData() {
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put(Constants.STATUS, Status.SUCCESS);
+        expectedResult.put(Constants.DATA_LIST, Lists.newArrayList(getProject()));
+
+        User loginUser = new User();
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Map<String, Object> actualResult = usersService.queryOwnedData(loginUser, 1, TransferDataType.PROJECT);
+        logger.info(actualResult.toString());
+        assertThat(expectedResult).containsExactlyEntriesOf(actualResult);
+    }
+
+    @Test
+    public void testTransferOwnedData() {
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put(Constants.STATUS, Status.SUCCESS);
+
+        User loginUser = new User();
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Map<String, Object> actualResult = usersService.transferOwnedData(loginUser, 1, 2,
+                Lists.newArrayList(1), TransferDataType.PROJECT);
+        logger.info(actualResult.toString());
+        assertThat(expectedResult).containsExactlyEntriesOf(actualResult);
+    }
+
+    private class MockProjectTransferableServiceImpl implements TransferableService {
+
+        @Override
+        public List<Project> queryCreatedByUser(int userId) {
+            return Lists.newArrayList(getProject());
+        }
+
+        @Override
+        public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
+            Map<String, Object> result = new HashMap<>();
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
+
+        @Override
+        public TransferDataType transferDataType() {
+            return TransferDataType.PROJECT;
+        }
+    }
+
+    private Project getProject() {
+        Project project = new Project();
+        project.setId(1);
+        project.setUserId(1);
+        project.setName("test_project");
+        return project;
     }
 
     /**

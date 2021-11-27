@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="transferData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="transferData.type.name + operation" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
         <div class="select-list-box">
@@ -44,6 +44,9 @@
             </ul>
           </div>
         </div>
+        <div class="expand-box">
+          <slot></slot>
+        </div>
       </div>
     </template>
   </m-popup>
@@ -66,22 +69,18 @@
       }
     },
     props: {
-      transferData: Object
+      transferData: Object,
+      operation: {
+        type: String,
+        default: i18n.$t('Authorize')
+      }
     },
     methods: {
       _ok () {
         this.$refs.popup.spinnerLoading = true
         setTimeout(() => {
           this.$refs.popup.spinnerLoading = false
-          if (this.transferData.type.name === `${i18n.$t('Managing Users')}`) {
-            this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
-          } else if (this.transferData.type.name === `${i18n.$t('Project')}`) {
-            this.$emit('onUpdateAuthProject', _.map(this.targetList, v => v.id).join(','))
-          } else if (this.transferData.type.name === `${i18n.$t('Datasource')}`) {
-            this.$emit('onUpdateAuthDataSource', _.map(this.targetList, v => v.id).join(','))
-          } else if (this.transferData.type.name === `${i18n.$t('UDF Function')}`) {
-            this.$emit('onUpdateAuthUdfFunc', _.map(this.targetList, v => v.id).join(','))
-          }
+          this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
         }, 800)
       },
       _sourceQuery () {
@@ -113,15 +112,7 @@
         }
       },
       close () {
-        if (this.transferData.type.name === `${i18n.$t('Managing Users')}`) {
-          this.$emit('close')
-        } else if (this.transferData.type.name === `${i18n.$t('Project')}`) {
-          this.$emit('closeAuthProject')
-        } else if (this.transferData.type.name === `${i18n.$t('Datasource')}`) {
-          this.$emit('closeAuthDataSource')
-        } else if (this.transferData.type.name === `${i18n.$t('UDF Function')}`) {
-          this.$emit('closeAuthUdfFunc')
-        }
+        this.$emit('close')
       }
     },
     mounted () {
@@ -205,6 +196,11 @@
     .select-oper-box {
       width: 20px;
       float: left;
+    }
+    .expand-box {
+      clear: both;
+      padding-top: 10px
+    ;
     }
   }
 </style>

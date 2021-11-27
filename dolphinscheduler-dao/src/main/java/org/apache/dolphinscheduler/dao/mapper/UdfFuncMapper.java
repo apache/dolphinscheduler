@@ -107,5 +107,11 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      */
     int batchUpdateUdfFunc(@Param("udfFuncList") List<UdfFunc> udfFuncList);
 
+    /**
+     * query udf function list created by user
+     * @param userId user id
+     * @return udf function list
+     */
+    List<UdfFunc> queryUdfFuncCreatedByUser(@Param("userId") int userId);
 
 }

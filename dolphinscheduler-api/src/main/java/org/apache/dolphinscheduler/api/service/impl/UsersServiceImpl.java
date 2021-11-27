@@ -17,65 +17,38 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
+import org.apache.dolphinscheduler.api.service.TransferableService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.ResourceUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UDFUser;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * users service impl
@@ -118,6 +91,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    @Autowired
+    private List<TransferableService> transferableServices;
 
     /**
      * create user, only system admin have permission
@@ -436,18 +411,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                         List<Resource> fileResourcesList = resourceMapper.queryResourceList(
                                 null, userId, ResourceType.FILE.ordinal());
                         if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
+                            ResourceUtils.copyResourceFiles(fileResourcesList, oldResourcePath, newResourcePath);
                         }
 
                         //udf resources
                         List<Resource> udfResourceList = resourceMapper.queryResourceList(
                                 null, userId, ResourceType.UDF.ordinal());
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
+                            ResourceUtils.copyResourceFiles(udfResourceList, oldUdfsPath, newUdfsPath);
                         }
 
                         //Delete the user from the old tenant directory
@@ -959,43 +930,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
-     * copy resource files
-     *
-     * @param resourceComponent resource component
-     * @param srcBasePath src base path
-     * @param dstBasePath dst base path
-     * @throws IOException io exception
-     */
-    private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
-        List<ResourceComponent> components = resourceComponent.getChildren();
-
-        if (CollectionUtils.isNotEmpty(components)) {
-            for (ResourceComponent component : components) {
-                // verify whether exist
-                if (!HadoopUtils.getInstance().exists(String.format("%s/%s", srcBasePath, component.getFullName()))) {
-                    logger.error("resource file: {} not exist,copy error", component.getFullName());
-                    throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                }
-
-                if (!component.isDirctory()) {
-                    // copy it to dst
-                    HadoopUtils.getInstance().copy(String.format("%s/%s", srcBasePath, component.getFullName()), String.format("%s/%s", dstBasePath, component.getFullName()), false, true);
-                    continue;
-                }
-
-                if (CollectionUtils.isEmpty(component.getChildren())) {
-                    // if not exist,need create it
-                    if (!HadoopUtils.getInstance().exists(String.format("%s/%s", dstBasePath, component.getFullName()))) {
-                        HadoopUtils.getInstance().mkdir(String.format("%s/%s", dstBasePath, component.getFullName()));
-                    }
-                } else {
-                    copyResourceFiles(component, srcBasePath, dstBasePath);
-                }
-            }
-        }
-    }
-
-    /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
@@ -1120,4 +1054,69 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.DATA_LIST, res);
         return result;
     }
+
+    /**
+     * query data owned by the user, only system admin have permission
+     *
+     * @param loginUser login user
+     * @param userId target user id
+     * @param transferDataType data type
+     * @return owned data list
+     */
+    @Override
+    public Map<String, Object> queryOwnedData(User loginUser, Integer userId, TransferDataType transferDataType) {
+        Map<String, Object> checkResult = checkTransferService(loginUser, transferDataType);
+        if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        return ((TransferableService) checkResult.get(Constants.DATA_LIST)).queryOwnedData(userId);
+    }
+
+    /**
+     * transfer data owned by the user, only system admin have permission
+     *
+     * @param loginUser login user
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @param transferDataType transfer data type
+     * @return transfer result code
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> transferOwnedData(User loginUser, int transferredUserId, int receivedUserId, List<Integer> transferredIds, TransferDataType transferDataType) {
+        Map<String, Object> checkResult = checkTransferService(loginUser, transferDataType);
+        if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        return ((TransferableService) checkResult.get(Constants.DATA_LIST)).transferOwnedData(transferredUserId, receivedUserId, transferredIds);
+    }
+
+    /**
+     * check and return transfer service
+     *
+     * @param loginUser login user
+     * @param transferDataType transfer data type
+     * @return check result
+     */
+    private Map<String, Object> checkTransferService(User loginUser, TransferDataType transferDataType) {
+        Map<String, Object> result = new HashMap<>();
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+        List<TransferableService> matchedTransferableServices = Optional.ofNullable(transferableServices).orElse(Collections.emptyList()).stream()
+                .filter(transferableService -> Objects.equals(transferDataType, transferableService.transferDataType()))
+                .collect(Collectors.toList());
+        if (matchedTransferableServices.size() != 1) {
+            putMsg(result, Status.TRANSFER_SERVICE_MISMATCH);
+            return result;
+        }
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, matchedTransferableServices.get(0));
+        return result;
+    }
+
 }

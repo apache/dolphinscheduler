@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -303,4 +304,16 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         Assert.assertTrue(udfFuncMapper.batchUpdateUdfFunc(udfFuncList) > 0);
 
     }
+
+    @Test
+    public void testQueryUdfFuncCreatedByUser() {
+        //insertOneUser
+        User user = insertOneUser();
+        //insertOne
+        UdfFunc udfFunc = insertOne(user);
+        List<UdfFunc> udfFuncs = udfFuncMapper.queryUdfFuncCreatedByUser(user.getId());
+        assertThat(udfFuncs.size()).isEqualTo(1);
+        assertThat(udfFuncs.get(0).getId()).isEqualTo(udfFunc.getId());
+    }
+
 }

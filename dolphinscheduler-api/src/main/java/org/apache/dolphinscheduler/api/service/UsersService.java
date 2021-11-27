@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -267,4 +268,28 @@ public interface UsersService {
      * @return create result code
      */
     Map<String, Object> batchActivateUser(User loginUser, List<String> userNames);
+
+    /**
+     * query data owned by the user, only system admin have permission
+     *
+     * @param loginUser login user
+     * @param userId target user id
+     * @param transferDataType data type
+     * @return owned data list
+     */
+    Map<String, Object> queryOwnedData(User loginUser, Integer userId, TransferDataType transferDataType);
+
+    /**
+     * transfer data owned by the user, only system admin have permission
+     *
+     * @param loginUser login user
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @param transferDataType transfer data type
+     * @return transfer result code
+     */
+    Map<String, Object> transferOwnedData(User loginUser, int transferredUserId, int receivedUserId,
+                                          List<Integer> transferredIds, TransferDataType transferDataType);
+    
 }

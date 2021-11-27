@@ -17,35 +17,34 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * udf func service impl
@@ -57,6 +56,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
     @Autowired
     private ResourceMapper resourceMapper;
+
+    @Autowired
+    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
     private UdfFuncMapper udfFuncMapper;
@@ -328,6 +330,81 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    /**
+     * query all udf function list created by user
+     *
+     * @param userId user id
+     * @return udf function list
+     */
+    @Override
+    public List<UdfFunc> queryCreatedByUser(int userId) {
+        return udfFuncMapper.queryUdfFuncCreatedByUser(userId);
+    }
+
+    /**
+     * transfer udf function list owned by the user
+     *
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @return transfer result code
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<UdfFunc> udfFuncList = udfFuncMapper.selectList(Wrappers.<UdfFunc>lambdaQuery()
+                .eq(UdfFunc::getUserId, transferredUserId)
+                .in(UdfFunc::getId, transferredIds)
+        );
+        Set<Integer> udfResourceIds = udfFuncList.stream().map(UdfFunc::getResourceId).collect(Collectors.toSet());
+        // check received user is visible to the udf resources or not
+        Set<Integer> visibleResourceIds = Stream.concat(
+                resourceMapper.listAuthorizedResourceById(
+                        receivedUserId, udfResourceIds.toArray(new Integer[0])
+                ).stream().map(Resource::getId),
+                resourceUserMapper.selectList(
+                        Wrappers.<ResourcesUser>lambdaQuery()
+                                .eq(ResourcesUser::getUserId, receivedUserId)
+                                .in(ResourcesUser::getResourcesId, udfResourceIds)
+                ).stream().map(ResourcesUser::getResourcesId)
+        ).collect(Collectors.toSet());
+        if (!CollectionUtils.isEqualCollection(udfResourceIds, visibleResourceIds)) {
+            throw new ServiceException(Status.UDF_RESOURCE_IS_BOUND, udfFuncList.stream().collect(Collectors.toMap(UdfFunc::getFuncName, UdfFunc::getResourceName)));
+        }
+
+        Set<Integer> realUdfFuncIds = udfFuncList.stream().map(UdfFunc::getId).collect(Collectors.toSet());
+        // update udf function owner
+        int updatedUdfFuncNum = udfFuncMapper.update(null, Wrappers.<UdfFunc>lambdaUpdate()
+                .set(UdfFunc::getUserId, receivedUserId)
+                .set(UdfFunc::getUpdateTime, new Date())
+                .in(UdfFunc::getId, realUdfFuncIds)
+        );
+        if (updatedUdfFuncNum != realUdfFuncIds.size()) {
+            putMsg(result, Status.TRANSFER_UDF_FUNCTION_ERROR);
+            return result;
+        }
+        // delete project user relation if exist
+        udfUserMapper.delete(Wrappers.<UDFUser>lambdaQuery()
+                .eq(UDFUser::getUserId, receivedUserId)
+                .in(UDFUser::getUdfId, realUdfFuncIds)
+        );
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * return the udf function type
+     *
+     * @return transfer data type
+     */
+    @Override
+    public TransferDataType transferDataType() {
+        return TransferDataType.UDF_FUNCTION;
     }
 
 }

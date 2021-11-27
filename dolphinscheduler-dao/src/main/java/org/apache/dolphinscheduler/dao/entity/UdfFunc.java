@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -65,6 +66,7 @@ public class UdfFunc {
     /**
      * udf data base
      */
+    @TableField("`database`")
     private String database;
 
     /**

@@ -156,5 +156,13 @@
             </where>
         </foreach>
     </update>
+    <select id="queryUdfFuncCreatedByUser" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        SELECT
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
+        where udf.user_id = #{userId}
+    </select>
 </mapper>
 

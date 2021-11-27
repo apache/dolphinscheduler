@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -43,12 +45,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * project service impl
@@ -495,6 +499,65 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * query all project list created by user
+     *
+     * @param userId user id
+     * @return project list
+     */
+    @Override
+    public List<Project> queryCreatedByUser(int userId) {
+        return projectMapper.queryProjectCreatedByUser(userId);
+    }
+
+    /**
+     * transfer projects owned by the user
+     *
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @return transfer result code
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<Project> projects = projectMapper.selectList(Wrappers.<Project>lambdaQuery()
+                .eq(Project::getUserId, transferredUserId)
+                .in(Project::getId, transferredIds)
+        );
+        Set<Integer> realProjectIds = projects.stream().map(Project::getId).collect(Collectors.toSet());
+        // update project owner
+        int updatedProjectNum = projectMapper.update(null, Wrappers.<Project>lambdaUpdate()
+                .set(Project::getUserId, receivedUserId)
+                .set(Project::getUpdateTime, new Date())
+                .in(Project::getId, realProjectIds)
+        );
+        if (updatedProjectNum != realProjectIds.size()) {
+            putMsg(result, Status.TRANSFER_PROJECT_ERROR);
+            return result;
+        }
+        // delete project user relation if exist
+        projectUserMapper.delete(Wrappers.<ProjectUser>lambdaQuery()
+                .eq(ProjectUser::getUserId, receivedUserId)
+                .in(ProjectUser::getProjectId, realProjectIds)
+        );
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * return the project type
+     *
+     * @return transfer data type
+     */
+    @Override
+    public TransferDataType transferDataType() {
+        return TransferDataType.PROJECT;
     }
 
 }

@@ -48,7 +48,7 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="100" fixed="right">
+        <el-table-column :label="$t('Operation')" width="140" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Authorize')" placement="top">
               <el-dropdown trigger="click">
@@ -58,6 +58,18 @@
                   <el-dropdown-item @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
                   <el-dropdown-item @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
                   <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-tooltip>
+            <el-tooltip :content="$t('Transfer')" placement="top">
+              <el-dropdown trigger="click">
+                <el-button type="danger" size="mini" icon="el-icon-minus" circle></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-for="option in transferOptions"
+                                    @click.native="openTransferDialog(scope.row, option)"
+                                    :key="option.type">
+                    {{ option.label }}
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-tooltip>
@@ -84,29 +96,62 @@
       v-if="authProjectDialog"
       :visible.sync="authProjectDialog"
       width="auto">
-      <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
+      <m-transfer :transferData="transferData" @onUpdate="onUpdateAuthProject" @close="closeAuthProject"></m-transfer>
     </el-dialog>
 
     <el-dialog
       v-if="authDataSourceDialog"
       :visible.sync="authDataSourceDialog"
       width="auto">
-      <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
+      <m-transfer :transferData="transferData" @onUpdate="onUpdateAuthDataSource" @close="closeAuthDataSource"></m-transfer>
     </el-dialog>
 
     <el-dialog
       v-if="authUdfFuncDialog"
       :visible.sync="authUdfFuncDialog"
       width="auto">
-      <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
+      <m-transfer :transferData="transferData" @onUpdate="onUpdateAuthUdfFunc" @close="closeAuthUdfFunc"></m-transfer>
     </el-dialog>
 
     <el-dialog
       v-if="resourceDialog"
       :visible.sync="resourceDialog"
       width="auto">
-      <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
+      <m-resource :resourceData="resourceData" @onUpdate="onUpdateAuthResource" @close="closeAuthResource"></m-resource>
     </el-dialog>
+
+    <el-dialog
+      v-if="transferDialog"
+      :visible.sync="transferDialog"
+      width="auto">
+      <m-resource v-if="transferDataType === 'RESOURCE'"
+                  :resourceData="resourceData"
+                  :operation="$t('Transfer')"
+                  @onUpdate="doTransfer"
+                  @close="closeTransferDialog">
+        <el-select v-model="receivedUserId"
+                   :placeholder="$t('Please select the user to receive transferred data')"
+                   size="medium"
+                   style="width: 100%;"
+                   filterable>
+          <el-option v-for="user in selectableReceivedUsers" :label="user.userName" :value="user.id" :key="user.id"></el-option>
+        </el-select>
+      </m-resource>
+      <m-transfer v-else
+                  :transferData="transferData"
+                  :operation="$t('Transfer')"
+                  @onUpdate="doTransfer"
+                  @close="closeTransferDialog">
+        <el-select v-model="receivedUserId"
+                   :placeholder="$t('Please select the user to receive transferred data')"
+                   size="medium"
+                   style="width: 100%;"
+                   filterable>
+          <el-option v-for="user in selectableReceivedUsers" :label="user.userName" :value="user.id" :key="user.id"></el-option>
+        </el-select>
+      </m-transfer>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -141,7 +186,43 @@
             name: ''
           }
         },
-        resourceDialog: false
+        resourceDialog: false,
+        transferOptions: [
+          {
+            type: 'PROJECT',
+            label: i18n.$t('Project'),
+            convert: data => _.map(data, v => ({
+              id: v.id,
+              name: v.name
+            }))
+          },
+          {
+            type: 'RESOURCE',
+            label: i18n.$t('Resources'),
+            convert: data => data
+          },
+          {
+            type: 'DATASOURCE',
+            label: i18n.$t('Datasource'),
+            convert: data => _.map(data, v => ({
+              id: v.id,
+              name: v.name
+            }))
+          },
+          {
+            type: 'UDF_FUNCTION',
+            label: i18n.$t('UDF Function'),
+            convert: data => _.map(data, v => ({
+              id: v.id,
+              name: v.funcName
+            }))
+          }
+        ],
+        transferDataType: '',
+        transferredUserId: null,
+        receivedUserId: null,
+        transferDialog: false,
+        allUsers: []
       }
     },
     props: {
@@ -150,7 +231,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList']),
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList', 'getOwnedData', 'getUsersAll', 'transferOwnedData']),
       _delete (item, i) {
         this.deleteUser({
           id: item.id
@@ -369,6 +450,66 @@
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+
+      openTransferDialog (item, option) {
+        this.transferDataType = option.type
+        this.transferredUserId = item.id
+        this.getUsersAll().then(res => {
+          this.allUsers = res || []
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+        this.getOwnedData({
+          userId: item.id,
+          transferDataType: option.type
+        }).then(data => {
+          if (option.type === 'RESOURCE') {
+            const sourceList = option.convert(data) || []
+            this.resourceData.fileSourceList = sourceList.filter(each => each.type === 'FILE')
+            this.resourceData.udfSourceList = sourceList.filter(each => each.type === 'UDF')
+            this.resourceData.fileTargetList = []
+            this.resourceData.udfTargetList = []
+            this.resourceData.type.name = option.label
+          } else {
+            this.transferData.sourceListPrs = option.convert(data) || []
+            this.transferData.targetListPrs = []
+            this.transferData.type.name = option.label
+          }
+          this.transferDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      closeTransferDialog () {
+        this.receivedUserId = null
+        this.transferDialog = false
+      },
+      doTransfer (transferredIds) {
+        const { transferDataType, transferredUserId, receivedUserId } = this
+        if (!receivedUserId) {
+          this.$message.warning(i18n.$t('Please select the user to receive transferred data'))
+          return
+        }
+        if (!transferredIds || transferredIds.length === 0) {
+          this.$message.warning(i18n.$t('Please select the data to be transferred'))
+          return
+        }
+        this.transferOwnedData({
+          transferredUserId, receivedUserId, transferredIds: this.handleTransferredIds(transferredIds, transferDataType), transferDataType
+        }).then(res => {
+          this.$message.success(res.msg)
+          this.closeTransferDialog()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      handleTransferredIds (transferredIds, transferDataType) {
+        let res = transferredIds
+        if (transferDataType === 'RESOURCE') {
+          res = Array.from(new Set(res.split(',').map(fullId => fullId.split('-')).flatMap(id => id))).join(',')
+        }
+        return res
       }
     },
     watch: {
@@ -383,6 +524,11 @@
       this.list = this.userList
     },
     mounted () {
+    },
+    computed: {
+      selectableReceivedUsers () {
+        return this.allUsers.filter(each => this.transferredUserId !== each.id)
+      }
     },
     components: { mTransfer, mResource }
   }

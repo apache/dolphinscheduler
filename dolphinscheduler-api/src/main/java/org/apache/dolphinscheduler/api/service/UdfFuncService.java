@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * udf func service
  */
-public interface UdfFuncService {
+public interface UdfFuncService extends TransferableService {
 
     /**
      * create udf function

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -40,7 +43,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,6 +57,9 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 
 /**
  * project service test
@@ -80,6 +88,14 @@ public class ProjectServiceTest {
 
     private String userName = "ProjectServiceTest";
 
+    @Before
+    public void before() {
+        MapperBuilderAssistant mapperBuilderAssistant = new MapperBuilderAssistant(new MybatisConfiguration(), "");
+        TableInfoHelper.initTableInfo(mapperBuilderAssistant, Project.class);
+        TableInfoHelper.initTableInfo(mapperBuilderAssistant, ProjectUser.class);
+        TableInfoHelper.initTableInfo(mapperBuilderAssistant, ProcessDefinition.class);
+    }
+
     @Test
     public void testCreateProject() {
 
@@ -96,7 +112,7 @@ public class ProjectServiceTest {
         Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS, result.get(Constants.STATUS));
 
         //success
-        Mockito.when(projectMapper.insert(Mockito.any(Project.class))).thenReturn(1);
+        Mockito.when(projectMapper.insert(any(Project.class))).thenReturn(1);
         result = projectService.createProject(loginUser, "test", "test");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -173,7 +189,7 @@ public class ProjectServiceTest {
         IPage<Project> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class), Mockito.eq(1), Mockito.eq(projectName))).thenReturn(page);
+        Mockito.when(projectMapper.queryProjectListPaging(any(Page.class), Mockito.eq(1), Mockito.eq(projectName))).thenReturn(page);
         User loginUser = getLoginUser();
 
         // project owner
@@ -183,7 +199,7 @@ public class ProjectServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
         //admin
-        Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class), Mockito.eq(0), Mockito.eq(projectName))).thenReturn(page);
+        Mockito.when(projectMapper.queryProjectListPaging(any(Page.class), Mockito.eq(0), Mockito.eq(projectName))).thenReturn(page);
         loginUser.setUserType(UserType.ADMIN_USER);
         result = projectService.queryProjectListPaging(loginUser, 10, 1, projectName);
         logger.info(result.toString());
@@ -238,14 +254,14 @@ public class ProjectServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS, result.get(Constants.STATUS));
 
-        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
+        Mockito.when(userMapper.queryByUserNameAccurately(any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc", "testuser");
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         //success
-        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
+        Mockito.when(userMapper.queryByUserNameAccurately(any())).thenReturn(new User());
         project.setUserId(1);
-        Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
+        Mockito.when(projectMapper.updateById(any(Project.class))).thenReturn(1);
         result = projectService.update(loginUser, 2L, "test", "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -337,6 +353,31 @@ public class ProjectServiceTest {
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+    }
+
+    @Test
+    public void testQueryOwnedData() {
+        Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(getList());
+
+        Map<String, Object> result = projectService.queryOwnedData(1);
+        logger.info(result.toString());
+        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
+        assertThat(projects.stream().map(Project::getId)).containsExactly(1);
+    }
+
+    @Test
+    public void testTransferOwnedData() {
+        Mockito.when(projectMapper.selectList(any())).thenReturn(getList());
+        Mockito.when(projectMapper.update(any(), any())).thenReturn(0);
+
+        Map<String, Object> result = projectService.transferOwnedData(1, 2, Lists.newArrayList(1));
+        logger.info(result.toString());
+        assertThat(result.get(Constants.STATUS)).isEqualTo(Status.TRANSFER_PROJECT_ERROR);
+
+        Mockito.when(projectMapper.update(any(), any())).thenReturn(1);
+        result = projectService.transferOwnedData(1, 2, Lists.newArrayList(1));
+        logger.info(result.toString());
+        assertThat(result.get(Constants.STATUS)).isEqualTo(Status.SUCCESS);
     }
 
     private Project getProject() {

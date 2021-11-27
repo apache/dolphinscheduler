@@ -17,22 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
-
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TransferDataType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -48,20 +35,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * users controller
@@ -498,4 +480,59 @@ public class UsersController extends BaseController {
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
+
+    /**
+     * query data owned by the user
+     *
+     * @param loginUser login user
+     * @param userId target user id
+     * @param transferDataType data type
+     * @return owned data list
+     */
+    @ApiOperation(value = "queryOwnedData", notes = "QUERY_OWNED_DATA_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "transferDataType", value = "TRANSFER_DATA_TYPE", required = true, type = "TransferDataType"),
+    })
+    @GetMapping("/owned-data")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_OWNER_DATA_ERROR)
+    @AccessLogAnnotation
+    public Result queryOwnedData(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @RequestParam(value = "userId") int userId,
+                                         @RequestParam(value = "transferDataType") TransferDataType transferDataType) {
+        Map<String, Object> result = usersService.queryOwnedData(loginUser, userId, transferDataType);
+        return returnDataList(result);
+    }
+
+    /**
+     * transfer data owned by the user
+     *
+     * @param loginUser login user
+     * @param transferredUserId transferred user id
+     * @param receivedUserId received user id
+     * @param transferredIds transferred ids
+     * @param transferDataType transfer data type
+     * @return transfer result code
+     */
+    @ApiOperation(value = "transferOwnedData", notes = "TRANSFER_OWNED_DATA_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "transferredUserId", value = "TRANSFERRED_USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "receivedUserId", value = "RECEIVED_USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "transferredIds", value = "TRANSFERRED_IDS", required = true, dataType = "Int[]", example = "[100]"),
+            @ApiImplicitParam(name = "transferDataType", value = "TRANSFER_DATA_TYPE", required = true, type = "TransferDataType"),
+    })
+    @PostMapping("/transfer-data")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(TRANSFER_OWNED_DATA_ERROR)
+    @AccessLogAnnotation
+    public Result transferOwnedData(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "transferredUserId") int transferredUserId,
+                                            @RequestParam(value = "receivedUserId") int receivedUserId,
+                                            @RequestParam(value = "transferredIds") List<Integer> transferredIds,
+                                            @RequestParam(value = "transferDataType") TransferDataType transferDataType) {
+        Map<String, Object> result = usersService.transferOwnedData(loginUser, transferredUserId, receivedUserId, transferredIds, transferDataType);
+        return returnDataList(result);
+    }
+
 }

@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * data source service
  */
-public interface DataSourceService {
+public interface DataSourceService extends TransferableService {
 
     /**
      * create data source

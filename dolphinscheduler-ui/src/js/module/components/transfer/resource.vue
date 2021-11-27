@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="resourceData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="resourceData.type.name + operation" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model" style="width: 660px">
         <div>
@@ -30,6 +30,9 @@
         <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" maxHeight="260" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
+        <div class="expand-box">
+          <slot></slot>
+        </div>
       </div>
     </template>
   </m-popup>
@@ -39,6 +42,7 @@
   import mPopup from '@/module/components/popup/popup'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import i18n from '@/module/i18n'
 
   export default {
     name: 'transfer',
@@ -71,7 +75,11 @@
       }
     },
     props: {
-      resourceData: Object
+      resourceData: Object,
+      operation: {
+        type: String,
+        default: i18n.$t('Authorize')
+      }
     },
     created () {
       let file = this.resourceData.fileSourceList
@@ -146,7 +154,7 @@
         this.$refs.popup.spinnerLoading = true
         setTimeout(() => {
           this.$refs.popup.spinnerLoading = false
-          this.$emit('onUpdateAuthResource', _.map(selAllSource, v => v).join(','))
+          this.$emit('onUpdate', _.map(selAllSource, v => v).join(','))
         }, 800)
       },
       _ckFile () {
@@ -218,7 +226,7 @@
         delete item.children
       },
       close () {
-        this.$emit('closeAuthResource')
+        this.$emit('close')
       }
     },
     watch: {
@@ -300,6 +308,10 @@
     .select-oper-box {
       width: 20px;
       float: left;
+    }
+    .expand-box {
+      clear: both;
+      padding-top: 10px;
     }
   }
   .vue-treeselect__menu {
