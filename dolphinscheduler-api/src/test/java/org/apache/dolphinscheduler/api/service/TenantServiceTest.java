@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -61,6 +62,9 @@ public class TenantServiceTest {
 
     @InjectMocks
     private TenantServiceImpl tenantService;
+
+    @Mock
+    private CacheNotifyService cacheNotifyService;
 
     @Mock
     private TenantMapper tenantMapper;
