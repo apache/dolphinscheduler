@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.slack;
 
+import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +27,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,12 +40,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-
-import com.google.common.base.Preconditions;
-
 public final class SlackSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(SlackSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(SlackSender.class);
 
     private final String webHookUrl;
     private final String botName;
@@ -83,7 +81,7 @@ public final class SlackSender {
             HttpEntity entity = response.getEntity();
             return EntityUtils.toString(entity, "UTF-8");
         } catch (Exception e) {
-            log.error("Send message to slack error.", e);
+            logger.error("Send message to slack error.", e);
             return "System Exception";
         }
     }

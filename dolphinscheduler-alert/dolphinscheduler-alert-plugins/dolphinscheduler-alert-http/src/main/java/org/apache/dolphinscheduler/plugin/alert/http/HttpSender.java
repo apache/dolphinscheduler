@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,16 +30,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public final class HttpSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(HttpSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
     private static final String URL_SPLICE_CHAR = "?";
     /**
      * request type post
@@ -86,7 +84,7 @@ public final class HttpSender {
             alertResult.setStatus("true");
             alertResult.setMessage(resp);
         } catch (Exception e) {
-            log.error("send http alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg  exception : {}", e.getMessage());
             alertResult.setStatus("false");
             alertResult.setMessage("send http request  alert fail.");
         }
@@ -149,7 +147,7 @@ public final class HttpSender {
             StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
-            log.error("send http alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg  exception : {}", e.getMessage());
         }
     }
 }

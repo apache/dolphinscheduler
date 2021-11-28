@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,11 +36,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public final class ExcelUtils {
     private static final int XLSX_WINDOW_ROW = 10000;
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ExcelUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
     private ExcelUtils() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
@@ -55,14 +54,14 @@ public final class ExcelUtils {
     public static void genExcelFile(String content, String title, String xlsFilePath) {
         File file = new File(xlsFilePath);
         if (!file.exists() && !file.mkdirs()) {
-            log.error("Create xlsx directory error, path:{}", xlsFilePath);
+            logger.error("Create xlsx directory error, path:{}", xlsFilePath);
             throw new AlertEmailException("Create xlsx directory error");
         }
 
         List<LinkedHashMap> itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)) {
-            log.error("itemsList is null");
+            logger.error("itemsList is null");
             throw new AlertEmailException("itemsList is null");
         }
 

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import static java.lang.String.format;
-
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.common.enums.PluginType;
@@ -26,7 +24,11 @@ import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,14 +37,11 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
+import static java.lang.String.format;
 
 @Component
 public final class AlertPluginManager {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AlertPluginManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final PluginDao pluginDao;
 
@@ -59,7 +58,7 @@ public final class AlertPluginManager {
         ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {
             final String name = factory.name();
 
-            log.info("Registering alert plugin: {}", name);
+            logger.info("Registering alert plugin: {}", name);
 
             if (!names.add(name)) {
                 throw new IllegalStateException(format("Duplicate alert plugins named '%s'", name));
@@ -67,7 +66,7 @@ public final class AlertPluginManager {
 
             final AlertChannel alertChannel = factory.create();
 
-            log.info("Registered alert plugin: {}", name);
+            logger.info("Registered alert plugin: {}", name);
 
             final List<PluginParams> params = factory.params();
             final String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
