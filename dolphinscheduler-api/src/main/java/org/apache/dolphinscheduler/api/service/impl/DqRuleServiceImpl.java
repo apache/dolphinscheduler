@@ -52,8 +52,9 @@ import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
 import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 import org.apache.dolphinscheduler.spi.task.dq.enums.OptionSourceType;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

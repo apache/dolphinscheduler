@@ -73,9 +73,10 @@ import org.apache.dolphinscheduler.spi.task.dq.enums.ExecuteSqlType;
 import org.apache.dolphinscheduler.spi.task.dq.utils.Md5Utils;
 import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
