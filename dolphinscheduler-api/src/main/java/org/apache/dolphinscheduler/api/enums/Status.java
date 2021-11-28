@@ -269,7 +269,7 @@ public enum Status {
     CREATE_PROCESS_TASK_RELATION_ERROR(50032, "create process task relation error", "创建工作流任务关系错误"),
     PROCESS_TASK_RELATION_NOT_EXIST(50033, "process task relation {0} does not exist", "工作流任务关系[{0}]不存在"),
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]", "工作流任务关系已存在, processCode:[{0}]"),
-    PROCESS_DAG_IS_EMPTY(50035, "process dag can not be empty", "工作流dag不能为空"),
+    PROCESS_DAG_IS_EMPTY(50035, "process dag is empty", "工作流dag是空"),
     CHECK_PROCESS_TASK_RELATION_ERROR(50036, "check process task relation error", "工作流任务关系参数错误"),
     CREATE_TASK_DEFINITION_ERROR(50037, "create task definition error", "创建任务错误"),
     UPDATE_TASK_DEFINITION_ERROR(50038, "update task definition error", "更新任务定义错误"),
@@ -287,6 +287,7 @@ public enum Status {
     TASK_DEFINE_STATE_ONLINE(50050, "task definition {0} is already on line", "任务定义[{0}]已上线"),
     TASK_HAS_DOWNSTREAM(50051, "Task [{0}] exists downstream dependence", "任务[{0}]存在下游依赖"),
     MAIN_TABLE_USING_VERSION(50052, "the version that the master table is using", "主表正在使用该版本"),
+    PROJECT_PROCESS_NOT_MATCH(50053, "the project and the process is not match", "项目和工作流不匹配"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**

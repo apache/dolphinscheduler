@@ -749,5 +749,19 @@ export default {
   users: '群员',
   Username: '用户名',
   showType: '内容展示类型',
-  'Please select a task type (required)': '请选择任务类型(必选)'
+  'Please select a task type (required)': '请选择任务类型(必选)',
+  layoutType: '布局类型',
+  gridLayout: '网格布局',
+  dagreLayout: '层次布局',
+  rows: '行数',
+  cols: '列数',
+  processOnline: '已上线',
+  searchNode: '搜索节点',
+  dagScale: '缩放',
+  workflowName: '工作流名称',
+  scheduleStartTime: '定时开始时间',
+  scheduleEndTime: '定时结束时间',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: '工作流上线状态',
+  schedulePublishStatus: '定时状态'
 }

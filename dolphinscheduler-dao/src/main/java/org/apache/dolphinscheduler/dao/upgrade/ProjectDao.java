@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +51,7 @@ public class ProjectDao {
                 Integer id = rs.getInt(1);
                 long code = rs.getLong(2);
                 if (code == 0L) {
-                    code = SnowFlakeUtils.getInstance().nextId();
+                    code = CodeGenerateUtils.getInstance().genCode();
                 }
                 projectMap.put(id, code);
             }

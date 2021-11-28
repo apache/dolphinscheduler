@@ -14,26 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+package org.apache.dolphinscheduler.common.utils;
 
-import java.sql.Connection;
+import java.util.HashSet;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-public class ConnectionFactoryTest {
-    @BeforeClass
-    public static void setup() {
-        System.setProperty("spring.profiles.active", "h2");
-    }
-
+public class CodeGenerateUtilsTest {
     @Test
-    public void testConnection() throws Exception {
-        Connection connection = ConnectionFactory.getInstance().getDataSource().getConnection();
-        Assert.assertTrue(connection != null);
+    public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
+        HashSet<Long> existsCode = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            Long currentCode = CodeGenerateUtils.getInstance().genCode();
+            Assert.assertFalse(existsCode.contains(currentCode));
+            existsCode.add(currentCode);
+        }
     }
 }
