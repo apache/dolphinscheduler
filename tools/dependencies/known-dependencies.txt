@@ -175,7 +175,6 @@ protostuff-core-1.7.2.jar
 protostuff-runtime-1.7.2.jar
 protostuff-api-1.7.2.jar
 protostuff-collectionschema-1.7.2.jar
-py4j-0.10.9.jar
 quartz-2.3.0.jar
 quartz-jobs-2.3.0.jar
 reflections-0.9.12.jar
