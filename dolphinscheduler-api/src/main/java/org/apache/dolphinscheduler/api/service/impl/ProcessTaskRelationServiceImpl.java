@@ -389,6 +389,57 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     }
 
     /**
+     * delete edge
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processDefinitionCode process definition code
+     * @param preTaskCode pre task code
+     * @param postTaskCode post task code
+     * @return delete result code
+     */
+    @Override
+    public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode);
+        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+            putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
+            return result;
+        }
+        if (processTaskRelationList.size() > 1) {
+            putMsg(result, Status.DATA_IS_NOT_VALID, "processTaskRelationList");
+            return result;
+        }
+        ProcessTaskRelation processTaskRelation = processTaskRelationList.get(0);
+        int upstreamCount = processTaskRelationMapper.countByCode(projectCode, processTaskRelation.getProcessDefinitionCode(),
+                0L, processTaskRelation.getPostTaskCode());
+
+        if (upstreamCount == 0) {
+            putMsg(result, Status.DATA_IS_NULL, "upstreamCount");
+            return result;
+        }
+        if (upstreamCount > 1) {
+            int delete = processTaskRelationMapper.deleteById(processTaskRelation.getId());
+            if (delete == 0) {
+                putMsg(result, Status.DELETE_EDGE_ERROR);
+            }
+            return result;
+        }
+        processTaskRelation.setPreTaskVersion(0);
+        processTaskRelation.setPreTaskCode(0L);
+        int update = processTaskRelationMapper.updateById(processTaskRelation);
+        if (update == 0) {
+            putMsg(result, Status.DELETE_EDGE_ERROR);
+        }
+        return result;
+    }
+
+    /**
      * build task definition
      *
      * @return task definition
