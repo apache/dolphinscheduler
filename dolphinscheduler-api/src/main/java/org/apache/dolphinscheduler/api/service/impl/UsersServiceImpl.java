@@ -174,6 +174,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             HadoopUtils.getInstance().mkdir(userPath);
         }
 
+        result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
 
