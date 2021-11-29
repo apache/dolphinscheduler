@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -463,6 +464,36 @@ public class ProcessTaskRelationServiceTest {
     }
 
     @Test
+    public void testDeleteTaskProcessRelation() {
+        long projectCode = 1L;
+        long taskCode = 2L;
+        long processDefinitionCode = 3L;
+        long preTaskCode = 4L;
+        long postTaskCode = 5L;
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
+        Mockito.when(processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode)).thenReturn(Lists.newArrayList());
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(projectCode);
+        processTaskRelationLog.setPreTaskCode(taskCode);
+        processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
+        Mockito.when(processTaskRelationMapper.deleteRelation(processTaskRelationLog)).thenReturn(1);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskType(TaskType.CONDITIONS.getDesc());
+        Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
+        Mockito.when(taskDefinitionMapper.deleteByCode(taskCode)).thenReturn(1);
+        result = processTaskRelationService.deleteTaskProcessRelation(loginUser, projectCode, processDefinitionCode, taskCode);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
     public void testDeleteEdge() {
         long projectCode = 1L;
         long processDefinitionCode = 3L;
@@ -488,7 +519,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(processTaskRelationMapper.countByCode(projectCode, processDefinitionCode, 0L, postTaskCode)).thenReturn(1);
         Mockito.when(processTaskRelationMapper.deleteById(processTaskRelation.getId())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.updateById(processTaskRelation)).thenReturn(1);
-        result = processTaskRelationService.deleteEdge(loginUser,projectCode,processDefinitionCode,preTaskCode,postTaskCode);
+        result = processTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 }
