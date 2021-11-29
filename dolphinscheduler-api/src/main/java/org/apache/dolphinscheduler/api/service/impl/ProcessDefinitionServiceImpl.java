@@ -1590,7 +1590,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // save dag schedule
-        Map<String, Object> scheduleResult = createDagSchedule(loginUser, projectCode, processDefinitionCode, scheduleJson);
+        Map<String, Object> scheduleResult = createDagSchedule(loginUser, project, processDefinition, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
             return scheduleResult;
         }
@@ -1610,35 +1610,49 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     private Map<String, Object> createDagSchedule(User loginUser,
-                                                  long projectCode,
-                                                  long processDefinitionCode,
+                                                  Project project,
+                                                  ProcessDefinition processDefinition,
                                                   String scheduleJson) {
-        Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
-        // set default value
-        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
-        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType();
-        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
-        int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId();
-        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup();
-        Long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode();
+        Map<String, Object> result = new HashMap<>();
+        Schedule scheduleObj = JSONUtils.parseObject(scheduleJson, Schedule.class);
+        Date now = new Date();
 
-        ScheduleParam param = new ScheduleParam();
-        param.setStartTime(schedule.getStartTime());
-        param.setEndTime(schedule.getEndTime());
-        param.setCrontab(schedule.getCrontab());
-        param.setTimezoneId(schedule.getTimezoneId());
+        scheduleObj.setProjectName(project.getName());
+        scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+        scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
-        return schedulerService.insertSchedule(
-                loginUser,
-                projectCode,
-                processDefinitionCode,
-                JSONUtils.toJsonString(param),
-                warningType,
-                warningGroupId,
-                failureStrategy,
-                processInstancePriority,
-                workerGroup,
-                environmentCode);
+        if (DateUtils.differSec(scheduleObj.getStartTime(), scheduleObj.getEndTime()) == 0) {
+            logger.warn("The start time must not be the same as the end");
+            putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            return result;
+        }
+        if (!org.quartz.CronExpression.isValidExpression(scheduleObj.getCrontab())) {
+            logger.error("{} verify failure", scheduleObj.getCrontab());
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleObj.getCrontab());
+            return result;
+        }
+        scheduleObj.setWarningType(scheduleObj.getWarningType() == null ? WarningType.NONE : scheduleObj.getWarningType());
+        scheduleObj.setWarningGroupId(scheduleObj.getWarningGroupId() == 0 ? 1 : scheduleObj.getWarningGroupId());
+        scheduleObj.setFailureStrategy(scheduleObj.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleObj.getFailureStrategy());
+        scheduleObj.setCreateTime(now);
+        scheduleObj.setUpdateTime(now);
+        scheduleObj.setUserId(loginUser.getId());
+        scheduleObj.setUserName(loginUser.getUserName());
+        scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+        scheduleObj.setProcessInstancePriority(scheduleObj.getProcessInstancePriority() == null ? Priority.MEDIUM : scheduleObj.getProcessInstancePriority());
+        scheduleObj.setWorkerGroup(scheduleObj.getWorkerGroup() == null ? "default" : scheduleObj.getWorkerGroup());
+        scheduleObj.setEnvironmentCode(scheduleObj.getEnvironmentCode() == null ? -1 : scheduleObj.getEnvironmentCode());
+        scheduleMapper.insert(scheduleObj);
+
+        /**
+         * updateProcessInstance receivers and cc by process definition id
+         */
+        processDefinition.setWarningGroupId(scheduleObj.getWarningGroupId());
+        processDefinitionMapper.updateById(processDefinition);
+
+        putMsg(result, Status.SUCCESS);
+        result.put("scheduleId", scheduleObj.getId());
+        return result;
     }
 
     /**
