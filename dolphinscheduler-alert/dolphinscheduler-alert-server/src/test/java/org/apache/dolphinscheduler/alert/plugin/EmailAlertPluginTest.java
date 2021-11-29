@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -40,14 +39,7 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +47,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @ActiveProfiles(ProfileType.H2)
 @RunWith(SpringRunner.class)
@@ -72,12 +69,6 @@ public class EmailAlertPluginTest {
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("spring.profiles.active", "h2");
-    }
-
-    @Before
-    public void setUp() {
-        alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-        pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
     }
 
     @Test
@@ -124,11 +115,10 @@ public class EmailAlertPluginTest {
         alertPluginInstance.setCreateTime(new Date());
         alertPluginInstance.setInstanceName("test email alert");
 
-        List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("Email", "alert");
-        if (pluginDefineList == null || pluginDefineList.size() == 0) {
+        PluginDefine pluginDefine = pluginDao.getPluginDefineMapper().queryByNameAndType("Email", "alert");
+        if (pluginDefine == null) {
             throw new RuntimeException("no alert plugin be load");
         }
-        PluginDefine pluginDefine = pluginDefineList.get(0);
         alertPluginInstance.setPluginDefineId(pluginDefine.getId());
         alertPluginInstance.setPluginInstanceParams(getEmailAlertParams());
         alertDao.getAlertPluginInstanceMapper().insert(alertPluginInstance);

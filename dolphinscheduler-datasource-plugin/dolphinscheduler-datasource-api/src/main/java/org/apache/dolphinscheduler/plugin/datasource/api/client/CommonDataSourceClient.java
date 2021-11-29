@@ -20,19 +20,19 @@ package org.apache.dolphinscheduler.plugin.datasource.api.client;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.exception.PluginException;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.base.Stopwatch;
-import com.zaxxer.hikari.HikariDataSource;
 
 public class CommonDataSourceClient implements DataSourceClient {
 
@@ -43,7 +43,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     public static final String COMMON_VALIDATION_QUERY = "select 1";
 
     protected final BaseConnectionParam baseConnectionParam;
-    protected HikariDataSource dataSource;
+    protected DataSource dataSource;
     protected JdbcTemplate jdbcTemplate;
 
     public CommonDataSourceClient(BaseConnectionParam baseConnectionParam) {
@@ -102,7 +102,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         try {
             this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
         } catch (Exception e) {
-            throw PluginException.getInstance("JDBC connect failed", e);
+            throw new RuntimeException("JDBC connect failed", e);
         } finally {
             logger.info("Time to execute check jdbc client with sql {} for {} ms ", this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
@@ -113,7 +113,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         try {
             return this.dataSource.getConnection();
         } catch (SQLException e) {
-            logger.error("get DataSource Connection fail SQLException: {}", e.getMessage(), e);
+            logger.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -121,7 +121,6 @@ public class CommonDataSourceClient implements DataSourceClient {
     @Override
     public void close() {
         logger.info("do close dataSource.");
-        this.dataSource.close();
         this.dataSource = null;
         this.jdbcTemplate = null;
     }

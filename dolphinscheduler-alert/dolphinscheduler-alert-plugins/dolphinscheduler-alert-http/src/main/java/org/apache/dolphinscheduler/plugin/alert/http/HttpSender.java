@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,13 +30,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public final class HttpSender {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(HttpSender.class);
@@ -59,11 +56,11 @@ public final class HttpSender {
 
     public HttpSender(Map<String, String> paramsMap) {
 
-        url = paramsMap.get(HttpAlertConstants.URL);
-        headerParams = paramsMap.get(HttpAlertConstants.HEADER_PARAMS);
-        bodyParams = paramsMap.get(HttpAlertConstants.BODY_PARAMS);
-        contentField = paramsMap.get(HttpAlertConstants.CONTENT_FIELD);
-        requestType = paramsMap.get(HttpAlertConstants.REQUEST_TYPE);
+        url = paramsMap.get(HttpAlertConstants.NAME_URL);
+        headerParams = paramsMap.get(HttpAlertConstants.NAME_HEADER_PARAMS);
+        bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
+        contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
+        requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
     }
 
     public AlertResult send(String msg) {

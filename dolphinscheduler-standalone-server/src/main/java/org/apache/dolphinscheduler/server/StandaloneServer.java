@@ -39,8 +39,7 @@ public class StandaloneServer {
             ApiApplicationServer.class,
             MasterServer.class,
             WorkerServer.class,
-            AlertServer.class,
-            PythonGatewayServer.class
-        ).profiles("h2", "api").run(args);
+            AlertServer.class
+        ).profiles("master", "worker", "api", "alert", "h2", "standalone").run(args);
     }
 }

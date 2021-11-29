@@ -25,46 +25,36 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-datasource-mysql</artifactId>
-    <name>${project.artifactId}</name>
-    <packaging>jar</packaging>
+    <artifactId>dolphinscheduler-datasource-all</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
+            <artifactId>dolphinscheduler-datasource-clickhouse</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-api</artifactId>
-            <version>${project.version}</version>
+            <artifactId>dolphinscheduler-datasource-db2</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-hive</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <scope>test</scope>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-mysql</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <scope>test</scope>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-oracle</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-sqlserver</artifactId>
         </dependency>
     </dependencies>
 </project>

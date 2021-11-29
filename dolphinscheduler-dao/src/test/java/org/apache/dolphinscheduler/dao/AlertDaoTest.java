@@ -18,26 +18,31 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.springframework.transaction.annotation.Transactional;
-
+@ActiveProfiles(ProfileType.H2)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@SpringBootApplication
 @Transactional
 public class AlertDaoTest {
-
-    @BeforeClass
-    public static void setUp() {
-        System.setProperty("spring.profiles.active", "h2");
-    }
+    @Autowired
+    private AlertDao alertDao;
 
     @Test
     public void testAlertDao() {
-        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", "
@@ -53,7 +58,6 @@ public class AlertDaoTest {
 
     @Test
     public void testSendServerStopedAlert() {
-        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         int alertGroupId = 1;
         String host = "127.0.0.998165432";
         String serverType = "Master";

@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import static java.util.Objects.requireNonNull;
-
+import com.sun.mail.smtp.SMTPProvider;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
@@ -26,36 +28,17 @@ import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailExcept
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import org.slf4j.Logger;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
-import org.slf4j.Logger;
-
-import com.sun.mail.smtp.SMTPProvider;
+import static java.util.Objects.requireNonNull;
 
 public final class MailSender {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(MailSender.class);
@@ -80,7 +63,7 @@ public final class MailSender {
     public MailSender(Map<String, String> config) {
         String receiversConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS);
         if (receiversConfig == null || "".equals(receiversConfig)) {
-            throw new AlertEmailException(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS + mustNotNull);
+            throw new AlertEmailException(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS + mustNotNull);
         }
 
         receivers = Arrays.asList(receiversConfig.split(","));
@@ -93,33 +76,33 @@ public final class MailSender {
         }
 
         mailSmtpHost = config.get(MailParamsConstants.NAME_MAIL_SMTP_HOST);
-        requireNonNull(mailSmtpHost, MailParamsConstants.MAIL_SMTP_HOST + mustNotNull);
+        requireNonNull(mailSmtpHost, MailParamsConstants.NAME_MAIL_SMTP_HOST + mustNotNull);
 
         mailSmtpPort = config.get(MailParamsConstants.NAME_MAIL_SMTP_PORT);
-        requireNonNull(mailSmtpPort, MailParamsConstants.MAIL_SMTP_PORT + mustNotNull);
+        requireNonNull(mailSmtpPort, MailParamsConstants.NAME_MAIL_SMTP_PORT + mustNotNull);
 
         mailSenderEmail = config.get(MailParamsConstants.NAME_MAIL_SENDER);
-        requireNonNull(mailSenderEmail, MailParamsConstants.MAIL_SENDER + mustNotNull);
+        requireNonNull(mailSenderEmail, MailParamsConstants.NAME_MAIL_SENDER + mustNotNull);
 
         enableSmtpAuth = config.get(MailParamsConstants.NAME_MAIL_SMTP_AUTH);
 
         mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
-        requireNonNull(mailUser, MailParamsConstants.MAIL_USER + mustNotNull);
+        requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
 
         mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
-        requireNonNull(mailPasswd, MailParamsConstants.MAIL_PASSWD + mustNotNull);
+        requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
 
         mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
-        requireNonNull(mailUseStartTLS, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
+        requireNonNull(mailUseStartTLS, MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
 
         mailUseSSL = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE);
-        requireNonNull(mailUseSSL, MailParamsConstants.MAIL_SMTP_SSL_ENABLE + mustNotNull);
+        requireNonNull(mailUseSSL, MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE + mustNotNull);
 
         sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
-        requireNonNull(sslTrust, MailParamsConstants.MAIL_SMTP_SSL_TRUST + mustNotNull);
+        requireNonNull(sslTrust, MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST + mustNotNull);
 
-        showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + mustNotNull);
+        showType = config.get(AlertConstants.NAME_SHOW_TYPE);
+        requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + mustNotNull);
 
         xlsFilePath = config.get(EmailConstants.XLS_FILE_PATH);
         if (StringUtils.isBlank(xlsFilePath)) {

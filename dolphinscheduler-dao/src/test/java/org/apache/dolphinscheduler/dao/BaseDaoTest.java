@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.hive;
+package org.apache.dolphinscheduler.dao;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.common.enums.ProfileType;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-public class HiveDataSourcePluginTest {
-
-    private HiveDataSourcePlugin dataSourcePlugin = new HiveDataSourcePlugin();
-
-    @Test
-    public void testGetDatasourceChannelFactorys() {
-        Iterable<DataSourceChannelFactory> channelFactorys = dataSourcePlugin.getDatasourceChannelFactorys();
-        for (DataSourceChannelFactory dataSourceChannelFactory : channelFactorys) {
-            Assert.assertTrue(dataSourceChannelFactory instanceof DataSourceChannelFactory);
-        }
-    }
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles(value = ProfileType.H2)
+@Transactional
+@Rollback
+public abstract class BaseDaoTest {
 }

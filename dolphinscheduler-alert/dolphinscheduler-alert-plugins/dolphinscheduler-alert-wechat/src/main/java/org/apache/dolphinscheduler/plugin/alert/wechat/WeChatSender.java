@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
-import static java.util.Objects.requireNonNull;
-
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -33,19 +30,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.slf4j.Logger;
+import static java.util.Objects.requireNonNull;
 
 public final class WeChatSender {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(WeChatSender.class);
@@ -71,8 +62,8 @@ public final class WeChatSender {
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
-        showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + MUST_NOT_NULL);
+        showType = config.get(AlertConstants.NAME_SHOW_TYPE);
+        requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
             .replace(CORP_ID_REGEX, weChatCorpId)
             .replace(SECRET_REGEX, weChatSecret);

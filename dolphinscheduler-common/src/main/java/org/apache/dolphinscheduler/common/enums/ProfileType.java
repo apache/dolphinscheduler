@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.hive;
+package org.apache.dolphinscheduler.common.enums;
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import com.google.common.collect.Lists;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
-public class HiveDataSourcePlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<DataSourceChannelFactory> getDatasourceChannelFactorys() {
-        return ImmutableList.of(new HiveDataSourceChannelFactory());
-    }
+public enum ProfileType {
+    ;
+
+    public static final String H2 = "h2";
+
+    public static final String MYSQL = "mysql";
+
+    public static final String POSTGRESQL = "postgresql";
+
+    public static final List<String> DATASOURCE_PROFILE = Lists.newArrayList(H2, MYSQL, POSTGRESQL);
 }

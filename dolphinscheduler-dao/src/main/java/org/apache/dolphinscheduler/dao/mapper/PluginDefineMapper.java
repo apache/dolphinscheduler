@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
 
@@ -64,5 +62,5 @@ public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
      * @param pluginType
      * @return
      */
-    List<PluginDefine> queryByNameAndType(@Param("pluginName") String pluginName, @Param("pluginType") String pluginType);
+    PluginDefine queryByNameAndType(@Param("pluginName") String pluginName, @Param("pluginType") String pluginType);
 }

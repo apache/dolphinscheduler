@@ -20,13 +20,12 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * WeChatSenderTest
@@ -67,7 +66,7 @@ public class WeChatSenderTest {
         );
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, "Kris");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG, "msg");
-        weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());
     }
 
     @Test
@@ -80,7 +79,7 @@ public class WeChatSenderTest {
 
     @Test
     public void testSendWeChatTextMsg() {
-        weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
+        weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TEXT.getDescp());
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
         Assert.assertEquals("false", alertResult.getStatus());
