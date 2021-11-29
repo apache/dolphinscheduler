@@ -1628,11 +1628,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.DATA_IS_NOT_VALID);
         }
         Date now = new Date();
-
-        scheduleObj.setProjectName(project.getName());
         scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
-        scheduleObj.setProcessDefinitionName(processDefinition.getName());
-
         if (DateUtils.differSec(scheduleObj.getStartTime(), scheduleObj.getEndTime()) == 0) {
             logger.warn("The start time must not be the same as the end");
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
