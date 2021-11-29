@@ -246,6 +246,7 @@ public class ProcessTaskRelationServiceTest {
         taskDefinition.setProjectCode(1L);
         taskDefinition.setCode(1L);
         taskDefinition.setVersion(1);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         return taskDefinition;
     }
 
@@ -301,6 +302,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
         Mockito.when(processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L)).thenReturn(Lists.newArrayList());
+        Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(getTaskDefinition());
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
         processTaskRelation.setProjectCode(projectCode);
