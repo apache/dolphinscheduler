@@ -186,7 +186,54 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> moveTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode, long targetProcessDefinitionCode, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(targetProcessDefinitionCode);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, targetProcessDefinitionCode);
+            return result;
+        }
+        if (processDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.PROJECT_PROCESS_NOT_MATCH);
+            return result;
+        }
+        List<ProcessTaskRelation> downstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L);
+        if (CollectionUtils.isNotEmpty(downstreamList)) {
+            Set<Long> postTaskCodes = downstreamList
+                .stream()
+                .map(ProcessTaskRelation::getPostTaskCode)
+                .collect(Collectors.toSet());
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(postTaskCodes, ","));
+            return result;
+        }
+        List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, 0L, taskCode);
+        if (upstreamList.isEmpty()) {
+            putMsg(result, Status.PROCESS_TASK_RELATION_NOT_EXIST, "taskCode:" + taskCode);
+            return result;
+        } else {
+            Set<Long> preTaskCodes = upstreamList
+                .stream()
+                .map(ProcessTaskRelation::getPreTaskCode)
+                .collect(Collectors.toSet());
+            if (preTaskCodes.size() > 1 || !preTaskCodes.contains(0L)) {
+                putMsg(result, Status.TASK_HAS_UPSTREAM, org.apache.commons.lang.StringUtils.join(preTaskCodes, ","));
+                return result;
+            }
+        }
+        Date now = new Date();
+        ProcessTaskRelation processTaskRelation = upstreamList.get(0);
+        processTaskRelation.setProcessDefinitionCode(processDefinition.getCode());
+        processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
+        processTaskRelation.setUpdateTime(now);
+        int update = processTaskRelationMapper.updateById(processTaskRelation);
+        if (update == 0) {
+            putMsg(result, Status.MOVE_PROCESS_TASK_RELATION_ERROR);
+        }
+        return result;
     }
 
     /**
