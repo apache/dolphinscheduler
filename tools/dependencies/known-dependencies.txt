@@ -70,7 +70,10 @@ hadoop-mapreduce-client-shuffle-2.7.3.jar
 hadoop-yarn-api-2.7.3.jar
 hadoop-yarn-client-2.7.3.jar
 hadoop-yarn-common-2.7.3.jar
+hadoop-yarn-server-applicationhistoryservice-2.6.0.jar
 hadoop-yarn-server-common-2.7.3.jar
+hadoop-yarn-server-resourcemanager-2.6.0.jar
+hadoop-yarn-server-web-proxy-2.6.0.jar
 hive-common-2.1.0.jar
 hive-jdbc-2.1.0.jar
 hive-metastore-2.1.0.jar
@@ -78,6 +81,10 @@ hive-orc-2.1.0.jar
 hive-serde-2.1.0.jar
 hive-service-2.1.0.jar
 hive-service-rpc-2.1.0.jar
+hive-shims-0.23:2.1.0.jar
+hive-shims-2.1.0.jar
+hive-shims-common:2.1.0.jar
+hive-shims-scheduler:2.1.0.jar
 hive-storage-api-2.1.0.jar
 htrace-core-3.1.0-incubating.jar
 httpclient-4.4.1.jar
@@ -233,10 +240,3 @@ xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
 Java-WebSocket-1.5.1.jar
-hive-shims:2.1.0
-hive-shims-0.23:2.1.0
-hive-shims-common:2.1.0
-hive-shims-scheduler:2.1.0
-hadoop-yarn-server-resourcemanager-2.6.0.jar
-hadoop-yarn-server-applicationhistoryservice-2.6.0.jar
-hadoop-yarn-server-web-proxy-2.6.0.jar
