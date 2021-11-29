@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.model;
 
+package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
 import java.util.Set;
