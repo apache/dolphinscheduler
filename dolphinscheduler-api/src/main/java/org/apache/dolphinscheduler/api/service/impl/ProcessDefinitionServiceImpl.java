@@ -1623,6 +1623,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                   String scheduleJson) {
         Map<String, Object> result = new HashMap<>();
         Schedule scheduleObj = JSONUtils.parseObject(scheduleJson, Schedule.class);
+        if (scheduleObj == null) {
+            putMsg(result, Status.DATA_IS_NOT_VALID, scheduleJson);
+            throw new ServiceException(Status.DATA_IS_NOT_VALID);
+        }
         Date now = new Date();
 
         scheduleObj.setProjectName(project.getName());
