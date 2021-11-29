@@ -212,7 +212,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<ProcessTaskRelation> downstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L);
-        if (!CollectionUtils.isEmpty(downstreamList)) {
+        if (CollectionUtils.isNotEmpty(downstreamList)) {
             Set<Long> postTaskCodes = downstreamList
                     .stream()
                     .map(ProcessTaskRelation::getPostTaskCode)
