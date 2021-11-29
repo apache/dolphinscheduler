@@ -163,17 +163,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
 
-
-    /**
-     * query edge by id
-     *
-     * @param projectCode           projectCode
-     * @param processTaskRelationId process task relationId
-     * @return ProcessTaskRelation
-     */
-    ProcessTaskRelation queryEdgeById(@Param("projectCode") long projectCode,
-                                      @Param("processTaskRelationId") int processTaskRelationId);
-
     /**
      * count by code
      *
