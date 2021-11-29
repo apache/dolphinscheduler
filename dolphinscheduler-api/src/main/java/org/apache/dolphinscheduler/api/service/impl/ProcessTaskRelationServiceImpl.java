@@ -346,6 +346,42 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     }
 
     /**
+     * delete edge
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processTaskRelationId process task relation id
+     * @return postTaskCode post task code
+     */
+    @Override
+    public Map<String, Object> deleteEdge(User loginUser, long projectCode, int processTaskRelationId) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        ProcessTaskRelation processTaskRelation = processTaskRelationMapper.selectById(processTaskRelationId);
+        if (null == processTaskRelation || projectCode != processTaskRelation.getProjectCode()) {
+            putMsg(result, Status.DATA_IS_NULL, "processTaskRelation");
+            return result;
+        }
+        int upstreamCount = processTaskRelationMapper.countByCode(projectCode, processTaskRelation.getProcessDefinitionCode(),
+                0L, processTaskRelation.getPostTaskCode());
+
+        if (upstreamCount == 0) {
+            putMsg(result, Status.DATA_IS_NULL, "upstreamCount");
+        } else if (upstreamCount > 1) {
+            processTaskRelationMapper.deleteById(processTaskRelation.getId());
+        } else {
+            processTaskRelation.setPreTaskVersion(0);
+            processTaskRelation.setPreTaskCode(0L);
+            processTaskRelationMapper.updateById(processTaskRelation);
+        }
+        return result;
+    }
+
+    /**
      * build task definition
      *
      * @return task definition

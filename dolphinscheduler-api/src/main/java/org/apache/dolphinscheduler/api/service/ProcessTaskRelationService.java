@@ -123,4 +123,14 @@ public interface ProcessTaskRelationService {
     Map<String, Object> queryDownstreamRelation(User loginUser,
                                                 long projectCode,
                                                 long taskCode);
+
+    /**
+     * delete edge
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processTaskRelationId process task relation id
+     * @return delete result code
+     */
+    Map<String, Object> deleteEdge(User loginUser, long projectCode, int processTaskRelationId);
 }
