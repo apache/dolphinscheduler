@@ -394,17 +394,5 @@ public interface ProcessDefinitionService {
                                                    long projectCode,
                                                    long code,
                                                    ReleaseState releaseState);
-
-    /**
-     * delete process definition and schedule
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
-     * @return update result code
-     */
-    Map<String, Object> deleteWorkflowAndSchedule(User loginUser,
-                                                  long projectCode,
-                                                  long code);
 }
 
