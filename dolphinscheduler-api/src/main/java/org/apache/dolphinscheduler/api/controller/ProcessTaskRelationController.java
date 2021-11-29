@@ -265,8 +265,8 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "deleteEdge", notes = "DELETE_EDGE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-            @ApiImplicitParam(name = "processTaskRelationId", value = "PROCESS_TASK_RELATION_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "processTaskRelationId", value = "PROCESS_TASK_RELATION_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
