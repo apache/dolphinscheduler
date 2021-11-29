@@ -274,7 +274,7 @@ public class ProcessTaskRelationController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEdge(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                             @RequestParam(name = "processTaskRelationId", required = true) int processTaskRelationId) {
+                             @PathVariable(name = "id", required = true) int processTaskRelationId) {
         return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processTaskRelationId));
     }
 
