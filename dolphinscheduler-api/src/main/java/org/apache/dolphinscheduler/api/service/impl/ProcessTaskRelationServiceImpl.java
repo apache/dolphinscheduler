@@ -199,7 +199,6 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -226,21 +225,22 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         processTaskRelationLog.setPreTaskCode(taskCode);
         processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
         int deleteRelation = processTaskRelationMapper.deleteRelation(processTaskRelationLog);
+        if (0 == deleteRelation) {
+            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+        }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (null == taskDefinition) {
             putMsg(result, Status.DATA_IS_NULL, "taskDefinition");
             return result;
         }
-        int deleteTaskDefinition = 0;
         if (TaskType.CONDITIONS.getDesc().equals(taskDefinition.getTaskType())
                 || TaskType.DEPENDENT.getDesc().equals(taskDefinition.getTaskType())
                 || TaskType.SUB_PROCESS.getDesc().equals(taskDefinition.getTaskType())) {
-            deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
-        }
-
-        if (deleteRelation < 0 || deleteTaskDefinition < 0) {
-            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            int deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
+            if (0 == deleteTaskDefinition) {
+                putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            }
         }
         return result;
     }
