@@ -260,22 +260,29 @@ public class ProcessTaskRelationController extends BaseController {
      *
      * @param loginUser             login user
      * @param projectCode           project code
-     * @param processTaskRelationId process task relation id
+     * @param processDefinitionCode process definition code
+     * @param preTaskCode pre task code
+     * @param postTaskCode post task code
      * @return delete result code
      */
     @ApiOperation(value = "deleteEdge", notes = "DELETE_EDGE_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processTaskRelationId", value = "PROCESS_TASK_RELATION_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
     })
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_EDGE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEdge(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                             @PathVariable(name = "id") int processTaskRelationId) {
-        return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processTaskRelationId));
+                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true)
+                             @PathVariable long projectCode,
+                             @PathVariable long processDefinitionCode,
+                             @PathVariable long preTaskCode,
+                             @PathVariable long postTaskCode) {
+        return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode));
     }
 
 }

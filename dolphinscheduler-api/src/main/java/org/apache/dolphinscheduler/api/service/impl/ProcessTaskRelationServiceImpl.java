@@ -350,22 +350,29 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      *
      * @param loginUser             login user
      * @param projectCode           project code
-     * @param processTaskRelationId process task relation id
-     * @return postTaskCode post task code
+     * @param processDefinitionCode process definition code
+     * @param preTaskCode pre task code
+     * @param postTaskCode post task code
+     * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteEdge(User loginUser, long projectCode, int processTaskRelationId) {
+    public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessTaskRelation processTaskRelation = processTaskRelationMapper.selectById(processTaskRelationId);
-        if (null == processTaskRelation || projectCode != processTaskRelation.getProjectCode()) {
-            putMsg(result, Status.DATA_IS_NULL, "processTaskRelation");
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode);
+        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+            putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
             return result;
         }
+        if (processTaskRelationList.size() > 1) {
+            putMsg(result, Status.DATA_IS_NOT_VALID, "processTaskRelationList");
+            return result;
+        }
+        ProcessTaskRelation processTaskRelation = processTaskRelationList.get(0);
         int upstreamCount = processTaskRelationMapper.countByCode(projectCode, processTaskRelation.getProcessDefinitionCode(),
                 0L, processTaskRelation.getPostTaskCode());
 
