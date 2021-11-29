@@ -177,4 +177,22 @@
           and post_task_code = #{processTaskRelationLog.postTaskCode}
           and post_task_version = #{processTaskRelationLog.post_task_version}
     </delete>
+
+    <select id="countByCode" resultType="int">
+        select count(0)
+        from t_ds_process_task_relation
+        WHERE 1=1
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
+        <if test="processDefinitionCode != 0">
+            and process_definition_code = #{processDefinitionCode}
+        </if>
+        <if test="preTaskCode != 0">
+            and pre_task_code = #{preTaskCode}
+        </if>
+        <if test="postTaskCode != 0">
+            and post_task_code = #{postTaskCode}
+        </if>
+    </select>
 </mapper>
