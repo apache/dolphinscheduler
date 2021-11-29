@@ -1592,7 +1592,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // save dag schedule
         Map<String, Object> scheduleResult = createDagSchedule(loginUser, project, processDefinition, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
-            return scheduleResult;
+            Status scheduleResultStatus = (Status) scheduleResult.get(Constants.STATUS);
+            putMsg(result, scheduleResultStatus);
+            throw new ServiceException(scheduleResultStatus);
         }
         return result;
     }
@@ -1671,6 +1673,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return update result code
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> updateProcessDefinitionBasicInfo(User loginUser,
                                                                 long projectCode,
                                                                 String name,
@@ -1731,7 +1734,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // update dag schedule
         Map<String, Object> scheduleResult = updateDagSchedule(loginUser, projectCode, code, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
-            return scheduleResult;
+            Status scheduleResultStatus = (Status) scheduleResult.get(Constants.STATUS);
+            putMsg(result, scheduleResultStatus);
+            throw new ServiceException(scheduleResultStatus);
         }
         return result;
     }
