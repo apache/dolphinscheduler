@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -191,15 +192,57 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete process task relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param taskCode the post task code
+     * @param taskCode              the post task code
      * @return delete result code
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        if (taskCode == 0) {
+            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            return result;
+        }
+        List<ProcessTaskRelation> downstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L);
+        if (!CollectionUtils.isEmpty(downstreamList)) {
+            Set<Long> postTaskCodes = downstreamList
+                    .stream()
+                    .map(ProcessTaskRelation::getPostTaskCode)
+                    .collect(Collectors.toSet());
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(postTaskCodes, ","));
+            return result;
+        }
+
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(projectCode);
+        processTaskRelationLog.setPreTaskCode(taskCode);
+        processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
+        int deleteRelation = processTaskRelationMapper.deleteRelation(processTaskRelationLog);
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (null == taskDefinition) {
+            putMsg(result, Status.DATA_IS_NULL, "taskDefinition");
+            return result;
+        }
+        int deleteTaskDefinition = 0;
+        if (TaskType.CONDITIONS.getDesc().equals(taskDefinition.getTaskType())
+                || TaskType.DEPENDENT.getDesc().equals(taskDefinition.getTaskType())
+                || TaskType.SUB_PROCESS.getDesc().equals(taskDefinition.getTaskType())) {
+            deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
+        }
+
+        if (deleteRelation < 0 || deleteTaskDefinition < 0) {
+            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+        }
+        return result;
     }
 
     /**
