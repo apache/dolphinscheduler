@@ -151,6 +151,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueObj.setUpdateTime(now);
 
         queueMapper.insert(queueObj);
+        result.put(Constants.DATA_LIST, queueObj);
         putMsg(result, Status.SUCCESS);
 
         return result;
