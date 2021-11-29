@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -59,7 +60,6 @@ public class DependentUtils {
         }
         return dependResult;
     }
-
 
     /**
      * get date interval list by business date and date value.

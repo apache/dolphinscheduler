@@ -21,6 +21,8 @@ services:
   dolphinscheduler:
     image: apache/dolphinscheduler:ci
     command: [ standalone-server ]
+    environment:
+      DATABASE_TYPE: h2
     expose:
       - 12345
     networks:
