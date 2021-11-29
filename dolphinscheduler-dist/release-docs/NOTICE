@@ -31,23 +31,6 @@ Jetty may be distributed under either license.
 
 ------
 
-plexus-cipher
-
-The code in this component contains a class - Base64 taken from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/Base64.java
-which is Apache license: http://www.apache.org/licenses/LICENSE-2.0
-
-The PBE key processing routine PBECipher.createCipher() is adopted from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/OpenSSL.java
- which is also Apache APL-2.0 license: http://www.apache.org/licenses/LICENSE-2.0
-
-------
-plexus-utils
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-------
-
-
 Eclipse
 
 The following artifacts are EPL.
@@ -128,11 +111,6 @@ org.mortbay.jasper:apache-jsp
   org.apache.tomcat:tomcat-api
   org.apache.tomcat:tomcat-util-scan
   org.apache.tomcat:tomcat-util
-
-org.mortbay.jasper:apache-el
-  org.apache.tomcat:tomcat-jasper-el
-  org.apache.tomcat:tomcat-el-api
-
 
 ------
 Mortbay
@@ -364,14 +342,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -460,12 +430,6 @@ Copyright 2009-2014 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-
-This product includes software components originally
-developed for Airlift (https://github.com/airlift/airlift),
-licensed under the Apache 2.0 license. The licensing terms
-for Airlift code can be found at:
-https://github.com/airlift/airlift/blob/master/LICENSE
 
 ========================================================================
 
@@ -1695,14 +1659,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -2054,6 +2010,3 @@ Xmlbeans NOTICE
     - W3C XML Schema documents Copyright 2001-2003 (c) World Wide Web
       Consortium (Massachusetts Institute of Technology, European Research
       Consortium for Informatics and Mathematics, Keio University)
-
-    - resolver.jar from Apache Xml Commons project,
-      Copyright (c) 2001-2003 Apache Software Foundation
