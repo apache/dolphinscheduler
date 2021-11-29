@@ -458,7 +458,7 @@ public abstract class UpgradeDao {
             ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
             ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
             if (processDefinition != null) {
-                processDefinition.setTenantId(jsonObject.get("tenantId").asInt());
+                processDefinition.setTenantId(jsonObject.get("tenantId") == null ? -1 : jsonObject.get("tenantId").asInt());
                 processDefinition.setTimeout(jsonObject.get("timeout").asInt());
                 processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
             } else {
@@ -501,7 +501,9 @@ public abstract class UpgradeDao {
                     taskDefinitionLog.setTimeoutFlag(timeout.getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
                     taskDefinitionLog.setTimeoutNotifyStrategy(timeout.getStrategy());
                 }
-                taskDefinitionLog.setDescription(task.get("description").asText());
+                String desc = task.get("description") != null ? task.get("description").asText() :
+                    task.get("desc") != null ? task.get("desc").asText() : "";
+                taskDefinitionLog.setDescription(desc);
                 taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
                 taskDefinitionLog.setTaskType(taskType);
                 taskDefinitionLog.setFailRetryInterval(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 1 : task.get("retryInterval").asInt());
@@ -509,7 +511,7 @@ public abstract class UpgradeDao {
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
                 String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
-                taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
+                taskDefinitionLog.setWorkerGroup(task.get("workerGroup") == null ? "default" : task.get("workerGroup").asText());
                 long taskCode = CodeGenerateUtils.getInstance().genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
@@ -615,12 +617,17 @@ public abstract class UpgradeDao {
                         dependItem.put("projectCode", projectIdCodeMap.get(dependItem.get("projectId").asInt()));
                         int definitionId = dependItem.get("definitionId").asInt();
                         Map<Long, Map<String, Long>> processCodeTaskNameCodeMap = processTaskMap.get(definitionId);
+                        if (processCodeTaskNameCodeMap == null) {
+                            logger.warn("We can't find processDefinition [{}], please check it is not exist, remove this dependence", definitionId);
+                            dependItemList.remove(j);
+                            continue;
+                        }
                         Optional<Map.Entry<Long, Map<String, Long>>> mapEntry = processCodeTaskNameCodeMap.entrySet().stream().findFirst();
                         if (mapEntry.isPresent()) {
                             Map.Entry<Long, Map<String, Long>> processCodeTaskNameCodeEntry = mapEntry.get();
                             dependItem.put("definitionCode", processCodeTaskNameCodeEntry.getKey());
                             String depTasks = dependItem.get("depTasks").asText();
-                            long taskCode = "ALL".equals(depTasks) ? 0L : processCodeTaskNameCodeEntry.getValue().get(depTasks);
+                            long taskCode = "ALL".equals(depTasks) || processCodeTaskNameCodeEntry.getValue() == null ? 0L : processCodeTaskNameCodeEntry.getValue().get(depTasks);
                             dependItem.put("depTaskCode", taskCode);
                         }
                         dependItem.remove("projectId");
