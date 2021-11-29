@@ -162,4 +162,18 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return int
      */
     int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
+
+    /**
+     * count by code
+     *
+     * @param projectCode           projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
+     * @return ProcessTaskRelation
+     */
+    int countByCode(@Param("projectCode") long projectCode,
+                    @Param("processDefinitionCode") long processDefinitionCode,
+                    @Param("preTaskCode") long preTaskCode,
+                    @Param("postTaskCode") long postTaskCode);
 }
