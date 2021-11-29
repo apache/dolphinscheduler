@@ -378,12 +378,20 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
 
         if (upstreamCount == 0) {
             putMsg(result, Status.DATA_IS_NULL, "upstreamCount");
-        } else if (upstreamCount > 1) {
-            processTaskRelationMapper.deleteById(processTaskRelation.getId());
-        } else {
-            processTaskRelation.setPreTaskVersion(0);
-            processTaskRelation.setPreTaskCode(0L);
-            processTaskRelationMapper.updateById(processTaskRelation);
+            return result;
+        }
+        if (upstreamCount > 1) {
+            int delete = processTaskRelationMapper.deleteById(processTaskRelation.getId());
+            if (delete == 0) {
+                putMsg(result, Status.DELETE_EDGE_ERROR);
+            }
+            return result;
+        }
+        processTaskRelation.setPreTaskVersion(0);
+        processTaskRelation.setPreTaskCode(0L);
+        int update = processTaskRelationMapper.updateById(processTaskRelation);
+        if (update == 0) {
+            putMsg(result, Status.DELETE_EDGE_ERROR);
         }
         return result;
     }
