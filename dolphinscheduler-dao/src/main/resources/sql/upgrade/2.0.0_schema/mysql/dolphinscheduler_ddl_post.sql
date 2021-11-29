@@ -26,3 +26,4 @@ alter table t_ds_process_definition drop modify_by;
 alter table t_ds_process_definition drop resource_ids;
 alter table t_ds_process_definition add column `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
 alter table t_ds_process_definition_log add column `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
+alter table t_ds_process_instance add column `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId';
