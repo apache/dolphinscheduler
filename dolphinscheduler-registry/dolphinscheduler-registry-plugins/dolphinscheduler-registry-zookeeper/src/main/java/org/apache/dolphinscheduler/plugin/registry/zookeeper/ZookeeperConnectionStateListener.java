@@ -24,9 +24,11 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ZookeeperConnectionStateListener implements ConnectionStateListener {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
+    
+    private static final Logger log = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
 
     private final ConnectionListener listener;
 
