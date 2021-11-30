@@ -136,5 +136,10 @@ public enum CommandType {
     /**
      * state event request
      */
-    STATE_EVENT_REQUEST;
+    STATE_EVENT_REQUEST,
+
+    /**
+     * cache expire
+     */
+    CACHE_EXPIRE;
 }
