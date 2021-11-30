@@ -25,7 +25,8 @@
           :key="taskType.name"
           @onDragstart="(e) => $emit('on-drag-start', e, taskType)"
           :class="{
-            disabled: isDetails
+            disabled: isDetails,
+            [`task-item-${taskType.name}`]: true
           }"
         >
           <div class="task-item">
