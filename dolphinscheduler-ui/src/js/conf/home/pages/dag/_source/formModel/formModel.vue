@@ -60,6 +60,7 @@
               :disabled="isDetails"
               :placeholder="$t('Please enter name (required)')"
               maxlength="100"
+              id="input-node-name"
             >
             </el-input>
           </div>
@@ -437,6 +438,7 @@
           :loading="spinnerLoading"
           @click="ok()"
           :disabled="isDetails"
+          id="button-submit"
           >{{ spinnerLoading ? $t("Loading...") : $t("Confirm") }}
         </el-button>
       </div>
