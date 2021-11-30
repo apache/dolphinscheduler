@@ -210,7 +210,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
                 value = "\"" + value + "\"";
             }
-            logger.info("paramName：{}，paramValue{}", paramName, value);
+            logger.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
         }
         return content;
