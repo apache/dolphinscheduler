@@ -59,7 +59,8 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.service.cache.processor.impl.UserCacheProcessorImpl;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class ProcessServiceTest {
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
-    private UserMapper userMapper;
+    private UserCacheProcessorImpl userCacheProcessor;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
     @Mock
@@ -330,7 +331,7 @@ public class ProcessServiceTest {
     public void testGetUserById() {
         User user = new User();
         user.setId(123);
-        Mockito.when(userMapper.selectById(123)).thenReturn(user);
+        Mockito.when(userCacheProcessor.selectById(123)).thenReturn(user);
         Assert.assertEquals(user, processService.getUserById(123));
     }
 
@@ -370,6 +371,8 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
+                , parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();

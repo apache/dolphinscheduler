@@ -22,10 +22,13 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -55,6 +58,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private CacheNotifyService cacheNotifyService;
 
     /**
      * query queue list
@@ -89,7 +95,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -223,6 +229,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         queueMapper.updateById(queueObj);
 
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.QUEUE, queueObj).convert2Command());
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -231,7 +239,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     /**
      * verify queue and queueName
      *
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
@@ -320,7 +328,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param newQueue new queue name
      * @return true if need to update user
      */
-    private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
+    private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
         return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
     }
 

@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -37,14 +34,23 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service impl
@@ -64,13 +70,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CacheNotifyService cacheNotifyService;
+
     /**
      * create tenant
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return create result code
      * @throws Exception exception
      */
@@ -133,7 +142,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -152,11 +161,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser  login user
-     * @param id         tenant id
+     * @param loginUser login user
+     * @param id tenant id
      * @param tenantCode tenant code
-     * @param queueId    queue id
-     * @param desc       description
+     * @param queueId queue id
+     * @param desc description
      * @return update result code
      * @throws Exception exception
      */
@@ -210,6 +219,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenant.setDescription(desc);
         tenant.setUpdateTime(now);
         tenantMapper.updateById(tenant);
+
+        // notify master to expire cache
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
 
         result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.MSG, Status.SUCCESS.getMsg());
@@ -269,6 +281,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         tenantMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+
+        // notify master to expire cache
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.TENANT, tenant).convert2Command());
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
