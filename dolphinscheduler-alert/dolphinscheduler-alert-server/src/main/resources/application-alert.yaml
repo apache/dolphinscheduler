@@ -30,3 +30,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+alert:
+  port: 50052

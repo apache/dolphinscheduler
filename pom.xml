@@ -96,7 +96,7 @@
         <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-        <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
@@ -122,6 +122,10 @@
         <netty.version>4.1.53.Final</netty.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <powermock.version>2.0.9</powermock.version>
+        <jsr305.version>3.0.0</jsr305.version>
+        <commons-compress.version>1.19</commons-compress.version>
+        <commons-math3.version>3.1.1</commons-math3.version>
+        <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
     </properties>
 
     <dependencyManagement>
@@ -219,6 +223,16 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-master</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-worker</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -809,6 +823,27 @@
                 <artifactId>py4j</artifactId>
                 <version>${py4j.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${commons-math3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${error_prone_annotations.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -868,12 +903,6 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${maven-dependency-plugin.version}</version>
                 </plugin>
@@ -891,20 +920,6 @@
                 <artifactId>provisio-maven-plugin</artifactId>
                 <extensions>true</extensions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -1072,6 +1087,18 @@
                     </instrumentation>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -1143,5 +1170,9 @@
         <module>dolphinscheduler-datasource-plugin</module>
         <module>dolphinscheduler-python</module>
         <module>dolphinscheduler-meter</module>
+        <module>dolphinscheduler-master</module>
+        <module>dolphinscheduler-worker</module>
+        <module>dolphinscheduler-log-server</module>
+        <module>dolphinscheduler-tools</module>
     </modules>
 </project>

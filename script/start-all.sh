@@ -20,7 +20,7 @@ workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/install_config.conf
 
-declare -A workersGroupMap=()
+workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}

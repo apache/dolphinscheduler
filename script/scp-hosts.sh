@@ -26,7 +26,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     txt="''"
 fi
 
-declare -A workersGroupMap=()
+workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
@@ -49,7 +49,7 @@ do
   echo "scp dirs to $host/$installPath starting"
 	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
 
-  for dsDir in bin conf lib script sql ui install.sh
+  for dsDir in bin conf master-server worker-server alert-server api-server logger-server script sql ui install.sh
   do
     # if worker in workersGroupMap
     if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
