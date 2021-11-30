@@ -155,28 +155,32 @@ const tasksState = {
     desc: `${i18n.$t('Submitted successfully')}`,
     color: '#A9A9A9',
     icoUnicode: 'ri-record-circle-fill',
-    isSpin: false
+    isSpin: false,
+    classNames: 'submitted'
   },
   RUNNING_EXECUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
     icoUnicode: 'el-icon-s-tools',
-    isSpin: true
+    isSpin: true,
+    classNames: 'executing'
   },
   READY_PAUSE: {
     id: 2,
     desc: `${i18n.$t('Ready to pause')}`,
     color: '#07b1a3',
     icoUnicode: 'ri-settings-3-line',
-    isSpin: false
+    isSpin: false,
+    classNames: 'submitted'
   },
   PAUSE: {
     id: 3,
     desc: `${i18n.$t('Pause')}`,
     color: '#057c72',
     icoUnicode: 'el-icon-video-pause',
-    isSpin: false
+    isSpin: false,
+    classNames: 'pause'
   },
   READY_STOP: {
     id: 4,
@@ -197,14 +201,16 @@ const tasksState = {
     desc: `${i18n.$t('Failed')}`,
     color: '#000000',
     icoUnicode: 'el-icon-circle-close',
-    isSpin: false
+    isSpin: false,
+    classNames: 'failed'
   },
   SUCCESS: {
     id: 7,
     desc: `${i18n.$t('Success')}`,
     color: '#33cc00',
     icoUnicode: 'el-icon-circle-check',
-    isSpin: false
+    isSpin: false,
+    classNames: 'success'
   },
   NEED_FAULT_TOLERANCE: {
     id: 8,
