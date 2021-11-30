@@ -29,6 +29,7 @@ fi
 declare -A workersGroupMap=()
 
 workersGroup=(${workers//,/ })
+# shellcheck disable=SC2068
 for workerGroup in ${workersGroup[@]}
 do
   echo $workerGroup;
@@ -39,6 +40,7 @@ done
 
 
 hostsArr=(${ips//,/ })
+# shellcheck disable=SC2068
 for host in ${hostsArr[@]}
 do
 
