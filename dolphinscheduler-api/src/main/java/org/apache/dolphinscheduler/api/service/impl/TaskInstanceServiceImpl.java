@@ -177,8 +177,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
-        if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, task.getTaskCode());
+        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
             return result;
         }
 
