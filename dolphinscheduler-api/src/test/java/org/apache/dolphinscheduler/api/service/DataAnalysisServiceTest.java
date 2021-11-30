@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
@@ -30,26 +25,9 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.CommandCount;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
-import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,6 +38,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 
 /**
  * data analysis service test
@@ -190,10 +174,10 @@ public class DataAnalysisServiceTest {
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any())).thenReturn(
                 Collections.emptyList());
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
-        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").first().isEqualTo(0);
-        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList().hasSameSizeAs(
+        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").isEqualTo(0);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").asList().hasSameSizeAs(
                 ExecutionStatus.values());
-        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList().extracting(
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").asList().extracting(
                 "count").allMatch(count -> count.equals(0));
     }
 

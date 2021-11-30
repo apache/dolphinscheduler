@@ -17,37 +17,35 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * mysql upgrade dao
- */
+@Service
+@Profile("shell-cli")
 public class MysqlUpgradeDao extends UpgradeDao {
-
     public static final Logger logger = LoggerFactory.getLogger(MysqlUpgradeDao.class);
 
-    /**
-     * mysql upgrade dao holder
-     */
-    private static class MysqlUpgradeDaoHolder {
-        private static final MysqlUpgradeDao INSTANCE = new MysqlUpgradeDao();
+    private MysqlUpgradeDao(DataSource dataSource) {
+        super(dataSource);
     }
 
-    /**
-     * mysql upgrade dao constructor
-     */
-    private MysqlUpgradeDao() {
+    @Override
+    protected String initSqlPath() {
+        return "create/release-1.0.0_schema/mysql";
     }
 
-    public static final MysqlUpgradeDao getInstance() {
-        return MysqlUpgradeDaoHolder.INSTANCE;
+    @Override
+    protected DbType getDbType() {
+        return DbType.MYSQL;
     }
-
 
     /**
      * determines whether a table exists

@@ -467,39 +467,37 @@ public final class Constants {
 
     public static final String SPRING_DATASOURCE_PASSWORD = "spring.datasource.password";
 
-    public static final String SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT = "spring.datasource.validationQueryTimeout";
-
-    public static final String SPRING_DATASOURCE_INITIAL_SIZE = "spring.datasource.initialSize";
+    public static final String SPRING_DATASOURCE_CONNECTION_TIMEOUT = "spring.datasource.connectionTimeout";
 
     public static final String SPRING_DATASOURCE_MIN_IDLE = "spring.datasource.minIdle";
 
     public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
 
-    public static final String SPRING_DATASOURCE_MAX_WAIT = "spring.datasource.maxWait";
+    public static final String SPRING_DATASOURCE_IDLE_TIMEOUT = "spring.datasource.idleTimeout";
 
-    public static final String SPRING_DATASOURCE_TIME_BETWEEN_EVICTION_RUNS_MILLIS = "spring.datasource.timeBetweenEvictionRunsMillis";
+    public static final String SPRING_DATASOURCE_MAX_LIFE_TIME = "spring.datasource.maxLifetime";
 
-    public static final String SPRING_DATASOURCE_TIME_BETWEEN_CONNECT_ERROR_MILLIS = "spring.datasource.timeBetweenConnectErrorMillis";
-
-    public static final String SPRING_DATASOURCE_MIN_EVICTABLE_IDLE_TIME_MILLIS = "spring.datasource.minEvictableIdleTimeMillis";
+    public static final String SPRING_DATASOURCE_VALIDATION_TIMEOUT = "spring.datasource.validationTimeout";
 
     public static final String SPRING_DATASOURCE_VALIDATION_QUERY = "spring.datasource.validationQuery";
 
-    public static final String SPRING_DATASOURCE_TEST_WHILE_IDLE = "spring.datasource.testWhileIdle";
+    public static final String SPRING_DATASOURCE_LEAK_DETECTION_THRESHOLD = "spring.datasource.leakDetectionThreshold";
 
-    public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
+    public static final String SPRING_DATASOURCE_INITIALIZATION_FAIL_TIMEOUT = "spring.datasource.initializationFailTimeout";
 
-    public static final String SPRING_DATASOURCE_TEST_ON_RETURN = "spring.datasource.testOnReturn";
+    public static final String SPRING_DATASOURCE_IS_AUTOCOMMIT = "spring.datasource.isAutoCommit";
 
-    public static final String SPRING_DATASOURCE_POOL_PREPARED_STATEMENTS = "spring.datasource.poolPreparedStatements";
+    public static final String SPRING_DATASOURCE_CACHE_PREP_STMTS = "spring.datasource.cachePrepStmts";
 
-    public static final String SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT = "spring.datasource.defaultAutoCommit";
+    public static final String SPRING_DATASOURCE_PREP_STMT_CACHE_SIZE = "spring.datasource.prepStmtCacheSize";
 
-    public static final String SPRING_DATASOURCE_KEEP_ALIVE = "spring.datasource.keepAlive";
+    public static final String SPRING_DATASOURCE_PREP_STMT_CACHE_SQL_LIMIT = "spring.datasource.prepStmtCacheSqlLimit";
 
-    public static final String SPRING_DATASOURCE_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE = "spring.datasource.maxPoolPreparedStatementPerConnectionSize";
+    public static final String CACHE_PREP_STMTS = "cachePrepStmts";
 
-    public static final String DEVELOPMENT = "development";
+    public static final String PREP_STMT_CACHE_SIZE = "prepStmtCacheSize";
+
+    public static final String PREP_STMT_CACHE_SQL_LIMIT = "prepStmtCacheSqlLimit";
 
     public static final String QUARTZ_PROPERTIES_PATH = "quartz.properties";
 
@@ -948,6 +946,19 @@ public final class Constants {
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
 
+
+    /**
+     * validation Query
+     */
+    public static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
+    public static final String MYSQL_VALIDATION_QUERY = "select 1";
+    public static final String HIVE_VALIDATION_QUERY = "select 1";
+    public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
+    public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
+    public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
+    public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
+    public static final String PRESTO_VALIDATION_QUERY = "select 1";
+
     /**
      * database type
      */
@@ -1022,12 +1033,6 @@ public final class Constants {
      */
     public static final int AUTHORIZE_READABLE_PERM = 4;
 
-
-    /**
-     * plugin configurations
-     */
-    public static final String PLUGIN_JAR_SUFFIX = ".jar";
-
     public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
     public static final int BUSY_NODE_STATUE = 2;
@@ -1040,9 +1045,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-
-    public static final String EXCEL_SUFFIX_XLS = ".xls";
 
     /**
      * datasource encryption salt
@@ -1080,21 +1082,7 @@ public final class Constants {
      * docker & kubernetes
      */
     public static final boolean DOCKER_MODE = !StringUtils.isEmpty(System.getenv("DOCKER"));
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
-
-    /**
-     * task parameter keys
-     */
-    public static final String TASK_PARAMS = "params";
-    public static final String TASK_PARAMS_DATASOURCE = "datasource";
-    public static final String TASK_PARAMS_DATASOURCE_NAME = "datasourceName";
-    public static final String TASK_DEPENDENCE = "dependence";
-    public static final String TASK_DEPENDENCE_DEPEND_TASK_LIST = "dependTaskList";
-    public static final String TASK_DEPENDENCE_DEPEND_ITEM_LIST = "dependItemList";
-    public static final String TASK_DEPENDENCE_PROJECT_ID = "projectId";
-    public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
-    public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
-    public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
+    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag

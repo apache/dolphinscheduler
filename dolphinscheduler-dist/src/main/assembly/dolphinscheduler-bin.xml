@@ -28,8 +28,10 @@
 
     <fileSets>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/src/main/resources</directory>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
@@ -41,19 +43,20 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
             </includes>
-            <excludes>
-                <exclude>application.properties</exclude>
-            </excludes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
@@ -64,6 +67,8 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
@@ -77,6 +82,8 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-server/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
@@ -88,6 +95,8 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
             <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
                 <include>**/*.properties</include>
                 <include>**/*.xml</include>
                 <include>**/*.json</include>
@@ -97,37 +106,11 @@
         </fileSet>
 
         <fileSet>
-            <directory>src/main/resources</directory>
+            <directory>${basedir}/../dolphinscheduler-standalone-server/src/main/resources</directory>
             <includes>
-                <include>**/*.properties</include>
-                <include>**/*.xml</include>
-                <include>**/*.json</include>
+                <include>**/*.yaml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
         </fileSet>
 
         <fileSet>
@@ -147,11 +130,11 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../sql</directory>
+            <directory>${basedir}/../dolphinscheduler-dao/src/main/resources/sql</directory>
             <includes>
                 <include>**/*</include>
             </includes>
-            <outputDirectory>./sql</outputDirectory>
+            <outputDirectory>./sql/sql</outputDirectory> <!-- make sure the hierarchy is the same as in src/resources -->
         </fileSet>
 
         <fileSet>
@@ -167,7 +150,7 @@
             <includes>
                 <include>env/*.*</include>
             </includes>
-            <outputDirectory>./conf</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
         </fileSet>
 
         <fileSet>
@@ -186,7 +169,6 @@
             <includes>
                 <include>*.sh</include>
                 <include>*.py</include>
-                <include>DISCLAIMER</include>
             </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>

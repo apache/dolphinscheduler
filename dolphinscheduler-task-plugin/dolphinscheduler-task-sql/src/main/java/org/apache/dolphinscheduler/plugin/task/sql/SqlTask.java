@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.plugin.task.util.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -35,9 +36,10 @@ import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -87,7 +89,7 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * default query sql limit
      */
-    private static final int LIMIT = 10000;
+    private static final int QUERY_LIMIT = 10000;
 
     /**
      * Abstract Yarn Task
@@ -181,7 +183,7 @@ public class SqlTask extends AbstractTaskExecutor {
         try {
 
             // create connection
-            connection = DatasourceUtil.getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
+            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -242,7 +244,7 @@ public class SqlTask extends AbstractTaskExecutor {
             int num = md.getColumnCount();
 
             int rowCount = 0;
-            int limit = sqlParameters.getLimit() == 0 ? LIMIT : sqlParameters.getLimit();
+            int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
 
             while (rowCount < limit && resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
@@ -252,13 +254,17 @@ public class SqlTask extends AbstractTaskExecutor {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
-
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
             logger.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
                 String row = JSONUtils.toJsonString(resultJSONArray.get(i));
                 logger.info("row {} : {}", i + 1, row);
+            }
+            if (resultSet.next()) {
+                logger.info("sql result limit : {} exceeding results are filtered", limit);
+                String log = String.format("sql result limit : %d exceeding results are filtered", limit);
+                resultJSONArray.add(JSONUtils.toJsonNode(log));
             }
         }
         String result = JSONUtils.toJsonString(resultJSONArray);

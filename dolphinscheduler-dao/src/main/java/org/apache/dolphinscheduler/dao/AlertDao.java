@@ -17,22 +17,18 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-
-import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,18 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
-
 @Component
-public class AlertDao extends AbstractBaseDao {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class AlertDao {
     @Autowired
     private AlertMapper alertMapper;
 
@@ -60,13 +46,6 @@ public class AlertDao extends AbstractBaseDao {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
-
-    @Override
-    protected void init() {
-        alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
-        alertPluginInstanceMapper = ConnectionFactory.getInstance().getMapper(AlertPluginInstanceMapper.class);
-        alertGroupMapper = ConnectionFactory.getInstance().getMapper(AlertGroupMapper.class);
-    }
 
     /**
      * insert alert
@@ -179,11 +158,9 @@ public class AlertDao extends AbstractBaseDao {
     }
 
     /**
-     * list the alert information of waiting to be executed
-     *
-     * @return alert list
+     * List alerts that are pending for execution
      */
-    public List<Alert> listWaitExecutionAlert() {
+    public List<Alert> listPendingAlerts() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
     }
 

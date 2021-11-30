@@ -45,6 +45,7 @@ export HOSTNAME=`hostname`
 export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
 export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
+export DOLPHINSCHEDULER_SQL_DIR=$DOLPHINSCHEDULER_HOME/sql
 export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
 
 export STOP_TIMEOUT=5
@@ -66,12 +67,12 @@ if [ "$command" = "api-server" ]; then
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-master.xml"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
   HEAP_OPTS="-Xms4g -Xmx4g -Xmn2g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $MASTER_SERVER_OPTS"
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
   HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
@@ -100,7 +101,7 @@ case $startStop in
     if [ "$DOCKER" = "true" ]; then
       echo start $command in docker
       export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS -XX:-UseContainerSupport"
-      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_SQL_DIR:$DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
       $JAVA_HOME/bin/java $exec_command
     else
       [ -w "$DOLPHINSCHEDULER_PID_DIR" ] || mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
@@ -113,7 +114,7 @@ case $startStop in
       fi
 
       echo starting $command, logging to $log
-      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_SQL_DIR:$DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
       echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
       nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
       echo $! > $pid
