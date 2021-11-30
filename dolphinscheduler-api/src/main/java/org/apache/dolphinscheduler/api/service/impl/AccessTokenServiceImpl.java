@@ -110,6 +110,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         int insert = accessTokenMapper.insert(accessToken);
 
         if (insert > 0) {
+            result.put(Constants.DATA_LIST, accessToken);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
