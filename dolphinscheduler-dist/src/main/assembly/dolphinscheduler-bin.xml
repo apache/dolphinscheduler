@@ -106,6 +106,19 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/../dolphinscheduler-meter/src/main/resources</directory>
+            <includes>
+                <include>**/*.yaml</include>
+                <include>**/*.yml</include>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.json</include>
+                <include>**/*.yml</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/src/main/resources</directory>
             <includes>
                 <include>**/*.yaml</include>
