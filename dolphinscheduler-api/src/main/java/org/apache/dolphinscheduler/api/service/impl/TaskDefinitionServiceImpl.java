@@ -333,7 +333,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<TaskDefinitionLog> page = new Page<>(pageNo, pageSize);
-        IPage<TaskDefinitionLog> taskDefinitionVersionsPaging = taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode);
+        IPage<TaskDefinitionLog> taskDefinitionVersionsPaging = taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode, projectCode);
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionVersionsPaging.getRecords();
 
         pageInfo.setTotalList(taskDefinitionLogs);
