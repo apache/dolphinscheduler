@@ -55,6 +55,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateEx
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -507,7 +508,7 @@ public class ProcessService {
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
                     continue;
                 }
-                int port = Constants.RPC_PORT;
+                int port = PropertyUtils.getInt(Constants.RPC_PORT, 50051);
                 String ip = "";
                 try {
                     ip = Host.of(taskInstance.getHost()).getIp();

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert;
 import static org.apache.dolphinscheduler.common.Constants.ALERT_RPC_PORT;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -100,7 +101,7 @@ public class AlertServer implements Closeable {
 
     private void startServer() {
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(ALERT_RPC_PORT);
+        serverConfig.setListenPort(PropertyUtils.getInt(ALERT_RPC_PORT, 50052));
 
         server = new NettyRemotingServer(serverConfig);
         server.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);

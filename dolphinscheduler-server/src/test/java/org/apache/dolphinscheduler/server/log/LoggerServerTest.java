@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
 import org.apache.commons.lang.StringUtils;
@@ -51,7 +52,7 @@ public class LoggerServerTest {
         org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/demo.txt"), expectedTmpDemoString, Charset.defaultCharset());
 
         String resultTmpDemoString = this.logClientService.rollViewLog(
-                "localhost", Constants.RPC_PORT,"/tmp/demo.txt", 0, 1000);
+                "localhost", PropertyUtils.getInt(Constants.RPC_PORT, 50051), "/tmp/demo.txt", 0, 1000);
 
         Assert.assertEquals(expectedTmpDemoString, resultTmpDemoString.replaceAll("[\r|\n|\t]", StringUtils.EMPTY));
 
@@ -63,11 +64,11 @@ public class LoggerServerTest {
         String expectedTmpRemoveString = "testRemoveTaskLog";
         org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
 
-        Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/tmp/remove.txt");
+        Boolean b = this.logClientService.removeTaskLog("localhost", PropertyUtils.getInt(Constants.RPC_PORT, 50051),"/tmp/remove.txt");
 
         Assert.assertTrue(b);
 
-        String result = this.logClientService.viewLog("localhost", Constants.RPC_PORT,"/tmp/demo.txt");
+        String result = this.logClientService.viewLog("localhost", PropertyUtils.getInt(Constants.RPC_PORT, 50051),"/tmp/demo.txt");
 
         Assert.assertEquals(StringUtils.EMPTY, result);
     }
