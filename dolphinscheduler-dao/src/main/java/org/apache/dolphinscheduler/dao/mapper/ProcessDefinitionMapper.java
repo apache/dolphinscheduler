@@ -53,7 +53,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     /**
      * update
      */
-    @CacheEvict(key = "#processDefinition.code")
+    @CacheEvict(key = "#p0.code")
     int updateById(@Name("processDefinition") @Param("et") ProcessDefinition processDefinition);
 
     /**

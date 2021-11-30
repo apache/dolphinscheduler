@@ -19,17 +19,16 @@ version: "2.1"
 
 services:
   dolphinscheduler:
-    image: apache/dolphinscheduler:ci
-    command: [ standalone-server ]
+    image: apache/dolphinscheduler-standalone-server:ci
     environment:
-      DATABASE_TYPE: h2
+      MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
     expose:
       - 12345
     networks:
       - e2e
     healthcheck:
-      test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/12345" ]
+      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
       timeout: 60s
       retries: 120

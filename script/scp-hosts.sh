@@ -18,7 +18,8 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/install_config.conf
+
+source ${workDir}/env/install_env.sh
 
 txt=""
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -37,7 +38,6 @@ do
   workersGroupMap+=([$worker]=$groupsName)
 done
 
-
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
@@ -49,11 +49,11 @@ do
   echo "scp dirs to $host/$installPath starting"
 	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
 
-  for dsDir in bin conf master-server worker-server alert-server api-server logger-server script sql ui install.sh
+  for dsDir in bin master-server worker-server alert-server api-server logger-server ui
   do
     # if worker in workersGroupMap
-    if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
-      sed -i ${txt} "s@^#\?worker.groups=.*@worker.groups=${workersGroupMap[${host}]}@g" ${dsDir}/worker.properties
+    if [[ "${workersGroupMap[${host}]}" ]]; then
+      echo "export WORKER_GROUPS_0=${workersGroupMap[${host}]}" >> worker-server/bin/dolphinscheduler_env.sh
     fi
 
     echo "start to scp $dsDir to $host/$installPath"

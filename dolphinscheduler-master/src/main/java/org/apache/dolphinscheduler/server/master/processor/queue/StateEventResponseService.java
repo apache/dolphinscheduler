@@ -108,7 +108,6 @@ public class StateEventResponseService {
                     StateEvent stateEvent = eventQueue.take();
                     persist(stateEvent);
                 } catch (InterruptedException e) {
-                    logger.warn("persist task error", e);
                     Thread.currentThread().interrupt();
                     break;
                 }

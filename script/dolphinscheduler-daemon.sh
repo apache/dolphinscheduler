@@ -35,15 +35,11 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
 
-source /etc/profile
-source "${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh"
+source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 
 export HOSTNAME=`hostname`
 
-export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
-export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
-export DOLPHINSCHEDULER_CONF_DIR="$DOLPHINSCHEDULER_HOME/$command/conf"
-export DOLPHINSCHEDULER_LIB_JARS="$DOLPHINSCHEDULER_HOME/$command/libs/*"
+export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/$command/logs
 
 export STOP_TIMEOUT=5
 
@@ -51,47 +47,23 @@ if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
   mkdir $DOLPHINSCHEDULER_LOG_DIR
 fi
 
-log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
-pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
+log=$DOLPHINSCHEDULER_HOME/$command-$HOSTNAME.out
+pid=$DOLPHINSCHEDULER_HOME/$command/pid
 
-cd $DOLPHINSCHEDULER_HOME
-
-export DOLPHINSCHEDULER_OPTS="-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:$DOLPHINSCHEDULER_LOG_DIR/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof -XshowSettings:vm $DOLPHINSCHEDULER_OPTS"
-
-export DATABASE_TYPE=${DATABASE_TYPE:-"h2"}
-export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-"default"}
+cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-api.xml"
-  CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
-  HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},api,${DATABASE_TYPE}"
+  :
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml"
-  CLASS=org.apache.dolphinscheduler.server.master.MasterServer
-  HEAP_OPTS="-Xms4g -Xmx4g -Xmn2g"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $MASTER_SERVER_OPTS"
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},master,${DATABASE_TYPE}"
+  :
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml"
-  CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
-  HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},worker,${DATABASE_TYPE}"
+  :
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
-  CLASS=org.apache.dolphinscheduler.alert.AlertServer
-  HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $ALERT_SERVER_OPTS"
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},alert,${DATABASE_TYPE}"
+  :
 elif [ "$command" = "logger-server" ]; then
-  CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
-  HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
-  export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
+  :
 elif [ "$command" = "standalone-server" ]; then
-  CLASS=org.apache.dolphinscheduler.server.StandaloneServer
-  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},standalone,${DATABASE_TYPE}"
+  :
 else
   echo "Error: No command named '$command' was found."
   exit 1
@@ -99,40 +71,21 @@ fi
 
 case $startStop in
   (start)
-    if [ "$DOCKER" = "true" ]; then
-      echo start $command in docker
-      export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS -XX:-UseContainerSupport"
-      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
-      $JAVA_HOME/bin/java $exec_command
-    else
-      [ -w "$DOLPHINSCHEDULER_PID_DIR" ] || mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
-
-      if [ -f $pid ]; then
-        if kill -0 `cat $pid` > /dev/null 2>&1; then
-          echo $command running as process `cat $pid`.  Stop it first.
-          exit 1
-        fi
-      fi
-
-      echo starting $command, logging to $log
-      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
-      echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
-      nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
-      echo $! > $pid
-    fi
+    echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
+    nohup "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
+    echo $! > $pid
     ;;
 
   (stop)
-
       if [ -f $pid ]; then
         TARGET_PID=`cat $pid`
         if kill -0 $TARGET_PID > /dev/null 2>&1; then
           echo stopping $command
-          kill $TARGET_PID
+          pkill -P $TARGET_PID
           sleep $STOP_TIMEOUT
           if kill -0 $TARGET_PID > /dev/null 2>&1; then
             echo "$command did not stop gracefully after $STOP_TIMEOUT seconds: killing with kill -9"
-            kill -9 $TARGET_PID
+            pkill -P -9 $TARGET_PID
           fi
         else
           echo no $command to stop

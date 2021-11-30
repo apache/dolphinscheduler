@@ -71,7 +71,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>com.zaxxer</groupId>
-                    <artifactId>HikariCP-java6</artifactId>
+                    <artifactId>HikariCP-java7</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -91,19 +91,4 @@
             <artifactId>caffeine</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>*.yaml</exclude>
-                        <exclude>*.properties</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

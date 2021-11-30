@@ -59,6 +59,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     @Autowired
     private ServerNodeManager serverNodeManager;
 
+    @Autowired
+    private TaskAckProcessor taskAckProcessor;
+
     /**
      * netty remote client
      */
@@ -79,7 +82,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
          * register EXECUTE_TASK_ACK command type TaskAckProcessor
          */
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
     }
 

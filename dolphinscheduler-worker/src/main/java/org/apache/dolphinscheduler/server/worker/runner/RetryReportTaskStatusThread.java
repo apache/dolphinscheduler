@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -43,19 +44,13 @@ public class RetryReportTaskStatusThread implements Runnable {
      */
     private static long RETRY_REPORT_TASK_STATUS_INTERVAL = 5 * 60 * 1000L;
 
-    /**
-     *  task callback service
-     */
-    private final TaskCallbackService taskCallbackService;
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
     public void start(){
         Thread thread = new Thread(this,"RetryReportTaskStatusThread");
         thread.setDaemon(true);
         thread.start();
-    }
-
-    public RetryReportTaskStatusThread(){
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
 
     /**

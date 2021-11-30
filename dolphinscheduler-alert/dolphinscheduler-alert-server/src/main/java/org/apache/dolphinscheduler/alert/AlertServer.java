@@ -37,14 +37,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@EnableAutoConfiguration
-@ComponentScan(value = {
-    "org.apache.dolphinscheduler.alert",
-    "org.apache.dolphinscheduler.dao"
-})
+@SpringBootApplication
+@ComponentScan("org.apache.dolphinscheduler")
 public class AlertServer implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 

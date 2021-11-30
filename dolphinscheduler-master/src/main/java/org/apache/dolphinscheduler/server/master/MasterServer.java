@@ -34,26 +34,21 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
-import javax.annotation.PostConstruct;
-
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.server.worker.*",
-        "org.apache.dolphinscheduler.server.monitor.*",
-        "org.apache.dolphinscheduler.server.log.*",
-        "org.apache.dolphinscheduler.alert.*"
-    })
-})
+import javax.annotation.PostConstruct;
+
+@SpringBootApplication
+@ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
 public class MasterServer implements IStoppable {
@@ -76,24 +71,28 @@ public class MasterServer implements IStoppable {
     @Autowired
     private EventExecuteService eventExecuteService;
 
+    @Autowired
+    private Scheduler scheduler;
+
+    @Autowired
+    private TaskAckProcessor taskAckProcessor;
+
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
-        new SpringApplicationBuilder(MasterServer.class)
-            .profiles("master")
-            .run(args);
+        SpringApplication.run(MasterServer.class);
     }
 
     /**
      * run master server
      */
     @PostConstruct
-    public void run() {
+    public void run() throws SchedulerException {
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, new StateEventProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, new TaskEventProcessor());
@@ -110,6 +109,8 @@ public class MasterServer implements IStoppable {
         this.eventExecuteService.start();
         this.masterSchedulerService.init();
         this.masterSchedulerService.start();
+
+        this.scheduler.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {

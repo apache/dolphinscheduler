@@ -45,6 +45,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-ui</artifactId>
+        </dependency>
+
         <!--springboot-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,7 +117,7 @@
               </exclusion>
               <exclusion>
                 <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP-java6</artifactId>
+                <artifactId>HikariCP-java7</artifactId>
               </exclusion>
             </exclusions>
         </dependency>
@@ -212,6 +217,11 @@
             <artifactId>hadoop-aws</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+        </dependency>
+
         <!-- just for test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -239,11 +249,10 @@
                 <directory>${project.basedir}/../dolphinscheduler-dao/src/main/resources</directory>
                 <includes>
                     <include>sql/**</include>
-                    <include>*.yaml</include>
                 </includes>
             </testResource>
             <testResource>
-                <directory>${project.basedir}/../dolphinscheduler-service/src/main/resources</directory>
+                <directory>${project.basedir}/src/test/resources</directory>
             </testResource>
         </testResources>
         <plugins>
@@ -278,4 +287,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

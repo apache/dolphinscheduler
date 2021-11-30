@@ -61,71 +61,22 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-server/src/main/resources</directory>
-            <includes>
-                <include>config/*.*</include>
-            </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-
-        <fileSet>
             <directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../script</directory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-            <outputDirectory>./script</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../script</directory>
-            <includes>
-                <include>env/*.*</include>
-            </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../script</directory>
-            <includes>
-                <include>start-all.sh</include>
-                <include>stop-all.sh</include>
-                <include>dolphinscheduler-daemon.sh</include>
-                <include>status-all.sh</include>
-            </includes>
-            <outputDirectory>./bin</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/.././</directory>
-            <includes>
-                <include>*.sh</include>
-                <include>*.py</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/release-docs</directory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <includes>
-                <include>**/*</include>
-            </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>

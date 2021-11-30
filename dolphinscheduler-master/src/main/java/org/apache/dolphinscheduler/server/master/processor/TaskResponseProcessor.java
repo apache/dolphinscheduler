@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * task response processor
@@ -41,14 +42,8 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);
 
-    /**
-     * process service
-     */
-    private final TaskResponseService taskResponseService;
-
-    public TaskResponseProcessor() {
-        this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
-    }
+    @Autowired
+    private TaskResponseService taskResponseService;
 
     /**
      * task final result response

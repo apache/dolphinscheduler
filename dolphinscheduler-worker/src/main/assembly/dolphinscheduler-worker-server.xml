@@ -28,27 +28,28 @@
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
-                <include>application-worker.yaml</include>
-                <include>logback-worker.xml</include>
+                <include>*.yaml</include>
+                <include>*.xml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
+            <directory>${basedir}/src/main/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../script/env</directory>
+            <outputDirectory>bin</outputDirectory>
             <includes>
-                <include>**/*.yaml</include>
+                <include>dolphinscheduler_env.sh</include>
             </includes>
-            <outputDirectory>conf</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
-            <includes>
-                <include>**/*.properties</include>
-            </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
             <includes>
                 <include>**/*.properties</include>
             </includes>

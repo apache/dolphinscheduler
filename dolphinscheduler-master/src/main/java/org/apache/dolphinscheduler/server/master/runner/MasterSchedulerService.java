@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -69,12 +68,6 @@ public class MasterSchedulerService extends Thread {
     private ProcessService processService;
     @Autowired
     private TaskProcessorFactory taskProcessorFactory;
-
-    /**
-     * zookeeper master client
-     */
-    @Autowired
-    private MasterRegistryClient masterRegistryClient;
 
     /**
      * master config
