@@ -290,20 +290,20 @@ public class MasterRegistryClient {
 
             ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
             if (workerHost == null
-                || !checkOwner
-                || processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
+                    || !checkOwner
+                    || processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
                 // only failover the task owned myself if worker down.
                 if (processInstance == null) {
                     logger.error("failover error, the process {} of task {} do not exists.",
-                        taskInstance.getProcessInstanceId(), taskInstance.getId());
+                            taskInstance.getProcessInstanceId(), taskInstance.getId());
                     continue;
                 }
                 taskInstance.setProcessInstance(processInstance);
 
                 TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                                                                                       .buildTaskInstanceRelatedInfo(taskInstance)
-                                                                                       .buildProcessInstanceRelatedInfo(processInstance)
-                                                                                       .create();
+                        .buildTaskInstanceRelatedInfo(taskInstance)
+                        .buildProcessInstanceRelatedInfo(processInstance)
+                        .create();
                 // only kill yarn job if exists , the local thread has exited
                 ProcessUtils.killYarnJob(taskExecutionContext);
 
@@ -364,14 +364,31 @@ public class MasterRegistryClient {
             registryClient);
 
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
-        registryClient.addConnectionStateListener(newState -> {
-            if (newState == ConnectionState.RECONNECTED || newState == ConnectionState.SUSPENDED) {
-                registryClient.persistEphemeral(localNodePath, "");
-            }
-        });
+        registryClient.addConnectionStateListener(this::handleConnectionState);
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
 
+    }
+
+    public void handleConnectionState(ConnectionState state) {
+        switch (state) {
+            case CONNECTED:
+                logger.debug("registry connection state is {}", state);
+                break;
+            case SUSPENDED:
+                logger.warn("registry connection state is {}, ready to stop myself", state);
+                registryClient.getStoppable().stop("registry connection state is SUSPENDED, stop myself");
+                break;
+            case RECONNECTED:
+                logger.debug("registry connection state is {}, clean the node info", state);
+                registryClient.persistEphemeral(localNodePath, "");
+                break;
+            case DISCONNECTED:
+                logger.warn("registry connection state is {}, ready to stop myself", state);
+                registryClient.getStoppable().stop("registry connection state is DISCONNECTED, stop myself");
+                break;
+            default:
+        }
     }
 
     public void deregister() {

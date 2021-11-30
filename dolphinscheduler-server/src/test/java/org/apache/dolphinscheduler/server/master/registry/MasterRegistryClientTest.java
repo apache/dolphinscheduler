@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -48,7 +49,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  * MasterRegistryClientTest
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ RegistryClient.class })
+@PrepareForTest({RegistryClient.class})
 @PowerMockIgnore({"javax.management.*"})
 public class MasterRegistryClientTest {
 
@@ -72,6 +73,9 @@ public class MasterRegistryClientTest {
         given(registryClient.getLock(Mockito.anyString())).willReturn(true);
         given(registryClient.releaseLock(Mockito.anyString())).willReturn(true);
         given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn("127.0.0.1:8080");
+        given(registryClient.getStoppable()).willReturn(cause -> {
+
+        });
         doNothing().when(registryClient).handleDeadServer(Mockito.anySet(), Mockito.any(NodeType.class), Mockito.anyString());
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
 
@@ -99,6 +103,13 @@ public class MasterRegistryClientTest {
     @Test
     public void registryTest() {
         masterRegistryClient.registry();
+    }
+
+    @Test
+    public void handleConnectionStateTest() {
+        masterRegistryClient.handleConnectionState(ConnectionState.CONNECTED);
+        masterRegistryClient.handleConnectionState(ConnectionState.RECONNECTED);
+        masterRegistryClient.handleConnectionState(ConnectionState.SUSPENDED);
     }
 
     @Test
