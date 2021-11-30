@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -25,15 +28,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.vo.AlertGroupVo;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +35,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * alert group service impl
@@ -116,12 +112,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        Page<AlertGroupVo> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroupVo> alertGroupVoIPage = alertGroupMapper.queryAlertGroupVo(page, searchVal);
-        PageInfo<AlertGroupVo> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        pageInfo.setTotal((int) alertGroupVoIPage.getTotal());
-        pageInfo.setTotalList(alertGroupVoIPage.getRecords());
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
+        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
+                page, searchVal);
+        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) alertGroupIPage.getTotal());
+        pageInfo.setTotalList(alertGroupIPage.getRecords());
         result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);
