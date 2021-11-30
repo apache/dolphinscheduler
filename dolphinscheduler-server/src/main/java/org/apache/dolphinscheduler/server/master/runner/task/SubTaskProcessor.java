@@ -59,7 +59,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-
+        setTaskExecutionLogger();
         return true;
     }
 
