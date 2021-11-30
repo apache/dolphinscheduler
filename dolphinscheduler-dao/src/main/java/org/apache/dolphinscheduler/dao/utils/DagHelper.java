@@ -406,7 +406,7 @@ public class DagHelper {
                                                     Map<String, TaskInstance> completeTaskList,
                                                     DAG<String, TaskNode, TaskNodeRelation> dag) {
 
-        SwitchParameters switchParameters = completeTaskList.get(taskNode.getName()).getSwitchDependency();
+        SwitchParameters switchParameters = completeTaskList.get(Long.toString(taskNode.getCode())).getSwitchDependency();
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
         List<String> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
