@@ -107,6 +107,9 @@ import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.cache.processor.ProcessDefinitionCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.ProcessTaskRelationCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.TaskDefinitionCacheProcessor;
 import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
 import org.apache.dolphinscheduler.service.cache.processor.UserCacheProcessor;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -156,6 +159,15 @@ public class ProcessService {
 
     @Autowired
     private UserCacheProcessor userCacheProcessor;
+
+    @Autowired
+    private ProcessDefinitionCacheProcessor processDefinitionCacheProcessor;
+
+    @Autowired
+    private ProcessTaskRelationCacheProcessor processTaskRelationCacheProcessor;
+
+    @Autowired
+    private TaskDefinitionCacheProcessor taskDefinitionCacheProcessor;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -233,8 +245,8 @@ public class ProcessService {
      * @return process instance
      */
     @Transactional
-    public ProcessInstance handleCommand(Logger logger, String host, Command command, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
-        ProcessInstance processInstance = constructProcessInstance(command, host, processDefinitionCacheMaps);
+    public ProcessInstance handleCommand(Logger logger, String host, Command command) {
+        ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
             logger.error("scan command, command parameter is error: {}", command);
@@ -455,9 +467,9 @@ public class ProcessService {
      * @return process definition
      */
     public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
-        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
+        ProcessDefinition processDefinition = processDefinitionCacheProcessor.queryByCode(processDefinitionCode);
         if (processDefinition == null || processDefinition.getVersion() != version) {
-            processDefinition = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
+            processDefinition = processDefinitionCacheProcessor.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
             if (processDefinition != null) {
                 processDefinition.setId(0);
             }
@@ -794,19 +806,12 @@ public class ProcessService {
      * @param host host
      * @return process instance
      */
-    private ProcessInstance constructProcessInstance(Command command, String host, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
+    private ProcessInstance constructProcessInstance(Command command, String host) {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
-        String key = String.format("%d-%d", command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-        if (processDefinitionCacheMaps.containsKey(key)) {
-            processDefinition = processDefinitionCacheMaps.get(key);
-        } else {
-            processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-            if (processDefinition != null) {
-                processDefinitionCacheMaps.put(key, processDefinition);
-            }
-        }
+
+        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -2423,14 +2428,14 @@ public class ProcessService {
      * find task definition by code and version
      */
     public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
-        return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+        return taskDefinitionCacheProcessor.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
     }
 
     /**
      * find process task relation list by projectCode and processDefinitionCode
      */
     public List<ProcessTaskRelation> findRelationByCode(long projectCode, long processDefinitionCode) {
-        return processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+        return processTaskRelationCacheProcessor.queryByProcessCode(projectCode, processDefinitionCode);
     }
 
     /**

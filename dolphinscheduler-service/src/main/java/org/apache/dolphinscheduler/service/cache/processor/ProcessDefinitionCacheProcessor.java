@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.service.cache.processor;
 
-public enum CacheType {
-    TENANT,
-    USER,
-    QUEUE,
-    PROCESS_DEFINITION,
-    PROCESS_TASK_RELATION,
-    TASK_DEFINITION;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+
+public interface ProcessDefinitionCacheProcessor extends BaseCacheProcessor {
+
+    ProcessDefinition queryByCode(long processDefinitionCode);
+
+    ProcessDefinition queryByDefinitionCodeAndVersion(long processDefinitionCode, int version);
 }

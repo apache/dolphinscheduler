@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.service.cache.processor.impl;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.service.cache.processor.BaseCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.ProcessDefinitionCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.ProcessTaskRelationCacheProcessor;
 import org.apache.dolphinscheduler.service.cache.processor.QueueCacheProcessor;
+import org.apache.dolphinscheduler.service.cache.processor.TaskDefinitionCacheProcessor;
 import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
 import org.apache.dolphinscheduler.service.cache.processor.UserCacheProcessor;
 
@@ -43,6 +46,15 @@ public class CacheProcessorFactory {
     @Autowired
     private QueueCacheProcessor queueCacheProcessor;
 
+    @Autowired
+    private ProcessDefinitionCacheProcessor processDefinitionCacheProcessor;
+
+    @Autowired
+    private ProcessTaskRelationCacheProcessor processTaskRelationCacheProcessor;
+
+    @Autowired
+    private TaskDefinitionCacheProcessor taskDefinitionCacheProcessor;
+
     Map<CacheType, BaseCacheProcessor> cacheProcessorMap = new ConcurrentHashMap<>();
 
     @PostConstruct
@@ -50,6 +62,9 @@ public class CacheProcessorFactory {
         cacheProcessorMap.put(CacheType.TENANT, tenantCacheProcessor);
         cacheProcessorMap.put(CacheType.USER, userCacheProcessor);
         cacheProcessorMap.put(CacheType.QUEUE, queueCacheProcessor);
+        cacheProcessorMap.put(CacheType.PROCESS_DEFINITION, processDefinitionCacheProcessor);
+        cacheProcessorMap.put(CacheType.PROCESS_TASK_RELATION, processTaskRelationCacheProcessor);
+        cacheProcessorMap.put(CacheType.TASK_DEFINITION, taskDefinitionCacheProcessor);
     }
 
     public BaseCacheProcessor getCacheProcessor(CacheType cacheType) {
