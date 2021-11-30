@@ -137,9 +137,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public boolean isTheTaskGroupAvailable(int id) {
-        TaskGroup taskGroup = taskGroupMapper.selectById(id);
-
-        return taskGroup.getStatus() == 1;
+        return taskGroupMapper.selectCountByIdStatus(id,Flag.YES.getCode()) == 1;
     }
 
     /**

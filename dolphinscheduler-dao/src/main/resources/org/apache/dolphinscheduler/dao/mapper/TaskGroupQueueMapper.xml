@@ -56,11 +56,7 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group_queue
-        <where>
-            <if test="status != 0">
-                and status = #{status}
-            </if>
-        </where>
+            where status = #{status}
     </select>
 
     <delete id="deleteByTaskId">

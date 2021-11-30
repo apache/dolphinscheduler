@@ -73,4 +73,6 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     int selectAvailableCountById(@Param("groupId") int groupId);
 
+    int selectCountByIdStatus(@Param("id") int id,@Param("status") int status);
+
 }

@@ -25,7 +25,7 @@
         <result property="groupSize" column="group_size" jdbcType="INTEGER"/>
         <result property="useSize" column="use_size" jdbcType="INTEGER"/>
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
-        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -82,6 +82,14 @@
         from t_ds_task_group
         where
         id = #{groupId} and use_size &lt; group_size
+    </select>
+
+    <select id="selectCountByIdStatus" resultType="java.lang.Integer">
+        select
+        count(1)
+        from t_ds_task_group
+        where
+        id = #{id} and status = #{status}
     </select>
 
 </mapper>
