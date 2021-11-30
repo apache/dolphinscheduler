@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParamete
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -97,6 +98,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     /**
      * task timeout process
+     *
      * @return
      */
     protected abstract boolean taskTimeout();
@@ -104,6 +106,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public void run() {
     }
+
 
     @Override
     public boolean action(TaskAction taskAction) {
@@ -217,10 +220,22 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
+     * set master task running logger.
+     */
+    public void setTaskExecutionLogger() {
+        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+    }
+
+    /**
      * set procedure task relation
      *
      * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskInstance taskInstance
+     * @param taskInstance                  taskInstance
      */
     private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
         ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
@@ -233,7 +248,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set datax task relation
      *
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskInstance taskInstance
+     * @param taskInstance              taskInstance
      */
     protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
         DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
@@ -258,7 +273,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set sqoop task relation
      *
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskInstance taskInstance
+     * @param taskInstance              taskInstance
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
         SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
@@ -285,11 +300,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         }
     }
 
+
     /**
      * set SQL task relation
      *
      * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskInstance taskInstance
+     * @param taskInstance            taskInstance
      */
     private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
         SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
@@ -301,7 +317,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // whether udf type
         boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(sqlParameters.getType())).isPresent()
-            && !StringUtils.isEmpty(sqlParameters.getUdfs());
+                && !StringUtils.isEmpty(sqlParameters.getUdfs());
 
         if (udfTypeFlag) {
             String[] udfFunIds = sqlParameters.getUdfs().split(",");
@@ -325,7 +341,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * whehter tenant is null
      *
-     * @param tenant tenant
+     * @param tenant       tenant
      * @param taskInstance taskInstance
      * @return result
      */
