@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -42,6 +45,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +56,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 /**
@@ -186,7 +192,85 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> moveTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode, long targetProcessDefinitionCode, long taskCode) {
-        return null;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(targetProcessDefinitionCode);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, targetProcessDefinitionCode);
+            return result;
+        }
+        if (processDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.PROJECT_PROCESS_NOT_MATCH);
+            return result;
+        }
+        List<ProcessTaskRelation> downstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L);
+        if (CollectionUtils.isNotEmpty(downstreamList)) {
+            Set<Long> postTaskCodes = downstreamList
+                .stream()
+                .map(ProcessTaskRelation::getPostTaskCode)
+                .collect(Collectors.toSet());
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(postTaskCodes, ","));
+            return result;
+        }
+        List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, 0L, taskCode);
+        if (upstreamList.isEmpty()) {
+            putMsg(result, Status.PROCESS_TASK_RELATION_NOT_EXIST, "taskCode:" + taskCode);
+            return result;
+        } else {
+            Set<Long> preTaskCodes = upstreamList
+                .stream()
+                .map(ProcessTaskRelation::getPreTaskCode)
+                .collect(Collectors.toSet());
+            if (preTaskCodes.size() > 1 || !preTaskCodes.contains(0L)) {
+                putMsg(result, Status.TASK_HAS_UPSTREAM, org.apache.commons.lang.StringUtils.join(preTaskCodes, ","));
+                return result;
+            }
+        }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        if (null == taskDefinition) {
+            putMsg(result, Status.DATA_IS_NULL, "taskDefinition");
+            return result;
+        }
+        ObjectNode paramNode = JSONUtils.parseObject(taskDefinition.getTaskParams());
+        if (TaskType.DEPENDENT.getDesc().equals(taskDefinition.getTaskType())) {
+            Set<Long> depProcessDefinitionCodes = new HashSet<>();
+            ObjectNode dependence = (ObjectNode) paramNode.get("dependence");
+            ArrayNode dependTaskList = JSONUtils.parseArray(JSONUtils.toJsonString(dependence.get("dependTaskList")));
+            for (int i = 0; i < dependTaskList.size(); i++) {
+                ObjectNode dependTask = (ObjectNode) dependTaskList.path(i);
+                ArrayNode dependItemList = JSONUtils.parseArray(JSONUtils.toJsonString(dependTask.get("dependItemList")));
+                for (int j = 0; j < dependItemList.size(); j++) {
+                    ObjectNode dependItem = (ObjectNode) dependItemList.path(j);
+                    long definitionCode = dependItem.get("definitionCode").asLong();
+                    depProcessDefinitionCodes.add(definitionCode);
+                }
+            }
+            if (depProcessDefinitionCodes.contains(targetProcessDefinitionCode)) {
+                putMsg(result, DATA_IS_NOT_VALID, "targetProcessDefinitionCode");
+                return result;
+            }
+        }
+        if (TaskType.SUB_PROCESS.getDesc().equals(taskDefinition.getTaskType())) {
+            long subProcessDefinitionCode = paramNode.get("processDefinitionCode").asLong();
+            if (targetProcessDefinitionCode == subProcessDefinitionCode) {
+                putMsg(result, DATA_IS_NOT_VALID, "targetProcessDefinitionCode");
+                return result;
+            }
+        }
+        Date now = new Date();
+        ProcessTaskRelation processTaskRelation = upstreamList.get(0);
+        processTaskRelation.setProcessDefinitionCode(processDefinition.getCode());
+        processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
+        processTaskRelation.setUpdateTime(now);
+        int update = processTaskRelationMapper.updateById(processTaskRelation);
+        if (update == 0) {
+            putMsg(result, Status.MOVE_PROCESS_TASK_RELATION_ERROR);
+        }
+        return result;
     }
 
     /**
