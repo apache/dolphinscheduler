@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public final class ScriptSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(ScriptSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(ScriptSender.class);
     private static final String ALERT_TITLE_OPTION = " -t ";
     private static final String ALERT_CONTENT_OPTION = " -c ";
     private static final String ALERT_USER_PARAMS_OPTION = " -p ";
@@ -62,7 +62,7 @@ public final class ScriptSender {
             return alertResult;
         }
         alertResult.setMessage("send script alert msg error,exitCode is " + exitCode);
-        log.info("send script alert msg error,exitCode is {}", exitCode);
+        logger.info("send script alert msg error,exitCode is {}", exitCode);
         return alertResult;
     }
 

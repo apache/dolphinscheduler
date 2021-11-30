@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import static java.util.Objects.requireNonNull;
-
+import com.sun.mail.smtp.SMTPProvider;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
@@ -26,18 +28,8 @@ import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailExcept
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -52,13 +44,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import org.slf4j.Logger;
-
-import com.sun.mail.smtp.SMTPProvider;
+import static java.util.Objects.requireNonNull;
 
 public final class MailSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(MailSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
 
     private final List<String> receivers;
     private final List<String> receiverCcs;
@@ -380,12 +377,12 @@ public final class MailSender {
     public void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                log.info("delete success: {}", file.getAbsolutePath());
+                logger.info("delete success: {}", file.getAbsolutePath());
             } else {
-                log.info("delete fail: {}", file.getAbsolutePath());
+                logger.info("delete fail: {}", file.getAbsolutePath());
             }
         } else {
-            log.info("file not exists: {}", file.getAbsolutePath());
+            logger.info("file not exists: {}", file.getAbsolutePath());
         }
     }
 
@@ -393,7 +390,7 @@ public final class MailSender {
      * handle exception
      */
     private void handleException(AlertResult alertResult, Exception e) {
-        log.error("Send email to {} failed", receivers, e);
+        logger.error("Send email to {} failed", receivers, e);
         alertResult.setMessage("Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 

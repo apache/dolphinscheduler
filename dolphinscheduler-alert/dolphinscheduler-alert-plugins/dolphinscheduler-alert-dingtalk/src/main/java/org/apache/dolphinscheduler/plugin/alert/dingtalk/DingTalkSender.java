@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -34,16 +33,16 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 public final class DingTalkSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(DingTalkSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(DingTalkSender.class);
     private final String url;
     private final String keyword;
     private final Boolean enableProxy;
@@ -109,13 +108,13 @@ public final class DingTalkSender {
 
         if (null == result) {
             alertResult.setMessage("send ding talk msg error");
-            log.info("send ding talk msg error,ding talk server resp is null");
+            logger.info("send ding talk msg error,ding talk server resp is null");
             return alertResult;
         }
         DingTalkSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, DingTalkSendMsgResponse.class);
         if (null == sendMsgResponse) {
             alertResult.setMessage("send ding talk msg fail");
-            log.info("send ding talk msg error,resp error");
+            logger.info("send ding talk msg error,resp error");
             return alertResult;
         }
         if (sendMsgResponse.errcode == 0) {
@@ -124,7 +123,7 @@ public final class DingTalkSender {
             return alertResult;
         }
         alertResult.setMessage(String.format("alert send ding talk msg error : %s", sendMsgResponse.getErrmsg()));
-        log.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
+        logger.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
         return alertResult;
     }
 
@@ -134,7 +133,7 @@ public final class DingTalkSender {
             String resp = sendMsg(title, content);
             return checkSendDingTalkSendMsgResult(resp);
         } catch (Exception e) {
-            log.info("send ding talk alert msg  exception : {}", e.getMessage());
+            logger.info("send ding talk alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setStatus("false");
             alertResult.setMessage("send ding talk alert fail.");
@@ -166,7 +165,7 @@ public final class DingTalkSender {
             } finally {
                 response.close();
             }
-            log.info("Ding Talk send title :{},content : {}, resp: {}", title, content, resp);
+            logger.info("Ding Talk send title :{},content : {}, resp: {}", title, content, resp);
             return resp;
         } finally {
             httpClient.close();
