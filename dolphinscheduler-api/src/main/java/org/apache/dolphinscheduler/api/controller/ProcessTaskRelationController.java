@@ -127,8 +127,18 @@ public class ProcessTaskRelationController extends BaseController {
                                           @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
                                           @RequestParam(name = "targetProcessDefinitionCode", required = true) long targetProcessDefinitionCode,
                                           @RequestParam(name = "taskCode", required = true) long taskCode) {
-        return returnDataList(processTaskRelationService.moveTaskProcessRelation(loginUser, projectCode, processDefinitionCode,
-            targetProcessDefinitionCode, taskCode));
+        Map<String, Object> result = new HashMap<>();
+        if (processDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+        } else if (targetProcessDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "targetProcessDefinitionCode");
+        } else if (taskCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "taskCode");
+        } else {
+            result = processTaskRelationService.moveTaskProcessRelation(loginUser, projectCode, processDefinitionCode,
+                targetProcessDefinitionCode, taskCode);
+        }
+        return returnDataList(result);
     }
 
     /**
