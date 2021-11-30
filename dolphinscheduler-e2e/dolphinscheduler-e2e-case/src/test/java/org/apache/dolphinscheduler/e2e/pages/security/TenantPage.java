@@ -17,12 +17,18 @@
  * under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.pages;
+package org.apache.dolphinscheduler.e2e.pages.security;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
+import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
@@ -30,9 +36,7 @@ import org.openqa.selenium.support.PageFactory;
 import lombok.Getter;
 
 @Getter
-public final class TenantPage {
-    private final WebDriver driver;
-
+public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(id = "button-create-tenant")
     private WebElement buttonCreateTenant;
 
@@ -40,18 +44,47 @@ public final class TenantPage {
     private List<WebElement> tenantList;
 
     @FindBys({
-            @FindBy(className = "el-popconfirm"),
-            @FindBy(className = "el-button--primary"),
+        @FindBy(className = "el-popconfirm"),
+        @FindBy(className = "el-button--primary"),
     })
     private WebElement buttonConfirm;
 
     private final CreateTenantForm createTenantForm;
 
-    public TenantPage(WebDriver driver) {
-        this.driver = driver;
-        this.createTenantForm = new CreateTenantForm();
+    public TenantPage(RemoteWebDriver driver) {
+        super(driver);
 
-        PageFactory.initElements(driver, this);
+        createTenantForm = new CreateTenantForm();
+    }
+
+    public TenantPage create(String tenant) {
+        return create(tenant, "");
+    }
+
+    public TenantPage create(String tenant, String description) {
+        buttonCreateTenant().click();
+        createTenantForm().inputTenantCode().sendKeys(tenant);
+        createTenantForm().inputDescription().sendKeys(description);
+        createTenantForm().buttonSubmit().click();
+
+        await().untilAsserted(() -> assertThat(tenantList())
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
+
+        return this;
+    }
+
+    public TenantPage delete(String tenant) {
+        tenantList()
+            .stream()
+            .filter(it -> it.getText().contains(tenant))
+            .findFirst()
+            .ifPresent(it -> it.findElement(By.className("delete")).click());
+
+        buttonConfirm().click();
+
+        return this;
     }
 
     @Getter

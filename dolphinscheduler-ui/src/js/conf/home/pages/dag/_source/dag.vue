@@ -23,6 +23,7 @@
       size=""
       :with-header="false"
       :wrapperClosable="false"
+      class="task-drawer"
     >
       <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
       <div style="width: 0px; height: 0px; overflow: hidden">

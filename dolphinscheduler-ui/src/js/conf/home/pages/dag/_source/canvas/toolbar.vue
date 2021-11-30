@@ -143,6 +143,7 @@
         type="primary"
         size="mini"
         @click="saveProcess"
+        id="button-save"
         >{{ $t("Save") }}</el-button
       >
       <el-button
