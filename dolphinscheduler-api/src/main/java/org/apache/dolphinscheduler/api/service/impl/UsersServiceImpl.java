@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -53,6 +53,9 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -118,6 +121,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    @Autowired
+    private CacheNotifyService cacheNotifyService;
+
 
     /**
      * create user, only system admin have permission
@@ -174,6 +180,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             HadoopUtils.getInstance().mkdir(userPath);
         }
 
+        result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
 
@@ -322,7 +329,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -342,8 +349,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     *
-     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -474,6 +479,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // updateProcessInstance user
         userMapper.updateById(user);
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -521,8 +528,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
-        
+
         userMapper.deleteById(id);
+
+        if (user != null) {
+            cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+        }
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -1066,6 +1078,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
+
+        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
+
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);

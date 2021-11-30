@@ -75,6 +75,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
+        setTaskExecutionLogger();
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -210,7 +211,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
                 value = "\"" + value + "\"";
             }
-            logger.info("paramName：{}，paramValue{}", paramName, value);
+            logger.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
         }
         return content;
