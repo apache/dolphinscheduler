@@ -154,6 +154,17 @@ public interface UsersService {
 
 
     /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCode project code
+     * @return grant result code
+     */
+    Map<String, Object> grantProjectByCode(User loginUser, int userId, long projectCode);
+
+
+    /**
      * grant resource
      *
      * @param loginUser login user
