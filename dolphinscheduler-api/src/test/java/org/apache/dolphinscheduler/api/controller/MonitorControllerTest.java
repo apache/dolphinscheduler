@@ -36,7 +36,6 @@ import org.springframework.test.web.servlet.MvcResult;
  * monitor controller test
  */
 public class MonitorControllerTest extends AbstractControllerTest {
-
     private static final Logger logger = LoggerFactory.getLogger(MonitorControllerTest.class);
 
     @Test
@@ -46,7 +45,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
             .header(SESSION_ID, sessionId)
            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -63,7 +62,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
             .header(SESSION_ID, sessionId)
            /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -79,7 +78,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
             .header(SESSION_ID, sessionId)
             /* .param("type", ResourceType.FILE.name())*/)
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
