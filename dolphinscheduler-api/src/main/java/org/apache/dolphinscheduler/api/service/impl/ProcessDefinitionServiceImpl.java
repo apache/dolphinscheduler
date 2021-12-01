@@ -520,6 +520,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+
         Map<String, Object> checkTaskDefinitions = checkTaskDefinitionList(taskDefinitionLogs, taskDefinitionJson);
         if (checkTaskDefinitions.get(Constants.STATUS) != Status.SUCCESS) {
             return checkTaskDefinitions;

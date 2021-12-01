@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -158,6 +159,7 @@ public class TaskDefinition {
     /**
      * timeout notify strategy
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private TaskTimeoutStrategy timeoutNotifyStrategy;
 
     /**
