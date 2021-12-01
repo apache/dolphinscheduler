@@ -37,6 +37,8 @@ echo "init env variables"
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_URL="jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_PARAMS}"
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+# export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
+
 
 #============================================================================
 # Registry
