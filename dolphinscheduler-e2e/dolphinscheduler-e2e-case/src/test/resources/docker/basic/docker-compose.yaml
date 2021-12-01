@@ -23,6 +23,7 @@ services:
     command: [ standalone-server ]
     environment:
       DATABASE_TYPE: h2
+      WORKER_TENANT_AUTO_CREATE: 'true'
     expose:
       - 12345
     networks:

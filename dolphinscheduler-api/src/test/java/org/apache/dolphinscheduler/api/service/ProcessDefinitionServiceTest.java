@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -407,6 +408,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    @Ignore
     public void testReleaseProcessDefinition() {
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));

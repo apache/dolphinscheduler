@@ -15,13 +15,13 @@
  * limitations under the License.
 */
 
-SET
-FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
+SET REFERENTIAL_INTEGRITY FALSE;
 
 -- ----------------------------
 -- Table structure for QRTZ_JOB_DETAILS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_JOB_DETAILS;
+DROP TABLE IF EXISTS QRTZ_JOB_DETAILS CASCADE;
 CREATE TABLE QRTZ_JOB_DETAILS
 (
     SCHED_NAME        varchar(120) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE QRTZ_JOB_DETAILS
 -- ----------------------------
 -- Table structure for QRTZ_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_TRIGGERS
 (
     SCHED_NAME     varchar(120) NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE QRTZ_TRIGGERS
 -- ----------------------------
 -- Table structure for QRTZ_BLOB_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_BLOB_TRIGGERS
 (
     SCHED_NAME    varchar(120) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE QRTZ_BLOB_TRIGGERS
 -- ----------------------------
 -- Table structure for QRTZ_CALENDARS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_CALENDARS;
+DROP TABLE IF EXISTS QRTZ_CALENDARS CASCADE;
 CREATE TABLE QRTZ_CALENDARS
 (
     SCHED_NAME    varchar(120) NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE QRTZ_CALENDARS
 -- ----------------------------
 -- Table structure for QRTZ_CRON_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_CRON_TRIGGERS
 (
     SCHED_NAME      varchar(120) NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE QRTZ_CRON_TRIGGERS
 -- ----------------------------
 -- Table structure for QRTZ_FIRED_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_FIRED_TRIGGERS
 (
     SCHED_NAME        varchar(120) NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE QRTZ_FIRED_TRIGGERS
 -- ----------------------------
 -- Table structure for QRTZ_LOCKS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_LOCKS;
+DROP TABLE IF EXISTS QRTZ_LOCKS CASCADE;
 CREATE TABLE QRTZ_LOCKS
 (
     SCHED_NAME varchar(120) NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE QRTZ_LOCKS
 -- ----------------------------
 -- Table structure for QRTZ_PAUSED_TRIGGER_GRPS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;
+DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS CASCADE;
 CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS
 (
     SCHED_NAME    varchar(120) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS
 -- ----------------------------
 -- Table structure for QRTZ_SCHEDULER_STATE
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;
+DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE CASCADE;
 CREATE TABLE QRTZ_SCHEDULER_STATE
 (
     SCHED_NAME        varchar(120) NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE QRTZ_SCHEDULER_STATE
 -- ----------------------------
 -- Table structure for QRTZ_SIMPLE_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_SIMPLE_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_SIMPLE_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_SIMPLE_TRIGGERS
 (
     SCHED_NAME      varchar(120) NOT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE QRTZ_SIMPLE_TRIGGERS
 -- ----------------------------
 -- Table structure for QRTZ_SIMPROP_TRIGGERS
 -- ----------------------------
-DROP TABLE IF EXISTS QRTZ_SIMPROP_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_SIMPROP_TRIGGERS CASCADE;
 CREATE TABLE QRTZ_SIMPROP_TRIGGERS
 (
     SCHED_NAME    varchar(120) NOT NULL,
@@ -248,7 +248,7 @@ CREATE TABLE QRTZ_SIMPROP_TRIGGERS
 -- ----------------------------
 -- Table structure for t_ds_access_token
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_access_token;
+DROP TABLE IF EXISTS t_ds_access_token CASCADE;
 CREATE TABLE t_ds_access_token
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -267,7 +267,7 @@ CREATE TABLE t_ds_access_token
 -- ----------------------------
 -- Table structure for t_ds_alert
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_alert;
+DROP TABLE IF EXISTS t_ds_alert CASCADE;
 CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
@@ -288,7 +288,7 @@ CREATE TABLE t_ds_alert
 -- ----------------------------
 -- Table structure for t_ds_alertgroup
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_alertgroup;
+DROP TABLE IF EXISTS t_ds_alertgroup CASCADE;
 CREATE TABLE t_ds_alertgroup
 (
     id                 int(11) NOT NULL AUTO_INCREMENT,
@@ -309,7 +309,7 @@ CREATE TABLE t_ds_alertgroup
 -- ----------------------------
 -- Table structure for t_ds_command
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_command;
+DROP TABLE IF EXISTS t_ds_command CASCADE;
 CREATE TABLE t_ds_command
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
@@ -341,7 +341,7 @@ CREATE TABLE t_ds_command
 -- ----------------------------
 -- Table structure for t_ds_datasource
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_datasource;
+DROP TABLE IF EXISTS t_ds_datasource CASCADE;
 CREATE TABLE t_ds_datasource
 (
     id                int(11) NOT NULL AUTO_INCREMENT,
@@ -363,7 +363,7 @@ CREATE TABLE t_ds_datasource
 -- ----------------------------
 -- Table structure for t_ds_error_command
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_error_command;
+DROP TABLE IF EXISTS t_ds_error_command CASCADE;
 CREATE TABLE t_ds_error_command
 (
     id                         int(11) NOT NULL,
@@ -395,7 +395,7 @@ CREATE TABLE t_ds_error_command
 -- ----------------------------
 -- Table structure for t_ds_process_definition
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_definition;
+DROP TABLE IF EXISTS t_ds_process_definition CASCADE;
 CREATE TABLE t_ds_process_definition
 (
     id               int(11) NOT NULL AUTO_INCREMENT,
@@ -427,7 +427,7 @@ CREATE TABLE t_ds_process_definition
 -- ----------------------------
 -- Table structure for t_ds_process_definition_log
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_definition_log;
+DROP TABLE IF EXISTS t_ds_process_definition_log CASCADE;
 CREATE TABLE t_ds_process_definition_log
 (
     id               int(11) NOT NULL AUTO_INCREMENT,
@@ -455,7 +455,7 @@ CREATE TABLE t_ds_process_definition_log
 -- ----------------------------
 -- Table structure for t_ds_task_definition
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_task_definition;
+DROP TABLE IF EXISTS t_ds_task_definition CASCADE;
 CREATE TABLE t_ds_task_definition
 (
     id                      int(11) NOT NULL AUTO_INCREMENT,
@@ -486,7 +486,7 @@ CREATE TABLE t_ds_task_definition
 -- ----------------------------
 -- Table structure for t_ds_task_definition_log
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_task_definition_log;
+DROP TABLE IF EXISTS t_ds_task_definition_log CASCADE;
 CREATE TABLE t_ds_task_definition_log
 (
     id                      int(11) NOT NULL AUTO_INCREMENT,
@@ -519,7 +519,7 @@ CREATE TABLE t_ds_task_definition_log
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_relation;
+DROP TABLE IF EXISTS t_ds_process_task_relation CASCADE;
 CREATE TABLE t_ds_process_task_relation
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
@@ -541,7 +541,7 @@ CREATE TABLE t_ds_process_task_relation
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation_log
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_relation_log;
+DROP TABLE IF EXISTS t_ds_process_task_relation_log CASCADE;
 CREATE TABLE t_ds_process_task_relation_log
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
@@ -565,7 +565,7 @@ CREATE TABLE t_ds_process_task_relation_log
 -- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_instance;
+DROP TABLE IF EXISTS t_ds_process_instance CASCADE;
 CREATE TABLE t_ds_process_instance
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
@@ -611,7 +611,7 @@ CREATE TABLE t_ds_process_instance
 -- ----------------------------
 -- Table structure for t_ds_project
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_project;
+DROP TABLE IF EXISTS t_ds_project CASCADE;
 CREATE TABLE t_ds_project
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -632,7 +632,7 @@ CREATE TABLE t_ds_project
 -- ----------------------------
 -- Table structure for t_ds_queue
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_queue;
+DROP TABLE IF EXISTS t_ds_queue CASCADE;
 CREATE TABLE t_ds_queue
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -652,7 +652,7 @@ VALUES ('1', 'default', 'default', null, null);
 -- ----------------------------
 -- Table structure for t_ds_relation_datasource_user
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_datasource_user;
+DROP TABLE IF EXISTS t_ds_relation_datasource_user CASCADE;
 CREATE TABLE t_ds_relation_datasource_user
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
@@ -671,7 +671,7 @@ CREATE TABLE t_ds_relation_datasource_user
 -- ----------------------------
 -- Table structure for t_ds_relation_process_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_process_instance;
+DROP TABLE IF EXISTS t_ds_relation_process_instance CASCADE;
 CREATE TABLE t_ds_relation_process_instance
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
@@ -688,7 +688,7 @@ CREATE TABLE t_ds_relation_process_instance
 -- ----------------------------
 -- Table structure for t_ds_relation_project_user
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_project_user;
+DROP TABLE IF EXISTS t_ds_relation_project_user CASCADE;
 CREATE TABLE t_ds_relation_project_user
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -707,7 +707,7 @@ CREATE TABLE t_ds_relation_project_user
 -- ----------------------------
 -- Table structure for t_ds_relation_resources_user
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_resources_user;
+DROP TABLE IF EXISTS t_ds_relation_resources_user CASCADE;
 CREATE TABLE t_ds_relation_resources_user
 (
     id           int(11) NOT NULL AUTO_INCREMENT,
@@ -726,7 +726,7 @@ CREATE TABLE t_ds_relation_resources_user
 -- ----------------------------
 -- Table structure for t_ds_relation_udfs_user
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_udfs_user;
+DROP TABLE IF EXISTS t_ds_relation_udfs_user CASCADE;
 CREATE TABLE t_ds_relation_udfs_user
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -741,7 +741,7 @@ CREATE TABLE t_ds_relation_udfs_user
 -- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_resources;
+DROP TABLE IF EXISTS t_ds_resources CASCADE;
 CREATE TABLE t_ds_resources
 (
     id           int(11) NOT NULL AUTO_INCREMENT,
@@ -767,7 +767,7 @@ CREATE TABLE t_ds_resources
 -- ----------------------------
 -- Table structure for t_ds_schedules
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_schedules;
+DROP TABLE IF EXISTS t_ds_schedules CASCADE;
 CREATE TABLE t_ds_schedules
 (
     id                        int(11) NOT NULL AUTO_INCREMENT,
@@ -796,7 +796,7 @@ CREATE TABLE t_ds_schedules
 -- ----------------------------
 -- Table structure for t_ds_session
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_session;
+DROP TABLE IF EXISTS t_ds_session CASCADE;
 CREATE TABLE t_ds_session
 (
     id              varchar(64) NOT NULL,
@@ -813,7 +813,7 @@ CREATE TABLE t_ds_session
 -- ----------------------------
 -- Table structure for t_ds_task_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_task_instance;
+DROP TABLE IF EXISTS t_ds_task_instance CASCADE;
 CREATE TABLE t_ds_task_instance
 (
     id                      int(11) NOT NULL AUTO_INCREMENT,
@@ -857,7 +857,7 @@ CREATE TABLE t_ds_task_instance
 -- ----------------------------
 -- Table structure for t_ds_tenant
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_tenant;
+DROP TABLE IF EXISTS t_ds_tenant CASCADE;
 CREATE TABLE t_ds_tenant
 (
     id          int(11) NOT NULL AUTO_INCREMENT,
@@ -876,7 +876,7 @@ CREATE TABLE t_ds_tenant
 -- ----------------------------
 -- Table structure for t_ds_udfs
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_udfs;
+DROP TABLE IF EXISTS t_ds_udfs CASCADE;
 CREATE TABLE t_ds_udfs
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
@@ -901,7 +901,7 @@ CREATE TABLE t_ds_udfs
 -- ----------------------------
 -- Table structure for t_ds_user
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_user;
+DROP TABLE IF EXISTS t_ds_user CASCADE;
 CREATE TABLE t_ds_user
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
@@ -926,7 +926,7 @@ CREATE TABLE t_ds_user
 -- ----------------------------
 -- Table structure for t_ds_worker_group
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_worker_group;
+DROP TABLE IF EXISTS t_ds_worker_group CASCADE;
 CREATE TABLE t_ds_worker_group
 (
     id          bigint(11) NOT NULL AUTO_INCREMENT,
@@ -945,7 +945,7 @@ CREATE TABLE t_ds_worker_group
 -- ----------------------------
 -- Table structure for t_ds_version
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_version;
+DROP TABLE IF EXISTS t_ds_version CASCADE;
 CREATE TABLE t_ds_version
 (
     id      int(11) NOT NULL AUTO_INCREMENT,
@@ -978,7 +978,7 @@ VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '',
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_plugin_define;
+DROP TABLE IF EXISTS t_ds_plugin_define CASCADE;
 CREATE TABLE t_ds_plugin_define
 (
     id            int          NOT NULL AUTO_INCREMENT,
@@ -994,7 +994,7 @@ CREATE TABLE t_ds_plugin_define
 -- ----------------------------
 -- Table structure for t_ds_alert_plugin_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
+DROP TABLE IF EXISTS t_ds_alert_plugin_instance CASCADE;
 CREATE TABLE t_ds_alert_plugin_instance
 (
     id                     int NOT NULL AUTO_INCREMENT,
@@ -1009,7 +1009,7 @@ CREATE TABLE t_ds_alert_plugin_instance
 --
 -- Table structure for table t_ds_environment
 --
-DROP TABLE IF EXISTS t_ds_environment;
+DROP TABLE IF EXISTS t_ds_environment CASCADE;
 CREATE TABLE t_ds_environment
 (
     id          int       NOT NULL AUTO_INCREMENT,
@@ -1028,7 +1028,7 @@ CREATE TABLE t_ds_environment
 --
 -- Table structure for table t_ds_environment_worker_group_relation
 --
-DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
+DROP TABLE IF EXISTS t_ds_environment_worker_group_relation CASCADE;
 CREATE TABLE t_ds_environment_worker_group_relation
 (
     id               int          NOT NULL AUTO_INCREMENT,
