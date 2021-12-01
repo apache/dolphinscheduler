@@ -114,19 +114,22 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
     @Override
     public void notifyMaster(Command command) {
         logger.info("send result, command:{}", command.toString());
-
-        List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
-        if (CollectionUtils.isEmpty(serverList)) {
-            return;
-        }
-
-        for (Server server : serverList) {
-            Host host = new Host(server.getHost(), server.getPort());
-            NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(host);
-            if (nettyRemoteChannel == null) {
-                continue;
+        try {
+            List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
+            if (CollectionUtils.isEmpty(serverList)) {
+                return;
             }
-            nettyRemoteChannel.writeAndFlush(command);
+
+            for (Server server : serverList) {
+                Host host = new Host(server.getHost(), server.getPort());
+                NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(host);
+                if (nettyRemoteChannel == null) {
+                    continue;
+                }
+                nettyRemoteChannel.writeAndFlush(command);
+            }
+        } catch (Exception e) {
+            logger.error("notify master error", e);
         }
     }
 }

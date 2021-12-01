@@ -19,7 +19,7 @@ spring:
     name: master-server
   cache:
     # default enable cache, you can disable by `type: none`
-    type: caffeine
+    type: none
     cache-names:
       - tenant
       - user
@@ -27,7 +27,7 @@ spring:
       - processTaskRelation
       - taskDefinition
     caffeine:
-      spec: maximumSize=100,expireAfterWrite=60s,recordStats
+      spec: maximumSize=100,expireAfterWrite=300s,recordStats
 
 master:
   listen-port: 5678

@@ -15,29 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.interceptor;
+package org.apache.dolphinscheduler.service.cache.impl;
 
-import org.apache.ibatis.plugin.Interceptor;
+import java.lang.reflect.Method;
 
-import java.util.List;
-
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
+import org.springframework.util.StringUtils;
 
 /**
- * the interceptor registry for mybatis
+ * custom cache key generator
  */
 @Component
-public class MybatisInterceptorRegistry {
+public class CacheKeyGenerator implements KeyGenerator {
 
-    private List<Interceptor> interceptors = Lists.newArrayList();
-
-    public List<Interceptor> getInterceptors() {
-        return interceptors;
-    }
-
-    public void addInterceptor(Interceptor interceptor) {
-        interceptors.add(interceptor);
+    @Override
+    public Object generate(Object target, Method method, Object... params) {
+        return StringUtils.arrayToDelimitedString(params, "_");
     }
 }

@@ -31,8 +31,6 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -51,11 +49,6 @@ public class CacheProcessor implements NettyRequestProcessor {
 
     private CacheManager cacheManager;
 
-    @PostConstruct
-    private void init() {
-        cacheManager = SpringApplicationContext.getBean(CacheManager.class);
-    }
-
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.CACHE_EXPIRE == command.getType(), String.format("invalid command type: %s", command.getType()));
@@ -69,7 +62,7 @@ public class CacheProcessor implements NettyRequestProcessor {
 
     private void cacheExpire(CacheExpireCommand cacheExpireCommand) {
         if (cacheManager == null) {
-            return;
+            cacheManager = SpringApplicationContext.getBean(CacheManager.class);
         }
 
         Object object = JSONUtils.parseObject(cacheExpireCommand.getUpdateObjJson(), cacheExpireCommand.getUpdateObjClass());
@@ -80,31 +73,52 @@ public class CacheProcessor implements NettyRequestProcessor {
         CacheType cacheType = cacheExpireCommand.getCacheType();
         switch (cacheType) {
             case TENANT:
-                Tenant tenant = (Tenant) object;
-                tenantCacheExpire(tenant);
+                if (object instanceof Tenant) {
+                    Tenant tenant = (Tenant) object;
+                    tenantCacheExpire(tenant);
+                }
                 break;
             case USER:
-                User user = (User) object;
-                userCacheExpire(user);
+                if (object instanceof User) {
+                    User user = (User) object;
+                    userCacheExpire(user);
+                }
                 break;
             case QUEUE:
-                Queue queue = (Queue) object;
-                queueCacheExpire(queue);
+                if (object instanceof Queue) {
+                    Queue queue = (Queue) object;
+                    queueCacheExpire(queue);
+                }
                 break;
             case PROCESS_DEFINITION:
-                ProcessDefinition processDefinition = (ProcessDefinition) object;
-                processDefinitionCacheExpire(processDefinition);
+                if (object instanceof ProcessDefinition) {
+                    ProcessDefinition processDefinition = (ProcessDefinition) object;
+                    processDefinitionCacheExpire(processDefinition);
+                }
                 break;
             case TASK_DEFINITION:
-                TaskDefinition taskDefinition = (TaskDefinition) object;
-                taskDefinitionCacheExpire(taskDefinition);
+                if (object instanceof TaskDefinition) {
+                    TaskDefinition taskDefinition = (TaskDefinition) object;
+                    taskDefinitionCacheExpire(taskDefinition);
+                }
                 break;
             case PROCESS_TASK_RELATION:
-                ProcessTaskRelation processTaskRelation = (ProcessTaskRelation) object;
-                processTaskRelationCacheExpire(processTaskRelation);
+                if (object instanceof ProcessTaskRelation) {
+                    ProcessTaskRelation processTaskRelation = (ProcessTaskRelation) object;
+                    processTaskRelationCacheExpire(processTaskRelation);
+                }
                 break;
             default:
                 logger.error("no support cache type:{}", cacheType);
+        }
+
+        // if delete operation, just send key
+        if (object instanceof String) {
+            Cache cache = cacheManager.getCache(cacheType.getCacheName());
+            if (cache != null) {
+                cache.evict(object);
+                logger.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), object);
+            }
         }
     }
 
@@ -112,6 +126,7 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(CacheType.TENANT.getCacheName());
         if (cache != null) {
             cache.evict(tenant.getId());
+            logger.info("cache evict, type:{}, key:{}", CacheType.TENANT.getCacheName(), tenant.getId());
         }
     }
 
@@ -119,6 +134,7 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(CacheType.USER.getCacheName());
         if (cache != null) {
             cache.evict(user.getId());
+            logger.info("cache evict, type:{}, key:{}", CacheType.USER.getCacheName(), user.getId());
         }
     }
 
@@ -126,6 +142,7 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(CacheType.USER.getCacheName());
         if (cache != null) {
             cache.clear();
+            logger.info("cache evict, type:{}, clear", CacheType.USER.getCacheName());
         }
     }
 
@@ -134,6 +151,8 @@ public class CacheProcessor implements NettyRequestProcessor {
         if (cache != null) {
             cache.evict(processDefinition.getCode());
             cache.evict(processDefinition.getCode() + "_" + processDefinition.getVersion());
+            logger.info("cache evict, type:{}, key:{}",
+                    CacheType.PROCESS_DEFINITION.getCacheName(), processDefinition.getCode() + "_" + processDefinition.getVersion());
         }
     }
 
@@ -141,6 +160,8 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(CacheType.PROCESS_TASK_RELATION.getCacheName());
         if (cache != null) {
             cache.evict(processTaskRelation.getProjectCode() + "_" + processTaskRelation.getProcessDefinitionCode());
+            logger.info("cache evict, type:{}, key:{}",
+                    CacheType.PROCESS_TASK_RELATION.getCacheName(), processTaskRelation.getProjectCode() + "_" + processTaskRelation.getProcessDefinitionCode());
         }
     }
 
@@ -148,6 +169,8 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(CacheType.TASK_DEFINITION.getCacheName());
         if (cache != null) {
             cache.evict(taskDefinition.getCode() + "_" + taskDefinition.getVersion());
+            logger.info("cache evict, type:{}, key:{}",
+                    CacheType.TASK_DEFINITION.getCacheName(), taskDefinition.getCode() + "_" + taskDefinition.getVersion());
         }
     }
 }

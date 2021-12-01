@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.ibatis.annotations.Param;
 
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -30,7 +31,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * tenant mapper interface
  */
-@CacheConfig(cacheNames = "tenant")
+@CacheConfig(cacheNames = "tenant", keyGenerator = "cacheKeyGenerator")
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**
@@ -41,6 +42,18 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      */
     @Cacheable(sync = true)
     Tenant queryById(@Param("tenantId") int tenantId);
+
+    /**
+     * delete by id
+     */
+    @CacheEvict
+    int deleteById(int id);
+
+    /**
+     * update
+     */
+    @CacheEvict
+    int updateById(@Param("et") Tenant tenant);
 
     /**
      * query tenant by code
