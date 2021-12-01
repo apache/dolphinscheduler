@@ -30,6 +30,10 @@ const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus
   }
 }
 
+const publishStatusFormat = (status) => {
+  return status === 0 || status === '0' ? i18n.$t('offline') : status === 1 || status === '1' ? i18n.$t('online') : '-'
+}
+
 export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
   const categoryDic = {
     active: { color: '#2D8DF0', category: i18n.$t('KinshipStateActive') },
@@ -66,13 +70,14 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
       formatter: (params) => {
         if (!params.data.name) return ''
         const { name, scheduleStartTime, scheduleEndTime, crontab, workFlowPublishStatus, schedulePublishStatus } = params.data
+
         return `
           ${i18n.$t('workflowName')}：${name}<br/>
           ${i18n.$t('scheduleStartTime')}：${scheduleStartTime}<br/>
           ${i18n.$t('scheduleEndTime')}：${scheduleEndTime}<br/>
           ${i18n.$t('crontabExpression')}：${crontab}<br/>
-          ${i18n.$t('workflowPublishStatus')}：${workFlowPublishStatus}<br/>
-          ${i18n.$t('schedulePublishStatus')}：${schedulePublishStatus}<br/>
+          ${i18n.$t('workflowPublishStatus')}：${publishStatusFormat(workFlowPublishStatus)}<br/>
+          ${i18n.$t('schedulePublishStatus')}：${publishStatusFormat(schedulePublishStatus)}<br/>
         `
       },
       color: '#2D303A',
