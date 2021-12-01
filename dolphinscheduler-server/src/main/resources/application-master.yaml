@@ -23,6 +23,9 @@ spring:
     cache-names:
       - tenant
       - user
+      - processDefinition
+      - processTaskRelation
+      - taskDefinition
     caffeine:
       spec: maximumSize=100,expireAfterWrite=60s,recordStats
 

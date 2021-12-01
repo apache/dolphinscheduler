@@ -18,10 +18,20 @@
 package org.apache.dolphinscheduler.common.enums;
 
 public enum CacheType {
-    TENANT,
-    USER,
-    QUEUE,
-    PROCESS_DEFINITION,
-    PROCESS_TASK_RELATION,
-    TASK_DEFINITION;
+    TENANT("tenant"),
+    USER("user"),
+    QUEUE("queue"),
+    PROCESS_DEFINITION("processDefinition"),
+    PROCESS_TASK_RELATION("processTaskRelation"),
+    TASK_DEFINITION("taskDefinition");
+
+    CacheType(String cacheName) {
+        this.cacheName = cacheName;
+    }
+
+    private final String cacheName;
+
+    public String getCacheName() {
+        return cacheName;
+    }
 }

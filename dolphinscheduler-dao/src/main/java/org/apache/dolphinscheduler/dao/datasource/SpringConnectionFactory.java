@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
+import org.apache.dolphinscheduler.dao.interceptor.MybatisInterceptorRegistry;
+
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSession;
@@ -28,6 +30,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -42,6 +45,10 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 @Configuration
 public class SpringConnectionFactory {
+
+    @Autowired
+    private MybatisInterceptorRegistry mybatisInterceptorRegistry;
+
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
@@ -60,6 +67,8 @@ public class SpringConnectionFactory {
         configuration.setCallSettersOnNulls(true);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.addInterceptor(paginationInterceptor());
+        mybatisInterceptorRegistry.getInterceptors().forEach(configuration::addInterceptor);
+
         configuration.setGlobalConfig(new GlobalConfig().setBanner(false));
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);

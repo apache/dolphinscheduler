@@ -64,7 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.service.cache.processor.impl.UserCacheProcessorImpl;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
@@ -116,7 +116,7 @@ public class ProcessServiceTest {
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
-    private UserCacheProcessorImpl userCacheProcessor;
+    private UserMapper userMapper;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
     @Mock
@@ -467,7 +467,7 @@ public class ProcessServiceTest {
     public void testGetUserById() {
         User user = new User();
         user.setId(123);
-        Mockito.when(userCacheProcessor.selectById(123)).thenReturn(user);
+        Mockito.when(userMapper.selectById(123)).thenReturn(user);
         Assert.assertEquals(user, processService.getUserById(123));
     }
 

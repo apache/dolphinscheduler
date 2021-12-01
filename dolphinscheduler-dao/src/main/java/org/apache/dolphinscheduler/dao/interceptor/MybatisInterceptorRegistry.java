@@ -15,8 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.processor;
+package org.apache.dolphinscheduler.dao.interceptor;
 
-public interface BaseCacheProcessor {
-    void cacheExpire(Class updateObjClass, String updateObjJson);
+import org.apache.ibatis.plugin.Interceptor;
+
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
+
+/**
+ * the interceptor registry for mybatis
+ */
+@Component
+public class MybatisInterceptorRegistry {
+
+    private List<Interceptor> interceptors = Lists.newArrayList();
+
+    public List<Interceptor> getInterceptors() {
+        return interceptors;
+    }
+
+    public void addInterceptor(Interceptor interceptor) {
+        interceptors.add(interceptor);
+    }
 }

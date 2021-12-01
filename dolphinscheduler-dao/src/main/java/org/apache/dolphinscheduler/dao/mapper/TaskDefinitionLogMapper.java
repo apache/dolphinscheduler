@@ -25,6 +25,9 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +35,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * task definition log mapper interface
  */
+@CacheConfig(cacheNames = "taskDefinition")
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
@@ -48,6 +52,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version version
      * @return task definition log
      */
+    @Cacheable(sync = true, key = "#taskCode + '_' + #taskDefinitionVersion")
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,
                                                       @Param("version") int version);
 

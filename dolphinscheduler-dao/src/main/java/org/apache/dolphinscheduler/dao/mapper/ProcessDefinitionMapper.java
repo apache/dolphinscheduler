@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -28,13 +27,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * process definition mapper interface
  */
+@CacheConfig(cacheNames = "processDefinition")
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
@@ -43,6 +45,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return process definition
      */
+    @Cacheable(sync = true)
     ProcessDefinition queryByCode(@Param("code") long code);
 
     /**
