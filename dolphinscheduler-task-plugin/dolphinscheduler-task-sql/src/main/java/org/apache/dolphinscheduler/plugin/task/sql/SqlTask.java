@@ -289,6 +289,7 @@ public class SqlTask extends AbstractTaskExecutor {
         taskAlertInfo.setAlertGroupId(groupId);
         taskAlertInfo.setContent(content);
         taskAlertInfo.setTitle(title);
+        setTaskAlertInfo(taskAlertInfo);
     }
 
     /**
