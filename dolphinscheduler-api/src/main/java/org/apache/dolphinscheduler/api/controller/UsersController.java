@@ -235,6 +235,30 @@ public class UsersController extends BaseController {
     }
 
     /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCodes project code array
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantProjectByCode", notes = "GRANT_PROJECT_BY_CODE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "projectCodes", value = "PROJECT_CODES", required = true, type = "String")
+    })
+    @PostMapping(value = "/grant-project-by-code")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_PROJECT_ERROR)
+    @AccessLogAnnotation
+    public Result grantProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam(value = "userId") int userId,
+            @RequestParam(value = "projectCodes") String projectCodes) {
+        Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, userId, projectCodes);
+        return returnDataList(result);
+    }
+
+    /**
      * grant resource
      *
      * @param loginUser login user
