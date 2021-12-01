@@ -173,20 +173,17 @@
     },
     watch: {},
     created () {
-      let pluginInstanceParams = []
       if (this.item) {
         this.instanceName = this.item.instanceName
         this.pluginDefineId = this.item.pluginDefineId
-        JSON.parse(this.item.pluginInstanceParams).forEach(item => {
+        this.rule = JSON.parse(this.item.pluginInstanceParams).map(item => {
           if (item.title.indexOf('$t') !== -1) {
             item.title = this.$t(item.field)
           }
-          pluginInstanceParams.push(item)
+          item.props = item.props || {}
+          return item
         })
-        this.rule = pluginInstanceParams
       }
-    },
-    mounted () {
     },
     components: { mPopover, mListBoxF }
   }
