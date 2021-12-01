@@ -404,6 +404,7 @@
       buildGraphJSON (tasks, locations, connects) {
         const nodes = []
         const edges = []
+        if (!locations) { locations = [] }
         tasks.forEach((task) => {
           const location = locations.find((l) => l.taskCode === task.code) || {}
           const node = this.$refs.canvas.genNodeJSON(
@@ -488,6 +489,10 @@
         const connects = this.connects
         const json = this.buildGraphJSON(tasks, locations, connects)
         this.$refs.canvas.fromJSON(json)
+        // Auto format
+        if (!locations) {
+          this.$refs.canvas.format()
+        }
       },
       /**
        * Return to the previous process

@@ -18,6 +18,16 @@
 import _ from 'lodash'
 import io from '@/module/io'
 
+// Avoid passing in illegal values when users directly call third-party interfaces
+const convertLocations = (locationStr) => {
+  let locations = null
+  if (!locationStr) return locations
+  try {
+    locations = JSON.parse(locationStr)
+  } catch (error) {}
+  return Array.isArray(locations) ? locations : null
+}
+
 export default {
   /**
    *  Task status acquisition
@@ -140,7 +150,7 @@ export default {
         // taskRelationJson
         state.connects = res.data.processTaskRelationList
         // locations
-        state.locations = JSON.parse(res.data.processDefinition.locations)
+        state.locations = convertLocations(res.data.processDefinition.locations)
         // global params
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
@@ -240,7 +250,7 @@ export default {
         // connects
         state.connects = processTaskRelationList
         // locations
-        state.locations = JSON.parse(processDefinition.locations)
+        state.locations = convertLocations(processDefinition.locations)
         // global params
         state.globalParams = processDefinition.globalParamList
         // timeout

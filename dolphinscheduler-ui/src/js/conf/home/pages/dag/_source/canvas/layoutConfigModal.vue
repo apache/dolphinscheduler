@@ -63,18 +63,20 @@
     DAGRE: 'dagre'
   }
 
+  export const DEFAULT_LAYOUT_CONFIG = {
+    cols: 0,
+    nodesep: 50,
+    padding: 50,
+    ranksep: 50,
+    rows: 0,
+    type: LAYOUT_TYPE.DAGRE
+  }
+
   export default {
     data () {
       return {
         visible: false,
-        form: {
-          type: LAYOUT_TYPE.DAGRE,
-          rows: 0,
-          cols: 0,
-          padding: 50,
-          ranksep: 50,
-          nodesep: 50
-        },
+        form: { ...DEFAULT_LAYOUT_CONFIG },
         LAYOUT_TYPE
       }
     },
