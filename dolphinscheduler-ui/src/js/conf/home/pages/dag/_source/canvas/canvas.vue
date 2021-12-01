@@ -50,7 +50,7 @@
   import { Graph, DataUri } from '@antv/x6'
   import dagTaskbar from './taskbar.vue'
   import contextMenu from './contextMenu.vue'
-  import layoutConfigModal, { LAYOUT_TYPE } from './layoutConfigModal.vue'
+  import layoutConfigModal, { LAYOUT_TYPE, DEFAULT_LAYOUT_CONFIG } from './layoutConfigModal.vue'
   import {
     NODE,
     EDGE,
@@ -430,6 +430,9 @@
        * @desc Auto layout use @antv/layout
        */
       format (layoutConfig) {
+        if (!layoutConfig) {
+          layoutConfig = DEFAULT_LAYOUT_CONFIG
+        }
         this.graph.cleanSelection()
 
         let layoutFunc = null
