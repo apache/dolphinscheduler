@@ -132,7 +132,7 @@
             this.strategy = [o.timeout.strategy]
           }
         } else {
-          this.strategy = []
+          this.strategy = [StrategyMap.WARN]
         }
         this.interval = o.timeout.interval || null
       }
