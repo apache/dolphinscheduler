@@ -93,7 +93,7 @@ public class TaskGroupServiceTest {
 
     private TaskGroup getTaskGroup() {
         TaskGroup taskGroup = new TaskGroup(taskGroupName, taskGroupDesc,
-            100, 1);
+            100, 1,1);
         return taskGroup;
     }
 
@@ -144,7 +144,7 @@ public class TaskGroupServiceTest {
 
         User loginUser = getLoginUser();
         TaskGroup taskGroup = getTaskGroup();
-        taskGroup.setStatus(Flag.NO.getCode());
+        taskGroup.setStatus(Flag.YES.getCode());
         // Task group status error
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         Map<String, Object> result = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);

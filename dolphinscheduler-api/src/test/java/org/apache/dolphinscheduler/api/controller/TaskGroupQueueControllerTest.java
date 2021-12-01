@@ -48,11 +48,11 @@ public class TaskGroupQueueControllerTest extends AbstractControllerTest {
         paramsMap.add("groupId", "1");
         paramsMap.add("pageNo", "1");
         paramsMap.add("pageSize", "10");
-        MvcResult mvcResult = mockMvc.perform(get("/task-group-queue/query-list-by-group-id")
+        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-group-id")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

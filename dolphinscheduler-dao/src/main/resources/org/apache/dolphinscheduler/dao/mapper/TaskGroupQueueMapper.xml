@@ -45,9 +45,6 @@
             <if test="groupId != 0">
                 and group_id = #{groupId}
             </if>
-            <if test="processId != 0">
-                and process_id = #{processId}
-            </if>
         </where>
     </select>
 

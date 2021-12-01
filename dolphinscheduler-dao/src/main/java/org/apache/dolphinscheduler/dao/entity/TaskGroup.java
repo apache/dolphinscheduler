@@ -68,11 +68,12 @@ public class TaskGroup implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    public TaskGroup(String name, String description, Integer groupSize, Integer userId) {
+    public TaskGroup(String name, String description, int groupSize, int userId,int status) {
         this.name = name;
         this.description = description;
         this.groupSize = groupSize;
         this.userId = userId;
+        this.status = status;
         init();
 
     }

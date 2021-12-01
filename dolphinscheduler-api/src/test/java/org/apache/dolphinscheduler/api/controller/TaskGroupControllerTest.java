@@ -53,7 +53,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -71,7 +71,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -89,7 +89,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -110,7 +110,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -126,7 +126,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result1 = JSONUtils.parseObject(mvcResult1.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result1 != null && result1.isFailed());
@@ -146,7 +146,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
@@ -164,7 +164,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
@@ -178,7 +178,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result1 = JSONUtils.parseObject(mvcResult1.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult1.getResponse().getContentAsString());
@@ -191,12 +191,13 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
+        paramsMap.add("taskId", "1");
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/wake-task-compulsively")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());

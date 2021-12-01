@@ -90,7 +90,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = new TaskGroup(name, description,
-                groupSize, loginUser.getId());
+                groupSize, loginUser.getId(),Flag.YES.getCode());
         int insert = taskGroupMapper.insert(taskGroup);
         logger.info("insert result:{}", insert);
         putMsg(result, Status.SUCCESS);
@@ -114,7 +114,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        if (taskGroup.getStatus() != Flag.NO.getCode()) {
+        if (taskGroup.getStatus() != Flag.YES.getCode()) {
             putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
             return result;
         }
