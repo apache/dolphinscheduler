@@ -212,27 +212,20 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         User user = usersService.queryUser(userName);
         Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
         long projectCode = project.getCode();
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, name);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
-
+        ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, name);
         long processDefinitionCode;
         // create or update process definition
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
+        if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
                 locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
-        } else if (verifyStatus == Status.SUCCESS) {
+        } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
                 locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
-            ProcessDefinition processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
+            processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
-        } else {
-            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
-            LOGGER.error(msg);
-            throw new RuntimeException(msg);
         }
 
         // Fresh process definition schedule 
@@ -241,6 +234,25 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         }
         processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
         return processDefinitionCode;
+    }
+
+    private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefineName) {
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefineName);
+        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+
+        ProcessDefinition processDefinition = null;
+        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
+            processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefineName);
+            long processDefinitionCode = processDefinition.getCode();
+            // make sure process definition offline which could edit
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+        } else if (verifyStatus != Status.SUCCESS) {
+            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
+            LOGGER.error(msg);
+            throw new RuntimeException(msg);
+        }
+
+        return processDefinition;
     }
 
     /**
@@ -405,16 +417,11 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         User user = usersService.queryUser(userName);
         Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
         long projectCode = project.getCode();
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
-
-        long processDefinitionCode;
+        ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, processDefinitionName);
         // get process definition info
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
-            processDefinitionCode = processDefinition.getCode();
+        if (processDefinition != null) {
             // make sure process definition online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(), ReleaseState.ONLINE);
             result.put("id", processDefinition.getId());
             result.put("name", processDefinition.getName());
             result.put("code", processDefinition.getCode());

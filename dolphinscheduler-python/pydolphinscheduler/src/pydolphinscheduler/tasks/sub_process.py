@@ -17,9 +17,10 @@
 
 """Task sub_process."""
 
-from typing import Dict, Optional
+from typing import Dict
 
-from pydolphinscheduler.constants import ProcessDefinitionDefault, TaskType
+from pydolphinscheduler.constants import TaskType
+from pydolphinscheduler.core.process_definition import ProcessDefinitionContext
 from pydolphinscheduler.core.task import Task, TaskParams
 from pydolphinscheduler.java_gateway import launch_gateway
 
@@ -35,17 +36,7 @@ class SubProcessTaskParams(TaskParams):
 class SubProcess(Task):
     """Task SubProcess object, declare behavior for SubProcess task to dolphinscheduler."""
 
-    def __init__(
-        self,
-        name: str,
-        process_definition_name: str,
-        user: Optional[str] = ProcessDefinitionDefault.USER,
-        project_name: Optional[str] = ProcessDefinitionDefault.PROJECT,
-        *args,
-        **kwargs
-    ):
-        self._user = user
-        self._project_name = project_name
+    def __init__(self, name: str, process_definition_name: str, *args, **kwargs):
         self._process_definition_name = process_definition_name
         self._process_definition = {}
         task_params = SubProcessTaskParams(
@@ -55,19 +46,20 @@ class SubProcess(Task):
 
     def get_process_definition_code(self) -> str:
         """Get process definition code, a wrapper for :func:`get_process_definition_info`."""
-        return self.get_process_definition_info(
-            self._user, self._project_name, self._process_definition_name
-        ).get("code")
+        return self.get_process_definition_info(self._process_definition_name).get(
+            "code"
+        )
 
-    def get_process_definition_info(
-        self, user: str, project_name: str, process_definition_name: str
-    ) -> Dict:
+    def get_process_definition_info(self, process_definition_name: str) -> Dict:
         """Get process definition info from java gateway, contains process definition id, name, code."""
         if self._process_definition:
             return self._process_definition
         else:
             gateway = launch_gateway()
+            process_definition = ProcessDefinitionContext.get()
             self._process_definition = gateway.entry_point.getProcessDefinitionInfo(
-                user, project_name, process_definition_name
+                process_definition.user.name,
+                process_definition.project.name,
+                process_definition_name,
             )
             return self._process_definition
