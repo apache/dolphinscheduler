@@ -91,11 +91,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * create process task relation
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode processDefinitionCode
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
      * @return create result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
@@ -189,11 +189,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * move task to other processDefinition
      *
-     * @param loginUser login user info
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param loginUser                   login user info
+     * @param projectCode                 project code
+     * @param processDefinitionCode       process definition code
      * @param targetProcessDefinitionCode target process definition code
-     * @param taskCode the current task code (the post task code)
+     * @param taskCode                    the current task code (the post task code)
      * @return move result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
@@ -325,9 +325,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         List<ProcessTaskRelation> downstreamList = processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, taskCode, 0L);
         if (CollectionUtils.isNotEmpty(downstreamList)) {
             Set<Long> postTaskCodes = downstreamList
-                    .stream()
-                    .map(ProcessTaskRelation::getPostTaskCode)
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(ProcessTaskRelation::getPostTaskCode)
+                .collect(Collectors.toSet());
             putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(postTaskCodes, ","));
             return result;
         }
@@ -345,8 +345,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             throw new ServiceException(Status.DELETE_TASK_PROCESS_RELATION_ERROR);
         }
         if (TaskType.CONDITIONS.getDesc().equals(taskDefinition.getTaskType())
-                || TaskType.DEPENDENT.getDesc().equals(taskDefinition.getTaskType())
-                || TaskType.SUB_PROCESS.getDesc().equals(taskDefinition.getTaskType())) {
+            || TaskType.DEPENDENT.getDesc().equals(taskDefinition.getTaskType())
+            || TaskType.SUB_PROCESS.getDesc().equals(taskDefinition.getTaskType())) {
             int deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
             if (0 == deleteTaskDefinition) {
                 putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
@@ -376,10 +376,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         if (StringUtils.isEmpty(preTaskCodes)) {
-            putMsg(result,Status.DATA_IS_NULL,"preTaskCodes");
+            putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
-        Status status = deleteUpstreamRelation(loginUser.getId(), projectCode, Lists.newArrayList(preTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).distinct().toArray(Long[]::new), taskCode);
+        Status status = deleteUpstreamRelation(loginUser.getId(), projectCode,
+            Lists.newArrayList(preTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).distinct().toArray(Long[]::new), taskCode);
         if (status != Status.SUCCESS) {
             putMsg(result, status);
         }
@@ -405,7 +406,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         if (StringUtils.isEmpty(postTaskCodes)) {
-            putMsg(result,Status.DATA_IS_NULL,"postTaskCodes");
+            putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode);
@@ -416,7 +417,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Set<Long> postTaskCodesSet = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
         int delete = 0;
         int deleteLog = 0;
-        for(long postTaskCode : postTaskCodesSet) {
+        for (long postTaskCode : postTaskCodesSet) {
             ProcessTaskRelationLog processTaskRelationLog = taskRelationLogMap.get(postTaskCode);
             if (processTaskRelationLog != null) {
                 delete += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
@@ -451,15 +452,15 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
-                    .stream()
-                    .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = buildTaskDefinition();
-                        taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinition.setCode(processTaskRelation.getPreTaskCode());
-                        taskDefinition.setVersion(processTaskRelation.getPreTaskVersion());
-                        return taskDefinition;
-                    })
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(processTaskRelation -> {
+                    TaskDefinition taskDefinition = buildTaskDefinition();
+                    taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
+                    taskDefinition.setCode(processTaskRelation.getPreTaskCode());
+                    taskDefinition.setVersion(processTaskRelation.getPreTaskVersion());
+                    return taskDefinition;
+                })
+                .collect(Collectors.toSet());
             taskDefinitionLogList = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         }
         result.put(Constants.DATA_LIST, taskDefinitionLogList);
@@ -487,15 +488,15 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
             Set<TaskDefinition> taskDefinitions = processTaskRelationList
-                    .stream()
-                    .map(processTaskRelation -> {
-                        TaskDefinition taskDefinition = buildTaskDefinition();
-                        taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
-                        taskDefinition.setCode(processTaskRelation.getPostTaskCode());
-                        taskDefinition.setVersion(processTaskRelation.getPostTaskVersion());
-                        return taskDefinition;
-                    })
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(processTaskRelation -> {
+                    TaskDefinition taskDefinition = buildTaskDefinition();
+                    taskDefinition.setProjectCode(processTaskRelation.getProjectCode());
+                    taskDefinition.setCode(processTaskRelation.getPostTaskCode());
+                    taskDefinition.setVersion(processTaskRelation.getPostTaskVersion());
+                    return taskDefinition;
+                })
+                .collect(Collectors.toSet());
             taskDefinitionLogList = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         }
         result.put(Constants.DATA_LIST, taskDefinitionLogList);
@@ -509,8 +510,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      * @param loginUser             login user
      * @param projectCode           project code
      * @param processDefinitionCode process definition code
-     * @param preTaskCode pre task code
-     * @param postTaskCode post task code
+     * @param preTaskCode           pre task code
+     * @param postTaskCode          post task code
      * @return delete result code
      */
     @Override
@@ -532,7 +533,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         ProcessTaskRelation processTaskRelation = processTaskRelationList.get(0);
         int upstreamCount = processTaskRelationMapper.countByCode(projectCode, processTaskRelation.getProcessDefinitionCode(),
-                0L, processTaskRelation.getPostTaskCode());
+            0L, processTaskRelation.getPostTaskCode());
 
         if (upstreamCount == 0) {
             putMsg(result, Status.DATA_IS_NULL, "upstreamCount");
@@ -572,8 +573,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 }
                 TaskDefinition that = (TaskDefinition) o;
                 return getCode() == that.getCode()
-                        && getVersion() == that.getVersion()
-                        && getProjectCode() == that.getProjectCode();
+                    && getVersion() == that.getVersion()
+                    && getProjectCode() == that.getProjectCode();
             }
 
             @Override
@@ -606,10 +607,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             upstreamLogList.add(processTaskRelationLog);
         }
         Map<Long, List<ProcessTaskRelationLog>> processTaskRelationListGroupByProcessDefinitionCode = upstreamLogList.stream()
-                .collect(Collectors.groupingBy(ProcessTaskRelationLog::getProcessDefinitionCode));
+            .collect(Collectors.groupingBy(ProcessTaskRelationLog::getProcessDefinitionCode));
         // count upstream relation group by process definition code
         List<Map<String, Long>> countListGroupByProcessDefinitionCode = processTaskRelationMapper
-                .countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, processTaskRelationListGroupByProcessDefinitionCode.keySet().toArray(new Long[0]), taskCode);
+            .countUpstreamByCodeGroupByProcessDefinitionCode(projectCode, processTaskRelationListGroupByProcessDefinitionCode.keySet().toArray(new Long[0]), taskCode);
 
         List<ProcessTaskRelationLog> deletes = new ArrayList<>();
         List<ProcessTaskRelationLog> updates = new ArrayList<>();
