@@ -20,13 +20,7 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.LoggerFactory;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(LoggerFactory.class)
 public class TaskParametersUtilsTest {
 
     @Test

@@ -38,21 +38,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
+@Transactional
+@Rollback
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class LoginHandlerInterceptorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptorTest.class);
 
     @Autowired
     LoginHandlerInterceptor interceptor;
-    @MockBean
+    @MockBean(name = "authenticator")
     private Authenticator authenticator;
-    @MockBean
+    @MockBean(name = "userMapper")
     private UserMapper    userMapper;
 
     @Test

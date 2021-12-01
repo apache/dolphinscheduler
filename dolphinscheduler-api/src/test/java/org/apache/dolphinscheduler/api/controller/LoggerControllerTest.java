@@ -40,8 +40,7 @@ import org.springframework.util.MultiValueMap;
  */
 @Ignore
 public class LoggerControllerTest extends AbstractControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(LoggerControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoggerControllerTest.class);
 
     @Test
     public void testQueryLog() throws Exception {
@@ -55,7 +54,7 @@ public class LoggerControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -73,7 +72,7 @@ public class LoggerControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                /*.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))*/
+                /*.andExpect(content().contentType(MediaType.APPLICATION_JSON))*/
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());

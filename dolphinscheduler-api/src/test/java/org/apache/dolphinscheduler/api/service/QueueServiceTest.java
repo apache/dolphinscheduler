@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -59,6 +60,9 @@ public class QueueServiceTest {
 
     @InjectMocks
     private QueueServiceImpl queueService;
+
+    @Mock
+    private CacheNotifyService cacheNotifyService;
 
     @Mock
     private QueueMapper queueMapper;
