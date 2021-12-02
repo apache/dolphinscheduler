@@ -161,9 +161,6 @@ public class ProcessService {
     private ProcessDefinitionMapper processDefineMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
-
-    @Autowired
     private ProcessDefinitionLogMapper processDefineLogMapper;
 
     @Autowired
@@ -460,7 +457,7 @@ public class ProcessService {
     public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null || processDefinition.getVersion() != version) {
-            processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
+            processDefinition = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
             if (processDefinition != null) {
                 processDefinition.setId(0);
             }
