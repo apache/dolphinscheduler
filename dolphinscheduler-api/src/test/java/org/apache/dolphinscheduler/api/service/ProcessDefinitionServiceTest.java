@@ -426,6 +426,13 @@ public class ProcessDefinitionServiceTest {
         // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
+        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        processTaskRelation.setProjectCode(projectCode);
+        processTaskRelation.setProcessDefinitionCode(46L);
+        processTaskRelation.setPostTaskCode(123L);
+        processTaskRelationList.add(processTaskRelation);
+        Mockito.when(processService.findRelationByCode(projectCode, 46L)).thenReturn(processTaskRelationList);
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));

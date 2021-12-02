@@ -141,7 +141,7 @@ public class ProcessTaskRelationController extends BaseController {
     }
 
     /**
-     * delete process task relation
+     * delete process task relation (delete task from workflow)
      *
      * @param loginUser login user
      * @param projectCode project code
