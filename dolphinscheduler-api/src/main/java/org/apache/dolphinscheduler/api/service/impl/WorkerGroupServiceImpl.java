@@ -287,8 +287,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
                 String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
-                wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
+                wg.setCreateTime(new Date(Long.valueOf(registeredValue.split(Constants.COMMA)[6])));
+                wg.setUpdateTime(new Date(Long.valueOf(registeredValue.split(Constants.COMMA)[7])));
                 wg.setSystemDefault(true);
             }
             workerGroups.add(wg);
