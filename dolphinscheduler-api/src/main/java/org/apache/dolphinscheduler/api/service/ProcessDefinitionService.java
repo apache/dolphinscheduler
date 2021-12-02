@@ -352,8 +352,7 @@ public interface ProcessDefinitionService {
                                                      String globalParams,
                                                      int timeout,
                                                      String tenantCode,
-                                                     String scheduleJson,
-                                                     ProcessExecutionTypeEnum executionType);
+                                                     String scheduleJson);
 
     /**
      * update process definition basic info
@@ -367,7 +366,6 @@ public interface ProcessDefinitionService {
      * @param timeout timeout
      * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
-     * @param executionType executionType
      * @return update result code
      */
     Map<String, Object> updateProcessDefinitionBasicInfo(User loginUser,
@@ -378,8 +376,7 @@ public interface ProcessDefinitionService {
                                                          String globalParams,
                                                          int timeout,
                                                          String tenantCode,
-                                                         String scheduleJson,
-                                                         ProcessExecutionTypeEnum executionType);
+                                                         String scheduleJson);
 
     /**
      * release process definition and schedule

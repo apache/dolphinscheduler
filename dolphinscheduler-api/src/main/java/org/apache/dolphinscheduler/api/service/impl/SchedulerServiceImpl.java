@@ -364,7 +364,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new ServiceException(result.get(Constants.MSG).toString(), e);
+            throw new ServiceException(result.get(Constants.MSG).toString());
         }
 
         putMsg(result, Status.SUCCESS);
@@ -442,7 +442,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void setSchedule(int projectId, Schedule schedule) {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
 
-        QuartzExecutors.getInstance().addJob(scheduler, ProcessScheduleJob.class, projectId, schedule);
+        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, projectId, schedule);
     }
 
     /**

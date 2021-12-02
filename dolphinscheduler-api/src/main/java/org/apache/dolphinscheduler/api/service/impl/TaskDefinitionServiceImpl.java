@@ -471,7 +471,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < genNum; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode()));
+                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateException e) {
             logger.error("Task code get error, ", e);

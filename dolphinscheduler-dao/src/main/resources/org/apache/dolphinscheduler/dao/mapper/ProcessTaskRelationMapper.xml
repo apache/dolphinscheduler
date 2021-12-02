@@ -121,19 +121,6 @@
         group by process_definition_code
     </select>
 
-    <update id="batchUpdateProcessTaskRelationPreTask" parameterType="java.util.List">
-        <foreach collection="processTaskRelationList" item="processTaskRelation" index="index" open="" close="" separator=";">
-            update t_ds_process_task_relation
-            <set>
-                pre_task_code=#{processTaskRelation.preTaskCode},
-                pre_task_version=#{processTaskRelation.preTaskVersion}
-            </set>
-            <where>
-                WHERE id = #{processTaskRelation.id}
-            </where>
-        </foreach>
-    </update>
-
     <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>

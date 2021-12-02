@@ -727,10 +727,9 @@ public class ProcessDefinitionController extends BaseController {
                                                @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                                @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                                @RequestParam(value = "tenantCode", required = true) String tenantCode,
-                                               @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
-                                               @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
+                                               @RequestParam(value = "scheduleJson", required = false) String scheduleJson) {
         return returnDataList(processDefinitionService.createEmptyProcessDefinition(loginUser, projectCode, name, description, globalParams,
-            timeout, tenantCode, scheduleJson, executionType));
+            timeout, tenantCode, scheduleJson));
     }
 
     /**
@@ -745,7 +744,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param timeout timeout
      * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
-     * @param executionType executionType
      * @param releaseState releaseState
      * @return update result code
      */
@@ -769,10 +767,9 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                                    @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                    @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
-                                                   @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                                    @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
         Map<String, Object> result = processDefinitionService.updateProcessDefinitionBasicInfo(loginUser, projectCode, name, code, description, globalParams,
-            timeout, tenantCode, scheduleJson, executionType);
+            timeout, tenantCode, scheduleJson);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
