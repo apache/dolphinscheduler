@@ -257,7 +257,7 @@ export default {
   'prop(required)': 'prop(必填)',
   'value(optional)': 'value(选填)',
   'value(required)': 'value(必填)',
-  'prop is empty': 'prop不能为空',
+  'prop is empty': '自定义参数prop不能为空',
   'value is empty': 'value不能为空',
   'prop is repeat': 'prop中有重复',
   'Start Time': '开始时间',

@@ -951,10 +951,15 @@
        * verification
        */
       _verification () {
+        // localParams Subcomponent verification
+        if (!this.$refs.refLocalParams._verifProp()) {
+          return false
+        }
         let sqoopParams = {
           jobType: this.jobType,
           localParams: this.localParams
         }
+
         if (this.jobType === 'CUSTOM') {
           if (!shellEditor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter Custom Shell(required)')}`)
