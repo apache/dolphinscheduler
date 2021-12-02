@@ -236,16 +236,19 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         return processDefinitionCode;
     }
 
-    private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefineName) {
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefineName);
+    /**
+     * get process definition
+     * @param user                  user who create or update schedule
+     * @param projectCode           project which process definition belongs to
+     * @param processDefinitionName process definition name
+     */
+    private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;
         if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefineName);
-            long processDefinitionCode = processDefinition.getCode();
-            // make sure process definition offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+            processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         } else if (verifyStatus != Status.SUCCESS) {
             String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
             LOGGER.error(msg);
