@@ -241,7 +241,7 @@ public class WorkflowExecuteThread implements Runnable {
     }
 
     private void handleEvents() {
-        while (this.stateEvents.size() > 0) {
+        while (!this.stateEvents.isEmpty()) {
 
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
