@@ -658,7 +658,7 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   Kinship: 'Workflow relationship',
   Reset: 'Reset',
-  KinshipStateActive: 'Active',
+  KinshipStateActive: 'Current selection',
   KinshipState1: 'Online',
   KinshipState0: 'Workflow is not online',
   KinshipState10: 'Scheduling is not online',
