@@ -79,11 +79,6 @@ public class SpringConnectionFactory {
     }
 
     @Bean
-    public SqlSession sqlSession(SqlSessionFactory sqlSessionFactory) {
-        return new SqlSessionTemplate(sqlSessionFactory);
-    }
-
-    @Bean
     public DatabaseIdProvider databaseIdProvider() {
         DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
         Properties properties = new Properties();

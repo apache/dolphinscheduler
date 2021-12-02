@@ -105,16 +105,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * query task relation by codes
      *
-     * @param projectCode   projectCode
-     * @param taskCode      taskCode
-     * @param postTaskCodes postTaskCodes list
-     * @return ProcessTaskRelation
-     */
-    List<ProcessTaskRelation> queryDownstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("postTaskCodes") Long[] postTaskCodes);
-
-    /**
-     * query task relation by codes
-     *
      * @param projectCode  projectCode
      * @param taskCode     taskCode
      * @param preTaskCodes preTaskCode list
@@ -130,8 +120,9 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processDefinitionCodes    processDefinitionCodes
      * @return upstream count list group by process definition code
      */
-    List<Map<Long, Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
-                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode") long taskCode);
+    List<Map<String, Long>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
+                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes,
+                                                                             @Param("taskCode") long taskCode);
 
     /**
      * batch update process task relation pre task
@@ -176,4 +167,5 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
                     @Param("processDefinitionCode") long processDefinitionCode,
                     @Param("preTaskCode") long preTaskCode,
                     @Param("postTaskCode") long postTaskCode);
+
 }

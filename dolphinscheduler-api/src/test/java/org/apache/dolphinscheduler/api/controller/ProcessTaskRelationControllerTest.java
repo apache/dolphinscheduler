@@ -42,8 +42,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * process task relation controller test
  */
 public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
-
-    @MockBean
+    @MockBean(name = "processTaskRelationServiceImpl")
     private ProcessTaskRelationService processTaskRelationService;
 
     @Test
