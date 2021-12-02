@@ -94,8 +94,6 @@ public class StateWheelExecuteThread extends Thread {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
                 if (0 >= timeRemain && processTimeout(taskInstance)) {
                     taskInstanceCheckList.remove(taskInstance.getId());
-                } else {
-                    processDependCheck(taskInstance);
                 }
             }
             if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
