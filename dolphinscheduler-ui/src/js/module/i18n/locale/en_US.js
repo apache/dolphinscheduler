@@ -676,7 +676,7 @@ export default {
   ms: 'ms',
   'Please Enter Url': 'Please Enter Url eg. 127.0.0.1:7077',
   Master: 'Master',
-  'Please select the waterdrop resources': 'Please select the waterdrop resources',
+  'Please select the seatunnel resources': 'Please select the seatunnel resources',
   zkDirectory: 'zkDirectory',
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',

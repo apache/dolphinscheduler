@@ -408,15 +408,15 @@
             :nodeData="nodeData"
             :postTasks="postTasks"
           ></m-switch>
-          <!-- waterdrop node -->
-          <m-waterdrop
-            v-if="nodeData.taskType === 'WATERDROP'"
+          <!-- seatunnel node -->
+          <m-seatunnel
+            v-if="nodeData.taskType === 'SEATUNNEL'"
             @on-params="_onParams"
             @on-cache-params="_onCacheParams"
-            ref="WATERDROP"
+            ref="SEATUNNEL"
             :backfill-item="backfillItem"
           >
-          </m-waterdrop>
+          </m-seatunnel>
         </div>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
@@ -454,7 +454,7 @@
   import i18n from '@/module/i18n'
   import mListBox from './tasks/_source/listBox'
   import mShell from './tasks/shell'
-  import mWaterdrop from './tasks/waterdrop'
+  import mSeatunnel from './tasks/seatunnel'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -1023,7 +1023,7 @@
       mListBox,
       mMr,
       mShell,
-      mWaterdrop,
+      mSeatunnel,
       mSubProcess,
       mProcedure,
       mSql,

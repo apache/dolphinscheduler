@@ -676,7 +676,7 @@ export default {
   ms: '毫秒',
   'Please Enter Url': '请直接填写地址,例如:127.0.0.1:7077',
   Master: 'Master',
-  'Please select the waterdrop resources': '请选择waterdrop配置文件',
+  'Please select the seatunnel resources': '请选择 seatunnel 配置文件',
   zkDirectory: 'zk注册目录',
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',

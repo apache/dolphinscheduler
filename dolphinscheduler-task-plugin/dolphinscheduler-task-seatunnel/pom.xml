@@ -19,28 +19,30 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dolphinscheduler-task-plugin</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dolphinscheduler-task-seatunnel</artifactId>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>dolphinscheduler-task-api</module>
-        <module>dolphinscheduler-task-shell</module>
-        <module>dolphinscheduler-task-datax</module>
-        <module>dolphinscheduler-task-flink</module>
-        <module>dolphinscheduler-task-http</module>
-        <module>dolphinscheduler-task-mr</module>
-        <module>dolphinscheduler-task-python</module>
-        <module>dolphinscheduler-task-spark</module>
-        <module>dolphinscheduler-task-sql</module>
-        <module>dolphinscheduler-task-sqoop</module>
-        <module>dolphinscheduler-task-procedure</module>
-        <module>dolphinscheduler-task-pigeon</module>
-        <module>dolphinscheduler-task-seatunnel</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+    </dependencies>
 </project>

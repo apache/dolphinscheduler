@@ -330,8 +330,8 @@ const tasksType = {
     desc: 'SWITCH',
     color: '#E46F13'
   },
-  WATERDROP: {
-    desc: 'WATERDROP',
+  SEATUNNEL: {
+    desc: 'SEATUNNEL',
     color: '#646465'
   }
 }
