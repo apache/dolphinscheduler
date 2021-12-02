@@ -414,6 +414,7 @@ CREATE TABLE `t_ds_process_definition` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out, unit: minute',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
@@ -443,6 +444,7 @@ CREATE TABLE `t_ds_process_definition_log` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -493,7 +495,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
+  `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
@@ -593,6 +595,7 @@ CREATE TABLE `t_ds_process_instance` (
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `var_pool` longtext COMMENT 'var_pool',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
+  `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
@@ -937,7 +940,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version` VALUES ('1', '2.0.0');
+INSERT INTO `t_ds_version` VALUES ('1', '2.0.2');
 
 
 -- ----------------------------
