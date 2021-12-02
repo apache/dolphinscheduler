@@ -16,6 +16,7 @@
  */
 import _ from 'lodash'
 import i18n from '@/module/i18n/index.js'
+import dayjs from 'dayjs'
 
 const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus, code }, sourceWorkFlowCode) => {
   if (code === sourceWorkFlowCode) return categoryDic.active
@@ -73,8 +74,8 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
 
         return `
           ${i18n.$t('workflowName')}：${name}<br/>
-          ${i18n.$t('scheduleStartTime')}：${scheduleStartTime}<br/>
-          ${i18n.$t('scheduleEndTime')}：${scheduleEndTime}<br/>
+          ${i18n.$t('scheduleStartTime')}：${dayjs(scheduleStartTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
+          ${i18n.$t('scheduleEndTime')}：${dayjs(scheduleEndTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
           ${i18n.$t('crontabExpression')}：${crontab}<br/>
           ${i18n.$t('workflowPublishStatus')}：${publishStatusFormat(workFlowPublishStatus)}<br/>
           ${i18n.$t('schedulePublishStatus')}：${publishStatusFormat(schedulePublishStatus)}<br/>
