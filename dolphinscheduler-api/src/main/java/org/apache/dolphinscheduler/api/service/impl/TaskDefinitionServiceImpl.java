@@ -32,10 +32,12 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -88,6 +90,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Autowired
     private ProcessService processService;
@@ -255,7 +260,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setId(taskDefinition.getId());
         taskDefinitionToUpdate.setProjectCode(projectCode);
         taskDefinitionToUpdate.setUserId(taskDefinition.getUserId());
-        taskDefinitionToUpdate.setVersion(version + 1);
+        taskDefinitionToUpdate.setVersion(++version);
         taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
         taskDefinitionToUpdate.setResourceIds(processService.getResourceIds(taskDefinitionToUpdate));
         taskDefinitionToUpdate.setUpdateTime(now);
@@ -267,6 +272,36 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if ((update & insert) != 1) {
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
+        }
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (!processTaskRelationList.isEmpty()) {
+            List<ProcessTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
+            int delete = 0;
+            int deleteLog = 0;
+            for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+                ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+                delete += processTaskRelationMapper.deleteRelation(processTaskRelationLog);
+                deleteLog += processTaskRelationLogMapper.deleteRelation(processTaskRelationLog);
+                if (processTaskRelationLog.getPreTaskCode() == taskCode) {
+                    processTaskRelationLog.setPreTaskVersion(version);
+                }
+                if (processTaskRelationLog.getPostTaskCode() == taskCode) {
+                    processTaskRelationLog.setPostTaskVersion(version);
+                }
+                processTaskRelationLog.setOperator(loginUser.getId());
+                processTaskRelationLog.setOperateTime(now);
+                processTaskRelationLog.setUpdateTime(now);
+                processTaskRelationLogList.add(processTaskRelationLog);
+            }
+            if ((delete & deleteLog) == 0) {
+                throw new ServiceException(Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            } else {
+                int insertRelation = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+                int insertRelationLog = processTaskRelationLogMapper.batchInsert(processTaskRelationLogList);
+                if ((insertRelation & insertRelationLog) == 0) {
+                    throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+                }
+            }
         }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS, update);

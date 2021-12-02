@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -50,7 +50,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
 
@@ -74,7 +73,6 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
-    ;
 
     @Test
     public void createTaskDefinition() {
@@ -166,6 +164,7 @@ public class TaskDefinitionServiceImplTest {
     @Test
     public void deleteTaskDefinitionByCode() {
         long projectCode = 1L;
+        long taskCode = 1L;
 
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
@@ -177,13 +176,14 @@ public class TaskDefinitionServiceImplTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
-        Mockito.when(processTaskRelationMapper.queryByTaskCode(Mockito.anyLong()))
+        Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(getTaskDefinition());
+        Mockito.when(processTaskRelationMapper.queryDownstreamByTaskCode(taskCode))
             .thenReturn(new ArrayList<>());
-        Mockito.when(taskDefinitionMapper.deleteByCode(Mockito.anyLong()))
+        Mockito.when(taskDefinitionMapper.deleteByCode(taskCode))
             .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-            .deleteTaskDefinitionByCode(loginUser, projectCode, Mockito.anyLong());
+            .deleteTaskDefinitionByCode(loginUser, projectCode, taskCode);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -239,6 +239,15 @@ public class TaskDefinitionServiceImplTest {
         project.setName("test");
         project.setUserId(1);
         return project;
+    }
+
+    private TaskDefinition getTaskDefinition() {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(1L);
+        taskDefinition.setCode(1L);
+        taskDefinition.setVersion(1);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        return taskDefinition;
     }
 
     @Test
@@ -304,10 +313,6 @@ public class TaskDefinitionServiceImplTest {
         // process definition online, resource exist
         Map<String, Object> onlineTaskResult = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, taskCode, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineTaskResult.get(Constants.STATUS));
-
-        // process definition online, resource does not exist
-        Map<String, Object> onlineResResult = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, taskCode, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, onlineResResult.get(Constants.STATUS));
 
         // release error code
         Map<String, Object> failResult = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, taskCode, ReleaseState.getEnum(2));
