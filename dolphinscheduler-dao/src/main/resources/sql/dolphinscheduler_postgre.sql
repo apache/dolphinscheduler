@@ -331,6 +331,7 @@ CREATE TABLE t_ds_process_definition (
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int DEFAULT '-1' ,
+  execution_type int DEFAULT '0',
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id) ,
@@ -355,6 +356,7 @@ CREATE TABLE t_ds_process_definition_log (
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int DEFAULT '-1' ,
+  execution_type int DEFAULT '0',
   operator int DEFAULT NULL ,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -498,6 +500,7 @@ CREATE TABLE t_ds_process_instance (
   tenant_id int NOT NULL DEFAULT '-1' ,
   var_pool text ,
   dry_run int DEFAULT '0' ,
+  next_process_instance_id int DEFAULT '0',
   PRIMARY KEY (id)
 ) ;
 
@@ -923,7 +926,7 @@ INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('2.0.0');
+INSERT INTO t_ds_version(version) VALUES ('1.4.0');
 
 --
 -- Table structure for table t_ds_plugin_define
