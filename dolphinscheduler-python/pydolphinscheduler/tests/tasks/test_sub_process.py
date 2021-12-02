@@ -22,10 +22,12 @@ from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.sub_process import SubProcess, SubProcessTaskParams
 
-PROCESS_DEFINITION_NAME = "test-process-definition"
-PROCESS_DEFINITION_CODE = "3643589832320"
+TEST_SUB_PROCESS_DEFINITION_NAME = "sub-test-process-definition"
+TEST_SUB_PROCESS_DEFINITION_CODE = "3643589832320"
+TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
 
 @pytest.mark.parametrize(
@@ -50,7 +52,11 @@ def test_sub_process_task_params_attr_setter(name, value):
 @patch(
     "pydolphinscheduler.tasks.sub_process.SubProcess.get_process_definition_info",
     return_value=(
-        {"id": 1, "name": PROCESS_DEFINITION_NAME, "code": PROCESS_DEFINITION_CODE}
+        {
+            "id": 1,
+            "name": TEST_SUB_PROCESS_DEFINITION_NAME,
+            "code": TEST_SUB_PROCESS_DEFINITION_CODE,
+        }
     ),
 )
 def test_sub_process_to_dict(mock_process_definition):
@@ -68,7 +74,7 @@ def test_sub_process_to_dict(mock_process_definition):
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "processDefinitionCode": PROCESS_DEFINITION_CODE,
+            "processDefinitionCode": TEST_SUB_PROCESS_DEFINITION_CODE,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
@@ -86,5 +92,6 @@ def test_sub_process_to_dict(mock_process_definition):
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        sub_process = SubProcess(name, PROCESS_DEFINITION_NAME)
-        assert sub_process.to_dict() == expect
+        with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME):
+            sub_process = SubProcess(name, TEST_SUB_PROCESS_DEFINITION_NAME)
+            assert sub_process.to_dict() == expect
