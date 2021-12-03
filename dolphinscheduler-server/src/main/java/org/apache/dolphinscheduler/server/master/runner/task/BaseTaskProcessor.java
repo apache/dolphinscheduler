@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -62,6 +61,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
@@ -80,7 +80,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstance processInstance;
 
-    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    @Autowired
+    protected ProcessService processService;
 
     /**
      * pause task, common tasks donot need this.
@@ -107,7 +108,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     public void run() {
     }
 
-
     @Override
     public boolean action(TaskAction taskAction) {
 
@@ -119,7 +119,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             case TIMEOUT:
                 return timeout();
             default:
-                logger.error("unknown task action: {}", taskAction.toString());
+                logger.error("unknown task action: {}", taskAction);
 
         }
         return false;
@@ -299,7 +299,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             }
         }
     }
-
 
     /**
      * set SQL task relation
