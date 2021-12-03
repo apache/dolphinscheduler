@@ -72,6 +72,8 @@ public class CacheEvictAspect {
             if (method.getName().equalsIgnoreCase(UPDATE_BY_ID) && args.length == 1) {
                 Object updateObj = args[0];
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, updateObj).convert2Command());
+            } else if (!cacheEvict.key().isEmpty()) {
+                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, cacheEvict.key()).convert2Command());
             } else {
                 Object key = cacheKeyGenerator.generate(target, method, args);
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
