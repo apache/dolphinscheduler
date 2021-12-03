@@ -107,6 +107,7 @@ public class SchedulerServiceTest {
         Project project = getProject(projectName, projectCode);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectCode(projectCode);
 
         Schedule schedule = new Schedule();
         schedule.setId(1);
