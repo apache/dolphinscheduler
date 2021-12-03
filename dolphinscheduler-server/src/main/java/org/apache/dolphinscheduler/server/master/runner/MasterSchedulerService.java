@@ -219,7 +219,7 @@ public class MasterSchedulerService extends Thread {
                     , processAlertManager
                     , masterConfig
                     , taskTimeoutCheckList
-                    ,taskProcessorFactory);
+                    , taskProcessorFactory);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
             if (processInstance.getTimeout() > 0) {
