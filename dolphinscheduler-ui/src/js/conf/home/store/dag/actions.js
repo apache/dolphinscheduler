@@ -18,6 +18,16 @@
 import _ from 'lodash'
 import io from '@/module/io'
 
+// Avoid passing in illegal values when users directly call third-party interfaces
+const convertLocations = (locationStr) => {
+  let locations = null
+  if (!locationStr) return locations
+  try {
+    locations = JSON.parse(locationStr)
+  } catch (error) {}
+  return Array.isArray(locations) ? locations : null
+}
+
 export default {
   /**
    *  Task status acquisition
@@ -133,12 +143,14 @@ export default {
         state.version = res.data.processDefinition.version
         // name
         state.name = res.data.processDefinition.name
+        // releaseState
+        state.releaseState = res.data.processDefinition.releaseState
         // description
         state.description = res.data.processDefinition.description
         // taskRelationJson
         state.connects = res.data.processTaskRelationList
         // locations
-        state.locations = JSON.parse(res.data.processDefinition.locations)
+        state.locations = convertLocations(res.data.processDefinition.locations)
         // global params
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
@@ -164,6 +176,7 @@ export default {
           'timeout',
           'environmentCode'
         ]))
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -235,7 +248,7 @@ export default {
         // connects
         state.connects = processTaskRelationList
         // locations
-        state.locations = JSON.parse(processDefinition.locations)
+        state.locations = convertLocations(processDefinition.locations)
         // global params
         state.globalParams = processDefinition.globalParamList
         // timeout
