@@ -30,6 +30,12 @@ const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus
   }
 }
 
+const formatName = (str) => {
+  if (typeof str !== 'string') return ''
+
+  return str.slice(0, 6) + (str.length > 6 ? '\n...' : '')
+}
+
 const publishStatusFormat = (status) => {
   return status === 0 || status === '0' ? i18n.$t('offline') : status === 1 || status === '1' ? i18n.$t('online') : '-'
 }
@@ -116,8 +122,7 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
         position: 'inside',
         formatter: (params) => {
           if (!params.data.name) return ''
-          const str = params.data.name.split('_').map(item => `{a|${item}\n}`).join('')
-          return str
+          return formatName(params.data.name)
         },
         color: '#222222',
         textStyle: {
