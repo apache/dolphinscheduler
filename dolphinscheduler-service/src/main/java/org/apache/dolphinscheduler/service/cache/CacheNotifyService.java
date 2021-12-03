@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.processor;
+package org.apache.dolphinscheduler.service.cache;
 
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.command.Command;
 
-public interface UserCacheProcessor extends BaseCacheProcessor {
-    void update(int userId);
-
-    User selectById(int userId);
+public interface CacheNotifyService {
+    void notifyMaster(Command command);
 }

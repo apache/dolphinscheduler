@@ -22,19 +22,17 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
-import org.apache.dolphinscheduler.service.cache.processor.impl.CacheProcessorFactory;
-import org.apache.dolphinscheduler.service.cache.processor.impl.TenantCacheProcessorImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import io.netty.channel.Channel;
 
@@ -47,21 +45,20 @@ public class CacheProcessorTest {
 
     private CacheProcessor cacheProcessor;
 
-    @InjectMocks
-    private TenantCacheProcessorImpl tenantCacheProcessor;
-
     @Mock
     private Channel channel;
 
     @Mock
-    private CacheProcessorFactory cacheProcessorFactory;
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
 
     @Before
     public void before() {
         PowerMockito.mockStatic(SpringApplicationContext.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TenantCacheProcessor.class)).thenReturn(tenantCacheProcessor);
-        PowerMockito.when(SpringApplicationContext.getBean(CacheProcessorFactory.class)).thenReturn(cacheProcessorFactory);
-        Mockito.when(cacheProcessorFactory.getCacheProcessor(CacheType.TENANT)).thenReturn(tenantCacheProcessor);
+        PowerMockito.when(SpringApplicationContext.getBean(CacheManager.class)).thenReturn(cacheManager);
+        Mockito.when(cacheManager.getCache(CacheType.TENANT.getCacheName())).thenReturn(cache);
         cacheProcessor = new CacheProcessor();
     }
 
