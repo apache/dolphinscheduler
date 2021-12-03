@@ -37,6 +37,7 @@ DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
 
 source /etc/profile
 source "${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh"
+source "${DOLPHINSCHEDULER_HOME}/conf/config/install_config.conf"
 
 export HOSTNAME=`hostname`
 
