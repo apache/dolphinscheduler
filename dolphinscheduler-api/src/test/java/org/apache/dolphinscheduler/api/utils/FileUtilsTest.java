@@ -76,7 +76,7 @@ public class FileUtilsTest {
         Mockito.when(file.getResource().getFile()).thenReturn(new File(src));
 
         //Invoke copyFile
-        FileUtils.copyFile(file,destFilename);
+        FileUtils.copyInputStreamToFile(file,destFilename);
 
         //Test file exists
         File destFile = new File(destFilename);
