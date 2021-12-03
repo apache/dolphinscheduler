@@ -42,7 +42,7 @@ public class TaskProcessorFactory {
 
     @Autowired
     public TaskProcessorFactory(List<ITaskProcessor> taskProcessors) {
-        taskProcessorMap = taskProcessors.stream().collect(Collectors.toMap(ITaskProcessor::getType, Function.identity()));
+        taskProcessorMap = taskProcessors.stream().collect(Collectors.toMap(ITaskProcessor::getType, Function.identity(), (v1, v2) -> v2));
     }
 
     public ITaskProcessor getTaskProcessor(String key) {
