@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -47,6 +48,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
@@ -59,6 +61,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.cache.processor.impl.UserCacheProcessorImpl;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -125,6 +129,10 @@ public class ProcessServiceTest {
     private ProcessDefinitionLogMapper processDefineLogMapper;
     @Mock
     private ResourceMapper resourceMapper;
+    @Mock
+    private TaskGroupMapper taskGroupMapper;
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     private HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
 
@@ -759,6 +767,43 @@ public class ProcessServiceTest {
         Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());
         Assert.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
+    }
+
+    @Test
+    public void testCreateTaskGroupQueue() {
+        Mockito.when(taskGroupQueueMapper.insert(Mockito.any(TaskGroupQueue.class))).thenReturn(1);
+        TaskGroupQueue taskGroupQueue = processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, TaskGroupQueueStatus.WAIT_QUEUE);
+        Assert.assertNotNull(taskGroupQueue);
+    }
+
+    @Test
+    public void testDoRelease() {
+
+        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setTaskGroupId(taskGroupQueue.getGroupId());
+
+        Mockito.when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
+        Mockito.when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
+
+        processService.releaseTaskGroup(taskInstance);
+
+    }
+
+    private TaskGroupQueue getTaskGroupQueue() {
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+        taskGroupQueue.setTaskName("task name");
+        taskGroupQueue.setId(1);
+        taskGroupQueue.setGroupId(1);
+        taskGroupQueue.setTaskId(1);
+        taskGroupQueue.setPriority(1);
+        taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
+        Date date = new Date(System.currentTimeMillis());
+        taskGroupQueue.setUpdateTime(date);
+        taskGroupQueue.setCreateTime(date);
+        return taskGroupQueue;
     }
 
 }

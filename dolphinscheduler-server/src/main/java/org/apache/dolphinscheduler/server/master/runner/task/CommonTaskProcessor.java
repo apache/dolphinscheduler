@@ -62,6 +62,18 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         setTaskExecutionLogger();
+        int taskGroupId = task.getTaskGroupId();
+        if (taskGroupId > 0) {
+            boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+                    task.getName(),
+                    taskGroupId,
+                    task.getProcessInstanceId(),
+                    task.getTaskInstancePriority().getCode());
+            if (!acquireTaskGroup) {
+                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
+                return true;
+            }
+        }
         dispatchTask(taskInstance, processInstance);
         return true;
     }
@@ -69,6 +81,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     @Override
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
+    }
+
+    @Override
+    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
+        this.dispatchTask(taskInstance,processInstance);
     }
 
     @Override

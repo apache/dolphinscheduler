@@ -16,6 +16,7 @@
  */
 import _ from 'lodash'
 import i18n from '@/module/i18n/index.js'
+import dayjs from 'dayjs'
 
 const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus, code }, sourceWorkFlowCode) => {
   if (code === sourceWorkFlowCode) return categoryDic.active
@@ -28,6 +29,12 @@ const getCategory = (categoryDic, { workFlowPublishStatus, schedulePublishStatus
     default:
       return categoryDic['1']
   }
+}
+
+const formatName = (str) => {
+  if (typeof str !== 'string') return ''
+
+  return str.slice(0, 6) + (str.length > 6 ? '\n...' : '')
 }
 
 const publishStatusFormat = (status) => {
@@ -72,8 +79,8 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
         const { name, scheduleStartTime, scheduleEndTime, crontab, workFlowPublishStatus, schedulePublishStatus } = params.data
         return `
           ${i18n.$t('workflowName')}：${name}<br/>
-          ${i18n.$t('scheduleStartTime')}：${scheduleStartTime}<br/>
-          ${i18n.$t('scheduleEndTime')}：${scheduleEndTime}<br/>
+          ${i18n.$t('scheduleStartTime')}：${dayjs(scheduleStartTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
+          ${i18n.$t('scheduleEndTime')}：${dayjs(scheduleEndTime).format('YYYY-MM-DD HH:mm:ss')}<br/>
           ${i18n.$t('crontabExpression')}：${crontab}<br/>
           ${i18n.$t('workflowPublishStatus')}：${publishStatusFormat(workFlowPublishStatus)}<br/>
           ${i18n.$t('schedulePublishStatus')}：${publishStatusFormat(schedulePublishStatus)}<br/>
@@ -115,8 +122,7 @@ export default function (locations, links, sourceWorkFlowCode, isShowLabel) {
         position: 'inside',
         formatter: (params) => {
           if (!params.data.name) return ''
-          const str = params.data.name.split('_').map(item => `{a|${item}\n}`).join('')
-          return str
+          return formatName(params.data.name)
         },
         color: '#222222',
         textStyle: {

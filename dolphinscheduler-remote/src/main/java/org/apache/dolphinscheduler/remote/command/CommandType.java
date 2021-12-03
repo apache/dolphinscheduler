@@ -137,9 +137,16 @@ public enum CommandType {
      * state event request
      */
     STATE_EVENT_REQUEST,
-
     /**
      * cache expire
      */
-    CACHE_EXPIRE;
+    CACHE_EXPIRE,
+    /**
+     * task state event request
+     */
+    TASK_FORCE_STATE_EVENT_REQUEST,
+    /**
+     * task state event request
+     */
+    TASK_WAKEUP_EVENT_REQUEST;
 }
