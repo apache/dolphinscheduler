@@ -15,8 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.processor;
+package org.apache.dolphinscheduler.service.cache.impl;
 
-public interface BaseCacheProcessor {
-    void cacheExpire(Class updateObjClass, String updateObjJson);
+import java.lang.reflect.Method;
+
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+/**
+ * custom cache key generator
+ */
+@Component
+public class CacheKeyGenerator implements KeyGenerator {
+
+    @Override
+    public Object generate(Object target, Method method, Object... params) {
+        return StringUtils.arrayToDelimitedString(params, "_");
+    }
 }

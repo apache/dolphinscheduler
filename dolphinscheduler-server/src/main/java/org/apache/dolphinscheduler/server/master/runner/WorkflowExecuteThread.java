@@ -737,19 +737,21 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskMap.clear();
         errorTaskMap.clear();
 
-        List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
-        for (TaskInstance task : validTaskInstanceList) {
-            validTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
-            taskInstanceMap.put(task.getId(), task);
+        if (ExecutionStatus.SUBMITTED_SUCCESS != processInstance.getState()) {
+            List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
+            for (TaskInstance task : validTaskInstanceList) {
+                validTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
+                taskInstanceMap.put(task.getId(), task);
 
-            if (task.isTaskComplete()) {
-                completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
-            }
-            if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
-                continue;
-            }
-            if (task.getState().typeIsFailure() && !task.taskCanRetry()) {
-                errorTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
+                if (task.isTaskComplete()) {
+                    completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
+                }
+                if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
+                    continue;
+                }
+                if (task.getState().typeIsFailure() && !task.taskCanRetry()) {
+                    errorTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
+                }
             }
         }
 

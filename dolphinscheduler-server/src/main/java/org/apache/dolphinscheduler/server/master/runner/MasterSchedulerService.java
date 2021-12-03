@@ -118,12 +118,6 @@ public class MasterSchedulerService extends Thread {
      */
     ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
 
-    /**
-     * key:code-version
-     * value: processDefinition
-     */
-    HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
-
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
@@ -195,10 +189,6 @@ public class MasterSchedulerService extends Thread {
             return;
         }
 
-        if (!masterConfig.isCacheProcessDefinition() && processDefinitionCacheMaps.size() > 0) {
-            processDefinitionCacheMaps.clear();
-        }
-
         List<ProcessInstance> processInstances = command2ProcessInstance(commands);
         if (CollectionUtils.isEmpty(processInstances)) {
             return;
@@ -245,8 +235,7 @@ public class MasterSchedulerService extends Thread {
                 try {
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
-                            command,
-                            processDefinitionCacheMaps);
+                            command);
                     if (processInstance != null) {
                         processInstances[index] = processInstance;
                         logger.info("handle command command {} end, create process instance {}",

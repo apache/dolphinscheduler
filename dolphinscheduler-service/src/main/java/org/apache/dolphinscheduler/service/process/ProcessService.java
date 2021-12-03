@@ -100,15 +100,15 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.cache.processor.TenantCacheProcessor;
-import org.apache.dolphinscheduler.service.cache.processor.UserCacheProcessor;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -155,7 +155,7 @@ public class ProcessService {
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
-    private UserCacheProcessor userCacheProcessor;
+    private UserMapper userMapper;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -194,7 +194,7 @@ public class ProcessService {
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private TenantCacheProcessor tenantCacheProcessor;
+    private TenantMapper tenantMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -233,8 +233,8 @@ public class ProcessService {
      * @return process instance
      */
     @Transactional
-    public ProcessInstance handleCommand(Logger logger, String host, Command command, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
-        ProcessInstance processInstance = constructProcessInstance(command, host, processDefinitionCacheMaps);
+    public ProcessInstance handleCommand(Logger logger, String host, Command command) {
+        ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
             logger.error("scan command, command parameter is error: {}", command);
@@ -739,7 +739,7 @@ public class ProcessService {
     public Tenant getTenantForProcess(int tenantId, int userId) {
         Tenant tenant = null;
         if (tenantId >= 0) {
-            tenant = tenantCacheProcessor.queryById(tenantId);
+            tenant = tenantMapper.queryById(tenantId);
         }
 
         if (userId == 0) {
@@ -747,8 +747,8 @@ public class ProcessService {
         }
 
         if (tenant == null) {
-            User user = userCacheProcessor.selectById(userId);
-            tenant = tenantCacheProcessor.queryById(user.getTenantId());
+            User user = userMapper.selectById(userId);
+            tenant = tenantMapper.queryById(user.getTenantId());
         }
         return tenant;
     }
@@ -794,19 +794,12 @@ public class ProcessService {
      * @param host host
      * @return process instance
      */
-    private ProcessInstance constructProcessInstance(Command command, String host, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
+    private ProcessInstance constructProcessInstance(Command command, String host) {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
-        String key = String.format("%d-%d", command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-        if (processDefinitionCacheMaps.containsKey(key)) {
-            processDefinition = processDefinitionCacheMaps.get(key);
-        } else {
-            processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-            if (processDefinition != null) {
-                processDefinitionCacheMaps.put(key, processDefinition);
-            }
-        }
+
+        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -1964,11 +1957,11 @@ public class ProcessService {
             return StringUtils.EMPTY;
         }
         int userId = resourceList.get(0).getUserId();
-        User user = userCacheProcessor.selectById(userId);
+        User user = userMapper.selectById(userId);
         if (Objects.isNull(user)) {
             return StringUtils.EMPTY;
         }
-        Tenant tenant = tenantCacheProcessor.queryById(user.getTenantId());
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (Objects.isNull(tenant)) {
             return StringUtils.EMPTY;
         }
@@ -2038,7 +2031,7 @@ public class ProcessService {
         if (processInstance == null) {
             return queue;
         }
-        User executor = userCacheProcessor.selectById(processInstance.getExecutorId());
+        User executor = userMapper.selectById(processInstance.getExecutorId());
         if (executor != null) {
             queue = executor.getQueue();
         }
@@ -2149,7 +2142,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId) {
-        return userCacheProcessor.selectById(userId);
+        return userMapper.selectById(userId);
     }
 
     /**
