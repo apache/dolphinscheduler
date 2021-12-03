@@ -71,6 +71,7 @@ class TaskType(str):
     HTTP = "HTTP"
     PYTHON = "PYTHON"
     SQL = "SQL"
+    SUB_PROCESS = "SUB_PROCESS"
 
 
 class DefaultTaskCodeNum(str):
