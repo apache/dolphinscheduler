@@ -19,7 +19,9 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
+set -a
 source ${workDir}/conf/config/install_config.conf
+set +a
 
 # 1.replace file
 echo "1.replace file"
@@ -31,7 +33,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 datasourceDriverClassname="com.mysql.jdbc.Driver"
-if [ $dbtype == "postgresql" ];then
+if [[ $dbtype == "postgresql" ]];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
 

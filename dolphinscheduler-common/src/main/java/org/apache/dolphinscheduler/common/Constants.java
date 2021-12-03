@@ -453,11 +453,6 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
-
-    /**
-     * data source config
-     */
-
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
     public static final String SPRING_DATASOURCE_URL = "spring.datasource.url";
