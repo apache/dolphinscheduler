@@ -17,14 +17,28 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * file utils
@@ -35,8 +49,28 @@ public class FileUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
+    public static final ThreadLocal<Logger> taskLoggerThreadLocal = new ThreadLocal<>();
+
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
+    }
+
+    /**
+     * get file suffix
+     *
+     * @param filename file name
+     * @return file suffix
+     */
+    public static String suffix(String filename) {
+
+        String fileSuffix = "";
+        if (!StringUtils.isEmpty(filename)) {
+            int lastIndex = filename.lastIndexOf('.');
+            if (lastIndex > 0) {
+                fileSuffix = filename.substring(lastIndex + 1);
+            }
+        }
+        return fileSuffix;
     }
 
     /**
@@ -118,7 +152,8 @@ public class FileUtils {
         //create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
     }
 
     /**
@@ -129,16 +164,30 @@ public class FileUtils {
      * @return true if write success
      */
     public static boolean writeContent2File(String content, String filePath) {
+        BufferedReader bufferedReader = null;
+        BufferedWriter bufferedWriter = null;
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
-                logger.error("mkdir parent failed");
+                FileUtils.logger.error("mkdir parent failed");
                 return false;
             }
-            IOUtils.write(content, new FileOutputStream(filePath), StandardCharsets.UTF_8);
+            bufferedReader = new BufferedReader(new StringReader(content));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(distFile), StandardCharsets.UTF_8));
+            char[] buf = new char[1024];
+            int len;
+            while ((len = bufferedReader.read(buf)) != -1) {
+                bufferedWriter.write(buf, 0, len);
+            }
+            bufferedWriter.flush();
+            bufferedReader.close();
+            bufferedWriter.close();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            FileUtils.logger.error(e.getMessage(), e);
             return false;
+        } finally {
+            IOUtils.closeQuietly(bufferedWriter);
+            IOUtils.closeQuietly(bufferedReader);
         }
         return true;
     }
@@ -154,9 +203,13 @@ public class FileUtils {
      * </ul>
      *
      * @param filename file name
+     * @throws IOException in case deletion is unsuccessful
      */
-    public static void deleteFile(String filename) {
-        org.apache.commons.io.FileUtils.deleteQuietly(new File(filename));
+    public static void deleteFile(String filename) throws IOException {
+        File file = new File(filename);
+        if (file.exists()) {
+            org.apache.commons.io.FileUtils.forceDelete(file);
+        }
     }
 
     /**

@@ -74,12 +74,8 @@ public class OSUtils {
      * @return percent %
      */
     public static double memoryUsage() {
-        GlobalMemory memory = hal.getMemory();
-        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
 
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(memoryUsage));
+        return Double.parseDouble(String.valueOf(0.01));
     }
 
     /**
@@ -90,12 +86,8 @@ public class OSUtils {
      * @return available Physical Memory Size, unit: G
      */
     public static double availablePhysicalMemorySize() {
-        GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
 
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(availablePhysicalMemorySize));
+        return Double.parseDouble(String.valueOf(0.01));
     }
 
     /**
@@ -104,20 +96,8 @@ public class OSUtils {
      * @return load average
      */
     public static double loadAverage() {
-        double loadAverage;
-        try {
-            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-            loadAverage = osBean.getSystemLoadAverage();
-        } catch (Exception e) {
-            logger.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage();
-            if (Double.isNaN(loadAverage)) {
-                return NEGATIVE_ONE;
-            }
-        }
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(loadAverage));
+
+        return Double.parseDouble(String.valueOf(0.01));
     }
 
     /**
@@ -126,15 +106,8 @@ public class OSUtils {
      * @return cpu usage
      */
     public static double cpuUsage() {
-        CentralProcessor processor = hal.getProcessor();
-        double cpuUsage = processor.getSystemCpuLoad();
-        if (Double.isNaN(cpuUsage)) {
-            return NEGATIVE_ONE;
-        }
 
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(cpuUsage));
+        return Double.parseDouble(String.valueOf(0.01));
     }
 
     public static List<String> getUserList() {

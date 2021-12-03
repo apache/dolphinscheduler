@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.io.Files;
-import org.apache.commons.beanutils.BeanMap;
+import static org.apache.dolphinscheduler.common.Constants.ALIAS;
+import static org.apache.dolphinscheduler.common.Constants.CONTENT;
+import static org.apache.dolphinscheduler.common.Constants.JAR;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -36,14 +34,41 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +77,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * resources service impl
@@ -309,8 +330,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!resource.isDirectory()) {
             //get the origin file suffix
-            String originSuffix = Files.getFileExtension(originFullName);
-            String suffix = Files.getFileExtension(fullName);
+            String originSuffix = FileUtils.suffix(originFullName);
+            String suffix = FileUtils.suffix(fullName);
             boolean suffixIsChanged = false;
             if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
                 suffixIsChanged = true;
@@ -453,8 +474,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             // file suffix
-            String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
-            String nameSuffix = Files.getFileExtension(name);
+            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
+            String nameSuffix = FileUtils.suffix(name);
 
             // determine file suffix
             if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -555,8 +576,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
-        String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
-        String nameSuffix = Files.getFileExtension(fullName);
+        String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
+        String nameSuffix = FileUtils.suffix(fullName);
 
         // determine file suffix
         if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -578,7 +599,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
-            FileUtils.deleteFile(localFilename);
+            try {
+                FileUtils.deleteFile(localFilename);
+            } catch (IOException ex) {
+                logger.error("delete local tmp file:{} error", localFilename, ex);
+            }
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -815,7 +840,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check preview or not by file suffix
-        String nameSuffix = Files.getFileExtension(resource.getAlias());
+        String nameSuffix = FileUtils.suffix(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
@@ -980,7 +1005,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         //check can edit by file suffix
-        String nameSuffix = Files.getFileExtension(resource.getAlias());
+        String nameSuffix = FileUtils.suffix(resource.getAlias());
         String resourceViewSuffixs = FileUtils.getResourceViewSuffixs();
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
