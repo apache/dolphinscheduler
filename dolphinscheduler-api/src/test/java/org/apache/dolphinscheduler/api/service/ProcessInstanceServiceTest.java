@@ -497,7 +497,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setScheduleTime(new Date());
         processInstance.setGlobalParams("");
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
-        Map<String, Object> successRes = processInstanceService.viewVariables(1);
+        Map<String, Object> successRes = processInstanceService.viewVariables(1L,1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -522,7 +522,7 @@ public class ProcessInstanceServiceTest {
         when(processService.genDagGraph(Mockito.any(ProcessDefinition.class)))
             .thenReturn(graph);
 
-        Map<String, Object> successRes = processInstanceService.viewGantt(1);
+        Map<String, Object> successRes = processInstanceService.viewGantt(0L, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 

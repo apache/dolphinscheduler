@@ -282,11 +282,12 @@ public interface ProcessDefinitionService {
     /**
      * Encapsulates the TreeView structure
      *
+     * @param projectCode project code
      * @param code process definition code
      * @param limit limit
      * @return tree view json data
      */
-    Map<String, Object> viewTree(long code, Integer limit);
+    Map<String, Object> viewTree(long projectCode, long code, Integer limit);
 
     /**
      * switch the defined process definition version
