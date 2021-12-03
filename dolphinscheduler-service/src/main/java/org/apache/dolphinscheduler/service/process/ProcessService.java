@@ -2273,6 +2273,9 @@ public class ProcessService {
      */
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                                 List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (taskRelationList.isEmpty()) {
+            return Constants.EXIT_CODE_SUCCESS;
+        }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
             taskDefinitionLogMap = taskDefinitionLogs.stream()
