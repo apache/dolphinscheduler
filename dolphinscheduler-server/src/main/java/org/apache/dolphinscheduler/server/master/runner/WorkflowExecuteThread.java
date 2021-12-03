@@ -518,7 +518,7 @@ public class WorkflowExecuteThread implements Runnable {
     private boolean processStateChangeHandler(StateEvent stateEvent) {
         try {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
-            if (processComplementData()) {
+            if (processInstance.getState() != ExecutionStatus.READY_STOP && processComplementData()) {
                 return true;
             }
             if (stateEvent.getExecutionStatus().typeIsFinished()) {
