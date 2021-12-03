@@ -25,7 +25,8 @@
             v-if="dialogVisible"
             :visible.sync="dialogVisible"
             width="auto"
-            :append-to-body="true">
+            :append-to-body="true"
+            :close-on-click-modal="false">
             <m-create-data-source :item="item" @onUpdate="onUpdate" @close="close"></m-create-data-source>
           </el-dialog>
         </template>
