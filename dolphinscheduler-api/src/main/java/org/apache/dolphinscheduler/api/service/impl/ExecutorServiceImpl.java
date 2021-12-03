@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -34,10 +33,12 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -47,6 +48,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -72,6 +74,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * executor service impl
@@ -400,6 +404,27 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         } else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * prepare to update process instance command type and status
+     *
+     * @param processInstance process instance
+     * @return update result
+     */
+    private Map<String, Object> forceStartTaskInstance(ProcessInstance processInstance, int taskId) {
+        Map<String, Object> result = new HashMap<>();
+        TaskGroupQueue taskGroupQueue = processService.loadTaskGroupQueue(taskId);
+        if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
+            putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
+            return result;
+        }
+        taskGroupQueue.setForceStart(Flag.YES.getCode());
+        processService.updateTaskGroupQueue(taskGroupQueue);
+        processService.sendStartTask2Master(processInstance,taskId
+                ,org.apache.dolphinscheduler.remote.command.CommandType.TASK_FORCE_STATE_EVENT_REQUEST);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 

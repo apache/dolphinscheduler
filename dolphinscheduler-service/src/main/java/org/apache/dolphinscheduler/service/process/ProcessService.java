@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -74,6 +75,8 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskGroup;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -94,10 +97,13 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -211,6 +217,12 @@ public class ProcessService {
 
     @Autowired
     private EnvironmentMapper environmentMapper;
+
+    @Autowired
+    private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private TaskGroupMapper taskGroupMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -2502,6 +2514,180 @@ public class ProcessService {
             processTaskMap.put(fatherProcess, fatherTask);
         }
         return processTaskMap;
+    }
+
+    /**
+     * the first time (when submit the task ) get the resource of the task group
+     * @param taskId    task id
+     * @param taskName
+     * @param groupId
+     * @param processId
+     * @param priority
+     * @return
+     */
+    public boolean acquireTaskGroup(int taskId,
+                                    String taskName, int groupId,
+                                    int processId, int priority) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(groupId);
+        if (taskGroup == null) {
+            return true;
+        }
+        // if task group is not applicable
+        if (taskGroup.getStatus() == Flag.NO.getCode()) {
+            return true;
+        }
+        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskId);
+        if (taskGroupQueue == null) {
+            taskGroupQueue = insertIntoTaskGroupQueue(taskId, taskName, groupId, processId, priority, TaskGroupQueueStatus.WAIT_QUEUE);
+        } else {
+            if (taskGroupQueue.getStatus() == TaskGroupQueueStatus.ACQUIRE_SUCCESS) {
+                return true;
+            }
+            taskGroupQueue.setInQueue(Flag.NO.getCode());
+            taskGroupQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
+            this.taskGroupQueueMapper.updateById(taskGroupQueue);
+        }
+        //check priority
+        List<TaskGroupQueue> highPriorityTasks = taskGroupQueueMapper.queryHighPriorityTasks(groupId, priority, TaskGroupQueueStatus.WAIT_QUEUE.getCode());
+        if (CollectionUtils.isNotEmpty(highPriorityTasks)) {
+            this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
+            return false;
+        }
+        //try to get taskGroup
+        int count = taskGroupMapper.selectAvailableCountById(groupId);
+        if (count == 1 && robTaskGroupResouce(taskGroupQueue)) {
+            return true;
+        }
+        this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
+        return false;
+    }
+
+    /**
+     *  try to get the task group resource(when other task release the resource)
+     * @param taskGroupQueue
+     * @return
+     */
+    public boolean robTaskGroupResouce(TaskGroupQueue taskGroupQueue) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupQueue.getGroupId());
+        int affectedCount = taskGroupMapper.updateTaskGroupResource(taskGroup.getId(),taskGroupQueue.getId(),
+                TaskGroupQueueStatus.WAIT_QUEUE.getCode());
+        if (affectedCount > 0) {
+            taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
+            this.taskGroupQueueMapper.updateById(taskGroupQueue);
+            this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean acquireTaskGroupAgain(TaskGroupQueue taskGroupQueue) {
+        return robTaskGroupResouce(taskGroupQueue);
+    }
+
+    public void releaseAllTaskGroup(int processInstanceId) {
+        List<TaskInstance> taskInstances = this.taskInstanceMapper.loadAllInfosNoRelease(processInstanceId, TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+        for (TaskInstance info : taskInstances) {
+            releaseTaskGroup(info);
+        }
+    }
+
+    /**
+     * release the TGQ resource when the corresponding task is finished.
+     *
+     * @return the result code and msg
+     */
+    public TaskInstance releaseTaskGroup(TaskInstance taskInstance) {
+
+        TaskGroup taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
+        if (taskGroup == null) {
+            return null;
+        }
+        TaskGroupQueue thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
+        if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
+            return null;
+        }
+        try {
+            while (taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(), taskGroup.getUseSize()
+                    , thisTaskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1) {
+                thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
+                if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
+                    return null;
+                }
+                taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
+            }
+        } catch (Exception e) {
+            logger.error("release the task group error",e);
+        }
+        logger.info("updateTask:{}",taskInstance.getName());
+        changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);
+        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryTheHighestPriorityTasks(taskGroup.getId(),
+                TaskGroupQueueStatus.WAIT_QUEUE.getCode(), Flag.NO.getCode(), Flag.NO.getCode());
+        if (taskGroupQueue == null) {
+            return null;
+        }
+        while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(), Flag.YES.getCode(), taskGroupQueue.getId()) != 1) {
+            taskGroupQueue = this.taskGroupQueueMapper.queryTheHighestPriorityTasks(taskGroup.getId(),
+                    TaskGroupQueueStatus.WAIT_QUEUE.getCode(), Flag.NO.getCode(), Flag.NO.getCode());
+            if (taskGroupQueue == null) {
+                return null;
+            }
+        }
+        return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
+    }
+
+    /**
+     * release the TGQ resource when the corresponding task is finished.
+     *
+     * @param taskId task id
+     * @return the result code and msg
+     */
+
+    public void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status) {
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
+        taskGroupQueue.setStatus(status);
+        taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
+        taskGroupQueueMapper.updateById(taskGroupQueue);
+    }
+
+    /**
+     * insert into task group queue
+     *
+     * @param taskId    task id
+     * @param taskName  task name
+     * @param groupId   group id
+     * @param processId process id
+     * @param priority  priority
+     * @return result and msg code
+     */
+    public TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
+                                                   String taskName, Integer groupId,
+                                                   Integer processId, Integer priority, TaskGroupQueueStatus status) {
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+        taskGroupQueueMapper.insert(taskGroupQueue);
+        return taskGroupQueue;
+    }
+
+    public int updateTaskGroupQueueStatus(Integer taskId, int status) {
+        return taskGroupQueueMapper.updateStatusByTaskId(taskId, status);
+    }
+
+    public int updateTaskGroupQueue(TaskGroupQueue taskGroupQueue) {
+        return taskGroupQueueMapper.updateById(taskGroupQueue);
+    }
+
+    public TaskGroupQueue loadTaskGroupQueue(int taskId) {
+        return this.taskGroupQueueMapper.queryByTaskId(taskId);
+    }
+
+    public void sendStartTask2Master(ProcessInstance processInstance,int taskId,
+                                     org.apache.dolphinscheduler.remote.command.CommandType taskType) {
+        String host = processInstance.getHost();
+        String address = host.split(":")[0];
+        int port = Integer.parseInt(host.split(":")[1]);
+        TaskEventChangeCommand taskEventChangeCommand = new TaskEventChangeCommand(
+                processInstance.getId(), taskId
+        );
+        stateEventCallbackService.sendResult(address, port, taskEventChangeCommand.convert2Command(taskType));
     }
 
     public ProcessInstance loadNextProcess4Serial(long code, int state) {

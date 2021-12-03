@@ -195,12 +195,25 @@ public class TaskDefinition {
     @TableField(exist = false)
     private String modifyBy;
 
+    /**
+     * task group id
+     */
+    private int taskGroupId;
+
     public TaskDefinition() {
     }
 
     public TaskDefinition(long code, int version) {
         this.code = code;
         this.version = version;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
     }
 
     public String getName() {
@@ -442,51 +455,51 @@ public class TaskDefinition {
         }
         TaskDefinition that = (TaskDefinition) o;
         return failRetryTimes == that.failRetryTimes
-            && failRetryInterval == that.failRetryInterval
-            && timeout == that.timeout
-            && delayTime == that.delayTime
-            && Objects.equals(name, that.name)
-            && Objects.equals(description, that.description)
-            && Objects.equals(taskType, that.taskType)
-            && Objects.equals(taskParams, that.taskParams)
-            && flag == that.flag
-            && taskPriority == that.taskPriority
-            && Objects.equals(workerGroup, that.workerGroup)
-            && timeoutFlag == that.timeoutFlag
-            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
-            && Objects.equals(resourceIds, that.resourceIds)
-            && environmentCode == that.environmentCode;
+                && failRetryInterval == that.failRetryInterval
+                && timeout == that.timeout
+                && delayTime == that.delayTime
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(taskType, that.taskType)
+                && Objects.equals(taskParams, that.taskParams)
+                && flag == that.flag
+                && taskPriority == that.taskPriority
+                && Objects.equals(workerGroup, that.workerGroup)
+                && timeoutFlag == that.timeoutFlag
+                && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+                && Objects.equals(resourceIds, that.resourceIds)
+                && environmentCode == that.environmentCode;
     }
 
     @Override
     public String toString() {
         return "TaskDefinition{"
-            + "id=" + id
-            + ", code=" + code
-            + ", name='" + name + '\''
-            + ", version=" + version
-            + ", description='" + description + '\''
-            + ", projectCode=" + projectCode
-            + ", userId=" + userId
-            + ", taskType=" + taskType
-            + ", taskParams='" + taskParams + '\''
-            + ", taskParamList=" + taskParamList
-            + ", taskParamMap=" + taskParamMap
-            + ", flag=" + flag
-            + ", taskPriority=" + taskPriority
-            + ", userName='" + userName + '\''
-            + ", projectName='" + projectName + '\''
-            + ", workerGroup='" + workerGroup + '\''
-            + ", failRetryTimes=" + failRetryTimes
-            + ", environmentCode='" + environmentCode + '\''
-            + ", failRetryInterval=" + failRetryInterval
-            + ", timeoutFlag=" + timeoutFlag
-            + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
-            + ", timeout=" + timeout
-            + ", delayTime=" + delayTime
-            + ", resourceIds='" + resourceIds + '\''
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
+                + "id=" + id
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", version=" + version
+                + ", description='" + description + '\''
+                + ", projectCode=" + projectCode
+                + ", userId=" + userId
+                + ", taskType=" + taskType
+                + ", taskParams='" + taskParams + '\''
+                + ", taskParamList=" + taskParamList
+                + ", taskParamMap=" + taskParamMap
+                + ", flag=" + flag
+                + ", taskPriority=" + taskPriority
+                + ", userName='" + userName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", failRetryTimes=" + failRetryTimes
+                + ", environmentCode='" + environmentCode + '\''
+                + ", failRetryInterval=" + failRetryInterval
+                + ", timeoutFlag=" + timeoutFlag
+                + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
+                + ", timeout=" + timeout
+                + ", delayTime=" + delayTime
+                + ", resourceIds='" + resourceIds + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }
