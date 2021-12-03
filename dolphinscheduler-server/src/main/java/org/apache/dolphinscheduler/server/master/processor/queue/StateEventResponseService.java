@@ -149,6 +149,10 @@ public class StateEventResponseService {
         }
     }
 
+    public void addEvent2WorkflowExecute(StateEvent stateEvent) {
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+        workflowExecuteThread.addStateEvent(stateEvent);
+    }
     public BlockingQueue<StateEvent> getEventQueue() {
         return eventQueue;
     }
