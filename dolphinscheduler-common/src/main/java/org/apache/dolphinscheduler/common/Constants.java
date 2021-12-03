@@ -402,7 +402,6 @@ public final class Constants {
     /**
      * datasource configuration path
      */
-    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
     public static final String COMMON_TASK_TYPE = "common";
 
