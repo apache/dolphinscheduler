@@ -25,11 +25,16 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * process task relation mapper interface
  */
+@CacheConfig(cacheNames = "processTaskRelation", keyGenerator = "cacheKeyGenerator")
 public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelation> {
 
     /**
@@ -39,8 +44,15 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return ProcessTaskRelation list
      */
+    @Cacheable(sync = true)
     List<ProcessTaskRelation> queryByProcessCode(@Param("projectCode") long projectCode,
                                                  @Param("processCode") long processCode);
+
+    /**
+     * update
+     */
+    @CacheEvict
+    int updateById(@Param("et") ProcessTaskRelation processTaskRelation);
 
     /**
      * process task relation by taskCode
@@ -65,6 +77,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return int
      */
+    @CacheEvict
     int deleteByCode(@Param("projectCode") long projectCode,
                      @Param("processCode") long processCode);
 

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -34,6 +31,13 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,9 +48,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service test
@@ -81,7 +84,7 @@ public class TenantServiceTest {
         try {
             //check tenantCode
             Map<String, Object> result =
-                tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
+                    tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
@@ -109,7 +112,7 @@ public class TenantServiceTest {
         page.setRecords(getList());
         page.setTotal(1L);
         Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest")))
-            .thenReturn(page);
+                .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
@@ -124,7 +127,7 @@ public class TenantServiceTest {
         try {
             // id not exist
             Map<String, Object> result =
-                tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
+                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
             logger.info(result.toString());
             // success
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
@@ -143,7 +146,7 @@ public class TenantServiceTest {
 
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
-            .thenReturn(getInstanceList());
+                .thenReturn(getInstanceList());
         Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 

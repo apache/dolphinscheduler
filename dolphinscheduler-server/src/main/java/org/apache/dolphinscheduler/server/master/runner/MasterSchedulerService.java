@@ -125,12 +125,6 @@ public class MasterSchedulerService extends Thread {
      */
     ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
 
-    /**
-     * key:code-version
-     * value: processDefinition
-     */
-    HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
-
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
@@ -207,14 +201,8 @@ public class MasterSchedulerService extends Thread {
         if (command != null) {
             logger.info("find one command: id: {}, type: {}", command.getId(), command.getCommandType());
             try {
-                ProcessInstance processInstance = processService.handleCommand(logger,
-                        getLocalAddress(),
-                        command,
-                        processDefinitionCacheMaps);
-                if (!masterConfig.getMasterCacheProcessDefinition()
-                        && processDefinitionCacheMaps.size() > 0) {
-                    processDefinitionCacheMaps.clear();
-                }
+                ProcessInstance processInstance = processService.handleCommand(logger, getLocalAddress(), command);
+
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
@@ -258,16 +246,13 @@ public class MasterSchedulerService extends Thread {
             }
             for (Command command : commandList) {
                 int slot = ServerNodeManager.getSlot();
-                if (ServerNodeManager.MASTER_SIZE != 0
-                        && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
+                if (ServerNodeManager.MASTER_SIZE != 0 && command.getId() % ServerNodeManager.MASTER_SIZE == slot) {
                     result = command;
                     break;
                 }
             }
             if (result != null) {
-                logger.info("find command {}, slot:{} :",
-                        result.getId(),
-                        ServerNodeManager.getSlot());
+                logger.info("find command {}, slot:{} :", result.getId(), ServerNodeManager.getSlot());
                 break;
             }
             pageNumber += 1;

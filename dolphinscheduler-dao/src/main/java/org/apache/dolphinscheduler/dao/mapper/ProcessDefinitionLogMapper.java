@@ -23,6 +23,9 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,6 +33,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * process definition log mapper interface
  */
+@CacheConfig(cacheNames = "processDefinition")
 public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinitionLog> {
 
     /**
@@ -66,6 +70,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param version version number
      * @return the process definition version info
      */
+    @Cacheable(sync = true, key = "#processDefinitionCode + '_' + #version")
     ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,  @Param("version") int version);
 
     /**
