@@ -18,7 +18,9 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
+set -a
 source $workDir/../conf/config/install_config.conf
+set +a
 
 # install_config.conf info
 echo -e '\n'
