@@ -344,8 +344,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
     @AccessLogAnnotation
     public Result viewVariables(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.viewVariables(id);
+        Map<String, Object> result = processInstanceService.viewVariables(projectCode, id);
         return returnDataList(result);
     }
 
@@ -368,7 +369,7 @@ public class ProcessInstanceController extends BaseController {
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("id") Integer id) throws Exception {
-        Map<String, Object> result = processInstanceService.viewGantt(id);
+        Map<String, Object> result = processInstanceService.viewGantt(projectCode, id);
         return returnDataList(result);
     }
 

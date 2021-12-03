@@ -340,7 +340,7 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.viewTree(processId, limit)).thenReturn(result);
+        Mockito.when(processDefinitionService.viewTree(projectCode, processId, limit)).thenReturn(result);
         Result response = processDefinitionController.viewTree(user, projectCode, processId, limit);
 
         Assert.assertTrue(response != null && response.isSuccess());

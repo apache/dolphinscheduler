@@ -73,9 +73,10 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      *
      * @param page pagination info
      * @param code process definition code
+     * @param projectCode project code
      * @return the paging process definition version list
      */
-    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page, @Param("code") long code);
+    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);
 
     /**
      * delete the certain process definition version by process definition id and version number

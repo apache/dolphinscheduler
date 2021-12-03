@@ -142,7 +142,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryProcessDefinitionVersionsPaging() {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
-        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L);
+        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L,1L);
         Assert.assertNotEquals(processDefinitionLogs.getTotal(), 0);
     }
 
