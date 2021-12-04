@@ -191,9 +191,9 @@ public class CacheProcessor implements NettyRequestProcessor {
     private void workerGroupCacheExpire(WorkerGroup workerGroup) {
         Cache cache = cacheManager.getCache(CacheType.WORKER_GROUP.getCacheName());
         if (cache != null) {
-            cache.evict("-");
+            cache.evict("all");
             logger.info("cache evict, type:{}, key:{}",
-                    CacheType.WORKER_GROUP.getCacheName(), "-");
+                    CacheType.WORKER_GROUP.getCacheName(), "all");
         }
     }
 

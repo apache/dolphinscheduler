@@ -39,7 +39,7 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      * query all worker group
      * @return worker group list
      */
-    @Cacheable(sync = true, key = "'-'")
+    @Cacheable(sync = true, key = "'all'")
     List<WorkerGroup> queryAllWorkerGroup();
 
     @CacheEvict

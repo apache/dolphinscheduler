@@ -116,12 +116,10 @@ public class CacheEvictAspect {
 
     private String parseKey(String key, List<String> paramNameList, List<Object> paramList) {
         SpelExpressionParser spelParser = new SpelExpressionParser();
-        //将方法的参数名和参数值一一对应的放入上下文中
         EvaluationContext ctx = new StandardEvaluationContext();
         for (int i = 0; i < paramNameList.size(); i++) {
             ctx.setVariable(paramNameList.get(i), paramList.get(i));
         }
-        // 解析SpEL表达式获取结果
         return spelParser.parseExpression(key).getValue(ctx).toString();
     }
 
