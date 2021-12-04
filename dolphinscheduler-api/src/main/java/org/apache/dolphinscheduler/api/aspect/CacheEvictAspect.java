@@ -119,7 +119,11 @@ public class CacheEvictAspect {
         for (int i = 0; i < paramNameList.size(); i++) {
             ctx.setVariable(paramNameList.get(i), paramList.get(i));
         }
-        return spelParser.parseExpression(key).getValue(ctx).toString();
+        Object obj = spelParser.parseExpression(key).getValue(ctx);
+        if (null == obj) {
+            throw new RuntimeException("parseKey error")
+        }
+        return obj.toString();
     }
 
     private <T extends Annotation> List<T> getParamAnnotationsByType(Method method, Class<T> annotationClass) {
