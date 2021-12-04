@@ -28,9 +28,7 @@ import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -40,16 +38,14 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +58,8 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -70,102 +68,38 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class UpgradeDao {
-
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
-    private static final String rootDir = System.getProperty("user.dir");
-    protected static final DataSource dataSource = getDataSource();
-    private static final DbType dbType = getCurrentDbType();
 
-    public static DataSource getDataSource(){
-        return ConnectionFactory.getInstance().getDataSource();
+    protected final DataSource dataSource;
+
+    protected UpgradeDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    /**
-     * get db type
-     * @return dbType
-     */
-    public static DbType getDbType(){
-        return dbType;
-    }
+    protected abstract String initSqlPath();
 
-    /**
-     * get current dbType
-     * @return
-     */
-    private static DbType getCurrentDbType(){
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            String name = conn.getMetaData().getDatabaseProductName().toUpperCase();
-            return DbType.valueOf(name);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            return null;
-        }finally {
-            ConnectionUtils.releaseResource(conn);
-        }
-    }
+    protected abstract DbType getDbType();
 
-    /**
-     * init schema
-     */
     public void initSchema() {
-        DbType dbType = getDbType();
-        String initSqlPath = "";
-        if (dbType != null) {
-            switch (dbType) {
-                case MYSQL:
-                    initSqlPath = "/sql/create/release-1.0.0_schema/mysql/";
-                    initSchema(initSqlPath);
-                    break;
-                case POSTGRESQL:
-                    initSqlPath = "/sql/create/release-1.2.0_schema/postgresql/";
-                    initSchema(initSqlPath);
-                    break;
-                default:
-                    logger.error("not support sql type: {},can't upgrade", dbType);
-                    throw new IllegalArgumentException("not support sql type,can't upgrade");
-            }
-        }
-    }
-
-
-    /**
-     * init scheam
-     *
-     * @param initSqlPath initSqlPath
-     */
-    public void initSchema(String initSqlPath) {
-
         // Execute the dolphinscheduler DDL, it cannot be rolled back
-        runInitDDL(initSqlPath);
+        runInitDDL();
 
         // Execute the dolphinscheduler DML, it can be rolled back
-        runInitDML(initSqlPath);
-
-
+        runInitDML();
     }
 
-    /**
-     * run DML
-     *
-     * @param initSqlPath initSqlPath
-     */
-    private void runInitDML(String initSqlPath) {
+    private void runInitDML() {
+        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + initSqlPath() + "/dolphinscheduler_dml.sql");
         Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
-            throw new RuntimeException("Environment variable user.dir not found");
-        }
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
             // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-            Reader initSqlReader = new FileReader(mysqlSQLFilePath);
+            Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream());
             initScriptRunner.runScript(initSqlReader);
 
             conn.commit();
@@ -189,68 +123,27 @@ public abstract class UpgradeDao {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(conn);
-
         }
 
     }
 
-    /**
-     * run DDL
-     *
-     * @param initSqlPath initSqlPath
-     */
-    private void runInitDDL(String initSqlPath) {
-        Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
-            throw new RuntimeException("Environment variable user.dir not found");
-        }
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
-        try {
-            conn = dataSource.getConnection();
+    private void runInitDDL() {
+        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + initSqlPath() + "/dolphinscheduler_ddl.sql");
+        try (Connection conn = dataSource.getConnection()) {
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            Reader initSqlReader = new FileReader(mysqlSQLFilePath);
+            Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream());
             initScriptRunner.runScript(initSqlReader);
-
-        } catch (IOException e) {
-
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
         } catch (Exception e) {
-
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
-
         }
-
     }
 
-    /**
-     * determines whether a table exists
-     *
-     * @param tableName tableName
-     * @return if table exist return true，else return false
-     */
     public abstract boolean isExistsTable(String tableName);
 
-    /**
-     * determines whether a field exists in the specified table
-     *
-     * @param tableName  tableName
-     * @param columnName columnName
-     * @return if column name exist return true，else return false
-     */
     public abstract boolean isExistsColumn(String tableName, String columnName);
 
-
-    /**
-     * get current version
-     *
-     * @param versionName versionName
-     * @return version
-     */
     public String getCurrentVersion(String versionName) {
         String sql = String.format("select version from %s", versionName);
         Connection conn = null;
@@ -276,17 +169,10 @@ public abstract class UpgradeDao {
         }
     }
 
-
-    /**
-     * upgrade DolphinScheduler
-     *
-     * @param schemaDir schema dir
-     */
     public void upgradeDolphinScheduler(String schemaDir) {
         upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl.sql");
         upgradeDolphinSchedulerDML(schemaDir);
     }
-
 
     /**
      * upgrade DolphinScheduler worker group
@@ -330,7 +216,7 @@ public abstract class UpgradeDao {
                 for (int i = 0; i < tasks.size(); i++) {
                     ObjectNode task = (ObjectNode) tasks.path(i);
                     ObjectNode workerGroupNode = (ObjectNode) task.path("workerGroupId");
-                    Integer workerGroupId = -1;
+                    int workerGroupId = -1;
                     if (workerGroupNode != null && workerGroupNode.canConvertToInt()) {
                         workerGroupId = workerGroupNode.asInt(-1);
                     }
@@ -355,9 +241,6 @@ public abstract class UpgradeDao {
         }
     }
 
-    /**
-     * updateProcessDefinitionJsonResourceList
-     */
     protected void updateProcessDefinitionJsonResourceList() {
         ResourceDao resourceDao = new ResourceDao();
         ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
@@ -415,17 +298,9 @@ public abstract class UpgradeDao {
 
     }
 
-    /**
-     * upgradeDolphinScheduler DML
-     *
-     * @param schemaDir schemaDir
-     */
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
-        if (StringUtils.isEmpty(rootDir)) {
-            throw new RuntimeException("Environment variable user.dir not found");
-        }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/dolphinscheduler_dml.sql", schemaDir, getDbType().name().toLowerCase()));
         logger.info("sqlSQLFilePath" + sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -434,7 +309,7 @@ public abstract class UpgradeDao {
             conn.setAutoCommit(false);
             // Execute the upgraded dolphinscheduler dml
             ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
-            Reader sqlReader = new FileReader(new File(sqlFilePath));
+            Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream());
             scriptRunner.runScript(sqlReader);
             if (isExistsTable(T_VERSION_NAME)) {
                 // Change version in the version table to the new version
@@ -466,16 +341,6 @@ public abstract class UpgradeDao {
             }
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } catch (SQLException e) {
-            try {
-                if (null != conn) {
-                    conn.rollback();
-                }
-            } catch (SQLException e1) {
-                logger.error(e1.getMessage(), e1);
-            }
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
         } catch (Exception e) {
             try {
                 if (null != conn) {
@@ -498,10 +363,7 @@ public abstract class UpgradeDao {
      * @param schemaDir schemaDir
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
-        if (StringUtils.isEmpty(rootDir)) {
-            throw new RuntimeException("Environment variable user.dir not found");
-        }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/{3}", rootDir, schemaDir, getDbType().name().toLowerCase(), scriptFile);
+        Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile));
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -511,23 +373,14 @@ public abstract class UpgradeDao {
             conn.setAutoCommit(true);
             // Execute the dolphinscheduler ddl.sql for the upgrade
             ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
-            Reader sqlReader = new FileReader(new File(sqlFilePath));
+            Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream());
             scriptRunner.runScript(sqlReader);
 
         } catch (FileNotFoundException e) {
 
             logger.error(e.getMessage(), e);
             throw new RuntimeException("sql file not found ", e);
-        } catch (IOException e) {
-
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (SQLException e) {
-
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
         } catch (Exception e) {
-
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         } finally {
@@ -612,7 +465,7 @@ public abstract class UpgradeDao {
                                             List<TaskDefinitionLog> taskDefinitionLogs,
                                             Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) throws Exception {
         Map<Integer, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
-                .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
+                                                                                 .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
         Date now = new Date();
         for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()) {
             if (entry.getValue() == null) {
@@ -621,7 +474,7 @@ public abstract class UpgradeDao {
             ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
             ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
             if (processDefinition != null) {
-                processDefinition.setTenantId(jsonObject.get("tenantId").asInt());
+                processDefinition.setTenantId(jsonObject.get("tenantId") == null ? -1 : jsonObject.get("tenantId").asInt());
                 processDefinition.setTimeout(jsonObject.get("timeout").asInt());
                 processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
             } else {
@@ -664,7 +517,9 @@ public abstract class UpgradeDao {
                     taskDefinitionLog.setTimeoutFlag(timeout.getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
                     taskDefinitionLog.setTimeoutNotifyStrategy(timeout.getStrategy());
                 }
-                taskDefinitionLog.setDescription(task.get("description").asText());
+                String desc = task.get("description") != null ? task.get("description").asText() :
+                    task.get("desc") != null ? task.get("desc").asText() : "";
+                taskDefinitionLog.setDescription(desc);
                 taskDefinitionLog.setFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL.equals(task.get("runFlag").asText()) ? Flag.YES : Flag.NO);
                 taskDefinitionLog.setTaskType(taskType);
                 taskDefinitionLog.setFailRetryInterval(TaskType.SUB_PROCESS.getDesc().equals(taskType) ? 1 : task.get("retryInterval").asInt());
@@ -672,7 +527,7 @@ public abstract class UpgradeDao {
                 taskDefinitionLog.setTaskPriority(JSONUtils.parseObject(JSONUtils.toJsonString(task.get("taskInstancePriority")), Priority.class));
                 String name = task.get("name").asText();
                 taskDefinitionLog.setName(name);
-                taskDefinitionLog.setWorkerGroup(task.get("workerGroup").asText());
+                taskDefinitionLog.setWorkerGroup(task.get("workerGroup") == null ? "default" : task.get("workerGroup").asText());
                 long taskCode = CodeGenerateUtils.getInstance().genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
@@ -763,8 +618,8 @@ public abstract class UpgradeDao {
     }
 
     public void convertDependence(List<TaskDefinitionLog> taskDefinitionLogs,
-                                   Map<Integer, Long> projectIdCodeMap,
-                                   Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) {
+                                  Map<Integer, Long> projectIdCodeMap,
+                                  Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) {
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
                 ObjectNode taskParams = JSONUtils.parseObject(taskDefinitionLog.getTaskParams());
@@ -778,12 +633,17 @@ public abstract class UpgradeDao {
                         dependItem.put("projectCode", projectIdCodeMap.get(dependItem.get("projectId").asInt()));
                         int definitionId = dependItem.get("definitionId").asInt();
                         Map<Long, Map<String, Long>> processCodeTaskNameCodeMap = processTaskMap.get(definitionId);
+                        if (processCodeTaskNameCodeMap == null) {
+                            logger.warn("We can't find processDefinition [{}], please check it is not exist, remove this dependence", definitionId);
+                            dependItemList.remove(j);
+                            continue;
+                        }
                         Optional<Map.Entry<Long, Map<String, Long>>> mapEntry = processCodeTaskNameCodeMap.entrySet().stream().findFirst();
                         if (mapEntry.isPresent()) {
                             Map.Entry<Long, Map<String, Long>> processCodeTaskNameCodeEntry = mapEntry.get();
                             dependItem.put("definitionCode", processCodeTaskNameCodeEntry.getKey());
                             String depTasks = dependItem.get("depTasks").asText();
-                            long taskCode = "ALL".equals(depTasks) ? 0L : processCodeTaskNameCodeEntry.getValue().get(depTasks);
+                            long taskCode = "ALL".equals(depTasks) || processCodeTaskNameCodeEntry.getValue() == null ? 0L : processCodeTaskNameCodeEntry.getValue().get(depTasks);
                             dependItem.put("depTaskCode", taskCode);
                         }
                         dependItem.remove("projectId");

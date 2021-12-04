@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -179,7 +180,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     private Pair<Boolean, List<String>> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
         try (LogClientService logClient = new LogClientService();) {
             logger.info("view log host : {},logPath : {}", host, logPath);
-            String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
+            String log = logClient.viewLog(host, PropertyUtils.getInt(Constants.RPC_PORT, 50051), logPath);
             List<String> appIds = Collections.emptyList();
             if (!StringUtils.isEmpty(log)) {
                 appIds = LoggerUtils.getAppIds(log, logger);

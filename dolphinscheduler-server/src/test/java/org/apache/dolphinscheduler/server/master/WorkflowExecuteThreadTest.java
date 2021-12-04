@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 
-import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -88,7 +87,6 @@ public class WorkflowExecuteThreadTest {
 
         applicationContext = mock(ApplicationContext.class);
         config = new MasterConfig();
-        config.setExecTaskNum(1);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
@@ -113,7 +111,6 @@ public class WorkflowExecuteThreadTest {
         dag.set(workflowExecuteThread, new DAG());
         PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
     }
-
 
     @Test
     public void testParseStartNodeName() throws ParseException {

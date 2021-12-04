@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.junit.BeforeClass;
+package org.apache.dolphinscheduler.remote.command.cache;
+
+import org.apache.dolphinscheduler.common.enums.CacheType;
+import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-public class UpgradeDaoTest {
-    private PostgresqlUpgradeDao postgresqlUpgradeDao;
-
-    @BeforeClass
-    public static void setUpClass() {
-        System.setProperty("spring.profiles.active", "h2");
-    }
+public class CacheExpireCommandTest {
 
     @Test
-    public void setUp() {
-        postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
-    }
+    public void testConvert2Command() {
+        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, 1);
+        Assert.assertEquals(Integer.class, cacheExpireCommand.getUpdateObjClass());
+        Assert.assertEquals("1", cacheExpireCommand.getUpdateObjJson());
 
-    @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception{
-        //postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
+        Command command = cacheExpireCommand.convert2Command();
+        Assert.assertEquals(CommandType.CACHE_EXPIRE, command.getType());
     }
-
 }

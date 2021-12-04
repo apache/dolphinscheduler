@@ -14,26 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+package org.apache.dolphinscheduler.service.cache;
 
-import java.sql.Connection;
+import org.apache.dolphinscheduler.remote.command.Command;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-
-public class ConnectionFactoryTest {
-    @BeforeClass
-    public static void setup() {
-        System.setProperty("spring.profiles.active", "h2");
-    }
-
-    @Test
-    public void testConnection() throws Exception {
-        Connection connection = ConnectionFactory.getInstance().getDataSource().getConnection();
-        Assert.assertTrue(connection != null);
-    }
+public interface CacheNotifyService {
+    void notifyMaster(Command command);
 }

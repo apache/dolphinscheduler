@@ -25,11 +25,16 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * process task relation mapper interface
  */
+@CacheConfig(cacheNames = "processTaskRelation", keyGenerator = "cacheKeyGenerator")
 public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelation> {
 
     /**
@@ -39,8 +44,15 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return ProcessTaskRelation list
      */
+    @Cacheable(sync = true)
     List<ProcessTaskRelation> queryByProcessCode(@Param("projectCode") long projectCode,
                                                  @Param("processCode") long processCode);
+
+    /**
+     * update
+     */
+    @CacheEvict
+    int updateById(@Param("et") ProcessTaskRelation processTaskRelation);
 
     /**
      * process task relation by taskCode
@@ -65,6 +77,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return int
      */
+    @CacheEvict
     int deleteByCode(@Param("projectCode") long projectCode,
                      @Param("processCode") long processCode);
 
@@ -105,16 +118,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * query task relation by codes
      *
-     * @param projectCode   projectCode
-     * @param taskCode      taskCode
-     * @param postTaskCodes postTaskCodes list
-     * @return ProcessTaskRelation
-     */
-    List<ProcessTaskRelation> queryDownstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode,@Param("postTaskCodes") Long[] postTaskCodes);
-
-    /**
-     * query task relation by codes
-     *
      * @param projectCode  projectCode
      * @param taskCode     taskCode
      * @param preTaskCodes preTaskCode list
@@ -130,8 +133,9 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processDefinitionCodes    processDefinitionCodes
      * @return upstream count list group by process definition code
      */
-    List<Map<Long, Integer>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
-                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes, @Param("taskCode") long taskCode);
+    List<Map<String, Long>> countUpstreamByCodeGroupByProcessDefinitionCode(@Param("projectCode") long projectCode,
+                                                                             @Param("processDefinitionCodes") Long[] processDefinitionCodes,
+                                                                             @Param("taskCode") long taskCode);
 
     /**
      * batch update process task relation pre task
@@ -162,4 +166,19 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return int
      */
     int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
+
+    /**
+     * count by code
+     *
+     * @param projectCode           projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @param preTaskCode           preTaskCode
+     * @param postTaskCode          postTaskCode
+     * @return ProcessTaskRelation
+     */
+    int countByCode(@Param("projectCode") long projectCode,
+                    @Param("processDefinitionCode") long processDefinitionCode,
+                    @Param("preTaskCode") long preTaskCode,
+                    @Param("postTaskCode") long postTaskCode);
+
 }
