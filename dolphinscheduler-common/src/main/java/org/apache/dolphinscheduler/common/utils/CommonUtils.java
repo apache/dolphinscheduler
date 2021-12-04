@@ -179,4 +179,26 @@ public class CommonUtils {
         return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);
     }
 
+    /*
+     * initialize class with error suppressed
+     */
+    private static void initializeClassWithErrorSuppressed(String classNameStr) {
+        try {
+            logger.info("initializing class without error: " + classNameStr);
+            Class.forName(classNameStr);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static void initializeAllJdbcDriversWithoutError() {
+        initializeClassWithErrorSuppressed(Constants.COM_MYSQL_CJ_JDBC_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.ORG_POSTGRESQL_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.COM_ORACLE_JDBC_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.COM_SQLSERVER_JDBC_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.COM_DB2_JDBC_DRIVER);
+        initializeClassWithErrorSuppressed(Constants.COM_PRESTO_JDBC_DRIVER);
+    }
+
 }
