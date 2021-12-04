@@ -22,9 +22,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -108,6 +110,18 @@ public class CacheProcessor implements NettyRequestProcessor {
                     processTaskRelationCacheExpire(processTaskRelation);
                 }
                 break;
+            case WORKER_GROUP:
+                if (object instanceof WorkerGroup) {
+                    WorkerGroup workerGroup = (WorkerGroup) object;
+                    workerGroupCacheExpire(workerGroup);
+                }
+                break;
+            case SCHEDULE:
+                if (object instanceof Schedule) {
+                    Schedule schedule = (Schedule) object;
+                    scheduleCacheExpire(schedule);
+                }
+                break;
             default:
                 logger.error("no support cache type:{}", cacheType);
         }
@@ -171,6 +185,24 @@ public class CacheProcessor implements NettyRequestProcessor {
             cache.evict(taskDefinition.getCode() + "_" + taskDefinition.getVersion());
             logger.info("cache evict, type:{}, key:{}",
                     CacheType.TASK_DEFINITION.getCacheName(), taskDefinition.getCode() + "_" + taskDefinition.getVersion());
+        }
+    }
+
+    private void workerGroupCacheExpire(WorkerGroup workerGroup) {
+        Cache cache = cacheManager.getCache(CacheType.WORKER_GROUP.getCacheName());
+        if (cache != null) {
+            cache.evict("all");
+            logger.info("cache evict, type:{}, key:{}",
+                    CacheType.WORKER_GROUP.getCacheName(), "all");
+        }
+    }
+
+    private void scheduleCacheExpire(Schedule schedule) {
+        Cache cache = cacheManager.getCache(CacheType.SCHEDULE.getCacheName());
+        if (cache != null) {
+            cache.evict(schedule.getProcessDefinitionCode());
+            logger.info("cache evict, type:{}, key:{}",
+                    CacheType.SCHEDULE.getCacheName(), schedule.getProcessDefinitionCode());
         }
     }
 }

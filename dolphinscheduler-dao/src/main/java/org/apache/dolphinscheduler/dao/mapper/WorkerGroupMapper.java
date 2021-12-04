@@ -23,18 +23,33 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * worker group mapper interface
  */
+@CacheConfig(cacheNames = "workerGroup", keyGenerator = "cacheKeyGenerator")
 public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
     /**
      * query all worker group
      * @return worker group list
      */
+    @Cacheable(sync = true, key = "'all'")
     List<WorkerGroup> queryAllWorkerGroup();
+
+    @CacheEvict
+    int deleteById(Integer id);
+
+    @CacheEvict
+    int insert(WorkerGroup entity);
+
+    @CacheEvict
+    int updateById(@Param("et") WorkerGroup entity);
 
     /**
      * query worer grouop by name
