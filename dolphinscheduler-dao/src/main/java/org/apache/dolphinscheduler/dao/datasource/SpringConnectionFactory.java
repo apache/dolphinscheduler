@@ -42,6 +42,7 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 @Configuration
 public class SpringConnectionFactory {
+
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
@@ -60,6 +61,7 @@ public class SpringConnectionFactory {
         configuration.setCallSettersOnNulls(true);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.addInterceptor(paginationInterceptor());
+
         configuration.setGlobalConfig(new GlobalConfig().setBanner(false));
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
@@ -76,11 +78,6 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();
-    }
-
-    @Bean
-    public SqlSession sqlSession(SqlSessionFactory sqlSessionFactory) {
-        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean

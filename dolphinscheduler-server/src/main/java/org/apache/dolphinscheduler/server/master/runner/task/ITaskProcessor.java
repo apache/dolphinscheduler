@@ -36,4 +36,6 @@ public interface ITaskProcessor {
 
     ExecutionStatus taskState();
 
+    void dispatch(TaskInstance taskInstance, ProcessInstance processInstance);
+
 }

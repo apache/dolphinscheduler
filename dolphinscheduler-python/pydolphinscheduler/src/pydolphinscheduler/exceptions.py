@@ -40,3 +40,7 @@ class PyDSJavaGatewayException(PyDSBaseException):
     """Exception for pydolphinscheduler Java gateway error."""
 
     pass
+
+
+class PyDSProcessDefinitionNotAssignException(PyDSBaseException):
+    """Exception for pydolphinscheduler process definition not assign error."""

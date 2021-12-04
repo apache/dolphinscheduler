@@ -25,6 +25,10 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +36,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * task definition log mapper interface
  */
+@CacheConfig(cacheNames = "taskDefinition", keyGenerator = "cacheKeyGenerator")
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
@@ -48,8 +53,15 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version version
      * @return task definition log
      */
+    @Cacheable(sync = true, key = "#taskCode + '_' + #taskDefinitionVersion")
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,
                                                       @Param("version") int version);
+
+    /**
+     * update
+     */
+    @CacheEvict
+    int updateById(@Param("et") TaskDefinitionLog taskDefinitionLog);
 
     /**
      * @param taskDefinitions taskDefinition list
@@ -72,14 +84,16 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version task definition version
      * @return delete result
      */
+    @CacheEvict
     int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * query the paging task definition version list by pagination info
      *
      * @param page pagination info
+     * @param projectCode project code
      * @param code process definition code
      * @return the paging task definition version list
      */
-    IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code);
+    IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);
 }
