@@ -97,11 +97,12 @@ BEGIN
 	--- drop index
 	EXECUTE 'DROP INDEX IF EXISTS "process_instance_index"';
 	EXECUTE 'DROP INDEX IF EXISTS "task_instance_index"';
+	EXECUTE 'DROP INDEX IF EXISTS "start_time_index"';
 
 	--- create index
 	EXECUTE 'CREATE INDEX IF NOT EXISTS priority_id_index ON ' || quote_ident(v_schema) ||'.t_ds_command USING Btree("process_instance_priority","id")';
 	EXECUTE 'CREATE INDEX IF NOT EXISTS process_instance_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("process_definition_code","id")';
-
+    EXECUTE 'CREATE INDEX IF NOT EXISTS start_time_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("start_time","end_time")';
 
 	---add comment
 	EXECUTE 'comment on column ' ||  quote_ident(v_schema) ||'.t_ds_user.state is ''state 0:disable 1:enable''';
