@@ -35,11 +35,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public final class HttpSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(HttpSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
     private static final String URL_SPLICE_CHAR = "?";
     /**
      * request type post
@@ -86,7 +87,7 @@ public final class HttpSender {
             alertResult.setStatus("true");
             alertResult.setMessage(resp);
         } catch (Exception e) {
-            log.error("send http alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg  exception : {}", e.getMessage());
             alertResult.setStatus("false");
             alertResult.setMessage("send http request  alert fail.");
         }
@@ -149,7 +150,7 @@ public final class HttpSender {
             StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
-            log.error("send http alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg  exception : {}", e.getMessage());
         }
     }
 }
