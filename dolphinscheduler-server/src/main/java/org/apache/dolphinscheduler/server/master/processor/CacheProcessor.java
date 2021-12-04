@@ -202,7 +202,7 @@ public class CacheProcessor implements NettyRequestProcessor {
         if (cache != null) {
             cache.evict(schedule.getProcessDefinitionCode());
             logger.info("cache evict, type:{}, key:{}",
-                    CacheType.SCHEDULE.getCacheName(), "-");
+                    CacheType.SCHEDULE.getCacheName(), schedule.getProcessDefinitionCode());
         }
     }
 }
