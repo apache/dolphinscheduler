@@ -17,7 +17,39 @@
 
 package org.apache.dolphinscheduler.service.quartz;
 
-import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+import org.quartz.CronTrigger;
+import org.quartz.Job;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.jdbcjobstore.JobStoreTX;
+import org.quartz.impl.jdbcjobstore.PostgreSQLDelegate;
+import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.simpl.SimpleThreadPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.apache.dolphinscheduler.common.Constants.ORG_POSTGRESQL_DRIVER;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK;
@@ -55,46 +87,9 @@ import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRI
 import static org.apache.dolphinscheduler.common.Constants.STRING_FALSE;
 import static org.apache.dolphinscheduler.common.Constants.STRING_TRUE;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
-
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.service.exceptions.ServiceException;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.quartz.CronTrigger;
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerKey;
-import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.jdbcjobstore.JobStoreTX;
-import org.quartz.impl.jdbcjobstore.PostgreSQLDelegate;
-import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
-import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.simpl.SimpleThreadPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * single Quartz executors instance
@@ -150,7 +145,6 @@ public class QuartzExecutors {
      */
     private void init() {
         try {
-            PropertyUtils.loadPropertyFile(DATASOURCE_PROPERTIES);
             StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
             Properties properties = new Properties();
 

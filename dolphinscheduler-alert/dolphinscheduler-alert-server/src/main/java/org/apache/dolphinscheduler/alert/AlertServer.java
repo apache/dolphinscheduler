@@ -38,7 +38,9 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableAutoConfiguration
@@ -66,7 +68,9 @@ public class AlertServer implements Closeable {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(AlertServer.class, args);
+        new SpringApplicationBuilder(AlertServer.class)
+            .web(WebApplicationType.NONE)
+            .run(args);
     }
 
     @PostConstruct

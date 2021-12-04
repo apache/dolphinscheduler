@@ -19,7 +19,9 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
+set -a
 source ${workDir}/conf/config/install_config.conf
+set +a
 
 # 1.replace file
 echo "1.replace file"
@@ -31,18 +33,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 datasourceDriverClassname="com.mysql.jdbc.Driver"
-if [ $dbtype == "postgresql" ];then
+if [[ $dbtype == "postgresql" ]];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
 
 # Change configuration in conf/config/dolphinscheduler_env.sh
 sed -i ${txt} "s@^export JAVA_HOME=.*@export JAVA_HOME=${javaHome}@g" conf/env/dolphinscheduler_env.sh
-
-# Change configuration in conf/datasource.properties
-sed -i ${txt} "s@^spring.datasource.driver-class-name=.*@spring.datasource.driver-class-name=${datasourceDriverClassname}@g" conf/datasource.properties
-sed -i ${txt} "s@^spring.datasource.url=.*@spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true@g" conf/datasource.properties
-sed -i ${txt} "s@^spring.datasource.username=.*@spring.datasource.username=${username}@g" conf/datasource.properties
-sed -i ${txt} "s@^spring.datasource.password=.*@spring.datasource.password=${password}@g" conf/datasource.properties
 
 # Change configuration in conf/common.properties
 sed -i ${txt} "s@^data.basedir.path=.*@data.basedir.path=${dataBasedirPath}@g" conf/common.properties

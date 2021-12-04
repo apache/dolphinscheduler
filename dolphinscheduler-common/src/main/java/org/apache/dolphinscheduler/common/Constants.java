@@ -402,7 +402,6 @@ public final class Constants {
     /**
      * datasource configuration path
      */
-    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
     public static final String COMMON_TASK_TYPE = "common";
 
@@ -453,11 +452,6 @@ public final class Constants {
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
-
-
-    /**
-     * data source config
-     */
 
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 

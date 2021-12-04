@@ -60,6 +60,10 @@
     </el-dialog>
     <edge-edit-model ref="edgeEditModel" />
     <el-drawer :visible.sync="versionDrawer" size="" :with-header="false">
+      <!-- fix the bug that Element-ui(2.13.2) auto focus on the first input -->
+      <div style="width: 0px; height: 0px; overflow: hidden">
+        <el-input type="text" />
+      </div>
       <m-versions
         :versionData="versionData"
         :isInstance="type === 'instance'"
@@ -187,7 +191,6 @@
     },
     beforeDestroy () {
       this.resetParams()
-
       clearInterval(this.statusTimer)
       window.removeEventListener('resize', this.resizeDebounceFunc)
     },
@@ -400,6 +403,7 @@
       buildGraphJSON (tasks, locations, connects) {
         const nodes = []
         const edges = []
+        if (!locations) { locations = [] }
         tasks.forEach((task) => {
           const location = locations.find((l) => l.taskCode === task.code) || {}
           const node = this.$refs.canvas.genNodeJSON(
@@ -484,6 +488,10 @@
         const connects = this.connects
         const json = this.buildGraphJSON(tasks, locations, connects)
         this.$refs.canvas.fromJSON(json)
+        // Auto format
+        if (!locations) {
+          this.$refs.canvas.format()
+        }
       },
       /**
        * Return to the previous process

@@ -18,7 +18,9 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
+set -a
 source $workDir/../conf/config/install_config.conf
+set +a
 
 txt=""
 if [[ "$OSTYPE" == "darwin"* ]]; then

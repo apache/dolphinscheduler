@@ -269,7 +269,7 @@ public enum Status {
     CREATE_PROCESS_TASK_RELATION_ERROR(50032, "create process task relation error", "创建工作流任务关系错误"),
     PROCESS_TASK_RELATION_NOT_EXIST(50033, "process task relation {0} does not exist", "工作流任务关系[{0}]不存在"),
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]", "工作流任务关系已存在, processCode:[{0}]"),
-    PROCESS_DAG_IS_EMPTY(50035, "process dag can not be empty", "工作流dag不能为空"),
+    PROCESS_DAG_IS_EMPTY(50035, "process dag is empty", "工作流dag是空"),
     CHECK_PROCESS_TASK_RELATION_ERROR(50036, "check process task relation error", "工作流任务关系参数错误"),
     CREATE_TASK_DEFINITION_ERROR(50037, "create task definition error", "创建任务错误"),
     UPDATE_TASK_DEFINITION_ERROR(50038, "update task definition error", "更新任务定义错误"),
@@ -280,13 +280,22 @@ public enum Status {
     QUERY_DETAIL_OF_TASK_DEFINITION_ERROR(50043, "query detail of task definition error", "查询任务详细信息错误"),
     QUERY_TASK_DEFINITION_LIST_PAGING_ERROR(50044, "query task definition list paging error", "分页查询任务定义列表错误"),
     TASK_DEFINITION_NAME_EXISTED(50045, "task definition name [{0}] already exists", "任务定义名称[{0}]已经存在"),
+    RELEASE_TASK_DEFINITION_ERROR(50046, "release task definition error", "上线任务错误"),
+    MOVE_PROCESS_TASK_RELATION_ERROR(50047, "move process task relation error", "移动任务到其他工作流错误"),
+    DELETE_TASK_PROCESS_RELATION_ERROR(50048, "delete process task relation error", "删除工作流任务关系错误"),
+    QUERY_TASK_PROCESS_RELATION_ERROR(50049, "query process task relation error", "查询工作流任务关系错误"),
+    TASK_DEFINE_STATE_ONLINE(50050, "task definition {0} is already on line", "任务定义[{0}]已上线"),
+    TASK_HAS_DOWNSTREAM(50051, "Task [{0}] exists downstream dependence", "任务[{0}]存在下游依赖"),
+    TASK_HAS_UPSTREAM(50052, "Task [{0}] exists upstream dependence", "任务[{0}]存在上游依赖"),
+    MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
+    PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
+    DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
      * for monitor
      */
     QUERY_DATABASE_STATE_ERROR(70001, "query database state error", "查询数据库状态错误"),
-    QUERY_ZOOKEEPER_STATE_ERROR(70002, "query zookeeper state error", "查询zookeeper状态错误"),
 
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),
