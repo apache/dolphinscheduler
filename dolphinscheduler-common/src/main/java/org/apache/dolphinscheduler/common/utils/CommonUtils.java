@@ -184,10 +184,10 @@ public class CommonUtils {
      */
     private static void initializeClassWithErrorSuppressed(String classNameStr) {
         try {
-            logger.info("initializing class without error: " + classNameStr);
+            logger.info("initializing class without error: {}", classNameStr);
             Class.forName(classNameStr);
         } catch (Exception ignored) {
-            logger.warn("initialize class failed: " + classNameStr + ", will ignore");
+            logger.warn("initialize class failed: {}, will ignore", classNameStr);
         }
     }
 

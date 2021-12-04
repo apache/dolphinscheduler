@@ -87,4 +87,9 @@ public class CommonUtilsTest {
         Assert.assertTrue(true);
     }
 
+    @Test
+    public void testInitializeAllJdbcDriversWithoutError() {
+        CommonUtils.initializeAllJdbcDriversWithoutError();
+    }
+
 }
