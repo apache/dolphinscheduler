@@ -449,16 +449,12 @@ export default {
   /**
    * get jar
    */
-  getResourcesListJar ({ state }) {
+  getResourcesListJar ({ state }, programType) {
     return new Promise((resolve, reject) => {
-      if (state.resourcesListJar.length) {
-        resolve()
-        return
-      }
       io.get('resources/query-by-type', {
-        type: 'FILE'
+        type: 'FILE',
+        programType
       }, res => {
-        state.resourcesListJar = res.data
         resolve(res.data)
       }).catch(res => {
         reject(res)
