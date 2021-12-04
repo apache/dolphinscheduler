@@ -121,7 +121,7 @@ public class CacheEvictAspect {
         }
         Object obj = spelParser.parseExpression(key).getValue(ctx);
         if (null == obj) {
-            throw new RuntimeException("parseKey error")
+            throw new RuntimeException("parseKey error");
         }
         return obj.toString();
     }
