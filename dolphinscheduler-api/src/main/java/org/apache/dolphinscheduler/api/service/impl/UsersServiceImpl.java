@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -53,8 +52,6 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
-import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -62,6 +59,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -120,10 +118,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private ProjectMapper projectMapper;
-
-    @Autowired
-    private CacheNotifyService cacheNotifyService;
-
 
     /**
      * create user, only system admin have permission
@@ -479,7 +473,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // updateProcessInstance user
         userMapper.updateById(user);
-        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -531,10 +524,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         userMapper.deleteById(id);
 
-        if (user != null) {
-            cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
-        }
-
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -583,6 +572,62 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);
+        }
+
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCodes project code array
+     * @return grant result code
+     */
+    @Override
+    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final String projectCodes) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        // 2. check if user is existed
+        User tempUser = this.userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 3. if the selected projectCodes are empty, delete all items associated with the user
+        if (this.check(result, StringUtils.isEmpty(projectCodes), Status.SUCCESS)) {
+            this.projectUserMapper.deleteProjectRelation(0, userId);
+            return result;
+        }
+
+        // 4. maintain the relationship between project and user
+        Set<Long> projectCodeSet = Arrays.stream(projectCodes.split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
+        final List<Project> projectList = this.projectMapper.queryByCodes(projectCodeSet);
+        if (CollectionUtils.isEmpty(projectList)) {
+            logger.info("project not exists");
+            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCodes);
+            return result;
+        }
+        for (final Project project : projectList) {
+            final Date today = new Date();
+
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(project.getId());
+            projectUser.setPerm(7);
+            projectUser.setCreateTime(today);
+            projectUser.setUpdateTime(today);
+            this.projectUserMapper.insert(projectUser);
         }
 
         putMsg(result, Status.SUCCESS);
@@ -1078,8 +1123,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
-
-        cacheNotifyService.notifyMaster(new CacheExpireCommand(CacheType.USER, user).convert2Command());
 
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
