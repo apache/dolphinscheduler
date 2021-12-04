@@ -23,6 +23,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,22 +38,24 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
     /**
      * query all worker group
+     *
      * @return worker group list
      */
-    @Cacheable(sync = true, key = "'all'")
+    @Cacheable(sync = true, key = "all")
     List<WorkerGroup> queryAllWorkerGroup();
 
-    @CacheEvict
+    @CacheEvict(key = "all")
     int deleteById(Integer id);
 
-    @CacheEvict
+    @CacheEvict(key = "all")
     int insert(WorkerGroup entity);
 
-    @CacheEvict
+    @CacheEvict(key = "all")
     int updateById(@Param("et") WorkerGroup entity);
 
     /**
      * query worer grouop by name
+     *
      * @param name name
      * @return worker group list
      */
