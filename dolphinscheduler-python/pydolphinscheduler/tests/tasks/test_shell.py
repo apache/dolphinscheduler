@@ -20,7 +20,28 @@
 
 from unittest.mock import patch
 
-from pydolphinscheduler.tasks.shell import Shell
+import pytest
+
+from pydolphinscheduler.tasks.shell import Shell, ShellTaskParams
+
+
+@pytest.mark.parametrize(
+    "name, value",
+    [
+        ("local_params", "local_params"),
+        ("resource_list", "resource_list"),
+        ("dependence", "dependence"),
+        ("wait_start_timeout", "wait_start_timeout"),
+        ("condition_result", "condition_result"),
+    ],
+)
+def test_shell_task_params_attr_setter(name, value):
+    """Test shell task parameters."""
+    raw_script = "echo shell task parameter"
+    shell_task_params = ShellTaskParams(raw_script)
+    assert raw_script == shell_task_params.raw_script
+    setattr(shell_task_params, name, value)
+    assert value == getattr(shell_task_params, name)
 
 
 def test_shell_to_dict():

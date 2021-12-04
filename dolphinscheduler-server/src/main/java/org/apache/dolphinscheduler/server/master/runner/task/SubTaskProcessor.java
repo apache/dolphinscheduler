@@ -54,12 +54,12 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         taskDefinition = processService.findTaskDefinition(
                 task.getTaskCode(), task.getTaskDefinitionVersion()
         );
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-
+        setTaskExecutionLogger();
         return true;
     }
 

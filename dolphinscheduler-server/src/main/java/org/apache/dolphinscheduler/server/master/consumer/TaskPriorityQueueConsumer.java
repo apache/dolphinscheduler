@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -33,6 +35,8 @@ import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -78,30 +82,24 @@ public class TaskPriorityQueueConsumer extends Thread {
     @Autowired
     private MasterConfig masterConfig;
 
+    /**
+     * consumer thread pool
+     */
+    private ThreadPoolExecutor consumerThreadPoolExecutor;
+
     @PostConstruct
     public void init() {
-        super.setName("TaskUpdateQueueConsumerThread");
+        this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
         super.start();
     }
 
     @Override
     public void run() {
-        List<TaskPriority> failedDispatchTasks = new ArrayList<>();
+        int fetchTaskNum = masterConfig.getDispatchTaskNumber();
         while (Stopper.isRunning()) {
             try {
-                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
-                failedDispatchTasks.clear();
-                for (int i = 0; i < fetchTaskNum; i++) {
-                    TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
-                    if (Objects.isNull(taskPriority)) {
-                        continue;
-                    }
+                List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
-                    boolean dispatchResult = dispatch(taskPriority);
-                    if (!dispatchResult) {
-                        failedDispatchTasks.add(taskPriority);
-                    }
-                }
                 if (!failedDispatchTasks.isEmpty()) {
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
@@ -119,25 +117,55 @@ public class TaskPriorityQueueConsumer extends Thread {
     }
 
     /**
+     * batch dispatch with thread pool
+     */
+    private List<TaskPriority> batchDispatch(int fetchTaskNum) throws TaskPriorityQueueException, InterruptedException {
+        List<TaskPriority> failedDispatchTasks = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(fetchTaskNum);
+
+        for (int i = 0; i < fetchTaskNum; i++) {
+            TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+            if (Objects.isNull(taskPriority)) {
+                latch.countDown();
+                continue;
+            }
+
+            consumerThreadPoolExecutor.submit(() -> {
+                boolean dispatchResult = this.dispatchTask(taskPriority);
+                if (!dispatchResult) {
+                    failedDispatchTasks.add(taskPriority);
+                }
+                latch.countDown();
+            });
+        }
+
+        latch.await();
+
+        return failedDispatchTasks;
+    }
+
+    /**
      * dispatch task
      *
      * @param taskPriority taskPriority
      * @return result
      */
-    protected boolean dispatch(TaskPriority taskPriority) {
+    protected boolean dispatchTask(TaskPriority taskPriority) {
         boolean result = false;
         try {
             TaskExecutionContext context = taskPriority.getTaskExecutionContext();
             ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 
-            if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
-                // when task finish, ignore this task, there is no need to dispatch anymore
-                return true;
-            } else {
-                result = dispatcher.dispatch(executionContext);
+            if (isTaskNeedToCheck(taskPriority)) {
+                if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
+                    // when task finish, ignore this task, there is no need to dispatch anymore
+                    return true;
+                }
             }
+
+            result = dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage(),e);
+            logger.error("dispatch error: {}", e.getMessage(), e);
         }
         return result;
     }
@@ -152,5 +180,17 @@ public class TaskPriorityQueueConsumer extends Thread {
     public Boolean taskInstanceIsFinalState(int taskInstanceId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
+    }
+
+    /**
+     * check if task need to check state, if true, refresh the checkpoint
+     */
+    private boolean isTaskNeedToCheck(TaskPriority taskPriority) {
+        long now = System.currentTimeMillis();
+        if (now - taskPriority.getCheckpoint() > Constants.SECOND_TIME_MILLIS) {
+            taskPriority.setCheckpoint(now);
+            return true;
+        }
+        return false;
     }
 }

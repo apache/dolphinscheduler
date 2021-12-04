@@ -46,4 +46,28 @@
         WHERE process_definition_code = #{processCode}
         and process_definition_version = #{processVersion}
     </delete>
+    <delete id="deleteRelation">
+        delete from t_ds_process_task_relation_log
+        WHERE project_code = #{processTaskRelationLog.projectCode}
+          and process_definition_code = #{processTaskRelationLog.processDefinitionCode}
+          and process_definition_version = #{processTaskRelationLog.processDefinitionVersion}
+        <if test="processTaskRelationLog.preTaskCode !=0 and processTaskRelationLog.preTaskVersion != 0">
+          and pre_task_code = #{processTaskRelationLog.preTaskCode}
+          and pre_task_version = #{processTaskRelationLog.preTaskVersion}
+        </if>
+          and post_task_code = #{processTaskRelationLog.postTaskCode}
+          and post_task_version = #{processTaskRelationLog.postTaskVersion}
+    </delete>
+    <select id="queryRelationLogByRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation_log
+        WHERE project_code = #{processTaskRelation.projectCode}
+        and process_definition_code = #{processTaskRelation.processDefinitionCode}
+        and process_definition_version = #{processTaskRelation.processDefinitionVersion}
+        and pre_task_code = #{processTaskRelation.preTaskCode}
+        and pre_task_version = #{processTaskRelation.preTaskVersion}
+        and post_task_code = #{processTaskRelation.postTaskCode}
+        and post_task_version = #{processTaskRelation.postTaskVersion}
+    </select>
 </mapper>

@@ -22,8 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -89,7 +87,6 @@ public class WorkflowExecuteThreadTest {
 
         applicationContext = mock(ApplicationContext.class);
         config = new MasterConfig();
-        config.setMasterExecTaskNum(1);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
@@ -114,7 +111,6 @@ public class WorkflowExecuteThreadTest {
         dag.set(workflowExecuteThread, new DAG());
         PowerMockito.doNothing().when(workflowExecuteThread, "endProcess");
     }
-
 
     @Test
     public void testParseStartNodeName() throws ParseException {
@@ -163,39 +159,52 @@ public class WorkflowExecuteThreadTest {
     public void testGetPreVarPool() {
         try {
             Set<String> preTaskName = new HashSet<>();
-            preTaskName.add("test1");
-            preTaskName.add("test2");
-            Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
+            preTaskName.add(Long.toString(1));
+            preTaskName.add(Long.toString(2));
 
             TaskInstance taskInstance = new TaskInstance();
 
             TaskInstance taskInstance1 = new TaskInstance();
             taskInstance1.setId(1);
-            taskInstance1.setName("test1");
+            taskInstance1.setTaskCode(1);
             taskInstance1.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"1\"}]");
             taskInstance1.setEndTime(new Date());
 
             TaskInstance taskInstance2 = new TaskInstance();
             taskInstance2.setId(2);
-            taskInstance2.setName("test2");
+            taskInstance2.setTaskCode(2);
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test2\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             taskInstance2.setEndTime(new Date());
 
-            completeTaskList.put("test1", taskInstance1);
-            completeTaskList.put("test2", taskInstance2);
+            Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
+            taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
+            taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
+
+            Map<String, Integer> completeTaskList = new ConcurrentHashMap<>();
+            completeTaskList.put(Long.toString(taskInstance1.getTaskCode()), taskInstance1.getId());
+            completeTaskList.put(Long.toString(taskInstance1.getTaskCode()), taskInstance2.getId());
 
             Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
 
-            Field field = masterExecThreadClass.getDeclaredField("completeTaskList");
-            field.setAccessible(true);
-            field.set(workflowExecuteThread, completeTaskList);
+            Field completeTaskMapField = masterExecThreadClass.getDeclaredField("completeTaskMap");
+            completeTaskMapField.setAccessible(true);
+            completeTaskMapField.set(workflowExecuteThread, completeTaskList);
+
+            Field taskInstanceMapField = masterExecThreadClass.getDeclaredField("taskInstanceMap");
+            taskInstanceMapField.setAccessible(true);
+            taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
 
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
+
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
-            completeTaskList.put("test2", taskInstance2);
-            field.setAccessible(true);
-            field.set(workflowExecuteThread, completeTaskList);
+            completeTaskList.put(Long.toString(taskInstance2.getTaskCode()), taskInstance2.getId());
+
+            completeTaskMapField.setAccessible(true);
+            completeTaskMapField.set(workflowExecuteThread, completeTaskList);
+            taskInstanceMapField.setAccessible(true);
+            taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
+
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {

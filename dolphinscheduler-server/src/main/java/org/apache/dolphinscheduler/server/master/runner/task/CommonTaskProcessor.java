@@ -39,8 +39,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,18 +55,26 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     @Autowired
     NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
-    /**
-     * logger of MasterBaseTaskExecThread
-     */
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
     public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
         this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+        this.taskInstance = processService.submitTaskWithRetry(processInstance, task, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
+        }
+        setTaskExecutionLogger();
+        int taskGroupId = task.getTaskGroupId();
+        if (taskGroupId > 0) {
+            boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
+                    task.getName(),
+                    taskGroupId,
+                    task.getProcessInstanceId(),
+                    task.getTaskInstancePriority().getCode());
+            if (!acquireTaskGroup) {
+                logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
+                return true;
+            }
         }
         dispatchTask(taskInstance, processInstance);
         return true;
@@ -77,6 +83,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     @Override
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
+    }
+
+    @Override
+    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
+        this.dispatchTask(taskInstance,processInstance);
     }
 
     @Override

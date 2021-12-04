@@ -122,6 +122,7 @@ public class ExecutorServiceTest {
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
         processDefinition.setCode(1L);
+        processDefinition.setProjectCode(projectCode);
 
         // processInstance
         processInstance.setId(processInstanceId);
@@ -279,9 +280,9 @@ public class ExecutorServiceTest {
 
     @Test
     public void testStartCheckByProcessDefinedCode() {
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
-        Mockito.doNothing().when(processService).recurseFindSubProcessId(1, ids);
+        List<Long> ids = new ArrayList<>();
+        ids.add(1L);
+        Mockito.doNothing().when(processService).recurseFindSubProcess(1, ids);
 
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         ProcessDefinition processDefinition = new ProcessDefinition();

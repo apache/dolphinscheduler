@@ -14,32 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.subprocess;
+
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class SubProcessParameters extends AbstractParameters {
 
     /**
      * process definition id
      */
-    private Integer processDefinitionId;
+    private long processDefinitionCode;
 
-    public void setProcessDefinitionId(Integer processDefinitionId){
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
 
-    public Integer getProcessDefinitionId(){
-        return this.processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return this.processDefinitionCode;
     }
 
     @Override
     public boolean checkParameters() {
-        return this.processDefinitionId != null && this.processDefinitionId != 0;
+        return this.processDefinitionCode != 0;
     }
 
     @Override

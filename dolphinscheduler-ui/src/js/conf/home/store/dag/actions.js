@@ -18,6 +18,16 @@
 import _ from 'lodash'
 import io from '@/module/io'
 
+// Avoid passing in illegal values when users directly call third-party interfaces
+const convertLocations = (locationStr) => {
+  let locations = null
+  if (!locationStr) return locations
+  try {
+    locations = JSON.parse(locationStr)
+  } catch (error) {}
+  return Array.isArray(locations) ? locations : null
+}
+
 export default {
   /**
    *  Task status acquisition
@@ -134,19 +144,20 @@ export default {
         state.version = res.data.processDefinition.version
         // name
         state.name = res.data.processDefinition.name
+        // releaseState
+        state.releaseState = res.data.processDefinition.releaseState
         // description
         state.description = res.data.processDefinition.description
         // taskRelationJson
         state.connects = res.data.processTaskRelationList
         // locations
-        state.locations = JSON.parse(res.data.processDefinition.locations)
+        state.locations = convertLocations(res.data.processDefinition.locations)
         // global params
         state.globalParams = res.data.processDefinition.globalParamList
         // timeout
         state.timeout = res.data.processDefinition.timeout
         // executionType
         state.executionType = res.data.processDefinition.executionType
-        // tenantId
         // tenantCode
         state.tenantCode = res.data.processDefinition.tenantCode || 'default'
         // tasks info
@@ -168,6 +179,7 @@ export default {
           'timeout',
           'environmentCode'
         ]))
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -239,7 +251,7 @@ export default {
         // connects
         state.connects = processTaskRelationList
         // locations
-        state.locations = JSON.parse(processDefinition.locations)
+        state.locations = convertLocations(processDefinition.locations)
         // global params
         state.globalParams = processDefinition.globalParamList
         // timeout
@@ -838,10 +850,50 @@ export default {
       })
     })
   },
-  getTaskDefinitions ({ state }, payload) {
+  /**
+   * Query Task Definitions List Paging
+   */
+  getTaskDefinitionsList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectCode}/task-definition`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete Task Definition by code
+   */
+  deleteTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.delete(`projects/${state.projectCode}/task-definition/${payload.code}`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Save Task Definition
+   */
+  saveTaskDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectCode}/task-definition`, {
+        taskDefinitionJson: JSON.stringify(payload.taskDefinitionJson)
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  updateTaskDefinition ({ state }, taskDefinition) {
+    return new Promise((resolve, reject) => {
+      io.put(`projects/${state.projectCode}/task-definition/${taskDefinition.code}`, {
+        taskDefinitionJsonObj: JSON.stringify(taskDefinition)
+      }, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

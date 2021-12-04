@@ -289,7 +289,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
+  `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
@@ -387,6 +387,8 @@ alter table t_ds_process_instance add var_pool longtext COMMENT 'var_pool' AFTER
 alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
 alter table t_ds_process_instance drop KEY `process_instance_index`;
 alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
+alter table t_ds_process_instance drop KEY `start_time_index`;
+alter table t_ds_process_instance add KEY `start_time_index` (`start_time`,`end_time`) USING BTREE;
 alter table t_ds_process_instance drop process_instance_json;
 alter table t_ds_process_instance drop locations;
 alter table t_ds_process_instance drop connects;

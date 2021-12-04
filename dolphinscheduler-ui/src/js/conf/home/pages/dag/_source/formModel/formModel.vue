@@ -46,7 +46,6 @@
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="form-model">
-
         <!-- Reference from task -->
         <!-- <reference-from-task :taskType="nodeData.taskType" /> -->
 
@@ -61,9 +60,32 @@
               :disabled="isDetails"
               :placeholder="$t('Please enter name (required)')"
               maxlength="100"
-              @blur="_verifName()"
+              id="input-node-name"
             >
             </el-input>
+          </div>
+        </m-list-box>
+
+        <m-list-box v-if="fromTaskDefinition">
+          <div slot="text">{{ $t("Task Type") }}</div>
+          <div slot="content">
+            <el-select
+              @change="changeTaskType"
+              :value="nodeData.taskType"
+              :placeholder="$t('Please select a task type (required)')"
+              size="small"
+              style="width: 100%"
+              :disabled="isDetails"
+            >
+              <el-option
+                v-for="type in tasksTypeList"
+                :key="type"
+                :label="type"
+                :value="type"
+                :disabled="type === 'CONDITIONS' || type === 'SWITCH'"
+              >
+              </el-option>
+            </el-select>
           </div>
         </m-list-box>
 
@@ -353,13 +375,14 @@
             :backfill-item="backfillItem"
           >
           </m-datax>
-        <m-pigeon
-          v-if="nodeData.taskType === 'PIGEON'"
-          @on-params="_onParams"
-          @on-cache-params="_onCacheParams"
-          :backfill-item="backfillItem"
-          ref="PIGEON">
-        </m-pigeon>
+          <m-pigeon
+            v-if="nodeData.taskType === 'PIGEON'"
+            @on-params="_onParams"
+            @on-cache-params="_onCacheParams"
+            :backfill-item="backfillItem"
+            ref="PIGEON"
+          >
+          </m-pigeon>
           <m-sqoop
             v-if="nodeData.taskType === 'SQOOP'"
             @on-params="_onParams"
@@ -398,7 +421,7 @@
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           ref="preTasks"
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
+          v-if="!fromTaskDefinition"
           :code="code"
         />
       </div>
@@ -415,7 +438,8 @@
           :loading="spinnerLoading"
           @click="ok()"
           :disabled="isDetails"
-          >{{ spinnerLoading ? $t("Loading...") : $t("Confirm add") }}
+          id="button-submit"
+          >{{ spinnerLoading ? $t("Loading...") : $t("Confirm") }}
         </el-button>
       </div>
     </div>
@@ -453,6 +477,7 @@
   import disabledState from '@/module/mixin/disabledState'
   import mPriority from '@/module/components/priority/priority'
   import { findComponentDownward } from '@/module/util/'
+  import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
   // import ReferenceFromTask from './_source/referenceFromTask.vue'
 
   export default {
@@ -524,7 +549,8 @@
         // refresh part of the formModel, after set backfillItem outside
         backfillRefresh: true,
         // whether this is a new Task
-        isNewCreate: true
+        isNewCreate: true,
+        tasksTypeList: Object.keys(tasksType)
       }
     },
     provide () {
@@ -542,7 +568,8 @@
       type: {
         type: String,
         default: ''
-      }
+      },
+      taskDefinition: Object
     },
     inject: ['dagChart'],
     methods: {
@@ -723,6 +750,16 @@
         }
         return true
       },
+      _verifTaskType () {
+        if (!this.fromTaskDefinition) return true
+        if (!this.nodeData.taskType) {
+          this.$message.warning(
+            `${i18n.$t('Please select a task type (required)')}`
+          )
+          return false
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
@@ -731,6 +768,12 @@
         if (!this._verifName()) {
           return
         }
+
+        // Verify task type
+        if (!this._verifTaskType()) {
+          return
+        }
+
         // verif workGroup
         if (!this._verifWorkGroup()) {
           return
@@ -777,14 +820,11 @@
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
-            environmentCode: this.environmentCode || -1,
-            status: this.status,
-            branch: this.branch
+            environmentCode: this.environmentCode || -1
           },
           fromThis: this
         })
-        // set run flag
-        this._setRunFlag()
+
         // set edge label
         this._setEdgeLabel()
       },
@@ -795,10 +835,8 @@
         this.name = name
       },
       /**
-       *  set run flag
-       *  TODO
+       *  set edge label by successBranch && failedBranch
        */
-      _setRunFlag () {},
       _setEdgeLabel () {
         if (this.successBranch || this.failedBranch) {
           const canvas = findComponentDownward(this.dagChart, 'dag-canvas')
@@ -892,7 +930,8 @@
           } else {
             this.workerGroup = o.workerGroup
           }
-          this.environmentCode = o.environmentCode === -1 ? '' : o.environmentCode
+          this.environmentCode =
+            o.environmentCode === -1 ? '' : o.environmentCode
           this.params = o.params || {}
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
@@ -901,23 +940,37 @@
         }
         this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
         this.isContentBox = true
+      },
+      changeTaskType (value) {
+        this.$emit('changeTaskType', value)
       }
     },
     created () {
       // Backfill data
-      let taskList = this.store.state.dag.tasks
       let o = {}
-      if (taskList.length) {
-        taskList.forEach((task) => {
-          if (task.code === this.nodeData.id) {
-            const backfillItem = this.taskToBackfillItem(task)
-            o = backfillItem
-            this.backfillItem = backfillItem
-            this.isNewCreate = false
-          }
-        })
-      }
       this.code = this.nodeData.id
+
+      if (this.fromTaskDefinition) {
+        if (this.taskDefinition) {
+          const backfillItem = this.taskToBackfillItem(this.taskDefinition)
+          o = backfillItem
+          this.backfillItem = backfillItem
+          this.isNewCreate = false
+        }
+      } else {
+        let taskList = this.store.state.dag.tasks
+        if (taskList.length) {
+          taskList.forEach((task) => {
+            if (task.code === this.nodeData.id) {
+              const backfillItem = this.taskToBackfillItem(task)
+              o = backfillItem
+              this.backfillItem = backfillItem
+              this.isNewCreate = false
+            }
+          })
+        }
+      }
+
       this.backfill(o)
 
       if (this.dagChart) {
@@ -958,6 +1011,12 @@
           )
         }
         return null
+      },
+      /**
+       * Open the modal from task definition
+       */
+      fromTaskDefinition () {
+        return this.type === 'task-definition'
       }
     },
     components: {
@@ -986,7 +1045,7 @@
       mWorkerGroups,
       mRelatedEnvironment,
       mPreTasks
-      // ReferenceFromTask
+    // ReferenceFromTask
     }
   }
 </script>

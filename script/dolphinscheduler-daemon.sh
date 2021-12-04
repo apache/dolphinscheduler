@@ -38,8 +38,6 @@ DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
 source /etc/profile
 source "${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh"
 
-export JAVA_HOME=$JAVA_HOME
-#export JAVA_HOME=/opt/soft/jdk
 export HOSTNAME=`hostname`
 
 export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
@@ -61,36 +59,40 @@ cd $DOLPHINSCHEDULER_HOME
 
 export DOLPHINSCHEDULER_OPTS="-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:$DOLPHINSCHEDULER_LOG_DIR/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof -XshowSettings:vm $DOLPHINSCHEDULER_OPTS"
 
+export DATABASE_TYPE=${DATABASE_TYPE:-"h2"}
+export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-"default"}
+
 if [ "$command" = "api-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $API_SERVER_OPTS"
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},api,${DATABASE_TYPE}"
 elif [ "$command" = "master-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-master.xml"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
   HEAP_OPTS="-Xms4g -Xmx4g -Xmn2g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $MASTER_SERVER_OPTS"
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},master,${DATABASE_TYPE}"
 elif [ "$command" = "worker-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:logback-worker.xml"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
   HEAP_OPTS="-Xms2g -Xmx2g -Xmn1g"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $WORKER_SERVER_OPTS"
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},worker,${DATABASE_TYPE}"
 elif [ "$command" = "alert-server" ]; then
   LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $ALERT_SERVER_OPTS"
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},alert,${DATABASE_TYPE}"
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
   HEAP_OPTS="-Xms1g -Xmx1g -Xmn512m"
   export DOLPHINSCHEDULER_OPTS="$HEAP_OPTS $DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
-elif [ "$command" = "zookeeper-server" ]; then
-  #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
-  LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
-  CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
 elif [ "$command" = "standalone-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.StandaloneServer
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},standalone,${DATABASE_TYPE}"
 else
   echo "Error: No command named '$command' was found."
   exit 1

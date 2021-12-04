@@ -69,4 +69,118 @@
             #{relation.conditionType},#{relation.conditionParams},#{relation.createTime},#{relation.updateTime})
         </foreach>
     </insert>
+    <select id="queryDownstreamByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE pre_task_code = #{taskCode}
+    </select>
+
+    <select id="queryDownstreamByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and pre_task_code = #{taskCode}
+    </select>
+
+    <select id="queryUpstreamByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+    </select>
+
+    <select id="queryUpstreamByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+        <if test="preTaskCodes != null and preTaskCodes.length != 0">
+            and pre_task_code in
+            <foreach collection="preTaskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="countUpstreamByCodeGroupByProcessDefinitionCode" resultType="java.util.HashMap">
+        select process_definition_code as processDefinitionCode,
+        count(0) as countValue
+        from t_ds_process_task_relation
+        WHERE project_code = #{projectCode}
+        and post_task_code = #{taskCode}
+        <if test="processDefinitionCodes != null and processDefinitionCodes.length != 0">
+            and process_definition_code in
+            <foreach collection="processDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        group by process_definition_code
+    </select>
+
+    <update id="batchUpdateProcessTaskRelationPreTask" parameterType="java.util.List">
+        <foreach collection="processTaskRelationList" item="processTaskRelation" index="index" open="" close="" separator=";">
+            update t_ds_process_task_relation
+            <set>
+                pre_task_code=#{processTaskRelation.preTaskCode},
+                pre_task_version=#{processTaskRelation.preTaskVersion}
+            </set>
+            <where>
+                WHERE id = #{processTaskRelation.id}
+            </where>
+        </foreach>
+    </update>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE 1=1
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
+        <if test="processDefinitionCode != 0">
+            and process_definition_code = #{processDefinitionCode}
+        </if>
+        <if test="preTaskCode != 0">
+            and pre_task_code = #{preTaskCode}
+        </if>
+        <if test="postTaskCode != 0">
+            and post_task_code = #{postTaskCode}
+        </if>
+    </select>
+
+    <delete id="deleteRelation">
+        delete from t_ds_process_task_relation
+        WHERE project_code = #{processTaskRelationLog.projectCode}
+          and process_definition_code = #{processTaskRelationLog.processDefinitionCode}
+          and process_definition_version = #{processTaskRelationLog.processDefinitionVersion}
+        <if test="processTaskRelationLog.preTaskCode !=0 and processTaskRelationLog.preTaskVersion != 0">
+            and pre_task_code = #{processTaskRelationLog.preTaskCode}
+            and pre_task_version = #{processTaskRelationLog.preTaskVersion}
+        </if>
+          and post_task_code = #{processTaskRelationLog.postTaskCode}
+          and post_task_version = #{processTaskRelationLog.postTaskVersion}
+    </delete>
+
+    <select id="countByCode" resultType="int">
+        select count(0)
+        from t_ds_process_task_relation
+        WHERE 1=1
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
+        <if test="processDefinitionCode != 0">
+            and process_definition_code = #{processDefinitionCode}
+        </if>
+        <if test="preTaskCode != 0">
+            and pre_task_code = #{preTaskCode}
+        </if>
+        <if test="postTaskCode != 0">
+            and post_task_code = #{postTaskCode}
+        </if>
+    </select>
 </mapper>

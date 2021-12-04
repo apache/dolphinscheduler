@@ -71,7 +71,7 @@ public class WorkerRegistryClientTest {
 
     @Before
     public void before() {
-        given(workerConfig.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
+        given(workerConfig.getGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //scheduleAtFixedRate
         given(heartBeatExecutor.scheduleAtFixedRate(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(TimeUnit.class))).willReturn(null);

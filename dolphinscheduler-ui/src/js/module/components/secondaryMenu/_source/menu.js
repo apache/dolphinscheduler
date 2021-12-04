@@ -51,13 +51,15 @@ const menu = {
           name: `${i18n.$t('Process definition')}`,
           path: 'definition',
           id: 0,
-          enabled: true
+          enabled: true,
+          classNames: 'process-definition'
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
-          enabled: true
+          enabled: true,
+          classNames: 'process-instance'
         },
         {
           name: `${i18n.$t('Task Instance')}`,
@@ -76,6 +78,12 @@ const menu = {
           path: 'history-task-record',
           id: 4,
           enabled: config.recordSwitch
+        },
+        {
+          name: `${i18n.$t('Task Definition')}`,
+          path: 'task-definition',
+          id: 5,
+          enabled: true
         }
       ]
     }
@@ -89,7 +97,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-user-solid',
-      children: []
+      children: [],
+      classNames: 'tenant-manage'
     },
     {
       name: `${i18n.$t('User Manage')}`,
