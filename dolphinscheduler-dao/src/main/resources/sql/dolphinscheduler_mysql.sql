@@ -600,7 +600,7 @@ CREATE TABLE `t_ds_process_instance` (
   `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
-  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE,
+  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
