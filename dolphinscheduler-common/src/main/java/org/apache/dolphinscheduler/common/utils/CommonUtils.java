@@ -187,6 +187,7 @@ public class CommonUtils {
             logger.info("initializing class without error: " + classNameStr);
             Class.forName(classNameStr);
         } catch (Exception ignored) {
+            logger.warn("initialize class failed: " + classNameStr + ", will ignore");
         }
     }
 
