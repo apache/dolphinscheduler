@@ -18,18 +18,35 @@
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 public final class WeChatAlertParamsConstants {
-    static final String ENTERPRISE_WE_CHAT_CORP_ID = "$t('corpId')";
+    static final String ENTERPRISE_WE_CHAT_CORP_ID = "corp.id";
+
     static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "corpId";
-    static final String ENTERPRISE_WE_CHAT_SECRET = "$t('secret')";
+
+
+    static final String ENTERPRISE_WE_CHAT_SECRET = "secret";
+
     static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "secret";
-    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "$t('teamSendMsg')";
+
+    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "team.send.msg";
+
     static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "teamSendMsg";
-    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "$t('userSendMsg')";
+
+
+    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "user.send.msg";
+
     static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "userSendMsg";
-    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "$t('agentId')";
+
+
+    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "agent.id";
+
     static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "agentId";
-    static final String ENTERPRISE_WE_CHAT_USERS = "$t('users')";
+
+
+    static final String ENTERPRISE_WE_CHAT_USERS = "users";
+
+
     static final String NAME_ENTERPRISE_WE_CHAT_USERS = "users";
+
 
     private WeChatAlertParamsConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

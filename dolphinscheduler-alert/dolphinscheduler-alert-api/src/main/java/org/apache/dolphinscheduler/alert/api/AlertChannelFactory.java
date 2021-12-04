@@ -27,9 +27,9 @@ public interface AlertChannelFactory {
     String name();
 
     AlertChannel create();
-
     /**
      * Returns the configurable parameters that this plugin needs to display on the web ui
      */
     List<PluginParams> params();
+
 }

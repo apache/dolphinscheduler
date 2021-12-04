@@ -18,15 +18,16 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 public final class ScriptParamsConstants {
-    static final String SCRIPT_TYPE = "$t('scriptType')";
+
+    static final String SCRIPT_TYPE = "type";
 
     static final String NAME_SCRIPT_TYPE = "type";
 
-    static final String SCRIPT_PATH = "$t('scriptPath')";
+    static final String SCRIPT_PATH = "path";
 
     static final String NAME_SCRIPT_PATH = "path";
 
-    static final String SCRIPT_USER_PARAMS = "$t('userParams')";
+    static final String SCRIPT_USER_PARAMS = "user.params";
 
     static final String NAME_SCRIPT_USER_PARAMS = "userParams";
 
