@@ -47,7 +47,7 @@ import org.springframework.context.annotation.ComponentScan;
     "org.apache.dolphinscheduler.dao"
 })
 public class AlertServer implements Closeable {
-    private static final Logger log = LoggerFactory.getLogger(AlertServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     private final PluginDao pluginDao;
     private final AlertDao alertDao;
@@ -71,13 +71,13 @@ public class AlertServer implements Closeable {
 
     @PostConstruct
     public void start() {
-        log.info("Starting Alert server");
+        logger.info("Starting Alert server");
 
         checkTable();
         startServer();
 
         if (alertPluginManager.size() == 0) {
-            log.warn("No alert plugin, alert sender will exit.");
+            logger.warn("No alert plugin, alert sender will exit.");
             return;
         }
 
@@ -93,7 +93,7 @@ public class AlertServer implements Closeable {
 
     private void checkTable() {
         if (!pluginDao.checkPluginDefineTableExist()) {
-            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
     }
@@ -118,7 +118,7 @@ public class AlertServer implements Closeable {
                 final List<Alert> alerts = alertDao.listPendingAlerts();
                 alertSender.send(alerts);
             } catch (Exception e) {
-                log.error("Failed to send alert", e);
+                logger.error("Failed to send alert", e);
             }
         }
     }
