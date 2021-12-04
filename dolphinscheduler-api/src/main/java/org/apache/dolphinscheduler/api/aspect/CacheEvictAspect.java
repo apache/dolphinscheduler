@@ -22,7 +22,14 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
+import org.apache.ibatis.annotations.Param;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,6 +39,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -73,7 +83,9 @@ public class CacheEvictAspect {
                 Object updateObj = args[0];
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, updateObj).convert2Command());
             } else if (!cacheEvict.key().isEmpty()) {
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, cacheEvict.key()).convert2Command());
+                List<Param> paramsList = getParamAnnotationsByType(method, Param.class);
+                String key = parseKey(cacheEvict.key(), paramsList.stream().map(o -> o.value()).collect(Collectors.toList()), Arrays.asList(args));
+                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
             } else {
                 Object key = cacheKeyGenerator.generate(target, method, args);
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
@@ -100,5 +112,30 @@ public class CacheEvictAspect {
             }
         }
         return null;
+    }
+
+    private String parseKey(String key, List<String> paramNameList, List<Object> paramList) {
+        SpelExpressionParser spelParser = new SpelExpressionParser();
+        //将方法的参数名和参数值一一对应的放入上下文中
+        EvaluationContext ctx = new StandardEvaluationContext();
+        for (int i = 0; i < paramNameList.size(); i++) {
+            ctx.setVariable(paramNameList.get(i), paramList.get(i));
+        }
+        // 解析SpEL表达式获取结果
+        return spelParser.parseExpression(key).getValue(ctx).toString();
+    }
+
+    private <T extends Annotation> List<T> getParamAnnotationsByType(Method method, Class<T> annotationClass) {
+        List<T> annotationsList = new ArrayList<>();
+        Annotation[][] annotations = method.getParameterAnnotations();
+        for (int i = 0; i < annotations.length; i++) {
+            Annotation[] annotationsI = annotations[i];
+            for (Annotation annotation : annotationsI) {
+                if (annotation.annotationType().equals(annotationClass)) {
+                    annotationsList.add((T) annotation);
+                }
+            }
+        }
+        return annotationsList;
     }
 }

@@ -25,8 +25,7 @@ public enum CacheType {
     PROCESS_TASK_RELATION("processTaskRelation"),
     TASK_DEFINITION("taskDefinition"),
     WORKER_GROUP("workerGroup"),
-    SCHEDULE("schedule"),
-    PROJECT("project");
+    SCHEDULE("schedule");
 
     CacheType(String cacheName) {
         this.cacheName = cacheName;

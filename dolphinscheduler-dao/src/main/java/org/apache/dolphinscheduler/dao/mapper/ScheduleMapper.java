@@ -76,8 +76,8 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
     @CacheEvict(key = "#entity.processDefinitionCode")
-    int insert(Schedule entity);
+    int insert(@Param("entity") Schedule entity);
 
     @CacheEvict
-    int updateById(@Param("et") Schedule entity);
+    int updateById(@Param("entity") Schedule entity);
 }

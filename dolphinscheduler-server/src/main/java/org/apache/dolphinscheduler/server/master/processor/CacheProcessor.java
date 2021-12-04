@@ -122,9 +122,6 @@ public class CacheProcessor implements NettyRequestProcessor {
                     scheduleCacheExpire(schedule);
                 }
                 break;
-            case PROJECT:
-                //TODO
-                break;
             default:
                 logger.error("no support cache type:{}", cacheType);
         }
