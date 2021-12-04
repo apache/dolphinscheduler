@@ -424,7 +424,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         // get process definition info
         if (processDefinition != null) {
             // make sure process definition online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(), ReleaseState.ONLINE);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(), ReleaseState.ONLINE, false);
             result.put("id", processDefinition.getId());
             result.put("name", processDefinition.getName());
             result.put("code", processDefinition.getCode());

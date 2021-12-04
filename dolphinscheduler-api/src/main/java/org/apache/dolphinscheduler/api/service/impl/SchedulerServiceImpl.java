@@ -383,6 +383,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return publish result code
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> setScheduleState(User loginUser, long projectCode, long processDefinitionCode,
                                                 ReleaseState queryState, ReleaseState updatedState) {
         Map<String, Object> result = new HashMap<>();

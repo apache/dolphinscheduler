@@ -569,10 +569,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         Map<String, Object> updateResult = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+            throw new ServiceException((Status) result.get(Constants.STATUS));
         }
         if (releaseProcessDefinition) {
-            return releaseProcessDefinition(loginUser, projectCode, code, ReleaseState.ONLINE, releaseSchedule);
+            Map<String, Object> releaseResult = releaseProcessDefinition(loginUser, projectCode, code, ReleaseState.ONLINE, releaseSchedule);
+            if (releaseResult.get(Constants.STATUS) != Status.SUCCESS) {
+                throw new ServiceException((Status) releaseResult.get(Constants.STATUS));
+            }
         }
         return updateResult;
     }
@@ -753,7 +756,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 if (releaseSchedule) {
                     Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.OFFLINE, ReleaseState.ONLINE);
                     if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
-                        return result;
+                        throw new ServiceException((Status) setScheduleStateResult.get(Constants.STATUS));
                     }
                 }
                 break;
@@ -763,7 +766,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 if (updateProcess > 0) {
                     Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.ONLINE, ReleaseState.OFFLINE);
                     if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
-                        return result;
+                        throw new ServiceException((Status) setScheduleStateResult.get(Constants.STATUS));
                     }
                 }
                 break;
