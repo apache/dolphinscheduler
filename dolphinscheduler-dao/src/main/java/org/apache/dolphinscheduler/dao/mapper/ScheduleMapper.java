@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -76,8 +77,8 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
     @CacheEvict(key = "#entity.processDefinitionCode")
-    int insert(@Param("entity") Schedule entity);
+    int insert(@Name("entity") Schedule entity);
 
     @CacheEvict
-    int updateById(@Param("entity") Schedule entity);
+    int updateById(@Name("entity") @Param("et")Schedule entity);
 }

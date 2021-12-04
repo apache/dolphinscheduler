@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
-import org.apache.ibatis.annotations.Param;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,6 +35,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.expression.EvaluationContext;
@@ -83,7 +82,7 @@ public class CacheEvictAspect {
                 Object updateObj = args[0];
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, updateObj).convert2Command());
             } else if (!cacheEvict.key().isEmpty()) {
-                List<Param> paramsList = getParamAnnotationsByType(method, Param.class);
+                List<Name> paramsList = getParamAnnotationsByType(method, Name.class);
                 String key = parseKey(cacheEvict.key(), paramsList.stream().map(o -> o.value()).collect(Collectors.toList()), Arrays.asList(args));
                 cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
             } else {
