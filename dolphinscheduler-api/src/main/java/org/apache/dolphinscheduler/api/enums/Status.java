@@ -345,9 +345,9 @@ public enum Status {
     QUERY_OWNER_DATA_ERROR(125001, "query owned data error", "查询拥有的数据失败"),
     TRANSFER_OWNED_DATA_ERROR(125010, "transfer owned data error", "转移拥有的数据失败"),
     TRANSFER_PROJECT_ERROR(125011, "transfer project error", "转移项目失败"),
-    TRANSFER_RESOURCE_ERROR(125012, "transfer resource error", "转移项目失败"),
-    TRANSFER_DATASOURCE_ERROR(125013, "transfer datasource error", "转移项目失败"),
-    TRANSFER_UDF_FUNCTION_ERROR(125014, "transfer udf function error", "转移项目失败"),
+    TRANSFER_RESOURCE_ERROR(125012, "transfer resource error", "转移资源失败"),
+    TRANSFER_DATASOURCE_ERROR(125013, "transfer datasource error", "转移数据源失败"),
+    TRANSFER_UDF_FUNCTION_ERROR(125014, "transfer udf function error", "转移UDF函数失败"),
 
     TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
