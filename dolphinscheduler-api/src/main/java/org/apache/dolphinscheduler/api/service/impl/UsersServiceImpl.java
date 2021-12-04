@@ -149,6 +149,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             HadoopUtils.getInstance().mkdir(userPath);
         }
 
+        result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
 
@@ -297,7 +298,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -317,8 +318,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     *
-     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -445,6 +444,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // updateProcessInstance user
         userMapper.updateById(user);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -492,8 +492,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
-        
+
         userMapper.deleteById(id);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -1000,6 +1001,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
+
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);

@@ -17,6 +17,17 @@
 spring:
   application:
     name: master-server
+  cache:
+    # default enable cache, you can disable by `type: none`
+    type: none
+    cache-names:
+      - tenant
+      - user
+      - processDefinition
+      - processTaskRelation
+      - taskDefinition
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=300s,recordStats
 
 master:
   listen-port: 5678
@@ -45,3 +56,15 @@ master:
   reserved-memory: 0.3
   # master cache process definition, default: true
   cache-process-definition: true
+
+server:
+  port: 5679
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

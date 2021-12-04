@@ -42,32 +42,17 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 @Configuration
 public class SpringConnectionFactory {
-    /**
-     * pagination interceptor
-     *
-     * @return pagination interceptor
-     */
+
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
     }
 
-    /**
-     * * get transaction manager
-     *
-     * @return DataSourceTransactionManager
-     */
     @Bean
     public DataSourceTransactionManager transactionManager(DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
-    /**
-     * * get sql session factory
-     *
-     * @return sqlSessionFactory
-     * @throws Exception sqlSessionFactory exception
-     */
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
@@ -76,6 +61,8 @@ public class SpringConnectionFactory {
         configuration.setCallSettersOnNulls(true);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.addInterceptor(paginationInterceptor());
+
+        configuration.setGlobalConfig(new GlobalConfig().setBanner(false));
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource);
@@ -93,16 +80,6 @@ public class SpringConnectionFactory {
         return sqlSessionFactoryBean.getObject();
     }
 
-    /**
-     * get sql session
-     *
-     * @return SqlSession
-     */
-    @Bean
-    public SqlSession sqlSession(SqlSessionFactory sqlSessionFactory) {
-        return new SqlSessionTemplate(sqlSessionFactory);
-    }
-
     @Bean
     public DatabaseIdProvider databaseIdProvider() {
         DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
@@ -113,5 +90,4 @@ public class SpringConnectionFactory {
         databaseIdProvider.setProperties(properties);
         return databaseIdProvider;
     }
-
 }

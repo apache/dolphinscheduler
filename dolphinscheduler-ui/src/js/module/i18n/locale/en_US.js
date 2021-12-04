@@ -661,7 +661,7 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   Kinship: 'Workflow relationship',
   Reset: 'Reset',
-  KinshipStateActive: 'Active',
+  KinshipStateActive: 'Current selection',
   KinshipState1: 'Online',
   KinshipState0: 'Workflow is not online',
   KinshipState10: 'Scheduling is not online',
@@ -759,5 +759,11 @@ export default {
   cols: 'Cols',
   processOnline: 'Online',
   searchNode: 'Search Node',
-  dagScale: 'Scale'
+  dagScale: 'Scale',
+  workflowName: 'Workflow Name',
+  scheduleStartTime: 'Schedule Start Time',
+  scheduleEndTime: 'Schedule End Time',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: 'Workflow Publish Status',
+  schedulePublishStatus: 'Schedule Publish Status'
 }

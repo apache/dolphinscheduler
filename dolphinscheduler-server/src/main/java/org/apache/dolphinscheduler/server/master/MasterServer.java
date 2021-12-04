@@ -24,8 +24,10 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
 import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
@@ -38,15 +40,12 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-/**
- *  master server
- */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
     @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
         "org.apache.dolphinscheduler.server.worker.*",
@@ -56,6 +55,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     })
 })
 @EnableTransactionManagement
+@EnableCaching
 public class MasterServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
@@ -80,7 +80,7 @@ public class MasterServer implements IStoppable {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         new SpringApplicationBuilder(MasterServer.class)
             .profiles("master")
-            .web(WebApplicationType.NONE).run(args);
+            .run(args);
     }
 
     /**
@@ -96,6 +96,9 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, new StateEventProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, new TaskEventProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, new TaskEventProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, new CacheProcessor());
         this.nettyRemotingServer.start();
 
         // self tolerant

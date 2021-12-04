@@ -260,7 +260,7 @@ export default {
   'prop(required)': 'prop(必填)',
   'value(optional)': 'value(选填)',
   'value(required)': 'value(必填)',
-  'prop is empty': 'prop不能为空',
+  'prop is empty': '自定义参数prop不能为空',
   'value is empty': 'value不能为空',
   'prop is repeat': 'prop中有重复',
   'Start Time': '开始时间',
@@ -760,5 +760,11 @@ export default {
   cols: '列数',
   processOnline: '已上线',
   searchNode: '搜索节点',
-  dagScale: '缩放'
+  dagScale: '缩放',
+  workflowName: '工作流名称',
+  scheduleStartTime: '定时开始时间',
+  scheduleEndTime: '定时结束时间',
+  crontabExpression: 'Crontab',
+  workflowPublishStatus: '工作流上线状态',
+  schedulePublishStatus: '定时状态'
 }
