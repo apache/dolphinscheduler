@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -154,10 +155,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
+        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
                 : new Long[] { projectCode };
-        List<ExecuteStatusCount> processInstanceStateCounts =
-                instanceStateCounter.apply(start, end, projectCodeArray);
+
+        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
+            processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
+        }
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
@@ -187,10 +191,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
+        List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
                 : new Long[] { projectCode };
-        List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
-                loginUser.getId(), projectCodeArray, isAdmin(loginUser));
+        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
+            defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
+                    loginUser.getId(), projectCodeArray, isAdmin(loginUser));
+        }
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
