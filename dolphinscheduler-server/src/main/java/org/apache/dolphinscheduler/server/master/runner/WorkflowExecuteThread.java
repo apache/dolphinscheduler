@@ -404,6 +404,10 @@ public class WorkflowExecuteThread implements Runnable {
             return false;
         }
 
+        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+            return false;
+        }
+
         Date scheduleDate = processInstance.getScheduleTime();
         if (scheduleDate == null) {
             scheduleDate = complementListDate.get(0);
