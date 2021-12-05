@@ -124,4 +124,11 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user list
      */
     List<User> selectByIds(@Param("ids") List<Integer> ids);
+
+    /**
+     * query authed user list by projectId
+     * @param projectId projectId
+     * @return user list
+     */
+    List<User> queryAuthedUserListByProjectId(@Param("projectId") int projectId);
 }
