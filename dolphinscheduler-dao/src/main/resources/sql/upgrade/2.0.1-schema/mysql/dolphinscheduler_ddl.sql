@@ -13,10 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.service.cache.processor;
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
-public interface QueueCacheProcessor extends BaseCacheProcessor {
-    public void expireAllUserCache();
-}
+alter table t_ds_process_instance drop KEY `start_time_index`;
+alter table t_ds_process_instance add KEY `start_time_index` (`start_time`,`end_time`) USING BTREE;

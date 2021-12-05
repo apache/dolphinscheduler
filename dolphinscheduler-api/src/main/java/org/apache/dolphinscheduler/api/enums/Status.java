@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.enums;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -340,10 +341,26 @@ public enum Status {
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
-    ENVIRONMENT_WORKER_GROUPS_IS_INVALID(1200012, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
-    UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(1200013,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
-            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中");
 
+    TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
+    TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
+    TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
+    TASK_GROUP_FULL(130004,"task group is full","任务组已经满了"),
+    TASK_GROUP_USED_SIZE_ERROR(130005,"the used size number of task group is dirty","任务组使用的容量发生了变化"),
+    TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"relase task group queue failed","任务组资源释放时出现了错误"),
+    TASK_GROUP_QUEUE_AWAKE_ERROR(130007,"awake waiting task failed","任务组使唤醒等待任务时发生了错误"),
+    CREATE_TASK_GROUP_ERROR(130008,"create task group error","创建任务组错误"),
+    UPDATE_TASK_GROUP_ERROR(130009,"update task group list error","更新任务组错误"),
+    QUERY_TASK_GROUP_LIST_ERROR(130010,"query task group list error","查询任务组列表错误"),
+    CLOSE_TASK_GROUP_ERROR(130011,"close task group error","关闭任务组错误"),
+    START_TASK_GROUP_ERROR(130012,"start task group error","启动任务组错误"),
+    QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013,"query task group queue list error","查询任务组队列列表错误"),
+    TASK_GROUP_CACHE_START_FAILED(130014,"cache start failed","任务组相关的缓存启动失败"),
+    ENVIRONMENT_WORKER_GROUPS_IS_INVALID(130015, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
+    UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
+            "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
+    TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源")
+    ;
 
     private final int code;
     private final String enMsg;
@@ -365,5 +382,19 @@ public enum Status {
         } else {
             return this.enMsg;
         }
+    }
+
+    /**
+     * Retrieve Status enum entity by status code.
+     * @param code
+     * @return
+     */
+    public static Optional<Status> findStatusBy(int code) {
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                return Optional.of(status);
+            }
+        }
+        return Optional.empty();
     }
 }

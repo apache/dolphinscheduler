@@ -32,9 +32,11 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -80,6 +82,9 @@ public class TaskInstanceServiceTest {
 
     @Mock
     UsersService usersService;
+
+    @Mock
+    TaskDefinitionMapper taskDefinitionMapper;
 
     @Test
     public void queryTaskListPaging() {
@@ -249,6 +254,9 @@ public class TaskInstanceServiceTest {
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectCode)).thenReturn(mockSuccess);
         when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(projectCode);
+        when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
         Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
 
