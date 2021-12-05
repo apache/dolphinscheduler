@@ -23,7 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
