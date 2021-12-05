@@ -505,7 +505,7 @@ CREATE TABLE t_ds_process_instance (
 ) ;
 
 create index process_instance_index on t_ds_process_instance (process_definition_code,id);
-create index start_time_index on t_ds_process_instance (start_time);
+create index start_time_index on t_ds_process_instance (start_time,end_time);
 
 --
 -- Table structure for table t_ds_project

@@ -102,7 +102,6 @@ BEGIN
 	EXECUTE 'CREATE INDEX IF NOT EXISTS priority_id_index ON ' || quote_ident(v_schema) ||'.t_ds_command USING Btree("process_instance_priority","id")';
 	EXECUTE 'CREATE INDEX IF NOT EXISTS process_instance_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("process_definition_code","id")';
 
-
 	---add comment
 	EXECUTE 'comment on column ' ||  quote_ident(v_schema) ||'.t_ds_user.state is ''state 0:disable 1:enable''';
 	EXECUTE 'comment on column ' ||  quote_ident(v_schema) ||'.t_ds_alertgroup.alert_instance_ids is ''alert instance ids''';
