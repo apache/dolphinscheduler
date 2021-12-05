@@ -277,6 +277,38 @@ public class ProjectServiceTest {
     }
 
     @Test
+    public void testQueryAuthorizedUser() {
+        final User loginUser = this.getLoginUser();
+
+        // Failure 1: PROJECT_NOT_FOUND
+        Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
+        logger.info("FAILURE 1: {}", result.toString());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+
+        // Failure 2: USER_NO_OPERATION_PROJECT_PERM
+        loginUser.setId(100);
+        Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(this.getProject());
+        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
+        logger.info("FAILURE 2: {}", result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
+
+        // SUCCESS
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Mockito.when(this.userMapper.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());
+        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
+        logger.info("SUCCESS 1: {}", result.toString());
+        List<User> users = (List<User>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(users));
+
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
+        logger.info("SUCCESS 2: {}", result.toString());
+        users = (List<User>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(users));
+    }
+
+    @Test
     public void testQueryCreatedProject() {
 
         User loginUser = getLoginUser();
@@ -363,6 +395,28 @@ public class ProjectServiceTest {
         loginUser.setUserName(userName);
         loginUser.setId(1);
         return loginUser;
+    }
+
+    /**
+     * Get general user
+     * @return
+     */
+    private User getGeneralUser() {
+        User user = new User();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        return user;
+    }
+
+    /**
+     * Get user list
+     * @return
+     */
+    private List<User> getUserList() {
+        List<User> userList = new ArrayList<>();
+        userList.add(this.getGeneralUser());
+        return userList;
     }
 
     /**
