@@ -122,6 +122,7 @@ public class ExecutorServiceTest {
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
         processDefinition.setCode(1L);
+        processDefinition.setProjectCode(projectCode);
 
         // processInstance
         processInstance.setId(processInstanceId);

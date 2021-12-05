@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public final class ZookeeperConnectionStateListener implements ConnectionStateListener {
     
-    private static final Logger log = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
 
     private final ConnectionListener listener;
 
@@ -41,15 +41,15 @@ public final class ZookeeperConnectionStateListener implements ConnectionStateLi
                              org.apache.curator.framework.state.ConnectionState newState) {
         switch (newState) {
             case LOST:
-                log.warn("Registry disconnected");
+                logger.warn("Registry disconnected");
                 listener.onUpdate(ConnectionState.DISCONNECTED);
                 break;
             case RECONNECTED:
-                log.info("Registry reconnected");
+                logger.info("Registry reconnected");
                 listener.onUpdate(ConnectionState.RECONNECTED);
                 break;
             case SUSPENDED:
-                log.warn("Registry suspended");
+                logger.warn("Registry suspended");
                 listener.onUpdate(ConnectionState.SUSPENDED);
                 break;
             default:

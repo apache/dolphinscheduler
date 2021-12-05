@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.cache.service.impl;
+package org.apache.dolphinscheduler.service.cache.impl;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
+import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -114,19 +114,22 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
     @Override
     public void notifyMaster(Command command) {
         logger.info("send result, command:{}", command.toString());
-
-        List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
-        if (CollectionUtils.isEmpty(serverList)) {
-            return;
-        }
-
-        for (Server server : serverList) {
-            Host host = new Host(server.getHost(), server.getPort());
-            NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(host);
-            if (nettyRemoteChannel == null) {
-                continue;
+        try {
+            List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
+            if (CollectionUtils.isEmpty(serverList)) {
+                return;
             }
-            nettyRemoteChannel.writeAndFlush(command);
+
+            for (Server server : serverList) {
+                Host host = new Host(server.getHost(), server.getPort());
+                NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(host);
+                if (nettyRemoteChannel == null) {
+                    continue;
+                }
+                nettyRemoteChannel.writeAndFlush(command);
+            }
+        } catch (Exception e) {
+            logger.error("notify master error", e);
         }
     }
 }

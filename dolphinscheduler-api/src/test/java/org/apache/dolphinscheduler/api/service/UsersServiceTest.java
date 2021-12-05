@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.cache.service.CacheNotifyService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -78,9 +77,6 @@ public class UsersServiceTest {
 
     @InjectMocks
     private UsersServiceImpl usersService;
-
-    @Mock
-    private CacheNotifyService cacheNotifyService;
 
     @Mock
     private UserMapper userMapper;
@@ -338,6 +334,30 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
         result = usersService.grantProject(loginUser, 1, projectIds);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testGrantProjectByCode() {
+        when(userMapper.selectById(1)).thenReturn(getUser());
+
+        // user no permission
+        User loginUser = new User();
+        String projectCodes = "3682329499136,3643998558592";
+        Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, 1, projectCodes);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+        // user not exist
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = this.usersService.grantProjectByCode(loginUser, 2, projectCodes);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // success
+        Mockito.when(this.projectMapper.queryByCodes(Mockito.anyCollection())).thenReturn(Lists.newArrayList(new Project()));
+        result = this.usersService.grantProjectByCode(loginUser, 1, projectCodes);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
