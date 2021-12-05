@@ -150,7 +150,7 @@ public class LoggerController extends BaseController {
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
             @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
     })
-    @GetMapping(value = "/download-log")
+    @GetMapping(value = "/{projectCode}/download-log")
     @ResponseBody
     @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
