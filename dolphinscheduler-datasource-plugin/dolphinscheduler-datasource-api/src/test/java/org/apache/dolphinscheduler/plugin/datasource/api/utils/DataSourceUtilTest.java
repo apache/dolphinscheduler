@@ -40,7 +40,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class, DataSourceClientProvider.class, PasswordUtils.class, CommonUtils.class})
-public class DatasourceUtilTest {
+public class DataSourceUtilTest {
 
     @Test
     public void testCheckDatasourceParam() {
@@ -52,7 +52,7 @@ public class DatasourceUtilTest {
         other.put("queryTimeout", "-1");
         other.put("characterEncoding", "utf8");
         mysqlDatasourceParamDTO.setOther(other);
-        DatasourceUtil.checkDatasourceParam(mysqlDatasourceParamDTO);
+        DataSourceUtil.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assert.assertTrue(true);
     }
 
@@ -68,7 +68,7 @@ public class DatasourceUtilTest {
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(mysqlDatasourceParamDTO);
+        ConnectionParam connectionParam = DataSourceUtil.buildConnectionParams(mysqlDatasourceParamDTO);
         Assert.assertNotNull(connectionParam);
     }
 
@@ -80,7 +80,7 @@ public class DatasourceUtilTest {
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setPassword("123456");
-        ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(DbType.MYSQL, JSONUtils.toJsonString(mysqlDatasourceParamDTO));
+        ConnectionParam connectionParam = DataSourceUtil.buildConnectionParams(DbType.MYSQL, JSONUtils.toJsonString(mysqlDatasourceParamDTO));
         Assert.assertNotNull(connectionParam);
     }
 
@@ -107,7 +107,7 @@ public class DatasourceUtilTest {
     public void testGetJdbcUrl() {
         MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
-        String jdbcUrl = DatasourceUtil.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
+        String jdbcUrl = DataSourceUtil.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
         Assert.assertEquals("jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 jdbcUrl);
     }
@@ -120,25 +120,25 @@ public class DatasourceUtilTest {
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
 
-        Assert.assertNotNull(DatasourceUtil.buildDatasourceParamDTO(DbType.MYSQL, JSONUtils.toJsonString(connectionParam)));
+        Assert.assertNotNull(DataSourceUtil.buildDatasourceParamDTO(DbType.MYSQL, JSONUtils.toJsonString(connectionParam)));
 
     }
 
     @Test
     public void testGetDatasourceProcessor() {
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.MYSQL));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.POSTGRESQL));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.HIVE));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.SPARK));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.CLICKHOUSE));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.ORACLE));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.SQLSERVER));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.DB2));
-        Assert.assertNotNull(DatasourceUtil.getDatasourceProcessor(DbType.PRESTO));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.MYSQL));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.POSTGRESQL));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.HIVE));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.SPARK));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.CLICKHOUSE));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.ORACLE));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.SQLSERVER));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.DB2));
+        Assert.assertNotNull(DataSourceUtil.getDatasourceProcessor(DbType.PRESTO));
     }
 
     @Test(expected = Exception.class)
     public void testGetDatasourceProcessorError() {
-        DatasourceUtil.getDatasourceProcessor(null);
+        DataSourceUtil.getDatasourceProcessor(null);
     }
 }
