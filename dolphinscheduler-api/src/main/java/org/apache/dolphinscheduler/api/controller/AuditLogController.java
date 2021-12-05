@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,19 +83,16 @@ public class AuditLogController extends BaseController {
     public Result queryAuditLogListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize,
-                                          @RequestParam(value = "moduleType", required = false) AuditModuleType moduleType,
+                                          @RequestParam(value = "resourceType", required = false) AuditResourceType resourceType,
                                           @RequestParam(value = "operationType", required = false) AuditOperationType operationType,
                                           @RequestParam(value = "startDate", required = false) String startDate,
                                           @RequestParam(value = "endDate", required = false) String endDate,
-                                          @RequestParam(value = "userName", required = false) String userName,
-                                          @RequestParam(value = "projectName", required = false) String projectName,
-                                          @RequestParam(value = "processName", required = false) String processName) {
+                                          @RequestParam(value = "userName", required = false) String userName) {
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
-        result = auditService.queryLogListPaging(loginUser, moduleType, operationType, startDate,
-                                                endDate, userName, projectName, processName, pageNo, pageSize);
+        result = auditService.queryLogListPaging(loginUser, resourceType, operationType, startDate, endDate, userName, pageNo, pageSize);
         return result;
     }
 }

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -34,19 +35,30 @@ public class AuditLog {
     private int id;
 
     /**
-     * user name
+     * user id
      */
-    private String userName;
+    private Integer userId;
 
     /**
-     * operation module
+     * resource type
      */
-    private Integer module;
+    private Integer resourceType;
 
     /**
-     * operation
+     * operation type
      */
     private Integer operation;
+
+    /**
+     * resource id
+     */
+    private Integer resourceId;
+
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
 
     /**
      * operation time
@@ -54,30 +66,20 @@ public class AuditLog {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date time;
 
-    /**
-     * project name
-     */
-    private String projectName;
-
-    /**
-     * process name
-     */
-    private String processName;
-
-    public String getUserName() {
-        return userName;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public Integer getModule() {
-        return module;
+    public Integer getResourceType() {
+        return resourceType;
     }
 
-    public void setModule(Integer module) {
-        this.module = module;
+    public void setResourceType(Integer resourceType) {
+        this.resourceType = resourceType;
     }
 
     public Integer getOperation() {
@@ -88,27 +90,27 @@ public class AuditLog {
         this.operation = operation;
     }
 
+    public Integer getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public Date getTime() {
         return time;
     }
 
     public void setTime(Date time) {
         this.time = time;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getProcessName() {
-        return processName;
-    }
-
-    public void setProcessName(String processName) {
-        this.processName = processName;
     }
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
@@ -28,21 +28,18 @@ public class AuditMessage {
 
     private Date auditDate;
 
-    private AuditModuleType module;
+    private AuditResourceType resourceType;
 
     private AuditOperationType operation;
 
-    private String projectName;
+    private Integer resourceId;
 
-    private String processName;
-
-    public AuditMessage(User user, Date auditDate, AuditModuleType module, AuditOperationType operation, String projectName, String processName) {
+    public AuditMessage(User user, Date auditDate, AuditResourceType resourceType, AuditOperationType operation, Integer resourceId) {
         this.user = user;
         this.auditDate = auditDate;
-        this.module = module;
+        this.resourceType = resourceType;
         this.operation = operation;
-        this.processName = processName;
-        this.projectName = projectName;
+        this.resourceId = resourceId;
     }
 
     public User getUser() {
@@ -61,12 +58,12 @@ public class AuditMessage {
         this.auditDate = auditDate;
     }
 
-    public AuditModuleType getModule() {
-        return module;
+    public AuditResourceType getResourceType() {
+        return resourceType;
     }
 
-    public void setModule(AuditModuleType module) {
-        this.module = module;
+    public void setResourceType(AuditResourceType resourceType) {
+        this.resourceType = resourceType;
     }
 
     public AuditOperationType getOperation() {
@@ -77,20 +74,12 @@ public class AuditMessage {
         this.operation = operation;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public Integer getResourceId() {
+        return resourceId;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getProcessName() {
-        return processName;
-    }
-
-    public void setProcessName(String processName) {
-        this.processName = processName;
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
     }
 
     @Override
@@ -98,9 +87,8 @@ public class AuditMessage {
         return "AuditMessage{"
                 + "user=" + user
                 + ", Date=" + auditDate
-                + ", module=" + module
+                + ", resourceType" + resourceType
                 + ", operation=" + operation
-                + ", projectName='" + projectName + '\''
-                + ", processName='" + processName + '\'';
+                + ", resourceId='" + resourceId + '\'';
     }
 }

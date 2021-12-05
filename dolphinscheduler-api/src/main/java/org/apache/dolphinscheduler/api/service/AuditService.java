@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 /**
@@ -30,33 +30,28 @@ public interface AuditService {
     /**
      * add new audit record
      *
-     * @param user          login user
-     * @param module        module type
-     * @param operation     operation type
-     * @param projectName   project name
-     * @param processName   process name
+     * @param user                  login user
+     * @param resourceType          resource type
+     * @param resourceId            resource id
+     * @param operation             operation type
      */
-    void addAudit(User user, AuditModuleType module, AuditOperationType operation,
-                  String projectName, String processName);
+    void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation);
 
     /**
      * query audit log list
      *
      * @param loginUser         login user
-     * @param moduleType        module type
+     * @param resourceType      resource type
      * @param operationType     operation type
      * @param startTime         start time
      * @param endTime           end time
      * @param userName          query user name
-     * @param projectName       project name
-     * @param processName       process name
      * @param pageNo            page number
      * @param pageSize          page size
      * @return                  audit log string
      */
-    Result queryLogListPaging(User loginUser, AuditModuleType moduleType,
+    Result queryLogListPaging(User loginUser, AuditResourceType resourceType,
                               AuditOperationType operationType, String startTime,
                               String endTime, String userName,
-                              String projectName, String processName,
                               Integer pageNo, Integer pageSize);
 }

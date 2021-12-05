@@ -1080,13 +1080,13 @@ CREATE TABLE t_ds_task_group
 -- Table structure for t_ds_alert_plugin_instance
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_audit_log;
-CREATE TABLE t_ds_audit_log (
-    id                  int NOT NULL AUTO_INCREMENT,
-    user_name           varchar(64) NOT NULL,
-    module              int NOT NULL,
-    operation           int NOT NULL,
-    time                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    project_name        text DEFAULT NULL,
-    process_name        text DEFAULT NULL,
+CREATE TABLE t_ds_audit_log
+(
+    id                  int(11) NOT NULL AUTO_INCREMENT,
+    user_id             int(11) NOT NULL,
+    resource_type       int(11) NOT NULL,
+    operation           int(11) NOT NULL,
+    time                timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    resource_id         int(11) NOT NULL,
     PRIMARY KEY (id)
 );

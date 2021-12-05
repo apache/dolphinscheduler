@@ -369,15 +369,14 @@ CREATE TABLE `t_ds_worker_group` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_audit_log`;
 CREATE TABLE `t_ds_audit_log` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(64) NOT NULL COMMENT 'user id',
-  `module` int(11) NOT NULL COMMENT 'module',
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `user_id` int(11) NOT NULL COMMENT 'user id',
+  `resource_type` int(11) NOT NULL COMMENT 'resource type',
   `operation` int(11) NOT NULL COMMENT 'operation',
   `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `project_name` text NULL DEFAULT NULL COMMENT 'project name',
-  `process_name` text NULL DEFAULT NULL COMMENT 'process name',
+  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
 
 -- t_ds_command
 alter table t_ds_command change process_definition_id process_definition_code bigint(20) NOT NULL COMMENT 'process definition code';

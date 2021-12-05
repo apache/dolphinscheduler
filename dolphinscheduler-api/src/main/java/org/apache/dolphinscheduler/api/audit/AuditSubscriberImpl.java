@@ -32,12 +32,11 @@ public class AuditSubscriberImpl implements AuditSubscriber {
     @Override
     public void execute(AuditMessage message) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setUserName(message.getUser().getUserName());
-        auditLog.setModule(message.getModule().getCode());
+        auditLog.setUserId(message.getUser().getId());
+        auditLog.setResourceType(message.getResourceType().getCode());
         auditLog.setOperation(message.getOperation().getCode());
         auditLog.setTime(message.getAuditDate());
-        auditLog.setProcessName(message.getProcessName());
-        auditLog.setProjectName(message.getProjectName());
+        auditLog.setResourceId(message.getResourceId());
         logMapper.insert(auditLog);
     }
 }

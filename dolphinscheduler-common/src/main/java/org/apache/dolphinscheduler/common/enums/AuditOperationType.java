@@ -24,10 +24,10 @@ import java.util.HashMap;
  */
 public enum AuditOperationType {
 
-    // TODO: add other audit operation enums
-    DEFAULT(0, "default"),
-    CREATE_USER(1, "create user"),
-    CREATE_PROJECT(2, "create project");
+    CREATE(0, "CREATE"),
+    READ(1, "READ"),
+    UPDATE(3, "UPDATE"),
+    DELETE(4, "DELETE");
 
     private final int code;
     private final String enMsg;

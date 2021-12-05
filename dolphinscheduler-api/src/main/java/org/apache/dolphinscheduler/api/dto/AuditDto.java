@@ -25,16 +25,14 @@ public class AuditDto {
 
     private String userName;
 
-    private String module;
+    private String resource;
 
     private String operation;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date time;
 
-    private String projectName;
-
-    private String processName;
+    private String resourceName;
 
     public String getUserName() {
         return userName;
@@ -44,12 +42,12 @@ public class AuditDto {
         this.userName = userName;
     }
 
-    public String getModule() {
-        return module;
+    public String getResource() {
+        return resource;
     }
 
-    public void setModule(String module) {
-        this.module = module;
+    public void setResource(String resource) {
+        this.resource = resource;
     }
 
     public String getOperation() {
@@ -68,19 +66,11 @@ public class AuditDto {
         this.time = time;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getProcessName() {
-        return processName;
-    }
-
-    public void setProcessName(String processName) {
-        this.processName = processName;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 }

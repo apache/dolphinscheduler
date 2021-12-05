@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditModuleType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
@@ -55,35 +55,33 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * add new audit log
      *
-     * @param user          login user
-     * @param module        module type
-     * @param operation     operation type
+     * @param user                  login user
+     * @param resourceType          resource type
+     * @param resourceId            resource id
+     * @param operation             operation type
      */
     @Override
-    public void addAudit(User user, AuditModuleType module, AuditOperationType operation, String projectName, String processName) {
-        publishService.publish(new AuditMessage(user, new Date(), module, operation, projectName, processName));
+    public void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation) {
+        publishService.publish(new AuditMessage(user, new Date(), resourceType, operation, resourceId));
     }
 
     /**
      * query audit log paging
      *
      * @param loginUser         login user
-     * @param moduleType        module type
+     * @param resourceType      resource type
      * @param operationType     operation type
      * @param startDate         start time
      * @param endDate           end time
      * @param userName          query user name
-     * @param projectName       project name
-     * @param processName       process name
      * @param pageNo            page number
      * @param pageSize          page size
      * @return  audit log string data
      */
     @Override
-    public Result queryLogListPaging(User loginUser, AuditModuleType moduleType,
+    public Result queryLogListPaging(User loginUser, AuditResourceType resourceType,
                                      AuditOperationType operationType, String startDate,
                                      String endDate, String userName,
-                                     String projectName, String processName,
                                      Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
@@ -94,9 +92,9 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             return result;
         }
 
-        int[] moduleArray = null;
-        if (moduleType != null) {
-            moduleArray = new int[]{moduleType.getCode()};
+        int[] resourceArray = null;
+        if (resourceType != null) {
+            resourceArray = new int[]{resourceType.getCode()};
         }
 
         int[] opsArray = null;
@@ -108,7 +106,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
 
         Page<AuditLog> page = new Page<>(pageNo, pageSize);
-        IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(page, moduleArray, opsArray, userName, projectName, processName, start, end);
+        IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(page, resourceArray, opsArray, userName, start, end);
         List<AuditLog> logList = logIPage != null ? logIPage.getRecords() : new ArrayList<>();
         PageInfo<AuditDto> pageInfo = new PageInfo<>(pageNo, pageSize);
 
@@ -128,12 +126,11 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      */
     private AuditDto transformAuditLog(AuditLog auditLog) {
         AuditDto auditDto = new AuditDto();
-        auditDto.setUserName(auditLog.getUserName());
-        auditDto.setModule(AuditModuleType.of(auditLog.getModule()).getMsg());
+        String resourceType = AuditResourceType.of(auditLog.getResourceType()).getMsg();
+        auditDto.setResource(resourceType);
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperation()).getMsg());
-        auditDto.setTime(auditLog.getTime());
-        auditDto.setProcessName(auditLog.getProcessName());
-        auditDto.setProjectName(auditLog.getProjectName());
+        auditDto.setUserName(auditLog.getUserName());
+        auditDto.setResourceName(auditLogMapper.queryResourceNameByType(resourceType, auditLog.getResourceId()));
         return auditDto;
     }
 }
