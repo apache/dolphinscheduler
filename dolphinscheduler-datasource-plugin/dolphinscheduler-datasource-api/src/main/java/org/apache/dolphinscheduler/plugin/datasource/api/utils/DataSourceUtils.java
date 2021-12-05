@@ -34,12 +34,12 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataSourceUtil {
+public class DataSourceUtils {
 
-    private DataSourceUtil() {
+    private DataSourceUtils() {
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataSourceUtils.class);
 
     private static final DatasourceProcessor mysqlProcessor = new MysqlDatasourceProcessor();
     private static final DatasourceProcessor postgreSqlProcessor = new PostgreSqlDatasourceProcessor();
