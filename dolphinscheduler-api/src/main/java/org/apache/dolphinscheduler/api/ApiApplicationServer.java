@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api;
 
+import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -38,4 +45,11 @@ public class ApiApplicationServer extends SpringBootServletInitializer {
         new SpringApplicationBuilder(ApiApplicationServer.class).profiles("api").run(args);
     }
 
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
+
+    @PostConstruct
+    public void run() {
+        PropertyUtils.setValue(SPRING_DATASOURCE_DRIVER_CLASS_NAME, driverClassName);
+    }
 }
