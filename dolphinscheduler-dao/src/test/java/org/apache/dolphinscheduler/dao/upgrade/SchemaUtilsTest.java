@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,5 +57,15 @@ public class SchemaUtilsTest {
         } catch (Exception ignored) {
             // This is expected
         }
+    }
+
+    @Test
+    public void testGetAllSchemaList() {
+        try {
+            SchemaUtils.getAllSchemaList();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
     }
 }
