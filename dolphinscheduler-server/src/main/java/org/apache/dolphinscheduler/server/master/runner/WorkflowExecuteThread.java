@@ -17,13 +17,25 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DependResult;
+import org.apache.dolphinscheduler.common.enums.Direct;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.StateEvent;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -33,7 +45,13 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -46,14 +64,29 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 
 /**
  * master exec thread,split dag
@@ -154,8 +187,12 @@ public class WorkflowExecuteThread implements Runnable {
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
     /**
+     * task retry check list
+     */
+    private ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList;
+
+    /**
      * start flag, true: start nodes submit completely
-     *
      */
     private boolean isStart = false;
 
@@ -165,14 +202,14 @@ public class WorkflowExecuteThread implements Runnable {
      * @param processInstance processInstance
      * @param processService processService
      * @param nettyExecutorManager nettyExecutorManager
-     * @param taskTimeoutCheckList
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList) {
+            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
+            , ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList) {
         this.processService = processService;
 
         this.processInstance = processInstance;
@@ -180,6 +217,7 @@ public class WorkflowExecuteThread implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
+        this.taskRetryCheckList = taskRetryCheckList;
     }
 
     @Override
@@ -197,7 +235,6 @@ public class WorkflowExecuteThread implements Runnable {
 
     /**
      * the process start nodes are submitted completely.
-     * @return
      */
     public boolean isStart() {
         return this.isStart;
@@ -296,11 +333,10 @@ public class WorkflowExecuteThread implements Runnable {
         if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             taskProcessor.action(TaskAction.TIMEOUT);
-            return false;
         } else {
             processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
-            return true;
         }
+        return true;
     }
 
     private boolean processTimeout() {
@@ -342,6 +378,7 @@ public class WorkflowExecuteThread implements Runnable {
                         task.getMaxRetryTimes(),
                         task.getRetryInterval());
                 this.addTimeoutCheck(task);
+                this.addRetryCheck(task);
             } else {
                 submitStandByTask();
             }
@@ -351,6 +388,7 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskList.put(Long.toString(task.getTaskCode()), task);
         activeTaskProcessorMaps.remove(task.getId());
         taskTimeoutCheckList.remove(task.getId());
+        taskRetryCheckList.remove(task.getId());
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
             processService.saveProcessInstance(processInstance);
@@ -497,7 +535,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processInstance.getProcessDefinitionVersion());
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
         List<TaskNode> taskNodeList =
-            processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
+                processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
         forbiddenTaskList.clear();
 
         taskNodeList.forEach(taskNode -> {
@@ -585,6 +623,7 @@ public class WorkflowExecuteThread implements Runnable {
                 activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
                 taskProcessor.run();
                 addTimeoutCheck(taskInstance);
+                addRetryCheck(taskInstance);
                 TaskDefinition taskDefinition = processService.findTaskDefinition(
                         taskInstance.getTaskCode(),
                         taskInstance.getTaskDefinitionVersion());
@@ -635,14 +674,33 @@ public class WorkflowExecuteThread implements Runnable {
                 taskInstance.getTaskDefinitionVersion()
         );
         taskInstance.setTaskDefine(taskDefinition);
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag() || taskInstance.taskCanRetry()) {
+        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
             this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-        } else {
-            if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-                this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-            }
+        }
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
         }
     }
+
+    private void addRetryCheck(TaskInstance taskInstance) {
+        if (taskRetryCheckList.containsKey(taskInstance.getId())) {
+            return;
+        }
+        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
+        if (taskDefinition == null) {
+            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            return;
+        }
+
+        if (taskInstance.taskCanRetry()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
+        }
+
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
+        }
+    }
+
 
     /**
      * find task instance in db.
@@ -991,7 +1049,6 @@ public class WorkflowExecuteThread implements Runnable {
     /**
      * generate the latest process instance status by the tasks state
      *
-     * @param instance
      * @return process instance execution status
      */
     private ExecutionStatus getProcessInstanceState(ProcessInstance instance) {
