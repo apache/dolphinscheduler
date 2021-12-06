@@ -34,10 +34,14 @@ workersGroup=(${workers//,/ })
 # shellcheck disable=SC2068
 for workerGroup in ${workersGroup[@]}
 do
-  echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
-  groupsName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupsName)
+  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
+  if [ -z ${workersGroupMap[$worker]} ];then
+      workersGroupMap+=([$worker]=$groupName)
+  else
+      finalGroupName="${workersGroupMap[$worker]},$groupName"
+      workersGroupMap[$worker]=$finalGroupName
+  fi
 done
 
 

@@ -196,6 +196,7 @@ public final class DingTalkSender {
             this.errmsg = errmsg;
         }
 
+        @Override
         public boolean equals(final Object o) {
             if (o == this) {
                 return true;
@@ -217,6 +218,7 @@ public final class DingTalkSender {
             return true;
         }
 
+        @Override
         public int hashCode() {
             final int PRIME = 59;
             int result = 1;
@@ -227,6 +229,7 @@ public final class DingTalkSender {
             return result;
         }
 
+        @Override
         public String toString() {
             return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg() + ")";
         }

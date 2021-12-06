@@ -23,7 +23,7 @@ public final class AlertConstants {
     /**
      * the field name of alert show type
      **/
-    public static final String SHOW_TYPE = "$t('showType')";
+    public static final String SHOW_TYPE = "show_type";
 
     public static final String NAME_SHOW_TYPE = "showType";
 
