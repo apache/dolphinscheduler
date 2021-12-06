@@ -30,10 +30,13 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 
 import org.apache.hadoop.util.ThreadUtil;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * 1. timeout check wheel
@@ -46,6 +49,9 @@ public class StateWheelExecuteThread extends Thread {
     ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
     ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    // task timeout map, avoid repeated timeout event
+    private Map<Integer, Integer> taskTimeoutMap = Maps.newConcurrentMap();
 
     private int stateCheckIntervalSecs;
 
@@ -92,13 +98,15 @@ public class StateWheelExecuteThread extends Thread {
         for (TaskInstance taskInstance : this.taskInstanceCheckList.values()) {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-                if (0 >= timeRemain) {
+                if (0 >= timeRemain && !taskTimeoutMap.containsKey(taskInstance.getId())) {
                     putTaskTimeoutEvent(taskInstance);
+                    taskTimeoutMap.put(taskInstance.getId(), 1);
                 }
             }
             if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
                 putTaskStateChangeEvent(taskInstance);
                 taskInstanceCheckList.remove(taskInstance.getId());
+                taskTimeoutMap.remove(taskInstance.getId());
             }
             if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
                 putTaskStateChangeEvent(taskInstance);
