@@ -199,9 +199,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         Page<AlertPluginInstance> page = new Page<>(pageNo, pageSize);
         IPage<AlertPluginInstance> alertPluginInstanceIPage = alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal);
 
-        PageInfo<AlertPluginInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());
-        pageInfo.setTotalList(alertPluginInstanceIPage.getRecords());
+        pageInfo.setTotalList(buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
