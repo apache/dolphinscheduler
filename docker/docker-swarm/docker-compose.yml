@@ -20,6 +20,8 @@ services:
 
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:11.11.0
+    ports:
+    - 5432:5432
     environment:
       TZ: Asia/Shanghai
       POSTGRESQL_USERNAME: root
@@ -44,7 +46,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-api:
-    image: dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:2.0.0-SNAPSHOT
+    image: apache/dolphinscheduler:2.0.0-SNAPSHOT
     command: api-server
     ports:
     - 12345:12345
@@ -68,7 +70,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-alert:
-    image: dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:2.0.0-SNAPSHOT
+    image: apache/dolphinscheduler:2.0.0-SNAPSHOT
     command: alert-server
     environment:
       TZ: Asia/Shanghai
@@ -87,7 +89,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-master:
-    image: dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:2.0.0-SNAPSHOT
+    image: apache/dolphinscheduler:2.0.0-SNAPSHOT
     command: master-server
     environment:
       TZ: Asia/Shanghai
@@ -108,7 +110,7 @@ services:
     - dolphinscheduler
 
   dolphinscheduler-worker:
-    image: dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler:2.0.0-SNAPSHOT
+    image: apache/dolphinscheduler:2.0.0-SNAPSHOT
     command: worker-server
     environment:
       TZ: Asia/Shanghai

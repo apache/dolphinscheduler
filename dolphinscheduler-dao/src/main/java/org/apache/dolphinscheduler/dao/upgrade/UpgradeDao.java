@@ -133,6 +133,7 @@ public abstract class UpgradeDao {
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
             Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream());
+            logger.info("Executing the sql file:{}",mysqlSQLFilePath.getFile().getAbsolutePath());
             initScriptRunner.runScript(initSqlReader);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
