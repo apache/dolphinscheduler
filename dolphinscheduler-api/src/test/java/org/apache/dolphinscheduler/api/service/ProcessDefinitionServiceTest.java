@@ -671,8 +671,7 @@ public class ProcessDefinitionServiceTest {
         int userId = 10;
         User loginUser = Mockito.mock(User.class);
         Mockito.when(loginUser.getId()).thenReturn(userId);
-
-
+        
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream outputStream = new ZipOutputStream(byteArrayOutputStream);
         outputStream.putNextEntry(new ZipEntry("import_sql/"));
