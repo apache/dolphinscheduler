@@ -96,7 +96,7 @@ public class StateWheelExecuteThread extends Thread {
         for (TaskInstance taskInstance : taskInstanceTimeoutCheckList.values()) {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-                if (0 >= timeRemain) {
+                if (timeRemain < 0) {
                     addTaskTimeoutEvent(taskInstance);
                     taskInstanceTimeoutCheckList.remove(taskInstance.getId());
                 }
@@ -127,7 +127,7 @@ public class StateWheelExecuteThread extends Thread {
         for (ProcessInstance processInstance : this.processInstanceTimeoutCheckList.values()) {
 
             long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-            if (0 >= timeRemain) {
+            if (timeRemain < 0) {
                 addProcessTimeoutEvent(processInstance);
                 processInstanceTimeoutCheckList.remove(processInstance.getId());
             }
@@ -162,7 +162,7 @@ public class StateWheelExecuteThread extends Thread {
     }
 
     private void addEvent(StateEvent stateEvent) {
-        if (!processInstanceExecMaps.contains(stateEvent.getProcessInstanceId())) {
+        if (!processInstanceExecMaps.containsKey(stateEvent.getProcessInstanceId())) {
             return;
         }
         WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecMaps.get(stateEvent.getProcessInstanceId());

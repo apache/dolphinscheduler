@@ -669,12 +669,14 @@ public class WorkflowExecuteThread implements Runnable {
         if (taskTimeoutCheckList.containsKey(taskInstance.getId())) {
             return;
         }
-        TaskDefinition taskDefinition = processService.findTaskDefinition(
-                taskInstance.getTaskCode(),
-                taskInstance.getTaskDefinitionVersion()
-        );
-        taskInstance.setTaskDefine(taskDefinition);
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
+        if (taskInstance.getTaskDefine() == null) {
+            TaskDefinition taskDefinition = processService.findTaskDefinition(
+                    taskInstance.getTaskCode(),
+                    taskInstance.getTaskDefinitionVersion()
+            );
+            taskInstance.setTaskDefine(taskDefinition);
+        }
+        if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
             this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
         }
         if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
@@ -686,12 +688,13 @@ public class WorkflowExecuteThread implements Runnable {
         if (taskRetryCheckList.containsKey(taskInstance.getId())) {
             return;
         }
-        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
-        if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
-            return;
+        if (taskInstance.getTaskDefine() == null) {
+            TaskDefinition taskDefinition = processService.findTaskDefinition(
+                    taskInstance.getTaskCode(),
+                    taskInstance.getTaskDefinitionVersion()
+            );
+            taskInstance.setTaskDefine(taskDefinition);
         }
-
         if (taskInstance.taskCanRetry()) {
             this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
         }
