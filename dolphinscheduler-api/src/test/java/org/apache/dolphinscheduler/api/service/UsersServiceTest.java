@@ -339,6 +339,55 @@ public class UsersServiceTest {
     }
 
     @Test
+    public void testGrantProjectByCode() {
+        when(userMapper.selectById(1)).thenReturn(getUser());
+
+        // user no permission
+        User loginUser = new User();
+        String projectCodes = "3682329499136,3643998558592";
+        Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, 1, projectCodes);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+        // user not exist
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = this.usersService.grantProjectByCode(loginUser, 2, projectCodes);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // success
+        Mockito.when(this.projectMapper.queryByCodes(Mockito.anyCollection())).thenReturn(Lists.newArrayList(new Project()));
+        result = this.usersService.grantProjectByCode(loginUser, 1, projectCodes);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testRevokeProject() {
+        Mockito.when(this.userMapper.selectById(1)).thenReturn(this.getUser());
+
+        final long projectCode = 3682329499136L;
+
+        // user no permission
+        User loginUser = new User();
+        Map<String, Object> result = this.usersService.revokeProject(loginUser, 1, projectCode);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+        // user not exist
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = this.usersService.revokeProject(loginUser, 2, projectCode);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // success
+        Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(new Project());
+        result = this.usersService.revokeProject(loginUser, 1, projectCode);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
     public void testGrantResources() {
         String resourceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());

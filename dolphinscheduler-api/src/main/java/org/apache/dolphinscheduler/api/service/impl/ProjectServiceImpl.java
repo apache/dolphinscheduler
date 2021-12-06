@@ -405,6 +405,31 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    @Override
+    public Map<String, Object> queryAuthorizedUser(User loginUser, Long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 1. check read permission
+        Project project = this.projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
+
+        // 2. query authorized user list
+        List<User> users = this.userMapper.queryAuthedUserListByProjectId(project.getId());
+        result.put(Constants.DATA_LIST, users);
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * query authorized project
      *
      * @param loginUser login user

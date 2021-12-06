@@ -13,27 +13,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+	)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
 
-package org.apache.dolphinscheduler.common.enums;
+    EXECUTE 'DROP INDEX IF EXISTS "start_time_index"';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS start_time_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("start_time","end_time")';
 
-public enum CacheType {
-    TENANT("tenant"),
-    USER("user"),
-    QUEUE("queue"),
-    PROCESS_DEFINITION("processDefinition"),
-    PROCESS_TASK_RELATION("processTaskRelation"),
-    TASK_DEFINITION("taskDefinition"),
-    WORKER_GROUP("workerGroup"),
-    SCHEDULE("schedule");
-
-    CacheType(String cacheName) {
-        this.cacheName = cacheName;
-    }
-
-    private final String cacheName;
-
-    public String getCacheName() {
-        return cacheName;
-    }
-}
+	return 'Success!';
+	exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+d//
