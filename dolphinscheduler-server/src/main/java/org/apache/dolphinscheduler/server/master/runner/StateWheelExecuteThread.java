@@ -92,16 +92,16 @@ public class StateWheelExecuteThread extends Thread {
         for (TaskInstance taskInstance : this.taskInstanceCheckList.values()) {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-                if (0 >= timeRemain && processTimeout(taskInstance)) {
-                    taskInstanceCheckList.remove(taskInstance.getId());
+                if (0 >= timeRemain) {
+                    putTaskTimeoutEvent(taskInstance);
                 }
             }
             if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
-                processDependCheck(taskInstance);
+                putTaskStateChangeEvent(taskInstance);
                 taskInstanceCheckList.remove(taskInstance.getId());
             }
             if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
-                processDependCheck(taskInstance);
+                putTaskStateChangeEvent(taskInstance);
             }
         }
     }
@@ -113,7 +113,8 @@ public class StateWheelExecuteThread extends Thread {
         for (ProcessInstance processInstance : this.processInstanceCheckList.values()) {
 
             long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-            if (0 <= timeRemain && processTimeout(processInstance)) {
+            if (0 >= timeRemain) {
+                putProcessTimeoutEvent(processInstance);
                 processInstanceCheckList.remove(processInstance.getId());
             }
         }
@@ -128,7 +129,7 @@ public class StateWheelExecuteThread extends Thread {
         workflowExecuteThread.addStateEvent(stateEvent);
     }
 
-    private boolean processDependCheck(TaskInstance taskInstance) {
+    private boolean putTaskStateChangeEvent(TaskInstance taskInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
@@ -138,7 +139,7 @@ public class StateWheelExecuteThread extends Thread {
         return true;
     }
 
-    private boolean processTimeout(TaskInstance taskInstance) {
+    private boolean putTaskTimeoutEvent(TaskInstance taskInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.TASK_TIMEOUT);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
@@ -147,7 +148,7 @@ public class StateWheelExecuteThread extends Thread {
         return true;
     }
 
-    private boolean processTimeout(ProcessInstance processInstance) {
+    private boolean putProcessTimeoutEvent(ProcessInstance processInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.PROCESS_TIMEOUT);
         stateEvent.setProcessInstanceId(processInstance.getId());

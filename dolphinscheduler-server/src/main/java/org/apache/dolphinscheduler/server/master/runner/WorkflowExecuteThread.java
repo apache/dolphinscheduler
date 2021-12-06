@@ -378,11 +378,10 @@ public class WorkflowExecuteThread implements Runnable {
         if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             taskProcessor.action(TaskAction.TIMEOUT);
-            return false;
         } else {
             processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
-            return true;
         }
+        return true;
     }
 
     private boolean processTimeout() {
@@ -415,7 +414,7 @@ public class WorkflowExecuteThread implements Runnable {
                         this.stateEvents.add(nextEvent);
                     } else {
                         ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                        this.processService.sendStartTask2Master(processInstance,nextTaskInstance.getId(),
+                        this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
                                 org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
                     }
                 }
