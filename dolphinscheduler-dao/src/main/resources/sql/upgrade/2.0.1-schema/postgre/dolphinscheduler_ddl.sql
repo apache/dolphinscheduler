@@ -13,12 +13,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+	)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
 
-package org.apache.dolphinscheduler.service.cache.service;
+    EXECUTE 'DROP INDEX IF EXISTS "start_time_index"';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS start_time_index ON ' || quote_ident(v_schema) ||'.t_ds_process_instance USING Btree("start_time","end_time")';
 
-import org.apache.dolphinscheduler.remote.command.Command;
-
-public interface CacheNotifyService {
-    void notifyMaster(Command command);
-}
+	return 'Success!';
+	exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+d//

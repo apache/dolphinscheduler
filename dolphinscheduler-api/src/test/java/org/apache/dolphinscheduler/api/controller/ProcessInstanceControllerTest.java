@@ -190,15 +190,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testViewVariables() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processInstanceService.viewVariables(1L,1)).thenReturn(mockResult);
-
+        PowerMockito.when(processInstanceService.viewVariables(1113L,123)).thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
