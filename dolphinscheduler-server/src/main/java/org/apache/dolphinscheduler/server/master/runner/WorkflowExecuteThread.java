@@ -206,6 +206,11 @@ public class WorkflowExecuteThread implements Runnable {
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
     /**
+     * task retry check list
+     */
+    private ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList;
+
+    /**
      * state event queue
      */
     private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
@@ -232,14 +237,15 @@ public class WorkflowExecuteThread implements Runnable {
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
             , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
+            , ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList
             , TaskProcessorFactory taskProcessorFactory) {
         this.processService = processService;
-
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
+        this.taskRetryCheckList = taskRetryCheckList;
         this.taskProcessorFactory = taskProcessorFactory;
     }
 
@@ -449,6 +455,7 @@ public class WorkflowExecuteThread implements Runnable {
                         task.getMaxRetryTimes(),
                         task.getRetryInterval());
                 this.addTimeoutCheck(task);
+                this.addRetryCheck(task);
             } else {
                 submitStandByTask();
             }
@@ -458,6 +465,7 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
         activeTaskProcessorMaps.remove(task.getId());
         taskTimeoutCheckList.remove(task.getId());
+        taskRetryCheckList.remove(task.getId());
 
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
@@ -825,6 +833,7 @@ public class WorkflowExecuteThread implements Runnable {
             taskProcessor.run();
 
             addTimeoutCheck(taskInstance);
+            addRetryCheck(taskInstance);
 
             if (taskProcessor.taskState().typeIsFinished()) {
                 StateEvent stateEvent = new StateEvent();
@@ -866,13 +875,30 @@ public class WorkflowExecuteThread implements Runnable {
             logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
             return;
         }
-
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag() || taskInstance.taskCanRetry()) {
+        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
             this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-        } else {
-            if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-                this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-            }
+        }
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
+        }
+    }
+
+    private void addRetryCheck(TaskInstance taskInstance) {
+        if (taskRetryCheckList.containsKey(taskInstance.getId())) {
+            return;
+        }
+        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
+        if (taskDefinition == null) {
+            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            return;
+        }
+
+        if (taskInstance.taskCanRetry()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
+        }
+
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
         }
     }
 

@@ -30,13 +30,10 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 
 import org.apache.hadoop.util.ThreadUtil;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 /**
  * 1. timeout check wheel
@@ -46,21 +43,21 @@ public class StateWheelExecuteThread extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(StateWheelExecuteThread.class);
 
-    ConcurrentHashMap<Integer, ProcessInstance> processInstanceCheckList;
-    ConcurrentHashMap<Integer, TaskInstance> taskInstanceCheckList;
+    private ConcurrentHashMap<Integer, ProcessInstance> processInstanceTimeoutCheckList;
+    private ConcurrentHashMap<Integer, TaskInstance> taskInstanceTimeoutCheckList;
+    private ConcurrentHashMap<Integer, TaskInstance> taskInstanceRetryCheckList;
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-
-    // task timeout map, avoid repeated timeout event
-    private Map<Integer, Integer> taskTimeoutMap = Maps.newConcurrentMap();
 
     private int stateCheckIntervalSecs;
 
-    public StateWheelExecuteThread(ConcurrentHashMap<Integer, ProcessInstance> processInstances,
-                                   ConcurrentHashMap<Integer, TaskInstance> taskInstances,
+    public StateWheelExecuteThread(ConcurrentHashMap<Integer, ProcessInstance> processInstanceTimeoutCheckList,
+                                   ConcurrentHashMap<Integer, TaskInstance> taskInstanceTimeoutCheckList,
+                                   ConcurrentHashMap<Integer, TaskInstance> taskInstanceRetryCheckList,
                                    ProcessInstanceExecCacheManager processInstanceExecCacheManager,
                                    int stateCheckIntervalSecs) {
-        this.processInstanceCheckList = processInstances;
-        this.taskInstanceCheckList = taskInstances;
+        this.processInstanceTimeoutCheckList = processInstanceTimeoutCheckList;
+        this.taskInstanceTimeoutCheckList = taskInstanceTimeoutCheckList;
+        this.taskInstanceRetryCheckList = taskInstanceRetryCheckList;
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.stateCheckIntervalSecs = stateCheckIntervalSecs;
     }
@@ -71,8 +68,9 @@ public class StateWheelExecuteThread extends Thread {
         logger.info("state wheel thread start");
         while (Stopper.isRunning()) {
             try {
-                checkProcess();
-                checkTask();
+                checkTask4Timeout();
+                checkTask4Retry();
+                checkProcess4Timeout();
             } catch (Exception e) {
                 logger.error("state wheel thread check error:", e);
             }
@@ -80,88 +78,96 @@ public class StateWheelExecuteThread extends Thread {
         }
     }
 
-    public boolean addProcess(ProcessInstance processInstance) {
-        this.processInstanceCheckList.put(processInstance.getId(), processInstance);
-        return true;
+    public void addProcess4TimeoutCheck(ProcessInstance processInstance) {
+        this.processInstanceTimeoutCheckList.put(processInstance.getId(), processInstance);
     }
 
-    public boolean addTask(TaskInstance taskInstance) {
-        this.taskInstanceCheckList.put(taskInstance.getId(), taskInstance);
-        return true;
+    public void addTask4TimeoutCheck(TaskInstance taskInstance) {
+        this.taskInstanceTimeoutCheckList.put(taskInstance.getId(), taskInstance);
     }
 
-    private void checkTask() {
-        if (taskInstanceCheckList.isEmpty()) {
+    public void addTask4RetryCheck(TaskInstance taskInstance) {
+        this.taskInstanceRetryCheckList.put(taskInstance.getId(), taskInstance);
+    }
+
+    public void checkTask4Timeout() {
+        if (taskInstanceTimeoutCheckList.isEmpty()) {
             return;
         }
-
-        for (TaskInstance taskInstance : this.taskInstanceCheckList.values()) {
+        for (TaskInstance taskInstance : taskInstanceTimeoutCheckList.values()) {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                 long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
-                if (0 >= timeRemain && !taskTimeoutMap.containsKey(taskInstance.getId())) {
-                    putTaskTimeoutEvent(taskInstance);
-                    taskTimeoutMap.put(taskInstance.getId(), 1);
+                if (0 >= timeRemain) {
+                    addTaskTimeoutEvent(taskInstance);
+                    taskInstanceTimeoutCheckList.remove(taskInstance.getId());
                 }
-            }
-            if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
-                putTaskStateChangeEvent(taskInstance);
-                taskInstanceCheckList.remove(taskInstance.getId());
-                taskTimeoutMap.remove(taskInstance.getId());
-            }
-            if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
-                putTaskStateChangeEvent(taskInstance);
             }
         }
     }
 
-    private void checkProcess() {
-        if (processInstanceCheckList.isEmpty()) {
+    private void checkTask4Retry() {
+        if (taskInstanceRetryCheckList.isEmpty()) {
             return;
         }
-        for (ProcessInstance processInstance : this.processInstanceCheckList.values()) {
+
+        for (TaskInstance taskInstance : this.taskInstanceRetryCheckList.values()) {
+            if (taskInstance.taskCanRetry() && taskInstance.retryTaskIntervalOverTime()) {
+                addTaskStateChangeEvent(taskInstance);
+                taskInstanceRetryCheckList.remove(taskInstance.getId());
+            }
+            if (taskInstance.isSubProcess() || taskInstance.isDependTask()) {
+                addTaskStateChangeEvent(taskInstance);
+            }
+        }
+    }
+
+    private void checkProcess4Timeout() {
+        if (processInstanceTimeoutCheckList.isEmpty()) {
+            return;
+        }
+        for (ProcessInstance processInstance : this.processInstanceTimeoutCheckList.values()) {
 
             long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(), processInstance.getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
             if (0 >= timeRemain) {
-                putProcessTimeoutEvent(processInstance);
-                processInstanceCheckList.remove(processInstance.getId());
+                addProcessTimeoutEvent(processInstance);
+                processInstanceTimeoutCheckList.remove(processInstance.getId());
             }
         }
     }
 
-    private void putEvent(StateEvent stateEvent) {
-
-        if (!processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
-            return;
-        }
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
-        workflowExecuteThread.addStateEvent(stateEvent);
-    }
-
-    private boolean putTaskStateChangeEvent(TaskInstance taskInstance) {
+    private boolean addTaskStateChangeEvent(TaskInstance taskInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskInstance.getId());
         stateEvent.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-        putEvent(stateEvent);
+        addEvent(stateEvent);
         return true;
     }
 
-    private boolean putTaskTimeoutEvent(TaskInstance taskInstance) {
+    private boolean addTaskTimeoutEvent(TaskInstance taskInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.TASK_TIMEOUT);
         stateEvent.setProcessInstanceId(taskInstance.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskInstance.getId());
-        putEvent(stateEvent);
+        addEvent(stateEvent);
         return true;
     }
 
-    private boolean putProcessTimeoutEvent(ProcessInstance processInstance) {
+    private boolean addProcessTimeoutEvent(ProcessInstance processInstance) {
         StateEvent stateEvent = new StateEvent();
         stateEvent.setType(StateEventType.PROCESS_TIMEOUT);
         stateEvent.setProcessInstanceId(processInstance.getId());
-        putEvent(stateEvent);
+        addEvent(stateEvent);
         return true;
+    }
+
+    private void addEvent(StateEvent stateEvent) {
+        if (!processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
+            return;
+        }
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+        workflowExecuteThread.addStateEvent(stateEvent);
     }
 
 }
