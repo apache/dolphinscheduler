@@ -288,6 +288,10 @@ public abstract class UpgradeDao {
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
         Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/dolphinscheduler_dml.sql", schemaDir, getDbType().name().toLowerCase()));
+        if (!sqlFilePath.exists()) {
+            logger.info("No dml file {}, returning", sqlFilePath);
+            return;
+        }
         logger.info("sqlSQLFilePath" + sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;

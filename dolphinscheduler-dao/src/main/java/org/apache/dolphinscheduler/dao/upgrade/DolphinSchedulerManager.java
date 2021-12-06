@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
