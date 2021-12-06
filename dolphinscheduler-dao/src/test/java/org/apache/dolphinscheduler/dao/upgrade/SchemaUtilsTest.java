@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import org.apache.commons.collections.CollectionUtils;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,5 +61,16 @@ public class SchemaUtilsTest {
         } catch (Exception ignored) {
             // This is expected
         }
+    }
+
+    @Test
+    public void testGetAllSchemaList() {
+        List<String> list = null;
+        try {
+            list = SchemaUtils.getAllSchemaList();
+        } catch (IOException ex) {
+            Assert.fail(ex.getMessage());
+        }
+        Assert.assertFalse("Can not find any schema files", CollectionUtils.isEmpty(list));
     }
 }
