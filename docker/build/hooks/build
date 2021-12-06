@@ -27,7 +27,7 @@ TAG=${TAG:-"$VERSION"}
 
 echo "Building Docker image as: $DOCKER_REPO:$TAG"
 
-"$MVN" -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+#"$MVN" -B clean package -Prelease -Dmaven.test.skip=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
 cp "$ROOT_DIR"/dolphinscheduler-dist/target/apache-dolphinscheduler-$VERSION-bin.tar.gz "$ROOT_DIR"/docker/build/
 
