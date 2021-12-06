@@ -20,6 +20,10 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
+set -a
+source "${DOLPHINSCHEDULER_HOME}/conf/config/install_config.conf"
+set +a
+
 export JAVA_HOME=$JAVA_HOME
 
 export DATABASE_TYPE=${DATABASE_TYPE:-"h2"}
