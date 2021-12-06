@@ -38,14 +38,13 @@ public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     /**
-     * copy source file to target file
-     *
-     * @param file         file
-     * @param destFilename destination file name
+     * copy source InputStream to target file
+     * @param file
+     * @param destFilename
      */
-    public static void copyFile(MultipartFile file, String destFilename) {
+    public static void copyInputStreamToFile(MultipartFile file, String destFilename) {
         try {
-            org.apache.commons.io.FileUtils.copyFile(file.getResource().getFile(), new File(destFilename));
+            org.apache.commons.io.FileUtils.copyInputStreamToFile(file.getInputStream(), new File(destFilename));
         } catch (IOException e) {
             logger.error("failed to copy file , {} is empty file", file.getOriginalFilename(), e);
         }
