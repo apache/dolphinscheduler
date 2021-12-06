@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
@@ -34,21 +35,28 @@ import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -61,6 +69,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
@@ -78,11 +87,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,6 +104,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -164,6 +178,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private TenantMapper tenantMapper;
+
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
 
     /**
      * create process definition
@@ -862,6 +879,149 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
+        int index = processDefinitionName.lastIndexOf(".");
+        if (index > 0) {
+            processDefinitionName = processDefinitionName.substring(0, index);
+        }
+        // build process definition
+        Date now = new Date();
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName(processDefinitionName);
+        processDefinition.setCreateTime(now);
+        processDefinition.setUpdateTime(now);
+        processDefinition.setFlag(Flag.YES);
+        processDefinition.setTenantId(-1);
+        processDefinition.setGlobalParamList(Collections.emptyList());
+
+        DagDataSchedule dagDataSchedule = new DagDataSchedule();
+        dagDataSchedule.setProcessDefinition(processDefinition);
+        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
+        dagDataSchedule.setTaskDefinitionList(taskDefinitionList);
+        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+        dagDataSchedule.setProcessTaskRelationList(processTaskRelationList);
+
+        // In most cases, there will be only one data source
+        Map<String, DataSource> dataSourceCache = new HashMap<>(1);
+        Map<String, Long> taskNameToCode = new HashMap<>(16);
+        Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
+        try (ZipInputStream zIn = new ZipInputStream(file.getInputStream());
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
+            ZipEntry entry;
+            while ((entry = zIn.getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    StringBuilder sql = new StringBuilder();
+                    String taskName = null;
+                    String datasourceName = null;
+                    List<String> upstreams = Collections.emptyList();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        int commentIndex = line.indexOf("--");
+                        if (commentIndex >= 0) {
+                            int colonIndex = line.indexOf(":", commentIndex);
+                            if (colonIndex > 0) {
+                                String key = line.substring(commentIndex + 2, colonIndex).trim().toLowerCase();
+                                String value = line.substring(colonIndex + 1).trim();
+                                switch (key) {
+                                    case "name":
+                                        taskName = value;
+                                        break;
+                                    case "upstream":
+                                        upstreams = Arrays.stream(value.split(",")).map(String::trim)
+                                            .filter(s -> !"".equals(s)).collect(Collectors.toList());
+                                        break;
+                                    case "datasource":
+                                        datasourceName = value;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        sql.append(line).append("\n");
+                    }
+                    if (taskName == null) {
+                        taskName = entry.getName().substring(processDefinitionName.length() + 1);
+                        index = taskName.lastIndexOf(".");
+                        if (index > 0) {
+                            taskName = taskName.substring(0, index);
+                        }
+                    }
+                    DataSource dataSource = dataSourceCache.get(datasourceName);
+                    if (dataSource == null) {
+                        if (isAdmin(loginUser)) {
+                            List<DataSource> dataSources  = dataSourceMapper.queryDataSourceByName(datasourceName);
+                            if (CollectionUtils.isNotEmpty(dataSources)) {
+                                dataSource = dataSources.get(0);
+                            }
+                        } else {
+                            dataSource = dataSourceMapper.queryDataSourceByNameAndUserId(loginUser.getId(), datasourceName);
+                        }
+                    }
+                    if (dataSource == null) {
+                        putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
+                        return result;
+                    }
+
+                    // build task definition
+                    TaskDefinition taskDefinition = new TaskDefinition();
+                    taskDefinition.setName(taskName);
+                    taskDefinition.setFlag(Flag.YES);
+                    SqlParameters sqlParameters = new SqlParameters();
+                    sqlParameters.setType(dataSource.getType().name());
+                    sqlParameters.setDatasource(dataSource.getId());
+                    sqlParameters.setSql(sql.substring(0, sql.length() - 1));
+                    sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
+                    sqlParameters.setLocalParams(Collections.emptyList());
+                    taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+                    taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+                    taskDefinition.setTaskType(TaskType.SQL.getDesc());
+                    taskDefinition.setFailRetryTimes(0);
+                    taskDefinition.setFailRetryInterval(0);
+                    taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
+                    taskDefinition.setWorkerGroup(DEFAULT_WORKER_GROUP);
+                    taskDefinition.setTaskPriority(Priority.MEDIUM);
+                    taskDefinition.setEnvironmentCode(-1);
+                    taskDefinition.setResourceIds("");
+
+                    taskDefinitionList.add(taskDefinition);
+                    taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
+                    taskNameToUpstream.put(taskDefinition.getName(), upstreams);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
+        }
+
+        // build task relation
+        for (Map.Entry<String, Long> entry : taskNameToCode.entrySet()) {
+            List<String> upstreams = taskNameToUpstream.get(entry.getKey());
+            if (CollectionUtils.isEmpty(upstreams)
+                || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
+                ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+                processTaskRelation.setPreTaskCode(0);
+                processTaskRelation.setPostTaskCode(entry.getValue());
+                processTaskRelation.setConditionType(ConditionType.NONE);
+                processTaskRelationList.add(processTaskRelation);
+                continue;
+            }
+            for (String upstream : upstreams) {
+                ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+                processTaskRelation.setPreTaskCode(taskNameToCode.get(upstream));
+                processTaskRelation.setPostTaskCode(entry.getValue());
+                processTaskRelation.setConditionType(ConditionType.NONE);
+                processTaskRelationList.add(processTaskRelation);
+            }
+        }
+
+        checkAndImport(loginUser, projectCode, result, dagDataSchedule);
         return result;
     }
 
