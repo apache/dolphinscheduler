@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -41,7 +40,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -117,9 +115,14 @@ public class MasterSchedulerService extends Thread {
     ConcurrentHashMap<Integer, ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
 
     /**
-     * task time out checkout list
+     * task time out check list
      */
     ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
+
+    /**
+     * task retry check list
+     */
+    ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
 
     private StateWheelExecuteThread stateWheelExecuteThread;
 
@@ -134,6 +137,7 @@ public class MasterSchedulerService extends Thread {
 
         stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
                 taskTimeoutCheckList,
+                taskRetryCheckList,
                 this.processInstanceExecCacheManager,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
@@ -209,6 +213,7 @@ public class MasterSchedulerService extends Thread {
                     , processAlertManager
                     , masterConfig
                     , taskTimeoutCheckList
+                    , taskRetryCheckList
                     , taskProcessorFactory);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
