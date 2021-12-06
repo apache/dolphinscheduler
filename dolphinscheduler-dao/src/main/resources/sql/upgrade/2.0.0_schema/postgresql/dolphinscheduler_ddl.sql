@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
+delimiter d//
 CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
 	)
     RETURNS character varying
@@ -304,3 +304,4 @@ BEGIN
 END;
 $BODY$;
 
+d//
