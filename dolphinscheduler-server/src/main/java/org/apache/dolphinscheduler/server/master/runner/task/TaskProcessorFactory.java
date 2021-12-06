@@ -17,37 +17,43 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.Constants;
+import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * the factory to create task processor
  */
+@Service
 public class TaskProcessorFactory {
 
-    public static final Map<String, ITaskProcessFactory> PROCESS_FACTORY_MAP = new ConcurrentHashMap<>();
+    private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
-    private static final String DEFAULT_PROCESSOR = Constants.COMMON_TASK_TYPE;
+    private Map<String, ITaskProcessor> taskProcessorMap;
 
-    static {
-        for (ITaskProcessFactory iTaskProcessor : ServiceLoader.load(ITaskProcessFactory.class)) {
-            PROCESS_FACTORY_MAP.put(iTaskProcessor.type(), iTaskProcessor);
-        }
+    @Autowired
+    public TaskProcessorFactory(List<ITaskProcessor> taskProcessors) {
+        taskProcessorMap = taskProcessors.stream().collect(Collectors.toMap(ITaskProcessor::getType, Function.identity(), (v1, v2) -> v2));
     }
 
-    public static ITaskProcessor getTaskProcessor(String type) {
-        if (Strings.isNullOrEmpty(type)) {
-            return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
+    public ITaskProcessor getTaskProcessor(String key) {
+        if (StringUtils.isEmpty(key)) {
+            key = DEFAULT_PROCESSOR;
         }
-        if (!PROCESS_FACTORY_MAP.containsKey(type)) {
-            return PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR).create();
+        ITaskProcessor taskProcessor = taskProcessorMap.get(key);
+        if (Objects.isNull(taskProcessor)) {
+            taskProcessor = taskProcessorMap.get(DEFAULT_PROCESSOR);
         }
-        return PROCESS_FACTORY_MAP.get(type).create();
-    }
 
+        return taskProcessor;
+    }
 }

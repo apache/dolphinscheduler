@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -68,6 +69,8 @@ public class MasterSchedulerService extends Thread {
      */
     @Autowired
     private ProcessService processService;
+    @Autowired
+    private TaskProcessorFactory taskProcessorFactory;
 
     /**
      * zookeeper master client
@@ -205,7 +208,8 @@ public class MasterSchedulerService extends Thread {
                     , nettyExecutorManager
                     , processAlertManager
                     , masterConfig
-                    , taskTimeoutCheckList);
+                    , taskTimeoutCheckList
+                    , taskProcessorFactory);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
             if (processInstance.getTimeout() > 0) {

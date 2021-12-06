@@ -131,6 +131,11 @@ public class WorkflowExecuteThread implements Runnable {
     private ProcessDefinition processDefinition;
 
     /**
+     * task processor
+     */
+    private TaskProcessorFactory taskProcessorFactory;
+
+    /**
      * the object of DAG
      */
     private DAG<String, TaskNode, TaskNodeRelation> dag;
@@ -216,13 +221,18 @@ public class WorkflowExecuteThread implements Runnable {
      * @param processInstance processInstance
      * @param processService processService
      * @param nettyExecutorManager nettyExecutorManager
+     * @param processAlertManager processAlertManager
+     * @param masterConfig masterConfig
+     * @param taskTimeoutCheckList taskTimeoutCheckList
+     * @param taskProcessorFactory taskProcessorFactory
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList) {
+            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
+            , TaskProcessorFactory taskProcessorFactory) {
         this.processService = processService;
 
         this.processInstance = processInstance;
@@ -230,6 +240,7 @@ public class WorkflowExecuteThread implements Runnable {
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
+        this.taskProcessorFactory = taskProcessorFactory;
     }
 
     @Override
@@ -791,7 +802,7 @@ public class WorkflowExecuteThread implements Runnable {
      */
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
-            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            ITaskProcessor taskProcessor = taskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
