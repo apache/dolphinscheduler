@@ -62,8 +62,8 @@ public class SubProcessTaskTest {
 
         MasterConfig config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
-        config.setMasterTaskCommitRetryTimes(3);
-        config.setMasterTaskCommitInterval(1000);
+        config.setTaskCommitRetryTimes(3);
+        config.setTaskCommitInterval(1000);
 
         PowerMockito.mockStatic(Stopper.class);
         PowerMockito.when(Stopper.isRunning()).thenReturn(true);

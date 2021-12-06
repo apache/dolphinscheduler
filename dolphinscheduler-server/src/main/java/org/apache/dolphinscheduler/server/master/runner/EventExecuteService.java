@@ -79,7 +79,7 @@ public class EventExecuteService extends Thread {
 
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
 
-        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
+        eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getExecThreads());
 
         this.processInstanceExecMaps = processInstanceExecMaps;
 

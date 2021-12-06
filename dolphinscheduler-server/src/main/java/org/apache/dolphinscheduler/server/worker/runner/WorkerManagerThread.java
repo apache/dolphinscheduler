@@ -69,7 +69,7 @@ public class WorkerManagerThread implements Runnable {
 
     public WorkerManagerThread() {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads());
+        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getExecThreads());
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
 

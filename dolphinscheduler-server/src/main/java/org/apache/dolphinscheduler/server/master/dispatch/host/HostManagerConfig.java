@@ -42,8 +42,7 @@ public class HostManagerConfig {
 
     @Bean
     public HostManager hostManager() {
-        String hostSelector = masterConfig.getHostSelector();
-        HostSelector selector = HostSelector.of(hostSelector);
+        HostSelector selector = masterConfig.getHostSelector();
         HostManager hostManager;
         switch (selector) {
             case RANDOM:
@@ -56,7 +55,7 @@ public class HostManagerConfig {
                 hostManager = new LowerWeightHostManager();
                 break;
             default:
-                throw new IllegalArgumentException("unSupport selector " + hostSelector);
+                throw new IllegalArgumentException("unSupport selector " + selector);
         }
         beanFactory.autowireBean(hostManager);
         return hostManager;
