@@ -559,11 +559,9 @@
         tasksTypeList: Object.keys(tasksType),
         helpUrlEnable: function (typekey) {
           const type = tasksType[typekey]
-          if (type) {
-            if (!type.helperLinkDisable) return true
-            return !type.helperLinkDisable
-          }
-          return false
+          if (!type) return false
+          if (!type.helperLinkDisable) return true
+          return !type.helperLinkDisable
         },
         helpUrl: function (tasktype) {
           return 'https://dolphinscheduler.apache.org/' +
