@@ -69,7 +69,7 @@
             </foreach>
         </if>
     </select>
-    <select id="countTaskInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+    <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select state, count(0) as count
         from t_ds_task_instance t
         left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
