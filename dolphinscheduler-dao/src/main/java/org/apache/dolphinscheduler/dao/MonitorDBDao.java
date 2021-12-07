@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
-import org.apache.dolphinscheduler.dao.utils.MysqlPerformance;
-import org.apache.dolphinscheduler.dao.utils.PostgrePerformance;
+import org.apache.dolphinscheduler.dao.utils.MySQLPerformance;
+import org.apache.dolphinscheduler.dao.utils.PostgreSQLPerformance;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
@@ -47,9 +47,9 @@ public class MonitorDBDao {
         try (final Connection conn = dataSource.getConnection()) {
             String driverClassName = DriverManager.getDriver(conn.getMetaData().getURL()).getClass().getName();
             if (driverClassName.contains(DbType.MYSQL.toString().toLowerCase())) {
-                return new MysqlPerformance().getMonitorRecord(conn);
+                return new MySQLPerformance().getMonitorRecord(conn);
             } else if (driverClassName.contains(DbType.POSTGRESQL.toString().toLowerCase())) {
-                return new PostgrePerformance().getMonitorRecord(conn);
+                return new PostgreSQLPerformance().getMonitorRecord(conn);
             }
         } catch (Exception e) {
             logger.error("SQLException: {}", e.getMessage(), e);
