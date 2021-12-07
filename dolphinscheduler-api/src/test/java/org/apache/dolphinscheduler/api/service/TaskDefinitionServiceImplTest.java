@@ -207,9 +207,10 @@ public class TaskDefinitionServiceImplTest {
 
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version))
             .thenReturn(new TaskDefinitionLog());
-
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(projectCode);
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode))
-            .thenReturn(new TaskDefinition());
+            .thenReturn(taskDefinition);
         Mockito.when(taskDefinitionMapper.updateById(new TaskDefinitionLog())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
             .switchVersion(loginUser, projectCode, taskCode, version);
@@ -306,7 +307,16 @@ public class TaskDefinitionServiceImplTest {
 
         // process definition offline
         putMsg(result, Status.SUCCESS);
-        Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(new TaskDefinition());
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(projectCode);
+        taskDefinition.setVersion(1);
+        taskDefinition.setCode(taskCode);
+        String params = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
+        taskDefinition.setTaskParams(params);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
+        Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
+        Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinition.getVersion())).thenReturn(taskDefinitionLog);
         Map<String, Object> offlineTaskResult = taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, taskCode, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS, offlineTaskResult.get(Constants.STATUS));
 
