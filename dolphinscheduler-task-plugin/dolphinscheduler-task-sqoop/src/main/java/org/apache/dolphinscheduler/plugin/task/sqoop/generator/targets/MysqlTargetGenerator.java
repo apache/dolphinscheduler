@@ -31,7 +31,7 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_QUOTES;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_QUOTES;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
@@ -63,7 +63,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
             if (null != targetMysqlParameter && targetMysqlParameter.getTargetDatasource() != 0) {
 
                 // get datasource
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                         DbType.of(taskExecutionContext.getSqoopTaskExecutionContext().getTargetType()),
                         taskExecutionContext.getSqoopTaskExecutionContext().getTargetConnectionParams());
 
@@ -71,7 +71,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
 
                     mysqlTargetSb.append(SPACE).append(DB_CONNECT)
                             .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DatasourceUtil.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
+                            .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
                             .append(SPACE).append(DB_USERNAME)
                             .append(SPACE).append(baseDataSource.getUser())
                             .append(SPACE).append(DB_PWD)
