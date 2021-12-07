@@ -18,7 +18,7 @@ spring:
   application:
     name: master-server
   cache:
-    # default enable cache, you can disable by `type: none`
+    # default unable cache, you can disable by `type: caffeine`
     type: none
     cache-names:
       - tenant
@@ -26,6 +26,8 @@ spring:
       - processDefinition
       - processTaskRelation
       - taskDefinition
+      - workerGroup
+      - schedule
     caffeine:
       spec: maximumSize=100,expireAfterWrite=300s,recordStats
 
@@ -37,8 +39,6 @@ master:
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
   exec-threads: 100
-  # master execute task number in parallel per process instance
-  exec-task-num: 20
   # master dispatch task number per batch
   dispatch-task-number: 3
   # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
@@ -54,8 +54,6 @@ master:
   max-cpu-load-avg: -1
   # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # master cache process definition, default: true
-  cache-process-definition: true
 
 server:
   port: 5679
