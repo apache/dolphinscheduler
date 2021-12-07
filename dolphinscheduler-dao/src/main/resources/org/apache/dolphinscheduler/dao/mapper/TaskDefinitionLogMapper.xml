@@ -47,9 +47,6 @@
                 and version = #{item.version})
             </foreach>
         </if>
-        <if test="taskDefinitions == null or taskDefinitions.size == 0">
-            1 != 1
-        </if>
     </select>
     <insert id="batchInsert">
         insert into t_ds_task_definition_log (code, name, version, description, project_code, user_id,
