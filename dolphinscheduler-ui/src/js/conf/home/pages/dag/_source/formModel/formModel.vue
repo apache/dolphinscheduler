@@ -19,7 +19,9 @@
     <div class="title-box">
       <span class="name">{{ $t("Current node settings") }}
         <a v-if="helpUrlEnable(nodeData.taskType)" class="helper-link" target="_blank"
-           :href="helpUrl(nodeData.taskType)">?{{nodeData.taskType}} {{ $t('Instructions') }}</a>
+           :href="helpUrl(nodeData.taskType)">
+          <i class="el-icon-question" />
+          {{nodeData.taskType}} {{ $t('Instructions') }}</a>
       </span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
@@ -555,16 +557,18 @@
         // whether this is a new Task
         isNewCreate: true,
         tasksTypeList: Object.keys(tasksType),
-        helpUrlEnable: function (typeKey) {
-          let type = tasksType[typeKey]
+        helpUrlEnable: function (typekey) {
+          const type = tasksType[typekey]
           if (type) {
-            let disabled = !!type.helperLinkDisable
-            return !disabled
+            if (!type.helperLinkDisable) return true
+            return !type.helperLinkDisable
           }
           return false
         },
-        helpUrl: function (tskType) {
-          return 'https://dolphinscheduler.apache.org/' + findLocale(i18n.globalScope.LOCALE).helperContext + '/docs/latest/user_doc/guide/task/' + tskType.toLowerCase() + '.html'
+        helpUrl: function (tasktype) {
+          return 'https://dolphinscheduler.apache.org/' +
+            findLocale(i18n.globalScope.LOCALE).helperContext +
+            '/docs/latest/user_doc/guide/task/' + tasktype.toLowerCase() + '.html'
         }
       }
     },
