@@ -29,10 +29,7 @@ public class CacheExpireCommandTest {
 
     @Test
     public void testConvert2Command() {
-        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, 1);
-        Assert.assertEquals(Integer.class, cacheExpireCommand.getUpdateObjClass());
-        Assert.assertEquals("1", cacheExpireCommand.getUpdateObjJson());
-
+        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, "1");
         Command command = cacheExpireCommand.convert2Command();
         Assert.assertEquals(CommandType.CACHE_EXPIRE, command.getType());
     }
