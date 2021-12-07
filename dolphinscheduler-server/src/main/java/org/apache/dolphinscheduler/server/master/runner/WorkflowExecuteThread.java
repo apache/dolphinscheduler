@@ -51,9 +51,11 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
@@ -84,6 +86,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -682,11 +685,10 @@ public class WorkflowExecuteThread implements Runnable {
             ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
         }
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
-        //release task group
-        processService.releaseAllTaskGroup(processInstance.getId());
+        if (checkTaskQueue()) {
+            //release task group
+            processService.releaseAllTaskGroup(processInstance.getId());
+        }
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {
@@ -725,8 +727,10 @@ public class WorkflowExecuteThread implements Runnable {
         processInstance.setProcessDefinition(processDefinition);
 
         List<TaskInstance> recoverNodeList = getStartTaskInstanceList(processInstance.getCommandParam());
-        List<TaskNode> taskNodeList =
-                processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
+
+        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<TaskDefinitionLog> taskDefinitionLogs = processService.getTaskDefineLogListByRelation(processTaskRelations);
+        List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();
 
         taskNodeList.forEach(taskNode -> {
@@ -759,7 +763,7 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskMap.clear();
         errorTaskMap.clear();
 
-        if (ExecutionStatus.SUBMITTED_SUCCESS != processInstance.getState()) {
+        if (!isNewProcessInstance()) {
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance task : validTaskInstanceList) {
                 validTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
@@ -1624,5 +1628,29 @@ public class WorkflowExecuteThread implements Runnable {
                                       List<String> recoveryNodeCodeList,
                                       TaskDependType depNodeType) throws Exception {
         return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeCodeList, depNodeType);
+    }
+
+    /**
+     * check task queue
+     */
+    private boolean checkTaskQueue() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        taskInstanceMap.forEach((id, taskInstance) -> {
+            if (taskInstance != null && taskInstance.getTaskGroupId() > 0) {
+                result.set(true);
+            }
+        });
+        return result.get();
+    }
+
+    /**
+     * is new process instance
+     */
+    private boolean isNewProcessInstance() {
+        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
