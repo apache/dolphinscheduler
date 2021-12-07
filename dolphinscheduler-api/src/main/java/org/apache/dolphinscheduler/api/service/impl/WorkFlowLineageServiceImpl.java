@@ -177,6 +177,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
 
     private Set<Long> querySourceWorkFlowCodes(long projectCode, long workFlowCode, List<TaskDefinition> taskDefinitionList) {
         Set<Long> sourceWorkFlowCodes = new HashSet<>();
+        if (taskDefinitionList == null || taskDefinitionList.isEmpty()) {
+            return sourceWorkFlowCodes;
+        }
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getProjectCode() == projectCode) {

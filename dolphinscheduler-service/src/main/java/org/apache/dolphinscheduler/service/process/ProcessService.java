@@ -126,9 +126,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.facebook.presto.jdbc.internal.guava.collect.Lists;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 
 /**
  * process relative dao that some mappers in this.
@@ -330,7 +330,7 @@ public class ProcessService {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.error("process define not exists");
-            return new ArrayList<>();
+            return Lists.newArrayList();
         }
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
@@ -339,8 +339,11 @@ public class ProcessService {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
         }
+        if (taskDefinitionSet.isEmpty()) {
+            return Lists.newArrayList();
+        }
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
-        return new ArrayList<>(taskDefinitionLogs);
+        return Lists.newArrayList(taskDefinitionLogs);
     }
 
     /**
@@ -2366,6 +2369,9 @@ public class ProcessService {
             if (processTaskRelation.getPostTaskCode() > 0) {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
+        }
+        if (taskDefinitionSet.isEmpty()) {
+            return Lists.newArrayList();
         }
         return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
     }
