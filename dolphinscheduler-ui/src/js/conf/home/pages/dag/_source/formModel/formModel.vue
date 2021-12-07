@@ -17,7 +17,10 @@
 <template>
   <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
-      <span class="name">{{ $t("Current node settings") }}</span>
+      <span class="name">{{ $t("Current node settings") }}
+        <a v-if="helpUrlEnable(nodeData.taskType)" class="helper-link" target="_blank"
+           :href="helpUrl(nodeData.taskType)">?{{nodeData.taskType}} {{ $t('Instructions') }}</a>
+      </span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log
@@ -452,6 +455,7 @@
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
+  import { findLocale } from '@/module/i18n/config'
   import mListBox from './tasks/_source/listBox'
   import mShell from './tasks/shell'
   import mWaterdrop from './tasks/waterdrop'
@@ -550,7 +554,18 @@
         backfillRefresh: true,
         // whether this is a new Task
         isNewCreate: true,
-        tasksTypeList: Object.keys(tasksType)
+        tasksTypeList: Object.keys(tasksType),
+        helpUrlEnable: function (typeKey) {
+          let type = tasksType[typeKey]
+          if (type) {
+            let disabled = !!type.helperLinkDisable
+            return !disabled
+          }
+          return false
+        },
+        helpUrl: function (tskType) {
+          return 'https://dolphinscheduler.apache.org/' + findLocale(i18n.globalScope.LOCALE).helperContext + '/docs/latest/user_doc/guide/task/' + tskType.toLowerCase() + '.html'
+        }
       }
     },
     provide () {
