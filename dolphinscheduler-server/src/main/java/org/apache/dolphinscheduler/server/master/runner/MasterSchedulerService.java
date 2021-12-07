@@ -109,6 +109,11 @@ public class MasterSchedulerService extends Thread {
     ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
 
     /**
+     * task retry check list
+     */
+    ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
+
+    /**
      * key:code-version
      * value: processDefinition
      */
@@ -127,6 +132,7 @@ public class MasterSchedulerService extends Thread {
 
         stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
                 taskTimeoutCheckList,
+                taskRetryCheckList,
                 this.processInstanceExecMaps,
                 masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
@@ -176,8 +182,6 @@ public class MasterSchedulerService extends Thread {
     /**
      * 1. get command by slot
      * 2. donot handle command if slot is empty
-     *
-     * @throws Exception
      */
     private void scheduleProcess() throws Exception {
 
@@ -201,7 +205,8 @@ public class MasterSchedulerService extends Thread {
                             , nettyExecutorManager
                             , processAlertManager
                             , masterConfig
-                            , taskTimeoutCheckList);
+                            , taskTimeoutCheckList
+                            , taskRetryCheckList);
 
                     this.processInstanceExecMaps.put(processInstance.getId(), workflowExecuteThread);
                     if (processInstance.getTimeout() > 0) {

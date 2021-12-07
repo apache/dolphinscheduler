@@ -764,6 +764,7 @@ public final class Constants {
     public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
+    public static final String WARNING_GROUP_NAME="warningGroupName";
     public static final String RWXR_XR_X = "rwxr-xr-x";
     public static final String QUEUE = "queue";
     public static final String QUEUE_NAME = "queueName";

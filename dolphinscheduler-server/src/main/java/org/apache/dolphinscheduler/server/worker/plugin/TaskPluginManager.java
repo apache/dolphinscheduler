@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.plugin;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -81,5 +82,9 @@ public class TaskPluginManager {
                 throw new RuntimeException("Failed to update task plugin: " + name);
             }
         });
+
+        // put WATERDROP task
+        taskChannelMap.put(TaskType.WATERDROP.getDesc(), taskChannelMap.get(TaskType.SHELL.getDesc()));
+
     }
 }
