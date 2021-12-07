@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -96,7 +97,7 @@ public class MasterRegistryClient {
     private ScheduledExecutorService heartBeatExecutor;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     /**
      * master startup time, ms
@@ -298,6 +299,24 @@ public class MasterRegistryClient {
                     continue;
                 }
                 processInstanceCacheMap.put(processInstance.getId(), processInstance);
+                taskInstance.setProcessInstance(processInstance);
+
+                TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                        .buildTaskInstanceRelatedInfo(taskInstance)
+                        .buildProcessInstanceRelatedInfo(processInstance)
+                        .create();
+                // only kill yarn job if exists , the local thread has exited
+                ProcessUtils.killYarnJob(taskExecutionContext);
+
+                taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
+                processService.saveTaskInstance(taskInstance);
+
+                StateEvent stateEvent = new StateEvent();
+                stateEvent.setTaskInstanceId(taskInstance.getId());
+                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                stateEvent.setProcessInstanceId(processInstance.getId());
+                stateEvent.setExecutionStatus(taskInstance.getState());
+                workflowExecuteThreadPool.submitStateEvent(stateEvent);
             }
 
             // only failover the task owned myself if worker down.
@@ -375,16 +394,12 @@ public class MasterRegistryClient {
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
         processService.saveTaskInstance(taskInstance);
 
-        WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecCacheManager.getByProcessInstanceId(processInstance.getId());
-        if (workflowExecuteThreadNotify == null) {
-            return;
-        }
         StateEvent stateEvent = new StateEvent();
         stateEvent.setTaskInstanceId(taskInstance.getId());
         stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
         stateEvent.setProcessInstanceId(processInstance.getId());
         stateEvent.setExecutionStatus(taskInstance.getState());
-        workflowExecuteThreadNotify.addStateEvent(stateEvent);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 
     /**

@@ -95,28 +95,15 @@ public class MasterSchedulerService extends Thread {
     private ThreadPoolExecutor masterPrepareExecService;
 
     /**
-     * master exec service
+     * workflow exec service
      */
-    private ThreadPoolExecutor masterExecService;
+    @Autowired
+    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    /**
-     * process timeout check list
-     */
-    ConcurrentHashMap<Integer, ProcessInstance> processTimeoutCheckList = new ConcurrentHashMap<>();
-
-    /**
-     * task time out check list
-     */
-    ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
-
-    /**
-     * task retry check list
-     */
-    ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
-
+    @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
@@ -124,15 +111,8 @@ public class MasterSchedulerService extends Thread {
      */
     public void init() {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Pre-Exec-Thread", masterConfig.getPreExecThreads());
-        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
-
-        stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
-                taskTimeoutCheckList,
-                taskRetryCheckList,
-                this.processInstanceExecCacheManager,
-                masterConfig.getStateWheelInterval() * Constants.SLEEP_TIME_MILLIS);
     }
 
     @Override
@@ -143,16 +123,6 @@ public class MasterSchedulerService extends Thread {
     }
 
     public void close() {
-        masterExecService.shutdown();
-        boolean terminated = false;
-        try {
-            terminated = masterExecService.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException ignore) {
-            Thread.currentThread().interrupt();
-        }
-        if (!terminated) {
-            logger.warn("masterExecService shutdown without terminated, increase await time");
-        }
         nettyRemotingClient.close();
         logger.info("master schedule service stopped...");
     }
@@ -205,15 +175,14 @@ public class MasterSchedulerService extends Thread {
                     , nettyExecutorManager
                     , processAlertManager
                     , masterConfig
-                    , taskTimeoutCheckList
-                    , taskRetryCheckList
+                    , stateWheelExecuteThread
                     , taskProcessorFactory);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
             if (processInstance.getTimeout() > 0) {
-                this.processTimeoutCheckList.put(processInstance.getId(), processInstance);
+                stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
-            masterExecService.execute(workflowExecuteThread);
+            workflowExecuteThreadPool.execute(workflowExecuteThread);
         }
     }
 

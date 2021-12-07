@@ -204,16 +204,6 @@ public class WorkflowExecuteThread implements Runnable {
     private List<Date> complementListDate = Lists.newLinkedList();
 
     /**
-     * task timeout check list
-     */
-    private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
-
-    /**
-     * task retry check list
-     */
-    private ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList;
-
-    /**
      * state event queue
      */
     private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
@@ -224,6 +214,11 @@ public class WorkflowExecuteThread implements Runnable {
     private PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
     /**
+     * state wheel execute thread
+     */
+    private StateWheelExecuteThread stateWheelExecuteThread;
+
+    /**
      * constructor of WorkflowExecuteThread
      *
      * @param processInstance processInstance
@@ -231,7 +226,7 @@ public class WorkflowExecuteThread implements Runnable {
      * @param nettyExecutorManager nettyExecutorManager
      * @param processAlertManager processAlertManager
      * @param masterConfig masterConfig
-     * @param taskTimeoutCheckList taskTimeoutCheckList
+     * @param stateWheelExecuteThread stateWheelExecuteThread
      * @param taskProcessorFactory taskProcessorFactory
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
@@ -239,16 +234,14 @@ public class WorkflowExecuteThread implements Runnable {
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
-            , ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList
+            , StateWheelExecuteThread stateWheelExecuteThread
             , TaskProcessorFactory taskProcessorFactory) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
-        this.taskTimeoutCheckList = taskTimeoutCheckList;
-        this.taskRetryCheckList = taskRetryCheckList;
+        this.stateWheelExecuteThread = stateWheelExecuteThread;
         this.taskProcessorFactory = taskProcessorFactory;
     }
 
@@ -457,8 +450,8 @@ public class WorkflowExecuteThread implements Runnable {
                         task.getRetryTimes(),
                         task.getMaxRetryTimes(),
                         task.getRetryInterval());
-                this.addTimeoutCheck(task);
-                this.addRetryCheck(task);
+                stateWheelExecuteThread.addTask4TimeoutCheck(task);
+                stateWheelExecuteThread.addTask4RetryCheck(task);
             } else {
                 submitStandByTask();
             }
@@ -467,8 +460,8 @@ public class WorkflowExecuteThread implements Runnable {
 
         completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
         activeTaskProcessorMaps.remove(task.getId());
-        taskTimeoutCheckList.remove(task.getId());
-        taskRetryCheckList.remove(task.getId());
+        stateWheelExecuteThread.removeTask4TimeoutCheck(task);
+        stateWheelExecuteThread.removeTask4RetryCheck(task);
 
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
@@ -837,8 +830,8 @@ public class WorkflowExecuteThread implements Runnable {
             activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
             taskProcessor.run();
 
-            addTimeoutCheck(taskInstance);
-            addRetryCheck(taskInstance);
+            stateWheelExecuteThread.addTask4TimeoutCheck(taskInstance);
+            stateWheelExecuteThread.addTask4RetryCheck(taskInstance);
 
             if (taskProcessor.taskState().typeIsFinished()) {
                 StateEvent stateEvent = new StateEvent();
@@ -868,42 +861,6 @@ public class WorkflowExecuteThread implements Runnable {
             nettyExecutorManager.doExecute(host, hostUpdateCommand.convert2Command());
         } catch (Exception e) {
             logger.error("notify process host update", e);
-        }
-    }
-
-    private void addTimeoutCheck(TaskInstance taskInstance) {
-        if (taskTimeoutCheckList.containsKey(taskInstance.getId())) {
-            return;
-        }
-        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
-        if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
-            return;
-        }
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
-            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-        }
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-        }
-    }
-
-    private void addRetryCheck(TaskInstance taskInstance) {
-        if (taskRetryCheckList.containsKey(taskInstance.getId())) {
-            return;
-        }
-        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
-        if (taskDefinition == null) {
-            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
-            return;
-        }
-
-        if (taskInstance.taskCanRetry()) {
-            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
-        }
-
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
         }
     }
 

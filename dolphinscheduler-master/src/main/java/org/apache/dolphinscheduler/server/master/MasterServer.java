@@ -43,6 +43,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.PostConstruct;
@@ -51,6 +52,7 @@ import javax.annotation.PostConstruct;
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
+@EnableScheduling
 public class MasterServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
@@ -117,8 +119,6 @@ public class MasterServer implements IStoppable {
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.eventExecuteService.init();
-        this.eventExecuteService.start();
         this.masterSchedulerService.init();
         this.masterSchedulerService.start();
 
