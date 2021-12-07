@@ -211,7 +211,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
         if (delete > 0) {
             List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
-            if (!processTaskRelationList.isEmpty()) {
+            if (!taskRelationList.isEmpty()) {
                 int deleteRelation = 0;
                 int deleteRelationLog = 0;
                 for (ProcessTaskRelation processTaskRelation : taskRelationList) {
