@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
@@ -50,7 +54,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheEvictAspect {
 
-    private static final String UPDATE_BY_ID = "updateById";
+    private static final Logger logger = LoggerFactory.getLogger(CacheEvictAspect.class);
+
+    /**
+     * symbol of spring el
+     */
+    private static final String EL_SYMBOL = "#";
 
     @Autowired
     private CacheKeyGenerator cacheKeyGenerator;
@@ -77,17 +86,18 @@ public class CacheEvictAspect {
 
         CacheType cacheType = getCacheType(cacheConfig, cacheEvict);
         if (cacheType != null) {
-            // todo use springEL is better
-            if (method.getName().equalsIgnoreCase(UPDATE_BY_ID) && args.length == 1) {
-                Object updateObj = args[0];
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, updateObj).convert2Command());
-            } else if (!cacheEvict.key().isEmpty()) {
-                List<Name> paramsList = getParamAnnotationsByType(method, Name.class);
-                String key = parseKey(cacheEvict.key(), paramsList.stream().map(o -> o.value()).collect(Collectors.toList()), Arrays.asList(args));
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
+            String cacheKey;
+            if (cacheEvict.key().isEmpty()) {
+                cacheKey = (String) cacheKeyGenerator.generate(target, method, args);
             } else {
-                Object key = cacheKeyGenerator.generate(target, method, args);
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, key).convert2Command());
+                cacheKey = cacheEvict.key();
+                List<Name> paramsList = getParamAnnotationsByType(method, Name.class);
+                if (cacheEvict.key().contains(EL_SYMBOL)) {
+                    cacheKey = parseKey(cacheEvict.key(), paramsList.stream().map(o -> o.value()).collect(Collectors.toList()), Arrays.asList(args));
+                }
+            }
+            if (StringUtils.isNotEmpty(cacheKey)) {
+                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, cacheKey).convert2Command());
             }
         }
 

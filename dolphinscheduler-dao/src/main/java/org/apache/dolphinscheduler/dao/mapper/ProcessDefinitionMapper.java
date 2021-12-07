@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -52,8 +53,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     /**
      * update
      */
-    @CacheEvict
-    int updateById(@Param("et") ProcessDefinition processDefinition);
+    @CacheEvict(key = "#processDefinition.code")
+    int updateById(@Name("processDefinition") @Param("et") ProcessDefinition processDefinition);
 
     /**
      * query process definition by code list
@@ -69,8 +70,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return delete result
      */
-    @CacheEvict
-    int deleteByCode(@Param("code") long code);
+    @CacheEvict(key = "#code")
+    int deleteByCode(@Name("code") @Param("code") long code);
 
     /**
      * verify process definition by name

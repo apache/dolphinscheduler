@@ -28,29 +28,23 @@ import java.io.Serializable;
 public class CacheExpireCommand implements Serializable {
 
     private CacheType cacheType;
-    private Class updateObjClass;
-    private String updateObjJson;
+    private String cacheKey;
 
     public CacheExpireCommand() {
         super();
     }
 
-    public CacheExpireCommand(CacheType cacheType, Object updateObj) {
+    public CacheExpireCommand(CacheType cacheType, String cacheKey) {
         this.cacheType = cacheType;
-        this.updateObjClass = updateObj.getClass();
-        this.updateObjJson = JSONUtils.toJsonString(updateObj);
+        this.cacheKey = cacheKey;
     }
 
     public CacheType getCacheType() {
         return cacheType;
     }
 
-    public Class getUpdateObjClass() {
-        return updateObjClass;
-    }
-
-    public String getUpdateObjJson() {
-        return updateObjJson;
+    public String getCacheKey() {
+        return cacheKey;
     }
 
     /**
@@ -68,6 +62,6 @@ public class CacheExpireCommand implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("CacheExpireCommand{CacheType=%s, updateObjClass=%s, updateObjJson=%s}", cacheType, updateObjClass, updateObjJson);
+        return String.format("CacheExpireCommand{CacheType=%s, cacheKey=%s}", cacheType, cacheKey);
     }
 }
