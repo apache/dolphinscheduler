@@ -37,4 +37,7 @@ BEGIN
         return SQLERRM;
 END;
 $BODY$;
+
+select dolphin_update_metadata();
+
 d//
