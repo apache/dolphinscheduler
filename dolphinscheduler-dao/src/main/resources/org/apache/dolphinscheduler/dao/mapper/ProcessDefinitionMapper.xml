@@ -109,7 +109,7 @@
             #{i}
         </foreach>
     </select>
-    <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+    <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
         SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id

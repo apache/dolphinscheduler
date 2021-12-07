@@ -318,11 +318,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
 
         Long[] projectCodes = new Long[1];
         projectCodes[0] = processDefinition.getProjectCode();
-        List<DefinitionGroupByUser> processDefinitions = processDefinitionMapper.countDefinitionGroupByUser(
-                processDefinition.getUserId(),
-                projectCodes,
-                user.getUserType() == UserType.ADMIN_USER
-        );
+        List<DefinitionGroupByUser> processDefinitions = processDefinitionMapper.countDefinitionByProjectCodes(projectCodes);
         Assert.assertNotEquals(processDefinitions.size(), 0);
     }
 

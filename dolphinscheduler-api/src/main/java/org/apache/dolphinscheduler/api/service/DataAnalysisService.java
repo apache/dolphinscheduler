@@ -49,7 +49,9 @@ public interface DataAnalysisService {
     Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
-     * statistics the process definition quantities of certain person
+     * statistics the process definition quantities of a certain person
+     *
+     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
      *
      * @param loginUser login user
      * @param projectCode project code
