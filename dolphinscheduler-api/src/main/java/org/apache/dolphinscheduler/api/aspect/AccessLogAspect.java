@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,6 +46,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AccessLogAspect {
     private static final Logger logger = LoggerFactory.getLogger(AccessLogAspect.class);
 
+    private static final String TRACE_ID = "traceId";
+
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
     public void logPointCut(){
         // Do nothing because of it's a pointcut
@@ -60,21 +62,24 @@ public class AccessLogAspect {
         Method method = sign.getMethod();
         AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
-        String tranceId = UUID.randomUUID().toString();
+        String traceId = UUID.randomUUID().toString();
 
         // log request
         if (!annotation.ignoreRequest()) {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
-
+                String traceIdFromHeader = request.getHeader(TRACE_ID);
+                if (!StringUtils.isEmpty(traceIdFromHeader)) {
+                    traceId = traceIdFromHeader;
+                }
                 // handle login info
                 String userName = parseLoginInfo(request);
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
-                logger.info("REQUEST TRANCE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
-                        tranceId,
+                logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                        traceId,
                         userName,
                         request.getRequestURI(),
                         request.getMethod(),
@@ -88,7 +93,7 @@ public class AccessLogAspect {
 
         // log response
         if (!annotation.ignoreResponse()) {
-            logger.info("RESPONSE TRANCE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", tranceId, ob, (System.currentTimeMillis() - startTime));
+            logger.info("RESPONSE TRACE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", traceId, ob, (System.currentTimeMillis() - startTime));
         }
 
         return ob;
