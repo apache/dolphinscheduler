@@ -66,7 +66,7 @@ public class CacheProcessorTest {
     public void testProcess() {
         Tenant tenant = new Tenant();
         tenant.setId(1);
-        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, tenant);
+        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, "1");
         Command command = cacheExpireCommand.convert2Command();
 
         cacheProcessor.process(channel, command);

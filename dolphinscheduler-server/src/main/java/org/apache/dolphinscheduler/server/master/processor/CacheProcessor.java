@@ -19,14 +19,6 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -67,142 +59,15 @@ public class CacheProcessor implements NettyRequestProcessor {
             cacheManager = SpringApplicationContext.getBean(CacheManager.class);
         }
 
-        Object object = JSONUtils.parseObject(cacheExpireCommand.getUpdateObjJson(), cacheExpireCommand.getUpdateObjClass());
-        if (object == null) {
+        if (cacheExpireCommand.getCacheKey().isEmpty()) {
             return;
         }
 
         CacheType cacheType = cacheExpireCommand.getCacheType();
-        switch (cacheType) {
-            case TENANT:
-                if (object instanceof Tenant) {
-                    Tenant tenant = (Tenant) object;
-                    tenantCacheExpire(tenant);
-                }
-                break;
-            case USER:
-                if (object instanceof User) {
-                    User user = (User) object;
-                    userCacheExpire(user);
-                }
-                break;
-            case QUEUE:
-                if (object instanceof Queue) {
-                    Queue queue = (Queue) object;
-                    queueCacheExpire(queue);
-                }
-                break;
-            case PROCESS_DEFINITION:
-                if (object instanceof ProcessDefinition) {
-                    ProcessDefinition processDefinition = (ProcessDefinition) object;
-                    processDefinitionCacheExpire(processDefinition);
-                }
-                break;
-            case TASK_DEFINITION:
-                if (object instanceof TaskDefinition) {
-                    TaskDefinition taskDefinition = (TaskDefinition) object;
-                    taskDefinitionCacheExpire(taskDefinition);
-                }
-                break;
-            case PROCESS_TASK_RELATION:
-                if (object instanceof ProcessTaskRelation) {
-                    ProcessTaskRelation processTaskRelation = (ProcessTaskRelation) object;
-                    processTaskRelationCacheExpire(processTaskRelation);
-                }
-                break;
-            case WORKER_GROUP:
-                if (object instanceof WorkerGroup) {
-                    WorkerGroup workerGroup = (WorkerGroup) object;
-                    workerGroupCacheExpire(workerGroup);
-                }
-                break;
-            case SCHEDULE:
-                if (object instanceof Schedule) {
-                    Schedule schedule = (Schedule) object;
-                    scheduleCacheExpire(schedule);
-                }
-                break;
-            default:
-                logger.error("no support cache type:{}", cacheType);
-        }
-
-        // if delete operation, just send key
-        if (object instanceof String) {
-            Cache cache = cacheManager.getCache(cacheType.getCacheName());
-            if (cache != null) {
-                cache.evict(object);
-                logger.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), object);
-            }
-        }
-    }
-
-    private void tenantCacheExpire(Tenant tenant) {
-        Cache cache = cacheManager.getCache(CacheType.TENANT.getCacheName());
+        Cache cache = cacheManager.getCache(cacheType.getCacheName());
         if (cache != null) {
-            cache.evict(tenant.getId());
-            logger.info("cache evict, type:{}, key:{}", CacheType.TENANT.getCacheName(), tenant.getId());
-        }
-    }
-
-    private void userCacheExpire(User user) {
-        Cache cache = cacheManager.getCache(CacheType.USER.getCacheName());
-        if (cache != null) {
-            cache.evict(user.getId());
-            logger.info("cache evict, type:{}, key:{}", CacheType.USER.getCacheName(), user.getId());
-        }
-    }
-
-    private void queueCacheExpire(Queue queue) {
-        Cache cache = cacheManager.getCache(CacheType.USER.getCacheName());
-        if (cache != null) {
-            cache.clear();
-            logger.info("cache evict, type:{}, clear", CacheType.USER.getCacheName());
-        }
-    }
-
-    private void processDefinitionCacheExpire(ProcessDefinition processDefinition) {
-        Cache cache = cacheManager.getCache(CacheType.PROCESS_DEFINITION.getCacheName());
-        if (cache != null) {
-            cache.evict(processDefinition.getCode());
-            cache.evict(processDefinition.getCode() + "_" + processDefinition.getVersion());
-            logger.info("cache evict, type:{}, key:{}",
-                    CacheType.PROCESS_DEFINITION.getCacheName(), processDefinition.getCode() + "_" + processDefinition.getVersion());
-        }
-    }
-
-    private void processTaskRelationCacheExpire(ProcessTaskRelation processTaskRelation) {
-        Cache cache = cacheManager.getCache(CacheType.PROCESS_TASK_RELATION.getCacheName());
-        if (cache != null) {
-            cache.evict(processTaskRelation.getProjectCode() + "_" + processTaskRelation.getProcessDefinitionCode());
-            logger.info("cache evict, type:{}, key:{}",
-                    CacheType.PROCESS_TASK_RELATION.getCacheName(), processTaskRelation.getProjectCode() + "_" + processTaskRelation.getProcessDefinitionCode());
-        }
-    }
-
-    private void taskDefinitionCacheExpire(TaskDefinition taskDefinition) {
-        Cache cache = cacheManager.getCache(CacheType.TASK_DEFINITION.getCacheName());
-        if (cache != null) {
-            cache.evict(taskDefinition.getCode() + "_" + taskDefinition.getVersion());
-            logger.info("cache evict, type:{}, key:{}",
-                    CacheType.TASK_DEFINITION.getCacheName(), taskDefinition.getCode() + "_" + taskDefinition.getVersion());
-        }
-    }
-
-    private void workerGroupCacheExpire(WorkerGroup workerGroup) {
-        Cache cache = cacheManager.getCache(CacheType.WORKER_GROUP.getCacheName());
-        if (cache != null) {
-            cache.evict("all");
-            logger.info("cache evict, type:{}, key:{}",
-                    CacheType.WORKER_GROUP.getCacheName(), "all");
-        }
-    }
-
-    private void scheduleCacheExpire(Schedule schedule) {
-        Cache cache = cacheManager.getCache(CacheType.SCHEDULE.getCacheName());
-        if (cache != null) {
-            cache.evict(schedule.getProcessDefinitionCode());
-            logger.info("cache evict, type:{}, key:{}",
-                    CacheType.SCHEDULE.getCacheName(), schedule.getProcessDefinitionCode());
+            cache.evict(cacheExpireCommand.getCacheKey());
+            logger.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), cacheExpireCommand.getCacheKey());
         }
     }
 }

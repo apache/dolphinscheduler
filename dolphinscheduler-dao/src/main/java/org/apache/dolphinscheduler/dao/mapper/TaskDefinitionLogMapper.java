@@ -25,6 +25,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -53,15 +54,15 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version version
      * @return task definition log
      */
-    @Cacheable(sync = true, key = "#taskCode + '_' + #taskDefinitionVersion")
+    @Cacheable(sync = true, key = "#code + '_' + #version")
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,
                                                       @Param("version") int version);
 
     /**
      * update
      */
-    @CacheEvict
-    int updateById(@Param("et") TaskDefinitionLog taskDefinitionLog);
+    @CacheEvict(key = "#taskDefinitionLog.code + '_' + #taskDefinitionLog.version")
+    int updateById(@Name("taskDefinitionLog") @Param("et") TaskDefinitionLog taskDefinitionLog);
 
     /**
      * @param taskDefinitions taskDefinition list
@@ -84,8 +85,8 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version task definition version
      * @return delete result
      */
-    @CacheEvict
-    int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
+    @CacheEvict(key = "#code + '_' #version")
+    int deleteByCodeAndVersion(@Name("code") @Param("code") long code, @Name("version") @Param("version") int version);
 
     /**
      * query the paging task definition version list by pagination info

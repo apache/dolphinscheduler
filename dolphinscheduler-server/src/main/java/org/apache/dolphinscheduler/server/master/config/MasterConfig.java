@@ -39,7 +39,6 @@ public class MasterConfig {
     private int stateWheelInterval;
     private double maxCpuLoadAvg;
     private double reservedMemory;
-    private boolean cacheProcessDefinition;
 
     public int getListenPort() {
         return listenPort;
@@ -135,13 +134,5 @@ public class MasterConfig {
 
     public void setReservedMemory(double reservedMemory) {
         this.reservedMemory = reservedMemory;
-    }
-
-    public boolean isCacheProcessDefinition() {
-        return cacheProcessDefinition;
-    }
-
-    public void setCacheProcessDefinition(boolean cacheProcessDefinition) {
-        this.cacheProcessDefinition = cacheProcessDefinition;
     }
 }
