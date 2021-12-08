@@ -52,7 +52,6 @@ import javax.annotation.PostConstruct;
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
-@EnableScheduling
 public class MasterServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
