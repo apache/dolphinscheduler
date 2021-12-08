@@ -23,7 +23,7 @@ from unittest.mock import patch
 import pytest
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.tasks.sub_process import SubProcess, SubProcessTaskParams
+from pydolphinscheduler.tasks.sub_process import SubProcess
 
 TEST_SUB_PROCESS_DEFINITION_NAME = "sub-test-process-definition"
 TEST_SUB_PROCESS_DEFINITION_CODE = "3643589832320"
@@ -31,22 +31,39 @@ TEST_PROCESS_DEFINITION_NAME = "simple-test-process-definition"
 
 
 @pytest.mark.parametrize(
-    "name, value",
+    "attr, expect",
     [
-        ("local_params", "local_params"),
-        ("resource_list", "resource_list"),
-        ("dependence", "dependence"),
-        ("wait_start_timeout", "wait_start_timeout"),
-        ("condition_result", "condition_result"),
+        (
+            {"process_definition_name": TEST_SUB_PROCESS_DEFINITION_NAME},
+            {
+                "processDefinitionCode": TEST_SUB_PROCESS_DEFINITION_CODE,
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        )
     ],
 )
-def test_sub_process_task_params_attr_setter(name, value):
-    """Test sub_process task parameters."""
-    process_definition_code = "3643589832320"
-    sub_process_task_params = SubProcessTaskParams(process_definition_code)
-    assert process_definition_code == sub_process_task_params.process_definition_code
-    setattr(sub_process_task_params, name, value)
-    assert value == getattr(sub_process_task_params, name)
+@patch(
+    "pydolphinscheduler.tasks.sub_process.SubProcess.get_process_definition_info",
+    return_value=(
+        {
+            "id": 1,
+            "name": TEST_SUB_PROCESS_DEFINITION_NAME,
+            "code": TEST_SUB_PROCESS_DEFINITION_CODE,
+        }
+    ),
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_property_task_params(mock_code_version, mock_pd_info, attr, expect):
+    """Test task sub process property."""
+    task = SubProcess("test-sub-process-task-params", **attr)
+    assert expect == task.task_params
 
 
 @patch(
@@ -59,11 +76,11 @@ def test_sub_process_task_params_attr_setter(name, value):
         }
     ),
 )
-def test_sub_process_to_dict(mock_process_definition):
-    """Test task sub_process function to_dict."""
+def test_sub_process_get_define(mock_process_definition):
+    """Test task sub_process function get_define."""
     code = 123
     version = 1
-    name = "test_sub_process_to_dict"
+    name = "test_sub_process_get_define"
     expect = {
         "code": code,
         "name": name,
@@ -94,4 +111,4 @@ def test_sub_process_to_dict(mock_process_definition):
     ):
         with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME):
             sub_process = SubProcess(name, TEST_SUB_PROCESS_DEFINITION_NAME)
-            assert sub_process.to_dict() == expect
+            assert sub_process.get_define() == expect
