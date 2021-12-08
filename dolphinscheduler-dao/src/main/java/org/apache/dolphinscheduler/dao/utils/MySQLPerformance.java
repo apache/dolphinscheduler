@@ -33,9 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * mysql performance
+ * MySQL performance
  */
-public class MySQLPerformance extends BaseDBPerformance{
+public class MySQLPerformance extends BaseDBPerformance {
 
     private static Logger logger = LoggerFactory.getLogger(MySQLPerformance.class);
 
