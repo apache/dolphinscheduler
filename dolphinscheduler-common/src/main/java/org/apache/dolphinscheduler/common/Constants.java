@@ -771,4 +771,7 @@ public final class Constants {
      */
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;
+
+    public static final String CACHE_KEY_VALUE_ALL = "'all'";
+
 }
