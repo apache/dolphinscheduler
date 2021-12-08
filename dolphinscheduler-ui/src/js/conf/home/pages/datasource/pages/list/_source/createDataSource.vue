@@ -514,7 +514,9 @@
           this.store.dispatch('datasource/getKerberosStartupState').then(res => {
             this.isShowPrincipal = res
             if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
-              this.showPrincipal = false
+              // TODO: follow-up support for multiple kerberos
+              // this.showPrincipal = false
+              this.showPrincipal = true
             } else {
               this.showPrincipal = true
             }
