@@ -178,8 +178,6 @@ public class TaskResponseService {
 
     /**
      * handle ack event
-     * @param taskResponseEvent
-     * @param taskInstance
      */
     private void handleAckEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         Channel channel = taskResponseEvent.getChannel();
@@ -208,8 +206,6 @@ public class TaskResponseService {
 
     /**
      * handle result event
-     * @param taskResponseEvent
-     * @param taskInstance
      */
     private void handleResultEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         Channel channel = taskResponseEvent.getChannel();
