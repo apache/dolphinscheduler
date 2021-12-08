@@ -76,6 +76,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         WorkflowExecuteThread workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
             logger.error("workflowExecuteThread is null, processInstanceId:{}", stateEvent.getProcessInstanceId());
+            return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
         this.execute(workflowExecuteThread);
