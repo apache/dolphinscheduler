@@ -832,6 +832,7 @@ public class WorkflowExecuteThread implements Runnable {
                         taskInstance.getId(), taskInstance.getName());
                 return null;
             }
+            validTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
             taskProcessor.run();
