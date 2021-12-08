@@ -556,18 +556,7 @@
         backfillRefresh: true,
         // whether this is a new Task
         isNewCreate: true,
-        tasksTypeList: Object.keys(tasksType),
-        helpUrlEnable: function (typekey) {
-          const type = tasksType[typekey]
-          if (!type) return false
-          if (!type.helperLinkDisable) return true
-          return !type.helperLinkDisable
-        },
-        helpUrl: function (tasktype) {
-          return 'https://dolphinscheduler.apache.org/' +
-            findLocale(i18n.globalScope.LOCALE).helperContext +
-            '/docs/latest/user_doc/guide/task/' + tasktype.toLowerCase() + '.html'
-        }
+        tasksTypeList: Object.keys(tasksType)
       }
     },
     provide () {
@@ -591,6 +580,17 @@
     inject: ['dagChart'],
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
+      helpUrlEnable (typekey) {
+        const type = tasksType[typekey]
+        if (!type) return false
+        if (!type.helperLinkDisable) return true
+        return !type.helperLinkDisable
+      },
+      helpUrl (tasktype) {
+        return 'https://dolphinscheduler.apache.org/' +
+          findLocale(i18n.globalScope.LOCALE).helperContext +
+          '/docs/latest/user_doc/guide/task/' + tasktype.toLowerCase() + '.html'
+      },
       taskToBackfillItem (task) {
         return {
           code: task.code,
