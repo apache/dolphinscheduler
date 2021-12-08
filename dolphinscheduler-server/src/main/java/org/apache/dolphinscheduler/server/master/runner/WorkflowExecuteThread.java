@@ -51,9 +51,11 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
@@ -84,6 +86,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +132,11 @@ public class WorkflowExecuteThread implements Runnable {
      * process definition
      */
     private ProcessDefinition processDefinition;
+
+    /**
+     * task processor
+     */
+    private TaskProcessorFactory taskProcessorFactory;
 
     /**
      * the object of DAG
@@ -201,6 +209,11 @@ public class WorkflowExecuteThread implements Runnable {
     private ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList;
 
     /**
+     * task retry check list
+     */
+    private ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList;
+
+    /**
      * state event queue
      */
     private ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
@@ -216,20 +229,27 @@ public class WorkflowExecuteThread implements Runnable {
      * @param processInstance processInstance
      * @param processService processService
      * @param nettyExecutorManager nettyExecutorManager
+     * @param processAlertManager processAlertManager
+     * @param masterConfig masterConfig
+     * @param taskTimeoutCheckList taskTimeoutCheckList
+     * @param taskProcessorFactory taskProcessorFactory
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList) {
+            , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
+            , ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList
+            , TaskProcessorFactory taskProcessorFactory) {
         this.processService = processService;
-
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.taskTimeoutCheckList = taskTimeoutCheckList;
+        this.taskRetryCheckList = taskRetryCheckList;
+        this.taskProcessorFactory = taskProcessorFactory;
     }
 
     @Override
@@ -367,11 +387,10 @@ public class WorkflowExecuteThread implements Runnable {
         if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy) {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             taskProcessor.action(TaskAction.TIMEOUT);
-            return false;
         } else {
             processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, taskInstance.getTaskDefine());
-            return true;
         }
+        return true;
     }
 
     private boolean processTimeout() {
@@ -404,7 +423,7 @@ public class WorkflowExecuteThread implements Runnable {
                         this.stateEvents.add(nextEvent);
                     } else {
                         ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                        this.processService.sendStartTask2Master(processInstance,nextTaskInstance.getId(),
+                        this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
                                 org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
                     }
                 }
@@ -439,6 +458,7 @@ public class WorkflowExecuteThread implements Runnable {
                         task.getMaxRetryTimes(),
                         task.getRetryInterval());
                 this.addTimeoutCheck(task);
+                this.addRetryCheck(task);
             } else {
                 submitStandByTask();
             }
@@ -448,6 +468,7 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
         activeTaskProcessorMaps.remove(task.getId());
         taskTimeoutCheckList.remove(task.getId());
+        taskRetryCheckList.remove(task.getId());
 
         if (task.getState().typeIsSuccess()) {
             processInstance.setVarPool(task.getVarPool());
@@ -664,11 +685,10 @@ public class WorkflowExecuteThread implements Runnable {
             ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
             processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
         }
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
-        //release task group
-        processService.releaseAllTaskGroup(processInstance.getId());
+        if (checkTaskQueue()) {
+            //release task group
+            processService.releaseAllTaskGroup(processInstance.getId());
+        }
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {
@@ -707,8 +727,10 @@ public class WorkflowExecuteThread implements Runnable {
         processInstance.setProcessDefinition(processDefinition);
 
         List<TaskInstance> recoverNodeList = getStartTaskInstanceList(processInstance.getCommandParam());
-        List<TaskNode> taskNodeList =
-                processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
+
+        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<TaskDefinitionLog> taskDefinitionLogs = processService.getTaskDefineLogListByRelation(processTaskRelations);
+        List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();
 
         taskNodeList.forEach(taskNode -> {
@@ -741,7 +763,7 @@ public class WorkflowExecuteThread implements Runnable {
         completeTaskMap.clear();
         errorTaskMap.clear();
 
-        if (ExecutionStatus.SUBMITTED_SUCCESS != processInstance.getState()) {
+        if (!isNewProcessInstance()) {
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance task : validTaskInstanceList) {
                 validTaskMap.put(Long.toString(task.getTaskCode()), task.getId());
@@ -791,7 +813,7 @@ public class WorkflowExecuteThread implements Runnable {
      */
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
-            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            ITaskProcessor taskProcessor = taskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
@@ -810,11 +832,13 @@ public class WorkflowExecuteThread implements Runnable {
                         taskInstance.getId(), taskInstance.getName());
                 return null;
             }
+            validTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
             taskProcessor.run();
 
             addTimeoutCheck(taskInstance);
+            addRetryCheck(taskInstance);
 
             if (taskProcessor.taskState().typeIsFinished()) {
                 StateEvent stateEvent = new StateEvent();
@@ -856,13 +880,30 @@ public class WorkflowExecuteThread implements Runnable {
             logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
             return;
         }
-
-        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag() || taskInstance.taskCanRetry()) {
+        if (TimeoutFlag.OPEN == taskDefinition.getTimeoutFlag()) {
             this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-        } else {
-            if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-                this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
-            }
+        }
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskTimeoutCheckList.put(taskInstance.getId(), taskInstance);
+        }
+    }
+
+    private void addRetryCheck(TaskInstance taskInstance) {
+        if (taskRetryCheckList.containsKey(taskInstance.getId())) {
+            return;
+        }
+        TaskDefinition taskDefinition = taskInstance.getTaskDefine();
+        if (taskDefinition == null) {
+            logger.error("taskDefinition is null, taskId:{}", taskInstance.getId());
+            return;
+        }
+
+        if (taskInstance.taskCanRetry()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
+        }
+
+        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
+            this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
         }
     }
 
@@ -1588,5 +1629,29 @@ public class WorkflowExecuteThread implements Runnable {
                                       List<String> recoveryNodeCodeList,
                                       TaskDependType depNodeType) throws Exception {
         return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeCodeList, depNodeType);
+    }
+
+    /**
+     * check task queue
+     */
+    private boolean checkTaskQueue() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        taskInstanceMap.forEach((id, taskInstance) -> {
+            if (taskInstance != null && taskInstance.getTaskGroupId() > 0) {
+                result.set(true);
+            }
+        });
+        return result.get();
+    }
+
+    /**
+     * is new process instance
+     */
+    private boolean isNewProcessInstance() {
+        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
