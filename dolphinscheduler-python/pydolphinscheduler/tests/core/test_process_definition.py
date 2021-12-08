@@ -28,7 +28,6 @@ from pydolphinscheduler.constants import (
     ProcessDefinitionReleaseState,
 )
 from pydolphinscheduler.core.process_definition import ProcessDefinition
-from pydolphinscheduler.core.task import TaskParams
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.side import Project, Tenant, User
 from pydolphinscheduler.utils.date import conv_to_schedule
@@ -152,8 +151,8 @@ def test__parse_datetime_not_support_type(val: Any):
             pd._parse_datetime(val)
 
 
-def test_process_definition_to_dict_without_task():
-    """Test process definition function to_dict without task."""
+def test_process_definition_get_define_without_task():
+    """Test process definition function get_define without task."""
     expect = {
         "name": TEST_PROCESS_DEFINITION_NAME,
         "description": None,
@@ -168,7 +167,7 @@ def test_process_definition_to_dict_without_task():
         "taskRelationJson": [{}],
     }
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
-        assert pd.to_dict() == expect
+        assert pd.get_define() == expect
 
 
 def test_process_definition_simple_context_manager():
@@ -176,10 +175,7 @@ def test_process_definition_simple_context_manager():
     expect_tasks_num = 5
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         for i in range(expect_tasks_num):
-            task_params = TaskParams()
-            curr_task = Task(
-                name=f"task-{i}", task_type=f"type-{i}", task_params=task_params
-            )
+            curr_task = Task(name=f"task-{i}", task_type=f"type-{i}")
             # Set deps task i as i-1 parent
             if i > 0:
                 pre_task = pd.get_one_task_by_name(f"task-{i - 1}")
@@ -221,11 +217,9 @@ def test_process_definition_simple_separate():
     expect_tasks_num = 5
     pd = ProcessDefinition(TEST_PROCESS_DEFINITION_NAME)
     for i in range(expect_tasks_num):
-        task_params = TaskParams()
         curr_task = Task(
             name=f"task-{i}",
             task_type=f"type-{i}",
-            task_params=task_params,
             process_definition=pd,
         )
         # Set deps task i as i-1 parent
