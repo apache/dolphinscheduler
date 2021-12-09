@@ -27,7 +27,7 @@ echo "init env variables"
 #============================================================================
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
-[ "h2" == ${DATABASE_TYPE} ] || export e=${DATABASE_PORT:-"5432"}
+[ "h2" == ${DATABASE_TYPE} ] || export DATABASE_PORT=${DATABASE_PORT:-"5432"}
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
@@ -39,7 +39,6 @@ echo "init env variables"
 
 [ "h2" == ${DATABASE_TYPE} ] || export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
-
 
 #============================================================================
 # Registry
