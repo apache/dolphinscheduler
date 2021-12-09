@@ -62,6 +62,7 @@ BEGIN
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "environment_code" bigint DEFAULT -1';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "var_pool" text';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "dry_run" int DEFAULT 0';
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "next_process_instance_id" int DEFAULT 0';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "task_definition_version" int DEFAULT 0';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "task_params" text';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "environment_code" bigint DEFAULT -1';
@@ -70,10 +71,12 @@ BEGIN
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "delay_time" int DEFAULT 0';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "var_pool" text';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "dry_run" int DEFAULT 0';
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS "task_group_id" int DEFAULT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_schedules ADD COLUMN IF NOT EXISTS "timezone_id" varchar(40) DEFAULT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_schedules ADD COLUMN IF NOT EXISTS "environment_code" int DEFAULT -1';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ADD COLUMN IF NOT EXISTS "code" bigint';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ADD COLUMN IF NOT EXISTS "warning_group_id" int';
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ADD COLUMN IF NOT EXISTS "execution_type" int DEFAULT 0';
 
 	---drop columns
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_tenant DROP COLUMN IF EXISTS "tenant_name"';
@@ -187,7 +190,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_process_definition_log" (
-	  id int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  code bigint NOT NULL,
 	  name varchar(255) DEFAULT NULL ,
 	  version int NOT NULL ,
@@ -229,14 +232,15 @@ BEGIN
 	  timeout_notify_strategy int DEFAULT NULL ,
 	  timeout int DEFAULT 0 ,
 	  delay_time int DEFAULT 0 ,
-	  resource_ids text ,
+	  task_group_id int DEFAULT NULL,
+      resource_ids text ,
 	  create_time timestamp DEFAULT NULL ,
 	  update_time timestamp DEFAULT NULL ,
 	  PRIMARY KEY (id)
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_task_definition_log" (
-	  id int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  code bigint NOT NULL,
 	  name varchar(255) DEFAULT NULL ,
 	  version int NOT NULL ,
@@ -255,6 +259,7 @@ BEGIN
 	  timeout_notify_strategy int DEFAULT NULL ,
 	  timeout int DEFAULT 0 ,
 	  delay_time int DEFAULT 0 ,
+      task_group_id int DEFAULT NULL,
 	  resource_ids text ,
 	  operator int DEFAULT NULL ,
 	  operate_time timestamp DEFAULT NULL ,
@@ -281,7 +286,7 @@ BEGIN
 	)';
 
 	EXECUTE 'CREATE TABLE IF NOT EXISTS '|| quote_ident(v_schema) ||'."t_ds_process_task_relation_log" (
-	  id int NOT NULL  ,
+	  id serial NOT NULL  ,
 	  name varchar(255) DEFAULT NULL ,
 	  project_code bigint DEFAULT NULL ,
 	  process_definition_code bigint DEFAULT NULL ,
@@ -306,7 +311,7 @@ BEGIN
       create_time timestamp DEFAULT NULL,
       update_time timestamp DEFAULT NULL,
       PRIMARY KEY (id),
-      UNIQUE KEY name_unique (name)
+      CONSTRAINT name_unique UNIQUE (name)
 	)';
 
 	return 'Success!';
