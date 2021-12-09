@@ -25,7 +25,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -52,8 +51,18 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * update
      */
-    @CacheEvict(key = "#processTaskRelation.projectCode + '_' + #processTaskRelation.processDefinitionCode")
-    int updateById(@Name("processTaskRelation") @Param("et") ProcessTaskRelation processTaskRelation);
+    @CacheEvict(key = "#p0.projectCode + '_' + #p0.processDefinitionCode")
+    int updateById(@Param("et") ProcessTaskRelation processTaskRelation);
+
+    /**
+     * delete process task relation by processCode
+     *
+     * @param projectCode projectCode
+     * @param processCode processCode
+     * @return int
+     */
+    @CacheEvict
+    int deleteByCode(@Param("projectCode") long projectCode, @Param("processCode") long processCode);
 
     /**
      * process task relation by taskCode
@@ -70,17 +79,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryByTaskCode(@Param("taskCode") long taskCode);
-
-    /**
-     * delete process task relation by processCode
-     *
-     * @param projectCode projectCode
-     * @param processCode processCode
-     * @return int
-     */
-    @CacheEvict(key = "#projectCode + '_' + #processCode")
-    int deleteByCode(@Name("projectCode") @Param("projectCode") long projectCode,
-                     @Name("processCode") @Param("processCode") long processCode);
 
     /**
      * batch insert process task relation
