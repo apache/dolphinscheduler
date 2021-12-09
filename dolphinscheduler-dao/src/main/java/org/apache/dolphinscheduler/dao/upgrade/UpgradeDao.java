@@ -364,7 +364,9 @@ public abstract class UpgradeDao {
      * @param schemaDir schemaDir
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
-        Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile));
+        String scriptFilePath = String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile);
+        logger.info("Start upgrading DolphinScheduler through sql file:{}", scriptFilePath);
+        Resource sqlFilePath = new ClassPathResource(scriptFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -378,7 +380,6 @@ public abstract class UpgradeDao {
             scriptRunner.runScript(sqlReader);
 
         } catch (FileNotFoundException e) {
-
             logger.error(e.getMessage(), e);
             throw new RuntimeException("sql file not found ", e);
         } catch (Exception e) {
