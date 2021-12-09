@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSource
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -56,8 +57,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     protected HikariDataSource oneSessionDataSource;
     private UserGroupInformation ugi;
 
-    public HiveDataSourceClient(BaseConnectionParam baseConnectionParam) {
-        super(baseConnectionParam);
+    public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     }
 
     @Override
-    protected void initClient(BaseConnectionParam baseConnectionParam) {
+    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         logger.info("Create Configuration for hive configuration.");
         this.hadoopConf = createHadoopConf();
         logger.info("Create Configuration success.");
@@ -76,7 +77,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         this.ugi = createUserGroupInformation(baseConnectionParam.getUser());
         logger.info("Create ugi success.");
 
-        super.initClient(baseConnectionParam);
+        super.initClient(baseConnectionParam, dbType);
         this.oneSessionDataSource = JdbcDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam);
         logger.info("Init {} success.", getClass().getName());
     }

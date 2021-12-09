@@ -17,10 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DatasourceUtil;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import java.sql.Driver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +39,13 @@ public class JdbcDataSourceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcDataSourceProvider.class);
 
-    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties) {
+    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
         logger.info("Creating HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         HikariDataSource dataSource = new HikariDataSource();
+
+        //TODO Support multiple versions of data sources
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        loaderJdbcDriver(classLoader, properties, dbType);
 
         dataSource.setDriverClassName(properties.getDriverClassName());
         dataSource.setJdbcUrl(properties.getJdbcUrl());
@@ -78,6 +87,27 @@ public class JdbcDataSourceProvider {
 
         logger.info("Creating OneSession HikariDataSource pool success.");
         return dataSource;
+    }
+
+    protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
+        String drv = StringUtils.isBlank(properties.getDriverClassName()) ? DatasourceUtil.getDatasourceProcessor(dbType).getDatasourceDriver() : properties.getDriverClassName();
+        try {
+            final Class<?> clazz = Class.forName(drv, true, classLoader);
+            final Driver driver = (Driver) clazz.newInstance();
+            if (!driver.acceptsURL(properties.getJdbcUrl())) {
+                logger.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
+                throw new RuntimeException("Jdbc driver loading error.");
+            }
+            if (dbType.equals(DbType.MYSQL)) {
+                if (driver.getMajorVersion() >= 8) {
+                    properties.setDriverClassName(drv);
+                } else {
+                    properties.setDriverClassName(Constants.COM_MYSQL_JDBC_DRIVER);
+                }
+            }
+        } catch (final Exception e) {
+            logger.warn("The specified driver not suitable.");
+        }
     }
 
 }
