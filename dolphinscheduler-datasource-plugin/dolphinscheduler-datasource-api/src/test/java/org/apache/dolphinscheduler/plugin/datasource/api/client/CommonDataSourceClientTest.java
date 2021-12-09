@@ -81,8 +81,8 @@ public class CommonDataSourceClientTest {
     public void testInitClient() {
         BaseConnectionParam baseConnectionParam = new MysqlConnectionParam();
         PowerMockito.doNothing().when(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());
-        commonDataSourceClient.initClient(baseConnectionParam, DbType.SQLSERVER);
-        Mockito.verify(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), DbType.SQLSERVER);
+        commonDataSourceClient.initClient(baseConnectionParam, DbType.MYSQL);
+        Mockito.verify(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());
     }
 
     @Test
