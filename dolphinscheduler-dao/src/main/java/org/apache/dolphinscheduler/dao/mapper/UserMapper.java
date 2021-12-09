@@ -52,7 +52,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * update
      */
-    @CacheEvict("#p0.id")
+    @CacheEvict(key = "#p0.id")
     int updateById(@Param("et") User user);
 
     /**

@@ -44,7 +44,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return ProcessTaskRelation list
      */
-    @Cacheable(sync = true)
+    @Cacheable(unless = "#result == null || #result.size() == 0")
     List<ProcessTaskRelation> queryByProcessCode(@Param("projectCode") long projectCode,
                                                  @Param("processCode") long processCode);
 
