@@ -130,7 +130,8 @@ public class MasterSchedulerService extends Thread {
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
-        stateWheelExecuteThread = new StateWheelExecuteThread(processTimeoutCheckList,
+        stateWheelExecuteThread = new StateWheelExecuteThread(processService,
+                processTimeoutCheckList,
                 taskTimeoutCheckList,
                 taskRetryCheckList,
                 this.processInstanceExecMaps,
