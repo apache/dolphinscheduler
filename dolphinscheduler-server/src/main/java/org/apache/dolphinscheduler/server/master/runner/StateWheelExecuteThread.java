@@ -95,7 +95,7 @@ public class StateWheelExecuteThread extends Thread {
         }
         for (TaskInstance taskInstance : taskInstanceTimeoutCheckList.values()) {
             if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
-                long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
+                long timeRemain = DateUtils.getRemainTime(taskInstance.getSubmitTime(), taskInstance.getTaskDefine().getTimeout() * Constants.SEC_2_MINUTES_TIME_UNIT);
                 if (timeRemain < 0) {
                     addTaskTimeoutEvent(taskInstance);
                     taskInstanceTimeoutCheckList.remove(taskInstance.getId());
