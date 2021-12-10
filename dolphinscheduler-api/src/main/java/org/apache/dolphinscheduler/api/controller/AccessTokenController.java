@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_BY_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ACCESS_TOKEN_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GENERATE_TOKEN_ERROR;
@@ -138,6 +139,27 @@ public class AccessTokenController extends BaseController {
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = accessTokenService.queryAccessTokenList(loginUser, searchVal, pageNo, pageSize);
         return result;
+    }
+
+    /**
+     * query access token for specified user
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return token list for specified user
+     */
+    @ApiOperation(value = "queryAccessTokenByUser", notes = "QUERY_ACCESS_TOKEN_BY_USER_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int")
+    })
+    @GetMapping(value = "/user/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_ACCESSTOKEN_BY_USER_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryAccessTokenByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @PathVariable("userId") Integer userId) {
+        Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(loginUser, userId);
+        return this.returnDataList(result);
     }
 
     /**

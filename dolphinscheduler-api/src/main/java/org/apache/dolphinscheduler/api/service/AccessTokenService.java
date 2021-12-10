@@ -39,6 +39,15 @@ public interface AccessTokenService {
     Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
+     * query access token for specified user
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return token list for specified user
+     */
+    Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId);
+
+    /**
      * create token
      *
      * @param userId token for user

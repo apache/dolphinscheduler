@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -75,6 +76,30 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         pageInfo.setTotalList(accessTokenList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query access token for specified user
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return token list for specified user
+     */
+    @Override
+    public Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // only admin can operate
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+
+        // query access token for specified user
+        List<AccessToken> accessTokenList = this.accessTokenMapper.queryAccessTokenByUser(userId);
+        result.put(Constants.DATA_LIST, accessTokenList);
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 

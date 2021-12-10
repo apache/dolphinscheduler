@@ -38,11 +38,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +79,25 @@ public class AccessTokenServiceTest {
         PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.getData();
         logger.info(result.toString());
         Assert.assertTrue(pageInfo.getTotal() > 0);
+    }
+
+    @Test
+    public void testQueryAccessTokenByUser() {
+        List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
+        Mockito.when(this.accessTokenMapper.queryAccessTokenByUser(1)).thenReturn(accessTokenList);
+
+        // USER_NO_OPERATION_PERM
+        User user = this.getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(user, 1);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+        // SUCCESS
+        user.setUserType(UserType.ADMIN_USER);
+        result = this.accessTokenService.queryAccessTokenByUser(user, 1);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
