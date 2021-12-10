@@ -317,10 +317,6 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean taskTimeout(StateEvent stateEvent) {
 
-        if (taskInstanceHashMap.containsRow(stateEvent.getTaskInstanceId())) {
-            return true;
-        }
-
         TaskInstance taskInstance = taskInstanceHashMap
                 .row(stateEvent.getTaskInstanceId())
                 .values()
@@ -703,7 +699,6 @@ public class WorkflowExecuteThread implements Runnable {
             this.taskRetryCheckList.put(taskInstance.getId(), taskInstance);
         }
     }
-
 
     /**
      * find task instance in db.
