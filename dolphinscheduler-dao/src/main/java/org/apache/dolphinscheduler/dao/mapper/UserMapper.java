@@ -23,7 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -53,8 +52,8 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * update
      */
-    @CacheEvict(key = "#user.id")
-    int updateById(@Name("user") @Param("et") User user);
+    @CacheEvict(key = "#p0.id")
+    int updateById(@Param("et") User user);
 
     /**
      * query all general user
@@ -166,6 +165,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query authed user list by projectId
+     *
      * @param projectId projectId
      * @return user list
      */

@@ -33,8 +33,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * process definition log mapper interface
  */
-@CacheConfig(cacheNames = "processDefinition")
+@CacheConfig(cacheNames = "processDefinition", keyGenerator = "cacheKeyGenerator")
 public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinitionLog> {
+
+    /**
+     * query the certain process definition version info by process definition code and version number
+     *
+     * @param code process definition code
+     * @param version version number
+     * @return the process definition version info
+     */
+    @Cacheable(sync = true)
+    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * query process definition log by name
@@ -62,16 +72,6 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * query max version definition log
      */
     ProcessDefinitionLog queryMaxVersionDefinitionLog(@Param("code") long code);
-
-    /**
-     * query the certain process definition version info by process definition code and version number
-     *
-     * @param code process definition code
-     * @param version version number
-     * @return the process definition version info
-     */
-    @Cacheable(sync = true, key = "#processDefinitionCode + '_' + #version")
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,  @Param("version") int version);
 
     /**
      * query the paging process definition version list by pagination info

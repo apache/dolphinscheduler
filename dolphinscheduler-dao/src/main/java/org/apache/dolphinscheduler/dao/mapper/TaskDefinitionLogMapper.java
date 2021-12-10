@@ -25,7 +25,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,28 +40,37 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
-     * query max version for definition
-     *
-     * @param code taskDefinitionCode
-     */
-    Integer queryMaxVersionForDefinition(@Param("code") long code);
-
-    /**
      * query task definition log
      *
      * @param code taskDefinitionCode
      * @param version version
      * @return task definition log
      */
-    @Cacheable(sync = true, key = "#code + '_' + #version")
-    TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code,
-                                                      @Param("version") int version);
+    @Cacheable(sync = true)
+    TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * update
      */
-    @CacheEvict(key = "#taskDefinitionLog.code + '_' + #taskDefinitionLog.version")
-    int updateById(@Name("taskDefinitionLog") @Param("et") TaskDefinitionLog taskDefinitionLog);
+    @CacheEvict(key = "#p0.code + '_' + #p0.version")
+    int updateById(@Param("et") TaskDefinitionLog taskDefinitionLog);
+
+    /**
+     * delete the certain task definition version by task definition code and version
+     *
+     * @param code task definition code
+     * @param version task definition version
+     * @return delete result
+     */
+    @CacheEvict
+    int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
+
+    /**
+     * query max version for definition
+     *
+     * @param code taskDefinitionCode
+     */
+    Integer queryMaxVersionForDefinition(@Param("code") long code);
 
     /**
      * @param taskDefinitions taskDefinition list
@@ -77,16 +85,6 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @return int
      */
     int batchInsert(@Param("taskDefinitionLogs") List<TaskDefinitionLog> taskDefinitionLogs);
-
-    /**
-     * delete the certain task definition version by task definition code and version
-     *
-     * @param code task definition code
-     * @param version task definition version
-     * @return delete result
-     */
-    @CacheEvict(key = "#code + '_' #version")
-    int deleteByCodeAndVersion(@Name("code") @Param("code") long code, @Name("version") @Param("version") int version);
 
     /**
      * query the paging task definition version list by pagination info

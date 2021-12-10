@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -54,7 +53,16 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * update
      */
     @CacheEvict(key = "#p0.code")
-    int updateById(@Name("processDefinition") @Param("et") ProcessDefinition processDefinition);
+    int updateById(@Param("et") ProcessDefinition processDefinition);
+
+    /**
+     * delete process definition by code
+     *
+     * @param code code
+     * @return delete result
+     */
+    @CacheEvict
+    int deleteByCode(@Param("code") long code);
 
     /**
      * query process definition by code list
@@ -65,19 +73,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<ProcessDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
-     * delete process definition by code
-     *
-     * @param code code
-     * @return delete result
-     */
-    @CacheEvict(key = "#code")
-    int deleteByCode(@Name("code") @Param("code") long code);
-
-    /**
      * verify process definition by name
      *
      * @param projectCode projectCode
-     * @param name        name
+     * @param name name
      * @return process definition
      */
     ProcessDefinition verifyByDefineName(@Param("projectCode") long projectCode,
@@ -87,7 +86,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * query process definition by name
      *
      * @param projectCode projectCode
-     * @param name        name
+     * @param name name
      * @return process definition
      */
     ProcessDefinition queryByDefineName(@Param("projectCode") long projectCode,
@@ -104,11 +103,11 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     /**
      * process definition page
      *
-     * @param page        page
-     * @param searchVal   searchVal
-     * @param userId      userId
+     * @param page page
+     * @param searchVal searchVal
+     * @param userId userId
      * @param projectCode projectCode
-     * @param isAdmin     isAdmin
+     * @param isAdmin isAdmin
      * @return process definition IPage
      */
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
