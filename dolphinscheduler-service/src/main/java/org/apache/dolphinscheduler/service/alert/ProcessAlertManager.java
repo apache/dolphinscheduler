@@ -255,7 +255,6 @@ public class ProcessAlertManager {
     }
 
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
-        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(),processInstance.getName(),
-                taskInstance.getId(), taskInstance.getName());
+        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
     }
 }
