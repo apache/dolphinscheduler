@@ -168,6 +168,7 @@ public class HadoopUtils implements Closeable {
                 configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
                 configuration.set(Constants.FS_S3A_SECRET_KEY, PropertyUtils.getString(Constants.FS_S3A_SECRET_KEY));
+                configuration.set(Constants.FS_S3A_PATH_STYLE_ACCESS, PropertyUtils.getString(Constants.FS_S3A_PATH_STYLE_ACCESS));
                 fs = FileSystem.get(configuration);
             }
 
