@@ -121,10 +121,11 @@ public class AlertDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .projectId(processDefinition.getId())
+                .projectCode(processDefinition.getProjectCode())
                 .projectName(processDefinition.getProjectName())
                 .owner(processDefinition.getUserName())
                 .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
                 .processName(processInstance.getName())
                 .processStartTime(processInstance.getStartTime())
                 .processHost(processInstance.getHost())
@@ -156,11 +157,13 @@ public class AlertDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectCode(taskDefinition.getProjectCode())
                 .projectName(taskDefinition.getProjectName())
                 .owner(taskDefinition.getUserName())
                 .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
                 .processName(processInstance.getName())
-                .taskId(taskInstance.getId())
+                .taskCode(taskInstance.getTaskCode())
                 .taskName(taskInstance.getName())
                 .taskType(taskInstance.getTaskType())
                 .taskStartTime(taskInstance.getStartTime())
