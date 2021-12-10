@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -38,15 +40,13 @@ import io.netty.channel.Channel;
 /**
  * handle state event received from master/api
  */
+@Component
 public class StateEventProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(StateEventProcessor.class);
 
+    @Autowired
     private StateEventResponseService stateEventResponseService;
-
-    public StateEventProcessor() {
-        stateEventResponseService = SpringApplicationContext.getBean(StateEventResponseService.class);
-    }
 
     @Override
     public void process(Channel channel, Command command) {

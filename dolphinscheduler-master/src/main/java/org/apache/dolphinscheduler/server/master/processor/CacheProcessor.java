@@ -27,8 +27,10 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -37,10 +39,12 @@ import io.netty.channel.Channel;
 /**
  * cache process from master/api
  */
+@Component
 public class CacheProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(CacheProcessor.class);
 
+    @Autowired
     private CacheManager cacheManager;
 
     @Override
@@ -55,9 +59,6 @@ public class CacheProcessor implements NettyRequestProcessor {
     }
 
     private void cacheExpire(CacheExpireCommand cacheExpireCommand) {
-        if (cacheManager == null) {
-            cacheManager = SpringApplicationContext.getBean(CacheManager.class);
-        }
 
         if (cacheExpireCommand.getCacheKey().isEmpty()) {
             return;

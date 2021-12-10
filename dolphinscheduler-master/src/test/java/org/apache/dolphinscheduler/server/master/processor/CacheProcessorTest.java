@@ -21,15 +21,13 @@ import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -40,10 +38,9 @@ import io.netty.channel.Channel;
  * task ack processor test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SpringApplicationContext.class})
 public class CacheProcessorTest {
-
-    private CacheProcessor cacheProcessor;
+    @InjectMocks
+    private CacheProcessor cacheProcessor = new CacheProcessor();
 
     @Mock
     private Channel channel;
@@ -56,10 +53,7 @@ public class CacheProcessorTest {
 
     @Before
     public void before() {
-        PowerMockito.mockStatic(SpringApplicationContext.class);
-        PowerMockito.when(SpringApplicationContext.getBean(CacheManager.class)).thenReturn(cacheManager);
         Mockito.when(cacheManager.getCache(CacheType.TENANT.getCacheName())).thenReturn(cache);
-        cacheProcessor = new CacheProcessor();
     }
 
     @Test
