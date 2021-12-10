@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface Registry extends Closeable {
-    void start(Map<String, String> config);
-
     boolean subscribe(String path, SubscribeListener listener);
 
     void unsubscribe(String path);

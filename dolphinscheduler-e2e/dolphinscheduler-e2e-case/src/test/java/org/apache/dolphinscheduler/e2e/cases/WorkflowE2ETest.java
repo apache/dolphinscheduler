@@ -19,12 +19,10 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm.TaskType;
@@ -34,12 +32,14 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowE2ETest {
@@ -81,9 +81,9 @@ class WorkflowE2ETest {
     @Test
     @Order(1)
     void testCreateWorkflow() {
-        final var workflow = "test-workflow-1";
+        final String workflow = "test-workflow-1";
 
-        final var workflowDefinitionPage =
+        final WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class);
@@ -114,9 +114,9 @@ class WorkflowE2ETest {
     @Test
     @Order(10)
     void testCreateSubWorkflow() {
-        final var workflow = "test-sub-workflow-1";
+        final String workflow = "test-sub-workflow-1";
 
-        final var workflowDefinitionPage =
+        final WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
                 .goTo(project)
@@ -145,9 +145,9 @@ class WorkflowE2ETest {
     @Test
     @Order(30)
     void testRunWorkflow() {
-        final var workflow = "test-workflow-1";
+        final String workflow = "test-workflow-1";
 
-        final var projectPage =
+        final ProjectDetailPage projectPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
                 .goTo(project);

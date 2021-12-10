@@ -37,12 +37,9 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.RegistryFactory;
-import org.apache.dolphinscheduler.registry.api.RegistryFactoryLoader;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.io.IOException;
@@ -53,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -69,16 +65,16 @@ public class RegistryClient {
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
     private static final String EMPTY = "";
-    private static final String REGISTRY_PREFIX = "registry";
-    private static final String REGISTRY_PLUGIN_NAME = "plugin.name";
-    private static final String REGISTRY_CONFIG_FILE_PATH = "/registry.properties";
-    private final AtomicBoolean isStarted = new AtomicBoolean(false);
-    private Registry registry;
     private IStoppable stoppable;
+
+    private final Registry registry;
+
+    public RegistryClient(Registry registry) {
+        this.registry = registry;
+    }
 
     @PostConstruct
     public void afterConstruct() {
-        start();
         initNodes();
     }
 
@@ -204,9 +200,7 @@ public class RegistryClient {
     }
 
     public void close() throws IOException {
-        if (isStarted.compareAndSet(true, false) && registry != null) {
-            registry.close();
-        }
+        registry.close();
     }
 
     public void persistEphemeral(String key, String value) {
@@ -271,24 +265,6 @@ public class RegistryClient {
             }).collect(Collectors.toSet());
         } catch (Exception e) {
             throw new RegistryException("Failed to get server node: " + nodeType, e);
-        }
-    }
-
-    private void start() {
-        if (isStarted.compareAndSet(false, true)) {
-            PropertyUtils.loadPropertyFile(REGISTRY_CONFIG_FILE_PATH);
-            final Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
-
-            if (null == registryConfig || registryConfig.isEmpty()) {
-                throw new RegistryException("registry config param is null");
-            }
-            final String pluginName = registryConfig.get(REGISTRY_PLUGIN_NAME);
-            final Map<String, RegistryFactory> factories = RegistryFactoryLoader.load();
-            if (!factories.containsKey(pluginName)) {
-                throw new RegistryException("No such registry plugin: " + pluginName);
-            }
-            registry = factories.get(pluginName).create();
-            registry.start(registryConfig);
         }
     }
 

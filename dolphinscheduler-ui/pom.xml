@@ -33,6 +33,7 @@
     <npm.version>6.14.11</npm.version>
     <sonar.sources>src</sonar.sources>
   </properties>
+
   <profiles>
     <profile>
       <id>release</id>
@@ -145,5 +146,4 @@
     </profile>
 
   </profiles>
-
 </project>

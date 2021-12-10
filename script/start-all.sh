@@ -18,9 +18,10 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/install_config.conf
 
-declare -A workersGroupMap=()
+source ${workDir}/env/install_env.sh
+
+workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}

@@ -53,7 +53,7 @@ class ProjectE2ETest {
     @Test
     @Order(30)
     void testDeleteProject() {
-        final var page = new ProjectPage(browser);
+        final ProjectPage page = new ProjectPage(browser);
         page.delete(project);
 
         await().untilAsserted(() -> {

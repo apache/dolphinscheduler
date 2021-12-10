@@ -19,20 +19,18 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
-
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 
-import lombok.Getter;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -94,7 +92,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
                 .filter(WebElement::isDisplayed)
                 .collect(Collectors.toList());
 
-        for (var buttons = cancelButtons.get();
+        for (List<WebElement> buttons = cancelButtons.get();
              !buttons.isEmpty();
              buttons = cancelButtons.get()) {
             buttons.forEach(WebElement::click);

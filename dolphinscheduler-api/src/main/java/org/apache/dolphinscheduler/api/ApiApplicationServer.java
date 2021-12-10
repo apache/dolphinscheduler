@@ -17,25 +17,18 @@
 
 package org.apache.dolphinscheduler.api;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
-@EnableAutoConfiguration
 @ServletComponentScan
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.server.*",
-        "org.apache.dolphinscheduler.alert.*"
-    })
-})
-public class ApiApplicationServer extends SpringBootServletInitializer {
+@SpringBootApplication
+@ComponentScan("org.apache.dolphinscheduler")
+public class ApiApplicationServer {
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(ApiApplicationServer.class).profiles("api").run(args);
+        SpringApplication.run(ApiApplicationServer.class);
     }
 
 }

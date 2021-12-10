@@ -61,7 +61,13 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
       - name: Build Image
-        run: TAG=ci sh ./docker/build/hooks/build
+        run: |
+          ./mvnw -B clean install \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl dolphinscheduler-standalone-server -am
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \

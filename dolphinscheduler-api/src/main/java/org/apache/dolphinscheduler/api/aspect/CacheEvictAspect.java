@@ -127,7 +127,7 @@ public class CacheEvictAspect {
         SpelExpressionParser spelParser = new SpelExpressionParser();
         EvaluationContext ctx = new StandardEvaluationContext();
         for (int i = 0; i < paramNameList.size(); i++) {
-            ctx.setVariable(paramNameList.get(i), paramList.get(i));
+            ctx.setVariable("p" + i, paramList.get(i));
         }
         Object obj = spelParser.parseExpression(key).getValue(ctx);
         if (null == obj) {
