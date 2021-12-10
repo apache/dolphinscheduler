@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MysqlUpgradeDao extends UpgradeDao {
-    public static final Logger logger = LoggerFactory.getLogger(MysqlUpgradeDao.class);
+public class MySQLUpgradeDao extends UpgradeDao {
+    public static final Logger logger = LoggerFactory.getLogger(MySQLUpgradeDao.class);
 
-    private MysqlUpgradeDao(DataSource dataSource) {
+    private MySQLUpgradeDao(DataSource dataSource) {
         super(dataSource);
     }
 

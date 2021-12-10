@@ -32,10 +32,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PostgresqlUpgradeDao extends UpgradeDao {
-    public static final Logger logger = LoggerFactory.getLogger(PostgresqlUpgradeDao.class);
+public class PostgreSQLUpgradeDao extends UpgradeDao {
+    public static final Logger logger = LoggerFactory.getLogger(PostgreSQLUpgradeDao.class);
 
-    private PostgresqlUpgradeDao(DataSource dataSource) {
+    private PostgreSQLUpgradeDao(DataSource dataSource) {
         super(dataSource);
     }
 
