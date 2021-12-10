@@ -108,6 +108,7 @@ public class ProcessAlertManager {
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
                     .processId(processInstance.getId())
+                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
@@ -131,8 +132,9 @@ public class ProcessAlertManager {
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
                         .processId(processInstance.getId())
+                        .processDefinitionCode(processInstance.getProcessDefinitionCode())
                         .processName(processInstance.getName())
-                        .taskId(task.getId())
+                        .taskCode(task.getTaskCode())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
                         .taskState(task.getState())
@@ -162,7 +164,10 @@ public class ProcessAlertManager {
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .processId(processInstance.getId())
+                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
+                    .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
                     .retryTimes(taskInstance.getRetryTimes())
@@ -255,7 +260,6 @@ public class ProcessAlertManager {
     }
 
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
-        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(),processInstance.getName(),
-                taskInstance.getId(), taskInstance.getName());
+        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, taskDefinition);
     }
 }

@@ -23,7 +23,14 @@ import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -111,8 +118,14 @@ public class AlertDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .projectCode(processDefinition.getProjectCode())
+                .projectName(processDefinition.getProjectName())
+                .owner(processDefinition.getUserName())
                 .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
                 .processName(processInstance.getName())
+                .processStartTime(processInstance.getStartTime())
+                .processHost(processInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
                 .warningLevel(AlertWarnLevel.MIDDLE)
                 .build();
@@ -133,28 +146,32 @@ public class AlertDao {
     /**
      * task timeout warn
      *
-     * @param alertGroupId alertGroupId
-     * @param processInstanceId processInstanceId
-     * @param processInstanceName processInstanceName
-     * @param taskId taskId
-     * @param taskName taskName
+     * @param processInstance processInstanceId
+     * @param taskInstance taskInstance
+     * @param taskDefinition taskDefinition
      */
-    public void sendTaskTimeoutAlert(int alertGroupId, int processInstanceId,
-                                     String processInstanceName, int taskId, String taskName) {
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, TaskDefinition taskDefinition) {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .processId(processInstanceId)
-                .processName(processInstanceName)
-                .taskId(taskId)
-                .taskName(taskName)
+                .projectCode(taskDefinition.getProjectCode())
+                .projectName(taskDefinition.getProjectName())
+                .owner(taskDefinition.getUserName())
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .taskCode(taskInstance.getTaskCode())
+                .taskName(taskInstance.getName())
+                .taskType(taskInstance.getTaskType())
+                .taskStartTime(taskInstance.getStartTime())
+                .taskHost(taskInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
                 .warningLevel(AlertWarnLevel.MIDDLE)
                 .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
-        saveTaskTimeoutAlert(alert, content, alertGroupId);
+        saveTaskTimeoutAlert(alert, content, processInstance.getWarningGroupId());
     }
 
     /**
