@@ -64,19 +64,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
 import py4j.GatewayServer;
 
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.server.master.*",
-        "org.apache.dolphinscheduler.server.worker.*",
-        "org.apache.dolphinscheduler.server.monitor.*",
-        "org.apache.dolphinscheduler.server.log.*",
-        "org.apache.dolphinscheduler.alert.*"
-    })
-})
+@ComponentScan(value = "org.apache.dolphinscheduler")
 public class PythonGatewayServer extends SpringBootServletInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
 
