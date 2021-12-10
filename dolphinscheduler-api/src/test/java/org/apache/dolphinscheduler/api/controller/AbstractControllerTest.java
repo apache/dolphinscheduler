@@ -53,7 +53,6 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * abstract controller test
  */
-@ActiveProfiles(value = {ProfileType.H2})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ApiApplicationServer.class, DaoConfiguration.class, RegistryServer.class})
 @AutoConfigureMockMvc
@@ -112,12 +111,11 @@ public abstract class AbstractControllerTest {
     }
 
     @Configuration
-    @Profile(ProfileType.H2)
     public static class RegistryServer {
         @PostConstruct
         public void startEmbedRegistryServer() throws Exception {
             final TestingServer server = new TestingServer(true);
-            System.setProperty("registry.servers", server.getConnectString());
+            System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
         }
     }
 }

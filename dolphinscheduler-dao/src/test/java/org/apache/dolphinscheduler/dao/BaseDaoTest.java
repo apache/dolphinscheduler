@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.dolphinscheduler.common.enums.ProfileType;
-
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DaoConfiguration.class)
 @SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
-@ActiveProfiles(value = ProfileType.H2)
 @Transactional
 @Rollback
 @EnableTransactionManagement
