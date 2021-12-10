@@ -657,7 +657,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        // 4. delete th relationship between project and user
+        // 4. delete the relationship between project and user
         this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
         this.putMsg(result, Status.SUCCESS);
         return result;
