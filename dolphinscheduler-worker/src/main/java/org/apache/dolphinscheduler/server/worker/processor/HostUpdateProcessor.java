@@ -23,10 +23,11 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
@@ -36,6 +37,7 @@ import io.netty.channel.Channel;
  * update process host
  * this used when master failover
  */
+@Component
 public class HostUpdateProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(HostUpdateProcessor.class);
@@ -43,11 +45,8 @@ public class HostUpdateProcessor implements NettyRequestProcessor {
     /**
      * task callback service
      */
-    private final TaskCallbackService taskCallbackService;
-
-    public HostUpdateProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-    }
+    @Autowired
+    private TaskCallbackService taskCallbackService;
 
     @Override
     public void process(Channel channel, Command command) {

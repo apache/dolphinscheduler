@@ -46,21 +46,26 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
 /**
  * logger request process logic
  */
+@Component
 public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
-    public LoggerRequestProcessor() {
+    @PostConstruct
+    public void init() {
         this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 

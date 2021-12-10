@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -77,11 +78,6 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
-    /**
-     * alert model netty remote server
-     */
-    private AlertClientService alertClientService;
-
     @Autowired
     private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
@@ -97,6 +93,21 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private TaskPluginManager taskPluginManager;
 
+    @Autowired
+    private TaskExecuteProcessor taskExecuteProcessor;
+
+    @Autowired
+    private TaskKillProcessor taskKillProcessor;
+
+    @Autowired
+    private DBTaskAckProcessor dbTaskAckProcessor;
+
+    @Autowired
+    private DBTaskResponseProcessor dbTaskResponseProcessor;
+
+    @Autowired
+    private HostUpdateProcessor hostUpdateProcessor;
+
     /**
      * worker server startup, not use web service
      *
@@ -108,23 +119,28 @@ public class WorkerServer implements IStoppable {
     }
 
     /**
+     * alert model netty remote server
+     */
+    @Bean
+    public AlertClientService alertClientService(WorkerConfig workerConfig) {
+        return new AlertClientService(workerConfig.getAlertListenHost(),
+                workerConfig.getAlertListenPort());
+    }
+
+    /**
      * worker server run
      */
     @PostConstruct
     public void run() {
-        // alert-server client registry
-        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(),
-                                                    workerConfig.getAlertListenPort());
-
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService, taskPluginManager));
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, new HostUpdateProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, dbTaskAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, dbTaskResponseProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
         this.nettyRemotingServer.start();
 
         // worker registry
@@ -177,7 +193,6 @@ public class WorkerServer implements IStoppable {
             // close
             this.nettyRemotingServer.close();
             this.workerRegistryClient.unRegistry();
-            this.alertClientService.close();
             this.springApplicationContext.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);

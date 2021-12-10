@@ -24,11 +24,13 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
+@Component
 public class HostUpdateResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(HostUpdateResponseProcessor.class);
