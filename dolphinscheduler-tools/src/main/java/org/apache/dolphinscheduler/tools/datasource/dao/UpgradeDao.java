@@ -307,7 +307,7 @@ public abstract class UpgradeDao {
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
         Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/dolphinscheduler_dml.sql", schemaDir, getDbType().name().toLowerCase()));
-        logger.info("sqlSQLFilePath" + sqlFilePath);
+        logger.info("sqlSQLFilePath: {}", sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
