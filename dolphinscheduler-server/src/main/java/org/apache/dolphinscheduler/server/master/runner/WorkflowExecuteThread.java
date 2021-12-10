@@ -317,10 +317,14 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean taskTimeout(StateEvent stateEvent) {
 
-        TaskInstance taskInstance = taskInstanceHashMap
-                .row(stateEvent.getTaskInstanceId())
-                .values()
-                .iterator().next();
+        if (!taskInstanceHashMap.containsRow(stateEvent.getTaskInstanceId())) {
+            return true;
+        }
+
+        // get lastest task instance into
+        TaskInstance taskInstance = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+        TaskDefinition taskDefinition = processService.findTaskDefinition(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+        taskInstance.setTaskDefine(taskDefinition);
 
         if (TimeoutFlag.CLOSE == taskInstance.getTaskDefine().getTimeoutFlag()) {
             return true;
