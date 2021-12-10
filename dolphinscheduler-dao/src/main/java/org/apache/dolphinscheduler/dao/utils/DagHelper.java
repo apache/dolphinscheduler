@@ -50,7 +50,6 @@ public class DagHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(DagHelper.class);
 
-
     /**
      * generate flow node relation list by task node list;
      * Edges that are not in the task Node List will not be added to the result
@@ -110,7 +109,7 @@ public class DagHelper {
                 List<TaskNode> childNodeList = new ArrayList<>();
                 if (startNode == null) {
                     logger.error("start node name [{}] is not in task node list [{}] ",
-                        startNodeCode,
+                            startNodeCode,
                             taskNodeList
                     );
                     continue;
@@ -135,7 +134,6 @@ public class DagHelper {
         return destTaskNodeList;
     }
 
-
     /**
      * find all the nodes that depended on the start node
      *
@@ -159,7 +157,6 @@ public class DagHelper {
         resultList.add(startNode);
         return resultList;
     }
-
 
     /**
      * find all nodes that start nodes depend on.
@@ -332,6 +329,10 @@ public class DagHelper {
     private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
                                               Map<String, TaskNode> skipTaskNodeList
     ) {
+        // if taskNode is null, skip it
+        if (taskNode == null) {
+            return true;
+        }
         if (CollectionUtils.isEmpty(taskNode.getDepList())) {
             return false;
         }
@@ -342,7 +343,6 @@ public class DagHelper {
         }
         return true;
     }
-
 
     /**
      * parse condition task find the branch process
@@ -382,9 +382,6 @@ public class DagHelper {
     /**
      * parse condition task find the branch process
      * set skip flag for another one.
-     *
-     * @param nodeCode
-     * @return
      */
     public static List<String> parseSwitchTask(String nodeCode,
                                                Map<String, TaskNode> skipTaskNodeList,
@@ -442,7 +439,6 @@ public class DagHelper {
             }
         }
     }
-
 
     /***
      * build dag graph
