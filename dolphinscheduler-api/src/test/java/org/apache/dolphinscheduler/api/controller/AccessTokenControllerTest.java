@@ -111,6 +111,19 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testQueryAccessTokenByUser() throws Exception {
+        MvcResult mvcResult = this.mockMvc
+                .perform(get("/access-tokens/user/1")
+                .header("sessionId", this.sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testDelAccessTokenById() throws Exception {
         testCreateToken();
         MvcResult mvcResult = mockMvc.perform(delete("/access-tokens/1")
