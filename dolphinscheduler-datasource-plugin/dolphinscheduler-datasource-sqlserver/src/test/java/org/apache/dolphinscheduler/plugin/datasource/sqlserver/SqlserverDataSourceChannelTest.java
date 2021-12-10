@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class SqlserverDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         SqlServerDataSourceChannel sourceChannel = PowerMockito.mock(SqlServerDataSourceChannel.class);
         SqlserverDataSourceClient dataSourceClient = PowerMockito.mock(SqlserverDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new SqlServerConnectionParam()));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new SqlServerConnectionParam(), DbType.SQLSERVER));
     }
 }
