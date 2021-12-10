@@ -307,6 +307,10 @@ public class DagHelper {
         }
         for (String subsequent : startVertexes) {
             TaskNode taskNode = dag.getNode(subsequent);
+            if (taskNode == null) {
+                logger.error("taskNode {} is null, please check dag", subsequent);
+                continue;
+            }
             if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList)) {
                 setTaskNodeSkip(subsequent, dag, completeTaskList, skipTaskNodeList);
                 continue;
@@ -329,10 +333,6 @@ public class DagHelper {
     private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
                                               Map<String, TaskNode> skipTaskNodeList
     ) {
-        // if taskNode is null, skip it
-        if (taskNode == null) {
-            return true;
-        }
         if (CollectionUtils.isEmpty(taskNode.getDepList())) {
             return false;
         }
