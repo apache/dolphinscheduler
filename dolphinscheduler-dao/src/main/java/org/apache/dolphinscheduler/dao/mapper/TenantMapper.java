@@ -52,7 +52,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     /**
      * update
      */
-    @CacheEvict
+    @CacheEvict(key = "#p0.id")
     int updateById(@Param("et") Tenant tenant);
 
     /**

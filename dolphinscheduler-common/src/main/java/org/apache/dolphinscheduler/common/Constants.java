@@ -39,11 +39,6 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
-     * alert properties
-     */
-    public static final String ALERT_RPC_PORT = "alert.rpc.port";
-
-    /**
      * registry properties
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
@@ -437,6 +432,10 @@ public final class Constants {
      */
     public static final String SUCCEEDED = "SUCCEEDED";
     /**
+     * ENDED
+     */
+    public static final String ENDED = "ENDED";
+    /**
      * NEW
      */
     public static final String NEW = "NEW";
@@ -767,4 +766,7 @@ public final class Constants {
      */
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;
+
+    public static final String CACHE_KEY_VALUE_ALL = "'all'";
+
 }

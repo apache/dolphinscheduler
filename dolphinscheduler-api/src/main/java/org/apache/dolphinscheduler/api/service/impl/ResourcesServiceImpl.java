@@ -596,7 +596,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!HadoopUtils.getInstance().exists(resourcePath)) {
                 createTenantDirIfNotExists(tenantCode);
             }
-            org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
+            org.apache.dolphinscheduler.api.utils.FileUtils.copyInputStreamToFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
             FileUtils.deleteFile(localFilename);
