@@ -34,10 +34,12 @@ import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * task response processor
  */
+@Component
 public class TaskResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 
 import org.apache.ibatis.annotations.Param;
 
-import org.springframework.boot.context.properties.bind.Name;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -53,8 +52,8 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     /**
      * update
      */
-    @CacheEvict(key = "#tenant.id")
-    int updateById(@Name("tenant") @Param("et") Tenant tenant);
+    @CacheEvict(key = "#p0.id")
+    int updateById(@Param("et") Tenant tenant);
 
     /**
      * query tenant by code
