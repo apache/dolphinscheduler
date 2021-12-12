@@ -57,22 +57,24 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
-          image: {{ include "dolphinscheduler.image.fullname" . }}
+          image: {{ include "dolphinscheduler.image.fullname.alert" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - "alert-server"
           ports:
             - containerPort: 50052
               name: "alert-port"
+            - containerPort: 50053
+              name: "actuator-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{ range $key, $value :=  .Values.alert.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
-            - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.resources }}
           resources:
             {{- toYaml .Values.alert.resources | nindent 12 }}
@@ -80,7 +82,7 @@ spec:
           {{- if .Values.alert.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "AlertServer"]
+              command: ["curl", "-s", "http://localhost:50053/actuator/health/liveness"]
             initialDelaySeconds: {{ .Values.alert.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.livenessProbe.timeoutSeconds }}
@@ -90,7 +92,7 @@ spec:
           {{- if .Values.alert.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "AlertServer"]
+              command: ["curl", "-s", "http://localhost:50053/actuator/health/readiness"]
             initialDelaySeconds: {{ .Values.alert.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.readinessProbe.timeoutSeconds }}

@@ -27,5 +27,9 @@ spec:
       targetPort: alert-port
       protocol: TCP
       name: alert-port
+    - port: 50053
+      targetPort: actuator-port
+      protocol: TCP
+      name: actuator-port
   selector:
     {{- include "dolphinscheduler.alert.labels" . | nindent 4 }}

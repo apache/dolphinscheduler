@@ -27,10 +27,22 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-Create a default docker image fullname.
+Create default docker images' fullname.
 */}}
-{{- define "dolphinscheduler.image.fullname" -}}
-{{- .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- define "dolphinscheduler.image.fullname.master" -}}
+{{- .Values.image.registry }}/dolphinscheduler-master:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.fullname.worker" -}}
+{{- .Values.image.registry }}/dolphinscheduler-worker:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.fullname.api" -}}
+{{- .Values.image.registry }}/dolphinscheduler-api:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.fullname.alert" -}}
+{{- .Values.image.registry }}/dolphinscheduler-alert-server:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.fullname.tools" -}}
+{{- .Values.image.registry }}/dolphinscheduler-tools:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 
 {{/*
@@ -108,37 +120,25 @@ Create a default fully qualified zookkeeper quorum.
 Create a database environment variables.
 */}}
 {{- define "dolphinscheduler.database.env_vars" -}}
-- name: DATABASE_TYPE
+- name: DATABASE
   {{- if .Values.postgresql.enabled }}
   value: "postgresql"
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
-- name: DATABASE_DRIVER
+- name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
-  value: "org.postgresql.Driver"
+  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
   {{- else }}
-  value: {{ .Values.externalDatabase.driver | quote }}
+  value: jdbc:{{ .Values.externalDatabase.type }}://{{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}/{{ .Values.externalDatabase.database }}?{{ .Values.externalDatabase.params }}
   {{- end }}
-- name: DATABASE_HOST
-  {{- if .Values.postgresql.enabled }}
-  value: {{ template "dolphinscheduler.postgresql.fullname" . }}
-  {{- else }}
-  value: {{ .Values.externalDatabase.host | quote }}
-  {{- end }}
-- name: DATABASE_PORT
-  {{- if .Values.postgresql.enabled }}
-  value: "5432"
-  {{- else }}
-  value: {{ .Values.externalDatabase.port | quote }}
-  {{- end }}
-- name: DATABASE_USERNAME
+- name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
   value: {{ .Values.postgresql.postgresqlUsername }}
   {{- else }}
   value: {{ .Values.externalDatabase.username | quote }}
   {{- end }}
-- name: DATABASE_PASSWORD
+- name: SPRING_DATASOURCE_PASSWORD
   valueFrom:
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
@@ -148,31 +148,33 @@ Create a database environment variables.
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
       {{- end }}
-- name: DATABASE_DATABASE
-  {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.postgresqlDatabase }}
-  {{- else }}
-  value: {{ .Values.externalDatabase.database | quote }}
-  {{- end }}
-- name: DATABASE_PARAMS
-  {{- if .Values.postgresql.enabled }}
-  value: "characterEncoding=utf8"
-  {{- else }}
-  value: {{ .Values.externalDatabase.params | quote }}
-  {{- end }}
+{{- end -}}
+
+{{/*
+Wait for database to be ready.
+*/}}
+{{- define "dolphinscheduler.database.wait-for-ready" -}}
+- name: wait-for-database
+  image: busybox:1.30
+  imagePullPolicy: IfNotPresent
+{{- if .Values.postgresql.enabled }}
+  command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.postgresql.fullname" . }} 5432 && exit 0 || sleep 5; done; exit 1']
+{{- else }}
+  command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ .Values.externalDatabase.host }} {{ .Values.externalDatabase.port }} && exit 0 || sleep 5; done; exit 1']
+{{- end }}
 {{- end -}}
 
 {{/*
 Create a registry environment variables.
 */}}
 {{- define "dolphinscheduler.registry.env_vars" -}}
-- name: REGISTRY_PLUGIN_NAME
+- name: REGISTRY_TYPE
   {{- if .Values.zookeeper.enabled }}
   value: "zookeeper"
   {{- else }}
   value: {{ .Values.externalRegistry.registryPluginName }}
   {{- end }}
-- name: REGISTRY_SERVERS
+- name: REGISTRY_ZOOKEEPER_CONNECT_STRING
   {{- if .Values.zookeeper.enabled }}
   value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
   {{- else }}

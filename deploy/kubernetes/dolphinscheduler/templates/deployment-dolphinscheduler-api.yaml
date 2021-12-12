@@ -57,10 +57,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
-          image: {{ include "dolphinscheduler.image.fullname" . }}
+          image: {{ include "dolphinscheduler.image.fullname.api" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - "api-server"
           ports:
             - containerPort: 12345
               name: "api-port"
@@ -70,11 +68,13 @@ spec:
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
+            {{ range $key, $value :=  .Values.api.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
-            - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.resources }}
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}
@@ -82,7 +82,7 @@ spec:
           {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "ApiApplicationServer"]
+              command: ["curl", "-s", "http://localhost:12345/actuator/health/liveness"]
             initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
@@ -92,7 +92,7 @@ spec:
           {{- if .Values.api.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "ApiApplicationServer"]
+              command: ["curl", "-s", "http://localhost:12345/actuator/health/readiness"]
             initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
