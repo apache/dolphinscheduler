@@ -47,7 +47,7 @@ services:
       replicas: 1
 
   dolphinscheduler-api:
-    image: apache/dolphinscheduler-tools
+    image: apache/dolphinscheduler-api
     ports:
       - 12345:12345
     env_file: .env
