@@ -20,15 +20,15 @@ import i18n from '@/module/i18n'
 /**
  * Module code table
  */
-const moduleType = [
+const resourceType = [
   {
     code: '',
     label: `${i18n.$t('Audit Type')}`
   }, {
-    code: 'USER_MODULE',
+    code: 'USER',
     label: `${i18n.$t('User Audit')}`
   }, {
-    code: 'PROJECT_MODULE',
+    code: 'PROJECT',
     label: `${i18n.$t('Project Audit')}`
   }
 ]
@@ -41,14 +41,20 @@ const operationType = [
     code: '',
     label: `${i18n.$t('All Operations')}`
   }, {
-    code: 'CREATE_USER',
-    label: `${i18n.$t('Create User')}`
+    code: 'CREATE',
+    label: `${i18n.$t('Create')}`
   }, {
-    code: 'CREATE_PROJECT',
-    label: `${i18n.$t('Create Project')}`
+    code: 'UPDATE',
+    label: `${i18n.$t('Update')}`
+  }, {
+    code: 'DELETE',
+    label: `${i18n.$t('Delete')}`
+  }, {
+    code: 'READ',
+    label: `${i18n.$t('Read')}`
   }
 ]
 
 export {
-  moduleType, operationType
+  resourceType, operationType
 }

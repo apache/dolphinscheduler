@@ -33,9 +33,9 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </div>
-      <el-select style="width: 140px;" @change="_onChangeModule" :value="searchParams.moduleType" :placeholder="$t('Audit Type')" size="mini">
+      <el-select style="width: 140px;" @change="_onChangeResource" :value="searchParams.resourceType" :placeholder="$t('Audit Type')" size="mini">
         <el-option
-          v-for="module in moduleTypeList"
+          v-for="module in resourceTypeList"
           :key="module.label"
           :value="module.code"
           :label="module.label">
@@ -52,41 +52,29 @@
       <div class="list">
         <el-input v-model="searchParams.userName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('User Name')"></el-input>
       </div>
-      <div class="list">
-        <el-input v-model="searchParams.projectName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Project Name')"></el-input>
-      </div>
-      <div class="list">
-        <el-input v-model="searchParams.processName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Process Name')"></el-input>
-      </div>
     </template>
   </m-conditions>
 </template>
 <script>
   import _ from 'lodash'
-  import { moduleType, operationType } from './common'
+  import { resourceType, operationType } from './common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
     name: 'monitor-log-conditions',
     data () {
       return {
         // state(list)
-        moduleTypeList: moduleType,
+        resourceTypeList: resourceType,
         operationTypeList: operationType,
         searchParams: {
-          // module
-          moduleType: '',
+          // resource type
+          resourceType: '',
           // operation
           operationType: '',
           // start date
           startDate: '',
           // end date
           endDate: '',
-          // operator
-          userName: '',
-          // project name
-          projectName: '',
-          // process name
-          processName: ''
         },
         dataTime: []
       }
@@ -106,10 +94,10 @@
         this.dataTime[1] = val[1]
       },
       /**
-       * change module
+       * change resource
        */
-      _onChangeModule (val) {
-        this.searchParams.moduleType = val
+      _onChangeResource (val) {
+        this.searchParams.resourceType = val
       },
       /**
        * change operation

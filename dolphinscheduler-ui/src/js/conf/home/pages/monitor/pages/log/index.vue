@@ -67,8 +67,8 @@
         searchParams: {
           pageSize: 10,
           pageNo: 1,
-          // module
-          moduleType: '',
+          // resource type
+          resourceType: '',
           // operation
           operationType: '',
           // start date
@@ -77,10 +77,6 @@
           endDate: '',
           // operator
           userName: '',
-          // project name
-          projectName: '',
-          // process name
-          processName: ''
         },
         isLeft: true,
         // isEffective: 1,

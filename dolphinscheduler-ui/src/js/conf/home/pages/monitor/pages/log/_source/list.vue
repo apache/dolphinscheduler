@@ -20,9 +20,8 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
-        <el-table-column prop="module" :label="$t('Audit Type')"></el-table-column>
-        <el-table-column prop="projectName" :label="$t('Project Name')"></el-table-column>
-        <el-table-column prop="processName" :label="$t('Process Name')"></el-table-column>
+        <el-table-column prop="resource" :label="$t('Audit Type')"></el-table-column>
+        <el-table-column prop="resourceName" :label="$t('Project Name')"></el-table-column>
         <el-table-column prop="operation" :label="$t('Operation')">
           <template slot-scope="scope">
             <span>{{scope.row.operation | filterNull}}</span>
