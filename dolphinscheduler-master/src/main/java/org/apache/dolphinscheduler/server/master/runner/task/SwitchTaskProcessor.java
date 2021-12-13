@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -75,7 +76,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskDefinition = processService.findTaskDefinition(
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),processInstance.getProcessDefinitionCode(),
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
@@ -176,7 +177,13 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         switchParameters.setResultConditionLocation(finalConditionLocation);
         taskInstance.setSwitchDependency(switchParameters);
 
-        logger.info("the switch task depend result : {}", conditionResult);
+        if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
+            conditionResult = DependResult.FAILED;
+            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+            return true;
+        }
+
+        logger.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
         return true;
     }
 
@@ -221,4 +228,18 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         return content;
     }
 
+    /**
+     * check whether switch result is valid
+     */
+    private boolean isValidSwitchResult(SwitchResultVo switchResult) {
+        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
+            return false;
+        }
+        for (String nextNode : switchResult.getNextNode()) {
+            if (StringUtils.isEmpty(nextNode)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
