@@ -126,7 +126,7 @@ def test_sql_get_define(mock_datasource):
     """Test task sql function get_define."""
     code = 123
     version = 1
-    name = "test_sql_dict"
+    name = "test_sql_get_define"
     command = "select 1"
     datasource_name = "test_datasource"
     expect = {
