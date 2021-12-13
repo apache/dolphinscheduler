@@ -70,6 +70,9 @@
         <include refid="baseSql"/>
         from t_ds_process_definition_log
         where code = #{code}
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
         order by version desc
     </select>
 

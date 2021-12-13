@@ -51,6 +51,9 @@
         <include refid="baseSql"/>
         from t_ds_process_instance
         where state = #{status}
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
         and start_time between
         #{startTime} and #{endTime}
         order by end_time-start_time desc

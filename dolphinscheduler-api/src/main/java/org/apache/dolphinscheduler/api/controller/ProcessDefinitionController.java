@@ -515,7 +515,7 @@ public class ProcessDefinitionController extends BaseController {
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("code") long code,
                            @RequestParam("limit") Integer limit) {
-        Map<String, Object> result = processDefinitionService.viewTree(code, limit);
+        Map<String, Object> result = processDefinitionService.viewTree(projectCode, code, limit);
         return returnDataList(result);
     }
 
