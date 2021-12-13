@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.enums;
 
 import java.util.Locale;
-
+import java.util.Optional;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
@@ -363,5 +363,19 @@ public enum Status {
         } else {
             return this.enMsg;
         }
+    }
+
+    /**
+     * Retrieve Status enum entity by status code.
+     * @param code
+     * @return
+     */
+    public static Optional<Status> findStatusBy(int code) {
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                return Optional.of(status);
+            }
+        }
+        return Optional.empty();
     }
 }
