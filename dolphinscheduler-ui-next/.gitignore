@@ -1,0 +1,15 @@
+.vscode
+.idea
+.DS_Store
+
+*.local
+*.swp
+*.tgz
+*.tsbuildinfo
+
+node_modules
+dist
+dist-ssr
+
+pnpm-lock.yaml
+.pnpm-debug.log
