@@ -72,6 +72,7 @@ class TaskType(str):
     PYTHON = "PYTHON"
     SQL = "SQL"
     SUB_PROCESS = "SUB_PROCESS"
+    PROCEDURE = "PROCEDURE"
 
 
 class DefaultTaskCodeNum(str):

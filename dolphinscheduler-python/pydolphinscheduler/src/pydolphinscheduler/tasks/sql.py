@@ -18,11 +18,10 @@
 """Task sql."""
 
 import re
-from typing import Dict, Optional
+from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.task import Task
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.tasks.database import Database
 
 
 class SqlType:
@@ -32,7 +31,7 @@ class SqlType:
     NOT_SELECT = 1
 
 
-class Sql(Task):
+class Sql(Database):
     """Task SQL object, declare behavior for SQL task to dolphinscheduler.
 
     It should run sql job in multiply sql lik engine, such as:
@@ -67,30 +66,10 @@ class Sql(Task):
         *args,
         **kwargs
     ):
-        super().__init__(name, TaskType.SQL, *args, **kwargs)
-        self.datasource_name = datasource_name
-        self.sql = sql
+        super().__init__(TaskType.SQL, name, datasource_name, sql, *args, **kwargs)
         self.pre_statements = pre_statements or []
         self.post_statements = post_statements or []
         self.display_rows = display_rows
-        self._datasource = {}
-
-    def get_datasource_type(self) -> str:
-        """Get datasource type from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self.datasource_name).get("type")
-
-    def get_datasource_id(self) -> str:
-        """Get datasource id from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self.datasource_name).get("id")
-
-    def get_datasource_info(self, name) -> Dict:
-        """Get datasource info from java gateway, contains datasource id, type, name."""
-        if self._datasource:
-            return self._datasource
-        else:
-            gateway = launch_gateway()
-            self._datasource = gateway.entry_point.getDatasourceInfo(name)
-            return self._datasource
 
     @property
     def sql_type(self) -> int:
@@ -103,18 +82,3 @@ class Sql(Task):
             return SqlType.NOT_SELECT
         else:
             return SqlType.SELECT
-
-    @property
-    def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:
-        """Override Task.task_params for sql task.
-
-        Sql task have some specials attribute for task_params, and is odd if we
-        directly set as python property, so we Override Task.task_params here.
-        """
-        params = super().task_params
-        custom_params = {
-            "type": self.get_datasource_type(),
-            "datasource": self.get_datasource_id(),
-        }
-        params.update(custom_params)
-        return params
