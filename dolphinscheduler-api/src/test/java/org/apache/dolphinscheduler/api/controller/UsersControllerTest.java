@@ -109,6 +109,43 @@ public class UsersControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testGrantProjectByCode() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userId", "32");
+        paramsMap.add("projectCode", "3682329499136");
+
+        MvcResult mvcResult = this.mockMvc
+                .perform(post("/users/grant-project-by-code")
+                .header(SESSION_ID, this.sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testRevokeProject() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userId", "32");
+        paramsMap.add("projectCode", "3682329499136");
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/users/revoke-project")
+                .header(SESSION_ID, this.sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testGrantResource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId","32");
