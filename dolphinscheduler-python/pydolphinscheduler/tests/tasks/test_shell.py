@@ -22,33 +22,40 @@ from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.tasks.shell import Shell, ShellTaskParams
+from pydolphinscheduler.tasks.shell import Shell
 
 
 @pytest.mark.parametrize(
-    "name, value",
+    "attr, expect",
     [
-        ("local_params", "local_params"),
-        ("resource_list", "resource_list"),
-        ("dependence", "dependence"),
-        ("wait_start_timeout", "wait_start_timeout"),
-        ("condition_result", "condition_result"),
+        (
+            {"command": "test script"},
+            {
+                "rawScript": "test script",
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        )
     ],
 )
-def test_shell_task_params_attr_setter(name, value):
-    """Test shell task parameters."""
-    raw_script = "echo shell task parameter"
-    shell_task_params = ShellTaskParams(raw_script)
-    assert raw_script == shell_task_params.raw_script
-    setattr(shell_task_params, name, value)
-    assert value == getattr(shell_task_params, name)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_property_task_params(mock_code_version, attr, expect):
+    """Test task shell task property."""
+    task = Shell("test-shell-task-params", **attr)
+    assert expect == task.task_params
 
 
-def test_shell_to_dict():
-    """Test task shell function to_dict."""
+def test_shell_get_define():
+    """Test task shell function get_define."""
     code = 123
     version = 1
-    name = "test_shell_to_dict"
+    name = "test_shell_get_define"
     command = "echo test shell"
     expect = {
         "code": code,
@@ -79,4 +86,4 @@ def test_shell_to_dict():
         return_value=(code, version),
     ):
         shell = Shell(name, command)
-        assert shell.to_dict() == expect
+        assert shell.get_define() == expect

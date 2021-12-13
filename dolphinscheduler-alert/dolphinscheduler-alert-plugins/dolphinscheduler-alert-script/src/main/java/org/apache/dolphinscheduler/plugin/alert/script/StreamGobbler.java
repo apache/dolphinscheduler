@@ -23,9 +23,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class StreamGobbler extends Thread {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(StreamGobbler.class);
+    private static final Logger logger = LoggerFactory.getLogger(StreamGobbler.class);
 
     private final InputStream inputStream;
 
@@ -46,16 +47,16 @@ public final class StreamGobbler extends Thread {
                 output.append(System.getProperty("line.separator"));
             }
             if (output.length() > 0) {
-                log.info("out put msg is{}", output);
+                logger.info("out put msg is{}", output);
             }
         } catch (IOException e) {
-            log.error("I/O error occurs {}", e.getMessage());
+            logger.error("I/O error occurs {}", e.getMessage());
         } finally {
             try {
                 inputBufferReader.close();
                 inputStreamReader.close();
             } catch (IOException e) {
-                log.error("I/O error occurs {}", e.getMessage());
+                logger.error("I/O error occurs {}", e.getMessage());
             }
         }
     }

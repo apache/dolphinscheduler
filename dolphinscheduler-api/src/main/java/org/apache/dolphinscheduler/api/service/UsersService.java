@@ -154,6 +154,25 @@ public interface UsersService {
 
 
     /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCodes project code array
+     * @return grant result code
+     */
+    Map<String, Object> grantProjectByCode(User loginUser, int userId, String projectCodes);
+
+    /**
+     * revoke the project permission for specified user.
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectCode   Project Code
+     * @return
+     */
+    Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
+
+    /**
      * grant resource
      *
      * @param loginUser login user
