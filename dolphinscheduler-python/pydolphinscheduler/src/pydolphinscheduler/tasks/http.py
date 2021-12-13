@@ -20,7 +20,7 @@
 from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSParamException
 
 
@@ -50,11 +50,22 @@ class HttpCheckCondition:
     BODY_NOT_CONTAINS = "BODY_NOT_CONTAINS"
 
 
-class HttpTaskParams(TaskParams):
-    """Parameter only for Http task types."""
+class Http(Task):
+    """Task HTTP object, declare behavior for HTTP task to dolphinscheduler."""
+
+    _task_custom_attr = {
+        "url",
+        "http_method",
+        "http_params",
+        "http_check_condition",
+        "condition",
+        "connect_timeout",
+        "socket_timeout",
+    }
 
     def __init__(
         self,
+        name: str,
         url: str,
         http_method: Optional[str] = HttpMethod.GET,
         http_params: Optional[str] = None,
@@ -65,7 +76,7 @@ class HttpTaskParams(TaskParams):
         *args,
         **kwargs
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(name, TaskType.HTTP, *args, **kwargs)
         self.url = url
         if not hasattr(HttpMethod, http_method):
             raise PyDSParamException(
@@ -88,31 +99,3 @@ class HttpTaskParams(TaskParams):
         self.condition = condition
         self.connect_timeout = connect_timeout
         self.socket_timeout = socket_timeout
-
-
-class Http(Task):
-    """Task HTTP object, declare behavior for HTTP task to dolphinscheduler."""
-
-    def __init__(
-        self,
-        name: str,
-        url: str,
-        http_method: Optional[str] = HttpMethod.GET,
-        http_params: Optional[str] = None,
-        http_check_condition: Optional[str] = HttpCheckCondition.STATUS_CODE_DEFAULT,
-        condition: Optional[str] = None,
-        connect_timeout: Optional[int] = 60000,
-        socket_timeout: Optional[int] = 60000,
-        *args,
-        **kwargs
-    ):
-        task_params = HttpTaskParams(
-            url=url,
-            http_method=http_method,
-            http_params=http_params,
-            http_check_condition=http_check_condition,
-            condition=condition,
-            connect_timeout=connect_timeout,
-            socket_timeout=socket_timeout,
-        )
-        super().__init__(name, TaskType.HTTP, task_params, *args, **kwargs)
