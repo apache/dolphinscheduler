@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.mysql;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class MysqlDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         MysqlDataSourceChannel sourceChannel = PowerMockito.mock(MysqlDataSourceChannel.class);
         MysqlDataSourceClient dataSourceClient = PowerMockito.mock(MysqlDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new MysqlConnectionParam()));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new MysqlConnectionParam(), DbType.MYSQL));
     }
 }
