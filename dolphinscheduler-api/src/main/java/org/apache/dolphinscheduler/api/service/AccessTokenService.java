@@ -82,7 +82,7 @@ public interface AccessTokenService {
      * @param id token id
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return update result code
      */
     Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token);
