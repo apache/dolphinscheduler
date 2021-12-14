@@ -22,26 +22,34 @@ from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.tasks.python import Python, PythonTaskParams
+from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.tasks.python import Python
 
 
 @pytest.mark.parametrize(
-    "name, value",
+    "attr, expect",
     [
-        ("local_params", "local_params"),
-        ("resource_list", "resource_list"),
-        ("dependence", "dependence"),
-        ("wait_start_timeout", "wait_start_timeout"),
-        ("condition_result", "condition_result"),
+        (
+            {"code": "print(1)"},
+            {
+                "rawScript": "print(1)",
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        )
     ],
 )
-def test_python_task_params_attr_setter(name, value):
-    """Test python task parameters."""
-    command = 'print("hello world.")'
-    python_task_params = PythonTaskParams(command)
-    assert command == python_task_params.raw_script
-    setattr(python_task_params, name, value)
-    assert value == getattr(python_task_params, name)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_property_task_params(mock_code_version, attr, expect):
+    """Test task python property."""
+    task = Python("test-python-task-params", **attr)
+    assert expect == task.task_params
 
 
 @pytest.mark.parametrize(
@@ -51,17 +59,16 @@ def test_python_task_params_attr_setter(name, value):
         ("print", "hello world"),
     ],
 )
-def test_python_task_not_support_code(script_code):
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_python_task_not_support_code(mock_code, script_code):
     """Test python task parameters."""
     name = "not_support_code_type"
-    code = 123
-    version = 1
-    with patch(
-        "pydolphinscheduler.core.task.Task.gen_code_and_version",
-        return_value=(code, version),
-    ):
-        with pytest.raises(ValueError, match="Parameter code do not support .*?"):
-            Python(name, script_code)
+    with pytest.raises(PyDSParamException, match="Parameter code do not support .*?"):
+        task = Python(name, script_code)
+        task.raw_script
 
 
 def foo():  # noqa: D103
@@ -79,8 +86,8 @@ def foo():  # noqa: D103
         ),
     ],
 )
-def test_python_to_dict(name, script_code, raw):
-    """Test task python function to_dict."""
+def test_python_get_define(name, script_code, raw):
+    """Test task python function get_define."""
     code = 123
     version = 1
     expect = {
@@ -112,4 +119,4 @@ def test_python_to_dict(name, script_code, raw):
         return_value=(code, version),
     ):
         shell = Python(name, script_code)
-        assert shell.to_dict() == expect
+        assert shell.get_define() == expect

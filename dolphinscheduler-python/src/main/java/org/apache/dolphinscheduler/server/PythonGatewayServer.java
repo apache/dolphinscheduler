@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -62,22 +64,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
 import py4j.GatewayServer;
 
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.server.master.*",
-        "org.apache.dolphinscheduler.server.worker.*",
-        "org.apache.dolphinscheduler.server.monitor.*",
-        "org.apache.dolphinscheduler.server.log.*",
-        "org.apache.dolphinscheduler.alert.*"
-    })
-})
+@ComponentScan(value = "org.apache.dolphinscheduler")
 public class PythonGatewayServer extends SpringBootServletInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
-    
+
     private static final WarningType DEFAULT_WARNING_TYPE = WarningType.NONE;
     private static final int DEFAULT_WARNING_GROUP_ID = 0;
     private static final FailureStrategy DEFAULT_FAILURE_STRATEGY = FailureStrategy.CONTINUE;
@@ -123,6 +116,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -207,35 +203,50 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         User user = usersService.queryUser(userName);
         Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
         long projectCode = project.getCode();
-        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, name);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
-
+        ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, name);
         long processDefinitionCode;
         // create or update process definition
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
+        if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
-        } else if (verifyStatus == Status.SUCCESS) {
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson,executionType);
-            ProcessDefinition processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
-            processDefinitionCode = processDefinition.getCode();
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
         } else {
-            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
-            LOGGER.error(msg);
-            throw new RuntimeException(msg);
+            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
+                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
+            processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
+            processDefinitionCode = processDefinition.getCode();
         }
-        
+
         // Fresh process definition schedule 
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup);
         }
         processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
         return processDefinitionCode;
+    }
+
+    /**
+     * get process definition
+     * @param user                  user who create or update schedule
+     * @param projectCode           project which process definition belongs to
+     * @param processDefinitionName process definition name
+     */
+    private ProcessDefinition getProcessDefinition(User user, long projectCode, String processDefinitionName) {
+        Map<String, Object> verifyProcessDefinitionExists = processDefinitionService.verifyProcessDefinitionName(user, projectCode, processDefinitionName);
+        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+
+        ProcessDefinition processDefinition = null;
+        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
+            processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+        } else if (verifyStatus != Status.SUCCESS) {
+            String msg = "Verify process definition exists status is invalid, neither SUCCESS or PROCESS_DEFINITION_NAME_EXIST.";
+            LOGGER.error(msg);
+            throw new RuntimeException(msg);
+        }
+
+        return processDefinition;
     }
 
     /**
@@ -254,16 +265,16 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
                                         long processDefinitionCode,
                                         String schedule,
                                         String workerGroup) {
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
+        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         // create or update schedule
         int scheduleId;
-        if (schedules.isEmpty()) {
+        if (scheduleObj == null) {
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, processDefinitionCode, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
-            scheduleId = schedules.get(0).getId();
+            scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, DEFAULT_WARNING_TYPE,
                 DEFAULT_WARNING_GROUP_ID, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
@@ -358,6 +369,63 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             Tenant tenant = (Tenant) tenantResult.get(Constants.DATA_LIST);
             usersService.createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
         }
+    }
+
+    /**
+     * Get datasource by given datasource name. It return map contain datasource id, type, name.
+     * Useful in Python API create sql task which need datasource information.
+     *
+     * @param datasourceName user who create or update schedule
+     */
+    public Map<String, Object> getDatasourceInfo(String datasourceName) {
+        Map<String, Object> result = new HashMap<>();
+        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
+        if (dataSourceList.size() > 1) {
+            String msg = String.format("Get more than one datasource by name %s", datasourceName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        } else if (dataSourceList.size() == 0) {
+            String msg = String.format("Can not find any datasource by name %s", datasourceName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        } else {
+            DataSource dataSource = dataSourceList.get(0);
+            result.put("id", dataSource.getId());
+            result.put("type", dataSource.getType().name());
+            result.put("name", dataSource.getName());
+        }
+        return result;
+    }
+
+    /**
+     * Get processDefinition by given processDefinitionName name. It return map contain processDefinition id, name, code.
+     * Useful in Python API create subProcess task which need processDefinition information.
+     *
+     * @param userName              user who create or update schedule
+     * @param projectName           project name which process definition belongs to
+     * @param processDefinitionName process definition name
+     */
+    public Map<String, Object> getProcessDefinitionInfo(String userName, String projectName, String processDefinitionName) {
+        Map<String, Object> result = new HashMap<>();
+
+        User user = usersService.queryUser(userName);
+        Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        long projectCode = project.getCode();
+        ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, processDefinitionName);
+        // get process definition info
+        if (processDefinition != null) {
+            // make sure process definition online
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(), ReleaseState.ONLINE);
+            result.put("id", processDefinition.getId());
+            result.put("name", processDefinition.getName());
+            result.put("code", processDefinition.getCode());
+        } else {
+            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
+        return result;
     }
 
     @PostConstruct

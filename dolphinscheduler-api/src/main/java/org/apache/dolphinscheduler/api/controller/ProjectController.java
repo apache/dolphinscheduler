@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_USER;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
@@ -235,6 +236,27 @@ public class ProjectController extends BaseController {
                                          @RequestParam("userId") Integer userId) {
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
         return returnDataList(result);
+    }
+
+    /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    @ApiOperation(value = "queryAuthorizedUser", notes = "QUERY_AUTHORIZED_USER_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+    })
+    @GetMapping(value = "/authed-user")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_USER)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryAuthorizedUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam("projectCode") Long projectCode) {
+        Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, projectCode);
+        return this.returnDataList(result);
     }
 
     /**

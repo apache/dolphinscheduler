@@ -26,11 +26,14 @@ from pydolphinscheduler.utils.string import attr2camel
 class Base:
     """DolphinScheduler Base object."""
 
+    # Object key attribute, to test whether object equals and so on.
     _KEY_ATTR: set = {"name", "description"}
 
-    _TO_DICT_ATTR: set = set()
+    # Object defines attribute, use when needs to communicate with Java gateway server.
+    _DEFINE_ATTR: set = set()
 
-    DEFAULT_ATTR: Dict = {}
+    # Object default attribute, will add those attribute to `_DEFINE_ATTR` when init assign missing.
+    _DEFAULT_ATTR: Dict = {}
 
     def __init__(self, name: str, description: Optional[str] = None):
         self.name = name
@@ -44,28 +47,28 @@ class Base:
             getattr(self, a, None) == getattr(other, a, None) for a in self._KEY_ATTR
         )
 
-    # TODO check how Redash do
-    # TODO DRY
-    def to_dict(self, camel_attr=True) -> Dict:
-        """Get object key attribute dict.
-
-        use attribute `self._TO_DICT_ATTR` to determine which attributes should including to
-        children `to_dict` function.
-        """
-        # content = {}
-        # for attr, value in self.__dict__.items():
-        #     # Don't publish private variables
-        #     if attr.startswith("_"):
-        #         continue
-        #     else:
-        #         content[snake2camel(attr)] = value
-        # content.update(self.DEFAULT_ATTR)
-        # return content
+    def get_define_custom(
+        self, camel_attr: bool = True, custom_attr: set = None
+    ) -> Dict:
+        """Get object definition attribute by given attr set."""
         content = {}
-        for attr in self._TO_DICT_ATTR:
+        for attr in custom_attr:
             val = getattr(self, attr, None)
             if camel_attr:
                 content[attr2camel(attr)] = val
             else:
                 content[attr] = val
+        return content
+
+    def get_define(self, camel_attr: bool = True) -> Dict:
+        """Get object definition attribute communicate to Java gateway server.
+
+        use attribute `self._DEFINE_ATTR` to determine which attributes should including when
+        object tries to communicate with Java gateway server.
+        """
+        content = self.get_define_custom(camel_attr, self._DEFINE_ATTR)
+        update_default = {
+            k: self._DEFAULT_ATTR.get(k) for k in self._DEFAULT_ATTR if k not in content
+        }
+        content.update(update_default)
         return content

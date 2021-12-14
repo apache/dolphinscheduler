@@ -477,6 +477,7 @@ CREATE TABLE `t_ds_task_definition` (
   `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text COMMENT 'resource id, separated by comma',
+  `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -495,7 +496,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
+  `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
@@ -508,6 +509,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -598,7 +600,7 @@ CREATE TABLE `t_ds_process_instance` (
   `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
-  KEY `start_time_index` (`start_time`) USING BTREE
+  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -832,6 +834,7 @@ CREATE TABLE `t_ds_task_instance` (
   `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
   `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
   `var_pool` longtext COMMENT 'var_pool',
+  `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
@@ -1017,3 +1020,40 @@ CREATE TABLE `t_ds_environment_worker_group_relation` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_group_queue
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_group_queue`;
+CREATE TABLE `t_ds_task_group_queue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+  `task_id` int(11) DEFAULT NULL COMMENT 'taskintanceid',
+  `task_name` varchar(100) DEFAULT NULL COMMENT 'TaskInstance name',
+  `group_id`  int(11) DEFAULT NULL COMMENT 'taskGroup id',
+  `process_id` int(11) DEFAULT NULL COMMENT 'processInstace id',
+  `priority` int(8) DEFAULT '0' COMMENT 'priority',
+  `status` tinyint(4) DEFAULT '-1' COMMENT '-1: waiting  1: running  2: finished',
+  `force_start` tinyint(4) DEFAULT '0' COMMENT 'is force start 0 NO ,1 YES',
+  `in_queue` tinyint(4) DEFAULT '0' COMMENT 'ready to get the queue by other task finish 0 NO ,1 YES',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY( `id` )
+)ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_group`;
+CREATE TABLE `t_ds_task_group` (
+   `id`  int(11)  NOT NULL AUTO_INCREMENT COMMENT'key',
+   `name` varchar(100) DEFAULT NULL COMMENT 'task_group name',
+   `description` varchar(200) DEFAULT NULL,
+   `group_size` int (11) NOT NULL COMMENT'group size',
+   `use_size` int (11) DEFAULT '0' COMMENT 'used size',
+   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+   `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+   `status` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY(`id`)
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;

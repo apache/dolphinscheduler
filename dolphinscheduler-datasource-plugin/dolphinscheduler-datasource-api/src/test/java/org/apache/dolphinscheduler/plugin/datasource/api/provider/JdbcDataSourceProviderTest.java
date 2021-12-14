@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,8 +38,8 @@ public class JdbcDataSourceProviderTest {
     public void testCreateJdbcDataSource() {
         PowerMockito.mockStatic(JdbcDataSourceProvider.class);
         HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
-        PowerMockito.when(JdbcDataSourceProvider.createJdbcDataSource(Mockito.any())).thenReturn(dataSource);
-        Assert.assertNotNull(JdbcDataSourceProvider.createJdbcDataSource(new MysqlConnectionParam()));
+        PowerMockito.when(JdbcDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSource);
+        Assert.assertNotNull(JdbcDataSourceProvider.createJdbcDataSource(new MysqlConnectionParam(), DbType.MYSQL));
     }
 
     @Test

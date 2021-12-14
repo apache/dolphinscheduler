@@ -74,9 +74,6 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         }
         address.deleteCharAt(address.length() - 1);
         String jdbcUrl = address.toString() + "/" + hiveParam.getDatabase();
-        if (CommonUtils.getKerberosStartupState()) {
-            jdbcUrl += ";principal=" + hiveParam.getPrincipal();
-        }
 
         HiveConnectionParam hiveConnectionParam = new HiveConnectionParam();
         hiveConnectionParam.setDatabase(hiveParam.getDatabase());

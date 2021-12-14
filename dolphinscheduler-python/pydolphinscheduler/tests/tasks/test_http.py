@@ -21,12 +21,8 @@ from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.tasks.http import (
-    Http,
-    HttpCheckCondition,
-    HttpMethod,
-    HttpTaskParams,
-)
+from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.tasks.http import Http, HttpCheckCondition, HttpMethod
 
 
 @pytest.mark.parametrize(
@@ -50,6 +46,38 @@ def test_attr_exists(class_name, attrs):
 
 
 @pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {"url": "https://www.apache.org"},
+            {
+                "url": "https://www.apache.org",
+                "httpMethod": "GET",
+                "httpParams": [],
+                "httpCheckCondition": "STATUS_CODE_DEFAULT",
+                "condition": None,
+                "connectTimeout": 60000,
+                "socketTimeout": 60000,
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        )
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_property_task_params(mock_code_version, attr, expect):
+    """Test task http property."""
+    task = Http("test-http-task-params", **attr)
+    assert expect == task.task_params
+
+
+@pytest.mark.parametrize(
     "param",
     [
         {"http_method": "http_method"},
@@ -61,18 +89,22 @@ def test_attr_exists(class_name, attrs):
         },
     ],
 )
-def test_http_task_param_not_support_param(param):
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_http_task_param_not_support_param(mock_code, param):
     """Test HttpTaskParams not support parameter."""
     url = "https://www.apache.org"
-    with pytest.raises(ValueError, match="Parameter .*?"):
-        HttpTaskParams(url, **param)
+    with pytest.raises(PyDSParamException, match="Parameter .*?"):
+        Http("test-no-supprot-param", url, **param)
 
 
-def test_http_to_dict():
-    """Test task HTTP function to_dict."""
+def test_http_get_define():
+    """Test task HTTP function get_define."""
     code = 123
     version = 1
-    name = "test_http_to_dict"
+    name = "test_http_get_define"
     url = "https://www.apache.org"
     expect = {
         "code": code,
@@ -109,4 +141,4 @@ def test_http_to_dict():
         return_value=(code, version),
     ):
         http = Http(name, url)
-        assert http.to_dict() == expect
+        assert http.get_define() == expect

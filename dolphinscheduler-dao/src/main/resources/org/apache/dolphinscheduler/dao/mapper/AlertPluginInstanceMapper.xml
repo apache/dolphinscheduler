@@ -36,11 +36,14 @@
         </foreach>
     </select>
 
-    <select id="queryByInstanceName" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+    <select id="queryByInstanceNamePage" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select
         *
         from t_ds_alert_plugin_instance
-        where instance_name = #{instanceName}
+        where 1 = 1
+        <if test="instanceName != null and instanceName != ''">
+            and instance_name like concat('%', #{instanceName}, '%')
+        </if>
     </select>
 
     <select id="existInstanceName" resultType="java.lang.Boolean">
