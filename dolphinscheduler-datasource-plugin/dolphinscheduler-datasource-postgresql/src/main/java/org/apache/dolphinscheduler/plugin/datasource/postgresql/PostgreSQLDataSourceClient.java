@@ -19,11 +19,12 @@ package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class PostgreSQLDataSourceClient extends CommonDataSourceClient {
 
-    public PostgreSQLDataSourceClient(BaseConnectionParam baseConnectionParam) {
-        super(baseConnectionParam);
+    public PostgreSQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 
 }
