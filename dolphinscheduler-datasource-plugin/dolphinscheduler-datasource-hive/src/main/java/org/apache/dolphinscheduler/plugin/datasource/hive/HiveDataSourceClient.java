@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_K
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -78,7 +78,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("Create ugi success.");
 
         super.initClient(baseConnectionParam, dbType);
-        this.oneSessionDataSource = JdbcDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam);
+        this.oneSessionDataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam);
         logger.info("Init {} success.", getClass().getName());
     }
 
