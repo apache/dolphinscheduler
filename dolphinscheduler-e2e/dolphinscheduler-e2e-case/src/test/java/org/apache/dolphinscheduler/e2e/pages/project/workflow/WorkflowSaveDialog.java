@@ -40,7 +40,7 @@ public final class WorkflowSaveDialog {
 
     @FindBy(id = "input-name")
     private WebElement inputName;
-    @FindBy(id = "button-submit")
+    @FindBy(id = "btn-submit")
     private WebElement buttonSubmit;
     @FindBys({
         @FindBy(className = "input-param-key"),

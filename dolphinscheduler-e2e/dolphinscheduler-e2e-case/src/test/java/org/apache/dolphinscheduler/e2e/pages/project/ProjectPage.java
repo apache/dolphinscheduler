@@ -37,10 +37,10 @@ import lombok.Getter;
 
 @Getter
 public final class ProjectPage extends NavBarPage implements NavBarItem {
-    @FindBy(id = "button-create-project")
+    @FindBy(id = "btn-create")
     private WebElement buttonCreateProject;
 
-    @FindBy(className = "rows-project")
+    @FindBy(className = "rows")
     private List<WebElement> projectList;
 
     @FindBys({
@@ -108,7 +108,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         @FindBy(id = "input-project-name")
         private WebElement inputProjectName;
 
-        @FindBy(id = "button-submit")
+        @FindBy(id = "btn-confirm")
         private WebElement buttonSubmit;
     }
 }

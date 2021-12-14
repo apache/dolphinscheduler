@@ -102,7 +102,7 @@
           </div>
         </template>
         <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()" id="button-submit">{{$t('Add')}}</el-button>
+        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()" id="btn-submit">{{$t('Add')}}</el-button>
       </div>
     </div>
   </div>

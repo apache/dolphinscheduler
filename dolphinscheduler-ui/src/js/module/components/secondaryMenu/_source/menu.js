@@ -52,14 +52,14 @@ const menu = {
           path: 'definition',
           id: 0,
           enabled: true,
-          classNames: 'process-definition'
+          classNames: 'tab-process-definition'
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
           enabled: true,
-          classNames: 'process-instance'
+          classNames: 'tab-process-instance'
         },
         {
           name: `${i18n.$t('Task Instance')}`,

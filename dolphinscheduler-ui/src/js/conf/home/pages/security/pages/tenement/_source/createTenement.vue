@@ -16,7 +16,7 @@
  */
 <template>
   <m-popover
-          okId="button-submit"
+          okId="btn-submit"
           cancelId="button-cancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
