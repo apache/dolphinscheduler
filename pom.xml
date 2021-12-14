@@ -1246,5 +1246,6 @@
         <module>dolphinscheduler-worker</module>
         <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
+        <module>dolphinscheduler-ui-next</module>
     </modules>
 </project>
