@@ -111,11 +111,12 @@ public class UsersControllerTest extends AbstractControllerTest {
     public void testGrantProjectByCode() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "32");
-        paramsMap.add("projectCodes", "3682329499136,3643998558592");
+        paramsMap.add("projectCode", "3682329499136");
 
-        MvcResult mvcResult = mockMvc.perform(post("/users/grant-project-by-code")
-                                                      .header(SESSION_ID, sessionId)
-                                                      .params(paramsMap))
+        MvcResult mvcResult = this.mockMvc
+                .perform(post("/users/grant-project-by-code")
+                .header(SESSION_ID, this.sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
