@@ -37,7 +37,8 @@ class Procedure(Database):
     database type and database instance would run this sql.
     """
 
-    def __init__(self, name: str, datasource_name: str, sql: str, *args, **kwargs):
-        super().__init__(
-            TaskType.PROCEDURE, name, datasource_name, sql, *args, **kwargs
-        )
+    _task_custom_attr = {"method"}
+
+    def __init__(self, name: str, datasource_name: str, method: str, *args, **kwargs):
+        super().__init__(TaskType.PROCEDURE, name, datasource_name, *args, **kwargs)
+        self.method = method
