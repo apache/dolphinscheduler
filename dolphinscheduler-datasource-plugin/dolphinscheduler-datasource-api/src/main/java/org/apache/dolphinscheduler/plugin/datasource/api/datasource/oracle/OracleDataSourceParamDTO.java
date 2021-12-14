@@ -15,31 +15,41 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class HiveDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
+public class OracleDataSourceParamDTO extends BaseDataSourceParamDTO {
+
+    private DbConnectType connectType;
+
+    public DbConnectType getConnectType() {
+        return connectType;
+    }
+
+    public void setConnectType(DbConnectType connectType) {
+        this.connectType = connectType;
+    }
 
     @Override
     public String toString() {
-        return "HiveDataSourceParamDTO{"
-                + "host='" + host + '\''
+        return "OracleDataSourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
                 + ", port=" + port
                 + ", database='" + database + '\''
-                + ", principal='" + principal + '\''
                 + ", userName='" + userName + '\''
                 + ", password='" + password + '\''
+                + ", connectType=" + connectType
                 + ", other='" + other + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
                 + '}';
     }
 
     @Override
     public DbType getType() {
-        return DbType.HIVE;
+        return DbType.ORACLE;
     }
 }

@@ -18,16 +18,16 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerDatasourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -41,15 +41,15 @@ public class DataSourceUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceUtils.class);
 
-    private static final DatasourceProcessor mysqlProcessor = new MysqlDatasourceProcessor();
-    private static final DatasourceProcessor postgreSqlProcessor = new PostgreSqlDatasourceProcessor();
-    private static final DatasourceProcessor hiveProcessor = new HiveDatasourceProcessor();
-    private static final DatasourceProcessor sparkProcessor = new SparkDatasourceProcessor();
-    private static final DatasourceProcessor clickhouseProcessor = new ClickHouseDatasourceProcessor();
-    private static final DatasourceProcessor oracleProcessor = new OracleDatasourceProcessor();
-    private static final DatasourceProcessor sqlServerProcessor = new SqlServerDatasourceProcessor();
-    private static final DatasourceProcessor db2PROCESSOR = new Db2DatasourceProcessor();
-    private static final DatasourceProcessor prestoPROCESSOR = new PrestoDatasourceProcessor();
+    private static final DataSourceProcessor mysqlProcessor = new MySQLDataSourceProcessor();
+    private static final DataSourceProcessor postgreSqlProcessor = new PostgreSQLDataSourceProcessor();
+    private static final DataSourceProcessor hiveProcessor = new HiveDataSourceProcessor();
+    private static final DataSourceProcessor sparkProcessor = new SparkDataSourceProcessor();
+    private static final DataSourceProcessor clickhouseProcessor = new ClickHouseDataSourceProcessor();
+    private static final DataSourceProcessor oracleProcessor = new OracleDataSourceProcessor();
+    private static final DataSourceProcessor sqlServerProcessor = new SQLServerDataSourceProcessor();
+    private static final DataSourceProcessor db2PROCESSOR = new Db2DataSourceProcessor();
+    private static final DataSourceProcessor prestoPROCESSOR = new PrestoDataSourceProcessor();
 
     /**
      * check datasource param
@@ -86,7 +86,7 @@ public class DataSourceUtils {
         return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
     }
 
-    public static DatasourceProcessor getDatasourceProcessor(DbType dbType) {
+    public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
         switch (dbType) {
             case MYSQL:
                 return mysqlProcessor;

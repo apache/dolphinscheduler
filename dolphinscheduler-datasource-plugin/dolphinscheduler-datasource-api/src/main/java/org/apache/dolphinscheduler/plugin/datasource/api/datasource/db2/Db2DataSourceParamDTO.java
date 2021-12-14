@@ -15,27 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class HiveConnectionParam extends BaseHDFSConnectionParam {
+public class Db2DataSourceParamDTO extends BaseDataSourceParamDTO {
+
     @Override
     public String toString() {
-        return "HiveConnectionParam{"
-                + "user='" + user + '\''
-                + ", password='" + password + '\''
-                + ", address='" + address + '\''
+        return "Db2DataSourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
+                + ", port=" + port
                 + ", database='" + database + '\''
-                + ", jdbcUrl='" + jdbcUrl + '\''
-                + ", driverLocation='" + driverLocation + '\''
-                + ", driverClassName='" + driverClassName + '\''
-                + ", validationQuery='" + validationQuery + '\''
+                + ", userName='" + userName + '\''
+                + ", password='" + password + '\''
                 + ", other='" + other + '\''
-                + ", principal='" + principal + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
                 + '}';
+    }
+
+    @Override
+    public DbType getType() {
+        return DbType.DB2;
     }
 }

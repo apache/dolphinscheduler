@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSqlDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDatasourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SqlServerDatasourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.PrestoDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;
@@ -37,27 +37,27 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 /**
  * Basic datasource params submitted to api.
  * <p>
- * see {@link MysqlDatasourceParamDTO}
- * see {@link PostgreSqlDatasourceParamDTO}
+ * see {@link MySQLDataSourceParamDTO}
+ * see {@link PostgreSQLDataSourceParamDTO}
  * see {@link HiveDataSourceParamDTO}
- * see {@link SparkDatasourceParamDTO}
- * see {@link ClickHouseDatasourceParamDTO}
- * see {@link OracleDatasourceParamDTO}
- * see {@link SqlServerDatasourceParamDTO}
- * see {@link Db2DatasourceParamDTO}
- * see {@link PrestoDatasourceParamDTO}
+ * see {@link SparkDataSourceParamDTO}
+ * see {@link ClickHouseDataSourceParamDTO}
+ * see {@link OracleDataSourceParamDTO}
+ * see {@link SQLServerDataSourceParamDTO}
+ * see {@link Db2DataSourceParamDTO}
+ * see {@link PrestoDataSourceParamDTO}
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(value = {
-        @JsonSubTypes.Type(value = MysqlDatasourceParamDTO.class, name = "MYSQL"),
-        @JsonSubTypes.Type(value = PostgreSqlDatasourceParamDTO.class, name = "POSTGRESQL"),
-        @JsonSubTypes.Type(value = HiveDataSourceParamDTO.class, name = "HIVE"),
-        @JsonSubTypes.Type(value = SparkDatasourceParamDTO.class, name = "SPARK"),
-        @JsonSubTypes.Type(value = ClickHouseDatasourceParamDTO.class, name = "CLICKHOUSE"),
-        @JsonSubTypes.Type(value = OracleDatasourceParamDTO.class, name = "ORACLE"),
-        @JsonSubTypes.Type(value = SqlServerDatasourceParamDTO.class, name = "SQLSERVER"),
-        @JsonSubTypes.Type(value = Db2DatasourceParamDTO.class, name = "DB2"),
-        @JsonSubTypes.Type(value = PrestoDatasourceParamDTO.class, name = "PRESTO"),
+    @JsonSubTypes.Type(value = MySQLDataSourceParamDTO.class, name = "MYSQL"),
+    @JsonSubTypes.Type(value = PostgreSQLDataSourceParamDTO.class, name = "POSTGRESQL"),
+    @JsonSubTypes.Type(value = HiveDataSourceParamDTO.class, name = "HIVE"),
+    @JsonSubTypes.Type(value = SparkDataSourceParamDTO.class, name = "SPARK"),
+    @JsonSubTypes.Type(value = ClickHouseDataSourceParamDTO.class, name = "CLICKHOUSE"),
+    @JsonSubTypes.Type(value = OracleDataSourceParamDTO.class, name = "ORACLE"),
+    @JsonSubTypes.Type(value = SQLServerDataSourceParamDTO.class, name = "SQLSERVER"),
+    @JsonSubTypes.Type(value = Db2DataSourceParamDTO.class, name = "DB2"),
+    @JsonSubTypes.Type(value = PrestoDataSourceParamDTO.class, name = "PRESTO"),
 })
 public abstract class BaseDataSourceParamDTO implements Serializable {
 
