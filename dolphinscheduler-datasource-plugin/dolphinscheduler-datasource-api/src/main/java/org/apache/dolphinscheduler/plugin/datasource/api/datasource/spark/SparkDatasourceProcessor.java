@@ -77,9 +77,6 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
         address.deleteCharAt(address.length() - 1);
 
         String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
-        if (CommonUtils.getKerberosStartupState()) {
-            jdbcUrl += ";principal=" + sparkDatasourceParam.getPrincipal();
-        }
 
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDatasourceParam.getPassword()));
