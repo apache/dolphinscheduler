@@ -71,10 +71,15 @@ public class AccessTokenController extends BaseController {
      * @param loginUser login user
      * @param userId token for user id
      * @param expireTime expire time for the token
-     * @param token token
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return create result state code
      */
-    @ApiIgnore
+    @ApiOperation(value = "createToken", notes = "CREATE_TOKEN_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int"),
+        @ApiImplicitParam(name = "expireTime", value = "EXPIRE_TIME", required = true, dataType = "String", example = "2021-12-31 00:00:00"),
+        @ApiImplicitParam(name = "token", value = "TOKEN", required = false, dataType = "String", example = "xxxx")
+    })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
@@ -82,7 +87,7 @@ public class AccessTokenController extends BaseController {
     public Result createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
-                              @RequestParam(value = "token") String token) {
+                              @RequestParam(value = "token", required = false) String token) {
 
         Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
         return returnDataList(result);
