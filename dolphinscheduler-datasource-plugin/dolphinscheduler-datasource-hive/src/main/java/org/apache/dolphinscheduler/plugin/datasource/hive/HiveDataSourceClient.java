@@ -90,7 +90,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private void checkKerberosEnv() {
         String krb5File = PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH);
-        if (StringUtils.isNotBlank(krb5File)) {
+        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        if (kerberosStartupState) {
             System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
             try {
                 Config.refresh();
