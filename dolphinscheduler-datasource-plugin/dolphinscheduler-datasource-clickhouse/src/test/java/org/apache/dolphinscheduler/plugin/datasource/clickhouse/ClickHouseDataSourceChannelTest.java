@@ -38,7 +38,7 @@ public class ClickHouseDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         ClickHouseDataSourceChannel sourceChannel = PowerMockito.mock(ClickHouseDataSourceChannel.class);
         ClickHouseDataSourceClient dataSourceClient = PowerMockito.mock(ClickHouseDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), DbType.CLICKHOUSE)).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new ClickHouseConnectionParam(), DbType.CLICKHOUSE));
     }
 }
