@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-public class HiveConnectionParam extends BaseHDFSConnectionParam {
+public class SQLServerConnectionParam extends BaseConnectionParam {
     @Override
     public String toString() {
-        return "HiveConnectionParam{"
+        return "SQLServerConnectionParam{"
                 + "user='" + user + '\''
                 + ", password='" + password + '\''
                 + ", address='" + address + '\''
@@ -32,10 +32,6 @@ public class HiveConnectionParam extends BaseHDFSConnectionParam {
                 + ", driverClassName='" + driverClassName + '\''
                 + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
-                + ", principal='" + principal + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
                 + '}';
     }
 }
