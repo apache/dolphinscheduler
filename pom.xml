@@ -98,7 +98,6 @@
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.1.2</checkstyle.version>
-        <zookeeper.version>3.4.14</zookeeper.version>
         <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
