@@ -39,6 +39,11 @@
         <property name="message" value="Prohibit invoking System.out.println in source code !"/>
     </module>
 
+    <module name="RegexpSingleline">
+        <property name="format" value="com\.mysql\.jdbc\.Driver"/>
+        <property name="message" value="Please use com.mysql.cj.jdbc.Driver instead of com.mysql.jdbc.Driver as MySQL driver name!"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename">
             <property name="severity" value="error"/>
