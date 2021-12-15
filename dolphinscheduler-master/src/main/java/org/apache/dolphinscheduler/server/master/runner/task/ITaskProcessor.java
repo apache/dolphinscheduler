@@ -32,7 +32,7 @@ public interface ITaskProcessor {
 
     String getType();
 
-    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval);
+    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger);
 
     ExecutionStatus taskState();
 

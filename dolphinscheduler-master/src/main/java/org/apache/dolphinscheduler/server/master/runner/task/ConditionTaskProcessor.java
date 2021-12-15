@@ -71,7 +71,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     private TaskDefinition taskDefinition;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
@@ -82,7 +82,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
 
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
         Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
@@ -141,7 +141,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),processInstance.getProcessDefinitionCode(),
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
