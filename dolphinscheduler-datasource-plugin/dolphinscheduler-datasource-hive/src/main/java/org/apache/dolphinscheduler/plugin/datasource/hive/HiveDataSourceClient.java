@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.hive;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
@@ -90,7 +91,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
     private void checkKerberosEnv() {
         String krb5File = PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH);
-        if (StringUtils.isNotBlank(krb5File)) {
+        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        if (kerberosStartupState && StringUtils.isNotBlank(krb5File)) {
             System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
             try {
                 Config.refresh();
