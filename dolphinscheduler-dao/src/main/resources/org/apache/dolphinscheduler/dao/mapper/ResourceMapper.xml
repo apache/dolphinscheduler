@@ -62,13 +62,14 @@
         where d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
             and (
-            <if test="resIds != null and resIds.size() > 0">
-                d.id in
-                <foreach collection="resIds" item="i" open="(" close=") or" separator=",">
-                    #{i}
-                </foreach>
-            </if>
-            d.user_id=#{userId} )
+                    d.user_id=#{userId}
+                    <if test="resIds != null and resIds.size() > 0">
+                        or d.id in
+                        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                            #{i}
+                        </foreach>
+                    </if>
+                )
         </if>
         <if test="searchVal != null and searchVal != ''">
             and d.alias like concat('%', #{searchVal}, '%')
