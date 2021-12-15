@@ -40,14 +40,11 @@ class Database(Task):
     database type and database instance would run this sql.
     """
 
-    _task_custom_attr = {"sql"}
-
     def __init__(
-        self, task_type: str, name: str, datasource_name: str, sql: str, *args, **kwargs
+        self, task_type: str, name: str, datasource_name: str, *args, **kwargs
     ):
         super().__init__(name, task_type, *args, **kwargs)
         self.datasource_name = datasource_name
-        self.sql = sql
         self._datasource = {}
 
     def get_datasource_type(self) -> str:

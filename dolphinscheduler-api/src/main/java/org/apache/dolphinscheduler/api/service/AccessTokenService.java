@@ -52,7 +52,7 @@ public interface AccessTokenService {
      *
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
     Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token);
@@ -82,7 +82,7 @@ public interface AccessTokenService {
      * @param id token id
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return update result code
      */
     Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token);
