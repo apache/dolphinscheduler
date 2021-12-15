@@ -208,7 +208,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param userId token for user
      * @param expireTime token expire time
      * @param token token string (if it is absent, it will be automatically generated)
-     * @return update result code
+     * @return updated access token entity
      */
     @Override
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
@@ -241,6 +241,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         accessTokenMapper.updateById(accessToken);
 
+        result.put(Constants.DATA_LIST, accessToken);
         putMsg(result, Status.SUCCESS);
         return result;
     }
