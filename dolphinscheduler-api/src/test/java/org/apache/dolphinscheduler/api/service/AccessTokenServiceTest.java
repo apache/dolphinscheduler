@@ -152,11 +152,13 @@ public class AccessTokenServiceTest {
         Map<String, Object> result = accessTokenService.updateToken(getLoginUser(), 1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertNotNull(result.get(Constants.DATA_LIST));
 
         // Token is absent
         result = accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE,getDate(),null);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assert.assertNotNull(result.get(Constants.DATA_LIST));
 
         // ACCESS_TOKEN_NOT_EXIST
         result = accessTokenService.updateToken(getLoginUser(), 2,Integer.MAX_VALUE,getDate(),"token");
