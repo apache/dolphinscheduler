@@ -52,14 +52,24 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                           @Param("name") String name);
 
     TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId,
-        @Param("taskCode") Long taskCode);
+                                          @Param("taskCode") Long taskCode);
 
     Integer countTask(@Param("projectCodes") Long[] projectCodes,
                       @Param("taskIds") int[] taskIds);
 
-    List<ExecuteStatusCount> countTaskInstanceStateByUser(@Param("startTime") Date startTime,
-                                                          @Param("endTime") Date endTime,
-                                                          @Param("projectCodes") Long[] projectCodes);
+    /**
+     * Statistics task instance group by given project codes list
+     * <p>
+     * We only need project codes to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCodes Project codes list to filter
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
+                                                                  @Param("endTime") Date endTime,
+                                                                  @Param("projectCodes") Long[] projectCodes);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,
@@ -73,4 +83,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("startTime") Date startTime,
                                                     @Param("endTime") Date endTime
     );
+
+    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,@Param("status") int status);
 }

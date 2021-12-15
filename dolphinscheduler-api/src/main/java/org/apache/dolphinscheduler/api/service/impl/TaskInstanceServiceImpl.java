@@ -29,9 +29,11 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -40,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +73,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     UsersService usersService;
+
+    @Autowired
+    TaskDefinitionMapper taskDefinitionMapper;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -132,12 +138,13 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
-
+        List<Integer> executorIds = taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
+        List<User> users = usersService.queryUser(executorIds);
+        Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, v -> v));
         for (TaskInstance taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.format2Duration(taskInstance.getStartTime(), taskInstance.getEndTime()));
-            User executor = usersService.queryUser(taskInstance.getExecutorId());
-            if (null != executor) {
-                taskInstance.setExecutorName(executor.getUserName());
+            if (userMap.containsKey(taskInstance.getExecutorId())) {
+                taskInstance.setExecutorName(userMap.get(taskInstance.getExecutorId()).getUserName());
             }
         }
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());
@@ -168,6 +175,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
         if (task == null) {
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
+        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
             return result;
         }
 

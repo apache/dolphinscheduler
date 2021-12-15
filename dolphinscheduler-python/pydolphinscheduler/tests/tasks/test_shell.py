@@ -20,14 +20,42 @@
 
 from unittest.mock import patch
 
+import pytest
+
 from pydolphinscheduler.tasks.shell import Shell
 
 
-def test_shell_to_dict():
-    """Test task shell function to_dict."""
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {"command": "test script"},
+            {
+                "rawScript": "test script",
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        )
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_property_task_params(mock_code_version, attr, expect):
+    """Test task shell task property."""
+    task = Shell("test-shell-task-params", **attr)
+    assert expect == task.task_params
+
+
+def test_shell_get_define():
+    """Test task shell function get_define."""
     code = 123
     version = 1
-    name = "test_shell_to_dict"
+    name = "test_shell_get_define"
     command = "echo test shell"
     expect = {
         "code": code,
@@ -58,4 +86,4 @@ def test_shell_to_dict():
         return_value=(code, version),
     ):
         shell = Shell(name, command)
-        assert shell.to_dict() == expect
+        assert shell.get_define() == expect

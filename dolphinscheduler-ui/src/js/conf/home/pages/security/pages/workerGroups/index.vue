@@ -24,7 +24,7 @@
             :title="item ? $t('Edit worker group') : $t('Create worker group')"
             v-if="createWorkerGroupDialog"
             :visible.sync="createWorkerGroupDialog"
-            width="50%">
+            width="auto">
             <m-create-worker :item="item" :worker-address-list="workerAddressList" @onUpdate="onUpdate" @close="close"></m-create-worker>
           </el-dialog>
         </template>

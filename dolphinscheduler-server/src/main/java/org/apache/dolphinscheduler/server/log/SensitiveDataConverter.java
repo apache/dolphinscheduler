@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import static org.apache.dolphinscheduler.common.Constants.STAR;
-
 import org.apache.dolphinscheduler.common.Constants;
 
 import org.apache.commons.lang.StringUtils;
@@ -80,7 +78,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
             String password = matcher.group();
 
-            String maskPassword = StringUtils.repeat(STAR, StringUtils.length(password));
+            String maskPassword = StringUtils.repeat(Constants.STAR, StringUtils.length(password));
 
             matcher.appendReplacement(sb, maskPassword);
         }

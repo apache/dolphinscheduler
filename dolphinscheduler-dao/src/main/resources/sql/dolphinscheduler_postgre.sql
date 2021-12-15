@@ -385,6 +385,7 @@ CREATE TABLE t_ds_task_definition (
   timeout_notify_strategy int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   delay_time int DEFAULT '0' ,
+  task_group_id int DEFAULT NULL,
   resource_ids text ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -416,6 +417,7 @@ CREATE TABLE t_ds_task_definition_log (
   delay_time int DEFAULT '0' ,
   resource_ids text ,
   operator int DEFAULT NULL ,
+  task_group_id int DEFAULT NULL,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -505,7 +507,7 @@ CREATE TABLE t_ds_process_instance (
 ) ;
 
 create index process_instance_index on t_ds_process_instance (process_definition_code,id);
-create index start_time_index on t_ds_process_instance (start_time);
+create index start_time_index on t_ds_process_instance (start_time,end_time);
 
 --
 -- Table structure for table t_ds_project
@@ -713,6 +715,7 @@ CREATE TABLE t_ds_task_instance (
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
+  task_group_id int DEFAULT NULL,
   var_pool text ,
   dry_run int DEFAULT '0' ,
   PRIMARY KEY (id),
@@ -988,4 +991,35 @@ CREATE TABLE t_ds_environment_worker_group_relation (
   update_time timestamp DEFAULT NULL,
   PRIMARY KEY (id) ,
   CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
+);
+
+DROP TABLE IF EXISTS t_ds_task_group_queue;
+CREATE TABLE t_ds_task_group_queue (
+   id serial NOT NULL,
+   task_id      int DEFAULT NULL ,
+   task_name    VARCHAR(100) DEFAULT NULL ,
+   group_id     int DEFAULT NULL ,
+   process_id   int DEFAULT NULL ,
+   priority     int DEFAULT '0' ,
+   status       int DEFAULT '-1' ,
+   force_start  int DEFAULT '0' ,
+   in_queue     int DEFAULT '0' ,
+   create_time  timestamp DEFAULT NULL ,
+   update_time  timestamp DEFAULT NULL ,
+   PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS t_ds_task_group;
+CREATE TABLE t_ds_task_group (
+   id serial NOT NULL,
+   name        varchar(100) DEFAULT NULL ,
+   description varchar(200) DEFAULT NULL ,
+   group_size  int NOT NULL ,
+   use_size    int DEFAULT '0' ,
+   user_id     int DEFAULT NULL ,
+   project_id  int DEFAULT NULL ,
+   status      int DEFAULT '1'  ,
+   create_time timestamp DEFAULT NULL ,
+   update_time timestamp DEFAULT NULL ,
+   PRIMARY KEY(id)
 );

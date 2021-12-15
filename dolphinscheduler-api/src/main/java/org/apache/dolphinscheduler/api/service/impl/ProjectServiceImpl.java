@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -97,20 +97,20 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             project = Project
                     .newBuilder()
                     .name(name)
-                    .code(SnowFlakeUtils.getInstance().nextId())
+                    .code(CodeGenerateUtils.getInstance().genCode())
                     .description(desc)
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())
                     .createTime(now)
                     .updateTime(now)
                     .build();
-        } catch (SnowFlakeException e) {
+        } catch (CodeGenerateException e) {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }
 
         if (projectMapper.insert(project) > 0) {
-            result.put(Constants.DATA_LIST, project.getId());
+            result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
@@ -401,6 +401,31 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    @Override
+    public Map<String, Object> queryAuthorizedUser(User loginUser, Long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 1. check read permission
+        Project project = this.projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
+
+        // 2. query authorized user list
+        List<User> users = this.userMapper.queryAuthedUserListByProjectId(project.getId());
+        result.put(Constants.DATA_LIST, users);
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 

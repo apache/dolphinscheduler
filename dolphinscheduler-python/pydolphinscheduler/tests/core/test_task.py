@@ -21,23 +21,49 @@ from unittest.mock import patch
 
 import pytest
 
-from pydolphinscheduler.core.task import Task, TaskParams, TaskRelation
+from pydolphinscheduler.core.task import Task, TaskRelation
 from tests.testing.task import Task as testTask
 
 
-def test_task_params_to_dict():
-    """Test TaskParams object function to_dict."""
-    raw_script = "test_task_params_to_dict"
-    expect = {
-        "resourceList": [],
-        "localParams": [],
-        "rawScript": raw_script,
-        "dependence": {},
-        "conditionResult": TaskParams.DEFAULT_CONDITION_RESULT,
-        "waitStartTimeout": {},
-    }
-    task_param = TaskParams(raw_script=raw_script)
-    assert task_param.to_dict() == expect
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            dict(),
+            {
+                "localParams": [],
+                "resourceList": [],
+                "dependence": {},
+                "waitStartTimeout": {},
+                "conditionResult": {"successNode": [""], "failedNode": [""]},
+            },
+        ),
+        (
+            {
+                "local_params": ["foo", "bar"],
+                "resource_list": ["foo", "bar"],
+                "dependence": {"foo", "bar"},
+                "wait_start_timeout": {"foo", "bar"},
+                "condition_result": {"foo": ["bar"]},
+            },
+            {
+                "localParams": ["foo", "bar"],
+                "resourceList": ["foo", "bar"],
+                "dependence": {"foo", "bar"},
+                "waitStartTimeout": {"foo", "bar"},
+                "conditionResult": {"foo": ["bar"]},
+            },
+        ),
+    ],
+)
+def test_property_task_params(attr, expect):
+    """Test class task property."""
+    task = testTask(
+        "test-property-task-params",
+        "test-task",
+        **attr,
+    )
+    assert expect == task.task_params
 
 
 def test_task_relation_to_dict():
@@ -56,16 +82,15 @@ def test_task_relation_to_dict():
     task_param = TaskRelation(
         pre_task_code=pre_task_code, post_task_code=post_task_code
     )
-    assert task_param.to_dict() == expect
+    assert task_param.get_define() == expect
 
 
-def test_task_to_dict():
-    """Test Task object function to_dict."""
+def test_task_get_define():
+    """Test Task object function get_define."""
     code = 123
     version = 1
-    name = "test_task_to_dict"
-    task_type = "test_task_to_dict_type"
-    raw_script = "test_task_params_to_dict"
+    name = "test_task_get_define"
+    task_type = "test_task_get_define_type"
     expect = {
         "code": code,
         "name": name,
@@ -76,7 +101,6 @@ def test_task_to_dict():
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "rawScript": raw_script,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
@@ -94,8 +118,8 @@ def test_task_to_dict():
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        task = Task(name=name, task_type=task_type, task_params=TaskParams(raw_script))
-        assert task.to_dict() == expect
+        task = Task(name=name, task_type=task_type)
+        assert task.get_define() == expect
 
 
 @pytest.mark.parametrize("shift", ["<<", ">>"])
@@ -104,13 +128,8 @@ def test_two_tasks_shift(shift: str):
 
     Here we test both `>>` and `<<` bit operator.
     """
-    raw_script = "script"
-    upstream = testTask(
-        name="upstream", task_type=shift, task_params=TaskParams(raw_script)
-    )
-    downstream = testTask(
-        name="downstream", task_type=shift, task_params=TaskParams(raw_script)
-    )
+    upstream = testTask(name="upstream", task_type=shift)
+    downstream = testTask(name="downstream", task_type=shift)
     if shift == "<<":
         downstream << upstream
     elif shift == ">>":
@@ -146,17 +165,10 @@ def test_tasks_list_shift(dep_expr: str, flag: str):
         "downstream": "upstream",
     }
     task_type = "dep_task_and_tasks"
-    raw_script = "script"
-    task = testTask(
-        name="upstream", task_type=task_type, task_params=TaskParams(raw_script)
-    )
+    task = testTask(name="upstream", task_type=task_type)
     tasks = [
-        testTask(
-            name="downstream1", task_type=task_type, task_params=TaskParams(raw_script)
-        ),
-        testTask(
-            name="downstream2", task_type=task_type, task_params=TaskParams(raw_script)
-        ),
+        testTask(name="downstream1", task_type=task_type),
+        testTask(name="downstream2", task_type=task_type),
     ]
 
     # Use build-in function eval to simply test case and reduce duplicate code
