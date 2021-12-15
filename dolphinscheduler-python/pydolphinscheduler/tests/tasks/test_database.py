@@ -55,12 +55,10 @@ def test_get_datasource_detail(mock_datasource, mock_code_version):
                 "task_type": TEST_DATABASE_TASK_TYPE,
                 "name": "test-task-params",
                 "datasource_name": TEST_DATABASE_DATASOURCE_NAME,
-                "sql": TEST_DATABASE_SQL,
             },
             {
                 "type": "MYSQL",
                 "datasource": 1,
-                "sql": TEST_DATABASE_SQL,
                 "localParams": [],
                 "resourceList": [],
                 "dependence": {},
@@ -105,7 +103,6 @@ def test_database_get_define(mock_datasource, mock_code_version):
         "taskParams": {
             "type": "MYSQL",
             "datasource": 1,
-            "sql": TEST_DATABASE_SQL,
             "localParams": [],
             "resourceList": [],
             "dependence": {},
@@ -121,7 +118,5 @@ def test_database_get_define(mock_datasource, mock_code_version):
         "timeoutNotifyStrategy": None,
         "timeout": 0,
     }
-    task = Database(
-        TEST_DATABASE_TASK_TYPE, name, TEST_DATABASE_DATASOURCE_NAME, TEST_DATABASE_SQL
-    )
+    task = Database(TEST_DATABASE_TASK_TYPE, name, TEST_DATABASE_DATASOURCE_NAME)
     assert task.get_define() == expect
