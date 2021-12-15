@@ -15,26 +15,22 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { defineStore } from 'pinia'
+import ThemeState from './types'
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    redirect: { name: 'Login' },
-    component: () => import('@/layouts/content/Content'),
-    children: [
-      {
-        path: '/login',
-        name: 'Login',
-        component: () => import('@/views/login/Login'),
-      },
-    ],
+export const useThemeStore = defineStore({
+  id: 'theme',
+  state: (): ThemeState => ({
+    darkTheme: true,
+  }),
+  getters: {
+    getTheme(): boolean {
+      return this.darkTheme
+    },
   },
-]
-
-const index = createRouter({
-  history: createWebHistory(),
-  routes,
+  actions: {
+    setDarkTheme(): void {
+      this.darkTheme = !this.darkTheme
+    },
+  },
 })
-
-export default index
