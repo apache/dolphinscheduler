@@ -70,7 +70,7 @@ import com.google.common.collect.Lists;
 /**
  * users service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UsersServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceTest.class);
