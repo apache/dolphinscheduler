@@ -66,7 +66,8 @@ class Sql(Database):
         *args,
         **kwargs
     ):
-        super().__init__(TaskType.SQL, name, datasource_name, sql, *args, **kwargs)
+        super().__init__(TaskType.SQL, name, datasource_name, *args, **kwargs)
+        self.sql = sql
         self.pre_statements = pre_statements or []
         self.post_statements = post_statements or []
         self.display_rows = display_rows
