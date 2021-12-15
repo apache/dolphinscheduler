@@ -16,36 +16,19 @@
  */
 
 import { defineComponent } from 'vue'
-import styles from './login.module.scss'
-import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
-import { useThemeStore } from '@/store/theme/theme'
+import { NLayout, NLayoutContent } from 'naive-ui'
 
-const Login = defineComponent({
-  name: 'Login',
-  setup() {
-    const { t, locale } = useI18n()
-    const themeStore = useThemeStore()
-
-    const setTheme = (): void => {
-      themeStore.setDarkTheme()
-    }
-
-    return { t, locale, setTheme }
-  },
+const Content = defineComponent({
+  name: 'Content',
   render() {
     return (
-      <div class={styles.container}>
-        <NButton type='error' onClick={this.setTheme}>
-          {this.t('login.test')} + 切换主题
-        </NButton>
-        <select v-model={this.locale}>
-          <option value='en_US'>en_US</option>
-          <option value='zh_CN'>zh_CN</option>
-        </select>
-      </div>
+      <NLayout>
+        <NLayoutContent>
+          <router-view />
+        </NLayoutContent>
+      </NLayout>
     )
   },
 })
 
-export default Login
+export default Content

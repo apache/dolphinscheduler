@@ -14,27 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    redirect: { name: 'Login' },
-    component: () => import('@/layouts/content/Content'),
-    children: [
-      {
-        path: '/login',
-        name: 'Login',
-        component: () => import('@/views/login/Login'),
-      },
-    ],
+const light = {
+  common: {
+    bodyColor: '#f8f8fc',
   },
-]
+}
 
-const index = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-export default index
+export default light
