@@ -167,7 +167,8 @@ class DependentItem(Base):
         else:
             gateway = launch_gateway()
             try:
-                return gateway.entry_point.getDependentInfo(*self.code_parameter)
+                self._code = gateway.entry_point.getDependentInfo(*self.code_parameter)
+                return self._code
             except Exception:
                 raise PyDSJavaGatewayException("Function get_code_from_gateway error.")
 
