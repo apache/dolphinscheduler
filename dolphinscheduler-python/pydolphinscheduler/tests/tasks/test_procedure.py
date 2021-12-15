@@ -52,10 +52,10 @@ def test_get_datasource_detail(mock_datasource, mock_code_version):
             {
                 "name": "test-procedure-task-params",
                 "datasource_name": TEST_PROCEDURE_DATASOURCE_NAME,
-                "sql": TEST_PROCEDURE_SQL,
+                "method": TEST_PROCEDURE_SQL,
             },
             {
-                "sql": TEST_PROCEDURE_SQL,
+                "method": TEST_PROCEDURE_SQL,
                 "type": "MYSQL",
                 "datasource": 1,
                 "localParams": [],
@@ -102,7 +102,7 @@ def test_sql_get_define(mock_datasource, mock_code_version):
         "taskParams": {
             "type": "MYSQL",
             "datasource": 1,
-            "sql": TEST_PROCEDURE_SQL,
+            "method": TEST_PROCEDURE_SQL,
             "localParams": [],
             "resourceList": [],
             "dependence": {},
