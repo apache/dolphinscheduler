@@ -15,26 +15,8 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+interface ThemeState {
+  darkTheme: boolean
+}
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    redirect: { name: 'Login' },
-    component: () => import('@/layouts/content/Content'),
-    children: [
-      {
-        path: '/login',
-        name: 'Login',
-        component: () => import('@/views/login/Login'),
-      },
-    ],
-  },
-]
-
-const index = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-export default index
+export default ThemeState
