@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
-    @FindBy(id = "btn-create")
+    @FindBy(id = "btnCreateProcess")
     private WebElement buttonCreateProcess;
-    @FindBy(className = "checkbox-select-all")
+    @FindBy(className = "select-all")
     private WebElement checkBoxSelectAll;
     @FindBy(className = "btn-delete-all")
     private WebElement buttonDeleteAll;
@@ -62,7 +62,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         workflowList()
             .stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").equals(workflow))
-            .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
+            .flatMap(it -> it.findElements(By.className("button-publish")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Cannot find publish button in workflow definition"))
@@ -75,7 +75,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         workflowList()
             .stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").equals(workflow))
-            .flatMap(it -> it.findElements(By.className("btn-run")).stream())
+            .flatMap(it -> it.findElements(By.className("button-run")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Cannot find run button in workflow definition"))

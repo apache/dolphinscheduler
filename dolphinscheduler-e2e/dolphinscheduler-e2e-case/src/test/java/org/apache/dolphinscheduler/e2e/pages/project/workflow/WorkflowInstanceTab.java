@@ -36,9 +36,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 public final class WorkflowInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
-    @FindBy(className = "rows")
+    @FindBy(className = "items-workflow-instances")
     private List<WebElement> instanceList;
-    @FindBy(className = "checkbox-select-all")
+    @FindBy(className = "select-all")
     private WebElement checkBoxSelectAll;
     @FindBy(className = "btn-delete-all")
     private WebElement buttonDeleteAll;

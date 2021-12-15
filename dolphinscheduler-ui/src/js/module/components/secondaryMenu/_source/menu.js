@@ -98,7 +98,7 @@ const menu = {
       enabled: true,
       icon: 'el-icon-user-solid',
       children: [],
-      classNames: 'tenant-manage'
+      classNames: 'tab-tenant-manage'
     },
     {
       name: `${i18n.$t('User Manage')}`,
