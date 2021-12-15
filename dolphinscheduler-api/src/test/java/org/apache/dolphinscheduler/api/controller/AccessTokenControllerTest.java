@@ -195,6 +195,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertNotNull(result.getData());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
