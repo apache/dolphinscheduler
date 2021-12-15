@@ -147,16 +147,21 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testUpdateToken() {
-
+        // Given Token
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         Map<String, Object> result = accessTokenService.updateToken(getLoginUser(), 1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        // not exist
+
+        // Token is absent
+        result = accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE,getDate(),null);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ACCESS_TOKEN_NOT_EXIST
         result = accessTokenService.updateToken(getLoginUser(), 2,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
-
     }
 
     private User getLoginUser() {
