@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
@@ -61,10 +62,15 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
 
+    /**
+     * multi-thread filter, avoid handling workflow at the same time
+     */
+    private ConcurrentHashMap<String, WorkflowExecuteThread> multiThreadFilterMap = new ConcurrentHashMap();
+
     @PostConstruct
     private void init() {
         this.setDaemon(true);
-        this.setThreadNamePrefix("Master-Exec-Thread-");
+        this.setThreadNamePrefix("Workflow-Execute-Thread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
     }
@@ -79,19 +85,35 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
-        this.execute(workflowExecuteThread);
+    }
+
+    /**
+     * start workflow
+     */
+    public void startWorkflow(WorkflowExecuteThread workflowExecuteThread) {
+        submit(workflowExecuteThread::startProcess);
     }
 
     /**
      * execute workflow
      */
-    public void execute(WorkflowExecuteThread workflowExecuteThread) {
+    public void executeEvent(WorkflowExecuteThread workflowExecuteThread) {
+        if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
+            return;
+        }
+        if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
+            return;
+        }
         int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
-        ListenableFuture future = this.submitListenable(workflowExecuteThread);
+        ListenableFuture future = this.submitListenable(() -> {
+            workflowExecuteThread.handleEvents();
+            multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
+        });
         future.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
                 logger.error("handle events {} failed", processInstanceId, ex);
+                multiThreadFilterMap.remove(workflowExecuteThread.getKey());
             }
 
             @Override
@@ -101,6 +123,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     logger.info("process instance {} finished.", processInstanceId);
                 }
+                multiThreadFilterMap.remove(workflowExecuteThread.getKey());
             }
         });
     }

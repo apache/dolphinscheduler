@@ -63,6 +63,10 @@ public class MasterSchedulerService extends Thread {
      */
     @Autowired
     private ProcessService processService;
+
+    /**
+     * task processor factory
+     */
     @Autowired
     private TaskProcessorFactory taskProcessorFactory;
 
@@ -179,7 +183,7 @@ public class MasterSchedulerService extends Thread {
             if (processInstance.getTimeout() > 0) {
                 stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
             }
-            workflowExecuteThreadPool.execute(workflowExecuteThread);
+            workflowExecuteThreadPool.startWorkflow(workflowExecuteThread);
         }
     }
 

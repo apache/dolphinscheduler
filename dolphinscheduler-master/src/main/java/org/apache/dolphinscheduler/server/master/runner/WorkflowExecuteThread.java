@@ -96,7 +96,7 @@ import com.google.common.collect.Lists;
 /**
  * master exec thread,split dag
  */
-public class WorkflowExecuteThread implements Runnable {
+public class WorkflowExecuteThread {
 
     /**
      * logger of WorkflowExecuteThread
@@ -245,19 +245,6 @@ public class WorkflowExecuteThread implements Runnable {
         this.taskProcessorFactory = taskProcessorFactory;
     }
 
-    @Override
-    public void run() {
-        try {
-            if (!this.isStart()) {
-                startProcess();
-            } else {
-                handleEvents();
-            }
-        } catch (Exception e) {
-            logger.error("handler error:", e);
-        }
-    }
-
     /**
      * the process start nodes are submitted completely.
      */
@@ -265,9 +252,14 @@ public class WorkflowExecuteThread implements Runnable {
         return this.isStart;
     }
 
-    private void handleEvents() {
+    /**
+     * handle event
+     */
+    public void handleEvents() {
+        if (!isStart) {
+            return;
+        }
         while (!this.stateEvents.isEmpty()) {
-
             try {
                 StateEvent stateEvent = this.stateEvents.peek();
                 if (stateEventHandler(stateEvent)) {
@@ -275,7 +267,6 @@ public class WorkflowExecuteThread implements Runnable {
                 }
             } catch (Exception e) {
                 logger.error("state handle error:", e);
-
             }
         }
     }
@@ -653,13 +644,21 @@ public class WorkflowExecuteThread implements Runnable {
         return false;
     }
 
-    private void startProcess() throws Exception {
-        if (this.taskInstanceMap.size() == 0) {
+    /**
+     * process start handle
+     */
+    public void startProcess() {
+        if (this.taskInstanceMap.size() > 0) {
+            return;
+        }
+        try {
             isStart = false;
             buildFlowDag();
             initTaskQueue();
             submitPostNode(null);
             isStart = true;
+        } catch (Exception e) {
+            logger.error("start process error, process instance id:{}", processInstance.getId(), e);
         }
     }
 
