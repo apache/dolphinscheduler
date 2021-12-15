@@ -193,10 +193,16 @@ public class AccessTokenController extends BaseController {
      * @param id token id
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return update result code
      */
-    @ApiIgnore
+    @ApiOperation(value = "updateToken", notes = "UPDATE_TOKEN_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "TOKEN_ID", required = true, dataType = "Int"),
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int"),
+        @ApiImplicitParam(name = "expireTime", value = "EXPIRE_TIME", required = true, dataType = "String", example = "2021-12-31 00:00:00"),
+        @ApiImplicitParam(name = "token", value = "TOKEN", required = false, dataType = "String", example = "xxxx")
+    })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
@@ -205,7 +211,7 @@ public class AccessTokenController extends BaseController {
                               @PathVariable(value = "id") int id,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
-                              @RequestParam(value = "token") String token) {
+                              @RequestParam(value = "token", required = false) String token) {
 
         Map<String, Object> result = accessTokenService.updateToken(loginUser, id, userId, expireTime, token);
         return returnDataList(result);
