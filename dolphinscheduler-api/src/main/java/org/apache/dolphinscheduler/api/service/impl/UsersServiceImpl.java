@@ -59,7 +59,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -602,7 +601,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // 2. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 
@@ -653,7 +652,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // 3. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 

@@ -15,26 +15,35 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import routes from './routes'
 
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    redirect: { name: 'Login' },
-    component: () => import('@/layouts/content/Content'),
-    children: [
-      {
-        path: '/login',
-        name: 'Login',
-        component: () => import('@/views/login/Login'),
-      },
-    ],
-  },
-]
+// NProgress
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
-const index = createRouter({
+const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
-export default index
+/**
+ * Routing to intercept
+ */
+router.beforeEach(
+  async (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) => {
+    NProgress.start()
+    next()
+    NProgress.done()
+  }
+)
+
+router.afterEach(() => {
+  NProgress.done()
+})
+
+export default router
