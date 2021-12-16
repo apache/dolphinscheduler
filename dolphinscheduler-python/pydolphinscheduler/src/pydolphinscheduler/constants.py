@@ -73,6 +73,7 @@ class TaskType(str):
     SQL = "SQL"
     SUB_PROCESS = "SUB_PROCESS"
     PROCEDURE = "PROCEDURE"
+    DEPENDENT = "DEPENDENT"
 
 
 class DefaultTaskCodeNum(str):
