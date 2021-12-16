@@ -345,7 +345,15 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
+    /**
+     * sleep 1000ms
+     */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * short sleep 100ms
+     */
+    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
 
     /**
      * one second mils
