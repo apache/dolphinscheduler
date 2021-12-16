@@ -100,8 +100,8 @@ class DataX(Task):
         self.target_table = target_table
         self.job_speed_byte = job_speed_byte
         self.job_speed_record = job_speed_record
-        self.pre_statements = pre_statements
-        self.post_statements = post_statements
+        self.pre_statements = pre_statements or []
+        self.post_statements = post_statements or []
         self.xms = xms
         self.xmx = xmx
 
