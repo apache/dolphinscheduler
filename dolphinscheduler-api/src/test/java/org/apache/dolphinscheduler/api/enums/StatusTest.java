@@ -51,6 +51,6 @@ public class StatusTest {
         // SUCCESS
         optional = Status.findStatusBy(10018);
         Assert.assertTrue(optional.isPresent());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, optional.get());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, optional.get());
     }
 }

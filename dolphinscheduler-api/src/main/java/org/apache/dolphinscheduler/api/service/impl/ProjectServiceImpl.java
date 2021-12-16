@@ -166,7 +166,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            putMsg(result, Status.PROJECT_NOT_EXIST);
         } else if (!checkReadPermission(loginUser, project)) {
             // check read permission
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
@@ -180,7 +180,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
         boolean checkResult = false;
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else if (!checkReadPermission(loginUser, project)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
@@ -193,7 +193,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndPerm(User loginUser, Project project, Result result) {
         boolean checkResult = false;
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else if (!checkReadPermission(loginUser, project)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {

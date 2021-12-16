@@ -146,10 +146,10 @@ public class DataAnalysisServiceTest {
 
         // checkProject false
         Map<String, Object> failResult = new HashMap<>();
-        putMsg(failResult, Status.PROJECT_NOT_FOUNT, 1);
+        putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, failResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
     }
 
     @Test
@@ -220,10 +220,10 @@ public class DataAnalysisServiceTest {
 
         //checkProject false
         Map<String, Object> failResult = new HashMap<>();
-        putMsg(failResult, Status.PROJECT_NOT_FOUNT, 1);
+        putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, failResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
