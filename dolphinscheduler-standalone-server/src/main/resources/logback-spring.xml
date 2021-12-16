@@ -26,6 +26,10 @@
         </encoder>
     </appender>
 
+    <logger name="org.apache.zookeeper" level="WARN"/>
+    <logger name="org.apache.hbase" level="WARN"/>
+    <logger name="org.apache.hadoop" level="WARN"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
