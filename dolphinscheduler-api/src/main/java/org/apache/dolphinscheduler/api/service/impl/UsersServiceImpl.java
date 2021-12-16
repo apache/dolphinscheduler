@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -53,12 +52,14 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,7 +119,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
-
     /**
      * create user, only system admin have permission
      *
@@ -174,6 +174,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             HadoopUtils.getInstance().mkdir(userPath);
         }
 
+        result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
 
@@ -322,7 +323,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         if (!isAdmin(loginUser)) {
-            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -342,8 +343,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     *
-     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -474,6 +473,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // updateProcessInstance user
         userMapper.updateById(user);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -521,8 +521,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
-        
+
         userMapper.deleteById(id);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -575,6 +576,90 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCode project code
+     * @return grant result code
+     */
+    @Override
+    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // 1. check if user is existed
+        User tempUser = this.userMapper.selectById(userId);
+        if (tempUser == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 2. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            return result;
+        }
+
+        // 3. only project owner can operate
+        if (!this.hasPerm(loginUser, project.getUserId())) {
+            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // 4. maintain the relationship between project and user
+        final Date today = new Date();
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setUserId(userId);
+        projectUser.setProjectId(project.getId());
+        projectUser.setPerm(7);
+        projectUser.setCreateTime(today);
+        projectUser.setUpdateTime(today);
+        this.projectUserMapper.insert(projectUser);
+
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * revoke the project permission for specified user.
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectCode   Project Code
+     * @return
+     */
+    @Override
+    public Map<String, Object> revokeProject(User loginUser, int userId, long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        // 2. check if user is existed
+        User user = this.userMapper.selectById(userId);
+        if (user == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 3. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            return result;
+        }
+
+        // 4. delete th relationship between project and user
+        this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1066,6 +1151,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
+
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);

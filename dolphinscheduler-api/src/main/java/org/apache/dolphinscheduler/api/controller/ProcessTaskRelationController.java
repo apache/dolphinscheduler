@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_EDGE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.MOVE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
@@ -126,12 +127,22 @@ public class ProcessTaskRelationController extends BaseController {
                                           @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
                                           @RequestParam(name = "targetProcessDefinitionCode", required = true) long targetProcessDefinitionCode,
                                           @RequestParam(name = "taskCode", required = true) long taskCode) {
-        return returnDataList(processTaskRelationService.moveTaskProcessRelation(loginUser, projectCode, processDefinitionCode,
-            targetProcessDefinitionCode, taskCode));
+        Map<String, Object> result = new HashMap<>();
+        if (processDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+        } else if (targetProcessDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "targetProcessDefinitionCode");
+        } else if (taskCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "taskCode");
+        } else {
+            result = processTaskRelationService.moveTaskProcessRelation(loginUser, projectCode, processDefinitionCode,
+                targetProcessDefinitionCode, taskCode);
+        }
+        return returnDataList(result);
     }
 
     /**
-     * delete process task relation
+     * delete process task relation (delete task from workflow)
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -253,4 +264,35 @@ public class ProcessTaskRelationController extends BaseController {
                                           @PathVariable("taskCode") long taskCode) {
         return returnDataList(processTaskRelationService.queryDownstreamRelation(loginUser, projectCode, taskCode));
     }
+
+    /**
+     * delete edge
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processDefinitionCode process definition code
+     * @param preTaskCode pre task code
+     * @param postTaskCode post task code
+     * @return delete result code
+     */
+    @ApiOperation(value = "deleteEdge", notes = "DELETE_EDGE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
+    })
+    @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_EDGE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result deleteEdge(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true)
+                             @PathVariable long projectCode,
+                             @PathVariable long processDefinitionCode,
+                             @PathVariable long preTaskCode,
+                             @PathVariable long postTaskCode) {
+        return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode));
+    }
+
 }

@@ -26,6 +26,7 @@
               size="small"
               v-model="localParamsList[$index].prop"
               :placeholder="$t('prop(required)')"
+              class="input-param-key"
               maxlength="256"
               @blur="_verifProp()"
               :style="inputStyle">
@@ -64,6 +65,7 @@
               size="small"
               v-model="localParamsList[$index].value"
               :placeholder="$t('value(optional)')"
+              class="input-param-val"
               maxlength="256"
               @blur="_handleValue()"
               :style="inputStyle">

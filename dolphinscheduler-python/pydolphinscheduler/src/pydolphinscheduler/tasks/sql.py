@@ -18,11 +18,10 @@
 """Task sql."""
 
 import re
-from typing import Dict, Optional
+from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.task import Task, TaskParams
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.tasks.database import Database
 
 
 class SqlType:
@@ -32,32 +31,7 @@ class SqlType:
     NOT_SELECT = 1
 
 
-class SqlTaskParams(TaskParams):
-    """Parameter only for Sql task type."""
-
-    def __init__(
-        self,
-        type: str,
-        datasource: str,
-        sql: str,
-        sql_type: Optional[int] = SqlType.NOT_SELECT,
-        display_rows: Optional[int] = 10,
-        pre_statements: Optional[str] = None,
-        post_statements: Optional[str] = None,
-        *args,
-        **kwargs
-    ):
-        super().__init__(*args, **kwargs)
-        self.type = type
-        self.datasource = datasource
-        self.sql = sql
-        self.sql_type = sql_type
-        self.display_rows = display_rows
-        self.pre_statements = pre_statements or []
-        self.post_statements = post_statements or []
-
-
-class Sql(Task):
+class Sql(Database):
     """Task SQL object, declare behavior for SQL task to dolphinscheduler.
 
     It should run sql job in multiply sql lik engine, such as:
@@ -73,47 +47,30 @@ class Sql(Task):
     database type and database instance would run this sql.
     """
 
+    _task_custom_attr = {
+        "sql",
+        "sql_type",
+        "pre_statements",
+        "post_statements",
+        "display_rows",
+    }
+
     def __init__(
         self,
         name: str,
         datasource_name: str,
         sql: str,
-        pre_sql: Optional[str] = None,
-        post_sql: Optional[str] = None,
+        pre_statements: Optional[str] = None,
+        post_statements: Optional[str] = None,
         display_rows: Optional[int] = 10,
         *args,
         **kwargs
     ):
-        self._sql = sql
-        self._datasource_name = datasource_name
-        self._datasource = {}
-        task_params = SqlTaskParams(
-            type=self.get_datasource_type(),
-            datasource=self.get_datasource_id(),
-            sql=sql,
-            sql_type=self.sql_type,
-            display_rows=display_rows,
-            pre_statements=pre_sql,
-            post_statements=post_sql,
-        )
-        super().__init__(name, TaskType.SQL, task_params, *args, **kwargs)
-
-    def get_datasource_type(self) -> str:
-        """Get datasource type from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self._datasource_name).get("type")
-
-    def get_datasource_id(self) -> str:
-        """Get datasource id from java gateway, a wrapper for :func:`get_datasource_info`."""
-        return self.get_datasource_info(self._datasource_name).get("id")
-
-    def get_datasource_info(self, name) -> Dict:
-        """Get datasource info from java gateway, contains datasource id, type, name."""
-        if self._datasource:
-            return self._datasource
-        else:
-            gateway = launch_gateway()
-            self._datasource = gateway.entry_point.getDatasourceInfo(name)
-            return self._datasource
+        super().__init__(TaskType.SQL, name, datasource_name, *args, **kwargs)
+        self.sql = sql
+        self.pre_statements = pre_statements or []
+        self.post_statements = post_statements or []
+        self.display_rows = display_rows
 
     @property
     def sql_type(self) -> int:
@@ -122,7 +79,7 @@ class Sql(Task):
             "^(?!(.* |)insert |(.* |)delete |(.* |)drop |(.* |)update |(.* |)alter ).*"
         )
         pattern_select = re.compile(pattern_select_str, re.IGNORECASE)
-        if pattern_select.match(self._sql) is None:
+        if pattern_select.match(self.sql) is None:
             return SqlType.NOT_SELECT
         else:
             return SqlType.SELECT

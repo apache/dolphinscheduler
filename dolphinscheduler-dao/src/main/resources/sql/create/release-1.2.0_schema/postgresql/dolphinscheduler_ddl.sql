@@ -375,6 +375,7 @@ DROP TABLE IF EXISTS t_ds_project;
 CREATE TABLE t_ds_project (
   id int NOT NULL  ,
   name varchar(100) DEFAULT NULL ,
+  code bigint NOT NULL,
   description varchar(200) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   flag int DEFAULT '1' ,

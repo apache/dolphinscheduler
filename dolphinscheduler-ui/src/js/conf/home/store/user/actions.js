@@ -113,7 +113,7 @@ export default {
    */
   deleteToken ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.delete(`access-token/${payload.id}`, payload, res => {
+      io.delete(`access-tokens/${payload.id}`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

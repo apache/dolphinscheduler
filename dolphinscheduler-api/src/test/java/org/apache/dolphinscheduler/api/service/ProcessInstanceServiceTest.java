@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -48,6 +49,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -111,6 +113,8 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     TenantMapper tenantMapper;
+    @Mock
+    TaskDefinitionMapper taskDefinitionMapper;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
         + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -255,6 +259,7 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         putMsg(result, Status.SUCCESS, projectCode);
         ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setProjectCode(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
@@ -347,6 +352,9 @@ public class ProcessInstanceServiceTest {
         taskInstance.setProcessInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(projectCode);
+        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         Map<String, Object> notSubprocessRes = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, notSubprocessRes.get(Constants.STATUS));
 
@@ -410,6 +418,7 @@ public class ProcessInstanceServiceTest {
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setId(1);
         processDefinition.setUserId(1);
+        processDefinition.setProjectCode(projectCode);
         Tenant tenant = getTenant();
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
@@ -497,7 +506,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setScheduleTime(new Date());
         processInstance.setGlobalParams("");
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
-        Map<String, Object> successRes = processInstanceService.viewVariables(1);
+        Map<String, Object> successRes = processInstanceService.viewVariables(1L,1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -522,7 +531,7 @@ public class ProcessInstanceServiceTest {
         when(processService.genDagGraph(Mockito.any(ProcessDefinition.class)))
             .thenReturn(graph);
 
-        Map<String, Object> successRes = processInstanceService.viewGantt(1);
+        Map<String, Object> successRes = processInstanceService.viewGantt(0L, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
