@@ -113,7 +113,7 @@ public class ProjectServiceTest {
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, null, projectCode);
         logger.info(result.toString());
         Status status = (Status) result.get(Constants.STATUS);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result.get(Constants.STATUS));
 
         Project project = getProject();
         //USER_NO_OPERATION_PROJECT_PERM
@@ -131,7 +131,7 @@ public class ProjectServiceTest {
         Map<String, Object> result2 = new HashMap<>();
 
         result2 = projectService.checkProjectAndAuth(loginUser, null, projectCode);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result2.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result2.get(Constants.STATUS));
 
         Project project1 = getProject();
         // USER_NO_OPERATION_PROJECT_PERM
@@ -198,7 +198,7 @@ public class ProjectServiceTest {
         //PROJECT_NOT_FOUNT
         Map<String, Object> result = projectService.deleteProject(loginUser, 11L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result.get(Constants.STATUS));
         loginUser.setId(2);
         //USER_NO_OPERATION_PROJECT_PERM
         result = projectService.deleteProject(loginUser, 1L);
@@ -231,7 +231,7 @@ public class ProjectServiceTest {
         // PROJECT_NOT_FOUNT
         Map<String, Object> result = projectService.update(loginUser, 1L, projectName, "desc", "testUser");
         logger.info(result.toString());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, result.get(Constants.STATUS));
 
         //PROJECT_ALREADY_EXISTS
         result = projectService.update(loginUser, 2L, projectName, "desc", userName);
@@ -283,7 +283,7 @@ public class ProjectServiceTest {
         // Failure 1: PROJECT_NOT_FOUND
         Map<String, Object> result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
         logger.info("FAILURE 1: {}", result.toString());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, result.get(Constants.STATUS));
 
         // Failure 2: USER_NO_OPERATION_PROJECT_PERM
         loginUser.setId(100);

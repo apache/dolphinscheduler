@@ -82,7 +82,7 @@ public class BaseServiceTest {
         baseService.putMsg(result, Status.SUCCESS);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         //has params
-        baseService.putMsg(result, Status.PROJECT_NOT_FOUNT,"test");
+        baseService.putMsg(result, Status.PROJECT_NOT_FOUND,"test");
 
     }
 
@@ -93,7 +93,7 @@ public class BaseServiceTest {
         baseService.putMsg(result, Status.SUCCESS);
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
         //has params
-        baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
+        baseService.putMsg(result,Status.PROJECT_NOT_FOUND,"test");
     }
 
     @Test
