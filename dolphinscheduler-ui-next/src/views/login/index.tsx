@@ -16,13 +16,13 @@
  */
 
 import { defineComponent } from 'vue'
-import styles from './login.module.scss'
+import styles from './index.module.scss'
 import { useI18n } from 'vue-i18n'
 import { NButton } from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
 
 const Login = defineComponent({
-  name: 'Login',
+  name: 'login',
   setup() {
     const { t, locale } = useI18n()
     const themeStore = useThemeStore()
