@@ -357,7 +357,7 @@ public class UsersServiceTest {
         // ERROR: PROJECT_NOT_FOUNT
         result = this.usersService.grantProjectByCode(loginUser, authorizer, 999);
         logger.info(result.toString());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, result.get(Constants.STATUS));
 
         // ERROR: USER_NO_OPERATION_PERM
         loginUser.setId(999);
