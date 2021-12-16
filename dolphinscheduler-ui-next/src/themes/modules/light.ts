@@ -14,18 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { defineStore } from 'pinia'
-
-export const useThemeStore = defineStore({
-  id: 'theme',
-  state: () => ({
-    dartTheme: true,
-  }),
-  getters: {
-    getTheme(): boolean {
-      return this.dartTheme
-    },
+const light = {
+  common: {
+    bodyColor: '#f8f8fc',
   },
-  actions: {},
-})
+}
+
+export default light

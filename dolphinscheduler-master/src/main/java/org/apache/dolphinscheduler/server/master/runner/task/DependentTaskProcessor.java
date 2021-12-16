@@ -81,7 +81,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     boolean allDependentItemFinished;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         this.taskInstance = task;
         this.taskInstance = processService.submitTaskWithRetry(processInstance, task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
@@ -97,7 +97,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());

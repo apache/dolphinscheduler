@@ -15,27 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import type { Component } from 'vue'
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
-/**
- * interface of task processor in master
- */
-public interface ITaskProcessor {
-
-    void run();
-
-    boolean action(TaskAction taskAction);
-
-    String getType();
-
-    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger);
-
-    ExecutionStatus taskState();
-
-    void dispatch(TaskInstance taskInstance, ProcessInstance processInstance);
-
+interface modules extends Object {
+  [key: string]: any
 }
+
+const classification = (modules: modules) => {
+  const components: { [key: string]: Component } = {}
+  // All TSX files under the views folder automatically generate mapping relationship
+  Object.keys(modules).forEach((key: string) => {
+    const nameMatch: string[] | null = key.match(/^\/src\/views\/(.+)\.tsx/)
+
+    if (!nameMatch) {
+      return
+    }
+
+    // If the page is named Index, the parent folder is used as the name
+    const indexMatch: string[] | null = nameMatch[1].match(/(.*)\/Index$/i)
+
+    let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
+
+    ;[name] = name.split('/').splice(-1)
+
+    components[name] = modules[key]
+  })
+  return components
+}
+
+export default classification

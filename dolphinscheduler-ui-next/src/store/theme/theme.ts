@@ -15,27 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import { defineStore } from 'pinia'
+import ThemeState from './types'
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
-/**
- * interface of task processor in master
- */
-public interface ITaskProcessor {
-
-    void run();
-
-    boolean action(TaskAction taskAction);
-
-    String getType();
-
-    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger);
-
-    ExecutionStatus taskState();
-
-    void dispatch(TaskInstance taskInstance, ProcessInstance processInstance);
-
-}
+export const useThemeStore = defineStore({
+  id: 'theme',
+  state: (): ThemeState => ({
+    darkTheme: true,
+  }),
+  getters: {
+    getTheme(): boolean {
+      return this.darkTheme
+    },
+  },
+  actions: {
+    setDarkTheme(): void {
+      this.darkTheme = !this.darkTheme
+    },
+  },
+})
