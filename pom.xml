@@ -868,13 +868,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>ca.vanzyl.maven.plugins</groupId>
-                    <artifactId>provisio-maven-plugin</artifactId>
-                    <version>1.0.4</version>
-                    <extensions>true</extensions>
-                </plugin>
-
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>rpm-maven-plugin</artifactId>
                     <version>${rpm-maven-plugion.version}</version>
@@ -987,11 +980,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>ca.vanzyl.maven.plugins</groupId>
-                <artifactId>provisio-maven-plugin</artifactId>
-                <extensions>true</extensions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
