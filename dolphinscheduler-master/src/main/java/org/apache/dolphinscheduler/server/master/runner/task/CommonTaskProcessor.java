@@ -54,14 +54,14 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     NettyExecutorManager nettyExecutorManager;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTaskWithRetry(processInstance, task, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         int taskGroupId = task.getTaskGroupId();
         if (taskGroupId > 0) {
             boolean acquireTaskGroup = processService.acquireTaskGroup(task.getId(),
@@ -85,7 +85,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
-        this.dispatchTask(taskInstance,processInstance);
+        this.dispatchTask(taskInstance, processInstance);
     }
 
     @Override

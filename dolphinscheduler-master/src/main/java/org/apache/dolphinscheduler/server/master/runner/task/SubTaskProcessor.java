@@ -53,7 +53,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     private StateEventCallbackService stateEventCallbackService;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
+    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         taskDefinition = processService.findTaskDefinition(
                 task.getTaskCode(), task.getTaskDefinitionVersion()
@@ -63,7 +63,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         return true;
     }
 

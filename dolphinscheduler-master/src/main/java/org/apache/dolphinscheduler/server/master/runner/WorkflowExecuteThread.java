@@ -825,7 +825,7 @@ public class WorkflowExecuteThread implements Runnable {
             // package task instance before submit
             processService.packageTaskInstance(taskInstance, processInstance);
 
-            boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getTaskCommitRetryTimes(), masterConfig.getTaskCommitInterval());
+            boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getTaskCommitRetryTimes(), masterConfig.getTaskCommitInterval(), masterConfig.isTaskLogger());
             if (!submit) {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
                         processInstance.getId(), processInstance.getName(),

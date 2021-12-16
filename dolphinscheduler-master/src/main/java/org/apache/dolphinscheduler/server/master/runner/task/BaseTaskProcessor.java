@@ -85,22 +85,16 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     /**
      * pause task, common tasks donot need this.
-     *
-     * @return
      */
     protected abstract boolean pauseTask();
 
     /**
      * kill task, all tasks need to realize this function
-     *
-     * @return
      */
     protected abstract boolean killTask();
 
     /**
      * task timeout process
-     *
-     * @return
      */
     protected abstract boolean taskTimeout();
 
@@ -134,7 +128,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * @return
+     *
      */
     protected boolean pause() {
         if (paused) {
@@ -227,7 +221,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * set master task running logger.
      */
-    public void setTaskExecutionLogger() {
+    public void setTaskExecutionLogger(boolean isTaskLogger) {
+        if (!isTaskLogger) {
+            return;
+        }
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
@@ -240,7 +237,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set procedure task relation
      *
      * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskInstance                  taskInstance
+     * @param taskInstance taskInstance
      */
     private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
         ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
@@ -253,7 +250,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set datax task relation
      *
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskInstance              taskInstance
+     * @param taskInstance taskInstance
      */
     protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
         DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
@@ -278,7 +275,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set sqoop task relation
      *
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskInstance              taskInstance
+     * @param taskInstance taskInstance
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
         SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
@@ -309,7 +306,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set SQL task relation
      *
      * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskInstance            taskInstance
+     * @param taskInstance taskInstance
      */
     private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
         SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
@@ -345,7 +342,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * whehter tenant is null
      *
-     * @param tenant       tenant
+     * @param tenant tenant
      * @param taskInstance taskInstance
      * @return result
      */

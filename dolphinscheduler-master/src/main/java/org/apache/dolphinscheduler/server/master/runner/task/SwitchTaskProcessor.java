@@ -65,8 +65,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private DependResult conditionResult;
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-
+    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
@@ -80,7 +79,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
