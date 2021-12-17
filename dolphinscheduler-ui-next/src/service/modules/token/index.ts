@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+import { axios } from '@/service/service'
+import { ListReq, TokenReq, UserReq, UpdateTokenReq } from './types'
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+export function queryAccessTokenList(params: ListReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+export function createToken(data: TokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'post',
+    data,
+  })
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
+export function queryAccessTokenByUser(params: UserReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
+}
 
-router.afterEach(() => {
-  NProgress.done()
-})
-
-export default router
+export function updateToken(data: UpdateTokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'put',
+    data,
+  })
+}
