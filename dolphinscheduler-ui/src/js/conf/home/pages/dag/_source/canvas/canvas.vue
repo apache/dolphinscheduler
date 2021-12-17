@@ -40,6 +40,8 @@
         />
       </div>
       <context-menu ref="contextMenu" />
+      <!-- tooltip for dag node -->
+      <node-tooltip ref="nodeTooltip" />
     </div>
     <layout-config-modal ref="layoutModal" @submit="format" />
   </div>
@@ -50,6 +52,7 @@
   import { Graph, DataUri } from '@antv/x6'
   import dagTaskbar from './taskbar.vue'
   import contextMenu from './contextMenu.vue'
+  import nodeTooltip from './nodeTooltip.vue'
   import layoutConfigModal, { LAYOUT_TYPE, DEFAULT_LAYOUT_CONFIG } from './layoutConfigModal.vue'
   import {
     NODE,
@@ -102,6 +105,7 @@
     components: {
       dagTaskbar,
       contextMenu,
+      nodeTooltip,
       layoutConfigModal
     },
     computed: {
@@ -261,6 +265,20 @@
         // node double click
         this.graph.on('node:dblclick', ({ cell }) => {
           this.dagChart.openFormModel(Number(cell.id), cell.data.taskType)
+        })
+        this.graph.on('node:mouseover', ({ cell }) => {
+          // issue#7428 display the full name of the node in DAG workflow page when mouseover
+          const node = this.graph.getCellById(cell.id)
+          if (node) {
+            let x = node.position().x
+            let y = node.position().y
+            if (x >= 0) {
+              const { left, top } = this.graph.getScrollbarPosition()
+              const o = this.originalScrollPosition
+              this.$refs.nodeTooltip.show(x + (o.left - left), y + (o.top - top), cell.data.taskName)
+            }
+            // FIXME when x < 0 , the position of the node tooltip is dislocation, the similar issue has been found on the context-menu
+          }
         })
         // create edge label
         this.graph.on('edge:dblclick', ({ cell }) => {
