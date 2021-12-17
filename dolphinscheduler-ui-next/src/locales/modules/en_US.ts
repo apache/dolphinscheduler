@@ -17,10 +17,10 @@
 
 const login = {
   test: 'Test',
-  username: 'Username',
-  username_tips: 'Please enter your username',
-  password: 'Password',
-  password_tips: 'Please enter your password',
+  userName: 'Username',
+  userName_tips: 'Please enter your username',
+  userPassword: 'Password',
+  userPassword_tips: 'Please enter your password',
   signin: 'Sign In',
 }
 

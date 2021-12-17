@@ -18,7 +18,6 @@
 import {
   createRouter,
   createWebHistory,
-  RouteRecordRaw,
   NavigationGuardNext,
   RouteLocationNormalized,
 } from 'vue-router'
