@@ -130,7 +130,7 @@ public class DataAnalysisServiceTest {
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         //SUCCESS
-        Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(DateUtils.getScheduleDate(startDate),
+        Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
         Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
         Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any())).thenReturn(true);
@@ -146,10 +146,10 @@ public class DataAnalysisServiceTest {
 
         // checkProject false
         Map<String, Object> failResult = new HashMap<>();
-        putMsg(failResult, Status.PROJECT_NOT_FOUNT, 1);
+        putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, failResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
     }
 
     @Test
@@ -187,7 +187,7 @@ public class DataAnalysisServiceTest {
 
         // when general user doesn't have any task then return all count are 0
         user.setUserType(UserType.GENERAL_USER);
-        Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any())).thenReturn(
+        Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any())).thenReturn(
                 Collections.emptyList());
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
         assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").isEqualTo(0);
@@ -206,7 +206,7 @@ public class DataAnalysisServiceTest {
 
         // when instanceStateCounter return null, then return nothing
         user.setUserType(UserType.GENERAL_USER);
-        PowerMockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any())).thenReturn(null);
+        PowerMockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any())).thenReturn(null);
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
         Assert.assertNull(result.get(Constants.DATA_LIST));
     }
@@ -220,17 +220,17 @@ public class DataAnalysisServiceTest {
 
         //checkProject false
         Map<String, Object> failResult = new HashMap<>();
-        putMsg(failResult, Status.PROJECT_NOT_FOUNT, 1);
+        putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, failResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(result);
 
         //SUCCESS
-        Mockito.when(processInstanceMapper.countInstanceStateByUser(DateUtils.getScheduleDate(startDate),
+        Mockito.when(processInstanceMapper.countInstanceStateByProjectCodes(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
         Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any())).thenReturn(true);
 
@@ -246,8 +246,8 @@ public class DataAnalysisServiceTest {
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(result);
 
-        Mockito.when(processDefinitionMapper.countDefinitionGroupByUser(Mockito.anyInt(), Mockito.any(Long[].class),
-            Mockito.anyBoolean())).thenReturn(new ArrayList<DefinitionGroupByUser>());
+        Mockito.when(processDefinitionMapper.countDefinitionByProjectCodes(
+            Mockito.any(Long[].class))).thenReturn(new ArrayList<DefinitionGroupByUser>());
         result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }

@@ -61,7 +61,7 @@ public class CacheNotifyServiceTest {
     public void testNotifyMaster() {
         User user1 = new User();
         user1.setId(100);
-        Command cacheExpireCommand = new CacheExpireCommand(CacheType.USER, user1).convert2Command();
+        Command cacheExpireCommand = new CacheExpireCommand(CacheType.USER, "100").convert2Command();
 
         NettyServerConfig serverConfig = new NettyServerConfig();
 

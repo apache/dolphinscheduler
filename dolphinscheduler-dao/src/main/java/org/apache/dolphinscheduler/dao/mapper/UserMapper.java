@@ -52,7 +52,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * update
      */
-    @CacheEvict
+    @CacheEvict(key = "#p0.id")
     int updateById(@Param("et") User user);
 
     /**
@@ -165,6 +165,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query authed user list by projectId
+     *
      * @param projectId projectId
      * @return user list
      */

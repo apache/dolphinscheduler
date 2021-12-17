@@ -46,7 +46,7 @@ public enum Status {
     DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
     DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
     TENANT_NOT_EXIST(10017, "tenant not exists", "租户不存在"),
-    PROJECT_NOT_FOUNT(10018, "project {0} not found ", "项目[{0}]不存在"),
+    PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
     PROJECT_ALREADY_EXISTS(10019, "project {0} already exists", "项目名称[{0}]已存在"),
     TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
     TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE(10021, "task instance {0} is not sub process instance", "任务实例[{0}]不是子流程实例"),
@@ -214,6 +214,7 @@ public enum Status {
     CURRENT_LOGIN_USER_TENANT_NOT_EXIST(10181, "the tenant of the currently login user is not specified", "未指定当前登录用户的租户"),
     REVOKE_PROJECT_ERROR(10182, "revoke project error", "撤销项目授权错误"),
     QUERY_AUTHORIZED_USER(10183, "query authorized user error", "查询拥有项目权限的用户错误"),
+    PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -286,8 +287,8 @@ public enum Status {
     MOVE_PROCESS_TASK_RELATION_ERROR(50047, "move process task relation error", "移动任务到其他工作流错误"),
     DELETE_TASK_PROCESS_RELATION_ERROR(50048, "delete process task relation error", "删除工作流任务关系错误"),
     QUERY_TASK_PROCESS_RELATION_ERROR(50049, "query process task relation error", "查询工作流任务关系错误"),
-    TASK_DEFINE_STATE_ONLINE(50050, "task definition {0} is already on line", "任务定义[{0}]已上线"),
-    TASK_HAS_DOWNSTREAM(50051, "Task [{0}] exists downstream dependence", "任务[{0}]存在下游依赖"),
+    TASK_DEFINE_STATE_ONLINE(50050, "task definition [{0}] is already on line", "任务定义[{0}]已上线"),
+    TASK_HAS_DOWNSTREAM(50051, "Task exists downstream [{0}] dependence", "任务存在下游[{0}]依赖"),
     TASK_HAS_UPSTREAM(50052, "Task [{0}] exists upstream dependence", "任务[{0}]存在上游依赖"),
     MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
     PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
@@ -305,6 +306,7 @@ public enum Status {
     UPDATE_ACCESS_TOKEN_ERROR(70013, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(70014, "delete access token error", "删除访问token错误"),
     ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist", "访问token不存在"),
+    QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
 
 
     COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
