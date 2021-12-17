@@ -150,6 +150,14 @@
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
+        <name>fs.s3a.path.style.access</name>
+        <value>false</value>
+        <description>
+            s3 need，s3 path style access
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
         <name>kerberos.expire.time</name>
         <value>7</value>
         <description></description>

@@ -309,6 +309,28 @@
           ]
         },
         {
+          "config": "dolphin-common/fs.s3a.path.style.access",
+          "subsection-name": "dynamic-row1-col1",
+          "depends-on": [
+            {
+              "configs":[
+                "dolphin-common/resource.storage.type"
+              ],
+              "if": "${dolphin-common/resource.storage.type} === S3",
+              "then": {
+                "property_value_attributes": {
+                  "visible": true
+                }
+              },
+              "else": {
+                "property_value_attributes": {
+                  "visible": false
+                }
+              }
+            }
+          ]
+        },
+        {
           "config": "dolphin-common/hadoop.security.authentication.startup.state",
           "subsection-name": "dynamic-row1-col2"
         },
@@ -594,6 +616,12 @@
         "config": "dolphin-common/fs.s3a.secret.key",
         "widget": {
           "type": "text-field"
+        }
+      },
+      {
+        "config": "dolphin-common/fs.s3a.path.style.access",
+        "widget": {
+          "type": "toggle"
         }
       },
       {
