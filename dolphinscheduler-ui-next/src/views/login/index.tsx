@@ -21,31 +21,32 @@ import { useI18n } from 'vue-i18n'
 import { NInput, NButton, NSwitch, NForm, NFormItem, FormRules } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
+import { queryLog } from '@/service/modules/login'
 
-const Login = defineComponent({
+const login = defineComponent({
   name: 'login',
   setup() {
     const { t, locale } = useI18n()
     const state = reactive({
       loginFormRef: ref(),
       loginForm: {
-        username: '',
-        password: '',
+        userName: '',
+        userPassword: '',
       },
       rules: {
-        username: {
+        userName: {
           trigger: ['input', 'blur'],
           validator() {
-            if (state.loginForm.username === '') {
-              return new Error(`${t('login.username_tips')}`)
+            if (state.loginForm.userName === '') {
+              return new Error(`${t('login.userName_tips')}`)
             }
           },
         },
-        password: {
+        userPassword: {
           trigger: ['input', 'blur'],
           validator() {
-            if (state.loginForm.password === '') {
-              return new Error(`${t('login.password_tips')}`)
+            if (state.loginForm.userPassword === '') {
+              return new Error(`${t('login.userPassword_tips')}`)
             }
           },
         },
@@ -60,7 +61,10 @@ const Login = defineComponent({
     const handleLogin = () => {
       state.loginFormRef.validate((valid: any) => {
         if (!valid) {
-          router.push({ path: 'home' })
+          queryLog({...state.loginForm}).then((res: Response) => {
+            console.log('res', res)
+            router.push({ path: 'home' })
+          })
         } else {
           console.log('Invalid')
         }
@@ -91,29 +95,29 @@ const Login = defineComponent({
           <div class={styles['form-model']}>
             <NForm rules={this.rules} ref='loginFormRef'>
               <NFormItem
-                label={this.t('login.username')}
+                label={this.t('login.userName')}
                 label-style={{ color: 'black' }}
-                path='username'
+                path='userName'
               >
                 <NInput
                   type='text'
                   size='large'
-                  v-model={[this.loginForm.username, 'value']}
-                  placeholder={this.t('login.username_tips')}
+                  v-model={[this.loginForm.userName, 'value']}
+                  placeholder={this.t('login.userName_tips')}
                   autofocus
                   onKeydown={withKeys(this.handleLogin, ['enter'])}
                 />
               </NFormItem>
               <NFormItem
-                label={this.t('login.password')}
+                label={this.t('login.userPassword')}
                 label-style={{ color: 'black' }}
-                path='password'
+                path='userPassword'
               >
                 <NInput
                   type='password'
                   size='large'
-                  v-model={[this.loginForm.password, 'value']}
-                  placeholder={this.t('login.password_tips')}
+                  v-model={[this.loginForm.userPassword, 'value']}
+                  placeholder={this.t('login.userPassword_tips')}
                   onKeydown={withKeys(this.handleLogin, ['enter'])}
                 />
               </NFormItem>
@@ -128,4 +132,4 @@ const Login = defineComponent({
   },
 })
 
-export default Login
+export default login
