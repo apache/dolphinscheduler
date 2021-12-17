@@ -767,9 +767,13 @@ export default {
   workflowPublishStatus: '工作流上线状态',
   schedulePublishStatus: '定时状态',
   'Audit Log': '审计日志',
-  'Audit Type': '审计类型',
-  'All Types': '所有审计类型',
+  'Resource Type': '资源类型',
+  'All Types': '所有类型',
   'All Operations': '所有操作',
   'User Audit': '用户管理审计',
-  'Project Audit': '项目管理审计'
+  'Project Audit': '项目管理审计',
+  'Create Operation': '创建',
+  'Update Operation': '更新',
+  'Delete Operation': '删除',
+  'Read Operation': "读取"
 }

@@ -766,10 +766,14 @@ export default {
   workflowPublishStatus: 'Workflow Publish Status',
   schedulePublishStatus: 'Schedule Publish Status',
   'Audit Log': 'Audit Log',
-  'Audit Type': 'audit type',
-  'All Types': 'all audit types',
+  'Resource Type': 'resource type',
+  'All Types': 'all types',
   'All Modules': 'all modules',
   'All Operations': 'all operations',
   'User Audit': 'user management audit',
-  'Project Audit': 'project management audit'
+  'Project Audit': 'project management audit',
+  'Create Operation': 'create',
+  'Update Operation': 'update',
+  'Delete Operation': 'delete',
+  'Read Operation': "read"
 }

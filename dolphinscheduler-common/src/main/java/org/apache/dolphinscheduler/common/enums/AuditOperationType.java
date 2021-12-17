@@ -26,8 +26,8 @@ public enum AuditOperationType {
 
     CREATE(0, "CREATE"),
     READ(1, "READ"),
-    UPDATE(3, "UPDATE"),
-    DELETE(4, "DELETE");
+    UPDATE(2, "UPDATE"),
+    DELETE(3, "DELETE");
 
     private final int code;
     private final String enMsg;

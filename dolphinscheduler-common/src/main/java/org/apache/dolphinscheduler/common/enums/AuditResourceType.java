@@ -24,9 +24,8 @@ import java.util.HashMap;
  */
 public enum AuditResourceType {
     // TODO: add other audit resource enums
-    DEFAULT(0, "DEFAULT"),
-    USER_MODULE(1, "USER"),
-    PROJECT_MODULE(2, "PROJECT");
+    USER_MODULE(0, "USER"),
+    PROJECT_MODULE(1, "PROJECT");
 
     private final int code;
     private final String enMsg;

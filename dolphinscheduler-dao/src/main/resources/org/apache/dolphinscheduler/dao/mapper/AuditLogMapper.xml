@@ -39,7 +39,7 @@
             and log.time > #{startDate} and log.time <![CDATA[ <=]]> #{endDate}
         </if>
         <if test="resourceType != null and resourceType.length > 0">
-            and log.module in
+            and log.resource_type in
             <foreach collection="resourceType" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>

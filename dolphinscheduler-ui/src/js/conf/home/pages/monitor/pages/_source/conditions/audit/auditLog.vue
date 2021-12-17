@@ -33,22 +33,26 @@
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </div>
-      <el-select style="width: 140px;" @change="_onChangeResource" :value="searchParams.resourceType" :placeholder="$t('Audit Type')" size="mini">
-        <el-option
-          v-for="module in resourceTypeList"
-          :key="module.label"
-          :value="module.code"
-          :label="module.label">
-        </el-option>
-      </el-select>
-      <el-select style="width: 140px;" @change="_onChangeOperation" :value="searchParams.operationType" :placeholder="$t('Operation')" size="mini">
-        <el-option
-          v-for="operation in operationTypeList"
-          :key="operation.label"
-          :value="operation.code"
-          :label="operation.label">
-        </el-option>
-      </el-select>
+      <div class="list">
+        <el-select style="width: 140px;" @change="_onChangeResource" :value="searchParams.resourceType" :placeholder="$t('Resource Type')" size="mini">
+          <el-option
+            v-for="module in resourceTypeList"
+            :key="module.label"
+            :value="module.code"
+            :label="module.label">
+          </el-option>
+        </el-select>
+      </div>
+      <div class="list">
+        <el-select style="width: 140px;" @change="_onChangeOperation" :value="searchParams.operationType" :placeholder="$t('Operation')" size="mini">
+          <el-option
+            v-for="operation in operationTypeList"
+            :key="operation.label"
+            :value="operation.code"
+            :label="operation.label">
+          </el-option>
+        </el-select>
+      </div>
       <div class="list">
         <el-input v-model="searchParams.userName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('User Name')"></el-input>
       </div>
@@ -74,7 +78,7 @@
           // start date
           startDate: '',
           // end date
-          endDate: '',
+          endDate: ''
         },
         dataTime: []
       }

@@ -131,6 +131,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperation()).getMsg());
         auditDto.setUserName(auditLog.getUserName());
         auditDto.setResourceName(auditLogMapper.queryResourceNameByType(resourceType, auditLog.getResourceId()));
+        auditDto.setTime(auditLog.getTime());
         return auditDto;
     }
 }

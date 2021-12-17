@@ -23,12 +23,12 @@ import i18n from '@/module/i18n'
 const resourceType = [
   {
     code: '',
-    label: `${i18n.$t('Audit Type')}`
+    label: `${i18n.$t('Resource Type')}`
   }, {
-    code: 'USER',
+    code: 'USER_MODULE',
     label: `${i18n.$t('User Audit')}`
   }, {
-    code: 'PROJECT',
+    code: 'PROJECT_MODULE',
     label: `${i18n.$t('Project Audit')}`
   }
 ]
@@ -42,16 +42,16 @@ const operationType = [
     label: `${i18n.$t('All Operations')}`
   }, {
     code: 'CREATE',
-    label: `${i18n.$t('Create')}`
+    label: `${i18n.$t('Create Operation')}`
   }, {
     code: 'UPDATE',
-    label: `${i18n.$t('Update')}`
+    label: `${i18n.$t('Update Operation')}`
   }, {
     code: 'DELETE',
-    label: `${i18n.$t('Delete')}`
+    label: `${i18n.$t('Delete Operation')}`
   }, {
     code: 'READ',
-    label: `${i18n.$t('Read')}`
+    label: `${i18n.$t('Read Operation')}`
   }
 ]
 
