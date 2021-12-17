@@ -27,12 +27,15 @@
             <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
           </div>
           <div class="list">
-            <el-input v-model="searchVal"
-                     @keyup.enter="_ckQuery"
-                     size="mini"
-                     :placeholder="$t('Please enter keyword')"
-                     type="text"
-                     style="width:180px;">
+            <el-input
+              v-model="searchVal"
+              @keyup.enter.native="_ckQuery"
+              size="mini"
+              :placeholder="$t('Please enter keyword')"
+              type="text"
+              style="width: 180px"
+              clearable
+            >
             </el-input>
           </div>
         </template>
