@@ -37,6 +37,7 @@
     "sass": "^1.44.0",
     "sass-loader": "^12.4.0",
     "typescript": "^4.4.4",
+    "typescript-plugin-css-modules": "^3.4.0",
     "vite": "^2.7.0",
     "vite-plugin-compression": "^0.3.6",
     "vue-tsc": "^0.28.10"
