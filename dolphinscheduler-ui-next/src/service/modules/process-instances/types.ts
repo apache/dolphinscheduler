@@ -69,3 +69,26 @@ interface LongestReq {
 interface IdReq {
   id: number
 }
+
+interface ProcessInstanceReq {
+  syncDefine: string
+  flag?: string
+  globalParams?: string
+  locations?: string
+  scheduleTime?: string
+  taskDefinitionJson?: string
+  taskRelationJson?: string
+  tenantCode?: string
+  timeout?: string
+}
+
+export {
+  CodeReq,
+  ProcessInstanceListReq,
+  BatchDeleteReq,
+  SubIdReq,
+  TaskReq,
+  LongestReq,
+  IdReq,
+  ProcessInstanceReq
+}
