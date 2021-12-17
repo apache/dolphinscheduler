@@ -101,7 +101,9 @@
 
     <select id="queryDataSourceByNameAndUserId" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
         select
-        <include refid="baseSql"/>
+        ds.id as id,
+        ds.name as name,
+        ds.type as type
         from t_ds_datasource ds
         join t_ds_relation_datasource_user rel
         on ds.id = rel.datasource_id
