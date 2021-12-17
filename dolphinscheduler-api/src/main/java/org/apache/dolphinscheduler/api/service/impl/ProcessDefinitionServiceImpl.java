@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -883,6 +884,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
@@ -890,22 +892,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (index > 0) {
             processDefinitionName = processDefinitionName.substring(0, index);
         }
-        // build process definition
-        Date now = new Date();
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setName(processDefinitionName);
-        processDefinition.setCreateTime(now);
-        processDefinition.setUpdateTime(now);
-        processDefinition.setFlag(Flag.YES);
-        processDefinition.setTenantId(-1);
-        processDefinition.setGlobalParamList(Collections.emptyList());
+        processDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
 
-        DagDataSchedule dagDataSchedule = new DagDataSchedule();
-        dagDataSchedule.setProcessDefinition(processDefinition);
-        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
-        dagDataSchedule.setTaskDefinitionList(taskDefinitionList);
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
-        dagDataSchedule.setProcessTaskRelationList(processTaskRelationList);
+        ProcessDefinition processDefinition;
+        List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
+        List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
 
         // In most cases, there will be only one data source
         Map<String, DataSource> dataSourceCache = new HashMap<>(1);
@@ -913,6 +904,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
         try (ZipInputStream zIn = new ZipInputStream(file.getInputStream());
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
+            // build process definition
+            processDefinition = new ProcessDefinition(projectCode,
+                processDefinitionName,
+                CodeGenerateUtils.getInstance().genCode(),
+                "",
+                "[]", null,
+                0, loginUser.getId(), loginUser.getTenantId());
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
@@ -922,32 +920,41 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     List<String> upstreams = Collections.emptyList();
                     String line;
                     while ((line = bufferedReader.readLine()) != null) {
-                        int commentIndex = line.indexOf("--");
+                        int commentIndex = line.indexOf("-- ");
                         if (commentIndex >= 0) {
                             int colonIndex = line.indexOf(":", commentIndex);
                             if (colonIndex > 0) {
-                                String key = line.substring(commentIndex + 2, colonIndex).trim().toLowerCase();
+                                String key = line.substring(commentIndex + 3, colonIndex).trim().toLowerCase();
                                 String value = line.substring(colonIndex + 1).trim();
                                 switch (key) {
                                     case "name":
                                         taskName = value;
+                                        line = line.substring(0, commentIndex);
                                         break;
                                     case "upstream":
                                         upstreams = Arrays.stream(value.split(",")).map(String::trim)
                                             .filter(s -> !"".equals(s)).collect(Collectors.toList());
+                                        line = line.substring(0, commentIndex);
                                         break;
                                     case "datasource":
                                         datasourceName = value;
+                                        line = line.substring(0, commentIndex);
                                         break;
                                     default:
                                         break;
                                 }
                             }
                         }
-                        sql.append(line).append("\n");
+                        if (!"".equals(line)) {
+                            sql.append(line).append("\n");
+                        }
                     }
                     if (taskName == null) {
-                        taskName = entry.getName().substring(processDefinitionName.length() + 1);
+                        taskName = entry.getName();
+                        index = taskName.indexOf("/");
+                        if (index > 0) {
+                            taskName = taskName.substring(index + 1);
+                        }
                         index = taskName.lastIndexOf(".");
                         if (index > 0) {
                             taskName = taskName.substring(0, index);
@@ -970,13 +977,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
 
                     // build task definition
-                    TaskDefinition taskDefinition = new TaskDefinition();
+                    TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
                     taskDefinition.setName(taskName);
                     taskDefinition.setFlag(Flag.YES);
                     SqlParameters sqlParameters = new SqlParameters();
                     sqlParameters.setType(dataSource.getType().name());
                     sqlParameters.setDatasource(dataSource.getId());
                     sqlParameters.setSql(sql.substring(0, sql.length() - 1));
+                    // it may be a query type, but it can only be determined by parsing SQL
                     sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
                     sqlParameters.setLocalParams(Collections.emptyList());
                     taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
@@ -988,6 +996,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     taskDefinition.setWorkerGroup(DEFAULT_WORKER_GROUP);
                     taskDefinition.setTaskPriority(Priority.MEDIUM);
                     taskDefinition.setEnvironmentCode(-1);
+                    taskDefinition.setTimeout(0);
+                    taskDefinition.setDelayTime(0);
+                    taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+                    taskDefinition.setVersion(0);
                     taskDefinition.setResourceIds("");
 
                     taskDefinitionList.add(taskDefinition);
@@ -997,7 +1009,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
+            putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+            return result;
         }
 
         // build task relation
@@ -1005,24 +1018,29 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<String> upstreams = taskNameToUpstream.get(entry.getKey());
             if (CollectionUtils.isEmpty(upstreams)
                 || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
-                ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+                ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
                 processTaskRelation.setPreTaskCode(0);
+                processTaskRelation.setPreTaskVersion(0);
                 processTaskRelation.setPostTaskCode(entry.getValue());
+                processTaskRelation.setPostTaskVersion(0);
                 processTaskRelation.setConditionType(ConditionType.NONE);
+                processTaskRelation.setName("");
                 processTaskRelationList.add(processTaskRelation);
                 continue;
             }
             for (String upstream : upstreams) {
-                ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+                ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
                 processTaskRelation.setPreTaskCode(taskNameToCode.get(upstream));
+                processTaskRelation.setPreTaskVersion(0);
                 processTaskRelation.setPostTaskCode(entry.getValue());
+                processTaskRelation.setPostTaskVersion(0);
                 processTaskRelation.setConditionType(ConditionType.NONE);
+                processTaskRelation.setName("");
                 processTaskRelationList.add(processTaskRelation);
             }
         }
 
-        checkAndImport(loginUser, projectCode, result, dagDataSchedule);
-        return result;
+        return createDagDefine(loginUser, processTaskRelationList, processDefinition, taskDefinitionList);
     }
 
     /**

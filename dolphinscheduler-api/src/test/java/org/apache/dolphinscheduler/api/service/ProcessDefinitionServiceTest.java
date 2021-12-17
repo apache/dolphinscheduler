@@ -44,8 +44,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -124,12 +122,6 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private DataSourceMapper dataSourceMapper;
-
-    @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -671,7 +663,9 @@ public class ProcessDefinitionServiceTest {
         int userId = 10;
         User loginUser = Mockito.mock(User.class);
         Mockito.when(loginUser.getId()).thenReturn(userId);
-        
+        Mockito.when(loginUser.getTenantId()).thenReturn(2);
+        Mockito.when(loginUser.getUserType()).thenReturn(UserType.GENERAL_USER);
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream outputStream = new ZipOutputStream(byteArrayOutputStream);
         outputStream.putNextEntry(new ZipEntry("import_sql/"));
@@ -681,6 +675,7 @@ public class ProcessDefinitionServiceTest {
 
         outputStream.putNextEntry(new ZipEntry("import_sql/b.sql"));
         outputStream.write("-- name: start_auto_dag\n-- datasource: mysql_1\nselect 1;".getBytes(StandardCharsets.UTF_8));
+
         outputStream.close();
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("import_sql.zip", byteArrayOutputStream.toByteArray());
@@ -691,18 +686,13 @@ public class ProcessDefinitionServiceTest {
 
         Mockito.when(dataSourceMapper.queryDataSourceByNameAndUserId(userId, "mysql_1")).thenReturn(dataSource);
 
-        Project project = Mockito.mock(Project.class);
-        Mockito.when(projectMapper.queryByCode(1001L)).thenReturn(project);
+        long projectCode =  1001;
+        Mockito.when(processService.saveTaskDefine(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.notNull())).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(Mockito.same(loginUser), Mockito.notNull(), Mockito.notNull())).thenReturn(1);
+        Mockito.when(processService.saveTaskRelation(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.anyLong(),
+            Mockito.eq(1), Mockito.notNull(), Mockito.notNull())).thenReturn(0);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, 1001L)).thenReturn(result);
-
-        Mockito.when(taskDefinitionMapper.batchInsert(Mockito.any())).thenReturn(2);
-        Mockito.when(taskDefinitionLogMapper.batchInsert(Mockito.any())).thenReturn(2);
-        Mockito.when(processService.saveProcessDefine(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(1);
-
-        result = processDefinitionService.importSqlProcessDefinition(loginUser, 1001L, mockMultipartFile);
+        Map<String, Object> result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
     }
