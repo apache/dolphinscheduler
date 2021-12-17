@@ -15,41 +15,40 @@
  * limitations under the License.
  */
 
+import { axios } from '@/service/service'
 import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+  ExecuteReq,
+  ProjectCodeReq,
+  ProcessDefinitionCodeReq,
+  ProcessInstanceReq,
+} from './types'
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+export function execute(data: ExecuteReq, code: ProjectCodeReq): any {
+  return axios({
+    url: `/projects/${code}/executors/execute`,
+    method: 'post',
+    data,
+  })
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+export function startCheckProcessDefinition(
+  data: ProcessDefinitionCodeReq,
+  code: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${code}/executors/start-check`,
+    method: 'post',
+    data,
+  })
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
-
-router.afterEach(() => {
-  NProgress.done()
-})
-
-export default router
+export function startProcessInstance(
+  data: ProcessInstanceReq,
+  code: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${code}/executors/start-process-instance`,
+    method: 'post',
+    data,
+  })
+}

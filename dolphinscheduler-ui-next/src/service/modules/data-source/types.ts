@@ -15,41 +15,55 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+type DataBase =
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
+  | 'PRESTO'
+  | 'H2'
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+interface DataSource {
+  database?: string
+  host?: string
+  id?: number
+  name?: string
+  note?: string
+  other?: object
+  password?: string
+  port?: number
+  type?: DataBase
+  userName?: string
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
+interface DataSourceReq {
+  dataSourceParam: DataSource
+}
 
-router.afterEach(() => {
-  NProgress.done()
-})
+interface UserIdReq {
+  userId: number
+}
 
-export default router
+interface TypeReq {
+  type: DataBase
+}
+
+interface NameReq {
+  name: string
+}
+
+interface IdReq {
+  id: number
+}
+
+export { ListReq, DataSourceReq, UserIdReq, TypeReq, NameReq, IdReq }

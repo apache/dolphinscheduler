@@ -15,41 +15,25 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+import { axios } from '@/service/service'
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+export function queryDatabaseState(): any {
+  return axios({
+    url: '/monitor/databases',
+    method: 'get',
+  })
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+export function listMaster(): any {
+  return axios({
+    url: '/monitor/masters',
+    method: 'get',
+  })
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
-
-router.afterEach(() => {
-  NProgress.done()
-})
-
-export default router
+export function listWorker(): any {
+  return axios({
+    url: '/monitor/workers',
+    method: 'get',
+  })
+}

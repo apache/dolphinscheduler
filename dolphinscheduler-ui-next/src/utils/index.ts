@@ -18,7 +18,7 @@
 import classification from './classification'
 
 const utils = {
-  classification
+  classification,
 }
 
 export default utils

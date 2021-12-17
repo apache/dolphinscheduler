@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+interface TokenReq {
+  expireTime: string
+  userId: number
+  token?: string
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+interface UserReq {
+  userId?: number
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
+interface UpdateTokenReq extends TokenReq {
+  id: number
+  alertGroup?: string
+  createTime?: string
+  email?: string
+  phone?: string
+  queue?: string
+  queueName?: string
+  state?: number
+  tenantCode?: string
+  tenantId?: number
+  updateTime?: string
+  userName?: string
+  userPassword?: string
+  userType?: string
+}
 
-router.afterEach(() => {
-  NProgress.done()
-})
-
-export default router
+export { ListReq, TokenReq, UserReq, UpdateTokenReq }

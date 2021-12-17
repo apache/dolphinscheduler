@@ -18,7 +18,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
 const baseRequestConfig: AxiosRequestConfig = {
-  baseURL: '/',
+  baseURL: '/dolphinscheduler',
   timeout: 10000,
 }
 

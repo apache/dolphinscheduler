@@ -44,12 +44,12 @@ const basePage: RouteRecordRaw[] = [
 /**
  * Login page
  */
- const loginPage: RouteRecordRaw[] = [
+const loginPage: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: components['login']
-  }
+    component: components['login'],
+  },
 ]
 
 const routes: RouteRecordRaw[] = [...basePage, ...loginPage]
