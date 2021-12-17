@@ -23,13 +23,7 @@ import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 public class ShellTaskChannel implements TaskChannel {
 
     @Override
-    public void cancelApplication(boolean status) {
-
-    }
-
-    @Override
     public ShellTask createTask(TaskRequest taskRequest) {
         return new ShellTask(taskRequest);
     }
-
 }

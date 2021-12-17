@@ -22,14 +22,9 @@ import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class SqlTaskChannel implements TaskChannel {
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
 
     @Override
     public AbstractTask createTask(TaskRequest taskRequest) {
         return new SqlTask(taskRequest);
     }
-
 }

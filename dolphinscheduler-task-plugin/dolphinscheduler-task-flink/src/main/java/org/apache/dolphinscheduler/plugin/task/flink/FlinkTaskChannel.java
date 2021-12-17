@@ -21,10 +21,6 @@ import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public class FlinkTaskChannel implements TaskChannel {
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
 
     @Override
     public FlinkTask createTask(TaskRequest taskRequest) {

@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
 public interface TaskChannel {
 
-    void cancelApplication(boolean status);
+    default void cancelApplication(boolean status) {}
 
     AbstractTask createTask(TaskRequest taskRequest);
-
 }
