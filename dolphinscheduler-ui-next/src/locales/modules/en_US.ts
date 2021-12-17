@@ -21,7 +21,7 @@ const login = {
   username_tips: 'Please enter your username',
   password: 'Password',
   password_tips: 'Please enter your password',
-  signin: 'Sign In'
+  signin: 'Sign In',
 }
 
 export default {
