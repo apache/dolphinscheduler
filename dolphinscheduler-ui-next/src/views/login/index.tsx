@@ -35,21 +35,21 @@ const Login = defineComponent({
       rules: {
         username: {
           trigger: ['input', 'blur'],
-          validator () {
+          validator() {
             if (state.loginForm.username === '') {
               return new Error(`${t('login.username_tips')}`)
             }
-          }
+          },
         },
         password: {
           trigger: ['input', 'blur'],
-          validator () {
+          validator() {
             if (state.loginForm.password === '') {
               return new Error(`${t('login.password_tips')}`)
             }
-          }
-        }
-      } as FormRules
+          },
+        },
+      } as FormRules,
     })
 
     const handleChange = (value: string) => {
@@ -67,16 +67,20 @@ const Login = defineComponent({
       })
     }
 
-    return { t, locale, handleChange, handleLogin, ...toRefs(state)}
+    return { t, locale, handleChange, handleLogin, ...toRefs(state) }
   },
   render() {
     return (
       <div class={styles.container}>
         <div class={styles['language-switch']}>
-          <NSwitch onUpdateValue={this.handleChange} checked-value="en_US" unchecked-value="zh_CN">
+          <NSwitch
+            onUpdateValue={this.handleChange}
+            checked-value='en_US'
+            unchecked-value='zh_CN'
+          >
             {{
-              checked: () => 'en_US', 
-              unchecked: () =>'zh_CN'
+              checked: () => 'en_US',
+              unchecked: () => 'zh_CN',
             }}
           </NSwitch>
         </div>
@@ -85,28 +89,36 @@ const Login = defineComponent({
             <div class={styles['logo-img']}></div>
           </div>
           <div class={styles['form-model']}>
-            <NForm rules={this.rules} ref="loginFormRef">
-              <NFormItem label={this.t('login.username')} label-style={{color:'black'}} path="username">
+            <NForm rules={this.rules} ref='loginFormRef'>
+              <NFormItem
+                label={this.t('login.username')}
+                label-style={{ color: 'black' }}
+                path='username'
+              >
                 <NInput
-                  type="text"
-                  size="large"
+                  type='text'
+                  size='large'
                   v-model={[this.loginForm.username, 'value']}
                   placeholder={this.t('login.username_tips')}
                   autofocus
                   onKeydown={withKeys(this.handleLogin, ['enter'])}
                 />
               </NFormItem>
-              <NFormItem label={this.t('login.password')} label-style={{color:'black'}} path="password">
+              <NFormItem
+                label={this.t('login.password')}
+                label-style={{ color: 'black' }}
+                path='password'
+              >
                 <NInput
-                  type="password"
-                  size="large"
+                  type='password'
+                  size='large'
                   v-model={[this.loginForm.password, 'value']}
                   placeholder={this.t('login.password_tips')}
                   onKeydown={withKeys(this.handleLogin, ['enter'])}
                 />
               </NFormItem>
             </NForm>
-            <NButton round type="primary" onClick={this.handleLogin}>
+            <NButton round type='primary' onClick={this.handleLogin}>
               {this.t('login.signin')}
             </NButton>
           </div>

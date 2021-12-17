@@ -19,11 +19,9 @@ import { defineComponent } from 'vue'
 import styles from './index.module.scss'
 
 export default defineComponent({
-    name: 'home',
-    setup() {},
-    render() {
-      return <div class={styles.container}>
-        Home Test
-      </div>
-    }
+  name: 'home',
+  setup() {},
+  render() {
+    return <div class={styles.container}>Home Test</div>
+  },
 })

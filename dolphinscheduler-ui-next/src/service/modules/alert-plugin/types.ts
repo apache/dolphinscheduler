@@ -15,41 +15,36 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  RouteRecordRaw,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from 'vue-router'
-import routes from './routes'
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
 
-// NProgress
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+interface PluginInstanceReq {
+  instanceName: string
+  pluginDefineId: number
+  pluginInstanceParams: string
+}
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+interface InstanceNameReq {
+  alertInstanceName: string
+}
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start()
-    next()
-    NProgress.done()
-  }
-)
+interface IdReq {
+  id: number
+}
 
-router.afterEach(() => {
-  NProgress.done()
-})
+interface UpdatePluginInstanceReq {
+  alertPluginInstanceId: number
+  instanceName: string
+  pluginInstanceParams: string
+}
 
-export default router
+export {
+  ListReq,
+  PluginInstanceReq,
+  InstanceNameReq,
+  IdReq,
+  UpdatePluginInstanceReq,
+}
