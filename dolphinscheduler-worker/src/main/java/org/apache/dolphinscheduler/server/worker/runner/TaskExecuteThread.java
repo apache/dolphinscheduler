@@ -379,9 +379,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
         if (taskExecutionContext.getScheduleTime() != null) {
             Date date = taskExecutionContext.getScheduleTime();
-            if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
-                date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
-            }
             String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
             Property p = new Property();
             p.setValue(dateTime);
