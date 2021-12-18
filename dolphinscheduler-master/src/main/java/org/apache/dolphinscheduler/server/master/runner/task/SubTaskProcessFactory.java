@@ -17,24 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.google.auto.service.AutoService;
 
-@Ignore
-public class TaskProcessorFactoryTest {
-
-    @Test
-    public void testFactory() {
-
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType("shell");
-
-        ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
-
-        Assert.assertNotNull(iTaskProcessor);
+@AutoService(ITaskProcessFactory.class)
+public class SubTaskProcessFactory implements ITaskProcessFactory {
+    @Override
+    public String type() {
+        return TaskType.SUB_PROCESS.getDesc();
     }
 
+    @Override
+    public ITaskProcessor create() {
+        return new SubTaskProcessor();
+    }
 }
