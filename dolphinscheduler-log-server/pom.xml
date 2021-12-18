@@ -55,7 +55,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>dolphinscheduler-logger-server</id>
+                        <id>dolphinscheduler-log-server</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
