@@ -78,7 +78,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("Create ugi success.");
 
         super.initClient(baseConnectionParam, dbType);
-        this.oneSessionDataSource = JdbcDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam);
+        this.oneSessionDataSource = JdbcDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
         logger.info("Init {} success.", getClass().getName());
     }
 
