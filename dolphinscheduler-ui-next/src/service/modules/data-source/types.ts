@@ -15,15 +15,55 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+type DataBase =
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
+  | 'PRESTO'
+  | 'H2'
+
+interface DataSource {
+  database?: string
+  host?: string
+  id?: number
+  name?: string
+  note?: string
+  other?: object
+  password?: string
+  port?: number
+  type?: DataBase
+  userName?: string
 }
 
-export default {
-  login,
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
+
+interface DataSourceReq {
+  dataSourceParam: DataSource
+}
+
+interface UserIdReq {
+  userId: number
+}
+
+interface TypeReq {
+  type: DataBase
+}
+
+interface NameReq {
+  name: string
+}
+
+interface IdReq {
+  id: number
+}
+
+export { ListReq, DataSourceReq, UserIdReq, TypeReq, NameReq, IdReq }

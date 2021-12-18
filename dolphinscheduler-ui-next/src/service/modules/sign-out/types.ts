@@ -14,16 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
-}
-
-export default {
-  login,
-}

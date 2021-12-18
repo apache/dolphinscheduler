@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
-export default {
-  login,
+interface GroupNameReq {
+  groupName: string
 }
+
+interface IdReq {
+  id: number
+}
+
+interface GroupReq extends GroupNameReq {
+  alertInstanceIds: string
+  description?: string
+}
+
+export { ListReq, GroupNameReq, IdReq, GroupReq }

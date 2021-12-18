@@ -15,15 +15,9 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface LoginReq {
+  userName: string
+  userPassword: string
 }
 
-export default {
-  login,
-}
+export { LoginReq }

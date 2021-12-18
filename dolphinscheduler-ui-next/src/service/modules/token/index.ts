@@ -15,15 +15,37 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+import { axios } from '@/service/service'
+import { ListReq, TokenReq, UserReq, UpdateTokenReq } from './types'
+
+export function queryAccessTokenList(params: ListReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
 }
 
-export default {
-  login,
+export function createToken(data: TokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'post',
+    data,
+  })
+}
+
+export function queryAccessTokenByUser(params: UserReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
+}
+
+export function updateToken(data: UpdateTokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'put',
+    data,
+  })
 }

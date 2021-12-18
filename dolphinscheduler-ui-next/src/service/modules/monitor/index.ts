@@ -15,15 +15,25 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+import { axios } from '@/service/service'
+
+export function queryDatabaseState(): any {
+  return axios({
+    url: '/monitor/databases',
+    method: 'get',
+  })
 }
 
-export default {
-  login,
+export function listMaster(): any {
+  return axios({
+    url: '/monitor/masters',
+    method: 'get',
+  })
+}
+
+export function listWorker(): any {
+  return axios({
+    url: '/monitor/workers',
+    method: 'get',
+  })
 }

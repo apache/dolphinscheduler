@@ -15,15 +15,21 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+import { axios } from '@/service/service'
+import { IdReq, LogReq } from './types'
+
+export function queryLog(params: LogReq): any {
+  return axios({
+    url: '/log/detail',
+    method: 'get',
+    params,
+  })
 }
 
-export default {
-  login,
+export function downloadTaskLog(params: IdReq): any {
+  return axios({
+    url: '/log/download-log',
+    method: 'get',
+    params,
+  })
 }

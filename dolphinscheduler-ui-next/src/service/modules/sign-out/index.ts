@@ -15,15 +15,11 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
-}
+import { axios } from '@/service/service'
 
-export default {
-  login,
+export function signOut(): any {
+  return axios({
+    url: '/signOut',
+    method: 'post',
+  })
 }

@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface CodeReq {
+  projectCode?: number
 }
 
-export default {
-  login,
+interface StateReq extends CodeReq {
+  endDate?: string
+  startDate?: string
 }
+
+export { CodeReq, StateReq }

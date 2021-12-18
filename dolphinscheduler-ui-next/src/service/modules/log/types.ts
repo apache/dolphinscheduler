@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface IdReq {
+  taskInstanceId: number
 }
 
-export default {
-  login,
+interface LogReq extends IdReq {
+  limit: number
+  skipLineNum: number
 }
+
+export { IdReq, LogReq }

@@ -15,15 +15,37 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
-export default {
-  login,
+interface TokenReq {
+  expireTime: string
+  userId: number
+  token?: string
 }
+
+interface UserReq {
+  userId?: number
+}
+
+interface UpdateTokenReq extends TokenReq {
+  id: number
+  alertGroup?: string
+  createTime?: string
+  email?: string
+  phone?: string
+  queue?: string
+  queueName?: string
+  state?: number
+  tenantCode?: string
+  tenantId?: number
+  updateTime?: string
+  userName?: string
+  userPassword?: string
+  userType?: string
+}
+
+export { ListReq, TokenReq, UserReq, UpdateTokenReq }

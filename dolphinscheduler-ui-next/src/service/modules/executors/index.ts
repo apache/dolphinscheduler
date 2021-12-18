@@ -15,15 +15,40 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+import { axios } from '@/service/service'
+import {
+  ExecuteReq,
+  ProjectCodeReq,
+  ProcessDefinitionCodeReq,
+  ProcessInstanceReq,
+} from './types'
+
+export function execute(data: ExecuteReq, code: ProjectCodeReq): any {
+  return axios({
+    url: `/projects/${code}/executors/execute`,
+    method: 'post',
+    data,
+  })
 }
 
-export default {
-  login,
+export function startCheckProcessDefinition(
+  data: ProcessDefinitionCodeReq,
+  code: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${code}/executors/start-check`,
+    method: 'post',
+    data,
+  })
+}
+
+export function startProcessInstance(
+  data: ProcessInstanceReq,
+  code: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${code}/executors/start-process-instance`,
+    method: 'post',
+    data,
+  })
 }

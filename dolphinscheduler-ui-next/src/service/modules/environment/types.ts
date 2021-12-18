@@ -15,15 +15,35 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface EnvironmentReq {
+  config: string
+  name: string
+  description?: string
+  workerGroups?: string
 }
 
-export default {
-  login,
+interface EnvironmentCodeReq {
+  environmentCode: number
+}
+
+interface EnvironmentNameReq {
+  environmentName: string
+}
+
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
+
+interface CodeReq {
+  code: number
+}
+
+export {
+  EnvironmentReq,
+  EnvironmentCodeReq,
+  EnvironmentNameReq,
+  ListReq,
+  CodeReq,
 }

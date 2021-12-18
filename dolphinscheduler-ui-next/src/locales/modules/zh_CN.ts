@@ -17,11 +17,11 @@
 
 const login = {
   test: '测试',
-  username: '用户名',
-  username_tips: '请输入用户名',
-  password: '密码',
-  password_tips: '请输入密码',
-  signin: '登录'
+  userName: '用户名',
+  userName_tips: '请输入用户名',
+  userPassword: '密码',
+  userPassword_tips: '请输入密码',
+  signin: '登录',
 }
 
 export default {

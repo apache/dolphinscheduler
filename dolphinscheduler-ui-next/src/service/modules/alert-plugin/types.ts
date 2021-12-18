@@ -15,15 +15,36 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
-export default {
-  login,
+interface PluginInstanceReq {
+  instanceName: string
+  pluginDefineId: number
+  pluginInstanceParams: string
+}
+
+interface InstanceNameReq {
+  alertInstanceName: string
+}
+
+interface IdReq {
+  id: number
+}
+
+interface UpdatePluginInstanceReq {
+  alertPluginInstanceId: number
+  instanceName: string
+  pluginInstanceParams: string
+}
+
+export {
+  ListReq,
+  PluginInstanceReq,
+  InstanceNameReq,
+  IdReq,
+  UpdatePluginInstanceReq,
 }

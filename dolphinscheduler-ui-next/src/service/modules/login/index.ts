@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
-}
+import { axios } from '@/service/service'
+import { LoginReq } from './types'
 
-export default {
-  login,
+export function queryLog(data: LoginReq): any {
+  return axios({
+    url: '/login',
+    method: 'post',
+    data,
+  })
 }
