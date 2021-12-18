@@ -1,0 +1,116 @@
+[INFO] 2021-12-18 21:24:15.402 org.apache.dolphinscheduler.server.master.config.MasterConfigTest:[55] - Starting MasterConfigTest using Java 1.8.0_221 on zhuangcongdembp with PID 7725 (started by zhuangchong in /Users/zhuangchong/developer/repos/zhaopinRepos/dolphinscheduler/dolphinscheduler-master)
+[INFO] 2021-12-18 21:24:15.404 org.apache.dolphinscheduler.server.master.config.MasterConfigTest:[663] - The following profiles are active: master
+[INFO] 2021-12-18 21:24:15.582 org.apache.dolphinscheduler.server.master.config.MasterConfigTest:[61] - Started MasterConfigTest in 0.908 seconds (JVM running for 5.073)
+[INFO] 2021-12-18 21:24:15.779 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.isalist
+[INFO] 2021-12-18 21:24:15.780 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: ftp.nonProxyHosts
+[INFO] 2021-12-18 21:24:15.780 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksNonProxyHosts
+[INFO] 2021-12-18 21:24:15.780 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyPort
+[INFO] 2021-12-18 21:24:15.780 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.io.unicode.encoding
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.endian
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url.bug
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.separator
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: localRepository
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.headless
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor
+[INFO] 2021-12-18 21:24:15.781 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.class.path
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyHost
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.ext.dirs
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.version
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.info
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: awt.toolkit
+[INFO] 2021-12-18 21:24:15.782 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.language
+[INFO] 2021-12-18 21:24:15.783 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.vendor
+[INFO] 2021-12-18 21:24:15.783 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.command
+[INFO] 2021-12-18 21:24:15.783 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.home
+[INFO] 2021-12-18 21:24:15.783 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.arch.data.model
+[INFO] 2021-12-18 21:24:15.783 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: jacoco-agent.destfile
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.version
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyHost
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.path
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.name
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding
+[INFO] 2021-12-18 21:24:15.784 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.version
+[INFO] 2021-12-18 21:24:15.785 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.printerjob
+[INFO] 2021-12-18 21:24:15.785 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.timezone
+[INFO] 2021-12-18 21:24:15.785 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.home
+[INFO] 2021-12-18 21:24:15.785 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.nonProxyHosts
+[INFO] 2021-12-18 21:24:15.785 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.version
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.management.compiler
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.name
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.version
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: surefire.test.class.path
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: spring.beaninfo.ignore
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.library.path
+[INFO] 2021-12-18 21:24:15.786 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyPort
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.jnu.encoding
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: FILE_LOG_CHARSET
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.name
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyHost
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.vendor
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyPort
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.io.tmpdir
+[INFO] 2021-12-18 21:24:15.787 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: line.separator
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: CONSOLE_LOG_CHARSET
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: surefire.real.class.path
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.endorsed.dirs
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.arch
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: basedir
+[INFO] 2021-12-18 21:24:15.788 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.graphicsenv
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.version
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: PID
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.name
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.dir
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.country
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.launcher
+[INFO] 2021-12-18 21:24:15.789 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.os.patch.level
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.name
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding.pkg
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: path.separator
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.vendor
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: gopherProxySet
+[INFO] 2021-12-18 21:24:15.790 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.library.path
+[INFO] 2021-12-18 21:24:15.791 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.version
+[INFO] 2021-12-18 21:24:15.791 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.name
+[WARN] 2021-12-18 21:24:15.816 org.apache.dolphinscheduler.server.master.dispatch.host.LowerWeightHostManager:[161] - worker 192.168.1.1:22 in work group default have not received the heartbeat
+[ERROR] 2021-12-18 21:24:18.124 org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService:[135] - persist task error
+java.lang.NullPointerException: null
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService.persist(TaskResponseService.java:176)
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService.access$100(TaskResponseService.java:52)
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService$TaskResponseWorker.run(TaskResponseService.java:130)
+[ERROR] 2021-12-18 21:24:18.124 org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService:[100] - stop error:
+java.lang.NullPointerException: null
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService.persist(TaskResponseService.java:176)
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService.stop(TaskResponseService.java:96)
+	at org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseServiceTest.after(TaskResponseServiceTest.java:97)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:33)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.mockito.internal.runners.DefaultInternalRunner$1.run(DefaultInternalRunner.java:99)
+	at org.mockito.internal.runners.DefaultInternalRunner.run(DefaultInternalRunner.java:105)
+	at org.mockito.internal.runners.StrictRunner.run(StrictRunner.java:40)
+	at org.mockito.junit.MockitoJUnitRunner.run(MockitoJUnitRunner.java:163)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+[INFO] 2021-12-18 21:24:18.125 org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService:[138] - StateEventResponseWorker stopped
+[INFO] 2021-12-18 21:24:18.147 org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor:[52] - received task kill response command : TaskKillResponseCommand{taskInstanceId=1, host='localhost', status=1, processId=1, appIds=[task_1]}
