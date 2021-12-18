@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
+
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
-public final class WeChatAlertConstants {
-    static final String MARKDOWN_QUOTE = ">";
+public enum WeChatType {
+    APP(1, "应用"),
+    APPCHAT(2, "群聊"),
+    ;
 
-    static final String MARKDOWN_ENTER = "\n";
+    private final int code;
+    private final String descp;
 
-    static final String CHARSET = "UTF-8";
+    WeChatType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
+    }
 
-    static final String WE_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}";
+    public int getCode() {
+        return code;
+    }
 
-    static final String WE_CHAT_APP_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/appchat/send?access_token" +
-            "={token}";
-
-    static final String WE_CHAT_TOKEN_URL = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={secret}";
-
-    private WeChatAlertConstants() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    public String getDescp() {
+        return descp;
     }
 }
