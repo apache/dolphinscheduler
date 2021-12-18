@@ -30,7 +30,7 @@ const basePage: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: { name: 'home' },
-    component: () => import('@/layouts/content/Content'),
+    component: () => import('@/layouts/BasicLayout'),
     children: [
       {
         path: '/home',
