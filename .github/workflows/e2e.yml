@@ -63,11 +63,10 @@ jobs:
       - name: Build Image
         run: |
           ./mvnw -B clean install \
-          -Prelease,docker \
-          -Ddocker.tag=ci \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
           -Dmaven.checkstyle.skip \
+          -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Run Test
         run: |
