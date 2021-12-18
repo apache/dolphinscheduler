@@ -15,37 +15,121 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, reactive, ref, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
 import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
-import { useThemeStore } from '@/store/theme/theme'
+import { NInput, NButton, NSwitch, NForm, NFormItem, FormRules } from 'naive-ui'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
+import { queryLog } from '@/service/modules/login'
 
-const Login = defineComponent({
+const login = defineComponent({
   name: 'login',
   setup() {
     const { t, locale } = useI18n()
-    const themeStore = useThemeStore()
+    const state = reactive({
+      loginFormRef: ref(),
+      loginForm: {
+        userName: '',
+        userPassword: '',
+      },
+      rules: {
+        userName: {
+          trigger: ['input', 'blur'],
+          validator() {
+            if (state.loginForm.userName === '') {
+              return new Error(`${t('login.userName_tips')}`)
+            }
+          },
+        },
+        userPassword: {
+          trigger: ['input', 'blur'],
+          validator() {
+            if (state.loginForm.userPassword === '') {
+              return new Error(`${t('login.userPassword_tips')}`)
+            }
+          },
+        },
+      } as FormRules,
+    })
 
-    const setTheme = (): void => {
-      themeStore.setDarkTheme()
+    const handleChange = (value: string) => {
+      locale.value = value
     }
 
-    return { t, locale, setTheme }
+    const router: Router = useRouter()
+    const handleLogin = () => {
+      state.loginFormRef.validate((valid: any) => {
+        if (!valid) {
+          queryLog({...state.loginForm}).then((res: Response) => {
+            console.log('res', res)
+            router.push({ path: 'home' })
+          })
+        } else {
+          console.log('Invalid')
+        }
+      })
+    }
+
+    return { t, locale, handleChange, handleLogin, ...toRefs(state) }
   },
   render() {
     return (
       <div class={styles.container}>
-        <NButton type='error' onClick={this.setTheme}>
-          {this.t('login.test')} + 切换主题
-        </NButton>
-        <select v-model={this.locale}>
-          <option value='en_US'>en_US</option>
-          <option value='zh_CN'>zh_CN</option>
-        </select>
+        <div class={styles['language-switch']}>
+          <NSwitch
+            onUpdateValue={this.handleChange}
+            checked-value='en_US'
+            unchecked-value='zh_CN'
+          >
+            {{
+              checked: () => 'en_US',
+              unchecked: () => 'zh_CN',
+            }}
+          </NSwitch>
+        </div>
+        <div class={styles['login-model']}>
+          <div class={styles.logo}>
+            <div class={styles['logo-img']}></div>
+          </div>
+          <div class={styles['form-model']}>
+            <NForm rules={this.rules} ref='loginFormRef'>
+              <NFormItem
+                label={this.t('login.userName')}
+                label-style={{ color: 'black' }}
+                path='userName'
+              >
+                <NInput
+                  type='text'
+                  size='large'
+                  v-model={[this.loginForm.userName, 'value']}
+                  placeholder={this.t('login.userName_tips')}
+                  autofocus
+                  onKeydown={withKeys(this.handleLogin, ['enter'])}
+                />
+              </NFormItem>
+              <NFormItem
+                label={this.t('login.userPassword')}
+                label-style={{ color: 'black' }}
+                path='userPassword'
+              >
+                <NInput
+                  type='password'
+                  size='large'
+                  v-model={[this.loginForm.userPassword, 'value']}
+                  placeholder={this.t('login.userPassword_tips')}
+                  onKeydown={withKeys(this.handleLogin, ['enter'])}
+                />
+              </NFormItem>
+            </NForm>
+            <NButton round type='primary' onClick={this.handleLogin}>
+              {this.t('login.signin')}
+            </NButton>
+          </div>
+        </div>
       </div>
     )
   },
 })
 
-export default Login
+export default login
