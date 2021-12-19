@@ -85,7 +85,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUNT);
+        mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUND);
         PowerMockito.when(processInstanceService.queryTaskListByProcessId(Mockito.any(), Mockito.anyLong(), Mockito.any()))
                 .thenReturn(mockResult);
 
@@ -97,7 +97,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -190,15 +190,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testViewVariables() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processInstanceService.viewVariables(Mockito.anyInt())).thenReturn(mockResult);
-
+        PowerMockito.when(processInstanceService.viewVariables(1113L,123)).thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());

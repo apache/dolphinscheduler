@@ -39,11 +39,6 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
-     * alert properties
-     */
-    public static final String ALERT_RPC_PORT = "alert.rpc.port";
-
-    /**
      * registry properties
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
@@ -350,7 +345,15 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
+    /**
+     * sleep 1000ms
+     */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * short sleep 100ms
+     */
+    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
 
     /**
      * one second mils
@@ -436,6 +439,10 @@ public final class Constants {
      * SUCCEEDED
      */
     public static final String SUCCEEDED = "SUCCEEDED";
+    /**
+     * ENDED
+     */
+    public static final String ENDED = "ENDED";
     /**
      * NEW
      */
@@ -767,4 +774,7 @@ public final class Constants {
      */
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;
+
+    public static final String CACHE_KEY_VALUE_ALL = "'all'";
+
 }

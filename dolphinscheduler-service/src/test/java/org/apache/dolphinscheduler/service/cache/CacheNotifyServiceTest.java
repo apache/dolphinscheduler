@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.service.cache.service.impl.CacheNotifyServiceImpl;
+import org.apache.dolphinscheduler.service.cache.impl.CacheNotifyServiceImpl;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class CacheNotifyServiceTest {
     public void testNotifyMaster() {
         User user1 = new User();
         user1.setId(100);
-        Command cacheExpireCommand = new CacheExpireCommand(CacheType.USER, user1).convert2Command();
+        Command cacheExpireCommand = new CacheExpireCommand(CacheType.USER, "100").convert2Command();
 
         NettyServerConfig serverConfig = new NettyServerConfig();
 

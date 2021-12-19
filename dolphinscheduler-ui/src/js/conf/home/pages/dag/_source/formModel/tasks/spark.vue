@@ -20,10 +20,11 @@
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
         <el-select
-                style="width: 130px;"
-                size="small"
-                v-model="programType"
-                :disabled="isDetails">
+          style="width: 130px;"
+          size="small"
+          v-model="programType"
+          :disabled="isDetails"
+          @change="programTypeChange">
           <el-option
                   v-for="city in programTypeList"
                   :key="city.code"
@@ -63,9 +64,9 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main Jar Package')}}</div>
+      <div slot="text">{{$t('Main Package')}}</div>
       <div slot="content">
-        <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
+        <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -206,6 +207,7 @@
   import disabledState from '@/module/mixin/disabledState'
   import Clipboard from 'clipboard'
   import { diGuiTree, searchTree } from './_source/resourceTree'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'spark',
@@ -265,6 +267,17 @@
     },
     mixins: [disabledState],
     methods: {
+      ...mapActions('dag', ['getResourcesListJar']),
+      programTypeChange () {
+        this.mainJar = null
+        this.mainClass = ''
+      },
+      getTargetResourcesListJar (programType) {
+        this.getResourcesListJar(programType).then(res => {
+          diGuiTree(res)
+          this.mainJarLists = res
+        })
+      },
       _copyPath (e, node) {
         e.stopPropagation()
         let clipboard = new Clipboard('.copy-path', {
@@ -372,7 +385,7 @@
         }
 
         if (!this.mainJar) {
-          this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
+          this.$message.warning(`${i18n.$t('Please enter main package')}`)
           return false
         }
 
@@ -469,9 +482,7 @@
     watch: {
       // Listening type
       programType (type) {
-        if (type === 'PYTHON') {
-          this.mainClass = ''
-        }
+        this.getTargetResourcesListJar(type)
       },
       // Watch the cacheParams
       cacheParams (val) {
@@ -531,6 +542,7 @@
       }
     },
     created () {
+      this.getTargetResourcesListJar(this.programType)
       let item = this.store.state.dag.resourcesListS
       let items = this.store.state.dag.resourcesListJar
       diGuiTree(item)
@@ -591,9 +603,6 @@
           this.localParams = localParams
         }
       }
-    },
-    mounted () {
-
     },
     components: { mLocalParams, mListBox, mList4Box, Treeselect }
   }

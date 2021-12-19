@@ -27,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * Task Group
- * alter TABLE t_ds_task_group ADD COLUMN `project_code` bigint(20) DEFAULT 0 COMMENT 'project code'
  */
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {

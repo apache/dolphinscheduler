@@ -18,9 +18,10 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/install_config.conf
 
-# install_config.conf info
+source ${workDir}/env/install_env.sh
+
+# install_env.sh info
 echo -e '\n'
 echo "====================== dolphinscheduler server config ============================="
 echo -e "1.dolphinscheduler server node config hosts:[ \033[1;32m ${ips} \033[0m ]"
@@ -36,7 +37,7 @@ firstColumn="node  server  state"
 echo $firstColumn
 echo -e '\n'
 
-declare -A workersGroupMap=()
+workersGroupMap=()
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}

@@ -51,6 +51,9 @@
         <include refid="baseSql"/>
         from t_ds_process_instance
         where state = #{status}
+        <if test="projectCode != 0">
+            and project_code = #{projectCode}
+        </if>
         and start_time between
         #{startTime} and #{endTime}
         order by end_time-start_time desc
@@ -144,7 +147,7 @@
         where worker_group = #{originWorkerGroupName}
     </update>
 
-    <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+    <select id="countInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
         from t_ds_process_instance t
         join t_ds_process_definition d on d.code=t.process_definition_code
