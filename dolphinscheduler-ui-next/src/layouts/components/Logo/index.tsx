@@ -29,7 +29,7 @@ const Logo = defineComponent({
   render() {
     return (
         <div class={styles.logo}>
-          <img src="~@/assets/images/nav-logo.svg" alt=""/>
+          <img src="../../../src/assets/images/nav-logo.svg" alt=""/>
         </div>
     )
   },

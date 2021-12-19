@@ -16,25 +16,30 @@
  */
 
 .container {
-  .language-switch {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-  }
-
-  .nav-model {
-//     height: 60px;
-//     box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 5px;
-//     position: relative;
+  .header-model {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 5px;
+    position: relative;
     width: 100%;
-//     padding: 0px;
-//     margin: 0px;
-    .logo {
-        width: 280px;
-        height: 60px;
-        display: block;
-        background: url('../assets/images/nav-logo.svg') no-repeat 23px;
-        margin: 0 auto;
+    padding: 0px;
+    margin: 0px;
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .menu {
+            margin-left: 0px;
+            text-align: center;
+            font-size: 15px;
+            color: rgb(255, 255, 255);
+        }
+        .profile {
+            display: flex;
+            margin-right: 20px;
+            text-align: center;
+        }
     }
   }
 }

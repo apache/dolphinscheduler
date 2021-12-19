@@ -126,20 +126,22 @@ const Layout = defineComponent({
   render() {
     return (
         <NLayout class={styles.container}>
-          <NLayoutHeader class={styles['nav-model']} inverted={this.inverted} bordered>
+          <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
             <Logo/>
-            <NMenu mode='horizontal' inverted={this.inverted} options={ menuOptions }/>
-            <div>
-              <NDropdown options={ switchLanguageDropDownOptions }>
-                <NButton>语言</NButton>
-              </NDropdown>
-              <NDropdown options={ dropDownOptions }>
-                <NButton>用户资料</NButton>
-              </NDropdown>
+            <div class={styles.nav}>
+              <NMenu mode='horizontal' class={styles.menu} inverted={this.inverted} options={menuOptions}/>
+              <div class={styles.profile}>
+                <NDropdown inverted={this.inverted} options={ switchLanguageDropDownOptions }>
+                  <NButton>语言</NButton>
+                </NDropdown>
+                <NDropdown inverted={this.inverted} options={ dropDownOptions }>
+                  <NButton>用户资料</NButton>
+                </NDropdown>
+              </div>
             </div>
           </NLayoutHeader>
           <NLayout hasSider>
-            <NLayoutSider inverted={this.inverted} nativeScrollbar={false} show-trigger>
+            <NLayoutSider width={240} inverted={this.inverted} nativeScrollbar={false} show-trigger>
               <NMenu
                   inverted={this.inverted}
                   collapsedWidth={64}
