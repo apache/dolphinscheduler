@@ -790,10 +790,6 @@ public class WorkflowExecuteThread implements Runnable {
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
-            TaskDefinition taskDefinition = processService.findTaskDefinition(
-                    taskInstance.getTaskCode(),
-                    taskInstance.getTaskDefinitionVersion());
-            taskInstance.setTaskGroupId(taskDefinition.getTaskGroupId());
             // package task instance before submit
             processService.packageTaskInstance(taskInstance, processInstance);
 
@@ -922,6 +918,10 @@ public class WorkflowExecuteThread implements Runnable {
 
             //set task param
             taskInstance.setTaskParams(taskNode.getTaskParams());
+
+            //set task group and priority
+            taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
+            taskInstance.setTaskGroupPriority(taskNode.getTaskGroupPriority());
 
             // task instance priority
             if (taskNode.getTaskInstancePriority() == null) {

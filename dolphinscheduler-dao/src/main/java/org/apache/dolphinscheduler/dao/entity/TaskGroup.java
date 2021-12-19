@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * Task Group
+ * alter TABLE t_ds_task_group ADD COLUMN `project_code` bigint(20) DEFAULT 0 COMMENT 'project code'
  */
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {
@@ -67,9 +68,14 @@ public class TaskGroup implements Serializable {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+    /**
+     * project Id
+     */
+    private long projectCode;
 
-    public TaskGroup(String name, String description, int groupSize, int userId,int status) {
+    public TaskGroup(String name,long projectCode, String description, int groupSize, int userId,int status) {
         this.name = name;
+        this.projectCode = projectCode;
         this.description = description;
         this.groupSize = groupSize;
         this.userId = userId;
@@ -172,5 +178,13 @@ public class TaskGroup implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(long projectCode) {
+        this.projectCode = projectCode;
     }
 }

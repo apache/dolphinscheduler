@@ -70,7 +70,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     task.getName(),
                     taskGroupId,
                     task.getProcessInstanceId(),
-                    task.getTaskInstancePriority().getCode());
+                    task.getTaskGroupPriority());
             if (!acquireTaskGroup) {
                 logger.info("submit task name :{}, but the first time to try to acquire task group failed", taskInstance.getName());
                 return true;

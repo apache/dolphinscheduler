@@ -92,7 +92,7 @@ public class TaskGroupServiceTest {
     }
 
     private TaskGroup getTaskGroup() {
-        TaskGroup taskGroup = new TaskGroup(taskGroupName, taskGroupDesc,
+        TaskGroup taskGroup = new TaskGroup(taskGroupName,0, taskGroupDesc,
             100, 1,1);
         return taskGroup;
     }
@@ -109,7 +109,7 @@ public class TaskGroupServiceTest {
         TaskGroup taskGroup = getTaskGroup();
         Mockito.when(taskGroupMapper.insert(taskGroup)).thenReturn(1);
         Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, taskGroupName, taskGroupDesc, 100);
+        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser,0, taskGroupName, taskGroupDesc, 100);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -134,7 +134,7 @@ public class TaskGroupServiceTest {
             Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
 
         // query all
-        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, 1, 10);
+        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, null, null,1,10);
         PageInfo<TaskGroup> pageInfo = (PageInfo<TaskGroup>) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(pageInfo.getTotalList());
     }

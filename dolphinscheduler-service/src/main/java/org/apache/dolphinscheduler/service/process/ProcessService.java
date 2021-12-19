@@ -2491,6 +2491,8 @@ public class ProcessService {
                         taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
+                taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
+                taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNodeList.add(taskNode);
             }
         }
