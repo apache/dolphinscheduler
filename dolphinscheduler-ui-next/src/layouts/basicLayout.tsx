@@ -16,11 +16,15 @@
  */
 
 import { defineComponent, ref } from 'vue'
-import styles from './layout.scss'
+import styles from './basicLayout.module.scss'
 import { useI18n } from 'vue-i18n'
+import { Logo } from './components/Logo';
 import 'remixicon/fonts/remixicon.css'
-import { NLayout, NLayoutContent, NLayoutSider, NLayoutHeader, NMenu, NDropdown, NButton } from 'naive-ui'
+import { NLayout, NLayoutContent, NLayoutSider, NLayoutHeader, NMenu, NDropdown, NButton, NIcon } from 'naive-ui'
 
+// function renderIcon (icon) {
+//   return () => h(NIcon, null, { default: () => h(icon) })
+// }
 
 const switchLanguageDropDownOptions = [
   {
@@ -47,7 +51,7 @@ const dropDownOptions = [
 const menuOptions = [
   {
     label: '且听风吟',
-    key: 'hear-the-wind-sing',
+    key: 'hear-the-wind-sing'
   },
   {
     label: '1973年的弹珠玩具',
@@ -112,7 +116,7 @@ const menuOptions = [
   }
 ]
 
-const Content = defineComponent({
+const Layout = defineComponent({
   name: 'BasicLayout',
   setup() {
     const inverted = ref(true)
@@ -121,9 +125,9 @@ const Content = defineComponent({
   },
   render() {
     return (
-        <NLayout>
-          <NLayoutHeader inverted={this.inverted} bordered>
-            <div class="logo">DolphinScheduler</div>
+        <NLayout class={styles.container}>
+          <NLayoutHeader class={styles['nav-model']} inverted={this.inverted} bordered>
+            <Logo/>
             <NMenu mode='horizontal' inverted={this.inverted} options={ menuOptions }/>
             <div>
               <NDropdown options={ switchLanguageDropDownOptions }>
@@ -152,4 +156,4 @@ const Content = defineComponent({
   },
 })
 
-export default Content
+export default Layout
