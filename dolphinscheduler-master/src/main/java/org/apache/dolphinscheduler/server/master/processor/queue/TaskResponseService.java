@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -73,6 +74,9 @@ public class TaskResponseService {
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    @Autowired
+    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @PostConstruct
     public void start() {
@@ -164,20 +168,16 @@ public class TaskResponseService {
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
 
-        if (workflowExecuteThread != null) {
-            StateEvent stateEvent = new StateEvent();
-            stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
-            stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
-            stateEvent.setExecutionStatus(taskResponseEvent.getState());
-            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-            workflowExecuteThread.addStateEvent(stateEvent);
-        }
+        StateEvent stateEvent = new StateEvent();
+        stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
+        stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+        stateEvent.setExecutionStatus(taskResponseEvent.getState());
+        stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent);
     }
 
     /**
      * handle ack event
-     * @param taskResponseEvent
-     * @param taskInstance
      */
     private void handleAckEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         Channel channel = taskResponseEvent.getChannel();
@@ -206,8 +206,6 @@ public class TaskResponseService {
 
     /**
      * handle result event
-     * @param taskResponseEvent
-     * @param taskInstance
      */
     private void handleResultEvent(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
         Channel channel = taskResponseEvent.getChannel();

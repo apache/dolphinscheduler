@@ -17,11 +17,7 @@
 
 import type { Component } from 'vue'
 
-interface modules extends Object {
-  [key: string]: any
-}
-
-const classification = (modules: modules) => {
+const classification = (modules: any) => {
   const components: { [key: string]: Component } = {}
   // All TSX files under the views folder automatically generate mapping relationship
   Object.keys(modules).forEach((key: string) => {

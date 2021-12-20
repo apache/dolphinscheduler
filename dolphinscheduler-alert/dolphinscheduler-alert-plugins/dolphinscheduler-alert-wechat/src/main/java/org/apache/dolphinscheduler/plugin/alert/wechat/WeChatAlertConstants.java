@@ -26,6 +26,9 @@ public final class WeChatAlertConstants {
 
     static final String WE_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}";
 
+    static final String WE_CHAT_APP_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/appchat/send?access_token" +
+            "={token}";
+
     static final String WE_CHAT_TOKEN_URL = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={secret}";
 
     private WeChatAlertConstants() {
