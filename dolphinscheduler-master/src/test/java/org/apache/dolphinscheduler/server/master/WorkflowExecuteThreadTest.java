@@ -111,7 +111,7 @@ public class WorkflowExecuteThreadTest {
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread, taskProcessorFactory));
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread));
         // prepareProcess init dag
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);

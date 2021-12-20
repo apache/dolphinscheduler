@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -61,7 +62,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
@@ -80,8 +80,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstance processInstance;
 
-    @Autowired
-    protected ProcessService processService;
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);;
 
     /**
      * pause task, common tasks donot need this.

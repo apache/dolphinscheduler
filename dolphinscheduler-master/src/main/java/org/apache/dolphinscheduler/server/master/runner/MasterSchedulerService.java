@@ -65,12 +65,6 @@ public class MasterSchedulerService extends Thread {
     private ProcessService processService;
 
     /**
-     * task processor factory
-     */
-    @Autowired
-    private TaskProcessorFactory taskProcessorFactory;
-
-    /**
      * master config
      */
     @Autowired
@@ -176,8 +170,7 @@ public class MasterSchedulerService extends Thread {
                     , nettyExecutorManager
                     , processAlertManager
                     , masterConfig
-                    , stateWheelExecuteThread
-                    , taskProcessorFactory);
+                    , stateWheelExecuteThread);
 
             this.processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteThread);
             if (processInstance.getTimeout() > 0) {

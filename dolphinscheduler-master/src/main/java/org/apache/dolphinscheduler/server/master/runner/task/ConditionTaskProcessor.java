@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,13 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 /**
  * condition task processor
  */
-@Service
 public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     /**
@@ -65,8 +62,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;
 
     private TaskDefinition taskDefinition;
 

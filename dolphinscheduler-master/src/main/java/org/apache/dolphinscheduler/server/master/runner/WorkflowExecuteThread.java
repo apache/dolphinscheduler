@@ -134,11 +134,6 @@ public class WorkflowExecuteThread {
     private ProcessDefinition processDefinition;
 
     /**
-     * task processor
-     */
-    private TaskProcessorFactory taskProcessorFactory;
-
-    /**
      * the object of DAG
      */
     private DAG<String, TaskNode, TaskNodeRelation> dag;
@@ -227,22 +222,19 @@ public class WorkflowExecuteThread {
      * @param processAlertManager processAlertManager
      * @param masterConfig masterConfig
      * @param stateWheelExecuteThread stateWheelExecuteThread
-     * @param taskProcessorFactory taskProcessorFactory
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig
-            , StateWheelExecuteThread stateWheelExecuteThread
-            , TaskProcessorFactory taskProcessorFactory) {
+            , StateWheelExecuteThread stateWheelExecuteThread) {
         this.processService = processService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
-        this.taskProcessorFactory = taskProcessorFactory;
     }
 
     /**
@@ -805,7 +797,7 @@ public class WorkflowExecuteThread {
      */
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
-            ITaskProcessor taskProcessor = taskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
