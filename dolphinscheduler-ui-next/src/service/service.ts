@@ -25,8 +25,8 @@ const baseRequestConfig: AxiosRequestConfig = {
     return qs.stringify(params, { arrayFormat: 'repeat' })
   },
   paramsSerializer: (params) => {
-    return qs.stringify(params, { arrayFormat: 'repeat'})
-  }
+    return qs.stringify(params, { arrayFormat: 'repeat' })
+  },
 }
 
 const service = axios.create(baseRequestConfig)
@@ -42,15 +42,16 @@ service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
 
 // The response to intercept
 service.interceptors.response.use((res: AxiosResponse) => {
-
   // No code will be processed
   if (res.data.code === undefined) {
     return res.data
   }
 
   switch (res.data.code) {
-    case 0: return res.data.data
-    default: throw new Error(`${res.data.msg}: ${res.config.url}`)
+    case 0:
+      return res.data.data
+    default:
+      throw new Error(`${res.data.msg}: ${res.config.url}`)
   }
 }, err)
 

@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+import { axios } from '@/service/service'
+import { PluginTypeReq, IdReq } from './types'
+
+export function queryUiPluginsByType(params: PluginTypeReq): any {
+  return axios({
+    url: '/ui-plugins/query-by-type',
+    method: 'get',
+    params,
+  })
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+export function queryUiPluginDetailById(id: IdReq): any {
+  return axios({
+    url: `/ui-plugins/${id}`,
+    method: 'get',
+  })
 }
-
-interface IdReq {
-  id: number
-}
-
-export { ListReq, QueueReq, IdReq }

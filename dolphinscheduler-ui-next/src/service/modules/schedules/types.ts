@@ -15,30 +15,53 @@
  * limitations under the License.
  */
 
-interface CodeReq {
+interface ProjectCodeReq {
   projectCode: number
 }
 
-interface ProcessInstanceListReq {
-  pageNo: number
-  pageSize: number
-  endDate?: string
-  executorName?: string
-  host?: string
-  processDefineCode?: number
-  processDefiniteCode?: string
-  searchVal?: string
-  startDate?: string
-  stateType?: string
+interface IdReq {
+  id: number
 }
 
-interface BatchDeleteReq {
-  processInstanceIds: string
-  projectName: string
+interface CodeReq {
+  code: number
+}
+
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
+
+interface ProcessDefinitionCodeReq {
+  processDefinitionCode: number
+}
+
+interface ScheduleReq {
+  schedule?: string
+}
+
+interface WorkerGroupIdReq {
+  workerGroupId?: number
+}
+
+interface ScheduleListReq extends ListReq, ProcessDefinitionCodeReq {
+  processDefinitionId: number
+}
+
+interface CreateScheduleReq extends ScheduleReq, ProcessDefinitionCodeReq {
+  environmentCode?: number
+  failureStrategy?: 'END' | 'CONTINUE'
+  processInstancePriority?: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW' | 'LOWEST'
+  warningGroupId?: number
+  warningType?: 'NONE' | 'SUCCESS' | 'FAILURE' | 'ALL'
+  workerGroup?: string
+}
+
+interface DeleteScheduleReq extends IdReq {
   alertGroup?: string
   createTime?: string
   email?: string
-  id?: number
   phone?: string
   queue?: string
   queueName?: string
@@ -48,47 +71,18 @@ interface BatchDeleteReq {
   updateTime?: string
   userName?: string
   userPassword?: string
-  userType?: string
-}
-
-interface SubIdReq {
-  subId: number
-}
-
-interface TaskReq {
-  taskCode: string
-  taskId: number
-}
-
-interface LongestReq {
-  endTime: string
-  size: number
-  startTime: string
-}
-
-interface IdReq {
-  id: number
-}
-
-interface ProcessInstanceReq {
-  syncDefine: string
-  flag?: string
-  globalParams?: string
-  locations?: string
-  scheduleTime?: string
-  taskDefinitionJson?: string
-  taskRelationJson?: string
-  tenantCode?: string
-  timeout?: string
+  userType?: 'ADMIN_USER' | 'GENERAL_USER'
 }
 
 export {
-  CodeReq,
-  ProcessInstanceListReq,
-  BatchDeleteReq,
-  SubIdReq,
-  TaskReq,
-  LongestReq,
+  ProjectCodeReq,
   IdReq,
-  ProcessInstanceReq,
+  CodeReq,
+  ListReq,
+  ProcessDefinitionCodeReq,
+  ScheduleReq,
+  WorkerGroupIdReq,
+  ScheduleListReq,
+  CreateScheduleReq,
+  DeleteScheduleReq,
 }

@@ -16,32 +16,26 @@
  */
 
 interface ListReq {
-	pageNo: number
-	pageSize: number
-	searchVal?: string
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
 interface ProjectsReq {
-	description?: string
-	projectName?: string
+  description?: string
+  projectName?: string
 }
 
 interface UserIdReq {
-	userId?: number
+  userId?: number
 }
 
 interface CodeReq {
-	code: number
+  code: number
 }
 
 interface UpdateProjectsReq extends ProjectsReq {
-	userName?: string
+  userName?: string
 }
 
-export {
-	ListReq,
-	ProjectsReq,
-	UserIdReq,
-	CodeReq,
-	UpdateProjectsReq
-}
+export { ListReq, ProjectsReq, UserIdReq, CodeReq, UpdateProjectsReq }

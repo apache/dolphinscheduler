@@ -15,19 +15,57 @@
  * limitations under the License.
  */
 
-interface ListReq {
+interface PageReq {
   pageNo: number
   pageSize: number
+}
+
+interface ListReq extends PageReq {
   searchVal?: string
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+interface ProjectCodeReq {
+  projectCode: number
 }
 
-interface IdReq {
-  id: number
+interface TaskDefinitionListReq extends ListReq {
+  taskType?: string
+  userId?: number
 }
 
-export { ListReq, QueueReq, IdReq }
+interface TaskDefinitionJsonReq {
+  taskDefinitionJson: string
+}
+
+interface GenNumReq {
+  genNum: number
+}
+
+interface CodeReq {
+  code: number
+}
+
+interface TaskDefinitionJsonObjReq {
+  taskDefinitionJsonObj: string
+}
+
+interface ReleaseStateReq {
+  releaseState: 'OFFLINE' | 'ONLINE'
+}
+
+interface VersionReq {
+  version: number
+}
+
+export {
+  PageReq,
+  ListReq,
+  ProjectCodeReq,
+  TaskDefinitionListReq,
+  TaskDefinitionJsonReq,
+  GenNumReq,
+  CodeReq,
+  TaskDefinitionJsonObjReq,
+  ReleaseStateReq,
+  VersionReq,
+}

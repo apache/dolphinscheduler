@@ -21,13 +21,17 @@ interface ListReq {
   searchVal?: string
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+interface TenantCodeReq {
+  tenantCode: string
+}
+
+interface TenantReq extends TenantCodeReq {
+  queueId: number
+  description?: string
 }
 
 interface IdReq {
   id: number
 }
 
-export { ListReq, QueueReq, IdReq }
+export { ListReq, TenantCodeReq, TenantReq, IdReq }

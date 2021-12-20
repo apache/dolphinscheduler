@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
-
-interface QueueReq {
-  queue: string
-  queueName: string
+interface PluginTypeReq {
+  pluginType: 'ALERT' | 'REGISTER' | 'TASK'
 }
 
 interface IdReq {
   id: number
 }
 
-export { ListReq, QueueReq, IdReq }
+export { PluginTypeReq, IdReq }

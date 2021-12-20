@@ -61,7 +61,7 @@ const login = defineComponent({
     const handleLogin = () => {
       state.loginFormRef.validate((valid: any) => {
         if (!valid) {
-          queryLog({...state.loginForm}).then((res: Response) => {
+          queryLog({ ...state.loginForm }).then((res: Response) => {
             console.log('res', res)
             router.push({ path: 'home' })
           })

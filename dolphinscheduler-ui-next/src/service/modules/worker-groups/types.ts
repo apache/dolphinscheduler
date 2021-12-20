@@ -21,13 +21,14 @@ interface ListReq {
   searchVal?: string
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+interface WorkerGroupReq {
+  addrList: string
+  name: string
+  id?: number
 }
 
 interface IdReq {
   id: number
 }
 
-export { ListReq, QueueReq, IdReq }
+export { ListReq, WorkerGroupReq, IdReq }
