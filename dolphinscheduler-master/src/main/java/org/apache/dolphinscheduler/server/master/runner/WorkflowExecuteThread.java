@@ -623,6 +623,7 @@ public class WorkflowExecuteThread {
                 processDefinition.getGlobalParamList(),
                 CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
         processInstance.setStartTime(new Date());
+        processInstance.setRestartTime(processInstance.getStartTime());
         processInstance.setEndTime(null);
         processService.saveProcessInstance(processInstance);
         this.taskInstanceMap.clear();

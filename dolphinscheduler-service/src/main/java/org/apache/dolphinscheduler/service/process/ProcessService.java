@@ -664,6 +664,7 @@ public class ProcessService {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
+        processInstance.setRestartTime(processInstance.getStartTime());
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
         processInstance.setCommandParam(command.getCommandParam());
@@ -853,6 +854,7 @@ public class ProcessService {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+        processInstance.setRestartTime(new Date());
         ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXECUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType) {
@@ -922,6 +924,7 @@ public class ProcessService {
                     updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
+                processInstance.setRestartTime(processInstance.getStartTime());
                 processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime + 1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
@@ -1860,6 +1863,10 @@ public class ProcessService {
      */
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host) {
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
+    }
+
+    public List<String> queryNeedFailoverProcessInstanceHost() {
+        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(stateArray);
     }
 
     /**

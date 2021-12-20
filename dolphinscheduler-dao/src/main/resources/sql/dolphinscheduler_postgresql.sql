@@ -505,6 +505,7 @@ CREATE TABLE t_ds_process_instance (
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
+  restart_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 

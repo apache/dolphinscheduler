@@ -40,6 +40,7 @@ public class MasterConfig {
     private double maxCpuLoadAvg;
     private double reservedMemory;
     private boolean taskLogger;
+    private int failoverInterval;
 
     public int getListenPort() {
         return listenPort;
@@ -143,5 +144,13 @@ public class MasterConfig {
 
     public void setTaskLogger(boolean taskLogger) {
         this.taskLogger = taskLogger;
+    }
+
+    public int getFailoverInterval() {
+        return failoverInterval;
+    }
+
+    public void setFailoverInterval(int failoverInterval) {
+        this.failoverInterval = failoverInterval;
     }
 }
