@@ -1069,6 +1069,7 @@ CREATE TABLE t_ds_task_group
    name        varchar(100) DEFAULT NULL ,
    description varchar(200) DEFAULT NULL ,
    group_size  int(11) NOT NULL ,
+   project_code  bigint(20) DEFAULT '0',
    use_size    int(11) DEFAULT '0' ,
    user_id     int(11) DEFAULT NULL ,
    project_id  int(11) DEFAULT NULL ,

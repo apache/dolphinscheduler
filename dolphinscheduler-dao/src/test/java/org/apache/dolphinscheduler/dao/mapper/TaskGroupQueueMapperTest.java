@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class TaskGroupQueueMapperTest extends BaseDaoTest {
 
-    @Mock
+    @Autowired
     TaskGroupQueueMapper taskGroupQueueMapper;
 
     int userId = 1;
