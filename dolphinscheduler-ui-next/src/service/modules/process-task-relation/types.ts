@@ -15,19 +15,41 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+interface ProjectCodeReq {
+  projectCode: string
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+interface ProcessDefinitionCodeReq {
+  processDefinitionCode: string
 }
 
-interface IdReq {
-  id: number
+interface PreTaskCodesReq {
+  preTaskCodes: string
 }
 
-export { ListReq, QueueReq, IdReq }
+interface PostTaskCodesReq {
+  postTaskCodes: string
+}
+
+interface TaskCodeReq {
+  taskCode: string
+}
+
+interface SaveReq extends ProcessDefinitionCodeReq, ProjectCodeReq {
+  postTaskCode: string
+  preTaskCode: string
+}
+
+interface MoveReq extends ProcessDefinitionCodeReq, TaskCodeReq {
+  targetProcessDefinitionCode: string
+}
+
+export {
+  ProjectCodeReq,
+  ProcessDefinitionCodeReq,
+  PreTaskCodesReq,
+  PostTaskCodesReq,
+  TaskCodeReq,
+  SaveReq,
+  MoveReq,
+}
