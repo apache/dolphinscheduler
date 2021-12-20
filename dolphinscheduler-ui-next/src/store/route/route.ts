@@ -15,22 +15,33 @@
  * limitations under the License.
  */
 
-.logo {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   height: 64px;
-   line-height: 64px;
-   overflow: hidden;
-   white-space: nowrap;
-   width: 220px;
+import { toRaw } from 'vue';
+import { defineStore } from 'pinia'
+import RouteState from './types'
+import { RouteRecordRaw } from "vue-router"
 
-   img {
-     width: auto;
-     height: 46px;
-   }
-
-   .title {
-     margin-bottom: 0;
-   }
-}
+export const useAsyncRouteStore = defineStore({
+  id: 'theme',
+  state: (): RouteState => ({
+    menus: [],
+    routers: [],
+    addRouters: [],
+  }),
+  getters: {
+    getMenus(): RouteRecordRaw[] {
+      return this.menus
+    },
+    getRouters(): RouteRecordRaw[] {
+      return toRaw(this.addRouters)
+    },
+  },
+  actions: {
+    setMenus(menus) {
+      this.menus = menus
+    },
+    async generateRouters(routes) {
+      console.log('generate....')
+      console.log(routes)
+    }
+  },
+})

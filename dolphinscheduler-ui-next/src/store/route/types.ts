@@ -14,32 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RouteRecordRaw } from 'vue-router'
 
-.container {
-  .header-model {
-    display: flex;
-    align-items: center;
-    height: 60px;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 5px;
-    position: relative;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    .nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .menu {
-            margin-left: 0px;
-            text-align: center;
-            font-size: 15px;
-            color: rgb(255, 255, 255);
-        }
-        .profile {
-            display: flex;
-            margin-right: 20px;
-            text-align: center;
-        }
-    }
-  }
+interface RouteState {
+  menus: RouteRecordRaw[]
+  routers: any[]
+  addRouters: any[]
 }
+
+export default RouteState
