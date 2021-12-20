@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+interface ProjectCodeReq {
+  projectCode: number
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+interface WorkFlowNameReq {
+  workFlowName: string
 }
 
-interface IdReq {
-  id: number
-}
-
-export { ListReq, QueueReq, IdReq }
+export { ProjectCodeReq, WorkFlowNameReq }

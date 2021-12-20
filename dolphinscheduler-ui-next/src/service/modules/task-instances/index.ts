@@ -15,19 +15,23 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+import { axios } from '@/service/service'
+import { ProjectCodeReq, IdReq, TaskListReq } from './types'
+
+export function queryTaskListPaging(
+  params: TaskListReq,
+  projectCode: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${projectCode}/task-instances`,
+    method: 'get',
+    params,
+  })
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+export function forceSuccess(id: IdReq, projectCode: ProjectCodeReq): any {
+  return axios({
+    url: `/projects/${projectCode}/task-instances/${id}/force-success`,
+    method: 'post',
+  })
 }
-
-interface IdReq {
-  id: number
-}
-
-export { ListReq, QueueReq, IdReq }

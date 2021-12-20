@@ -16,40 +16,96 @@
  */
 
 interface FileReq {
-	file: any
+  file: any
 }
 
-interface TypeReq {
-	type: 'FILE' | 'UDF'
+interface ResourceTypeReq {
+  type: 'FILE' | 'UDF'
 }
 
-interface NameReqReq {
-	name: string
+interface UdfTypeReq {
+  type: 'HIVE' | 'SPARK'
+}
+
+interface NameReq {
+  name: string
 }
 
 interface FileNameReq {
-	fileName: string
+  fileName: string
 }
 
-interface ListReq {
-	id: number
-	pageNo: number
-	pageSize: number
-	type: 'FILE' | 'UDF'
-	searchVal?: string
+interface FullNameReq {
+  fullName: string
 }
 
-interface CreateReq extends TypeReq {
-	currentDir: string
-	pid: number
-	description?: string
+interface IdReq {
+  id: number
+}
+
+interface ContentReq {
+  content: string
+}
+
+interface DescriptionReq {
+  description?: string
+}
+
+interface CreateReq extends ResourceTypeReq, DescriptionReq {
+  currentDir: string
+  pid: number
 }
 
 interface UserIdReq {
-	userId: number
+  userId: number
 }
 
-interface OnlineCreateReq extends CreateReq {
-	content: string
-	suffix: string
+interface OnlineCreateReq extends CreateReq, ContentReq {
+  suffix: string
+}
+
+interface ProgramTypeReq {
+  programType: 'JAVA' | 'SCALA' | 'PYTHON'
+}
+
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
+
+interface ViewResourceReq {
+  limit: number
+  skipLineNum: number
+}
+
+interface ResourceIdReq {
+  resourceId: number
+}
+
+interface UdfFuncReq extends UdfTypeReq, DescriptionReq {
+  className: string
+  funcName: string
+  argTypes?: string
+  database?: string
+}
+
+export {
+  FileReq,
+  ResourceTypeReq,
+  UdfTypeReq,
+  NameReq,
+  FileNameReq,
+  FullNameReq,
+  IdReq,
+  ContentReq,
+  DescriptionReq,
+  CreateReq,
+  UserIdReq,
+  OnlineCreateReq,
+  ProgramTypeReq,
+  ListReq,
+  ViewResourceReq,
+  ResourceIdReq,
+  UdfFuncReq,
 }
