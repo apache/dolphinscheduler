@@ -185,22 +185,5 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         Assert.assertTrue(result1 != null && result1.isSuccess());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
-
-    @Test
-    public void testWakeCompulsively() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queueId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(post("/task-group/forceStart")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
-        Assert.assertTrue(result != null && (result.isSuccess() || result.isStatus(Status.TASK_GROUP_CACHE_START_FAILED)));
-        logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
+    
 }
