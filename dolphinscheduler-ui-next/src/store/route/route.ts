@@ -40,7 +40,6 @@ export const useAsyncRouteStore = defineStore({
       this.menus = menus
     },
     async generateRouters(routes) {
-      console.log('generate....')
       console.log(routes)
     }
   },
