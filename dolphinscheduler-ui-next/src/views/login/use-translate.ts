@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
+import { WritableComputedRef } from "vue"
 
-const utils = {
-  mapping
+export function useTranslate (locale: WritableComputedRef<string>) {
+  const handleChange = (value: string) => {
+    locale.value = value
+  }
+  return {
+    handleChange
+  }
 }
-
-export default utils

@@ -15,28 +15,25 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
+import { queryLog } from '@/service/modules/login'
 
-const classification = (modules: any) => {
-  const components: { [key: string]: Component } = {}
-  // All TSX files under the views folder automatically generate mapping relationship
-  Object.keys(modules).forEach((key: string) => {
-    const nameMatch: string[] | null = key.match(/^\/src\/views\/(.+)\.tsx/)
-
-    if (!nameMatch) {
-      return
-    }
-
-    // If the page is named Index, the parent folder is used as the name
-    const indexMatch: string[] | null = nameMatch[1].match(/(.*)\/Index$/i)
-
-    let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
-
-    ;[name] = name.split('/').splice(-1)
-
-    components[name] = modules[key]
-  })
-  return components
+export function useLogin (state) {
+  const router: Router = useRouter()
+  const handleLogin = () => {
+    state.loginFormRef.validate((valid: any) => {
+      if (!valid) {
+        queryLog({...state.loginForm}).then((res: Response) => {
+          console.log('res', res)
+          router.push({ path: 'home' })
+        })
+      } else {
+        console.log('Invalid')
+      }
+    })
+  }
+  return {
+    handleLogin
+  }
 }
-
-export default classification
