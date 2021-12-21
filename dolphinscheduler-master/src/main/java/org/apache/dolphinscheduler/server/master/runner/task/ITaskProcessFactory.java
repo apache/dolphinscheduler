@@ -15,19 +15,11 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
+package org.apache.dolphinscheduler.server.master.runner.task;
 
-interface QueueReq {
-  queue: string
-  queueName: string
-}
+public interface ITaskProcessFactory {
 
-interface IdReq {
-  id: number
-}
+    String type();
 
-export { ListReq, QueueReq, IdReq }
+    ITaskProcessor create();
+}
