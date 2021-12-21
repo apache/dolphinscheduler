@@ -42,10 +42,14 @@ public class CreateDolphinScheduler {
 
         @Override
         public void run(String... args) throws Exception {
+            if (dolphinSchedulerManager.schemaIsInitialized()) {
+                dolphinSchedulerManager.upgradeDolphinScheduler();
+                logger.info("upgrade DolphinScheduler finished");
+            } else {
+                dolphinSchedulerManager.initDolphinScheduler();
+            }
             dolphinSchedulerManager.initDolphinScheduler();
             logger.info("init DolphinScheduler finished");
-            dolphinSchedulerManager.upgradeDolphinScheduler();
-            logger.info("upgrade DolphinScheduler finished");
             logger.info("create DolphinScheduler success");
         }
     }
