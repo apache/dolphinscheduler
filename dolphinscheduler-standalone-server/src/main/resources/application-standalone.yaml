@@ -32,3 +32,11 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+logging:
+  level:
+    org:
+      apache:
+        zookeeper: WARN
+        hbase: WARN
+        hadoop: WARN
