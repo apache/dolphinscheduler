@@ -16,29 +16,21 @@
  */
 
 import { defineComponent, ref } from 'vue'
-
 import styles from './index.module.scss'
-import {NDropdown, NIcon, NLayoutHeader, NMenu} from "naive-ui";
-import {Logo} from "@/layouts/basic/components/logo";
-import {IosArrowDown} from "@vicons/ionicons4";
-import {UserAlt} from "@vicons/fa";
+import { NLayoutSider, NMenu } from "naive-ui";
 
-const Header = defineComponent({
-  name: 'Header',
+const Sider = defineComponent({
+  name: 'Sider',
   props:{
+    visible: {
+      type:Boolean,
+      default: true
+    },
     inverted: {
       type:Boolean,
       default: true
     },
     menuOptions: {
-      type: Array,
-      default: []
-    },
-    languageOptions: {
-      type: Array,
-      default: []
-    },
-    profileOptions: {
       type: Array,
       default: []
     },
@@ -54,38 +46,35 @@ const Header = defineComponent({
 
     function handleMenuClick(key, data) {
       currentMenu.value = data
+      console.log(data)
     }
 
     return { handleMenuClick }
   },
   render() {
-    return (
-        <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
-          <Logo/>
-          <div class={styles.nav}>
-            <NMenu mode='horizontal'
-                   onUpdate:value={this.handleMenuClick}
-                   class={styles.menu}
-                   inverted={this.inverted}
-                   options={this.menuOptions}/>
-            <div class={styles.profile}>
-              <NDropdown inverted={this.inverted} options={this.languageOptions}>
-                <span>
-                 中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                </span>
-              </NDropdown>
-              <NDropdown inverted={this.inverted} options={this.profileOptions}>
-                <span>
-                  <NIcon class={styles.icon}><UserAlt/></NIcon>
-                  admin
-                  <NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                </span>
-              </NDropdown>
-            </div>
-          </div>
-        </NLayoutHeader>
-    )
+    if(this.visible) {
+      return (
+          <NLayoutSider
+              width={240}
+              collapseMode={'width'}
+              collapsedWidth={64}
+              inverted={this.inverted}
+              nativeScrollbar={false}
+              show-trigger
+              bordered>
+            <NMenu
+                onUpdate:value={this.handleMenuClick}
+                inverted={this.inverted}
+                collapsedWidth={64}
+                collapsedIconSize={22}
+                options={this.menuOptions}
+            />
+          </NLayoutSider>
+      )
+    } else {
+      return ('')
+    }
   },
 })
 
-export { Header };
+export { Sider };

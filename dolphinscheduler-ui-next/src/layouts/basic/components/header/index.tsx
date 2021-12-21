@@ -18,21 +18,74 @@
 import { defineComponent, ref } from 'vue'
 
 import styles from './index.module.scss'
+import {NDropdown, NIcon, NLayoutHeader, NMenu} from "naive-ui";
+import {Logo} from "@/layouts/basic/components/logo";
+import {IosArrowDown} from "@vicons/ionicons4";
+import {UserAlt} from "@vicons/fa";
 
-const Logo = defineComponent({
-  name: 'Logo',
-  setup() {
-    const inverted = ref(true)
+const Header = defineComponent({
+  name: 'Header',
+  props:{
+    inverted: {
+      type:Boolean,
+      default: true
+    },
+    menuOptions: {
+      type: Array,
+      default: []
+    },
+    languageOptions: {
+      type: Array,
+      default: []
+    },
+    profileOptions: {
+      type: Array,
+      default: []
+    },
+    currentMenu: {
+      type: Object
+    },
+    defaultMenuKey: {
+      type: String
+    }
+  },
+  setup(props) {
+    const currentMenu = ref({})
 
-    return { inverted }
+    function handleMenuClick(key, data) {
+      currentMenu.value = data
+    }
+
+    return { handleMenuClick }
   },
   render() {
     return (
-        <div class={styles.logo}>
-          <img src="../../../src/assets/images/nav-logo.svg" alt=""/>
-        </div>
+        <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
+          <Logo/>
+          <div class={styles.nav}>
+            <NMenu mode='horizontal'
+                   onUpdate:value={this.handleMenuClick}
+                   class={styles.menu}
+                   inverted={this.inverted}
+                   options={this.menuOptions}/>
+            <div class={styles.profile}>
+              <NDropdown inverted={this.inverted} options={this.languageOptions}>
+                <span>
+                 中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                </span>
+              </NDropdown>
+              <NDropdown inverted={this.inverted} options={this.profileOptions}>
+                <span>
+                  <NIcon class={styles.icon}><UserAlt/></NIcon>
+                  admin
+                  <NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                </span>
+              </NDropdown>
+            </div>
+          </div>
+        </NLayoutHeader>
     )
   },
 })
 
-export { Logo };
+export { Header };
