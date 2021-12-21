@@ -409,6 +409,7 @@ public class MasterRegistryClient {
             return;
         }
         Date serverStartupTime = getServerStartupTime(NodeType.MASTER, masterHost);
+        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
 
         long startTime = System.currentTimeMillis();
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
@@ -430,6 +431,9 @@ public class MasterRegistryClient {
                     continue;
                 }
                 if (taskInstance.getState().typeIsFinished()) {
+                    continue;
+                }
+                if (!checkTaskInstanceNeedFailover(workerServers, taskInstance)) {
                     continue;
                 }
                 logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
