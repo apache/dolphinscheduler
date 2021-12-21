@@ -48,7 +48,7 @@ public class JDBCDataSourceProvider {
         loaderJdbcDriver(classLoader, properties, dbType);
 
         dataSource.setDriverClassName(properties.getDriverClassName());
-        dataSource.setJdbcUrl(properties.getJdbcUrl());
+        dataSource.setJdbcUrl(DataSourceUtils.getJdbcUrl(dbType, properties));
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
@@ -67,13 +67,13 @@ public class JDBCDataSourceProvider {
     /**
      * @return One Session Jdbc DataSource
      */
-    public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties) {
+    public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
         logger.info("Creating OneSession HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 
         HikariDataSource dataSource = new HikariDataSource();
 
         dataSource.setDriverClassName(properties.getDriverClassName());
-        dataSource.setJdbcUrl(properties.getJdbcUrl());
+        dataSource.setJdbcUrl(DataSourceUtils.getJdbcUrl(dbType, properties));
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
