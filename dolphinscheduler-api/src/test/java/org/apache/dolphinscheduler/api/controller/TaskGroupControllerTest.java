@@ -49,7 +49,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
-        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-all")
+        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-projectCode")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
