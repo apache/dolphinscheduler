@@ -17,7 +17,7 @@
 
 """Task Switch."""
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.base import Base
