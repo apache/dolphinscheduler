@@ -160,6 +160,17 @@ class Conditions(Task):
     def __init__(self, name: str, condition: ConditionOperator, *args, **kwargs):
         super().__init__(name, TaskType.CONDITIONS, *args, **kwargs)
         self.condition = condition
+        # Set condition tasks as current task downstream
+        self._set_dep()
+
+    def _set_dep(self) -> None:
+        """Set downstream according to parameter `condition`."""
+        downstream = []
+        for cond in self.condition.args:
+            if isinstance(cond, ConditionOperator):
+                for status in cond.args:
+                    downstream.extend(list(status.tasks))
+        self.set_downstream(downstream)
 
     @property
     def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:

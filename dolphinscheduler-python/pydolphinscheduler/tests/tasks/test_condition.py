@@ -21,6 +21,7 @@ from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.exceptions import PyDSParamException
 from pydolphinscheduler.tasks.condition import (
     FAILURE,
@@ -36,7 +37,7 @@ from tests.testing.task import Task
 TEST_NAME = "test-name"
 TEST_PROJECT = "test-project"
 TEST_PROCESS_DEFINITION = "test-process-definition"
-TEST_TASK = "test-task"
+TEST_TYPE = "test-type"
 TEST_PROJECT_CODE, TEST_DEFINITION_CODE, TEST_TASK_CODE = 12345, 123456, 1234567
 
 TEST_OPERATOR_LIST = ("AND", "OR")
@@ -74,15 +75,15 @@ def test_class_status_depend_item_list_no_expect_type(obj: Status, tasks: Tuple)
 @pytest.mark.parametrize(
     "obj, tasks",
     [
-        (Status, [Task(str(i), TEST_TASK) for i in range(1)]),
-        (Status, [Task(str(i), TEST_TASK) for i in range(2)]),
-        (Status, [Task(str(i), TEST_TASK) for i in range(3)]),
-        (SUCCESS, [Task(str(i), TEST_TASK) for i in range(1)]),
-        (SUCCESS, [Task(str(i), TEST_TASK) for i in range(2)]),
-        (SUCCESS, [Task(str(i), TEST_TASK) for i in range(3)]),
-        (FAILURE, [Task(str(i), TEST_TASK) for i in range(1)]),
-        (FAILURE, [Task(str(i), TEST_TASK) for i in range(2)]),
-        (FAILURE, [Task(str(i), TEST_TASK) for i in range(3)]),
+        (Status, [Task(str(i), TEST_TYPE) for i in range(1)]),
+        (Status, [Task(str(i), TEST_TYPE) for i in range(2)]),
+        (Status, [Task(str(i), TEST_TYPE) for i in range(3)]),
+        (SUCCESS, [Task(str(i), TEST_TYPE) for i in range(1)]),
+        (SUCCESS, [Task(str(i), TEST_TYPE) for i in range(2)]),
+        (SUCCESS, [Task(str(i), TEST_TYPE) for i in range(3)]),
+        (FAILURE, [Task(str(i), TEST_TYPE) for i in range(1)]),
+        (FAILURE, [Task(str(i), TEST_TYPE) for i in range(2)]),
+        (FAILURE, [Task(str(i), TEST_TYPE) for i in range(3)]),
     ],
 )
 def test_class_status_depend_item_list(obj: Status, tasks: Tuple):
@@ -129,13 +130,13 @@ def test_condition_operator_relation(obj: ConditionOperator, expect: str):
     [
         (
             ConditionOperator,
-            [Status(Task("1", TEST_TASK)), 1],
+            [Status(Task("1", TEST_TYPE)), 1],
             ".*?operator parameter support ConditionTask and ConditionOperator.*?",
         ),
         (
             ConditionOperator,
             [
-                Status(Task("1", TEST_TASK)),
+                Status(Task("1", TEST_TYPE)),
                 1.0,
             ],
             ".*?operator parameter support ConditionTask and ConditionOperator.*?",
@@ -143,16 +144,16 @@ def test_condition_operator_relation(obj: ConditionOperator, expect: str):
         (
             ConditionOperator,
             [
-                Status(Task("1", TEST_TASK)),
-                ConditionOperator(And(Status(Task("1", TEST_TASK)))),
+                Status(Task("1", TEST_TYPE)),
+                ConditionOperator(And(Status(Task("1", TEST_TYPE)))),
             ],
             ".*?operator parameter only support same type.",
         ),
         (
             ConditionOperator,
             [
-                ConditionOperator(And(Status(Task("1", TEST_TASK)))),
-                Status(Task("1", TEST_TASK)),
+                ConditionOperator(And(Status(Task("1", TEST_TYPE)))),
+                Status(Task("1", TEST_TYPE)),
             ],
             ".*?operator parameter only support same type.",
         ),
@@ -187,7 +188,7 @@ def test_condition_operator_set_define_attr_status(
     """Test :func:`set_define_attr` with one or more class status."""
     attr = "depend_item_list"
 
-    tasks = [Task(str(i), TEST_TASK) for i in range(task_num)]
+    tasks = [Task(str(i), TEST_TYPE) for i in range(task_num)]
     status = Status(*tasks)
 
     expect = [
@@ -222,7 +223,7 @@ def test_condition_operator_set_define_attr_mix_status(
     """Test :func:`set_define_attr` with one or more mixed status."""
     attr = "depend_item_list"
 
-    task = Task("test-operator", TEST_TASK)
+    task = Task("test-operator", TEST_TYPE)
     status_list = []
     expect = []
     for sta in status:
@@ -254,7 +255,7 @@ def test_condition_operator_set_define_attr_operator(
     """Test :func:`set_define_attr` with one or more class condition operator."""
     attr = "depend_task_list"
 
-    task = Task("test-operator", TEST_TASK)
+    task = Task("test-operator", TEST_TYPE)
     status = Status(task)
 
     expect = [
@@ -292,7 +293,7 @@ def test_condition_operator_set_define_attr_mix_operator(
     """Test :func:`set_define_attr` with one or more class mix condition operator."""
     attr = "depend_task_list"
 
-    task = Task("test-operator", TEST_TASK)
+    task = Task("test-operator", TEST_TYPE)
 
     expect = []
     sub_condition = []
@@ -386,3 +387,53 @@ def test_dependent_get_define(mock_condition_code_version, mock_task_code_versio
 
     task = Conditions(name, condition=cond_operator)
     assert task.get_define() == expect
+
+
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_condition_set_dep_workflow(mock_task_code_version):
+    """Test task condition set dependence in workflow level."""
+    with ProcessDefinition(name="test-condition-set-dep-workflow") as pd:
+        parent = Task(name="parent", task_type=TEST_TYPE)
+        condition_success_1 = Task(name="condition_success_1", task_type=TEST_TYPE)
+        condition_success_2 = Task(name="condition_success_2", task_type=TEST_TYPE)
+        condition_fail = Task(name="condition_fail", task_type=TEST_TYPE)
+        cond_operator = And(
+            And(
+                SUCCESS(condition_success_1, condition_success_2),
+                FAILURE(condition_fail),
+            ),
+        )
+
+        condition = Conditions(name=TEST_NAME, condition=cond_operator)
+        parent >> condition
+        # General tasks test
+        assert len(pd.tasks) == 5
+        assert sorted(pd.task_list, key=lambda t: t.name) == sorted(
+            [
+                parent,
+                condition,
+                condition_success_1,
+                condition_success_2,
+                condition_fail,
+            ],
+            key=lambda t: t.name,
+        )
+        # Task dep test
+        assert parent._downstream_task_codes == {condition.code}
+        assert condition._upstream_task_codes == {parent.code}
+
+        # Condition task dep after ProcessDefinition function get_define called
+        assert condition._downstream_task_codes == {
+            condition_success_1.code,
+            condition_success_2.code,
+            condition_fail.code,
+        }
+        assert all(
+            [
+                child._upstream_task_codes == {condition.code}
+                for child in [condition_success_1, condition_success_2, condition_fail]
+            ]
+        )
