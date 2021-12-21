@@ -195,7 +195,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/task-group/forceStart")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
