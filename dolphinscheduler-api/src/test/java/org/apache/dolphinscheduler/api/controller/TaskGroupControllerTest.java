@@ -67,7 +67,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "1");
         paramsMap.add("name", "TGQ");
         paramsMap.add("pageSize", "10");
-        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-name")
+        MvcResult mvcResult = mockMvc.perform(get("/task-group/list-paging")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -190,10 +190,9 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     public void testWakeCompulsively() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "1");
-        paramsMap.add("taskId", "1");
+        paramsMap.add("queueId", "1");
 
-        MvcResult mvcResult = mockMvc.perform(post("/task-group/wake-task-compulsively")
+        MvcResult mvcResult = mockMvc.perform(post("/task-group/forceStart")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
