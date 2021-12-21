@@ -39,6 +39,7 @@ public class MasterConfig {
     private int stateWheelInterval;
     private double maxCpuLoadAvg;
     private double reservedMemory;
+    private boolean taskLogger;
 
     public int getListenPort() {
         return listenPort;
@@ -134,5 +135,13 @@ public class MasterConfig {
 
     public void setReservedMemory(double reservedMemory) {
         this.reservedMemory = reservedMemory;
+    }
+
+    public boolean isTaskLogger() {
+        return taskLogger;
+    }
+
+    public void setTaskLogger(boolean taskLogger) {
+        this.taskLogger = taskLogger;
     }
 }

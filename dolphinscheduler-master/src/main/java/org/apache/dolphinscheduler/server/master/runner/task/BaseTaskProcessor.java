@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -61,7 +62,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
@@ -80,27 +80,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstance processInstance;
 
-    @Autowired
-    protected ProcessService processService;
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);;
 
     /**
      * pause task, common tasks donot need this.
-     *
-     * @return
      */
     protected abstract boolean pauseTask();
 
     /**
      * kill task, all tasks need to realize this function
-     *
-     * @return
      */
     protected abstract boolean killTask();
 
     /**
      * task timeout process
-     *
-     * @return
      */
     protected abstract boolean taskTimeout();
 
@@ -134,7 +127,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * @return
+     *
      */
     protected boolean pause() {
         if (paused) {
@@ -227,7 +220,10 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * set master task running logger.
      */
-    public void setTaskExecutionLogger() {
+    public void setTaskExecutionLogger(boolean isTaskLogger) {
+        if (!isTaskLogger) {
+            return;
+        }
         logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
@@ -240,7 +236,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set procedure task relation
      *
      * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskInstance                  taskInstance
+     * @param taskInstance taskInstance
      */
     private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
         ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
@@ -253,7 +249,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set datax task relation
      *
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskInstance              taskInstance
+     * @param taskInstance taskInstance
      */
     protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
         DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
@@ -278,7 +274,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set sqoop task relation
      *
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskInstance              taskInstance
+     * @param taskInstance taskInstance
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
         SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
@@ -309,7 +305,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set SQL task relation
      *
      * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskInstance            taskInstance
+     * @param taskInstance taskInstance
      */
     private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
         SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
@@ -345,7 +341,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * whehter tenant is null
      *
-     * @param tenant       tenant
+     * @param tenant tenant
      * @param taskInstance taskInstance
      * @return result
      */

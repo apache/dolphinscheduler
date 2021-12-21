@@ -15,10 +15,37 @@
  * limitations under the License.
  */
 
-.container {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+import { axios } from '@/service/service'
+import { ListReq, TokenReq, UserReq, UpdateTokenReq } from './types'
+
+export function queryAccessTokenList(params: ListReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
+}
+
+export function createToken(data: TokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'post',
+    data,
+  })
+}
+
+export function queryAccessTokenByUser(params: UserReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'get',
+    params,
+  })
+}
+
+export function updateToken(data: UpdateTokenReq): any {
+  return axios({
+    url: '/access-tokens',
+    method: 'put',
+    data,
+  })
 }

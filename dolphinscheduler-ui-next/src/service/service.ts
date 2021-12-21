@@ -16,24 +16,43 @@
  */
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import qs from 'qs'
 
 const baseRequestConfig: AxiosRequestConfig = {
-  baseURL: '/',
+  baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
   timeout: 10000,
+  transformRequest: (params) => {
+    return qs.stringify(params, { arrayFormat: 'repeat' })
+  },
+  paramsSerializer: (params) => {
+    return qs.stringify(params, { arrayFormat: 'repeat' })
+  },
 }
 
 const service = axios.create(baseRequestConfig)
 
-const err = (error: AxiosError): Promise<AxiosError> => {
-  return Promise.reject(error)
+const err = (err: AxiosError): Promise<AxiosError> => {
+  return Promise.reject(err)
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
+  console.log('config', config)
   return config
 }, err)
 
+// The response to intercept
 service.interceptors.response.use((res: AxiosResponse) => {
-  return res.data
+  // No code will be processed
+  if (res.data.code === undefined) {
+    return res.data
+  }
+
+  switch (res.data.code) {
+    case 0:
+      return res.data.data
+    default:
+      throw new Error(`${res.data.msg}: ${res.config.url}`)
+  }
 }, err)
 
 export { service as axios }

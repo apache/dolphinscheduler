@@ -33,7 +33,7 @@
           <div class="list">
             <el-input
               v-model="searchVal"
-              @keyup.enter="_ckQuery"
+              @keyup.enter.native="_ckQuery"
               size="mini"
               :placeholder="$t('Please enter keyword')"
               type="text"

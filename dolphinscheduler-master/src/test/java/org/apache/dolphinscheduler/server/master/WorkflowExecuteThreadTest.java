@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -84,6 +85,8 @@ public class WorkflowExecuteThreadTest {
 
     private TaskProcessorFactory taskProcessorFactory;
 
+    private StateWheelExecuteThread stateWheelExecuteThread;
+
     @Before
     public void init() throws Exception {
         processService = mock(ProcessService.class);
@@ -107,9 +110,8 @@ public class WorkflowExecuteThreadTest {
         processDefinition.setGlobalParamList(Collections.emptyList());
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList = new ConcurrentHashMap<>();
-        ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList = new ConcurrentHashMap<>();
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, taskTimeoutCheckList, taskRetryCheckList, taskProcessorFactory));
+        stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread));
         // prepareProcess init dag
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);

@@ -15,37 +15,39 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import styles from './login.module.scss'
+import { reactive, ref } from 'vue'
+import { FormRules } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
-import { useThemeStore } from '@/store/theme/theme'
 
-const Login = defineComponent({
-  name: 'Login',
-  setup() {
-    const { t, locale } = useI18n()
-    const themeStore = useThemeStore()
+export function useValidate () {
+  const { t, locale } = useI18n()
+  const state = reactive({
+    loginFormRef: ref(),
+    loginForm: {
+      userName: '',
+      userPassword: '',
+    },
+    rules: {
+      userName: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.loginForm.userName === '') {
+            return new Error(`${t('login.userName_tips')}`)
+          }
+        },
+      },
+      userPassword: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.loginForm.userPassword === '') {
+            return new Error(`${t('login.userPassword_tips')}`)
+          }
+        },
+      },
+    } as FormRules,
+  })
 
-    const setTheme = (): void => {
-      themeStore.setDarkTheme()
-    }
-
-    return { t, locale, setTheme }
-  },
-  render() {
-    return (
-      <div class={styles.container}>
-        <NButton type='error' onClick={this.setTheme}>
-          {this.t('login.test')} + 切换主题
-        </NButton>
-        <select v-model={this.locale}>
-          <option value='en_US'>en_US</option>
-          <option value='zh_CN'>zh_CN</option>
-        </select>
-      </div>
-    )
-  },
-})
-
-export default Login
+  return {
+    state, t, locale
+  }
+}
