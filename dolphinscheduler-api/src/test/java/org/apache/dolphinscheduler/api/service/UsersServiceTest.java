@@ -728,13 +728,13 @@ public class UsersServiceTest {
         }
     }
 
-    private Project getProject() {
-        Project project = new Project();
-        project.setId(1);
-        project.setUserId(1);
-        project.setName("test_project");
-        return project;
-    }
+//    private Project getProject() {
+//        Project project = new Project();
+//        project.setId(1);
+//        project.setUserId(1);
+//        project.setName("test_project");
+//        return project;
+//    }
 
     /**
      * get disabled user
