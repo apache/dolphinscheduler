@@ -143,11 +143,11 @@ public final class HttpSender {
      * set body params
      */
     private void setMsgInRequestBody(String msg) {
-        ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
-        //set msg content field
-        objectNode.put(contentField, msg);
         try {
-            StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
+            ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
+            //set msg content field
+            objectNode.put(contentField, msg);
+            StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
             logger.error("send http alert msg  exception : {}", e.getMessage());
