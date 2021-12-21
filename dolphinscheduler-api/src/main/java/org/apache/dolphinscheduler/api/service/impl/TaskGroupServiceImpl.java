@@ -82,7 +82,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (groupSize <= 0) {
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
-
         }
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
@@ -185,6 +184,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
 
+        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
+    }
+
+    private Map<String, Object> getStringObjectMap(int pageNo, int pageSize, Map<String, Object> result, IPage<TaskGroup> taskGroupPaging) {
         PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
         int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
         List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
@@ -236,16 +239,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging = taskGroupMapper.queryTaskGroupPaging(page, userId, name, status);
 
-        PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
-        List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
-        pageInfo.setTotal(total);
-        pageInfo.setTotalList(list);
-
-        result.put(Constants.DATA_LIST, pageInfo);
-        logger.info("select result:{}", taskGroupPaging);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
     }
 
     /**

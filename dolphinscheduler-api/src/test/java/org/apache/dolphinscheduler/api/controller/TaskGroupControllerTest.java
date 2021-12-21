@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -185,5 +184,5 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         Assert.assertTrue(result1 != null && result1.isSuccess());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
-    
+
 }
