@@ -22,7 +22,7 @@ import { useI18n } from 'vue-i18n'
 
 // All TSX files under the views folder automatically generate mapping relationship
 const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.classification(modules)
+const components: { [key: string]: Component } = utils.mapping(modules)
 
 /**
  * Basic page
