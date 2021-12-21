@@ -149,18 +149,17 @@ const basic = defineComponent({
   setup() {
     const inverted = ref(true)
     const hasSider = ref(false)
-    const defaultMenuKey = ref('project')
+    const defaultMenuKey = ref('home')
     const currentMenu = ref({})
     const topMenuOptions = ref([])
     const sideMenuOptions = ref([])
 
-    function handleTopMenuClick(key, data) {
+    function handleTopMenuClick(data) {
       currentMenu.value = data
       generateMenus()
     }
 
     function handleSideMenuClick(key, data) {
-      console.log(key)
       console.log(data)
     }
 
@@ -177,10 +176,9 @@ const basic = defineComponent({
           }
         }
       })
-      console.log(topMenuOptions.value)
     }
     generateMenus()
-    return { topMenuOptions, sideMenuOptions, inverted, hasSider }
+    return { topMenuOptions, sideMenuOptions, inverted, hasSider, defaultMenuKey, handleTopMenuClick }
   },
   render() {
     return (
@@ -190,6 +188,8 @@ const basic = defineComponent({
               profileOptions={profileOptions}
               menuOptions={this.topMenuOptions}
               inverted={this.inverted}
+              defaultMenuKey={this.defaultMenuKey}
+              onMenuClick={this.handleTopMenuClick}
           />
           <NLayout hasSider>
             <Sider

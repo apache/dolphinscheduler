@@ -16,8 +16,7 @@
  */
 
 import { defineComponent, ref } from 'vue'
-import styles from './index.module.scss'
-import { NLayoutSider, NMenu } from "naive-ui";
+import { NLayoutSider, NMenu } from 'naive-ui'
 
 const Sider = defineComponent({
   name: 'Sider',
@@ -77,4 +76,4 @@ const Sider = defineComponent({
   },
 })
 
-export { Sider };
+export { Sider }

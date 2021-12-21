@@ -21,7 +21,7 @@ import RouteState from './types'
 import { RouteRecordRaw } from "vue-router"
 
 export const useAsyncRouteStore = defineStore({
-  id: 'theme',
+  id: 'route',
   state: (): RouteState => ({
     menus: [],
     routers: [],

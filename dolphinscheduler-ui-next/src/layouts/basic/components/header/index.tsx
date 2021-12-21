@@ -18,10 +18,10 @@
 import { defineComponent, ref } from 'vue'
 
 import styles from './index.module.scss'
-import {NDropdown, NIcon, NLayoutHeader, NMenu} from "naive-ui";
-import {Logo} from "@/layouts/basic/components/logo";
-import {IosArrowDown} from "@vicons/ionicons4";
-import {UserAlt} from "@vicons/fa";
+import { NDropdown, NIcon, NLayoutHeader, NMenu } from 'naive-ui'
+import { Logo } from '@/layouts/basic/components/logo'
+import { IosArrowDown } from "@vicons/ionicons4"
+import { UserAlt } from '@vicons/fa'
 
 const Header = defineComponent({
   name: 'Header',
@@ -49,11 +49,12 @@ const Header = defineComponent({
       type: String
     }
   },
-  setup(props) {
+  setup(props, context) {
     const currentMenu = ref({})
 
     function handleMenuClick(key, data) {
       currentMenu.value = data
+      context.emit('menuClick', data)
     }
 
     return { handleMenuClick }
@@ -65,6 +66,7 @@ const Header = defineComponent({
           <div class={styles.nav}>
             <NMenu mode='horizontal'
                    onUpdate:value={this.handleMenuClick}
+                   defaultValue={this.defaultMenuKey}
                    class={styles.menu}
                    inverted={this.inverted}
                    options={this.menuOptions}/>

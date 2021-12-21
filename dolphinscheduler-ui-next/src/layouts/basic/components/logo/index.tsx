@@ -35,4 +35,4 @@ const Logo = defineComponent({
   },
 })
 
-export { Logo };
+export { Logo }
