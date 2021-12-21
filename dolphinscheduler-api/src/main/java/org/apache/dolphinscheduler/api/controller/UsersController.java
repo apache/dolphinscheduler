@@ -17,6 +17,21 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.TransferDataType;
@@ -213,6 +228,54 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userId") int userId,
                                @RequestParam(value = "projectIds") String projectIds) {
         Map<String, Object> result = usersService.grantProject(loginUser, userId, projectIds);
+        return returnDataList(result);
+    }
+
+    /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCode project code
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantProjectByCode", notes = "GRANT_PROJECT_BY_CODE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long")
+    })
+    @PostMapping(value = "/grant-project-by-code")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_PROJECT_ERROR)
+    @AccessLogAnnotation
+    public Result grantProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam(value = "userId") int userId,
+            @RequestParam(value = "projectCode") long projectCode) {
+        Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, userId, projectCode);
+        return this.returnDataList(result);
+    }
+
+    /**
+     * revoke project
+     *
+     * @param loginUser     login user
+     * @param userId        user id
+     * @param projectCode   project code
+     * @return revoke result code
+     */
+    @ApiOperation(value = "revokeProject", notes = "REVOKE_PROJECT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100")
+    })
+    @PostMapping(value = "/revoke-project")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(REVOKE_PROJECT_ERROR)
+    @AccessLogAnnotation
+    public Result revokeProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam(value = "userId") int userId,
+            @RequestParam(value = "projectCode") long projectCode) {
+        Map<String, Object> result = this.usersService.revokeProject(loginUser, userId, projectCode);
         return returnDataList(result);
     }
 

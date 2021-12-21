@@ -23,7 +23,9 @@ public enum CacheType {
     QUEUE("queue"),
     PROCESS_DEFINITION("processDefinition"),
     PROCESS_TASK_RELATION("processTaskRelation"),
-    TASK_DEFINITION("taskDefinition");
+    TASK_DEFINITION("taskDefinition"),
+    WORKER_GROUP("workerGroup"),
+    SCHEDULE("schedule");
 
     CacheType(String cacheName) {
         this.cacheName = cacheName;

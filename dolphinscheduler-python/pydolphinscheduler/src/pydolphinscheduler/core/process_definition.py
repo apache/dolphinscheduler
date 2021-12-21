@@ -68,7 +68,7 @@ class ProcessDefinition(Base):
         "param",
     }
 
-    _TO_DICT_ATTR = {
+    _DEFINE_ATTR = {
         "name",
         "description",
         "_project",
@@ -195,7 +195,7 @@ class ProcessDefinition(Base):
         if not self.tasks:
             return [self.tasks]
         else:
-            return [task.to_dict() for task in self.tasks.values()]
+            return [task.get_define() for task in self.tasks.values()]
 
     @property
     def task_relation_json(self) -> List[Dict]:
@@ -204,7 +204,7 @@ class ProcessDefinition(Base):
             return [self.tasks]
         else:
             self._handle_root_relation()
-            return [tr.to_dict() for tr in self._task_relations]
+            return [tr.get_define() for tr in self._task_relations]
 
     @property
     def schedule_json(self) -> Optional[Dict]:

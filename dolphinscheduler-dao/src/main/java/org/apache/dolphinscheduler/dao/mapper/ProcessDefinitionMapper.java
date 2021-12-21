@@ -52,16 +52,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     /**
      * update
      */
-    @CacheEvict
+    @CacheEvict(key = "#p0.code")
     int updateById(@Param("et") ProcessDefinition processDefinition);
-
-    /**
-     * query process definition by code list
-     *
-     * @param codes codes
-     * @return process definition list
-     */
-    List<ProcessDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
      * delete process definition by code
@@ -71,6 +63,14 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      */
     @CacheEvict
     int deleteByCode(@Param("code") long code);
+
+    /**
+     * query process definition by code list
+     *
+     * @param codes codes
+     * @return process definition list
+     */
+    List<ProcessDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
      * verify process definition by name
@@ -141,17 +141,14 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<ProcessDefinition> queryDefinitionListByTenant(@Param("tenantId") int tenantId);
 
     /**
-     * count process definition group by user
+     * Statistics process definition group by project codes list
+     * <p>
+     * We only need project codes to determine whether the definition belongs to the user or not.
      *
-     * @param userId userId
      * @param projectCodes projectCodes
-     * @param isAdmin isAdmin
-     * @return process definition list
+     * @return definition group by user
      */
-    List<DefinitionGroupByUser> countDefinitionGroupByUser(
-            @Param("userId") Integer userId,
-            @Param("projectCodes") Long[] projectCodes,
-            @Param("isAdmin") boolean isAdmin);
+    List<DefinitionGroupByUser> countDefinitionByProjectCodes(@Param("projectCodes") Long[] projectCodes);
 
     /**
      * list all resource ids

@@ -551,6 +551,90 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
+     * grant project by code
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectCode project code
+     * @return grant result code
+     */
+    @Override
+    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // 1. check if user is existed
+        User tempUser = this.userMapper.selectById(userId);
+        if (tempUser == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 2. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+
+        // 3. only project owner can operate
+        if (!this.hasPerm(loginUser, project.getUserId())) {
+            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // 4. maintain the relationship between project and user
+        final Date today = new Date();
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setUserId(userId);
+        projectUser.setProjectId(project.getId());
+        projectUser.setPerm(7);
+        projectUser.setCreateTime(today);
+        projectUser.setUpdateTime(today);
+        this.projectUserMapper.insert(projectUser);
+
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * revoke the project permission for specified user.
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectCode   Project Code
+     * @return
+     */
+    @Override
+    public Map<String, Object> revokeProject(User loginUser, int userId, long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        // 2. check if user is existed
+        User user = this.userMapper.selectById(userId);
+        if (user == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 3. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+
+        // 4. delete th relationship between project and user
+        this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * grant resource
      *
      * @param loginUser login user

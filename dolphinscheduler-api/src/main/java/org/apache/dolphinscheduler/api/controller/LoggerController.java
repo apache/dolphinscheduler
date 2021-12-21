@@ -32,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,6 +44,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -82,7 +84,6 @@ public class LoggerController extends BaseController {
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 
-
     /**
      * download log file
      *
@@ -107,4 +108,59 @@ public class LoggerController extends BaseController {
             .body(logBytes);
     }
 
+    /**
+     * query task log in specified project
+     *
+     * @param loginUser      login user
+     * @param projectCode project code
+     * @param taskInstanceId task instance id
+     * @param skipNum        skip number
+     * @param limit          limit
+     * @return task log content
+     */
+    @ApiOperation(value = "queryLogInSpecifiedProject", notes = "QUERY_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
+    })
+    @GetMapping(value = "/{projectCode}/detail")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                   @RequestParam(value = "skipLineNum") int skipNum,
+                                   @RequestParam(value = "limit") int limit) {
+        return returnDataList(loggerService.queryLog(loginUser, projectCode, taskInstanceId, skipNum, limit));
+    }
+
+    /**
+     * download log file
+     *
+     * @param loginUser      login user
+     * @param projectCode    project code
+     * @param taskInstanceId task instance id
+     * @return log file content
+     */
+    @ApiOperation(value = "downloadTaskLogInSpecifiedProject", notes = "DOWNLOAD_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
+    })
+    @GetMapping(value = "/{projectCode}/download-log")
+    @ResponseBody
+    @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public ResponseEntity downloadTaskLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
+        byte[] logBytes = loggerService.getLogBytes(loginUser, projectCode, taskInstanceId);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                .body(logBytes);
+    }
 }

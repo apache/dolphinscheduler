@@ -302,6 +302,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -387,8 +388,6 @@ alter table t_ds_process_instance add var_pool longtext COMMENT 'var_pool' AFTER
 alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
 alter table t_ds_process_instance drop KEY `process_instance_index`;
 alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
-alter table t_ds_process_instance drop KEY `start_time_index`;
-alter table t_ds_process_instance add KEY `start_time_index` (`start_time`,`end_time`) USING BTREE;
 alter table t_ds_process_instance drop process_instance_json;
 alter table t_ds_process_instance drop locations;
 alter table t_ds_process_instance drop connects;
