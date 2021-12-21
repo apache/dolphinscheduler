@@ -15,40 +15,32 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from "vue-router";
-import routes from "./routes";
+import { toRaw } from "vue";
+import { defineStore } from "pinia";
+import RouteState from "./types";
+import { RouteRecordRaw } from "vue-router";
 
-// NProgress
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
+export const useAsyncRouteStore = defineStore({
+  id: "route",
+  state: (): RouteState => ({
+    menus: [],
+    routers: [],
+    addRouters: [],
+  }),
+  getters: {
+    getMenus(): RouteRecordRaw[] {
+      return this.menus;
+    },
+    getRouters(): RouteRecordRaw[] {
+      return toRaw(this.addRouters);
+    },
+  },
+  actions: {
+    setMenus(menus) {
+      this.menus = menus;
+    },
+    async generateRouters(routes) {
+      console.log(routes);
+    },
+  },
 });
-
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start();
-    next();
-    NProgress.done();
-  }
-);
-
-router.afterEach(() => {
-  NProgress.done();
-});
-
-export default router;
