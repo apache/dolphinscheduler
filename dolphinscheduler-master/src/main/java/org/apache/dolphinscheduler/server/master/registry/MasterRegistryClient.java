@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -191,24 +192,57 @@ public class MasterRegistryClient {
      */
     public void removeWorkerNodePath(String path, NodeType nodeType, boolean failover) {
         logger.info("{} node deleted : {}", nodeType, path);
+
+        if (StringUtils.isEmpty(path)) {
+            logger.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
+            return;
+        }
+
+        String serverHost = registryClient.getHostByEventDataPath(path);
+        if (StringUtils.isEmpty(serverHost)) {
+            logger.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
+            return;
+        }
+
+        // when worker node remove, master need to handle dead server with lock
+        String failoverPath = getFailoverLockPath(nodeType, serverHost);
+        boolean lock = false;
         try {
-            String serverHost = null;
-            if (!StringUtils.isEmpty(path)) {
-                serverHost = registryClient.getHostByEventDataPath(path);
-                if (StringUtils.isEmpty(serverHost)) {
-                    logger.error("server down error: unknown path: {}", path);
-                    return;
-                }
-                // handle dead server
+            if (isNeedToHandleDeadServer(serverHost, nodeType, registryClient.getSessionTimeout())) {
+                lock = registryClient.getLock(failoverPath);
                 registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
             }
-            //failover server
+        } catch (Exception e) {
+            logger.error("{} server handle dead server failed", nodeType, e);
+        } finally {
+            if (lock) {
+                registryClient.releaseLock(failoverPath);
+            }
+        }
+
+        try {
             if (failover) {
                 failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
             logger.error("{} server failover failed", nodeType, e);
         }
+    }
+
+    private boolean isNeedToHandleDeadServer(String host, NodeType nodeType, Duration sessionTimeout) {
+        long sessionTimeoutMillis = Math.max(Constants.REGISTRY_SESSION_TIMEOUT, sessionTimeout.toMillis());
+        List<Server> serverList = registryClient.getServerList(nodeType);
+        if (CollectionUtils.isEmpty(serverList)) {
+            return true;
+        }
+        Date startupTime = getServerStartupTime(serverList, host);
+        if (startupTime == null) {
+            return true;
+        }
+        if (System.currentTimeMillis() - startupTime.getTime() > sessionTimeoutMillis) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -283,7 +317,11 @@ public class MasterRegistryClient {
         }
         Date workerServerStartDate = getServerStartupTime(workerServers, taskInstance.getHost());
         if (workerServerStartDate != null) {
-            return taskInstance.getStartTime().after(workerServerStartDate);
+            if (taskInstance.getStartTime() == null) {
+                return taskInstance.getSubmitTime().after(workerServerStartDate);
+            } else {
+                return taskInstance.getStartTime().after(workerServerStartDate);
+            }
         }
         return false;
     }
@@ -315,7 +353,6 @@ public class MasterRegistryClient {
         List<Server> servers = registryClient.getServerList(nodeType);
         return getServerStartupTime(servers, host);
     }
-
 
     /**
      * failover worker tasks
