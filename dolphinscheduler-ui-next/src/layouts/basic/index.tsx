@@ -18,7 +18,7 @@
 import { h, defineComponent, ref } from 'vue'
 import styles from './index.module.scss'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import {RouteRecordRaw, useRoute} from 'vue-router'
 import { UserAlt } from '@vicons/fa'
 import { IosArrowDown } from '@vicons/ionicons4';
 import { PersonCircleOutline, LogOutOutline } from '@vicons/ionicons5';
@@ -65,27 +65,74 @@ const menuOptions = [
   {
     label: '项目管理',
     key: 'project',
-    icon: renderIcon(Notes)
+    icon: renderIcon(Notes),
+    children: [
+      {
+        label: '项目',
+        key: 'projects-list'
+      },
+      {
+        label: '工作流监控',
+        key: 'projects-index',
+      },
+    ]
   },
   {
     label: '资源中心',
     key: 'resources',
-    icon: renderIcon(FolderOutlined)
+    icon: renderIcon(FolderOutlined),
+    children: [
+      {
+        label: '文件管理',
+        key: 'file',
+      },
+      {
+        label: '创建资源',
+        key: 'resource-file-create',
+      },
+    ]
   },
   {
     label: '数据源中心',
     key: 'datasource',
-    icon: renderIcon(Database)
+    icon: renderIcon(Database),
+    children: [
+      {
+        label: '数据源中心',
+        key: 'datasource-list',
+      }
+    ]
   },
   {
     label: '监控中心',
     key: 'monitor',
-    icon: renderIcon(MonitorFilled)
+    icon: renderIcon(MonitorFilled),
+    children: [
+      {
+        key: 'servers-master',
+        title: '服务管理-Master'
+      },
+      {
+        key: 'servers-worker',
+        title: '服务管理-Worker'
+      },
+    ]
   },
   {
     label: '安全中心',
     key: 'security',
-    icon: renderIcon(SafetyCertificateOutlined)
+    icon: renderIcon(SafetyCertificateOutlined),
+    children: [
+      {
+        key: 'tenement-manage',
+        label: '租户管理'
+
+      },
+      {
+        key: 'users-manage',
+        label: '用户管理'
+      },
+    ],
   }
 ]
 
@@ -93,53 +140,118 @@ const basic = defineComponent({
   name: 'basic',
   setup() {
     const inverted = ref(true)
-    return { inverted }
+    const hasSider = ref(false)
+    const defaultMenuKey = ref('project')
+    const currentMenu = ref({})
+    const topMenuOptions = ref([])
+    const sideMenuOptions = ref([])
+
+    function handleMenuClick(key, data) {
+      currentMenu.value = data
+      console.log(key)
+      console.log(data)
+    }
+
+    function generateMenus() {
+      topMenuOptions.value = []
+      sideMenuOptions.value = []
+      hasSider.value = false
+      menuOptions.forEach(option => {
+        topMenuOptions.value.push({label:option.label, key: option.key, icon: option.icon})
+        if(currentMenu.value.key === option.key || defaultMenuKey.value === option.key) {
+          if(option.hasOwnProperty('children') && option.children) {
+            sideMenuOptions.value = option.children
+            hasSider.value = true
+          }
+        }
+      })
+      console.log(topMenuOptions.value)
+    }
+    generateMenus()
+    return { topMenuOptions, sideMenuOptions, inverted, hasSider, handleMenuClick }
   },
   render() {
-    return (
-        <NLayout class={styles.container}>
-          <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
-            <Logo/>
-            <div class={styles.nav}>
-              <NMenu mode='horizontal' class={styles.menu} inverted={this.inverted} options={menuOptions}/>
-              <div class={styles.profile}>
-                <NDropdown inverted={this.inverted} options={ switchLanguageDropDownOptions }>
-                  <span>
-                   中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                  </span>
-                </NDropdown>
-                <NDropdown inverted={this.inverted} options={ dropDownOptions }>
-                  <span>
-                    <NIcon class={styles.icon}><UserAlt/></NIcon>
-                    admin
-                    <NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                  </span>
-                </NDropdown>
+    if (this.hasSider === true) {
+      return (
+          <NLayout class={styles.container}>
+            <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
+              <Logo/>
+              <div class={styles.nav}>
+                <NMenu mode='horizontal'
+                       onUpdate:value={this.handleMenuClick}
+                       class={styles.menu}
+                       inverted={this.inverted}
+                       options={this.topMenuOptions}/>
+                <div class={styles.profile}>
+                  <NDropdown inverted={this.inverted} options={switchLanguageDropDownOptions}>
+                    <span>
+                     中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                    </span>
+                  </NDropdown>
+                  <NDropdown inverted={this.inverted} options={dropDownOptions}>
+                    <span>
+                      <NIcon class={styles.icon}><UserAlt/></NIcon>
+                      admin
+                      <NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                    </span>
+                  </NDropdown>
+                </div>
               </div>
-            </div>
-          </NLayoutHeader>
-          <NLayout hasSider>
-            <NLayoutSider
-                width={240}
-                collapseMode={'width'}
-                collapsedWidth={64}
-                inverted={this.inverted}
-                nativeScrollbar={false}
-                show-trigger
-                bordered>
-              <NMenu
-                  inverted={this.inverted}
+            </NLayoutHeader>
+            <NLayout hasSider>
+              <NLayoutSider
+                  width={240}
+                  collapseMode={'width'}
                   collapsedWidth={64}
-                  collapsedIconSize={22}
-                  options={ menuOptions }
-            />
-            </NLayoutSider>
-            <NLayoutContent>
-              <router-view />
-            </NLayoutContent>
+                  inverted={this.inverted}
+                  nativeScrollbar={false}
+                  show-trigger
+                  bordered>
+                <NMenu
+                    inverted={this.inverted}
+                    collapsedWidth={64}
+                    collapsedIconSize={22}
+                    options={this.sideMenuOptions}
+                />
+              </NLayoutSider>
+              <NLayoutContent>
+                <router-view/>
+              </NLayoutContent>
+            </NLayout>
           </NLayout>
-        </NLayout>
-    )
+      )
+    } else {
+      return (
+          <NLayout class={styles.container}>
+            <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
+              <Logo/>
+              <div class={styles.nav}>
+                <NMenu mode='horizontal' class={styles.menu} inverted={this.inverted}
+                       options={menuOptions}/>
+                <div class={styles.profile}>
+                  <NDropdown inverted={this.inverted} options={switchLanguageDropDownOptions}>
+                    <span>
+                     中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                    </span>
+                  </NDropdown>
+                  <NDropdown inverted={this.inverted} options={dropDownOptions}>
+                    <span>
+                      <NIcon class={styles.icon}><UserAlt/></NIcon>
+                      admin
+                      <NIcon class={styles.icon}><IosArrowDown/></NIcon>
+                    </span>
+                  </NDropdown>
+                </div>
+              </div>
+            </NLayoutHeader>
+            <NLayout hasSider>
+              <NLayoutContent>
+                <router-view/>
+              </NLayoutContent>
+            </NLayout>
+          </NLayout>
+      )
+    }
   },
 })
 
