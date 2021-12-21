@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -79,11 +81,35 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     }
 
     /**
+     * query access token for specified user
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return token list for specified user
+     */
+    @Override
+    public Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        // only admin can operate
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+
+        // query access token for specified user
+        List<AccessToken> accessTokenList = this.accessTokenMapper.queryAccessTokenByUser(userId);
+        result.put(Constants.DATA_LIST, accessTokenList);
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * create token
      *
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
+     * @param token token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
     @SuppressWarnings("checkstyle:WhitespaceAround")
@@ -91,14 +117,23 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
 
+        // 1. check permission
         if (!hasPerm(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
+        // 2. check if user is existed
         if (userId <= 0) {
             throw new IllegalArgumentException("User id should not less than or equals to 0.");
         }
+
+        // 3. generate access token if absent
+        if (StringUtils.isBlank(token)) {
+            token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+        }
+
+        // 4. persist to the database
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
@@ -106,10 +141,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
 
-        // insert
         int insert = accessTokenMapper.insert(accessToken);
 
         if (insert > 0) {
+            result.put(Constants.DATA_LIST, accessToken);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
@@ -172,22 +207,33 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param id token id
      * @param userId token for user
      * @param expireTime token expire time
-     * @param token token string
-     * @return update result code
+     * @param token token string (if it is absent, it will be automatically generated)
+     * @return updated access token entity
      */
     @Override
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
+
+        // 1. check permission
         if (!hasPerm(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+
+        // 2. check if token is existed
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
             logger.error("access token not exist,  access token id {}", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
+
+        // 3. generate access token if absent
+        if (StringUtils.isBlank(token)) {
+            token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+        }
+
+        // 4. persist to the database
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
         accessToken.setToken(token);
@@ -195,6 +241,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         accessTokenMapper.updateById(accessToken);
 
+        result.put(Constants.DATA_LIST, accessToken);
         putMsg(result, Status.SUCCESS);
         return result;
     }

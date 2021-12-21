@@ -113,6 +113,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             createTenantDirIfNotExists(tenantCode);
         }
 
+        result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
 
         return result;
