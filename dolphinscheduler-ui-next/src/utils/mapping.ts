@@ -15,44 +15,28 @@
  * limitations under the License.
  */
 
-import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
-import utils from '@/utils'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+const mapping = (modules: any) => {
+  const components: { [key: string]: Component } = {}
+  // All TSX files under the views folder automatically generate mapping relationship
+  Object.keys(modules).forEach((key: string) => {
+    const nameMatch: string[] | null = key.match(/^\/src\/views\/(.+)\.tsx/)
 
-/**
- * Basic page
- */
-const basePage: RouteRecordRaw[] = [
-  {
-    path: '/',
-    redirect: { name: 'home' },
-    component: () => import('@/layouts/content/Content'),
-    children: [
-      {
-        path: '/home',
-        name: 'home',
-        component: components['home'],
-      },
-    ],
-  },
-]
+    if (!nameMatch) {
+      return
+    }
 
-/**
- * Login page
- */
-const loginPage: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    name: 'login',
-    component: components['login'],
-  },
-]
+    // If the page is named Index, the parent folder is used as the name
+    const indexMatch: string[] | null = nameMatch[1].match(/(.*)\/Index$/i)
 
-const routes: RouteRecordRaw[] = [...basePage, ...loginPage]
+    let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
 
-// 重新组织后导出
-export default routes
+    ;[name] = name.split('/').splice(-1)
+
+    components[name] = modules[key]
+  })
+  return components
+}
+
+export default mapping
