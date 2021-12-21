@@ -16,78 +16,50 @@
  */
 
 import { axios } from '@/service/service'
-import {
-  ListReq,
-  ProjectsReq,
-  UserIdReq,
-  CodeReq,
-  UpdateProjectsReq,
-} from './types'
+import { ListReq, TenantCodeReq, TenantReq, IdReq } from './types'
 
-export function queryProjectListPaging(params: ListReq): any {
+export function queryTenantListPaging(params: ListReq): any {
   return axios({
-    url: `/projects`,
+    url: '/tenants',
     method: 'get',
     params,
   })
 }
 
-export function createProject(data: ProjectsReq): any {
+export function createTenant(data: TenantReq): any {
   return axios({
-    url: `/projects`,
+    url: '/tenants',
     method: 'post',
     data,
   })
 }
 
-export function queryAuthorizedProject(params: UserIdReq): any {
+export function queryTenantList(): any {
   return axios({
-    url: `/projects/authed-project`,
+    url: '/tenants/list',
+    method: 'get',
+  })
+}
+
+export function verifyTenantCode(params: TenantCodeReq): any {
+  return axios({
+    url: '/tenants/verify-code',
     method: 'get',
     params,
   })
 }
 
-export function queryProjectCreatedAndAuthorizedByUser(): any {
+export function updateTenant(data: TenantCodeReq, id: IdReq): any {
   return axios({
-    url: `/projects/created-and-authed`,
-    method: 'get',
-  })
-}
-
-export function queryAllProjectList(): any {
-  return axios({
-    url: `/projects/list`,
-    method: 'get',
-  })
-}
-
-export function queryUnauthorizedProject(params: UserIdReq): any {
-  return axios({
-    url: `/projects/unauth-project`,
-    method: 'get',
-    params,
-  })
-}
-
-export function queryProjectByCode(code: CodeReq): any {
-  return axios({
-    url: `/projects/${code}`,
-    method: 'get',
-  })
-}
-
-export function updateProject(data: UpdateProjectsReq, code: CodeReq): any {
-  return axios({
-    url: `/projects/${code}`,
+    url: `/tenants/${id}`,
     method: 'put',
     data,
   })
 }
 
-export function deleteProject(code: CodeReq): any {
+export function deleteTenantById(id: IdReq): any {
   return axios({
-    url: `/projects/${code}`,
+    url: `/tenants/${id}`,
     method: 'delete',
   })
 }

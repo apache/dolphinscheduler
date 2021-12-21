@@ -15,19 +15,33 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+import { axios } from '@/service/service'
+import { ProjectCodeReq, WorkFlowNameReq } from './types'
+
+export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
+  return axios({
+    url: `/projects/${projectCode}/lineages/list`,
+    method: 'get',
+  })
 }
 
-interface QueueReq {
-  queue: string
-  queueName: string
+export function queryLineageByWorkFlowName(
+  params: WorkFlowNameReq,
+  projectCode: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${projectCode}/lineages/query-by-name`,
+    method: 'get',
+    params,
+  })
 }
 
-interface IdReq {
-  id: number
+export function queryLineageByWorkFlowCode(
+  workFlowCode: WorkFlowNameReq,
+  projectCode: ProjectCodeReq
+): any {
+  return axios({
+    url: `/projects/${projectCode}/lineages/${workFlowCode}`,
+    method: 'get',
+  })
 }
-
-export { ListReq, QueueReq, IdReq }

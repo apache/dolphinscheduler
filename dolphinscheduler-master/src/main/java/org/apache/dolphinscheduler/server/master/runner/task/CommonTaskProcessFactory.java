@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
+package org.apache.dolphinscheduler.server.master.runner.task;
 
-interface QueueReq {
-  queue: string
-  queueName: string
-}
+import org.apache.dolphinscheduler.common.Constants;
 
-interface IdReq {
-  id: number
-}
+import com.google.auto.service.AutoService;
 
-export { ListReq, QueueReq, IdReq }
+@AutoService(ITaskProcessFactory.class)
+public class CommonTaskProcessFactory implements ITaskProcessFactory {
+    @Override
+    public String type() {
+        return Constants.COMMON_TASK_TYPE;
+
+    }
+
+    @Override
+    public ITaskProcessor create() {
+        return new CommonTaskProcessor();
+    }
+}

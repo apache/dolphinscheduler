@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
-
-interface QueueReq {
-  queue: string
-  queueName: string
+interface ProjectCodeReq {
+  projectCode: number
 }
 
 interface IdReq {
   id: number
 }
 
-export { ListReq, QueueReq, IdReq }
+interface TaskListReq {
+  pageNo: number
+  pageSize: number
+  endDate?: string
+  executorName?: string
+  host?: string
+  processInstanceId?: number
+  processInstanceName?: string
+  searchVal?: string
+  startDate?: string
+  stateType?: string
+  taskName?: string
+}
+
+export { ProjectCodeReq, IdReq, TaskListReq }
