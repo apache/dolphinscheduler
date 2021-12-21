@@ -15,79 +15,92 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref } from "vue";
 
-import styles from './index.module.scss'
-import { NDropdown, NIcon, NLayoutHeader, NMenu } from 'naive-ui'
-import { Logo } from '@/layouts/basic/components/logo'
-import { IosArrowDown } from "@vicons/ionicons4"
-import { UserAlt } from '@vicons/fa'
+import styles from "./index.module.scss";
+import { NDropdown, NIcon, NLayoutHeader, NMenu } from "naive-ui";
+import { Logo } from "@/layouts/basic/components/logo";
+import { IosArrowDown } from "@vicons/ionicons4";
+import { UserAlt } from "@vicons/fa";
 
 const Header = defineComponent({
-  name: 'Header',
-  props:{
+  name: "Header",
+  props: {
     inverted: {
-      type:Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
     menuOptions: {
       type: Array,
-      default: []
+      default: [],
     },
     languageOptions: {
       type: Array,
-      default: []
+      default: [],
     },
     profileOptions: {
       type: Array,
-      default: []
+      default: [],
     },
     currentMenu: {
-      type: Object
+      type: Object,
     },
     defaultMenuKey: {
-      type: String
-    }
+      type: String,
+    },
   },
   setup(props, context) {
-    const currentMenu = ref({})
+    const currentMenuRef = ref({});
 
-    function handleMenuClick(key, data) {
-      currentMenu.value = data
-      context.emit('menuClick', data)
-    }
+    const handleMenuClick = (key, data) => {
+      currentMenuRef.value = data;
+      context.emit("menuClick", data);
+    };
 
-    return { handleMenuClick }
+    return { handleMenuClick };
   },
   render() {
     return (
-        <NLayoutHeader class={styles['header-model']} inverted={this.inverted} bordered>
-          <Logo/>
-          <div class={styles.nav}>
-            <NMenu mode='horizontal'
-                   onUpdate:value={this.handleMenuClick}
-                   defaultValue={this.defaultMenuKey}
-                   class={styles.menu}
-                   inverted={this.inverted}
-                   options={this.menuOptions}/>
-            <div class={styles.profile}>
-              <NDropdown inverted={this.inverted} options={this.languageOptions}>
-                <span>
-                 中文<NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                </span>
-              </NDropdown>
-              <NDropdown inverted={this.inverted} options={this.profileOptions}>
-                <span>
-                  <NIcon class={styles.icon}><UserAlt/></NIcon>
-                  admin
-                  <NIcon class={styles.icon}><IosArrowDown/></NIcon>
-                </span>
-              </NDropdown>
-            </div>
+      <NLayoutHeader
+        class={styles["header-model"]}
+        inverted={this.inverted}
+        bordered
+      >
+        <Logo />
+        <div class={styles.nav}>
+          <NMenu
+            mode="horizontal"
+            onUpdate:value={this.handleMenuClick}
+            defaultValue={this.defaultMenuKey}
+            class={styles.menu}
+            inverted={this.inverted}
+            options={this.menuOptions}
+          />
+          <div class={styles.profile}>
+            <NDropdown inverted={this.inverted} options={this.languageOptions}>
+              <span>
+                中文
+                <NIcon class={styles.icon}>
+                  <IosArrowDown />
+                </NIcon>
+              </span>
+            </NDropdown>
+            <NDropdown inverted={this.inverted} options={this.profileOptions}>
+              <span>
+                <NIcon class={styles.icon}>
+                  <UserAlt />
+                </NIcon>
+                admin
+                <NIcon class={styles.icon}>
+                  <IosArrowDown />
+                </NIcon>
+              </span>
+            </NDropdown>
           </div>
-        </NLayoutHeader>
-    )
+        </div>
+      </NLayoutHeader>
+    );
   },
-})
+});
 
 export { Header };

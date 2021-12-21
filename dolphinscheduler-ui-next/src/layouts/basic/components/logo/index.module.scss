@@ -16,21 +16,21 @@
  */
 
 .logo {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   height: 64px;
-   line-height: 64px;
-   overflow: hidden;
-   white-space: nowrap;
-   width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  line-height: 64px;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 280px;
 
-   img {
-     width: auto;
-     height: 46px;
-   }
+  img {
+    width: auto;
+    height: 46px;
+  }
 
-   .title {
-     margin-bottom: 0;
-   }
+  .title {
+    margin-bottom: 0;
+  }
 }

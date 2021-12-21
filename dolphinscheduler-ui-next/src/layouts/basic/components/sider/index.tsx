@@ -15,65 +15,65 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
-import { NLayoutSider, NMenu } from 'naive-ui'
+import { defineComponent, ref } from "vue";
+import { NLayoutSider, NMenu } from "naive-ui";
 
 const Sider = defineComponent({
-  name: 'Sider',
-  props:{
+  name: "Sider",
+  props: {
     visible: {
-      type:Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
     inverted: {
-      type:Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
     menuOptions: {
       type: Array,
-      default: []
+      default: [],
     },
     currentMenu: {
-      type: Object
+      type: Object,
     },
     defaultMenuKey: {
-      type: String
-    }
+      type: String,
+    },
   },
   setup(props) {
-    const currentMenu = ref({})
+    const currentMenuRef = ref({});
 
-    function handleMenuClick(key, data) {
-      currentMenu.value = data
-      console.log(data)
-    }
+    const handleMenuClick = (key, data) => {
+      currentMenuRef.value = data;
+    };
 
-    return { handleMenuClick }
+    return { handleMenuClick };
   },
   render() {
-    if(this.visible) {
+    if (this.visible) {
       return (
-          <NLayoutSider
-              width={240}
-              collapseMode={'width'}
-              collapsedWidth={64}
-              inverted={this.inverted}
-              nativeScrollbar={false}
-              show-trigger
-              bordered>
-            <NMenu
-                onUpdate:value={this.handleMenuClick}
-                inverted={this.inverted}
-                collapsedWidth={64}
-                collapsedIconSize={22}
-                options={this.menuOptions}
-            />
-          </NLayoutSider>
-      )
+        <NLayoutSider
+          width={240}
+          collapseMode={"width"}
+          collapsedWidth={64}
+          inverted={this.inverted}
+          nativeScrollbar={false}
+          show-trigger
+          bordered
+        >
+          <NMenu
+            onUpdate:value={this.handleMenuClick}
+            inverted={this.inverted}
+            collapsedWidth={64}
+            collapsedIconSize={22}
+            options={this.menuOptions}
+          />
+        </NLayoutSider>
+      );
     } else {
-      return ('')
+      return "";
     }
   },
-})
+});
 
-export { Sider }
+export { Sider };

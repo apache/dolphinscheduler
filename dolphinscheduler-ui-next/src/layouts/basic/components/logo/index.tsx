@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref } from "vue";
 
-import styles from './index.module.scss'
+import styles from "./index.module.scss";
 
 const Logo = defineComponent({
-  name: 'Logo',
+  name: "Logo",
   setup() {
-    const inverted = ref(true)
+    const invertedRef = ref(true);
 
-    return { inverted }
+    return { invertedRef };
   },
   render() {
     return (
-        <div class={styles.logo}>
-          <img src="../../../src/assets/images/nav-logo.svg" alt=""/>
-        </div>
-    )
+      <div class={styles.logo}>
+        <img src="../../../src/assets/images/nav-logo.svg" alt="" />
+      </div>
+    );
   },
-})
+});
 
-export { Logo }
+export { Logo };
