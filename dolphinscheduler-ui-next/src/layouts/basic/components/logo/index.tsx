@@ -15,40 +15,24 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHistory,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-} from "vue-router";
-import routes from "./routes";
+import { defineComponent, ref } from "vue";
 
-// NProgress
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
+import styles from "./index.module.scss";
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
+const Logo = defineComponent({
+  name: "Logo",
+  setup() {
+    const invertedRef = ref(true);
+
+    return { invertedRef };
+  },
+  render() {
+    return (
+      <div class={styles.logo}>
+        <img src="../../../src/assets/images/nav-logo.svg" alt="" />
+      </div>
+    );
+  },
 });
 
-/**
- * Routing to intercept
- */
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    NProgress.start();
-    next();
-    NProgress.done();
-  }
-);
-
-router.afterEach(() => {
-  NProgress.done();
-});
-
-export default router;
+export { Logo };
