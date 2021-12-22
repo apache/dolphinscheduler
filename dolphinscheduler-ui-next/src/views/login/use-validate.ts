@@ -19,7 +19,7 @@ import { reactive, ref } from 'vue'
 import { FormRules } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-export function useValidate () {
+export function useValidate() {
   const { t, locale } = useI18n()
   const state = reactive({
     loginFormRef: ref(),
@@ -48,6 +48,8 @@ export function useValidate () {
   })
 
   return {
-    state, t, locale
+    state,
+    t,
+    locale,
   }
 }
