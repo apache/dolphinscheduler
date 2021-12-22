@@ -18,7 +18,7 @@
 import mapping from './mapping'
 
 const utils = {
-  mapping
+  mapping,
 }
 
 export default utils
