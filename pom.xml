@@ -949,7 +949,7 @@
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>.</argument>
+                                    <argument>${project.basedir}</argument>
                                     <argument>--file=src/main/docker/Dockerfile</argument>
                                 </arguments>
                             </configuration>
@@ -975,7 +975,7 @@
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>.</argument>
+                                    <argument>${project.basedir}</argument>
                                     <argument>--file=src/main/docker/Dockerfile</argument>
                                 </arguments>
                             </configuration>
