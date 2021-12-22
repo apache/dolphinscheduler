@@ -76,6 +76,7 @@ class TaskType(str):
     DATAX = "DATAX"
     DEPENDENT = "DEPENDENT"
     CONDITIONS = "CONDITIONS"
+    SWITCH = "SWITCH"
 
 
 class DefaultTaskCodeNum(str):
