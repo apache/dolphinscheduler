@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from "vue";
-import { NLayoutSider, NMenu } from "naive-ui";
+import { defineComponent, ref } from 'vue'
+import { NLayoutSider, NMenu } from 'naive-ui'
 
 const Sider = defineComponent({
-  name: "Sider",
+  name: 'Sider',
   props: {
     visible: {
       type: Boolean,
@@ -41,20 +41,20 @@ const Sider = defineComponent({
     },
   },
   setup(props) {
-    const currentMenuRef = ref({});
+    const currentMenuRef = ref({})
 
     const handleMenuClick = (key, data) => {
-      currentMenuRef.value = data;
-    };
+      currentMenuRef.value = data
+    }
 
-    return { handleMenuClick };
+    return { handleMenuClick }
   },
   render() {
     if (this.visible) {
       return (
         <NLayoutSider
           width={240}
-          collapseMode={"width"}
+          collapseMode={'width'}
           collapsedWidth={64}
           inverted={this.inverted}
           nativeScrollbar={false}
@@ -69,11 +69,11 @@ const Sider = defineComponent({
             options={this.menuOptions}
           />
         </NLayoutSider>
-      );
+      )
     } else {
-      return "";
+      return ''
     }
   },
-});
+})
 
-export { Sider };
+export { Sider }
