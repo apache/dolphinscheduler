@@ -89,52 +89,17 @@ public abstract class UpgradeDao {
     public abstract DbType getDbType();
 
     public void initSchema() {
-        // Execute the dolphinscheduler DDL, it cannot be rolled back
-        runInitDDL();
-
-        // Execute the dolphinscheduler DML, it can be rolled back
-        runInitDML();
+        // Execute the dolphinscheduler full sql
+        runInitSql(getDbType());
     }
 
-    private void runInitDML() {
-        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + initSqlPath() + "/dolphinscheduler_dml.sql");
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-
-            // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
-            ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-            Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream());
-            initScriptRunner.runScript(initSqlReader);
-
-            conn.commit();
-        } catch (IOException e) {
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                logger.error(e1.getMessage(), e1);
-            }
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (Exception e) {
-            try {
-                if (null != conn) {
-                    conn.rollback();
-                }
-            } catch (SQLException e1) {
-                logger.error(e1.getMessage(), e1);
-            }
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
-        }
-
-    }
-
-    private void runInitDDL() {
-        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + initSqlPath() + "/dolphinscheduler_ddl.sql");
+    /**
+     * run init sql to init db schema
+     * @param dbType db type
+     */
+    private void runInitSql(DbType dbType) {
+        String sqlFile = String.format("dolphinscheduler_%s.sql",dbType.getDescp());
+        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + sqlFile);
         try (Connection conn = dataSource.getConnection()) {
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
