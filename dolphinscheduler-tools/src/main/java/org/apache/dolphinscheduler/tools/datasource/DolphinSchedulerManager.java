@@ -55,21 +55,28 @@ public class DolphinSchedulerManager {
     }
 
     public void initDolphinScheduler() {
+        this.initDolphinSchedulerSchema();
+    }
+
+    /**
+     * whether schema is initialized
+     * @return true if schema is initialized
+     */
+    public boolean schemaIsInitialized() {
         // Determines whether the dolphinscheduler table structure has been init
         if (upgradeDao.isExistsTable("t_escheduler_version")
             || upgradeDao.isExistsTable("t_ds_version")
             || upgradeDao.isExistsTable("t_escheduler_queue")) {
             logger.info("The database has been initialized. Skip the initialization step");
-            return;
+            return true;
         }
-        this.initDolphinSchedulerSchema();
+        return false;
     }
 
     public void initDolphinSchedulerSchema() {
         logger.info("Start initializing the DolphinScheduler manager table structure");
         upgradeDao.initSchema();
     }
-
     public void upgradeDolphinScheduler() throws IOException {
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
