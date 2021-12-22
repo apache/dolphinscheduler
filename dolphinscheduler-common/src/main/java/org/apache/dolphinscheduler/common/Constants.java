@@ -53,7 +53,7 @@ public final class Constants {
     public static final String ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK = "org.quartz.jobStore.acquireTriggersWithinLock";
     public static final String ORG_QUARTZ_JOBSTORE_DATASOURCE = "org.quartz.jobStore.dataSource";
     public static final String ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS = "org.quartz.dataSource.myDs.connectionProvider.class";
-
+    public static final String ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT = "org.quartz.scheduler.batchTriggerAcquisitionMaxCount";
     /**
      * quartz config default value
      */
@@ -66,6 +66,7 @@ public final class Constants {
     public static final String QUARTZ_INSTANCENAME = "DolphinScheduler";
     public static final String QUARTZ_INSTANCEID = "AUTO";
     public static final String QUARTZ_ACQUIRETRIGGERSWITHINLOCK = "true";
+    public static final String QUARTZ_BATCHTRIGGERACQUISTITIONMAXCOUNT = "100";
 
     /**
      * common properties path

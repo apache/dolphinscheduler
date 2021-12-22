@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master;
 
+import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -31,8 +33,9 @@ import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProce
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
@@ -50,8 +53,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import static org.apache.dolphinscheduler.common.Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME;
 
 /**
  *  master server
@@ -105,6 +106,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private EventExecuteService eventExecuteService;
 
+    @Autowired
+    private FailoverExecuteThread failoverExecuteThread;
+
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
@@ -145,8 +149,8 @@ public class MasterServer implements IStoppable {
 
         // self tolerant
         this.masterRegistryClient.init(this.processInstanceExecMaps);
-        this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
+        this.masterRegistryClient.start();
 
         this.eventExecuteService.init(this.processInstanceExecMaps);
         this.eventExecuteService.start();
@@ -154,6 +158,8 @@ public class MasterServer implements IStoppable {
         this.masterSchedulerService.init(this.processInstanceExecMaps);
 
         this.masterSchedulerService.start();
+
+        this.failoverExecuteThread.start();
 
         // start QuartzExecutors
         // what system should do if exception
@@ -217,8 +223,17 @@ public class MasterServer implements IStoppable {
             }
             // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
             springApplicationContext.close();
+            logger.info("springApplicationContext close");
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
+        } finally {
+            try {
+                // thread sleep 60 seconds for quietly stop
+                Thread.sleep(60000L);
+            } catch (Exception e) {
+                logger.warn("thread sleep exception ", e);
+            }
+            System.exit(1);
         }
     }
 

@@ -409,9 +409,10 @@ public class WorkflowExecuteThread implements Runnable {
 
     private boolean checkStateEvent(StateEvent stateEvent) {
         if (this.processInstance.getId() != stateEvent.getProcessInstanceId()) {
-            logger.error("mismatch process instance id: {}, state event:{}",
+            logger.error("mismatch process instance id: {}, state event:{}, task instance id:{}",
                     this.processInstance.getId(),
-                    stateEvent.toString());
+                    stateEvent.toString(),
+                    stateEvent.getTaskInstanceId());
             return false;
         }
         return true;
@@ -482,6 +483,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processDefinition.getGlobalParamList(),
                 CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
         processInstance.setStartTime(new Date());
+        processInstance.setRestartTime(processInstance.getStartTime());
         processInstance.setEndTime(null);
         processService.saveProcessInstance(processInstance);
         this.taskInstanceHashMap.clear();
@@ -876,11 +878,11 @@ public class WorkflowExecuteThread implements Runnable {
             }
 
             if (completeTaskList.containsKey(Long.toString(task.getTaskCode()))) {
-                logger.info("task {} has already run success", task.getName());
+                logger.info("task {} has already run success, task id:{}", task.getName(), task.getId());
                 continue;
             }
             if (task.getState().typeIsPause() || task.getState().typeIsCancel()) {
-                logger.info("task {} stopped, the state is {}", task.getName(), task.getState());
+                logger.info("task {} stopped, the state is {}, task id:{}", task.getName(), task.getState(), task.getId());
             } else {
                 addTaskToStandByList(task);
             }
@@ -1167,13 +1169,13 @@ public class WorkflowExecuteThread implements Runnable {
      * @param taskInstance task instance
      */
     private void addTaskToStandByList(TaskInstance taskInstance) {
-        logger.info("add task to stand by list: {}", taskInstance.getName());
+        logger.info("add task to stand by list, task name: {} , task id:{}", taskInstance.getName(), taskInstance.getId());
         try {
             if (!readyToSubmitTaskQueue.contains(taskInstance)) {
                 readyToSubmitTaskQueue.put(taskInstance);
             }
         } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
+            logger.error("add task instance to readyToSubmitTaskQueue, taskName: {}, task id: {}", taskInstance.getName(), taskInstance.getId(), e);
         }
     }
 
@@ -1253,7 +1255,7 @@ public class WorkflowExecuteThread implements Runnable {
                     TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
                     if (retryTask != null && retryTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
                         task.setState(retryTask.getState());
-                        logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
+                        logger.info("task name: {} has been forced success, put it into complete task list and stop retrying, task id:{}", task.getName(), task.getId());
                         removeTaskFromStandbyList(task);
                         completeTaskList.put(Long.toString(task.getTaskCode()), task);
                         submitPostNode(Long.toString(task.getTaskCode()));

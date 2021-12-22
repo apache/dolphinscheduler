@@ -70,8 +70,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-        dispatchTask(taskInstance, processInstance);
-        return true;
+        return dispatchTask(taskInstance, processInstance);
     }
 
     @Override
@@ -127,7 +126,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
+            logger.info("master submit success, task id:{}, task name:{}, process id:{}",
+                    taskInstance.getId(), taskInstance.getName(), taskInstance.getProcessInstanceId());
             return true;
         } catch (Exception e) {
             logger.error("submit task  Exception: ", e);

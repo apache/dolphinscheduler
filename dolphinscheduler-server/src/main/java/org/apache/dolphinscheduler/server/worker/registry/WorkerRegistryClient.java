@@ -20,11 +20,14 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -104,6 +107,14 @@ public class WorkerRegistryClient {
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 
+        while (!this.checkNodeExists()) {
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+        }
+
+        this.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+
+        registryClient.addConnectionStateListener(this::handleConnectionState);
+
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 workerConfig.getWorkerMaxCpuloadAvg(),
                 workerConfig.getWorkerReservedMemory(),
@@ -117,6 +128,32 @@ public class WorkerRegistryClient {
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
+    }
+
+    public void handleConnectionState(ConnectionState state) {
+        switch (state) {
+            case CONNECTED:
+                logger.info("registry connection state is {}", state);
+                break;
+            case SUSPENDED:
+                logger.info("registry connection state is {}, ready to stop myself", state);
+                registryClient.getStoppable().stop("registry connection state is SUSPENDED, stop myself");
+                break;
+            case RECONNECTED:
+                logger.info("registry connection state is {}, clean the node info", state);
+                String address = NetUtils.getAddr(workerConfig.getListenPort());
+                Set<String> workerZkPaths = getWorkerZkPaths();
+                for (String workerZKPath : workerZkPaths) {
+                    registryClient.persistEphemeral(workerZKPath, "");
+                    logger.info("worker node : {} reconnect to ZK {} successfully", address, workerZKPath);
+                }
+                break;
+            case DISCONNECTED:
+                logger.info("registry connection state is {}, ready to stop myself", state);
+                registryClient.getStoppable().stop("registry connection state is DISCONNECTED, stop myself");
+                break;
+            default:
+        }
     }
 
     /**
@@ -177,4 +214,11 @@ public class WorkerRegistryClient {
         registryClient.setStoppable(stoppable);
     }
 
+    public boolean checkNodeExists() {
+        boolean result = registryClient.checkNodeExists(NetUtils.getHost(), NodeType.WORKER);
+        if (result) {
+            logger.info("check worker, node exist success, host:{}", NetUtils.getHost());
+        }
+        return result;
+    }
 }

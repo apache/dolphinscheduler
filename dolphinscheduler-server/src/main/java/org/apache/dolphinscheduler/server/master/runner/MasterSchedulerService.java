@@ -234,6 +234,7 @@ public class MasterSchedulerService extends Thread {
             if (ServerNodeManager.MASTER_SIZE == 0) {
                 return null;
             }
+            logger.debug("master size:{}",ServerNodeManager.MASTER_SIZE);
             List<Command> commandList = processService.findCommandPage(ServerNodeManager.MASTER_SIZE, pageNumber);
             if (commandList.size() == 0) {
                 return null;
