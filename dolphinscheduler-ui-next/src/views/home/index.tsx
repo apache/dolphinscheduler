@@ -19,6 +19,7 @@ import { defineComponent } from 'vue'
 import styles from './index.module.scss'
 import PieChart from '@/components/chart/modules/Pie'
 import GaugeChart from '@/components/chart/modules/Gauge'
+import BarChart from '@/components/chart/modules/Bar'
 
 export default defineComponent({
   name: 'home',
@@ -29,6 +30,7 @@ export default defineComponent({
         Home Test
         <PieChart />
         <GaugeChart />
+        <BarChart />
       </div>
     )
   },
