@@ -42,8 +42,8 @@ export default {
       name: 'resource-file-create',
       component: components['home'],
       meta: {
-        title: '创建资源'
-      }
-    }
-  ]
+        title: '创建资源',
+      },
+    },
+  ],
 }

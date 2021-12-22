@@ -42,8 +42,8 @@ export default {
       name: 'users-manage',
       component: components['home'],
       meta: {
-        title: '用户管理'
-      }
-    }
-  ]
+        title: '用户管理',
+      },
+    },
+  ],
 }
