@@ -20,17 +20,17 @@ import {
   createWebHistory,
   NavigationGuardNext,
   RouteLocationNormalized,
-} from "vue-router";
-import routes from "./routes";
+} from 'vue-router'
+import routes from './routes'
 
 // NProgress
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
 /**
  * Routing to intercept
@@ -41,14 +41,14 @@ router.beforeEach(
     from: RouteLocationNormalized,
     next: NavigationGuardNext
   ) => {
-    NProgress.start();
-    next();
-    NProgress.done();
+    NProgress.start()
+    next()
+    NProgress.done()
   }
-);
+)
 
 router.afterEach(() => {
-  NProgress.done();
-});
+  NProgress.done()
+})
 
-export default router;
+export default router

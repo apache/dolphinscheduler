@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { defineComponent } from "vue";
-import { NLayout, NLayoutContent } from "naive-ui";
+import { defineComponent } from 'vue'
+import { NLayout, NLayoutContent } from 'naive-ui'
 
 const Content = defineComponent({
-  name: "Content",
+  name: 'Content',
   render() {
     return (
       <NLayout>
@@ -27,8 +27,8 @@ const Content = defineComponent({
           <router-view />
         </NLayoutContent>
       </NLayout>
-    );
+    )
   },
-});
+})
 
-export default Content;
+export default Content
