@@ -27,7 +27,7 @@ export default {
   name: 'projects',
   redirect: { name: 'projects-list' },
   meta: { title: '项目管理' },
-  component: () => import('@/layouts/basic'),
+  component: () => import('@/layouts/content'),
   children: [
     {
       path: '/projects/list',

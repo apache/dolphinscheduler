@@ -27,7 +27,7 @@ export default {
   name: 'security',
   meta: { title: '安全中心' },
   redirect: { name: 'tenement-manage' },
-  component: () => import('@/layouts/basic'),
+  component: () => import('@/layouts/content'),
   children: [
     {
       path: '/security/tenant',
