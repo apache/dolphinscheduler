@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RouteRecordRaw } from "vue-router";
 
-import mapping from './mapping'
-
-const utils = {
-  mapping,
+interface RouteState {
+  menus: RouteRecordRaw[];
+  routers: any[];
+  addRouters: any[];
 }
 
-export default utils
+export default RouteState;

@@ -15,10 +15,22 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  line-height: 64px;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 280px;
 
-const utils = {
-  mapping,
+  img {
+    width: auto;
+    height: 46px;
+  }
+
+  .title {
+    margin-bottom: 0;
+  }
 }
-
-export default utils

@@ -15,10 +15,20 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
+import { defineComponent } from 'vue'
 
-const utils = {
-  mapping,
-}
+import styles from './index.module.scss'
 
-export default utils
+const Logo = defineComponent({
+  name: 'Logo',
+  setup() {},
+  render() {
+    return (
+      <div class={styles.logo}>
+        <img src='./src/assets/images/nav-logo.svg' alt='' />
+      </div>
+    )
+  },
+})
+
+export default Logo

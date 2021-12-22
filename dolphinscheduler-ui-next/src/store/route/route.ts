@@ -15,10 +15,32 @@
  * limitations under the License.
  */
 
-import mapping from './mapping'
+import { toRaw } from "vue";
+import { defineStore } from "pinia";
+import RouteState from "./types";
+import { RouteRecordRaw } from "vue-router";
 
-const utils = {
-  mapping,
-}
-
-export default utils
+export const useAsyncRouteStore = defineStore({
+  id: "route",
+  state: (): RouteState => ({
+    menus: [],
+    routers: [],
+    addRouters: [],
+  }),
+  getters: {
+    getMenus(): RouteRecordRaw[] {
+      return this.menus;
+    },
+    getRouters(): RouteRecordRaw[] {
+      return toRaw(this.addRouters);
+    },
+  },
+  actions: {
+    setMenus(menus) {
+      this.menus = menus;
+    },
+    async generateRouters(routes) {
+      console.log(routes);
+    },
+  },
+});
