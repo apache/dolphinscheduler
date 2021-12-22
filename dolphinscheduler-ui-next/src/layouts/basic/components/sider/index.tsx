@@ -50,8 +50,9 @@ const Sider = defineComponent({
     return { handleMenuClick }
   },
   render() {
-    if (this.visible) {
-      return (
+    return 
+      this.visible ?
+      (
         <NLayoutSider
           width={240}
           collapseMode={'width'}
@@ -69,10 +70,7 @@ const Sider = defineComponent({
             options={this.menuOptions}
           />
         </NLayoutSider>
-      )
-    } else {
-      return ''
-    }
+      ) : ''
   },
 })
 
