@@ -74,3 +74,11 @@ do
   apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
 done
+
+# python gateway server check state
+pythonGatewayHost=(${pythonGatewayServers//,/ })
+for pythonGatewayServer in "${pythonGatewayHost[@]}"
+do
+  pythonGatewayState=`ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status python-gateway-server;"`
+  echo "$apiServer  $pythonGatewayState"
+done

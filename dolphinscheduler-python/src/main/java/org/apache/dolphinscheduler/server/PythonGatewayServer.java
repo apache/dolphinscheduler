@@ -55,6 +55,8 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -500,9 +502,12 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     }
 
     @PostConstruct
-    public void run() {
-        GatewayServer server = new GatewayServer(this);
+    public void run() throws UnknownHostException {
         GatewayServer.turnLoggingOn();
+
+        InetAddress host = InetAddress.getLocalHost();
+        LOGGER.info("GatewayServer for " + this.getClass().getName() + " started on host: " + host.toString());
+        GatewayServer server = new GatewayServer(this, 25333, 25334, host, host, 0, 0, null);
         // Start server to accept python client RPC
         server.start();
     }
