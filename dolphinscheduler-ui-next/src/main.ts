@@ -20,9 +20,13 @@ import App from './App'
 import router from './router'
 import { createPinia } from 'pinia'
 import i18n from '@/locales'
+import * as echarts from 'echarts'
+import 'echarts/theme/macarons'
+import 'echarts/theme/dark-bold'
 import './assets/styles/default.scss'
 
 const app = createApp(App)
+app.config.globalProperties.echarts = echarts
 app.use(router)
 app.use(createPinia())
 app.use(i18n)
