@@ -58,7 +58,7 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group
-        where project_code in ( #{projectCode} , = 0)
+        where project_code in ( #{projectCode} ,  0)
     </select>
 
     <!--modify data by id-->
