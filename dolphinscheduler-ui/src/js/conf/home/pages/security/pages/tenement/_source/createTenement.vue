@@ -16,8 +16,8 @@
  */
 <template>
   <m-popover
-          okId="button-submit"
-          cancelId="button-cancel"
+          okId="btnSubmit"
+          cancelId="btnCancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
@@ -28,7 +28,7 @@
           <template slot="name"><strong>*</strong>{{$t('OS Tenant Code')}}</template>
           <template slot="content">
             <el-input
-                id="input-tenant-code"
+                id="inputTenantCode"
                 type="input"
                 :disabled="item ? true : false"
                 v-model="tenantCode"
@@ -43,7 +43,7 @@
           <template slot="content">
             <el-select v-model="queueId" size="small">
               <el-option
-                      id="select-queue"
+                      id="selectQueue"
                       v-for="city in queueList"
                       :key="city.id"
                       :value="city.id"
@@ -56,7 +56,7 @@
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <el-input
-                    id="input-description"
+                    id="inputDescription"
                     type="textarea"
                     v-model="description"
                     size="small"
