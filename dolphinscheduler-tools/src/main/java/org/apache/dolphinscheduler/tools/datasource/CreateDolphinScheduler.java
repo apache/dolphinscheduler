@@ -47,9 +47,8 @@ public class CreateDolphinScheduler {
                 logger.info("upgrade DolphinScheduler finished");
             } else {
                 dolphinSchedulerManager.initDolphinScheduler();
+                logger.info("init DolphinScheduler finished");
             }
-            dolphinSchedulerManager.initDolphinScheduler();
-            logger.info("init DolphinScheduler finished");
             logger.info("create DolphinScheduler success");
         }
     }
