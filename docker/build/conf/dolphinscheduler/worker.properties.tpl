@@ -44,6 +44,3 @@ alert.listen.host=${ALERT_LISTEN_HOST}
 
 # worker retry report task statues interval seconds
 worker.retry.report.task.statues.interval=${WORKER_RETRY_REPORT_TASK_STATUS_INTERVAL}
-
-# worker retry report task statues interval seconds
-worker.retry.report.task.statues.interval=${WORKER_RETRY_REPORT_TASK_STATUS_INTERVAL}
