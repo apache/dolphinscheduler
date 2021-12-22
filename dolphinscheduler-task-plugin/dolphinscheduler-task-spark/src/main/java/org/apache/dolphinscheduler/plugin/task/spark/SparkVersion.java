@@ -30,7 +30,7 @@ public enum SparkVersion {
     private final int code;
     private final String descp;
     /**
-     * usage: spark-submit [options] <app jar | python file> [app arguments] *
+     * usage: spark-submit [options] <app jar | python file> [app arguments]
      */
     private final String command;
 
