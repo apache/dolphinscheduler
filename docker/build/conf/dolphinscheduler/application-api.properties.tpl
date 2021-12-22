@@ -38,6 +38,9 @@ server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javasc
 # max http post size
 server.jetty.max-http-form-post-size=5000000
 
+# max http header size
+server.max-http-header-size=81920
+
 # messages encoding
 spring.messages.encoding=UTF-8
 

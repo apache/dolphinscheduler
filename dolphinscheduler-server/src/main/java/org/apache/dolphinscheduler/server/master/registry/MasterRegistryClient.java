@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
@@ -127,16 +128,16 @@ public class MasterRegistryClient {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
-            // self tolerant
-            if (registryClient.getActiveMasterNum() == 1) {
-                removeNodePath(null, NodeType.MASTER, true);
-                removeNodePath(null, NodeType.WORKER, true);
-            }
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             logger.error("master start up exception", e);
+            this.registryClient.getStoppable().stop("master start up exception");
         } finally {
-            registryClient.releaseLock(nodeLock);
+            try {
+                registryClient.releaseLock(nodeLock);
+            } catch (Exception e) {
+                logger.error("release lock error", e);
+            }
         }
     }
 
@@ -150,18 +151,57 @@ public class MasterRegistryClient {
     }
 
     /**
-     * remove zookeeper node path
+     * remove master node path
      *
-     * @param path zookeeper node path
-     * @param nodeType zookeeper node type
+     * @param path node path
+     * @param nodeType node type
      * @param failover is failover
      */
-    public void removeNodePath(String path, NodeType nodeType, boolean failover) {
+    public void removeMasterNodePath(String path, NodeType nodeType, boolean failover) {
         logger.info("{} node deleted : {}", nodeType, path);
-        String failoverPath = getFailoverLockPath(nodeType);
+
+        if (StringUtils.isEmpty(path)) {
+            logger.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
+            return;
+        }
+
+        String serverHost = registryClient.getHostByEventDataPath(path);
+        if (StringUtils.isEmpty(serverHost)) {
+            logger.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
+            return;
+        }
+
+        String failoverPath = getFailoverLockPath(nodeType, serverHost);
         try {
             registryClient.getLock(failoverPath);
 
+            if (!registryClient.exists(path)) {
+                logger.info("path: {} not exists", path);
+                // handle dead server
+                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+            }
+
+            //failover server
+            if (failover) {
+                failoverServerWhenDown(serverHost, nodeType);
+            }
+        } catch (Exception e) {
+            logger.error("{} server failover failed, host:{}", nodeType, serverHost, e);
+        } finally {
+            registryClient.releaseLock(failoverPath);
+        }
+    }
+
+    /**
+     * remove worker node path
+     *
+     * @param path     node path
+     * @param nodeType node type
+     * @param failover is failover
+     */
+    public void removeWorkerNodePath(String path, NodeType nodeType, boolean failover) {
+        logger.info("{} node deleted : {}", nodeType, path);
+        try {
             String serverHost = null;
             if (!StringUtils.isEmpty(path)) {
                 serverHost = registryClient.getHostByEventDataPath(path);
@@ -169,18 +209,18 @@ public class MasterRegistryClient {
                     logger.error("server down error: unknown path: {}", path);
                     return;
                 }
-                // handle dead server
-                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+                if (!registryClient.exists(path)) {
+                    logger.info("path: {} not exists", path);
+                    // handle dead server
+                    registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+                }
             }
             //failover server
             if (failover) {
                 failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed.", nodeType);
-            logger.error("failover exception ", e);
-        } finally {
-            registryClient.releaseLock(failoverPath);
+            logger.error("{} server failover failed", nodeType, e);
         }
     }
 
@@ -209,12 +249,12 @@ public class MasterRegistryClient {
      * @param nodeType zookeeper node type
      * @return fail over lock path
      */
-    private String getFailoverLockPath(NodeType nodeType) {
+    public String getFailoverLockPath(NodeType nodeType, String host) {
         switch (nodeType) {
             case MASTER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
+                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS + "/" + host;
             case WORKER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
+                return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS + "/" + host;
             default:
                 return "";
         }
@@ -226,7 +266,11 @@ public class MasterRegistryClient {
      * @param taskInstance task instance
      * @return true if task instance need fail over
      */
-    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) {
+    private boolean checkTaskInstanceNeedFailover(List<Server> workerServers, TaskInstance taskInstance) {
+
+        // first submit: host is null
+        // dispatch succeed: host is not null &&  submit_time is null
+        // ACK || RESULT from worker: host is not null && start_time is not null
 
         boolean taskNeedFailover = true;
 
@@ -234,14 +278,15 @@ public class MasterRegistryClient {
         if (taskInstance.getHost() == null) {
             return false;
         }
-
-        // if the worker node exists in zookeeper, we must check the task starts after the worker
-        if (registryClient.checkNodeExists(taskInstance.getHost(), NodeType.WORKER)) {
-            //if task start after worker starts, there is no need to failover the task.
-            if (checkTaskAfterWorkerStart(taskInstance)) {
-                taskNeedFailover = false;
-            }
+        // host is not null and submit time is null, master will retry
+        if (taskInstance.getSubmitTime() == null) {
+            return false;
         }
+        //if task start after worker starts, there is no need to failover the task.
+        if (checkTaskAfterWorkerStart(workerServers, taskInstance)) {
+            taskNeedFailover = false;
+        }
+
         return taskNeedFailover;
     }
 
@@ -270,6 +315,54 @@ public class MasterRegistryClient {
     }
 
     /**
+     * check task start after the worker server starts.
+     *
+     * @param taskInstance task instance
+     * @return true if task instance start time after worker server start date
+     */
+    private boolean checkTaskAfterWorkerStart(List<Server> workerServers, TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            return false;
+        }
+
+        Date taskTime = taskInstance.getStartTime() == null ? taskInstance.getSubmitTime() : taskInstance.getStartTime();
+
+        Date workerServerStartDate = getServerStartupTime(workerServers, taskInstance.getHost());
+        if (workerServerStartDate != null) {
+            return taskTime.after(workerServerStartDate);
+        }
+        return false;
+    }
+
+    /**
+     * get server startup time
+     */
+    private Date getServerStartupTime(List<Server> servers, String host) {
+        if (CollectionUtils.isEmpty(servers)) {
+            return null;
+        }
+        Date serverStartupTime = null;
+        for (Server server : servers) {
+            if (host.equals(server.getHost() + Constants.COLON + server.getPort())) {
+                serverStartupTime = server.getCreateTime();
+                break;
+            }
+        }
+        return serverStartupTime;
+    }
+
+    /**
+     * get server startup time
+     */
+    private Date getServerStartupTime(NodeType nodeType, String host) {
+        if (StringUtils.isEmpty(host)) {
+            return null;
+        }
+        List<Server> servers = registryClient.getServerList(nodeType);
+        return getServerStartupTime(servers, host);
+    }
+
+    /**
      * failover worker tasks
      * <p>
      * 1. kill yarn job if there are yarn jobs in tasks.
@@ -279,9 +372,12 @@ public class MasterRegistryClient {
      * @param workerHost worker host
      */
     private void failoverWorker(String workerHost) {
+
         if (StringUtils.isEmpty(workerHost)) {
             return;
         }
+
+        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
 
         long startTime = System.currentTimeMillis();
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
@@ -300,11 +396,17 @@ public class MasterRegistryClient {
                 processInstanceCacheMap.put(processInstance.getId(), processInstance);
             }
 
-            // only failover the task owned myself if worker down.
-            if (processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
-                logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
-                failoverTaskInstance(processInstance, taskInstance);
+            if (!checkTaskInstanceNeedFailover(workerServers, taskInstance)) {
+                continue;
             }
+
+            // only failover the task owned myself if worker down.
+            if (!processInstance.getHost().equalsIgnoreCase(getLocalAddress())) {
+                continue;
+            }
+
+            logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
+            failoverTaskInstance(processInstance, taskInstance);
         }
         logger.info("end worker[{}] failover, useTime:{}ms", workerHost, System.currentTimeMillis() - startTime);
     }
@@ -316,10 +418,13 @@ public class MasterRegistryClient {
      *
      * @param masterHost master host
      */
-    private void failoverMaster(String masterHost) {
+    public void failoverMaster(String masterHost) {
+
         if (StringUtils.isEmpty(masterHost)) {
             return;
         }
+
+        Date serverStartupTime = getServerStartupTime(NodeType.MASTER, masterHost);
 
         long startTime = System.currentTimeMillis();
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
@@ -330,11 +435,19 @@ public class MasterRegistryClient {
                 continue;
             }
 
+            if (serverStartupTime != null && processInstance.getRestartTime() != null
+                    && processInstance.getRestartTime().after(serverStartupTime)) {
+                continue;
+            }
+
             logger.info("failover process instance id: {}", processInstance.getId());
 
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance taskInstance : validTaskInstanceList) {
                 if (Constants.NULL.equals(taskInstance.getHost())) {
+                    continue;
+                }
+                if (taskInstance.getState().typeIsFinished()) {
                     continue;
                 }
                 logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
@@ -347,6 +460,13 @@ public class MasterRegistryClient {
         logger.info("master[{}] failover end, useTime:{}ms", masterHost, System.currentTimeMillis() - startTime);
     }
 
+    /**
+     * failover task instance
+     * <p>
+     * 1. kill yarn job if there are yarn jobs in tasks.
+     * 2. change task state from running to need failover.
+     * 3. try to notify local master
+     */
     private void failoverTaskInstance(ProcessInstance processInstance, TaskInstance taskInstance) {
         if (taskInstance == null) {
             logger.error("failover task instance error, taskInstance is null");
@@ -359,24 +479,23 @@ public class MasterRegistryClient {
             return;
         }
 
-        if (!checkTaskInstanceNeedFailover(taskInstance)) {
-            return;
-        }
-
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .create();
 
-        // only kill yarn job if exists , the local thread has exited
-        ProcessUtils.killYarnJob(taskExecutionContext);
+        if (masterConfig.getMasterKillYarnJobWhenHandleFailOver()) {
+            // only kill yarn job if exists , the local thread has exited
+            ProcessUtils.killYarnJob(taskExecutionContext);
+        }
 
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
         processService.saveTaskInstance(taskInstance);
 
         WorkflowExecuteThread workflowExecuteThreadNotify = processInstanceExecMaps.get(processInstance.getId());
         if (workflowExecuteThreadNotify == null) {
+            logger.info("workflowExecuteThreadNotify is null, just return, task id:{},process id:{}", taskInstance.getId(), processInstance.getId());
             return;
         }
         StateEvent stateEvent = new StateEvent();

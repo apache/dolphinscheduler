@@ -114,9 +114,9 @@ public class MasterRegistryClientTest {
 
     @Test
     public void removeNodePathTest() {
-        masterRegistryClient.removeNodePath("/path", NodeType.MASTER, false);
-        masterRegistryClient.removeNodePath("/path", NodeType.MASTER, true);
+        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, false);
+        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, true);
         //Cannot mock static methods
-        masterRegistryClient.removeNodePath("/path", NodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath("/path", NodeType.WORKER, true);
     }
 }

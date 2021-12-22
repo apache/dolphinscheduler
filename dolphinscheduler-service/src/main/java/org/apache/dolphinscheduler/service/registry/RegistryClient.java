@@ -330,7 +330,7 @@ public class RegistryClient {
             if (serverPath.startsWith(serverType + UNDERLINE + host)) {
                 String server = REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS + SINGLE_SLASH + serverPath;
                 remove(server);
-                logger.info("{} server {} deleted from zk dead server path success", serverType, host);
+                logger.info("{} server {} deleted from zk dead server path:{} success", serverType, host,server);
             }
         }
     }

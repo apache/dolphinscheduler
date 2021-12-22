@@ -18,17 +18,19 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
-
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Retry Report Task Status Thread
@@ -38,10 +40,8 @@ public class RetryReportTaskStatusThread implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(RetryReportTaskStatusThread.class);
 
-    /**
-     * every 5 minutes
-     */
-    private static long RETRY_REPORT_TASK_STATUS_INTERVAL = 5 * 60 * 1000L;
+    @Autowired
+    WorkerConfig workerConfig;
 
     /**
      *  task callback service
@@ -68,7 +68,7 @@ public class RetryReportTaskStatusThread implements Runnable {
         while (Stopper.isRunning()){
 
             // sleep 5 minutes
-            ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_INTERVAL);
+            ThreadUtils.sleep(workerConfig.getRetryReportTaskStatusInterval() * 1000);
 
             try {
                 if (!responceCache.getAckCache().isEmpty()){

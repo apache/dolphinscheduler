@@ -63,6 +63,12 @@ public class MasterConfig {
     @Value("${master.cache.process.definition:true}")
     private boolean masterCacheProcessDefinition;
 
+    @Value("${master.failover.interval:10}")
+    private int failoverInterval;
+
+    @Value("${master.kill.yarn.job.when.handle.fail.over:true}")
+    private boolean masterKillYarnJobWhenHandleFailOver;
+
     public int getListenPort() {
         return listenPort;
     }
@@ -162,4 +168,19 @@ public class MasterConfig {
         this.masterCacheProcessDefinition = masterCacheProcessDefinition;
     }
 
+    public int getFailoverInterval() {
+        return failoverInterval;
+    }
+
+    public void setFailoverInterval(int failoverInterval) {
+        this.failoverInterval = failoverInterval;
+    }
+
+    public boolean getMasterKillYarnJobWhenHandleFailOver() {
+        return masterKillYarnJobWhenHandleFailOver;
+    }
+
+    public void setMasterKillYarnJobWhenHandleFailOver(boolean masterKillYarnJobWhenHandleFailOver) {
+        this.masterKillYarnJobWhenHandleFailOver = masterKillYarnJobWhenHandleFailOver;
+    }
 }

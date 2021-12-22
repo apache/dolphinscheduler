@@ -181,4 +181,7 @@ public class PropertyUtils {
         properties.setProperty(key, value);
     }
 
+    public static String dumpProperties() {
+        return properties.toString();
+    }
 }

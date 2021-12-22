@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -136,8 +137,13 @@ public class TaskPriorityQueueConsumer extends Thread {
             } else {
                 result = dispatcher.dispatch(executionContext);
             }
+            if (result) {
+                processService.updateHostAndSubmitTimeById(taskPriority.getTaskId(), executionContext.getHost().getAddress(), new Date());
+            }
         } catch (ExecuteException e) {
-            logger.error("dispatch error: {}", e.getMessage(),e);
+            logger.error("ExecuteException dispatch error: {}", e.getMessage(), e);
+        } catch (Throwable t) {
+            logger.error("dispatch error: {}", t, t);
         }
         return result;
     }

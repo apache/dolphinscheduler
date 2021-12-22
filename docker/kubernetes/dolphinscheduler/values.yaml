@@ -53,6 +53,10 @@ externalDatabase:
 ## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
+  tickTime: 3000
+  maxSessionTimeout: 60000
+  initLimit: 300
+  maxClientCnxns: 2000
   fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   persistence:
     enabled: false
@@ -158,6 +162,9 @@ master:
     MASTER_TASK_COMMIT_INTERVAL: "1000"
     MASTER_MAX_CPULOAD_AVG: "-1"
     MASTER_RESERVED_MEMORY: "0.3"
+    ORG_QUARTZ_THREADPOOL_THREADCOUNT: "25"
+    ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT: "1"
+    SESSION_TIMEOUT_MS: 60000
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -225,6 +232,8 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "-1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_GROUPS: "default"
+    SESSION_TIMEOUT_MS: 60000
+    WORKER_RETRY_REPORT_TASK_STATUS_INTERVAL: 600
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
