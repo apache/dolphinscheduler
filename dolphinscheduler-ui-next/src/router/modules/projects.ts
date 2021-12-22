@@ -15,58 +15,35 @@
  * limitations under the License.
  */
 
-import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
 import utils from '@/utils'
-import projectsPage from './modules/projects'
-import resourcesPage from './modules/resources'
-import datasourcePage from './modules/datasource'
-import monitorPage from './modules/monitor'
-import securityPage from './modules/security'
 
 // All TSX files under the views folder automatically generate mapping relationship
 const modules = import.meta.glob('/src/views/**/**.tsx')
 const components: { [key: string]: Component } = utils.mapping(modules)
 
-/**
- * Basic page
- */
-const basePage: RouteRecordRaw[] = [
-  {
-    path: '/',
-    redirect: { name: 'home' },
-    meta: { title: '首页' },
-    component: () => import('@/layouts/basic'),
-    children: [
-      {
-        path: '/home',
-        name: 'home',
-        component: components['home'],
-        meta: {
-          title: '首页',
-        },
+export default {
+  path: '/projects',
+  name: 'projects',
+  redirect: { name: 'projects-list' },
+  meta: { title: '项目管理' },
+  component: () => import('@/layouts/basic'),
+  children: [
+    {
+      path: '/projects/list',
+      name: 'projects-list',
+      component: components['home'],
+      meta: {
+        title: '项目',
       },
-    ],
-  },
-  projectsPage,
-  resourcesPage,
-  datasourcePage,
-  monitorPage,
-  securityPage,
-]
-
-/**
- * Login page
- */
-const loginPage: RouteRecordRaw[] = [
-  {
-    path: '/login',
-    name: 'login',
-    component: components['login'],
-  },
-]
-
-const routes: RouteRecordRaw[] = [...basePage, ...loginPage]
-
-// 重新组织后导出
-export default routes
+    },
+    {
+      path: '/projects/:projectCode/index',
+      name: 'projects-index',
+      component: components['home'],
+      meta: {
+        title: '工作流监控'
+      }
+    }
+  ]
+}
