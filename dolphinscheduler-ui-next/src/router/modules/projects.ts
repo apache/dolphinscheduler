@@ -15,41 +15,35 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
-import { FormRules } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import type { Component } from 'vue'
+import utils from '@/utils'
 
-export function useValidate() {
-  const { t, locale } = useI18n()
-  const state = reactive({
-    loginFormRef: ref(),
-    loginForm: {
-      userName: '',
-      userPassword: '',
+// All TSX files under the views folder automatically generate mapping relationship
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
+
+export default {
+  path: '/projects',
+  name: 'projects',
+  redirect: { name: 'projects-list' },
+  meta: { title: '项目管理' },
+  component: () => import('@/layouts/basic'),
+  children: [
+    {
+      path: '/projects/list',
+      name: 'projects-list',
+      component: components['home'],
+      meta: {
+        title: '项目',
+      },
     },
-    rules: {
-      userName: {
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.loginForm.userName === '') {
-            return new Error(`${t('login.userName_tips')}`)
-          }
-        },
+    {
+      path: '/projects/:projectCode/index',
+      name: 'projects-index',
+      component: components['home'],
+      meta: {
+        title: '工作流监控',
       },
-      userPassword: {
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.loginForm.userPassword === '') {
-            return new Error(`${t('login.userPassword_tips')}`)
-          }
-        },
-      },
-    } as FormRules,
-  })
-
-  return {
-    state,
-    t,
-    locale,
-  }
+    },
+  ],
 }

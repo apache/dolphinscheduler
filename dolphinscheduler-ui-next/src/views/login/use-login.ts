@@ -19,12 +19,12 @@ import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { queryLog } from '@/service/modules/login'
 
-export function useLogin (state) {
+export function useLogin(state: any) {
   const router: Router = useRouter()
   const handleLogin = () => {
     state.loginFormRef.validate((valid: any) => {
       if (!valid) {
-        queryLog({...state.loginForm}).then((res: Response) => {
+        queryLog({ ...state.loginForm }).then((res: Response) => {
           console.log('res', res)
           router.push({ path: 'home' })
         })
@@ -34,6 +34,6 @@ export function useLogin (state) {
     })
   }
   return {
-    handleLogin
+    handleLogin,
   }
 }

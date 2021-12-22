@@ -15,10 +15,35 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import type { Component } from 'vue'
+import utils from '@/utils'
 
-const DSTable = defineComponent({
-  name: 'DSTable',
-})
+// All TSX files under the views folder automatically generate mapping relationship
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
 
-export default DSTable
+export default {
+  path: '/resource',
+  name: 'resource',
+  redirect: { name: 'file' },
+  meta: { title: '资源中心' },
+  component: () => import('@/layouts/basic'),
+  children: [
+    {
+      path: '/resource/file',
+      name: 'file',
+      component: components['home'],
+      meta: {
+        title: '文件管理',
+      },
+    },
+    {
+      path: '/resource/file/create',
+      name: 'resource-file-create',
+      component: components['home'],
+      meta: {
+        title: '创建资源',
+      },
+    },
+  ],
+}

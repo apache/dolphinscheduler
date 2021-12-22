@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from "vue";
-import { NLayoutSider, NMenu } from "naive-ui";
+import { defineComponent, ref } from 'vue'
+import { NLayoutSider, NMenu } from 'naive-ui'
 
 const Sider = defineComponent({
-  name: "Sider",
+  name: 'Sider',
   props: {
     visible: {
       type: Boolean,
@@ -41,39 +41,38 @@ const Sider = defineComponent({
     },
   },
   setup(props) {
-    const currentMenuRef = ref({});
+    const currentMenuRef = ref({})
 
     const handleMenuClick = (key, data) => {
-      currentMenuRef.value = data;
-    };
+      currentMenuRef.value = data
+    }
 
-    return { handleMenuClick };
+    return { handleMenuClick }
   },
   render() {
-    if (this.visible) {
-      return (
-        <NLayoutSider
-          width={240}
-          collapseMode={"width"}
-          collapsedWidth={64}
+    return
+    this.visible ? (
+      <NLayoutSider
+        width={240}
+        collapseMode={'width'}
+        collapsedWidth={64}
+        inverted={this.inverted}
+        nativeScrollbar={false}
+        show-trigger
+        bordered
+      >
+        <NMenu
+          onUpdate:value={this.handleMenuClick}
           inverted={this.inverted}
-          nativeScrollbar={false}
-          show-trigger
-          bordered
-        >
-          <NMenu
-            onUpdate:value={this.handleMenuClick}
-            inverted={this.inverted}
-            collapsedWidth={64}
-            collapsedIconSize={22}
-            options={this.menuOptions}
-          />
-        </NLayoutSider>
-      );
-    } else {
-      return "";
-    }
+          collapsedWidth={64}
+          collapsedIconSize={22}
+          options={this.menuOptions}
+        />
+      </NLayoutSider>
+    ) : (
+      ''
+    )
   },
-});
+})
 
-export { Sider };
+export { Sider }

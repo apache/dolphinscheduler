@@ -180,9 +180,6 @@ class DependentOperator(Base):
         "relation",
     }
 
-    DEPENDENT_ITEM = "DependentItem"
-    DEPENDENT_OPERATOR = "DependentOperator"
-
     def __init__(self, *args):
         super().__init__(self.__class__.__name__)
         self.args = args

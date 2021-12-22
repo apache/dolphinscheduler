@@ -30,7 +30,7 @@ import lombok.Getter;
 
 @Getter
 public class SecurityPage extends NavBarPage implements NavBarItem {
-    @FindBy(className = "tenant-manage")
+    @FindBy(className = "tab-tenant-manage")
     private WebElement menuTenantManage;
 
     public SecurityPage(RemoteWebDriver driver) {
