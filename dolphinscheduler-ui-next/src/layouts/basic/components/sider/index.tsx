@@ -50,27 +50,28 @@ const Sider = defineComponent({
     return { handleMenuClick }
   },
   render() {
-    return 
-      this.visible ?
-      (
-        <NLayoutSider
-          width={240}
-          collapseMode={'width'}
-          collapsedWidth={64}
+    return
+    this.visible ? (
+      <NLayoutSider
+        width={240}
+        collapseMode={'width'}
+        collapsedWidth={64}
+        inverted={this.inverted}
+        nativeScrollbar={false}
+        show-trigger
+        bordered
+      >
+        <NMenu
+          onUpdate:value={this.handleMenuClick}
           inverted={this.inverted}
-          nativeScrollbar={false}
-          show-trigger
-          bordered
-        >
-          <NMenu
-            onUpdate:value={this.handleMenuClick}
-            inverted={this.inverted}
-            collapsedWidth={64}
-            collapsedIconSize={22}
-            options={this.menuOptions}
-          />
-        </NLayoutSider>
-      ) : ''
+          collapsedWidth={64}
+          collapsedIconSize={22}
+          options={this.menuOptions}
+        />
+      </NLayoutSider>
+    ) : (
+      ''
+    )
   },
 })
 

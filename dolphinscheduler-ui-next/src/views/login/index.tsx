@@ -82,7 +82,12 @@ const login = defineComponent({
                 />
               </NFormItem>
             </NForm>
-            <NButton round type='primary' onClick={this.handleLogin}>
+            <NButton
+              round
+              type='info'
+              style={{ width: '100%' }}
+              onClick={this.handleLogin}
+            >
               {this.t('login.signin')}
             </NButton>
           </div>

@@ -17,11 +17,19 @@
 
 import { defineComponent } from 'vue'
 import styles from './index.module.scss'
+import PieChart from '@/components/chart/modules/Pie'
+import GaugeChart from '@/components/chart/modules/Gauge'
 
 export default defineComponent({
   name: 'home',
   setup() {},
   render() {
-    return <div class={styles.container}>Home Test</div>
+    return (
+      <div class={styles.container}>
+        Home Test
+        <PieChart />
+        <GaugeChart />
+      </div>
+    )
   },
 })

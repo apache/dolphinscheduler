@@ -42,8 +42,8 @@ export default {
       name: 'projects-index',
       component: components['home'],
       meta: {
-        title: '工作流监控'
-      }
-    }
-  ]
+        title: '工作流监控',
+      },
+    },
+  ],
 }

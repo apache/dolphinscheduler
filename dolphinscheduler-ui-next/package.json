@@ -12,6 +12,8 @@
   "dependencies": {
     "@vueuse/core": "^7.2.2",
     "axios": "^0.24.0",
+    "echarts": "^5.2.2",
+    "lodash": "^4.17.21",
     "date-fns": "^2.27.0",
     "naive-ui": "^2.21.5",
     "nprogress": "^0.2.0",

@@ -42,8 +42,8 @@ export default {
       name: 'servers-worker',
       component: components['home'],
       meta: {
-        title: '服务管理-Worker'
-      }
-    }
-  ]
+        title: '服务管理-Worker',
+      },
+    },
+  ],
 }

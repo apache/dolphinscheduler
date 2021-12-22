@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RouteRecordRaw } from "vue-router";
+import { RouteRecordRaw } from 'vue-router'
 
 interface RouteState {
-  menus: RouteRecordRaw[];
-  routers: any[];
-  addRouters: any[];
+  menus: RouteRecordRaw[]
+  routers: any[]
+  addRouters: any[]
 }
 
-export default RouteState;
+export default RouteState
