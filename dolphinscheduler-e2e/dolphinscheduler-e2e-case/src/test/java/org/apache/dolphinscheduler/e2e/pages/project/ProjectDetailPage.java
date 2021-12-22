@@ -31,9 +31,9 @@ import lombok.Getter;
 
 @Getter
 public final class ProjectDetailPage extends NavBarPage {
-    @FindBy(className = "process-definition")
+    @FindBy(className = "tab-process-definition")
     private WebElement menuProcessDefinition;
-    @FindBy(className = "process-instance")
+    @FindBy(className = "tab-process-instance")
     private WebElement menuProcessInstances;
 
     public ProjectDetailPage(RemoteWebDriver driver) {

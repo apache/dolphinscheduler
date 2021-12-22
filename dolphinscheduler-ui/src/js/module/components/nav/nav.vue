@@ -29,7 +29,7 @@
       </div>
       <div class="clearfix list">
         <div class="nav-links">
-          <router-link :to="{ path: '/projects'}" tag="a" active-class="active" id="project-tab">
+          <router-link :to="{ path: '/projects'}" tag="a" active-class="active" id="tabProject">
             <span><em class="ansiconfont el-icon-tickets"></em>{{$t('Project Manage')}}</span><strong></strong>
           </router-link>
         </div>
@@ -57,7 +57,7 @@
       </div>
       <div class="clearfix list" >
         <div class="nav-links">
-          <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']" id="security-tab">
+          <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']" id="tabSecurity">
             <span><em class="ansfont ri-shield-check-line"></em>{{$t('Security')}}</span><strong></strong>
           </router-link>
         </div>
