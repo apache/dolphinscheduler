@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue'
 
-import styles from "./index.module.scss";
-import { NDropdown, NIcon, NLayoutHeader, NMenu } from "naive-ui";
-import { Logo } from "@/layouts/basic/components/logo";
-import { IosArrowDown } from "@vicons/ionicons4";
-import { UserAlt } from "@vicons/fa";
+import styles from './index.module.scss'
+import { NDropdown, NIcon, NLayoutHeader, NMenu } from 'naive-ui'
+import Logo from '@/layouts/basic/components/logo'
+import { IosArrowDown } from '@vicons/ionicons4'
+import { UserAlt } from '@vicons/fa'
 
 const Header = defineComponent({
-  name: "Header",
+  name: 'Header',
   props: {
     inverted: {
       type: Boolean,
@@ -50,26 +50,26 @@ const Header = defineComponent({
     },
   },
   setup(props, context) {
-    const currentMenuRef = ref({});
+    const currentMenuRef = ref({})
 
     const handleMenuClick = (key, data) => {
-      currentMenuRef.value = data;
-      context.emit("menuClick", data);
-    };
+      currentMenuRef.value = data
+      context.emit('menuClick', data)
+    }
 
-    return { handleMenuClick };
+    return { handleMenuClick }
   },
   render() {
     return (
       <NLayoutHeader
-        class={styles["header-model"]}
+        class={styles['header-model']}
         inverted={this.inverted}
         bordered
       >
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            mode="horizontal"
+            mode='horizontal'
             onUpdate:value={this.handleMenuClick}
             defaultValue={this.defaultMenuKey}
             class={styles.menu}
@@ -99,8 +99,8 @@ const Header = defineComponent({
           </div>
         </div>
       </NLayoutHeader>
-    );
+    )
   },
-});
+})
 
-export { Header };
+export { Header }
