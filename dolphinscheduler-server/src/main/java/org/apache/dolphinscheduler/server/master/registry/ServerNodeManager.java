@@ -51,6 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 
@@ -387,7 +388,8 @@ public class ServerNodeManager implements InitializingBean {
             workerGroup = workerGroup.toLowerCase();
             Set<String> nodes = workerGroupNodes.get(workerGroup);
             if (CollectionUtils.isNotEmpty(nodes)) {
-                return Collections.unmodifiableSet(nodes);
+                // avoid ConcurrentModificationException
+                return Collections.unmodifiableSet(nodes.stream().collect(Collectors.toSet()));
             }
             return nodes;
         } finally {

@@ -32,7 +32,8 @@
 
 #org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
 #org.quartz.threadPool.makeThreadsDaemons = true
-#org.quartz.threadPool.threadCount = 25
+org.quartz.threadPool.threadCount = ${ORG_QUARTZ_THREADPOOL_THREADCOUNT}
+org.quartz.scheduler.batchTriggerAcquisitionMaxCount = ${ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT}
 #org.quartz.threadPool.threadPriority = 5
 
 #============================================================================

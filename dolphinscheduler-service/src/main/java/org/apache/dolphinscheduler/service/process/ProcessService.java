@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -26,8 +27,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-
-import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -579,6 +578,7 @@ public class ProcessService {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
+        processInstance.setRestartTime(processInstance.getStartTime());
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
         processInstance.setCommandParam(command.getCommandParam());
@@ -775,6 +775,7 @@ public class ProcessService {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+        processInstance.setRestartTime(new Date());
         ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXECUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType) {
@@ -844,6 +845,7 @@ public class ProcessService {
                     updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
+                processInstance.setRestartTime(processInstance.getStartTime());
                 processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime + 1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
@@ -1015,6 +1017,7 @@ public class ProcessService {
         }
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         updateTaskInstance(taskInstance);
+        logger.debug("update task instance, task instance id:{}", taskInstance.getId());
     }
 
     /**
@@ -1317,9 +1320,6 @@ public class ProcessService {
         taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
-        if (taskInstance.getSubmitTime() == null) {
-            taskInstance.setSubmitTime(new Date());
-        }
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
@@ -1435,6 +1435,11 @@ public class ProcessService {
         }
     }
 
+    public boolean updateHostAndSubmitTimeById(int id, String host, Date date) {
+        int count = taskInstanceMapper.updateHostAndSubmitTimeById(id, host, date);
+        return count > 0;
+    }
+
     /**
      * insert task instance
      *
@@ -1454,6 +1459,7 @@ public class ProcessService {
      */
     public boolean updateTaskInstance(TaskInstance taskInstance) {
         int count = taskInstanceMapper.updateById(taskInstance);
+        logger.debug("updateTaskInstance, task instance id:{}, state;{}", taskInstance.getId(), taskInstance.getState());
         return count > 0;
     }
 
@@ -1691,8 +1697,9 @@ public class ProcessService {
      * @param executePath executePath
      * @param logPath logPath
      * @param taskInstId taskInstId
+     * @reutrn
      */
-    public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
+    public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
                                 String executePath,
                                 String logPath,
                                 int taskInstId) {
@@ -1701,7 +1708,7 @@ public class ProcessService {
         taskInstance.setHost(host);
         taskInstance.setExecutePath(executePath);
         taskInstance.setLogPath(logPath);
-        saveTaskInstance(taskInstance);
+        return saveTaskInstance(taskInstance);
     }
 
     /**
@@ -1721,8 +1728,9 @@ public class ProcessService {
      * @param endTime endTime
      * @param taskInstId taskInstId
      * @param varPool varPool
+     * @return
      */
-    public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
+    public boolean changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
@@ -1734,7 +1742,7 @@ public class ProcessService {
         taskInstance.setEndTime(endTime);
         taskInstance.setVarPool(varPool);
         changeOutParam(taskInstance);
-        saveTaskInstance(taskInstance);
+        return saveTaskInstance(taskInstance);
     }
 
     /**
@@ -1817,6 +1825,10 @@ public class ProcessService {
      */
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host) {
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
+    }
+
+    public List<String> queryNeedFailoverProcessInstanceHost() {
+        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(stateArray);
     }
 
     /**

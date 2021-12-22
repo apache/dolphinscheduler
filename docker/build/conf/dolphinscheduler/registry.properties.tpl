@@ -17,3 +17,4 @@
 
 registry.plugin.name=${REGISTRY_PLUGIN_NAME}
 registry.servers=${REGISTRY_SERVERS}
+session.timeout.ms=${SESSION_TIMEOUT_MS}

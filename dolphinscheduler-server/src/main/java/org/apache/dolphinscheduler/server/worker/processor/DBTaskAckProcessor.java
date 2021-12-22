@@ -17,16 +17,20 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.*;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+
+import io.netty.channel.Channel;
 
 /**
  *  db task ack processor
@@ -50,6 +54,7 @@ public class DBTaskAckProcessor implements NettyRequestProcessor {
 
         if (taskAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()){
             ResponceCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
+            logger.debug("removeAckCache: taskinstance id:{}", taskAckCommand.getTaskInstanceId());
         }
     }
 

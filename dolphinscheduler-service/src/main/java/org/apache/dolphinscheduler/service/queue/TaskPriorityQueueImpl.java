@@ -32,7 +32,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     /**
      * queue size
      */
-    private static final Integer QUEUE_MAX_SIZE = 3000;
+    private static final Integer QUEUE_MAX_SIZE = 10000;
 
     /**
      * queue

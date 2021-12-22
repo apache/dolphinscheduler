@@ -110,6 +110,7 @@ public class TaskResponseService {
     public void addResponse(TaskResponseEvent taskResponseEvent) {
         try {
             eventQueue.put(taskResponseEvent);
+            logger.debug("eventQueue size:{}", eventQueue.size());
         } catch (InterruptedException e) {
             logger.error("put task : {} error :{}", taskResponseEvent, e);
             Thread.currentThread().interrupt();
@@ -155,36 +156,49 @@ public class TaskResponseService {
                 try {
                     if (taskInstance != null) {
                         ExecutionStatus status = taskInstance.getState().typeIsFinished() ? taskInstance.getState() : taskResponseEvent.getState();
-                        processService.changeTaskState(taskInstance, status,
+                        boolean result = processService.changeTaskState(taskInstance, status,
                                 taskResponseEvent.getStartTime(),
                                 taskResponseEvent.getWorkerAddress(),
                                 taskResponseEvent.getExecutePath(),
                                 taskResponseEvent.getLogPath(),
                                 taskResponseEvent.getTaskInstanceId());
+                        logger.debug("changeTaskState in ACK , changed in meta:{} ,task instance state:{}, task response event state:{}, taskInstance id:{},taskInstance host:{}",
+                                result, taskInstance.getState(), taskResponseEvent.getState(), taskInstance.getId(), taskInstance.getHost());
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
                     channel.writeAndFlush(taskAckCommand.convert2Command());
+                    logger.debug("worker ack master success, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
                 } catch (Exception e) {
                     logger.error("worker ack master error", e);
-                    DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(), -1);
+                    DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(), taskInstance == null ? -1 : taskInstance.getId());
                     channel.writeAndFlush(taskAckCommand.convert2Command());
                 }
                 break;
             case RESULT:
                 try {
+                    boolean result = true;
                     if (taskInstance != null) {
-                        processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
+                        result = processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
                                 taskResponseEvent.getEndTime(),
                                 taskResponseEvent.getProcessId(),
                                 taskResponseEvent.getAppIds(),
                                 taskResponseEvent.getTaskInstanceId(),
                                 taskResponseEvent.getVarPool()
                         );
+                        logger.debug("changeTaskState in RESULT , changed in meta:{} task instance state:{}, task response event state:{}, taskInstance id:{},taskInstance host:{}",
+                                result, taskInstance.getState(), taskResponseEvent.getState(), taskInstance.getId(), taskInstance.getHost());
                     }
-                    // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
-                    DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
-                    channel.writeAndFlush(taskResponseCommand.convert2Command());
+                    if (!result) {
+                        DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), taskResponseEvent.getTaskInstanceId());
+                        channel.writeAndFlush(taskResponseCommand.convert2Command());
+                        logger.debug("worker response master failure, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
+                    } else {
+                        // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
+                        DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(), taskResponseEvent.getTaskInstanceId());
+                        channel.writeAndFlush(taskResponseCommand.convert2Command());
+                        logger.debug("worker response master success, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
+                    }
                 } catch (Exception e) {
                     logger.error("worker response master error", e);
                     DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), -1);

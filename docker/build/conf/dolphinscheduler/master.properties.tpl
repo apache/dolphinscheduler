@@ -44,3 +44,7 @@ master.max.cpuload.avg=${MASTER_MAX_CPULOAD_AVG}
 
 # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
 master.reserved.memory=${MASTER_RESERVED_MEMORY}
+# master failover interval minutes
+master.failover.interval=${MASTER_FAILOVER_INTERVAL}
+# master kill yarn job when handle failover
+master.kill.yarn.job.when.handle.failover=${MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER}

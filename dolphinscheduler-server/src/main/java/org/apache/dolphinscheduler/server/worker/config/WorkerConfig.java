@@ -65,6 +65,17 @@ public class WorkerConfig {
     @Value("${task.plugin.binding:}")
     private String taskPluginBinding;
 
+    @Value("${worker.retry.report.task.statues.interval:10}")
+    private int retryReportTaskStatusInterval;
+
+    public int getRetryReportTaskStatusInterval() {
+        return retryReportTaskStatusInterval;
+    }
+
+    public void setRetryReportTaskStatusInterval(int retryReportTaskStatusInterval) {
+        this.retryReportTaskStatusInterval = retryReportTaskStatusInterval;
+    }
+
     public int getListenPort() {
         return listenPort;
     }
