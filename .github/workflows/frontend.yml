@@ -57,7 +57,6 @@ jobs:
           node-version: 8
       - name: Compile and Build
         run: |
-          npm install node-sass --unsafe-perm
           npm install
           npm run lint
           npm run build

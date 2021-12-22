@@ -55,16 +55,6 @@
                 </configuration>
               </execution>
               <execution>
-                <id>npm install node-sass --unsafe-perm</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <arguments>install node-sass --unsafe-perm</arguments>
-                </configuration>
-              </execution>
-              <execution>
                 <id>npm install</id>
                 <goals>
                   <goal>npm</goal>
@@ -107,16 +97,6 @@
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
                   <npmVersion>${npm.version}</npmVersion>
-                </configuration>
-              </execution>
-              <execution>
-                <id>npm install node-sass --unsafe-perm</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <arguments>install node-sass --unsafe-perm</arguments>
                 </configuration>
               </execution>
               <execution>
