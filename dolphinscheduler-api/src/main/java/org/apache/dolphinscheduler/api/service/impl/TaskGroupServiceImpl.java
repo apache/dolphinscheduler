@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -28,20 +30,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task Group Service
@@ -70,7 +68,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> createTaskGroup(User loginUser,long projectcode, String name, String description, int groupSize) {
+    public Map<String, Object> createTaskGroup(User loginUser, long projectcode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -88,11 +86,14 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup(name, projectcode,description,
-                groupSize, loginUser.getId(),Flag.YES.getCode());
-        int insert = taskGroupMapper.insert(taskGroup);
-        logger.info("insert result:{}", insert);
-        putMsg(result, Status.SUCCESS);
+        TaskGroup taskGroup = new TaskGroup(name, projectcode, description,
+            groupSize, loginUser.getId(), Flag.YES.getCode());
+        if (taskGroupMapper.insert(taskGroup) > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
+            return result;
+        }
 
         return result;
     }
@@ -136,7 +137,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      */
     @Override
     public boolean isTheTaskGroupAvailable(int id) {
-        return taskGroupMapper.selectCountByIdStatus(id,Flag.YES.getCode()) == 1;
+        return taskGroupMapper.selectCountByIdStatus(id, Flag.YES.getCode()) == 1;
     }
 
     /**
@@ -148,7 +149,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> queryAllTaskGroup(User loginUser, String name,Integer status,int pageNo, int pageSize) {
+    public Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize) {
         return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, status);
     }
 
@@ -292,16 +293,16 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * wake a task manually
      *
      * @param loginUser
-     * @param queueId    task group queue id
+     * @param queueId   task group queue id
      * @return result
      */
     @Override
-    public Map<String, Object> wakeTaskcompulsively(User loginUser, int queueId) {
+    public Map<String, Object> forceStartTask(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        taskGroupQueueService.forceStartTask(queueId,Flag.YES.getCode());
+        taskGroupQueueService.forceStartTask(queueId, Flag.YES.getCode());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -312,7 +313,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        taskGroupQueueService.modifyPriority(queueId,priority);
+        taskGroupQueueService.modifyPriority(queueId, priority);
         putMsg(result, Status.SUCCESS);
         return result;
     }

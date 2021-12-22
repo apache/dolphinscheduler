@@ -266,7 +266,7 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result forceStart(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "queueId") Integer queueId) {
-        Map<String, Object> result = taskGroupService.wakeTaskcompulsively(loginUser, queueId);
+        Map<String, Object> result = taskGroupService.forceStartTask(loginUser, queueId);
         return returnDataList(result);
     }
 

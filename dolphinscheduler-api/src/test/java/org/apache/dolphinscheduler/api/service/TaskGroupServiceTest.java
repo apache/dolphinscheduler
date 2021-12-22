@@ -171,7 +171,7 @@ public class TaskGroupServiceTest {
 
         TreeMap<Integer, Integer> tm = new TreeMap<>();
         tm.put(1, 1);
-        Map<String, Object> map1 = taskGroupService.wakeTaskcompulsively(getLoginUser(), 1);
+        Map<String, Object> map1 = taskGroupService.forceStartTask(getLoginUser(), 1);
         Assert.assertEquals(Status.SUCCESS, map1.get(Constants.STATUS));
 
     }

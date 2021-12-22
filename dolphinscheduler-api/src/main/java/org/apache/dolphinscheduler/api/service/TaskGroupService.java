@@ -136,7 +136,7 @@ public interface TaskGroupService {
      * @param taskId task id
      * @return result
      */
-    Map<String, Object> wakeTaskcompulsively(User loginUser, int taskId);
+    Map<String, Object> forceStartTask(User loginUser, int taskId);
 
     Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority);
 }
