@@ -36,7 +36,7 @@ const basePage: RouteRecordRaw[] = [
     path: '/',
     redirect: { name: 'home' },
     meta: { title: '首页' },
-    component: () => import('@/layouts/basic'),
+    component: () => import('@/layouts/content'),
     children: [
       {
         path: '/home',

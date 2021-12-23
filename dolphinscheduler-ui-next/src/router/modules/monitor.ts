@@ -27,7 +27,7 @@ export default {
   name: 'monitor',
   meta: { title: 'monitor' },
   redirect: { name: 'servers-master' },
-  component: () => import('@/layouts/basic'),
+  component: () => import('@/layouts/content'),
   children: [
     {
       path: '/monitor/servers/master',
