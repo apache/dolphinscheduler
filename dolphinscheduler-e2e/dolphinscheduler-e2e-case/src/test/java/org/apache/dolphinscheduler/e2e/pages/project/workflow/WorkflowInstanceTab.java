@@ -36,11 +36,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 public final class WorkflowInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
-    @FindBy(className = "rows-workflow-instances")
+    @FindBy(className = "items-workflow-instances")
     private List<WebElement> instanceList;
     @FindBy(className = "select-all")
     private WebElement checkBoxSelectAll;
-    @FindBy(className = "button-delete-all")
+    @FindBy(className = "btn-delete-all")
     private WebElement buttonDeleteAll;
     @FindBys({
         @FindBy(className = "el-popconfirm"),
@@ -82,7 +82,7 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
         private final WebElement row;
 
         public WebElement rerunButton() {
-            return row.findElement(By.className("button-rerun"));
+            return row.findElement(By.className("btn-rerun"));
         }
 
         public boolean isSuccess() {
@@ -94,7 +94,7 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
         }
 
         public Row rerun() {
-            row.findElements(By.className("button-rerun"))
+            row.findElements(By.className("btn-rerun"))
                .stream()
                .filter(WebElement::isDisplayed)
                .findFirst()

@@ -20,7 +20,7 @@
           @change="_onChange"
           v-model="selectedValue"
           size="small"
-          id="select-tenant"
+          id="selectTenant"
           style="width: 180px">
     <el-option
             v-for="item in itemList"

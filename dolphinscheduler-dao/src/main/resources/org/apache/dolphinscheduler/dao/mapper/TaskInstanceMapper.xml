@@ -81,8 +81,11 @@
                 #{i}
             </foreach>
         </if>
-        <if test="startTime != null and endTime != null">
-            and t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+        <if test="startTime != null">
+            and t.start_time <![CDATA[ > ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by t.state
     </select>

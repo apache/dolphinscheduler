@@ -18,10 +18,15 @@
 import type { RouteRecordRaw } from 'vue-router'
 import type { Component } from 'vue'
 import utils from '@/utils'
+import projectsPage from './modules/projects'
+import resourcesPage from './modules/resources'
+import datasourcePage from './modules/datasource'
+import monitorPage from './modules/monitor'
+import securityPage from './modules/security'
 
 // All TSX files under the views folder automatically generate mapping relationship
 const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.classification(modules)
+const components: { [key: string]: Component } = utils.mapping(modules)
 
 /**
  * Basic page
@@ -30,15 +35,24 @@ const basePage: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: { name: 'home' },
-    component: () => import('@/layouts/content/Content'),
+    meta: { title: '首页' },
+    component: () => import('@/layouts/content'),
     children: [
       {
         path: '/home',
         name: 'home',
         component: components['home'],
+        meta: {
+          title: '首页',
+        },
       },
     ],
   },
+  projectsPage,
+  resourcesPage,
+  datasourcePage,
+  monitorPage,
+  securityPage,
 ]
 
 /**

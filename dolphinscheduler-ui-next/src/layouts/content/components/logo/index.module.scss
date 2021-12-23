@@ -14,29 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import type { Component } from 'vue'
-
-const classification = (modules: any) => {
-  const components: { [key: string]: Component } = {}
-  // All TSX files under the views folder automatically generate mapping relationship
-  Object.keys(modules).forEach((key: string) => {
-    const nameMatch: string[] | null = key.match(/^\/src\/views\/(.+)\.tsx/)
-
-    if (!nameMatch) {
-      return
-    }
-
-    // If the page is named Index, the parent folder is used as the name
-    const indexMatch: string[] | null = nameMatch[1].match(/(.*)\/Index$/i)
-
-    let name: string = indexMatch ? indexMatch[1] : nameMatch[1]
-
-    ;[name] = name.split('/').splice(-1)
-
-    components[name] = modules[key]
-  })
-  return components
+ 
+.logo {
+  width: 180px;
+  height: 100%;
+  margin-left: 12px;
+  background: url('../../../../assets/images/logo.svg') 100% no-repeat;
 }
-
-export default classification
