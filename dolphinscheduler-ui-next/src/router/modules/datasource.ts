@@ -27,15 +27,15 @@ export default {
   name: 'datasource',
   redirect: { name: 'datasource-list' },
   meta: { title: '数据源中心' },
-  component: () => import('@/layouts/basic'),
+  component: () => import('@/layouts/content'),
   children: [
     {
       path: '/datasource/list',
       name: 'datasource-list',
       component: components['home'],
       meta: {
-        title: '数据源中心'
-      }
-    }
-  ]
+        title: '数据源中心',
+      },
+    },
+  ],
 }

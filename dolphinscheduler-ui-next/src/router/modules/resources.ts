@@ -27,7 +27,7 @@ export default {
   name: 'resource',
   redirect: { name: 'file' },
   meta: { title: '资源中心' },
-  component: () => import('@/layouts/basic'),
+  component: () => import('@/layouts/content'),
   children: [
     {
       path: '/resource/file',
@@ -42,8 +42,8 @@ export default {
       name: 'resource-file-create',
       component: components['home'],
       meta: {
-        title: '创建资源'
-      }
-    }
-  ]
+        title: '创建资源',
+      },
+    },
+  ],
 }

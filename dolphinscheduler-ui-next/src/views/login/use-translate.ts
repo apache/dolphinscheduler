@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-import { WritableComputedRef } from "vue"
+import { WritableComputedRef } from 'vue'
 
-export function useTranslate (locale: WritableComputedRef<string>) {
+export function useTranslate(locale: WritableComputedRef<string>) {
   const handleChange = (value: string) => {
     locale.value = value
   }
   return {
-    handleChange
+    handleChange,
   }
 }

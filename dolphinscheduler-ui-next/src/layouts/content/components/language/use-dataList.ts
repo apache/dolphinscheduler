@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { NLayout, NLayoutContent } from 'naive-ui'
+import { reactive, ref } from 'vue'
 
-const Content = defineComponent({
-  name: 'Content',
-  render() {
-    return (
-      <NLayout>
-        <NLayoutContent>
-          <router-view />
-        </NLayoutContent>
-      </NLayout>
-    )
-  },
-})
+export function useDataList() {
+  const languageOptions = [
+    {
+      label: 'English',
+      key: 'en',
+    },
+    {
+      label: '中文',
+      key: 'zh',
+    },
+  ]
+  
+  const state = reactive({
+    chooseVal: ref('中文'),
+    languageOptions: languageOptions
+  })
 
-export default Content
+  return {
+    state
+  }
+}

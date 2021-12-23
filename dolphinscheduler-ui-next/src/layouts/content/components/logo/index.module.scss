@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { defineComponent } from 'vue'
-
-const DSTable = defineComponent({
-  name: 'DSTable',
-})
-
-export default DSTable
+ 
+.logo {
+  width: 180px;
+  height: 100%;
+  margin-left: 12px;
+  background: url('../../../../assets/images/logo.svg') 100% no-repeat;
+}
