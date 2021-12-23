@@ -416,6 +416,7 @@ export default {
   'Backward execution': '向后执行',
   'Forward execution': '向前执行',
   'Execute only the current node': '仅执行当前节点',
+  'Backward Dependent execution': '向后依赖执行',
   'Notification strategy': '通知策略',
   'Notification group': '通知组',
   'Please select a notification group': '请选择通知组',

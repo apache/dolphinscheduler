@@ -78,4 +78,9 @@
         </if>
         order by version desc
     </select>
+    <select id="queryDefinitionListByTaskType" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select distinct code, name, version, task_params
+        from t_ds_task_definition_log
+        where task_type = #{taskType}
+    </select>
 </mapper>

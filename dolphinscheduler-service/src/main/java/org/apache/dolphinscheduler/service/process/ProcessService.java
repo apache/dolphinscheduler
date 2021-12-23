@@ -29,6 +29,10 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -39,6 +43,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -2715,5 +2720,34 @@ public class ProcessService {
         if (delete != 1) {
             throw new ServiceException("delete command fail, id:" + commandId);
         }
+    }
+
+    public List<ProcessDefinition> getPostDependentProcessDefinitionByCode(long processDefinitionCode) throws JsonProcessingException {
+        List<ProcessDefinition> result = new ArrayList<>();
+        List<TaskDefinition> definitionList = taskDefinitionLogMapper.queryDefinitionListByTaskType(TaskType.DEPENDENT.getDesc());
+        for (TaskDefinition taskDefinition : definitionList) {
+            String dependence = taskDefinition.getDependence();
+            ArrayNode dependTaskList = (ArrayNode) new ObjectMapper().readTree(dependence).get("dependTaskList");
+            for (JsonNode dependTask : dependTaskList) {
+                ArrayNode dependItemList = (ArrayNode) dependTask.get("dependItemList");
+                for (JsonNode dependentItem : dependItemList) {
+                    long taskDefinitionCode = taskDefinition.getCode();
+                    Long dependentProcessDefinitionCode = dependentItem.get("definitionCode").asLong();
+                    if (dependentProcessDefinitionCode.equals(processDefinitionCode)) {
+                        List<ProcessTaskRelation> dependentTaskRelationList = processTaskRelationMapper.
+                            queryDistinctDefineCodeByTaskCode(taskDefinitionCode);
+                        if (dependentTaskRelationList.size() > 0) {
+                            for (ProcessTaskRelation dependentTaskRelation : dependentTaskRelationList) {
+                                ProcessDefinition processDefine = processDefineMapper.queryByCode(dependentTaskRelation.getProcessDefinitionCode());
+                                if (!result.contains(processDefine)) {
+                                    result.add(processDefine);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 }

@@ -180,4 +180,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
                     @Param("preTaskCode") long preTaskCode,
                     @Param("postTaskCode") long postTaskCode);
 
+    /**
+     *
+     * @param taskCode taskCode
+     * @return list
+     */
+    List<ProcessTaskRelation> queryDistinctDefineCodeByTaskCode(@Param("taskCode") long taskCode);
 }

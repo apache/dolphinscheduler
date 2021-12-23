@@ -95,4 +95,11 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @return the paging task definition version list
      */
     IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);
+
+    /**
+     *
+     * @param taskType taskType
+     * @return task definition list
+     */
+    List<TaskDefinition> queryDefinitionListByTaskType(@Param("taskType") String taskType);
 }

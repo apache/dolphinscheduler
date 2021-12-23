@@ -42,6 +42,7 @@
           <el-radio :label="'TASK_POST'">{{$t('Backward execution')}}</el-radio>
           <el-radio :label="'TASK_PRE'">{{$t('Forward execution')}}</el-radio>
           <el-radio :label="'TASK_ONLY'">{{$t('Execute only the current node')}}</el-radio>
+          <el-radio :label="'TASK_DEPENDENT'">{{$t('Backward Dependent execution')}}</el-radio>
         </el-radio-group>
       </div>
     </div>

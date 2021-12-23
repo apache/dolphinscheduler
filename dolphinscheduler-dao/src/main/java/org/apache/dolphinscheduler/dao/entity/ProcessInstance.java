@@ -535,6 +535,15 @@ public class ProcessInstance {
     }
 
     /**
+     * check this process is start task dependent backward data
+     *
+     * @return whether complement data
+     */
+    public boolean isDependentData() {
+        return this.taskDependType == TaskDependType.TASK_DEPENDENT;
+    }
+
+    /**
      * check this process is start complement data
      *
      * @return whether complement data

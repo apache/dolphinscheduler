@@ -183,4 +183,14 @@
             and post_task_code = #{postTaskCode}
         </if>
     </select>
+    <select id="queryDistinctDefineCodeByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        process_definition_code
+        from t_ds_process_task_relation
+        WHERE pre_task_code = #{taskCode}
+        <if test="taskCode != 0">
+            or post_task_code = #{taskCode}
+        </if>
+        group by process_definition_code
+    </select>
 </mapper>

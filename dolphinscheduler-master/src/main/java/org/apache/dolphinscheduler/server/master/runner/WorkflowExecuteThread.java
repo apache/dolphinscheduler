@@ -565,6 +565,9 @@ public class WorkflowExecuteThread {
             if (processComplementData()) {
                 return true;
             }
+            if (processDependentData()) {
+                return true;
+            }
             if (stateEvent.getExecutionStatus().typeIsFinished()) {
                 endProcess();
             }
@@ -636,6 +639,44 @@ public class WorkflowExecuteThread {
             return true;
         }
         return false;
+    }
+
+    //backward dependent execution
+    private boolean processDependentData() throws Exception {
+        if (!processInstance.isDependentData()) {
+            return false;
+        }
+        if (processInstance.getState().typeIsFinished()) {
+            endProcess();
+            List<ProcessDefinition> postDependentProcessList = processService.
+                getPostDependentProcessDefinitionByCode(processInstance.getProcessDefinitionCode());
+            if (postDependentProcessList.size() > 0) {
+                for (ProcessDefinition postDependentProcess : postDependentProcessList) {
+                    Command command = new Command();
+                    command.setCommandType(CommandType.START_PROCESS);
+                    command.setProcessDefinitionCode(postDependentProcess.getCode());
+                    Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+                    cmdParam.remove(Constants.CMD_PARAM_START_NODES);
+                    command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                    command.setTaskDependType(TaskDependType.TASK_DEPENDENT);
+                    command.setFailureStrategy(processInstance.getFailureStrategy());
+                    command.setWarningType(processInstance.getWarningType());
+                    command.setWarningGroupId(processInstance.getWarningGroupId());
+                    command.setScheduleTime(processInstance.getScheduleTime());
+                    command.setStartTime(new Date());
+                    command.setExecutorId(processInstance.getExecutorId());
+                    command.setUpdateTime(new Date());
+                    command.setProcessInstancePriority(processInstance.getProcessInstancePriority());
+                    command.setWorkerGroup(processInstance.getWorkerGroup());
+                    command.setEnvironmentCode(processInstance.getEnvironmentCode());
+                    command.setDryRun(processInstance.getDryRun());
+                    command.setProcessInstanceId(0);
+                    command.setProcessDefinitionVersion(postDependentProcess.getVersion());
+                    processService.createCommand(command);
+                }
+            }
+        }
+        return true;
     }
 
     /**

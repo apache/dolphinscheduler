@@ -30,7 +30,8 @@ public enum TaskDependType {
      */
     TASK_ONLY(0, "task only"),
     TASK_PRE(1, "task pre"),
-    TASK_POST(2, "task post");
+    TASK_POST(2, "task post"),
+    TASK_DEPENDENT(3, "task dependent");
 
     TaskDependType(int code, String descp) {
         this.code = code;

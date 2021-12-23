@@ -417,6 +417,7 @@ export default {
   'Backward execution': 'Backward execution',
   'Forward execution': 'Forward execution',
   'Execute only the current node': 'Execute only the current node',
+  'Backward Dependent execution': 'Backward Dependent execution',
   'Notification strategy': 'Notification strategy',
   'Notification group': 'Notification group',
   'Please select a notification group': 'Please select a notification group',
