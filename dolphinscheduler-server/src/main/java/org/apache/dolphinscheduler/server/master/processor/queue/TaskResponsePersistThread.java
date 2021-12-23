@@ -10,7 +10,6 @@ import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
 
-public class TaskResponsePersistThread implements Callable<TaskResponsePersistThread> {
+public class TaskResponsePersistThread implements Runnable {
 
     /**
      * logger of TaskResponsePersistThread
@@ -30,11 +29,6 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
 
     private final Integer processInstanceId;
 
-    private final long createTime;
-
-    // delay 10 sec
-    private static final long DELAY_TIME = 10 * 1000L;
-
     /**
      * process service
      */
@@ -44,15 +38,14 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
 
     public TaskResponsePersistThread(ProcessService processService,
                                      ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper,
-                                     Integer processInstanceId,long createTime) {
+                                     Integer processInstanceId) {
         this.processService = processService;
         this.processInstanceMapper = processInstanceMapper;
         this.processInstanceId = processInstanceId;
-        this.createTime = createTime;
     }
 
     @Override
-    public TaskResponsePersistThread call() throws Exception {
+    public void run() {
         while (!this.events.isEmpty()) {
             TaskResponseEvent event = this.events.peek();
             try {
@@ -66,7 +59,6 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
                 this.events.remove(event);
             }
         }
-        return this;
     }
 
     /**
@@ -174,7 +166,7 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
         return processInstanceId;
     }
 
-    public boolean enableDestroy() {
-        return DELAY_TIME < System.currentTimeMillis() - createTime;
+    public String getKey() {
+        return String.valueOf(processInstanceId);
     }
 }
