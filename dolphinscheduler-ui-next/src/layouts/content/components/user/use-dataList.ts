@@ -15,27 +15,35 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { reactive, ref, h } from 'vue'
+import { NIcon } from 'naive-ui'
+import {
+  UserOutlined, LogoutOutlined
+} from '@vicons/antd'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+export function useDataList() {
+  const renderIcon = (icon:any) => {
+    return () => h(NIcon, null, { default: () => h(icon) })
+  }
 
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
+  const profileOptions = [
     {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['home'],
-      meta: {
-        title: '数据源中心',
-      },
+      label: '用户信息',
+      key: 'profile',
+      icon: renderIcon(UserOutlined),
     },
-  ],
+    {
+      label: '退出登录',
+      key: 'logout',
+      icon: renderIcon(LogoutOutlined),
+    },
+  ]
+  
+  const state = reactive({
+    profileOptions: profileOptions
+  })
+
+  return {
+    state
+  }
 }

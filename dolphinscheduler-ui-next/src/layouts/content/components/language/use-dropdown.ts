@@ -15,27 +15,14 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { DropdownOption } from 'naive-ui'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
-
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['home'],
-      meta: {
-        title: '数据源中心',
-      },
-    },
-  ],
+export function useDropDown(state: any) {
+  const handleSelect = (key: string | number, option: DropdownOption) => {
+    console.log(key, option)
+    state.chooseVal = option.label
+  }
+  return {
+    handleSelect
+  }
 }

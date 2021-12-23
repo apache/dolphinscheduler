@@ -15,27 +15,19 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
+import { MenuOption } from 'naive-ui' 
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+export function useMenuClick() {
+  const router: Router = useRouter()
 
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['home'],
-      meta: {
-        title: '数据源中心',
-      },
-    },
-  ],
+  const handleMenuClick = (key: string, item: MenuOption) => {
+    console.log(key, item)
+    router.push({ path: 'home' })
+  }
+
+  return {
+    handleMenuClick
+  }
 }
