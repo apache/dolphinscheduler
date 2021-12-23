@@ -15,27 +15,24 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import { defineComponent } from 'vue'
+import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
+import NavBar from './components/navbar'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+const Content = defineComponent({
+  name: 'Content',
+  render() {
+    return (
+      <NLayout>
+        <NLayoutHeader>
+          <NavBar></NavBar>
+        </NLayoutHeader>
+        <NLayoutContent>
+          <router-view />
+        </NLayoutContent>
+      </NLayout>
+    )
+  },
+})
 
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['home'],
-      meta: {
-        title: '数据源中心',
-      },
-    },
-  ],
-}
+export default Content
