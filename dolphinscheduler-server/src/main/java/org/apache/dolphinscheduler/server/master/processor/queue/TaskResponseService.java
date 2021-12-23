@@ -149,7 +149,7 @@ public class TaskResponseService {
                     TaskResponsePersistThread taskResponsePersistThread = null;
                     if (processInstanceMapper.containsKey(taskResponseEvent.getProcessInstanceId())) {
                         taskResponsePersistThread = new TaskResponsePersistThread(
-                                processService, processInstanceMapper, taskResponseEvent.getProcessInstanceId());
+                                processService, processInstanceMapper, taskResponseEvent.getProcessInstanceId(), System.currentTimeMillis());
                         taskResponsePersistThread = processTaskResponseMapper.putIfAbsent(taskResponseEvent.getProcessInstanceId(), taskResponsePersistThread);
                     }
                     if (null != taskResponsePersistThread) {
@@ -200,6 +200,10 @@ public class TaskResponseService {
                 int processInstanceId = entry.getKey();
                 TaskResponsePersistThread taskResponsePersistThread = entry.getValue();
                 if (taskResponsePersistThread.isEmpty()) {
+                    if (!processInstanceMapper.containsKey(taskResponsePersistThread.getProcessInstanceId()) && taskResponsePersistThread.enableDestroy()) {
+                        processTaskResponseMapper.remove(taskResponsePersistThread.getProcessInstanceId());
+                        logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
+                    }
                     continue;
                 }
                 logger.info("persist process instance : {} , events count:{}",

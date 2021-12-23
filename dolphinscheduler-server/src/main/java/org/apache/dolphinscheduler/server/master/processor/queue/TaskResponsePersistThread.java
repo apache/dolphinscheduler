@@ -30,7 +30,10 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
 
     private final Integer processInstanceId;
 
-    volatile boolean stop = false;
+    private final long createTime;
+
+    // delay 10 sec
+    private static final long DELAY_TIME = 10 * 1000L;
 
     /**
      * process service
@@ -41,10 +44,11 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
 
     public TaskResponsePersistThread(ProcessService processService,
                                      ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper,
-                                     Integer processInstanceId) {
+                                     Integer processInstanceId,long createTime) {
         this.processService = processService;
         this.processInstanceMapper = processInstanceMapper;
         this.processInstanceId = processInstanceId;
+        this.createTime = createTime;
     }
 
     @Override
@@ -168,5 +172,9 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
 
     public Integer getProcessInstanceId() {
         return processInstanceId;
+    }
+
+    public boolean enableDestroy() {
+        return DELAY_TIME < System.currentTimeMillis() - createTime;
     }
 }
