@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -197,10 +196,7 @@ public class TaskResponseService {
 
         private void eventHandler() {
 
-            Iterator<Map.Entry<Integer, TaskResponsePersistThread>> iter = processTaskResponseMapper.entrySet().iterator();
-
-            while (iter.hasNext()) {
-                Map.Entry<Integer, TaskResponsePersistThread> entry = iter.next();
+            for (Map.Entry<Integer, TaskResponsePersistThread> entry : processTaskResponseMapper.entrySet()) {
                 int processInstanceId = entry.getKey();
                 TaskResponsePersistThread taskResponsePersistThread = entry.getValue();
                 if (taskResponsePersistThread.isEmpty()) {
@@ -209,23 +205,19 @@ public class TaskResponseService {
                 logger.info("persist process instance : {} , events count:{}",
                         processInstanceId, taskResponsePersistThread.eventSize());
                 ListenableFuture future = listeningExecutorService.submit(taskResponsePersistThread);
-                FutureCallback futureCallback = new FutureCallback() {
+                FutureCallback<TaskResponsePersistThread> futureCallback = new FutureCallback<TaskResponsePersistThread>() {
                     @Override
-                    public void onSuccess(Object o) {
-                        logger.info("persist events {} succeeded.", processInstanceId);
-                        if (!processInstanceMapper.containsKey(processInstanceId)) {
-                            processTaskResponseMapper.remove(processInstanceId);
-                            logger.info("remove process instance: {}", processInstanceId);
+                    public void onSuccess(TaskResponsePersistThread taskResponsePersistThread) {
+                        logger.info("persist events {} succeeded.", taskResponsePersistThread.getProcessInstanceId());
+                        if (!processInstanceMapper.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
+                            processTaskResponseMapper.remove(taskResponsePersistThread.getProcessInstanceId());
+                            logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
                         }
                     }
 
                     @Override
                     public void onFailure(Throwable throwable) {
-                        logger.info("persist events failed: {}", processInstanceId, throwable);
-                        if (!processInstanceMapper.containsKey(processInstanceId) ) {
-                            processTaskResponseMapper.remove(processInstanceId);
-                            logger.info("remove process instance: {}", processInstanceId);
-                        }
+                        logger.info("persist events failed: {}", throwable);
                     }
                 };
                 Futures.addCallback(future, futureCallback, listeningExecutorService);

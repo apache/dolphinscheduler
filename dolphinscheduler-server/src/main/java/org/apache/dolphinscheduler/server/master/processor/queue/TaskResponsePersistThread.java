@@ -10,6 +10,7 @@ import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,16 +19,18 @@ import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
 
-public class TaskResponsePersistThread implements Runnable {
+public class TaskResponsePersistThread implements Callable<TaskResponsePersistThread> {
 
     /**
      * logger of TaskResponsePersistThread
      */
     private static final Logger logger = LoggerFactory.getLogger(TaskResponsePersistThread.class);
 
-    private ConcurrentLinkedQueue<TaskResponseEvent> events = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<TaskResponseEvent>  events = new ConcurrentLinkedQueue<>();
 
     private final Integer processInstanceId;
+
+    volatile boolean stop = false;
 
     /**
      * process service
@@ -45,17 +48,19 @@ public class TaskResponsePersistThread implements Runnable {
     }
 
     @Override
-    public void run() {
+    public TaskResponsePersistThread call() throws Exception {
         while (!this.events.isEmpty()) {
             TaskResponseEvent event = this.events.peek();
             try {
-                persist(event);
+                boolean result = persist(event);
+                if (result) {
+                    this.events.remove(event);
+                }
             } catch (Exception e) {
                 logger.error("persist error, task id:{}, instance id:{}", event.getTaskInstanceId(), event.getProcessInstanceId(), e);
-            } finally {
-                this.events.remove(event);
             }
         }
+        return this;
     }
 
     /**
@@ -63,17 +68,20 @@ public class TaskResponsePersistThread implements Runnable {
      *
      * @param taskResponseEvent taskResponseEvent
      */
-    private void persist(TaskResponseEvent taskResponseEvent) {
+    private boolean persist(TaskResponseEvent taskResponseEvent) {
         Event event = taskResponseEvent.getEvent();
         Channel channel = taskResponseEvent.getChannel();
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+
+        boolean result = true;
+
         switch (event) {
             case ACK:
                 try {
                     if (taskInstance != null) {
                         ExecutionStatus status = taskInstance.getState().typeIsFinished() ? taskInstance.getState() : taskResponseEvent.getState();
-                        boolean result = processService.changeTaskState(taskInstance, status,
+                        processService.changeTaskState(taskInstance, status,
                                 taskResponseEvent.getStartTime(),
                                 taskResponseEvent.getWorkerAddress(),
                                 taskResponseEvent.getExecutePath(),
@@ -87,6 +95,7 @@ public class TaskResponsePersistThread implements Runnable {
                     channel.writeAndFlush(taskAckCommand.convert2Command());
                     logger.debug("worker ack master success, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
                 } catch (Exception e) {
+                    result = false;
                     logger.error("worker ack master error", e);
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(), taskInstance == null ? -1 : taskInstance.getId());
                     channel.writeAndFlush(taskAckCommand.convert2Command());
@@ -94,7 +103,6 @@ public class TaskResponsePersistThread implements Runnable {
                 break;
             case RESULT:
                 try {
-                    boolean result = true;
                     if (taskInstance != null) {
                         result = processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
                                 taskResponseEvent.getEndTime(),
@@ -117,6 +125,7 @@ public class TaskResponsePersistThread implements Runnable {
                         logger.debug("worker response master success, taskInstance id:{},taskInstance host:{}", taskInstance.getId(), taskInstance.getHost());
                     }
                 } catch (Exception e) {
+                    result = false;
                     logger.error("worker response master error", e);
                     DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), -1);
                     channel.writeAndFlush(taskResponseCommand.convert2Command());
@@ -125,15 +134,19 @@ public class TaskResponsePersistThread implements Runnable {
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
-        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
-        if (workflowExecuteThread != null) {
-            StateEvent stateEvent = new StateEvent();
-            stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
-            stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
-            stateEvent.setExecutionStatus(taskResponseEvent.getState());
-            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-            workflowExecuteThread.addStateEvent(stateEvent);
+
+        if (result) {
+            WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+            if (workflowExecuteThread != null) {
+                StateEvent stateEvent = new StateEvent();
+                stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
+                stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+                stateEvent.setExecutionStatus(taskResponseEvent.getState());
+                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                workflowExecuteThread.addStateEvent(stateEvent);
+            }
         }
+        return result;
     }
 
     public boolean addEvent(TaskResponseEvent event) {
