@@ -53,11 +53,13 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
             TaskResponseEvent event = this.events.peek();
             try {
                 boolean result = persist(event);
-                if (result) {
-                    this.events.remove(event);
+                if (!result) {
+                    logger.error("persist meta error, task id:{}, instance id:{}", event.getTaskInstanceId(), event.getProcessInstanceId());
                 }
             } catch (Exception e) {
                 logger.error("persist error, task id:{}, instance id:{}", event.getTaskInstanceId(), event.getProcessInstanceId(), e);
+            } finally {
+                this.events.remove(event);
             }
         }
         return this;
@@ -135,16 +137,14 @@ public class TaskResponsePersistThread implements Callable<TaskResponsePersistTh
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
 
-        if (result) {
-            WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
-            if (workflowExecuteThread != null) {
-                StateEvent stateEvent = new StateEvent();
-                stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
-                stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
-                stateEvent.setExecutionStatus(taskResponseEvent.getState());
-                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-                workflowExecuteThread.addStateEvent(stateEvent);
-            }
+        WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+        if (workflowExecuteThread != null) {
+            StateEvent stateEvent = new StateEvent();
+            stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
+            stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+            stateEvent.setExecutionStatus(taskResponseEvent.getState());
+            stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
+            workflowExecuteThread.addStateEvent(stateEvent);
         }
         return result;
     }
