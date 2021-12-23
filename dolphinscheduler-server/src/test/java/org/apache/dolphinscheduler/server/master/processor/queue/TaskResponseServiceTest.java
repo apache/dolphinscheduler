@@ -35,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.netty.channel.Channel;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TaskResponseServiceTest {
 
     @Mock(name = "processService")
