@@ -20,7 +20,6 @@ import {
   onMounted,
   onBeforeUnmount,
   watch,
-  isRef,
 } from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import { throttle } from 'echarts'
