@@ -1071,6 +1071,26 @@ public class WorkflowExecuteThread {
     }
 
     /**
+     * This function is specially used to handle the dependency situation where the parent node is a prohibited node.
+     * When the parent node is a forbidden node, the dependency relationship should continue to be traced
+     *
+     * @param taskCode taskCode
+     * @param indirectDepCodeList All indirectly dependent nodes
+     * @return List<String>
+     */
+    private void getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
+        TaskNode taskNode = dag.getNode(taskCode);
+        List<String> depCodeList = taskNode.getDepList();
+        for (String depsNode : depCodeList) {
+            if (forbiddenTaskMap.containsKey(depsNode)) {
+                getIndirectDepList(depsNode, indirectDepCodeList);
+            } else {
+                indirectDepCodeList.add(depsNode);
+            }
+        }
+    }
+
+    /**
      * determine whether the dependencies of the task node are complete
      *
      * @return DependResult
@@ -1083,10 +1103,11 @@ public class WorkflowExecuteThread {
             return DependResult.SUCCESS;
         }
         TaskNode taskNode = dag.getNode(taskCode);
-        List<String> depCodeList = taskNode.getDepList();
-        for (String depsNode : depCodeList) {
+        List<String> indirectDepCodeList = new ArrayList<>();
+        getIndirectDepList(taskCode, indirectDepCodeList);
+
+        for (String depsNode : indirectDepCodeList) {
             if (!dag.containsNode(depsNode)
-                    || forbiddenTaskMap.containsKey(depsNode)
                     || skipTaskNodeMap.containsKey(depsNode)) {
                 continue;
             }
