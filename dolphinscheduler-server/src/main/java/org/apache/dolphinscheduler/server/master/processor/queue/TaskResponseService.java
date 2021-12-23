@@ -147,15 +147,20 @@ public class TaskResponseService {
                 try {
                     // if not task , blocking here
                     TaskResponseEvent taskResponseEvent = eventQueue.take();
-                    if (processInstanceMapper.containsKey(taskResponseEvent.getProcessInstanceId())
-                            && !processTaskResponseMapper.containsKey(taskResponseEvent.getProcessInstanceId())) {
-                        TaskResponsePersistThread taskResponsePersistThread = new TaskResponsePersistThread(
+                    TaskResponsePersistThread taskResponsePersistThread = null;
+                    if (processInstanceMapper.containsKey(taskResponseEvent.getProcessInstanceId())) {
+                        taskResponsePersistThread = new TaskResponsePersistThread(
                                 processService, processInstanceMapper, taskResponseEvent.getProcessInstanceId());
-                        processTaskResponseMapper.put(taskResponseEvent.getProcessInstanceId(), taskResponsePersistThread);
+                        taskResponsePersistThread = processTaskResponseMapper.putIfAbsent(taskResponseEvent.getProcessInstanceId(), taskResponsePersistThread);
                     }
-                    TaskResponsePersistThread taskResponsePersistThread = processTaskResponseMapper.get(taskResponseEvent.getProcessInstanceId());
                     if (null != taskResponsePersistThread) {
-                        taskResponsePersistThread.addEvent(taskResponseEvent);
+                        if (taskResponsePersistThread.addEvent(taskResponseEvent)) {
+                            logger.debug("submit task response persist queue success, task instance id:{},process instance id:{}, state:{} ",
+                                    taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId(), taskResponseEvent.getState());
+                        } else {
+                            logger.error("submit task response persist queue error, task instance id:{},process instance id:{} ",
+                                    taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                        }
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -197,11 +202,6 @@ public class TaskResponseService {
             while (iter.hasNext()) {
                 Map.Entry<Integer, TaskResponsePersistThread> entry = iter.next();
                 int processInstanceId = entry.getKey();
-                if (!processInstanceMapper.containsKey(processInstanceId)) {
-                    iter.remove();
-                    logger.info("remove process instance: {}", processInstanceId);
-                    continue;
-                }
                 TaskResponsePersistThread taskResponsePersistThread = entry.getValue();
                 if (taskResponsePersistThread.isEmpty()) {
                     continue;
@@ -213,11 +213,19 @@ public class TaskResponseService {
                     @Override
                     public void onSuccess(Object o) {
                         logger.info("persist events {} succeeded.", processInstanceId);
+                        if (!processInstanceMapper.containsKey(processInstanceId)) {
+                            processTaskResponseMapper.remove(processInstanceId);
+                            logger.info("remove process instance: {}", processInstanceId);
+                        }
                     }
 
                     @Override
                     public void onFailure(Throwable throwable) {
                         logger.info("persist events failed: {}", processInstanceId, throwable);
+                        if (!processInstanceMapper.containsKey(processInstanceId) ) {
+                            processTaskResponseMapper.remove(processInstanceId);
+                            logger.info("remove process instance: {}", processInstanceId);
+                        }
                     }
                 };
                 Futures.addCallback(future, futureCallback, listeningExecutorService);
