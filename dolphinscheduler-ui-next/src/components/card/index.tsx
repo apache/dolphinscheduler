@@ -15,23 +15,28 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import styles from './index.module.scss'
-import Card from '@/components/card'
-import PieChart from '@/components/chart/modules/Pie'
-import GaugeChart from '@/components/chart/modules/Gauge'
-import BarChart from '@/components/chart/modules/Bar'
+import { defineComponent, PropType } from 'vue'
+import { NCard } from 'naive-ui'
 
-export default defineComponent({
-  name: 'home',
-  setup() {},
+const props = {
+  title: String as PropType<string>,
+}
+
+const headerStyle = {
+  borderBottom: '1px solid var(--border-color)',
+}
+
+const Card = defineComponent({
+  name: 'Card',
+  props,
   render() {
+    const { title, $slots } = this
     return (
-      <div class={styles.container}>
-        <Card title='test'>{{ default: () => <PieChart /> }}</Card>
-        <Card title='test'>{{ default: () => <GaugeChart /> }}</Card>
-        <Card title='test'>{{ default: () => <BarChart /> }}</Card>
-      </div>
+      <NCard title={title} size='small' headerStyle={headerStyle}>
+        {$slots}
+      </NCard>
     )
   },
 })
+
+export default Card
