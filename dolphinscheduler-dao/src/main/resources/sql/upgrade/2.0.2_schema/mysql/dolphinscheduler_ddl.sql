@@ -18,3 +18,4 @@
 SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
 alter table t_ds_process_instance add column if not exists `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time';
+alter table t_ds_process_task_relation add KEY if not exists `project_code_process_definition_code_index` (`project_code`,`process_definition_code`) USING BTREE;

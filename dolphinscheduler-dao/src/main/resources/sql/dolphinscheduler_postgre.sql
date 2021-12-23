@@ -440,6 +440,8 @@ CREATE TABLE t_ds_process_task_relation (
   PRIMARY KEY (id)
 ) ;
 
+create index project_code_process_definition_code_index on t_ds_process_task_relation (project_code,process_definition_code);
+
 DROP TABLE IF EXISTS t_ds_process_task_relation_log;
 CREATE TABLE t_ds_process_task_relation_log (
   id int NOT NULL  ,
