@@ -17,5 +17,44 @@
 
 SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
-alter table t_ds_process_instance add column if not exists `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time';
-alter table t_ds_process_task_relation add KEY if not exists `project_code_process_definition_code_index` (`project_code`,`process_definition_code`) USING BTREE;
+
+-- uc_dolphin_T_t_ds_process_instance_A_restart_time
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_restart_time;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_restart_time()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='restart_time')
+   THEN
+         ALTER TABLE t_ds_process_instance ADD COLUMN `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_A_restart_time();
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_restart_time;
+
+
+-- uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
+           WHERE TABLE_NAME='t_ds_process_task_relation'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND INDEX_NAME ='project_code_process_definition_code_index')
+   THEN
+ALTER TABLE `t_ds_process_task_relation` ADD KEY `project_code_process_definition_code_index`(`project_code`,`process_definition_code`) USING BTREE;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index();
+DROP PROCEDURE uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index;
