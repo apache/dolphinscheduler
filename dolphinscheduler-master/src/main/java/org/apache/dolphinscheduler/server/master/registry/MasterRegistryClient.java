@@ -427,7 +427,7 @@ public class MasterRegistryClient {
                 logger.debug("registry connection state is {}", state);
                 break;
             case SUSPENDED:
-                logger.warn("registry connection state is {}, ready to retry connection", state);
+                logger.warn("registry connection state is {}, ready to retry connections", state);
                 break;
             case RECONNECTED:
                 logger.debug("registry connection state is {}, clean the node info", state);
