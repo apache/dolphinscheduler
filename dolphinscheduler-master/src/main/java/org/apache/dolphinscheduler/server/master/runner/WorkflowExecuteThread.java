@@ -1076,7 +1076,6 @@ public class WorkflowExecuteThread {
      *
      * @param taskCode taskCode
      * @param indirectDepCodeList All indirectly dependent nodes
-     * @return List<String>
      */
     private void getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
         TaskNode taskNode = dag.getNode(taskCode);
