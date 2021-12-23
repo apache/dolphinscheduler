@@ -166,6 +166,7 @@ master:
     ORG_QUARTZ_THREADPOOL_THREADCOUNT: "25"
     ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT: "1"
     SESSION_TIMEOUT_MS: 60000
+    MASTER_PERSIST_EVENT_STATE_THREADS: 10
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

@@ -48,3 +48,5 @@ master.reserved.memory=${MASTER_RESERVED_MEMORY}
 master.failover.interval=${MASTER_FAILOVER_INTERVAL}
 # master kill yarn job when handle failover
 master.kill.yarn.job.when.handle.failover=${MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER}
+# master.persist.event.state.threads
+master.persist.event.state.threads=${MASTER_PERSIST_EVENT_STATE_THREADS}
