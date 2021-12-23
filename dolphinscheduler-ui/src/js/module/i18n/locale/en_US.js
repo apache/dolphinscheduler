@@ -764,5 +764,6 @@ export default {
   scheduleEndTime: 'Schedule End Time',
   crontabExpression: 'Crontab',
   workflowPublishStatus: 'Workflow Publish Status',
-  schedulePublishStatus: 'Schedule Publish Status'
+  schedulePublishStatus: 'Schedule Publish Status',
+  'Task Group Manage': 'Task Group Manage',
 }
