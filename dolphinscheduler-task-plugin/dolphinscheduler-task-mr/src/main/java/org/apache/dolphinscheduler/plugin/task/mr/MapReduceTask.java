@@ -119,17 +119,9 @@ public class MapReduceTask extends AbstractYarnTask {
     protected void setMainJarName() {
         // main jar
         ResourceInfo mainJar = mapreduceParameters.getMainJar();
-        if (mainJar != null) {
-            int resourceId = mainJar.getId();
-            String resourceName;
-            if (resourceId == 0) {
-                resourceName = mainJar.getRes();
-            } else {
-                resourceName = mainJar.getResourceName().replaceFirst("/", "");
-            }
-            mainJar.setRes(resourceName);
-            mapreduceParameters.setMainJar(mainJar);
-        }
+        String resourceName = getResourceNameOfMainJar(mainJar);
+        mainJar.setRes(resourceName);
+        mapreduceParameters.setMainJar(mainJar);
     }
 
     @Override
