@@ -835,7 +835,7 @@ CREATE TABLE t_ds_task_instance
     retry_times             int(4) DEFAULT '0',
     pid                     int(4) DEFAULT NULL,
     app_link                text,
-    task_params             text,
+    task_params             longtext,
     flag                    tinyint(4) DEFAULT '1',
     retry_interval          int(4) DEFAULT NULL,
     max_retry_times         int(2) DEFAULT NULL,
