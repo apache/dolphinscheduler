@@ -381,6 +381,8 @@ public class WorkflowExecuteThread implements Runnable {
                 this.addRetryCheck(task);
             } else {
                 submitStandByTask();
+                taskTimeoutCheckList.remove(task.getId());
+                taskRetryCheckList.remove(task.getId());
             }
             return;
         }
