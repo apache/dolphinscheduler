@@ -765,5 +765,17 @@ export default {
   scheduleEndTime: '定时结束时间',
   crontabExpression: 'Crontab',
   workflowPublishStatus: '工作流上线状态',
-  schedulePublishStatus: '定时状态'
+  schedulePublishStatus: '定时状态',
+  'Task group manage': '任务组管理',
+  'Create task group': '创建任务组',
+  'Edit task group': '编辑任务组',
+  'Delete task group': '删除任务组',
+  'Task group code': '任务组编号',
+  'Task group name': '任务组名称',
+  'Task group resource pool size': '资源容量',
+  'Task group resource used pool size': '已用资源',
+  'Task group desc': '描述信息',
+  'Please enter task group desc': '请输入任务组描述',
+  'Please enter task group resource pool size': '请输入资源容量大小',
+  'Please select project': '请选择项目'
 }

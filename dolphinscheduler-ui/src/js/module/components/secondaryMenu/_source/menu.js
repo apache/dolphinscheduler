@@ -195,6 +195,15 @@ const menu = {
           enabled: true
         }
       ]
+    },
+    {
+      name: `${i18n.$t('Task group manage')}`,
+      id: 2,
+      path: 'task-group-manage',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-setting',
+      children: []
     }
   ],
   user: [

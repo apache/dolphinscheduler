@@ -19,7 +19,7 @@
     <template slot="content">
       <div class="create-environment-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Environment Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Task group name')}}</template>
           <template slot="content">
             <el-input
                     type="input"
@@ -30,31 +30,8 @@
             </el-input>
           </template>
         </m-list-box-f>
-       <m-list-box-f>
-        <template slot="name"><strong>*</strong>{{$t('Environment Config')}}</template>
-        <template slot="content">
-          <el-input
-                  type="textarea"
-                  :autosize="{ minRows: 10, maxRows: 20 }"
-                  v-model="config"
-                  :placeholder="configExample">
-          </el-input>
-        </template>
-        </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Environment Desc')}}</template>
-          <template slot="content">
-            <el-input
-                    type="input"
-                    v-model="description"
-                    maxlength="60"
-                    size="mini"
-                    :placeholder="$t('Please enter environment desc')">
-            </el-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('Environment Worker Group')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
             <el-select
               v-model="workerGroups"
@@ -62,7 +39,7 @@
               multiple
               collapse-tags
               style="display: block;"
-              :placeholder="$t('Please select worker groups')">
+              :placeholder="$t('Please select project')">
               <el-option
                 v-for="item in workerGroupOptions"
                 :key="item.id"
@@ -70,6 +47,30 @@
                 :value="item.name">
               </el-option>
             </el-select>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name"><strong>*</strong>{{$t('Task group resource pool size')}}</template>
+          <template slot="content">
+            <el-input
+              type="input"
+              v-model="name"
+              maxlength="60"
+              size="mini"
+              :placeholder="$t('Please enter task group resource pool size')">
+            </el-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name"><strong>*</strong>{{$t('Task group desc')}}</template>
+          <template slot="content">
+            <el-input
+                    type="input"
+                    v-model="description"
+                    maxlength="60"
+                    size="mini"
+                    :placeholder="$t('Please enter task group desc')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -85,39 +86,32 @@
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
-    name: 'create-environment',
+    name: 'create-task-group',
     data () {
       return {
         store,
+        name: '',
+        projectCode: '',
+        groupSize: 0,
+        projects: [],
+        projectOptions: [],
         workerGroups: [],
         workerGroupOptions: [],
         environment: '',
-        name: '',
         config: '',
-        description: '',
-        configExample: 'export HADOOP_HOME=/opt/hadoop-2.6.5\n' +
-          'export HADOOP_CONF_DIR=/etc/hadoop/conf\n' +
-          'export SPARK_HOME=/opt/soft/spark\n' +
-          'export PYTHON_HOME=/opt/soft/python\n' +
-          'export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n' +
-          'export HIVE_HOME=/opt/soft/hive\n' +
-          'export FLINK_HOME=/opt/soft/flink\n' +
-          'export DATAX_HOME=/opt/soft/datax\n' +
-          'export YARN_CONF_DIR=/etc/hadoop/conf\n' +
-          'export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n' +
-          'export HADOOP_CLASSPATH=`hadoop classpath`\n'
+        description: ''
       }
     },
     props: {
       item: Object
     },
     methods: {
-      ...mapActions('security', ['getWorkerGroupsAll']),
-      _getWorkerGroupList () {
-        this.getWorkerGroupsAll().then(res => {
-          this.workerGroups = res
-          console.log('get Worker Group List')
-          console.log(this.workerGroups)
+      ...mapActions('projects', ['getProjectsList']),
+      _getProjectList () {
+        this.getProjectsList().then(res => {
+          this.projects = res
+          console.log('get project List')
+          console.log(this.projects)
         })
       },
       _ok () {

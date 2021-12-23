@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Environment manage')">
+  <m-list-construction :title="$t('Task group manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create()">{{$t('Create environment')}}</el-button>
+          <el-button size="mini" @click="_create()">{{$t('Create task group')}}</el-button>
           <el-dialog
-            :title="item && item.name ? $t('Edit environment') : $t('Create environment')"
-            :v-if="createEnvironmentDialog"
-            :visible.sync="createEnvironmentDialog"
+            :title="item && item.name ? $t('Edit task group') : $t('Create task group')"
+            :v-if="createTaskGroupDialog"
+            :visible.sync="createTaskGroupDialog"
             width="auto">
             <m-create-environment :item="item" @onUpdate="onUpdate" @close="close"></m-create-environment>
           </el-dialog>
@@ -65,20 +65,20 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateEnvironment from './_source/createEnvironment'
+  import mCreateEnvironment from './_source/createTaskGroup'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'environment-index',
+    name: 'task-group-index',
     data () {
       return {
         total: null,
         isLoading: true,
         environmentList: [],
-        workerGroupList: [],
+        projectList: [],
         environmentWorkerGroupRelationList: [],
         searchParams: {
           pageSize: 10,
@@ -88,13 +88,14 @@
         isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         item: {},
-        createEnvironmentDialog: false
+        createTaskGroupDialog: false
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getEnvironmentListPaging', 'getWorkerGroupsAll']),
+      ...mapActions('projects', ['getProjectsList']),
+      ...mapActions('security', ['getEnvironmentListPaging']),
       /**
        * Query
        */
@@ -110,18 +111,18 @@
       },
       _onEdit (item) {
         this.item = item
-        this.createEnvironmentDialog = true
+        this.createTaskGroupDialog = true
       },
       _create () {
-        this.item = { workerGroupOptions: this.workerGroupList }
-        this.createEnvironmentDialog = true
+        this.item = { projectOptions: this.projectList }
+        this.createTaskGroupDialog = true
       },
       onUpdate () {
         this._debounceGET('false')
-        this.createEnvironmentDialog = false
+        this.createTaskGroupDialog = false
       },
       close () {
-        this.createEnvironmentDialog = false
+        this.createTaskGroupDialog = false
       },
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
@@ -130,7 +131,7 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        Promise.all([this.getEnvironmentListPaging(this.searchParams), this.getWorkerGroupsAll()]).then((values) => {
+        Promise.all([this.getEnvironmentListPaging(this.searchParams), this.getProjectsList()]).then((values) => {
           if (this.searchParams.pageNo > 1 && values[0].totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
@@ -139,9 +140,9 @@
             this.total = values[0].total
             this.isLoading = false
           }
-          this.workerGroupList = values[1]
+          this.projectList = values[1]
           this.environmentList.forEach(item => {
-            item.workerGroupOptions = this.workerGroupList
+            item.projectOptions = this.projectList
           })
         }).catch(e => {
           this.isLoading = false

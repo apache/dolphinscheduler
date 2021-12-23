@@ -65,7 +65,7 @@
   import { mapActions } from 'vuex'
 
   export default {
-    name: 'environment-list',
+    name: 'task-group-list',
     data () {
       return {
         list: []

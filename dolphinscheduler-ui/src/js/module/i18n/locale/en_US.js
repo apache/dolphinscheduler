@@ -765,5 +765,16 @@ export default {
   crontabExpression: 'Crontab',
   workflowPublishStatus: 'Workflow Publish Status',
   schedulePublishStatus: 'Schedule Publish Status',
-  'Task Group Manage': 'Task Group Manage',
+  'Task group manage': 'Task group manage',
+  'Create task group': 'Create task group',
+  'Edit task group': 'Edit task group',
+  'Delete task group': 'Delete task group',
+  'Task group code': 'Task group code',
+  'Task group name': 'Task group name',
+  'Task group resource pool size': 'Resource pool size',
+  'Task group resource used pool size': 'Used resource',
+  'Task group desc': 'Task group desc',
+  'Please enter task group desc': 'Please enter task group description',
+  'Please enter task group resource pool size': 'Please enter task group resource pool size',
+  'Please select project': 'Please select a project'
 }

@@ -152,6 +152,14 @@ const resource = [
             }
           }
         ]
+      },
+      {
+        path: '/resource/task-groups',
+        name: 'task-group-manage',
+        component: resolve => require(['../../pages/resource/pages/taskGroups'], resolve),
+        meta: {
+          title: `${i18n.$t('Task group manage')}`
+        }
       }
     ]
   }
