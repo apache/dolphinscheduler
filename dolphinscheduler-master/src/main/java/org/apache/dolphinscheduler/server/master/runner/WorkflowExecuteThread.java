@@ -437,6 +437,8 @@ public class WorkflowExecuteThread {
                 stateWheelExecuteThread.addTask4RetryCheck(task);
             } else {
                 submitStandByTask();
+                stateWheelExecuteThread.removeTask4TimeoutCheck(task);
+                stateWheelExecuteThread.removeTask4RetryCheck(task);
             }
             return;
         }

@@ -121,22 +121,9 @@ public class SparkTask extends AbstractYarnTask {
     protected void setMainJarName() {
         // main jar
         ResourceInfo mainJar = sparkParameters.getMainJar();
-
-        if (null == mainJar) {
-            throw new RuntimeException("Spark task jar params is null");
-        }
-
-        int resourceId = mainJar.getId();
-        String resourceName;
-        if (resourceId == 0) {
-            resourceName = mainJar.getRes();
-        } else {
-            //when update resource maybe has error
-            resourceName = mainJar.getResourceName().replaceFirst("/", "");
-        }
+        String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         sparkParameters.setMainJar(mainJar);
-
     }
 
     @Override

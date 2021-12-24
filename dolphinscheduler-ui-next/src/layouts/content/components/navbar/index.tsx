@@ -15,20 +15,41 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-
+import { defineComponent, toRefs } from 'vue'
 import styles from './index.module.scss'
+import { NMenu } from 'naive-ui'
+import Logo from '../logo'
+import Language from '../language'
+import User from '../user'
+import { useDataList } from './use-dataList'
+import { useMenuClick } from './use-menuClick'
 
-const Logo = defineComponent({
-  name: 'Logo',
-  setup() {},
+const navbar = defineComponent({
+  name: 'navbar',
+  setup() {
+    const { state } = useDataList()
+    const { handleMenuClick } = useMenuClick()
+    return { ...toRefs(state), handleMenuClick }
+  },
   render() {
     return (
-      <div class={styles.logo}>
-        <img src='./src/assets/images/nav-logo.svg' alt='' />
+      <div class={styles.container}>
+        <Logo />
+        <div class={styles.nav}>
+          <NMenu
+            v-model={[this.activeKey, 'value']}
+            mode='horizontal'
+            options={this.menuOptions}
+            onUpdateValue={this.handleMenuClick}
+          />
+        </div>
+        <div class={styles.settings}>
+          <Language />
+          <User />
+        </div>
       </div>
     )
   },
 })
 
-export default Logo
+export default navbar

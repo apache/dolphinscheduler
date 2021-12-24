@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { NLayout, NLayoutContent } from 'naive-ui'
+import { DropdownOption } from 'naive-ui'
 
-const Content = defineComponent({
-  name: 'Content',
-  render() {
-    return (
-      <NLayout>
-        <NLayoutContent>
-          <router-view />
-        </NLayoutContent>
-      </NLayout>
-    )
-  },
-})
-
-export default Content
+export function useDropDown() {
+  const handleSelect = (key: string | number, option: DropdownOption) => {
+    console.log(key, option)
+  }
+  return {
+    handleSelect,
+  }
+}

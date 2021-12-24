@@ -15,40 +15,18 @@
  * limitations under the License.
  */
 
-.container {
-  .header-model {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 60px;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 5px;
-    position: relative;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: inherit;
-      .menu {
-        margin-left: 0px;
-        text-align: center;
-        font-size: 15px;
-        color: rgb(255, 255, 255);
-      }
-      .profile {
-        width: 135px;
-        display: flex;
-        justify-content: space-between;
-        margin-right: 20px;
-        text-align: center;
-        .icon {
-          margin-right: 5px;
-          display: inline-flex;
-          align-items: center;
-        }
-      }
-    }
+import { DropdownOption } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+export function useDropDown(state: any) {
+  const { locale } = useI18n()
+
+  const handleSelect = (key: string | number, option: DropdownOption) => {
+    console.log(key, option)
+    state.chooseVal = option.label
+    locale.value = key as string
+  }
+  return {
+    handleSelect,
   }
 }
