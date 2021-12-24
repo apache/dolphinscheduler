@@ -216,11 +216,11 @@ public class WorkflowExecuteThread {
     /**
      * constructor of WorkflowExecuteThread
      *
-     * @param processInstance processInstance
-     * @param processService processService
-     * @param nettyExecutorManager nettyExecutorManager
-     * @param processAlertManager processAlertManager
-     * @param masterConfig masterConfig
+     * @param processInstance         processInstance
+     * @param processService          processService
+     * @param nettyExecutorManager    nettyExecutorManager
+     * @param processAlertManager     processAlertManager
+     * @param masterConfig            masterConfig
      * @param stateWheelExecuteThread stateWheelExecuteThread
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
@@ -861,7 +861,7 @@ public class WorkflowExecuteThread {
      * find task instance in db.
      * in case submit more than one same name task in the same time.
      *
-     * @param taskCode task code
+     * @param taskCode    task code
      * @param taskVersion task version
      * @return TaskInstance
      */
@@ -879,7 +879,7 @@ public class WorkflowExecuteThread {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param taskNode taskNode
+     * @param taskNode        taskNode
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
@@ -1074,7 +1074,7 @@ public class WorkflowExecuteThread {
      * This function is specially used to handle the dependency situation where the parent node is a prohibited node.
      * When the parent node is a forbidden node, the dependency relationship should continue to be traced
      *
-     * @param taskCode taskCode
+     * @param taskCode            taskCode
      * @param indirectDepCodeList All indirectly dependent nodes
      */
     private void getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
@@ -1106,25 +1106,23 @@ public class WorkflowExecuteThread {
         getIndirectDepList(taskCode, indirectDepCodeList);
 
         for (String depsNode : indirectDepCodeList) {
-            if (!dag.containsNode(depsNode)
-                    || skipTaskNodeMap.containsKey(depsNode)) {
-                continue;
-            }
-            // dependencies must be fully completed
-            if (!completeTaskMap.containsKey(depsNode)) {
-                return DependResult.WAITING;
-            }
-            Integer depsTaskId = completeTaskMap.get(depsNode);
-            ExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
-            if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
-                return DependResult.NON_EXEC;
-            }
-            // ignore task state if current task is condition
-            if (taskNode.isConditionsTask()) {
-                continue;
-            }
-            if (!dependTaskSuccess(depsNode, taskCode)) {
-                return DependResult.FAILED;
+            if (dag.containsNode(depsNode) && !skipTaskNodeMap.containsKey(depsNode)) {
+                // dependencies must be fully completed
+                if (!completeTaskMap.containsKey(depsNode)) {
+                    return DependResult.WAITING;
+                }
+                Integer depsTaskId = completeTaskMap.get(depsNode);
+                ExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
+                if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
+                    return DependResult.NON_EXEC;
+                }
+                // ignore task state if current task is condition
+                if (taskNode.isConditionsTask()) {
+                    continue;
+                }
+                if (!dependTaskSuccess(depsNode, taskCode)) {
+                    return DependResult.FAILED;
+                }
             }
         }
         logger.info("taskCode: {} completeDependTaskList: {}", taskCode, Arrays.toString(completeTaskMap.keySet().toArray()));
@@ -1587,10 +1585,10 @@ public class WorkflowExecuteThread {
     /**
      * generate flow dag
      *
-     * @param totalTaskNodeList total task node list
-     * @param startNodeNameList start node name list
+     * @param totalTaskNodeList    total task node list
+     * @param startNodeNameList    start node name list
      * @param recoveryNodeCodeList recovery node code list
-     * @param depNodeType depend node type
+     * @param depNodeType          depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
