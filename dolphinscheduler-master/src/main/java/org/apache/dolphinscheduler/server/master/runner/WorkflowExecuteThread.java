@@ -920,6 +920,10 @@ public class WorkflowExecuteThread {
             //set task param
             taskInstance.setTaskParams(taskNode.getTaskParams());
 
+            //set task group and priority
+            taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
+            taskInstance.setTaskGroupPriority(taskNode.getTaskGroupPriority());
+
             // task instance priority
             if (taskNode.getTaskInstancePriority() == null) {
                 taskInstance.setTaskInstancePriority(Priority.MEDIUM);
