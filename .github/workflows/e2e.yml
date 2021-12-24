@@ -80,3 +80,11 @@ jobs:
           name: recording-${{ matrix.case.name }}
           path: ${{ env.RECORDING_PATH }}
           retention-days: 1
+
+  result:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: [ e2e ]
+    steps:
+      - name: Status
+        run: echo "Passed!"
