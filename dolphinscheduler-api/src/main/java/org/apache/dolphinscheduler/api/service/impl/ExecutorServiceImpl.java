@@ -621,6 +621,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
         switch (runMode) {
             case RUN_MODE_SERIAL: {
+                if (start.after(end)) {
+                    logger.warn("The startDate {} is later than the endDate {}", start, end);
+                    break;
+                }
                 cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                 cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
                 command.setCommandParam(JSONUtils.toJsonString(cmdParam));
@@ -628,6 +632,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
             }
             case RUN_MODE_PARALLEL: {
+                if (start.after(end)) {
+                    logger.warn("The startDate {} is later than the endDate {}", start, end);
+                    break;
+                }
+
                 LinkedList<Date> listDate = new LinkedList<>();
                 List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
                 listDate.addAll(CronUtils.getSelfFireDateList(start, end, schedules));
@@ -636,6 +645,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 if (!CollectionUtils.isEmpty(listDate)) {
                     if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
                         createCount = Math.min(listDate.size(), expectedParallelismNumber);
+                        if (listDateSize < createCount) {
+                            createCount = listDateSize;
+                        }
                     }
                     logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
 
