@@ -374,9 +374,5 @@ public class ExecutorServiceTest {
         Assert.assertEquals("2,3", result.get(1));
         Assert.assertEquals("4,4", result.get(2));
     }
-
-    public static void main(String[] args) {
-        ExecutorServiceTest test = new ExecutorServiceTest();
-        test.testCreateComplementToParallel();
-    }
+    
 }
