@@ -532,7 +532,8 @@ CREATE TABLE `t_ds_process_task_relation` (
   `condition_params` text COMMENT 'condition params(json)',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `project_code_process_definition_code_index` (`project_code`,`process_definition_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

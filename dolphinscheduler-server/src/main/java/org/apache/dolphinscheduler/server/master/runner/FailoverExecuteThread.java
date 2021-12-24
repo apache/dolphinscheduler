@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -66,10 +67,12 @@ public class FailoverExecuteThread extends Thread {
         while (Stopper.isRunning()) {
             logger.info("failover execute started");
             try {
-                List<String> hosts = processService.queryNeedFailoverProcessInstanceHost();
+                List<String> hosts = getNeedFailoverMasterServers();
                 if (CollectionUtils.isEmpty(hosts)) {
                     continue;
                 }
+                logger.info("need failover hosts:{}", hosts);
+
                 for (String host : hosts) {
                     String failoverPath = masterRegistryClient.getFailoverLockPath(NodeType.MASTER, host);
                     try {
@@ -87,5 +90,21 @@ public class FailoverExecuteThread extends Thread {
                 ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
             }
         }
+    }
+
+    private List<String> getNeedFailoverMasterServers() {
+        // failover myself && failover dead masters
+        List<String> hosts = processService.queryNeedFailoverProcessInstanceHost();
+
+        Iterator<String> iterator = hosts.iterator();
+        while (iterator.hasNext()) {
+            String host = iterator.next();
+            if (registryClient.checkNodeExists(host, NodeType.MASTER)) {
+                if (!host.equals(masterRegistryClient.getLocalAddress())) {
+                    iterator.remove();
+                }
+            }
+        }
+        return hosts;
     }
 }

@@ -66,8 +66,11 @@ public class MasterConfig {
     @Value("${master.failover.interval:10}")
     private int failoverInterval;
 
-    @Value("${master.kill.yarn.job.when.handle.fail.over:true}")
+    @Value("${master.kill.yarn.job.when.handle.failover:true}")
     private boolean masterKillYarnJobWhenHandleFailOver;
+
+    @Value("${master.persist.event.state.threads:10}")
+    private int masterPersistEventStateThreads;
 
     public int getListenPort() {
         return listenPort;
@@ -182,5 +185,13 @@ public class MasterConfig {
 
     public void setMasterKillYarnJobWhenHandleFailOver(boolean masterKillYarnJobWhenHandleFailOver) {
         this.masterKillYarnJobWhenHandleFailOver = masterKillYarnJobWhenHandleFailOver;
+    }
+
+    public int getMasterPersistEventStateThreads() {
+        return masterPersistEventStateThreads;
+    }
+
+    public void setMasterPersistEventStateThreads(int masterPersistEventStateThreads) {
+        this.masterPersistEventStateThreads = masterPersistEventStateThreads;
     }
 }
