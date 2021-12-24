@@ -15,29 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, defineProps } from 'vue'
-import { NCard } from 'naive-ui'
-import Props from '@/components/card/types'
-
-const headerStyle = {
-  borderBottom: '1px solid var(--border-color)',
+interface Props {
+  title: string
 }
 
-const Card = defineComponent({
-  name: 'Card',
-  setup() {
-    const props = defineProps<Props>()
-
-    return { ...props }
-  },
-  render() {
-    const { title, $slots } = this
-    return (
-      <NCard title={title} size='small' headerStyle={headerStyle}>
-        {$slots}
-      </NCard>
-    )
-  },
-})
-
-export default Card
+export default Props
