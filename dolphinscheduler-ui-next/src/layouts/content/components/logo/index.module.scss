@@ -14,10 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 .logo {
   width: 180px;
   height: 100%;
   margin-left: 12px;
-  background: url('../../../../assets/images/logo.svg') 100% no-repeat;
+}
+
+.logo-dark {
+  background: url('../../../../assets/images/logo-dark.svg') 100% no-repeat;
+}
+
+.logo-light {
+  background: url('../../../../assets/images/logo-light.svg') 100% no-repeat;
 }
