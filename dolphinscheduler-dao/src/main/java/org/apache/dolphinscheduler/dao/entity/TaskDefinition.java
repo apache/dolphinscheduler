@@ -199,6 +199,10 @@ public class TaskDefinition {
      * task group id
      */
     private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
 
     public TaskDefinition() {
     }
@@ -501,5 +505,13 @@ public class TaskDefinition {
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }
