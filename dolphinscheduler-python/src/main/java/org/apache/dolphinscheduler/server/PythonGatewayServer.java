@@ -467,7 +467,9 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     public void run() {
         GatewayServer server = new GatewayServer(this);
         GatewayServer.turnLoggingOn();
-        // Start server to accept python client RPC
+
+        LOGGER.info("GatewayServer for " + this.getClass().getName() + " started on host: " + host.toString());
+        // Start server to accept python client socket
         server.start();
     }
 

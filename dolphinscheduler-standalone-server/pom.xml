@@ -35,6 +35,10 @@
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-python</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <version>${curator.test}</version>

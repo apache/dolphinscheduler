@@ -58,6 +58,13 @@ do
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
 done
 
+pythonGatewayServersHost=(${pythonGatewayServers//,/ })
+for pythonGatewayServer in ${pythonGatewayServersHost[@]}
+do
+  echo "$pythonGatewayServer python gateway server is stopping"
+  ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop python-gateway-server;"
+done
+
 # query server status
 echo "query server status"
 cd $installPath/; sh bin/status-all.sh

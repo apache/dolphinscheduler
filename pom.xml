@@ -1142,5 +1142,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-standalone-server</module>
         <module>dolphinscheduler-datasource-plugin</module>
+        <module>dolphinscheduler-python</module>
     </modules>
 </project>
