@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -34,11 +35,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.netty.channel.Channel;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TaskResponseServiceTest {
 
     @Mock(name = "processService")
     private ProcessService processService;
+
+    @Mock
+    private MasterConfig masterConfig;
 
     @InjectMocks
     TaskResponseService taskRspService;
@@ -54,6 +58,7 @@ public class TaskResponseServiceTest {
 
     @Before
     public void before() {
+        Mockito.when(masterConfig.getMasterPersistEventStateThreads()).thenReturn(10);
         taskRspService.start();
 
         ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,

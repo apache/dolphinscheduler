@@ -436,13 +436,6 @@ public class MasterRegistryClient {
                 continue;
             }
 
-            if (serverStartupTime != null && processInstance.getRestartTime() != null
-                    && processInstance.getRestartTime().after(serverStartupTime)) {
-                continue;
-            }
-
-            logger.info("failover process instance id: {}", processInstance.getId());
-
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance taskInstance : validTaskInstanceList) {
                 if (Constants.NULL.equals(taskInstance.getHost())) {
@@ -457,6 +450,13 @@ public class MasterRegistryClient {
                 logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
                 failoverTaskInstance(processInstance, taskInstance);
             }
+
+            if (serverStartupTime != null && processInstance.getRestartTime() != null
+                    && processInstance.getRestartTime().after(serverStartupTime)) {
+                continue;
+            }
+
+            logger.info("failover process instance id: {}", processInstance.getId());
             //updateProcessInstance host is null and insert into command
             processService.processNeedFailoverProcessInstances(processInstance);
         }
@@ -576,7 +576,7 @@ public class MasterRegistryClient {
     /**
      * get local address
      */
-    private String getLocalAddress() {
+    public String getLocalAddress() {
         return NetUtils.getAddr(masterConfig.getListenPort());
     }
 

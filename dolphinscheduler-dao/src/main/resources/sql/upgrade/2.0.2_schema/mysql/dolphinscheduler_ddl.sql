@@ -17,6 +17,7 @@
 
 SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
+
 -- uc_dolphin_T_t_ds_process_instance_A_restart_time
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_restart_time;
 delimiter d//
@@ -36,3 +37,24 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_process_instance_A_restart_time();
 DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_restart_time;
+
+
+-- uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
+           WHERE TABLE_NAME='t_ds_process_task_relation'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND INDEX_NAME ='project_code_process_definition_code_index')
+   THEN
+ALTER TABLE `t_ds_process_task_relation` ADD KEY `project_code_process_definition_code_index`(`project_code`,`process_definition_code`) USING BTREE;
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index();
+DROP PROCEDURE uc_dolphin_T_t_ds_process_task_relation_A_pc_pd_index;
