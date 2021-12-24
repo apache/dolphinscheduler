@@ -47,13 +47,15 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
         DBTaskResponseCommand taskResponseCommand = JSONUtils.parseObject(
                 command.getBody(), DBTaskResponseCommand.class);
 
-        if (taskResponseCommand == null){
+        if (taskResponseCommand == null) {
             return;
         }
 
-        if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()){
+        if (taskResponseCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponceCache.get().removeResponseCache(taskResponseCommand.getTaskInstanceId());
             logger.debug("removeResponseCache: taskinstance id:{}", taskResponseCommand.getTaskInstanceId());
+            TaskCallbackService.remove(taskResponseCommand.getTaskInstanceId());
+            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskResponseCommand.getTaskInstanceId());
         }
     }
 
