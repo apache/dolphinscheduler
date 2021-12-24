@@ -661,6 +661,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(listDate.get(endDateIndex)));
                         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                         processService.createCommand(command);
+                    }
                 }
                 break;
             }
