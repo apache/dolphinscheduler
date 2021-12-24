@@ -29,10 +29,9 @@ parent -> switch ->
 .
 """
 
-from tasks.switch import Branch, Default, Switch, SwitchCondition
-
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
+from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 
 with ProcessDefinition(
     name="task_dependent_external",
