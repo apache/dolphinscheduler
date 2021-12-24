@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface AccessLogAnnotation {
     // ignore request args
-    String[] ignoreRequestArgs() default {"loginUser"};
+    String[] ignoreRequestArgs() default {};
 
     boolean ignoreRequest() default false;
 
