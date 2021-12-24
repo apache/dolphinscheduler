@@ -17,14 +17,12 @@
 
 import { defineComponent, computed } from 'vue'
 import { NConfigProvider, darkTheme, GlobalThemeOverrides } from 'naive-ui'
-import { useAsyncRouteStore } from '@/store/route/route'
 import { useThemeStore } from '@/store/theme/theme'
 import themeList from '@/themes'
 
 const App = defineComponent({
   name: 'App',
   setup() {
-    const asyncRouteStore = useAsyncRouteStore()
     const themeStore = useThemeStore()
     const currentTheme = computed(() =>
       themeStore.darkTheme ? darkTheme : undefined
@@ -36,8 +34,6 @@ const App = defineComponent({
   render() {
     const themeOverrides: GlobalThemeOverrides =
       themeList[this.currentTheme ? 'dark' : 'light']
-
-    console.log(themeOverrides)
 
     return (
       <NConfigProvider
