@@ -16,13 +16,17 @@
  */
 
 import { DropdownOption } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 export function useDropDown(state: any) {
+  const { locale } = useI18n()
+
   const handleSelect = (key: string | number, option: DropdownOption) => {
     console.log(key, option)
     state.chooseVal = option.label
+    locale.value = key as string
   }
   return {
-    handleSelect
+    handleSelect,
   }
 }

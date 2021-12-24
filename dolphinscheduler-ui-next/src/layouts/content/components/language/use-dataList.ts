@@ -21,20 +21,20 @@ export function useDataList() {
   const languageOptions = [
     {
       label: 'English',
-      key: 'en',
+      key: 'en_US',
     },
     {
       label: '中文',
-      key: 'zh',
+      key: 'zh_CN',
     },
   ]
-  
+
   const state = reactive({
     chooseVal: ref('中文'),
-    languageOptions: languageOptions
+    languageOptions: languageOptions,
   })
 
   return {
-    state
+    state,
   }
 }

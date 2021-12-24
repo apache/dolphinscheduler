@@ -17,7 +17,7 @@
 
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { MenuOption } from 'naive-ui' 
+import { MenuOption } from 'naive-ui'
 
 export function useMenuClick() {
   const router: Router = useRouter()
@@ -28,6 +28,6 @@ export function useMenuClick() {
   }
 
   return {
-    handleMenuClick
+    handleMenuClick,
   }
 }

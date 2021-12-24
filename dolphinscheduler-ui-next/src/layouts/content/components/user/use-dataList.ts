@@ -17,12 +17,10 @@
 
 import { reactive, ref, h } from 'vue'
 import { NIcon } from 'naive-ui'
-import {
-  UserOutlined, LogoutOutlined
-} from '@vicons/antd'
+import { UserOutlined, LogoutOutlined } from '@vicons/antd'
 
 export function useDataList() {
-  const renderIcon = (icon:any) => {
+  const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
   }
 
@@ -38,12 +36,12 @@ export function useDataList() {
       icon: renderIcon(LogoutOutlined),
     },
   ]
-  
+
   const state = reactive({
-    profileOptions: profileOptions
+    profileOptions: profileOptions,
   })
 
   return {
-    state
+    state,
   }
 }
