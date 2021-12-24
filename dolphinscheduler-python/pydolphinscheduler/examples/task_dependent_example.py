@@ -34,8 +34,7 @@ task_dependent:
 
 task_dependent(this task dependent on task_dependent_external.task_1 and task_dependent_external.task_2).
 """
-from constants import ProcessDefinitionDefault
-
+from pydolphinscheduler.constants import ProcessDefinitionDefault
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.dependent import And, Dependent, DependentItem, Or
 from pydolphinscheduler.tasks.shell import Shell
