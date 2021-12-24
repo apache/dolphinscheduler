@@ -89,6 +89,15 @@ public class TaskNode {
     private int retryInterval;
 
     /**
+     * task group id
+     */
+    private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
+
+    /**
      * params information
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -464,5 +473,21 @@ public class TaskNode {
 
     public void setWaitStartTimeout(String waitStartTimeout) {
         this.waitStartTimeout = waitStartTimeout;
+    }
+
+    public int getTaskGroupId() {
+        return taskGroupId;
+    }
+
+    public void setTaskGroupId(int taskGroupId) {
+        this.taskGroupId = taskGroupId;
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

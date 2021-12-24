@@ -85,6 +85,12 @@ public class TaskInstance implements Serializable {
     private String processInstanceName;
 
     /**
+     * process instance name
+     */
+    @TableField(exist = false)
+    private int taskGroupPriority;
+
+    /**
      * state
      */
     private ExecutionStatus state;
@@ -735,5 +741,13 @@ public class TaskInstance implements Serializable {
 
     public boolean isFirstRun() {
         return endTime == null;
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

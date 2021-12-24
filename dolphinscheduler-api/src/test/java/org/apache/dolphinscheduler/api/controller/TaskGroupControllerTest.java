@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -49,7 +48,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
-        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-all")
+        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-projectCode")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -67,7 +66,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "1");
         paramsMap.add("name", "TGQ");
         paramsMap.add("pageSize", "10");
-        MvcResult mvcResult = mockMvc.perform(get("/task-group/query-list-by-name")
+        MvcResult mvcResult = mockMvc.perform(get("/task-group/list-paging")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -186,22 +185,4 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
-    @Test
-    public void testWakeCompulsively() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "1");
-        paramsMap.add("taskId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(post("/task-group/wake-task-compulsively")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
-        Assert.assertTrue(result != null && (result.isSuccess() || result.isStatus(Status.TASK_GROUP_CACHE_START_FAILED)));
-        logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
 }
