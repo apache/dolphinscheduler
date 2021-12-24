@@ -16,13 +16,25 @@
  */
 
 import { defineComponent } from 'vue'
+import { useThemeStore } from '@/store/theme/theme'
 import styles from './index.module.scss'
 
 const logo = defineComponent({
   name: 'logo',
-  setup() {},
+  setup() {
+    const themeStore = useThemeStore()
+
+    return { themeStore }
+  },
   render() {
-    return <div class={styles.logo}></div>
+    return (
+      <div
+        class={[
+          styles.logo,
+          styles[`logo-${this.themeStore.darkTheme ? 'dark' : 'light'}`],
+        ]}
+      />
+    )
   },
 })
 

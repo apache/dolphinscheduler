@@ -40,16 +40,6 @@ public class PluginDao {
     }
 
     /**
-     * add pluginDefine
-     *
-     * @param pluginDefine plugin define entiy
-     * @return plugin define id
-     */
-    public int addPluginDefine(PluginDefine pluginDefine) {
-        return pluginDefineMapper.insert(pluginDefine);
-    }
-
-    /**
      * add or update plugin define
      *
      * @param pluginDefine new pluginDefine
@@ -82,13 +72,5 @@ public class PluginDao {
      */
     public PluginDefine getPluginDefineById(int pluginDefineId) {
         return pluginDefineMapper.selectById(pluginDefineId);
-    }
-
-    public PluginDefineMapper getPluginDefineMapper() {
-        return pluginDefineMapper;
-    }
-
-    public void setPluginDefineMapper(PluginDefineMapper pluginDefineMapper) {
-        this.pluginDefineMapper = pluginDefineMapper;
     }
 }
