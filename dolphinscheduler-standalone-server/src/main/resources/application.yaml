@@ -36,17 +36,6 @@ spring:
     url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;INIT=runscript from 'classpath:sql/dolphinscheduler_h2.sql'
     username: sa
     password: ""
-    hikari:
-      connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
-      pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -75,6 +64,9 @@ spring:
       max-request-size: 1024MB
   messages:
     basename: i18n/messages
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 registry:
   type: zookeeper
