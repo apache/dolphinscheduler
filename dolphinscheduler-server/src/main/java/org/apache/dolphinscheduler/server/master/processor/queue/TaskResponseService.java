@@ -77,11 +77,11 @@ public class TaskResponseService {
     /**
      * event handler
      */
-    private Thread eventHandler;
+    private Thread taskResponseEventHandler;
 
-    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper;
+    private ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMap;
 
-    private final ConcurrentHashMap<String, TaskResponsePersistThread> eventHandlerMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, TaskResponsePersistThread> taskResponseEventHandlerMap = new ConcurrentHashMap<>();
 
     private ListeningExecutorService listeningExecutorService;
 
@@ -90,11 +90,11 @@ public class TaskResponseService {
     /**
      * task response mapper
      */
-    private final ConcurrentHashMap<Integer, TaskResponsePersistThread> processTaskResponseMapper = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, TaskResponsePersistThread> processTaskResponseMap = new ConcurrentHashMap<>();
 
-    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMapper) {
-        if (this.processInstanceMapper == null) {
-            this.processInstanceMapper = processInstanceMapper;
+    public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceMap) {
+        if (this.processInstanceMap == null) {
+            this.processInstanceMap = processInstanceMap;
         }
     }
 
@@ -103,18 +103,18 @@ public class TaskResponseService {
         eventExecService = ThreadUtils.newDaemonFixedThreadExecutor("PersistEventState", masterConfig.getMasterPersistEventStateThreads());
         this.listeningExecutorService = MoreExecutors.listeningDecorator(eventExecService);
         this.taskResponseWorker = new TaskResponseWorker();
-        this.taskResponseWorker.setName("StateEventResponseWorker");
+        this.taskResponseWorker.setName("TaskResponseWorker");
         this.taskResponseWorker.start();
-        this.eventHandler = new EventHandler();
-        this.eventHandler.setName("StateEventResponseHandler");
-        this.eventHandler.start();
+        this.taskResponseEventHandler = new TaskResponseEventHandler();
+        this.taskResponseEventHandler.setName("TaskResponseEventHandler");
+        this.taskResponseEventHandler.start();
     }
 
     @PreDestroy
     public void stop() {
         try {
             this.taskResponseWorker.interrupt();
-            this.eventHandler.interrupt();
+            this.taskResponseEventHandler.interrupt();
             this.eventExecService.shutdown();
         } catch (Exception e) {
             logger.error("stop error:", e);
@@ -147,13 +147,13 @@ public class TaskResponseService {
                 try {
                     // if not task , blocking here
                     TaskResponseEvent taskResponseEvent = eventQueue.take();
-                    if (processInstanceMapper.containsKey(taskResponseEvent.getProcessInstanceId())
-                            && !processTaskResponseMapper.containsKey(taskResponseEvent.getProcessInstanceId())) {
+                    if (processInstanceMap.containsKey(taskResponseEvent.getProcessInstanceId())
+                            && !processTaskResponseMap.containsKey(taskResponseEvent.getProcessInstanceId())) {
                         TaskResponsePersistThread taskResponsePersistThread = new TaskResponsePersistThread(
-                                processService, processInstanceMapper, taskResponseEvent.getProcessInstanceId());
-                        processTaskResponseMapper.put(taskResponseEvent.getProcessInstanceId(), taskResponsePersistThread);
+                                processService, processInstanceMap, taskResponseEvent.getProcessInstanceId());
+                        processTaskResponseMap.put(taskResponseEvent.getProcessInstanceId(), taskResponsePersistThread);
                     }
-                    TaskResponsePersistThread taskResponsePersistThread = processTaskResponseMapper.get(taskResponseEvent.getProcessInstanceId());
+                    TaskResponsePersistThread taskResponsePersistThread = processTaskResponseMap.get(taskResponseEvent.getProcessInstanceId());
                     if (null != taskResponsePersistThread) {
                         if (taskResponsePersistThread.addEvent(taskResponseEvent)) {
                             logger.debug("submit task response persist queue success, task instance id:{},process instance id:{}, state:{} ",
@@ -177,7 +177,7 @@ public class TaskResponseService {
     /**
      * event handler thread
      */
-    class EventHandler extends Thread {
+    class TaskResponseEventHandler extends Thread {
 
         @Override
         public void run() {
@@ -198,41 +198,41 @@ public class TaskResponseService {
 
         private void eventHandler() {
 
-            for (TaskResponsePersistThread taskResponsePersistThread: processTaskResponseMapper.values()) {
+            for (TaskResponsePersistThread taskResponsePersistThread: processTaskResponseMap.values()) {
 
-                if (eventHandlerMap.containsKey(taskResponsePersistThread.getKey())) {
+                if (taskResponseEventHandlerMap.containsKey(taskResponsePersistThread.getKey())) {
                     continue;
                 }
                 if (taskResponsePersistThread.eventSize() == 0) {
-                    if (!processInstanceMapper.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
-                        processTaskResponseMapper.remove(taskResponsePersistThread.getProcessInstanceId());
+                    if (!processInstanceMap.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
+                        processTaskResponseMap.remove(taskResponsePersistThread.getProcessInstanceId());
                         logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
                     }
                     continue;
                 }
-                logger.info("already exists handler process size:{}", eventHandlerMap.size());
-                eventHandlerMap.put(taskResponsePersistThread.getKey(), taskResponsePersistThread);
+                logger.info("already exists handler process size:{}", taskResponseEventHandlerMap.size());
+                taskResponseEventHandlerMap.put(taskResponsePersistThread.getKey(), taskResponsePersistThread);
 
                 ListenableFuture future = listeningExecutorService.submit(taskResponsePersistThread);
                 FutureCallback futureCallback = new FutureCallback() {
                     @Override
                     public void onSuccess(Object o) {
                         logger.info("persist events {} succeeded.", taskResponsePersistThread.getProcessInstanceId());
-                        if (!processInstanceMapper.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
-                            processTaskResponseMapper.remove(taskResponsePersistThread.getProcessInstanceId());
+                        if (!processInstanceMap.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
+                            processTaskResponseMap.remove(taskResponsePersistThread.getProcessInstanceId());
                             logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
                         }
-                        eventHandlerMap.remove(taskResponsePersistThread.getKey());
+                        taskResponseEventHandlerMap.remove(taskResponsePersistThread.getKey());
                     }
 
                     @Override
                     public void onFailure(Throwable throwable) {
                         logger.error("persist events failed: {}", throwable);
-                        if (!processInstanceMapper.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
-                            processTaskResponseMapper.remove(taskResponsePersistThread.getProcessInstanceId());
+                        if (!processInstanceMap.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
+                            processTaskResponseMap.remove(taskResponsePersistThread.getProcessInstanceId());
                             logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
                         }
-                        eventHandlerMap.remove(taskResponsePersistThread.getKey());
+                        taskResponseEventHandlerMap.remove(taskResponsePersistThread.getKey());
                     }
                 };
                 Futures.addCallback(future, futureCallback, listeningExecutorService);
