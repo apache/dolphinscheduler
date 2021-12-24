@@ -15,20 +15,29 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, defineProps } from 'vue'
+import { NCard } from 'naive-ui'
+import Props from '@/components/card/types'
 
-import styles from './index.module.scss'
+const headerStyle = {
+  borderBottom: '1px solid var(--border-color)',
+}
 
-const Logo = defineComponent({
-  name: 'Logo',
-  setup() {},
+const Card = defineComponent({
+  name: 'Card',
+  setup() {
+    const props = defineProps<Props>()
+
+    return { ...props }
+  },
   render() {
+    const { title, $slots } = this
     return (
-      <div class={styles.logo}>
-        <img src='./src/assets/images/nav-logo.svg' alt='' />
-      </div>
+      <NCard title={title} size='small' headerStyle={headerStyle}>
+        {$slots}
+      </NCard>
     )
   },
 })
 
-export default Logo
+export default Card
