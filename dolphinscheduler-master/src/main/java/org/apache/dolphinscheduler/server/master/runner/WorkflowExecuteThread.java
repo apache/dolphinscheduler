@@ -1083,32 +1083,49 @@ public class WorkflowExecuteThread {
             return DependResult.SUCCESS;
         }
         TaskNode taskNode = dag.getNode(taskCode);
-        List<String> depCodeList = taskNode.getDepList();
-        for (String depsNode : depCodeList) {
-            if (!dag.containsNode(depsNode)
-                || forbiddenTaskMap.containsKey(depsNode)
-                || skipTaskNodeMap.containsKey(depsNode)) {
-                continue;
-            }
-            // dependencies must be fully completed
-            if (!completeTaskMap.containsKey(depsNode)) {
-                return DependResult.WAITING;
-            }
-            Integer depsTaskId = completeTaskMap.get(depsNode);
-            ExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
-            if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
-                return DependResult.NON_EXEC;
-            }
-            // ignore task state if current task is condition
-            if (taskNode.isConditionsTask()) {
-                continue;
-            }
-            if (!dependTaskSuccess(depsNode, taskCode)) {
-                return DependResult.FAILED;
+        List<String> indirectDepCodeList = new ArrayList<>();
+        getIndirectDepList(taskCode, indirectDepCodeList);
+        for (String depsNode : indirectDepCodeList) {
+            if (dag.containsNode(depsNode) && !skipTaskNodeMap.containsKey(depsNode)) {
+                // dependencies must be fully completed
+                if (!completeTaskMap.containsKey(depsNode)) {
+                    return DependResult.WAITING;
+                }
+                Integer depsTaskId = completeTaskMap.get(depsNode);
+                ExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
+                if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
+                    return DependResult.NON_EXEC;
+                }
+                // ignore task state if current task is condition
+                if (taskNode.isConditionsTask()) {
+                    continue;
+                }
+                if (!dependTaskSuccess(depsNode, taskCode)) {
+                    return DependResult.FAILED;
+                }
             }
         }
         logger.info("taskCode: {} completeDependTaskList: {}", taskCode, Arrays.toString(completeTaskMap.keySet().toArray()));
         return DependResult.SUCCESS;
+    }
+
+    /**
+     * This function is specially used to handle the dependency situation where the parent node is a prohibited node.
+     * When the parent node is a forbidden node, the dependency relationship should continue to be traced
+     *
+     * @param taskCode            taskCode
+     * @param indirectDepCodeList All indirectly dependent nodes
+     */
+    private void getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
+        TaskNode taskNode = dag.getNode(taskCode);
+        List<String> depCodeList = taskNode.getDepList();
+        for (String depsNode : depCodeList) {
+            if (forbiddenTaskMap.containsKey(depsNode)) {
+                getIndirectDepList(depsNode, indirectDepCodeList);
+            } else {
+                indirectDepCodeList.add(depsNode);
+            }
+        }
     }
 
     /**
