@@ -21,14 +21,14 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.RWXR_XR_X;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.util.OSUtils;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -235,12 +235,10 @@ public class DataxTask extends AbstractTaskExecutor {
      */
     private List<ObjectNode> buildDataxJobContentJson() {
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
-        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                DbType.of(dataxTaskExecutionContext.getSourcetype()),
+        JdbcConnectionParam dataSourceCfg = JdbcDataSourceProvider.buildConnectionParams(
                 dataxTaskExecutionContext.getSourceConnectionParams());
 
-        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                DbType.of(dataxTaskExecutionContext.getTargetType()),
+        JdbcConnectionParam dataTargetCfg = JdbcDataSourceProvider.buildConnectionParams(
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
@@ -252,7 +250,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
+        urlArr.add(dataSourceCfg.getJdbcUrl());
 
         readerConnArr.add(readerConn);
 
@@ -270,7 +268,7 @@ public class DataxTask extends AbstractTaskExecutor {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+        writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
@@ -451,12 +449,12 @@ public class DataxTask extends AbstractTaskExecutor {
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, JdbcConnectionParam dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
             logger.info("try to execute sql analysis query column name");
-            columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
+            columnNames = tryExecuteSqlResolveColumnNames(dataSourceCfg, sql);
         }
 
         notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
@@ -542,13 +540,13 @@ public class DataxTask extends AbstractTaskExecutor {
      * @param sql sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(JdbcConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+                Connection connection = DataSourcePluginManager.getConnection(baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

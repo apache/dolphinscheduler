@@ -21,12 +21,11 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILU
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.TASK_LOG_INFO_FORMAT;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DataType;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
@@ -99,13 +98,12 @@ public class ProcedureTask extends AbstractTaskExecutor {
         CallableStatement stmt = null;
         try {
             // load class
-            DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
-            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
+            JdbcConnectionParam connectionParam = JdbcDataSourceProvider.buildConnectionParams(
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
             // get jdbc connection
-            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+            connection = DataSourcePluginManager.getConnection(connectionParam);
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());

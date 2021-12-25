@@ -15,29 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql;
+package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashSet;
+import java.util.Set;
 
-public class MySQLDataSourceParamDTO extends BaseDataSourceParamDTO {
+public class PluginClassLoader extends URLClassLoader {
 
-    @Override
-    public String toString() {
-        return "MySQLDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + '}';
+    private final Set<String> driverLocations = new HashSet<>();
+
+    static {
+        //Parallel loading
+        ClassLoader.registerAsParallelCapable();
+    }
+
+    public PluginClassLoader(Set<String> driverLocations, URL[] urls, ClassLoader parent) {
+        super(urls, parent);
+        this.driverLocations.addAll(driverLocations);
+    }
+
+    public Set<String> location() {
+        return this.driverLocations;
     }
 
     @Override
-    public DbType getType() {
-        return DbType.MYSQL;
+    public String toString() {
+        return "PluginClassLoader{driverLocation=" + driverLocations + "}";
     }
 }

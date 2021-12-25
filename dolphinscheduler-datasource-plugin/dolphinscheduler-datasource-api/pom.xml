@@ -133,11 +133,10 @@
             <scope>test</scope>
         </dependency>
 
-
-
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.7.0</version>
         </dependency>
     </dependencies>
 </project>

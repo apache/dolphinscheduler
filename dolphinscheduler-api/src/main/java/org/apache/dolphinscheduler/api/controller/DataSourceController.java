@@ -37,9 +37,9 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceParam;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
@@ -90,7 +90,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true)
-                                   @RequestBody BaseDataSourceParamDTO dataSourceParam) {
+                                   @RequestBody DataSourceParam dataSourceParam) {
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
 
@@ -113,7 +113,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @PathVariable(value = "id") Integer id,
-                                   @RequestBody BaseDataSourceParamDTO dataSourceParam) {
+                                   @RequestBody DataSourceParam dataSourceParam) {
         dataSourceParam.setId(id);
         return dataSourceService.updateDataSource(dataSourceParam.getId(), loginUser, dataSourceParam);
     }
@@ -209,10 +209,9 @@ public class DataSourceController extends BaseController {
     @ApiException(CONNECT_DATASOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        DataSourceUtils.checkDatasourceParam(dataSourceParam);
-        ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
-        return dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
+                                    @RequestBody DataSourceParam dataSourceParam) {
+        JdbcConnectionParam connectionParams = JdbcDataSourceProvider.buildConnectionParams(dataSourceParam);
+        return dataSourceService.checkConnection(connectionParams);
     }
 
     /**

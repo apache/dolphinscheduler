@@ -34,13 +34,12 @@ import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_QUOTES;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EQUAL_SIGN;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -67,15 +66,14 @@ public class MySQLSourceGenerator implements ISourceGenerator {
             SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
 
             if (null != sourceMysqlParameter) {
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        DbType.of(taskExecutionContext.getSqoopTaskExecutionContext().getSourcetype()),
+                JdbcConnectionParam baseDataSource =  JdbcDataSourceProvider.buildConnectionParams(
                         taskExecutionContext.getSqoopTaskExecutionContext().getSourceConnectionParams());
 
                 if (null != baseDataSource) {
 
                     mysqlSourceSb.append(SPACE).append(DB_CONNECT)
                             .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
+                            .append(baseDataSource.getJdbcUrl()).append(DOUBLE_QUOTES)
                         .append(SPACE).append(DB_USERNAME)
                         .append(SPACE).append(baseDataSource.getUser())
                         .append(SPACE).append(DB_PWD)

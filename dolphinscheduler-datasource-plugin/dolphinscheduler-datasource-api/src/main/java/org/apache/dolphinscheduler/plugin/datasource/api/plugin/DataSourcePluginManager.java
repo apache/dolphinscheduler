@@ -17,16 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import static java.lang.String.format;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-
-import java.util.Collections;
-import java.util.HashSet;
+import java.sql.Connection;
 import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -35,32 +30,14 @@ import org.slf4j.LoggerFactory;
 public class DataSourcePluginManager {
     private static final Logger logger = LoggerFactory.getLogger(DataSourcePluginManager.class);
 
-    private final Map<String, DataSourceChannel> datasourceClientMap = new ConcurrentHashMap<>();
+    private static final Map<String, DataSourceClient> uniqueId2dataSourceClientMap = new ConcurrentHashMap<>();
 
-    public Map<String, DataSourceChannel> getDataSourceChannelMap() {
-        return Collections.unmodifiableMap(datasourceClientMap);
-    }
+    public static Connection getConnection(JdbcConnectionParam jdbcConnectionParam) {
+        String datasourceUniqueId = jdbcConnectionParam.getDatasourceUniqueId();
+        logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
 
-    public void installPlugin() {
-        final Set<String> names = new HashSet<>();
-
-        ServiceLoader.load(DataSourceChannelFactory.class).forEach(factory -> {
-            final String name = factory.getName();
-
-            logger.info("Registering datasource plugin: {}", name);
-
-            if (!names.add(name)) {
-                throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
-            }
-
-            loadDatasourceClient(factory);
-
-            logger.info("Registered datasource plugin: {}", name);
-        });
-    }
-
-    private void loadDatasourceClient(DataSourceChannelFactory datasourceChannelFactory) {
-        DataSourceChannel datasourceChannel = datasourceChannelFactory.create();
-        datasourceClientMap.put(datasourceChannelFactory.getName(), datasourceChannel);
+        DataSourceClient dataSourceClient = uniqueId2dataSourceClientMap.computeIfAbsent(datasourceUniqueId, $ ->
+                DataSourceClientProvider.createDataSourceClient(jdbcConnectionParam));
+        return dataSourceClient.getConnection();
     }
 }

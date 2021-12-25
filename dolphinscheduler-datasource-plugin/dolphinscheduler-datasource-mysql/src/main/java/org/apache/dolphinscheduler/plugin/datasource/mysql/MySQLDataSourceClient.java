@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.plugin.datasource.mysql;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 public class MySQLDataSourceClient extends CommonDataSourceClient {
 
-    public MySQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+    public MySQLDataSourceClient(JdbcConnectionParam connectionParam) {
+        super(connectionParam);
     }
 
 }

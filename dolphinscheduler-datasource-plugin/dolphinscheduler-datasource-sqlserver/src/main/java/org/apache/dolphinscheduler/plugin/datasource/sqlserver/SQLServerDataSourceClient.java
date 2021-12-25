@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 public class SQLServerDataSourceClient extends CommonDataSourceClient {
 
-    public SQLServerDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+    public SQLServerDataSourceClient(JdbcConnectionParam connectionParam) {
+        super(connectionParam);
     }
 
 }

@@ -41,19 +41,14 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>provided</scope>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -61,4 +56,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-datasource-postgresql-${project.version}</finalName>
+    </build>
 </project>

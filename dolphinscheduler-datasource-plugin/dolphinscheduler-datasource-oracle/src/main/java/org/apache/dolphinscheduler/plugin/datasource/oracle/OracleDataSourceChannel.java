@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 public class OracleDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new OracleDataSourceClient(baseConnectionParam, dbType);
+    public DataSourceClient createDataSourceClient(JdbcConnectionParam connectionParam) {
+        return new OracleDataSourceClient(connectionParam);
     }
 }

@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class DB2DataSourceChannelTest {
     public void testCreateDataSourceClient() {
         DB2DataSourceChannel sourceChannel = PowerMockito.mock(DB2DataSourceChannel.class);
         DB2DataSourceClient dataSourceClient = PowerMockito.mock(DB2DataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new JdbcConnectionParam()));
     }
 }

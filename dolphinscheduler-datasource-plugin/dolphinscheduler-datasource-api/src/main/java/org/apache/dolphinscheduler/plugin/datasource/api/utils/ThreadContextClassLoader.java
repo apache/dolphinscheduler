@@ -15,23 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql;
+package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import java.io.Closeable;
 
-public class MySQLConnectionParam extends BaseConnectionParam {
+public class ThreadContextClassLoader
+        implements Closeable {
+    private final ClassLoader threadContextClassLoader;
+
+    public ThreadContextClassLoader(ClassLoader newThreadContextClassLoader) {
+        this.threadContextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(newThreadContextClassLoader);
+    }
+
     @Override
-    public String toString() {
-        return "MySQLConnectionParam{"
-                + "user='" + user + '\''
-                + ", password='" + password + '\''
-                + ", address='" + address + '\''
-                + ", database='" + database + '\''
-                + ", jdbcUrl='" + jdbcUrl + '\''
-                + ", driverLocation='" + driverLocation + '\''
-                + ", driverClassName='" + driverClassName + '\''
-                + ", validationQuery='" + validationQuery + '\''
-                + ", other='" + other + '\''
-                + '}';
+    public void close() {
+        Thread.currentThread().setContextClassLoader(threadContextClassLoader);
     }
 }

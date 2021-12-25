@@ -40,6 +40,7 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -52,9 +53,8 @@
                 </exclusion>
             </exclusions>
             <version>${mssql.jdbc.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -62,4 +62,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-datasource-sqlserver-${project.version}</finalName>
+    </build>
 </project>

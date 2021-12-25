@@ -27,12 +27,10 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceParam;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -78,8 +76,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return create result code
      */
     @Override
-    public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
-        DataSourceUtils.checkDatasourceParam(datasourceParam);
+    public Result<Object> createDataSource(User loginUser, DataSourceParam datasourceParam) {
         Result<Object> result = new Result<>();
         // check name can use or not
         if (checkName(datasourceParam.getName())) {
@@ -87,8 +84,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         // check connect
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
-        Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParam);
+        JdbcConnectionParam jdbcConnectionParam = JdbcDataSourceProvider.buildConnectionParams(datasourceParam);
+        Result<Object> isConnection = checkConnection(jdbcConnectionParam);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
@@ -102,8 +99,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setNote(datasourceParam.getNote());
         dataSource.setUserId(loginUser.getId());
         dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(datasourceParam.getType());
-        dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
+        dataSource.setType(datasourceParam.getDbType());
+        dataSource.setConnectionParams(JSONUtils.toJsonString(jdbcConnectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
         try {
@@ -125,8 +122,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return update result code
      */
     @Override
-    public Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam) {
-        DataSourceUtils.checkDatasourceParam(dataSourceParam);
+    public Result<Object> updateDataSource(int id, User loginUser, DataSourceParam dataSourceParam) {
         Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -146,15 +142,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         //check password，if the password is not updated, set to the old password.
-        BaseConnectionParam connectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dataSourceParam);
-        String password = connectionParam.getPassword();
+        JdbcConnectionParam jdbcConnectionParam = JdbcDataSourceProvider.buildConnectionParams(dataSourceParam);
+        String password = jdbcConnectionParam.getPassword();
         if (StringUtils.isBlank(password)) {
             String oldConnectionParams = dataSource.getConnectionParams();
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
-            connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
+            jdbcConnectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
 
-        Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
+        Result<Object> isConnection = checkConnection(jdbcConnectionParam);
         if (isConnection.isFailed()) {
             return isConnection;
         }
@@ -165,7 +161,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setNote(dataSourceParam.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
-        dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
+        dataSource.setConnectionParams(JSONUtils.toJsonString(jdbcConnectionParam));
         dataSource.setUpdateTime(now);
         try {
             dataSourceMapper.updateById(dataSource);
@@ -197,14 +193,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        // type
-        BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDatasourceParamDTO(
-                dataSource.getType(), dataSource.getConnectionParams());
-        baseDataSourceParamDTO.setId(dataSource.getId());
-        baseDataSourceParamDTO.setName(dataSource.getName());
-        baseDataSourceParamDTO.setNote(dataSource.getNote());
+        // build dataSourceParam
+        DataSourceParam dataSourceParam = new DataSourceParam();
+        dataSourceParam.setId(dataSource.getId());
+        dataSourceParam.setName(dataSource.getName());
+        dataSourceParam.setNote(dataSource.getNote());
+        dataSourceParam.setDbType(dataSource.getType());
+        dataSourceParam.setProps(JSONUtils.toObjectMap(dataSource.getConnectionParams()));
 
-        result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
+        result.put(Constants.DATA_LIST, dataSourceParam);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -308,16 +305,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     /**
      * check connection
-     *
-     * @param type data source type
-     * @param connectionParam connectionParam
+     * @param jdbcConnectionParam JDBC connection parameters
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
      */
-    @Override
-    public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
+    public Result<Object> checkConnection(JdbcConnectionParam jdbcConnectionParam) {
         Result<Object> result = new Result<>();
-        try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
+        try (Connection connection = DataSourcePluginManager.getConnection(jdbcConnectionParam)) {
             if (connection == null) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
@@ -325,7 +319,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.SUCCESS);
             return result;
         } catch (Exception e) {
-            logger.error("datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type, connectionParam, e.getMessage());
+            logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", jdbcConnectionParam.getDbType().getDescp(), jdbcConnectionParam.getJdbcUrl(), e.getMessage());
             return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), e.getMessage());
         }
     }
@@ -344,7 +338,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        return checkConnection(dataSource.getType(), DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
+        return checkConnection(JdbcDataSourceProvider.buildConnectionParams(dataSource.getConnectionParams()));
     }
 
     /**

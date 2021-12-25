@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
 
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 public class ClickHouseDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new ClickHouseDataSourceClient(baseConnectionParam, dbType);
+    public DataSourceClient createDataSourceClient(JdbcConnectionParam connectionParam) {
+        return new ClickHouseDataSourceClient(connectionParam);
     }
 }

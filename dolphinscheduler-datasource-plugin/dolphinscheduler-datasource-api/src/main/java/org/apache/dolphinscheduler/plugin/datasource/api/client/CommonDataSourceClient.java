@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.Connection;
@@ -43,15 +42,15 @@ public class CommonDataSourceClient implements DataSourceClient {
     public static final String COMMON_PASSWORD = "123456";
     public static final String COMMON_VALIDATION_QUERY = "select 1";
 
-    protected final BaseConnectionParam baseConnectionParam;
+    protected final JdbcConnectionParam connectionParam;
     protected DataSource dataSource;
     protected JdbcTemplate jdbcTemplate;
 
-    public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        this.baseConnectionParam = baseConnectionParam;
+    public CommonDataSourceClient(JdbcConnectionParam connectionParam) {
+        this.connectionParam = connectionParam;
         preInit();
-        checkEnv(baseConnectionParam);
-        initClient(baseConnectionParam, dbType);
+        checkEnv(connectionParam);
+        initClient(connectionParam);
         checkClient();
     }
 
@@ -59,41 +58,41 @@ public class CommonDataSourceClient implements DataSourceClient {
         logger.info("preInit in CommonDataSourceClient");
     }
 
-    protected void checkEnv(BaseConnectionParam baseConnectionParam) {
-        checkValidationQuery(baseConnectionParam);
-        checkUser(baseConnectionParam);
+    protected void checkEnv(JdbcConnectionParam connectionParam) {
+        checkValidationQuery(connectionParam);
+        checkUser(connectionParam);
     }
 
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        this.dataSource = JDBCDataSourceProvider.createJdbcDataSource(baseConnectionParam, dbType);
+    protected void initClient(JdbcConnectionParam connectionParam) {
+        this.dataSource = JdbcDataSourceProvider.getDataSourceFactory().createDataSource(connectionParam);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    protected void checkUser(BaseConnectionParam baseConnectionParam) {
-        if (StringUtils.isBlank(baseConnectionParam.getUser())) {
-            setDefaultUsername(baseConnectionParam);
+    protected void checkUser(JdbcConnectionParam connectionParam) {
+        if (StringUtils.isBlank(connectionParam.getUser())) {
+            setDefaultUsername(connectionParam);
         }
-        if (StringUtils.isBlank(baseConnectionParam.getPassword())) {
-            setDefaultPassword(baseConnectionParam);
+        if (StringUtils.isBlank(connectionParam.getPassword())) {
+            setDefaultPassword(connectionParam);
         }
     }
 
-    protected void setDefaultUsername(BaseConnectionParam baseConnectionParam) {
+    protected void setDefaultUsername(JdbcConnectionParam baseConnectionParam) {
         baseConnectionParam.setUser(COMMON_USER);
     }
 
-    protected void setDefaultPassword(BaseConnectionParam baseConnectionParam) {
+    protected void setDefaultPassword(JdbcConnectionParam baseConnectionParam) {
         baseConnectionParam.setPassword(COMMON_PASSWORD);
     }
 
-    protected void checkValidationQuery(BaseConnectionParam baseConnectionParam) {
-        if (StringUtils.isBlank(baseConnectionParam.getValidationQuery())) {
-            setDefaultValidationQuery(baseConnectionParam);
+    protected void checkValidationQuery(JdbcConnectionParam connectionParam) {
+        if (StringUtils.isBlank(connectionParam.getValidationQuery())) {
+            setDefaultValidationQuery(connectionParam);
         }
     }
 
-    protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
-        baseConnectionParam.setValidationQuery(COMMON_VALIDATION_QUERY);
+    protected void setDefaultValidationQuery(JdbcConnectionParam connectionParam) {
+        connectionParam.setValidationQuery(COMMON_VALIDATION_QUERY);
     }
 
     @Override
@@ -101,11 +100,11 @@ public class CommonDataSourceClient implements DataSourceClient {
         //Checking data source client
         Stopwatch stopwatch = Stopwatch.createStarted();
         try {
-            this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
+            this.jdbcTemplate.execute(COMMON_VALIDATION_QUERY);
         } catch (Exception e) {
             throw new RuntimeException("JDBC connect failed", e);
         } finally {
-            logger.info("Time to execute check jdbc client with sql {} for {} ms ", this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            logger.info("Time to execute check jdbc client with sql {} for {} ms ", COMMON_VALIDATION_QUERY, stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
     }
 
@@ -114,7 +113,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         try {
             return this.dataSource.getConnection();
         } catch (SQLException e) {
-            logger.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
+            logger.error("get dataSource Connection fail SQLException: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -122,6 +121,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     @Override
     public void close() {
         logger.info("do close dataSource.");
+        JdbcDataSourceProvider.getDataSourceFactory().destroy(this.dataSource);
         this.dataSource = null;
         this.jdbcTemplate = null;
     }

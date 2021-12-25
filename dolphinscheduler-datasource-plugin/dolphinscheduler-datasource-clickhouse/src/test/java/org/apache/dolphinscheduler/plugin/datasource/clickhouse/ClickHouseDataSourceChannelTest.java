@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class ClickHouseDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         ClickHouseDataSourceChannel sourceChannel = PowerMockito.mock(ClickHouseDataSourceChannel.class);
         ClickHouseDataSourceClient dataSourceClient = PowerMockito.mock(ClickHouseDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new ClickHouseConnectionParam(), DbType.CLICKHOUSE));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new JdbcConnectionParam()));
     }
 }

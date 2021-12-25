@@ -224,6 +224,17 @@ public class JSONUtils {
     }
 
     /**
+     * json to map
+     * {@link #toMap(String, Class, Class)}
+     *
+     * @param json json
+     * @return json to map
+     */
+    public static Map<String, Object> toObjectMap(String json) {
+        return parseObject(json, new TypeReference<Map<String, Object>>() {});
+    }
+
+    /**
      * from the key-value generated json  to get the str value no matter the real type of value
      * @param json the json str
      * @param nodeName key

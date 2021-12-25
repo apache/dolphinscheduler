@@ -18,16 +18,12 @@
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.exception.DataSourceException;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.utils.CommonUtil;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.hadoop.conf.Configuration;
@@ -41,10 +37,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.zaxxer.hikari.HikariDataSource;
 
 import sun.security.krb5.Config;
 
@@ -55,11 +51,11 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     private ScheduledExecutorService kerberosRenewalService;
 
     private Configuration hadoopConf;
-    protected HikariDataSource oneSessionDataSource;
+    protected DataSource oneSessionDataSource;
     private UserGroupInformation ugi;
 
-    public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+    public HiveDataSourceClient(JdbcConnectionParam connectionParam) {
+        super(connectionParam);
     }
 
     @Override
@@ -69,31 +65,29 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     }
 
     @Override
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    protected void initClient(JdbcConnectionParam connectionParam) {
         logger.info("Create Configuration for hive configuration.");
         this.hadoopConf = createHadoopConf();
         logger.info("Create Configuration success.");
 
         logger.info("Create UserGroupInformation.");
-        this.ugi = createUserGroupInformation(baseConnectionParam.getUser());
+        this.ugi = createUserGroupInformation(connectionParam);
         logger.info("Create ugi success.");
 
-        super.initClient(baseConnectionParam, dbType);
-        this.oneSessionDataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
+        super.initClient(connectionParam);
+        this.oneSessionDataSource = JdbcDataSourceProvider.getDataSourceFactory().createDataSource(connectionParam);
         logger.info("Init {} success.", getClass().getName());
     }
 
     @Override
-    protected void checkEnv(BaseConnectionParam baseConnectionParam) {
-        super.checkEnv(baseConnectionParam);
-        checkKerberosEnv();
+    protected void checkEnv(JdbcConnectionParam connectionParam) {
+        super.checkEnv(connectionParam);
+        checkKerberosEnv(connectionParam);
     }
 
-    private void checkKerberosEnv() {
-        String krb5File = PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH);
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        if (kerberosStartupState && StringUtils.isNotBlank(krb5File)) {
-            System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
+    private void checkKerberosEnv(JdbcConnectionParam connectionParam) {
+        if (StringUtils.isNotBlank(connectionParam.getKerberosKrb5Conf())) {
+            System.setProperty(JAVA_SECURITY_KRB5_CONF, connectionParam.getKerberosKrb5Conf());
             try {
                 Config.refresh();
                 Class<?> kerberosName = Class.forName("org.apache.hadoop.security.authentication.util.KerberosName");
@@ -101,18 +95,14 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
                 field.setAccessible(true);
                 field.set(null, Config.getInstance().getDefaultRealm());
             } catch (Exception e) {
-                throw new RuntimeException("Update Kerberos environment failed.", e);
+                throw DataSourceException.getInstance("Update Kerberos environment failed.", e);
             }
         }
     }
 
-    private UserGroupInformation createUserGroupInformation(String username) {
-        String krb5File = PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH);
-        String keytab = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH);
-        String principal = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME);
-
+    private UserGroupInformation createUserGroupInformation(JdbcConnectionParam connectionParam) {
         try {
-            UserGroupInformation ugi = CommonUtil.createUGI(getHadoopConf(), principal, keytab, krb5File, username);
+            UserGroupInformation ugi = CommonUtil.createUGI(getHadoopConf(), connectionParam);
             try {
                 Field isKeytabField = ugi.getClass().getDeclaredField("isKeytab");
                 isKeytabField.setAccessible(true);
@@ -130,7 +120,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             }, 5, 5, TimeUnit.MINUTES);
             return ugi;
         } catch (IOException e) {
-            throw new RuntimeException("createUserGroupInformation fail. ", e);
+            throw DataSourceException.getInstance("createUserGroupInformation fail. ", e);
         }
     }
 
@@ -161,8 +151,7 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         logger.info("close HiveDataSourceClient.");
         kerberosRenewalService.shutdown();
         this.ugi = null;
-
-        this.oneSessionDataSource.close();
+        JdbcDataSourceProvider.getDataSourceFactory().destroy(this.dataSource);
         this.oneSessionDataSource = null;
     }
 }

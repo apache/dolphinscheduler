@@ -55,6 +55,36 @@
             <outputDirectory>standalone-server</outputDirectory>
         </fileSet>
 
+        <!-- hive -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-hive/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-hive-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>./plugin/hive/</outputDirectory>
+        </fileSet>
+
+        <!-- mysql -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-mysql/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-mysql-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>./plugin/mysql/</outputDirectory>
+        </fileSet>
+
+        <!-- sqlserver -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-sqlserver/target/
+            </directory>
+            <includes>
+                <include>dolphinscheduler-datasource-sqlserver-${project.version}.jar</include>
+            </includes>
+            <outputDirectory>./plugin/sqlserver/</outputDirectory>
+        </fileSet>
+
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
             <outputDirectory>tools</outputDirectory>

@@ -37,6 +37,5 @@
         <module>dolphinscheduler-datasource-oracle</module>
         <module>dolphinscheduler-datasource-postgresql</module>
         <module>dolphinscheduler-datasource-api</module>
-        <module>dolphinscheduler-datasource-all</module>
     </modules>
 </project>

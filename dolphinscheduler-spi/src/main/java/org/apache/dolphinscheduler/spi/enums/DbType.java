@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.spi.enums;
 
 import static java.util.stream.Collectors.toMap;
 
+import org.apache.dolphinscheduler.spi.utils.Constants;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -64,4 +66,27 @@ public enum DbType {
         return null;
     }
 
+    public String getDefaultDriverClass() {
+        switch (this) {
+            case MYSQL:
+                return Constants.COM_MYSQL_JDBC_DRIVER;
+            case POSTGRESQL:
+                return Constants.ORG_POSTGRESQL_DRIVER;
+            case HIVE:
+            case SPARK:
+                return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+            case CLICKHOUSE:
+                return Constants.COM_CLICKHOUSE_JDBC_DRIVER;
+            case ORACLE:
+                return Constants.COM_ORACLE_JDBC_DRIVER;
+            case SQLSERVER:
+                return Constants.COM_SQLSERVER_JDBC_DRIVER;
+            case DB2:
+                return Constants.COM_DB2_JDBC_DRIVER;
+            case PRESTO:
+                return Constants.COM_PRESTO_JDBC_DRIVER;
+            default:
+                throw new IllegalStateException("Unexpected defaultDriverClass for value: " + this);
+        }
+    }
 }

@@ -19,9 +19,8 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceParam;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public interface DataSourceService {
      * @param datasourceParam datasource parameter
      * @return create result code
      */
-    Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
+    Result<Object> createDataSource(User loginUser, DataSourceParam datasourceParam);
 
     /**
      * updateProcessInstance datasource
@@ -47,7 +46,7 @@ public interface DataSourceService {
      * @param dataSourceParam data source params
      * @return update result code
      */
-    Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam);
+    Result<Object> updateDataSource(int id, User loginUser, DataSourceParam dataSourceParam);
 
     /**
      * updateProcessInstance datasource
@@ -88,11 +87,10 @@ public interface DataSourceService {
     /**
      * check connection
      *
-     * @param type      data source type
-     * @param parameter data source parameters
+     * @param jdbcConnectionParam  JDBC connection parameters
      * @return true if connect successfully, otherwise false
      */
-    Result<Object> checkConnection(DbType type, ConnectionParam parameter);
+    Result<Object> checkConnection(JdbcConnectionParam jdbcConnectionParam);
 
     /**
      * test connection

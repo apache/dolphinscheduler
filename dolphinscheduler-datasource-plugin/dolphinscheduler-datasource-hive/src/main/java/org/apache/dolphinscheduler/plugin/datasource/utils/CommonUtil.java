@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.utils;
 
 import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF;
 
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -42,16 +43,16 @@ public class CommonUtil {
         return resUploadType == ResUploadType.HDFS && kerberosStartupState;
     }
 
-    public static synchronized UserGroupInformation createUGI(Configuration configuration, String principal, String keyTab, String krb5File, String username)
+    public static synchronized UserGroupInformation createUGI(Configuration configuration, JdbcConnectionParam connectionParam)
             throws IOException {
         if (getKerberosStartupState()) {
-            Objects.requireNonNull(keyTab);
-            if (StringUtils.isNotBlank(krb5File)) {
-                System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
+            Objects.requireNonNull(connectionParam.getKerberosKeytab());
+            if (StringUtils.isNotBlank(connectionParam.getKerberosKrb5Conf())) {
+                System.setProperty(JAVA_SECURITY_KRB5_CONF, connectionParam.getKerberosKrb5Conf());
             }
-            return loginKerberos(configuration, principal, keyTab);
+            return loginKerberos(configuration, connectionParam.getKerberosPrincipal(), connectionParam.getKerberosKeytab());
         }
-        return UserGroupInformation.createRemoteUser(username);
+        return UserGroupInformation.createRemoteUser(connectionParam.getUser());
     }
 
     public static synchronized UserGroupInformation loginKerberos(final Configuration config, final String principal, final String keyTab)

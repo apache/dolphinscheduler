@@ -41,9 +41,8 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -52,4 +51,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-datasource-db2-${project.version}</finalName>
+    </build>
 </project>

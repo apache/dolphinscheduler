@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.postgresql.PostgreSQLConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class PostgreSQLDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         PostgreSQLDataSourceChannel sourceChannel = PowerMockito.mock(PostgreSQLDataSourceChannel.class);
         PostgreSQLDataSourceClient dataSourceClient = PowerMockito.mock(PostgreSQLDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new JdbcConnectionParam()));
     }
 }

@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class OracleDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         OracleDataSourceChannel sourceChannel = PowerMockito.mock(OracleDataSourceChannel.class);
         OracleDataSourceClient dataSourceClient = PowerMockito.mock(OracleDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any())).thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new JdbcConnectionParam()));
     }
 }

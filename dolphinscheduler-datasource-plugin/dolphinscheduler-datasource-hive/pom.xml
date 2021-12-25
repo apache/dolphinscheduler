@@ -93,13 +93,12 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
-            <version>${hive.jdbc.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -313,9 +312,8 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -324,4 +322,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-datasource-hive-${project.version}</finalName>
+    </build>
 </project>

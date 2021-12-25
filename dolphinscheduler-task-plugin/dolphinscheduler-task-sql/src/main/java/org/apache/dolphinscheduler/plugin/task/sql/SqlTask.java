@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.util.MapUtils;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Direct;
@@ -79,7 +78,7 @@ public class SqlTask extends AbstractTaskExecutor {
     /**
      * base datasource
      */
-    private BaseConnectionParam baseConnectionParam;
+    private JdbcConnectionParam connectionParam;
 
     /**
      * create function format
@@ -133,8 +132,7 @@ public class SqlTask extends AbstractTaskExecutor {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
 
             // get datasource
-            baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                    DbType.valueOf(sqlParameters.getType()),
+            connectionParam = JdbcDataSourceProvider.buildConnectionParams(
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
@@ -183,7 +181,7 @@ public class SqlTask extends AbstractTaskExecutor {
         try {
 
             // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
+            connection = DataSourcePluginManager.getConnection(connectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
