@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +124,7 @@ public class TaskCallbackService {
      *
      * @param taskInstanceId taskInstanceId
      */
-    public void remove(int taskInstanceId) {
+    public static void remove(int taskInstanceId) {
         REMOTE_CHANNELS.remove(taskInstanceId);
     }
 
@@ -156,7 +155,7 @@ public class TaskCallbackService {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        remove(taskInstanceId);
+                        // remove(taskInstanceId);
                         return;
                     }
                 }
