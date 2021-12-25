@@ -18,11 +18,16 @@
 import { reactive, ref, h } from 'vue'
 import { NIcon } from 'naive-ui'
 import {
-  HomeOutlined, ProfileOutlined, FolderOutlined, DatabaseOutlined, DesktopOutlined, SafetyCertificateOutlined
+  HomeOutlined,
+  ProfileOutlined,
+  FolderOutlined,
+  DatabaseOutlined,
+  DesktopOutlined,
+  SafetyCertificateOutlined,
 } from '@vicons/antd'
 
 export function useDataList() {
-  const renderIcon = (icon:any) => {
+  const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
   }
 
@@ -35,7 +40,7 @@ export function useDataList() {
     {
       label: '项目管理',
       key: 'project',
-      icon: renderIcon(ProfileOutlined)
+      icon: renderIcon(ProfileOutlined),
     },
     {
       label: '资源中心',
@@ -56,15 +61,15 @@ export function useDataList() {
       label: '安全中心',
       key: 'security',
       icon: renderIcon(SafetyCertificateOutlined),
-    }
+    },
   ]
-  
+
   const state = reactive({
     activeKey: ref('home'),
-    menuOptions: menuOptions
+    menuOptions: menuOptions,
   })
 
   return {
-    state
+    state,
   }
 }

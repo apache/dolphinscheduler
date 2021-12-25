@@ -17,7 +17,7 @@
 
 const dark = {
   common: {
-    bodyColor: '#28292d',
+    // bodyColor: '#28292d',
   },
 }
 
