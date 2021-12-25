@@ -17,7 +17,7 @@
 <template>
   <m-popover ref="popover" :ok-text="item && item.name ? $t('Edit') : $t('Submit')" @ok="_ok" @close="close">
     <template slot="content">
-      <div class="create-environment-model">
+      <div class="create-task-group-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Task group name')}}</template>
           <template slot="content">
@@ -34,17 +34,17 @@
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
             <el-select
-              v-model="workerGroups"
+              :disabled="item.modalType==='edit'"
+              v-model="projectCode"
               size="mini"
-              multiple
               collapse-tags
               style="display: block;"
               :placeholder="$t('Please select project')">
               <el-option
-                v-for="item in workerGroupOptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.name">
+                v-for="item in projectOptions"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code">
               </el-option>
             </el-select>
           </template>
@@ -54,7 +54,7 @@
           <template slot="content">
             <el-input
               type="input"
-              v-model="name"
+              v-model="groupSize"
               maxlength="60"
               size="mini"
               :placeholder="$t('Please enter task group resource pool size')">
@@ -92,13 +92,10 @@
         store,
         name: '',
         projectCode: '',
-        groupSize: 0,
+        groupSize: 10,
         projects: [],
+        project: [],
         projectOptions: [],
-        workerGroups: [],
-        workerGroupOptions: [],
-        environment: '',
-        config: '',
         description: ''
       }
     },
@@ -118,12 +115,13 @@
         if (!this._verification()) {
           return
         }
+        console.log(this.item)
 
         let param = {
           name: _.trim(this.name),
-          config: _.trim(this.config),
-          description: _.trim(this.description),
-          workerGroups: JSON.stringify(this.workerGroups)
+          projectCode: this.projectCode,
+          groupSize: _.trim(this.groupSize),
+          description: _.trim(this.description)
         }
 
         let $then = (res) => {
@@ -140,27 +138,24 @@
         if (this.item && this.item.name) {
           this.$refs.popover.spinnerLoading = true
           let updateParam = {
-            code: this.item.code,
+            id: this.item.id,
             name: _.trim(this.name),
-            config: _.trim(this.config),
-            description: _.trim(this.description),
-            workerGroups: JSON.stringify(this.workerGroups)
+            groupSize: _.trim(this.groupSize),
+            description: _.trim(this.description)
           }
-          this.store.dispatch('security/updateEnvironment', updateParam).then(res => {
+          console.log('update....')
+          console.log(updateParam)
+          this.store.dispatch('resource/updateTaskGroup', updateParam).then(res => {
             $then(res)
           }).catch(e => {
             $catch(e)
           })
         } else {
-          this._verifyName(param).then(() => {
-            this.$refs.popover.spinnerLoading = true
-            this.store.dispatch('security/createEnvironment', param).then(res => {
-              $then(res)
-            }).catch(e => {
-              $catch(e)
-            })
+          this.$refs.popover.spinnerLoading = true
+          this.store.dispatch('resource/createTaskGroup', param).then(res => {
+            $then(res)
           }).catch(e => {
-            this.$message.error(e.msg || '')
+            $catch(e)
           })
         }
       },
@@ -169,24 +164,11 @@
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.config.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter environment config')}`)
-          return false
-        }
         if (!this.description.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter environment desc')}`)
           return false
         }
         return true
-      },
-      _verifyName (param) {
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('security/verifyEnvironment', { environmentName: param.name }).then(res => {
-            resolve()
-          }).catch(e => {
-            reject(e)
-          })
-        })
       },
       close () {
         this.$emit('close')
@@ -196,22 +178,25 @@
       item: {
         handler (val, oldVal) {
           this.name = val.name
-          this.config = val.config
+          this.projectCode = val.projectCode
+          this.groupSize = val.groupSize
           this.description = val.description
-          this.workerGroups = val.workerGroups
-          this.workerGroupOptions = val.workerGroupOptions
+          this.projectOptions = val.projectOptions
+          this.modalType = val.modalType
         },
         deep: true
       }
     },
     created () {
+      console.log('created...')
+      console.log(this.item)
       if (this.item && this.item.name) {
         this.name = this.item.name
-        this.config = this.item.config
+        this.projectCode = this.item.projectCode
+        this.groupSize = this.item.groupSize
         this.description = this.item.description
-        this.workerGroups = this.item.workerGroups
       }
-      this.workerGroupOptions = this.item.workerGroupOptions
+      this.projectOptions = this.item.projectOptions
     },
     mounted () {
     },
