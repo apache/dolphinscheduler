@@ -13,22 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { defineComponent } from 'vue'
-
-import styles from './index.module.scss'
-
-const Logo = defineComponent({
-  name: 'Logo',
-  setup() {},
-  render() {
-    return (
-      <div class={styles.logo}>
-        <img src='./src/assets/images/nav-logo.svg' alt='' />
-      </div>
-    )
-  },
-})
-
-export default Logo
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
