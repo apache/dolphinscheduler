@@ -423,7 +423,7 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, projectCode,
-                6, ReleaseState.OFFLINE, false);
+                6, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         // project check auth success, processs definition online
@@ -437,17 +437,17 @@ public class ProcessDefinitionServiceTest {
         processTaskRelationList.add(processTaskRelation);
         Mockito.when(processService.findRelationByCode(projectCode, 46L)).thenReturn(processTaskRelationList);
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.ONLINE, false);
+                loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
 
         // project check auth success, processs definition online
         Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.ONLINE, false);
+                loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
 
         // release error code
         Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, projectCode, 46, ReleaseState.getEnum(2), false);
+                loginUser, projectCode, 46, ReleaseState.getEnum(2));
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
 
     }

@@ -200,7 +200,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('dag', ['editProcessState', 'releaseWorkflowAndSchedule', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
 
       selectable (row, index) {
@@ -296,9 +296,8 @@
       _poponline (item, releaseSchedule) {
         this._upProcessState({
           ...item,
-          releaseState: 'ONLINE',
-          releaseSchedule
-        })
+          releaseState: 'ONLINE'
+        }, releaseSchedule)
       },
       /**
        * copy
@@ -473,8 +472,8 @@
       /**
        * Edit state
        */
-      _upProcessState (o) {
-        this.editProcessState(o).then(res => {
+      _upProcessState (o, releaseSchedule) {
+        (releaseSchedule ? this.releaseWorkflowAndSchedule(o) : this.editProcessState(o)).then(res => {
           this.$message.success(res.msg)
           $('body').find('.tooltip.fade.top.in').remove()
           this._onUpdate()

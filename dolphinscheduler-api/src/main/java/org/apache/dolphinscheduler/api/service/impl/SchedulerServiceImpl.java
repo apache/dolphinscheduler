@@ -373,32 +373,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     /**
-     * set schedule online or offline
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param queryState query state
-     * @param updatedState updated state
-     * @return publish result code
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> setScheduleState(User loginUser, long projectCode, long processDefinitionCode,
-                                                ReleaseState queryState, ReleaseState updatedState) {
-        Map<String, Object> result = new HashMap<>();
-        List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
-                new long[]{processDefinitionCode}, queryState.getCode()
-        );
-        if (CollectionUtils.size(scheduleList) != 1) {
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        Schedule schedule = scheduleList.get(0);
-        return setScheduleState(loginUser, projectCode, schedule.getId(), updatedState);
-    }
-
-    /**
      * query schedule
      *
      * @param loginUser login user

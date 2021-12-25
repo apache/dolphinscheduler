@@ -172,8 +172,8 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE, false)).thenReturn(result);
-        Result response = processDefinitionController.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE, false);
+        Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE)).thenReturn(result);
+        Result response = processDefinitionController.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE);
         Assert.assertTrue(response != null && response.isSuccess());
     }
 

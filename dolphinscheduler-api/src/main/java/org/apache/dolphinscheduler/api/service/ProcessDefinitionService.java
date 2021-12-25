@@ -215,14 +215,12 @@ public interface ProcessDefinitionService {
      * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
-     * @param releaseSchedule release schedule
      * @return release result code
      */
     Map<String, Object> releaseProcessDefinition(User loginUser,
                                                  long projectCode,
                                                  long code,
-                                                 ReleaseState releaseState,
-                                                 boolean releaseSchedule);
+                                                 ReleaseState releaseState);
 
     /**
      * batch export process definition by codes

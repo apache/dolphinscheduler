@@ -572,7 +572,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException((Status) result.get(Constants.STATUS));
         }
         if (releaseProcessDefinition) {
-            Map<String, Object> releaseResult = releaseProcessDefinition(loginUser, projectCode, code, ReleaseState.ONLINE, releaseSchedule);
+            Map<String, Object> releaseResult = releaseSchedule ? releaseWorkflowAndSchedule(loginUser, projectCode, code, ReleaseState.ONLINE) :
+                releaseProcessDefinition(loginUser, projectCode, code, ReleaseState.ONLINE);
             if (releaseResult.get(Constants.STATUS) != Status.SUCCESS) {
                 throw new ServiceException((Status) releaseResult.get(Constants.STATUS));
             }
@@ -719,12 +720,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
-     * @param releaseSchedule release schedule
      * @return release result code
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState, boolean releaseSchedule) {
+    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
@@ -752,22 +752,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
-                // release schedule if needed
-                if (releaseSchedule) {
-                    Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.OFFLINE, ReleaseState.ONLINE);
-                    if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
-                        throw new ServiceException((Status) setScheduleStateResult.get(Constants.STATUS));
-                    }
-                }
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
-                if (updateProcess > 0) {
-                    Map<String, Object> setScheduleStateResult = schedulerService.setScheduleState(loginUser, projectCode, code, ReleaseState.ONLINE, ReleaseState.OFFLINE);
-                    if (setScheduleStateResult.get(Constants.STATUS) != Status.SUCCESS) {
-                        throw new ServiceException((Status) setScheduleStateResult.get(Constants.STATUS));
+                Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(code);
+                if (updateProcess > 0 && schedule != null) {
+                    logger.info("set schedule offline, project code: {}, schedule id: {}, process definition code: {}", projectCode, schedule.getId(), code);
+                    // set status
+                    schedule.setReleaseState(releaseState);
+                    int updateSchedule = scheduleMapper.updateById(schedule);
+                    if (updateSchedule == 0) {
+                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
+                        throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
                     }
+                    schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             default:

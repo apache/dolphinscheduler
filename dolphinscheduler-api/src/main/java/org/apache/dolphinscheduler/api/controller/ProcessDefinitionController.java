@@ -352,7 +352,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
-     * @param releaseSchedule release schedule
      * @return release result code
      */
     @ApiOperation(value = "release", notes = "RELEASE_PROCESS_DEFINITION_NOTES")
@@ -368,9 +367,8 @@ public class ProcessDefinitionController extends BaseController {
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable(value = "code", required = true) long code,
-                                           @RequestParam(value = "releaseState", required = true) ReleaseState releaseState,
-                                           @RequestParam(value = "releaseSchedule", required = false, defaultValue = "false") boolean releaseSchedule) {
-        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState, releaseSchedule);
+                                           @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
+        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectCode, code, releaseState);
         return returnDataList(result);
     }
 

@@ -51,8 +51,22 @@ export default {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectCode}/process-definition/${payload.code}/release`, {
         name: payload.name,
-        releaseState: payload.releaseState,
-        releaseSchedule: payload.releaseSchedule
+        releaseState: payload.releaseState
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * release workflow and schedule
+   */
+  releaseWorkflowAndSchedule ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectCode}/process-definition/${payload.code}/release-workflow`, {
+        name: payload.name,
+        releaseState: payload.releaseState
       }, res => {
         resolve(res)
       }).catch(e => {
