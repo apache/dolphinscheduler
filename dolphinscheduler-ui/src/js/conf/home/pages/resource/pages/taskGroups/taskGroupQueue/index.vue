@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Task group manage')">
+  <m-list-construction :title="$t('Task group queue')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="search-group">
@@ -42,9 +42,9 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="taskGroupList.length || total>0">
+      <template v-if="taskGroupQueue.length || total>0">
         <m-list @on-edit="_onEdit"
-                :task-group-list="taskGroupList"
+                :task-group-queue="taskGroupQueue"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
 
@@ -89,6 +89,7 @@
         isLoading: true,
         modalType: 'create',
         taskGroupList: [],
+        taskGroupQueue: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1
@@ -152,11 +153,16 @@
           this.taskGroupList = values.totalList
           if (this.taskGroupList) {
             this.searchParams.groupId = this.taskGroupList[0].id
+
             console.log(this.searchParams)
             this.getTaskListInTaskGroupQueueById(this.searchParams).then((res) => {
               if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
                 this.searchParams.pageNo = this.searchParams.pageNo - 1
               } else {
+                this.taskGroupQueue = []
+                if (res.totalList) {
+                  this.taskGroupQueue = res.totalList
+                }
                 this.total = res.total
                 this.isLoading = false
               }

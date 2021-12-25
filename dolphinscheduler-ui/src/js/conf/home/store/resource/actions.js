@@ -258,7 +258,7 @@ export default {
    */
   getTaskListInTaskGroupQueueById ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('task-group/query-list-by-group-id', payload, res => {
+      io.get('task-group/query-list-by-group-id', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
