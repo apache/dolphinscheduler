@@ -50,8 +50,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -127,8 +129,8 @@ public class MasterServer implements IStoppable {
     /**
      * run master server
      */
-    @PostConstruct
-    public void run() {
+    @EventListener
+    public void run(ApplicationReadyEvent ignored) {
         PropertyUtils.setValue(SPRING_DATASOURCE_DRIVER_CLASS_NAME, driverClassName);
 
         // init remoting server
