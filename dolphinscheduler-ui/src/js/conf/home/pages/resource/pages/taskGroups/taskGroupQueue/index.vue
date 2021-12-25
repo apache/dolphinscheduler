@@ -23,26 +23,20 @@
             <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
           </div>
           <div class="list">
-            <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.stateType" :placeholder="$t('State')" size="mini">
+            <el-input v-model="searchParams.instanceName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
+          </div>
+          <div class="list">
+            <el-input v-model="searchParams.processeName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Name')"></el-input>
+          </div>
+          <div class="list">
+            <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.groupId" :placeholder="$t('Task group name')" size="mini">
               <el-option
-                v-for="city in stateTypeList"
-                :key="city.label"
-                :value="city.code"
-                :label="city.label">
+                v-for="taskGroup in taskGroupList"
+                :key="taskGroup.id"
+                :value="taskGroup.id"
+                :label="taskGroup.name">
               </el-option>
             </el-select>
-          </div>
-          <div class="list">
-            <el-input v-model="searchParams.host" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('host')"></el-input>
-          </div>
-          <div class="list">
-            <el-input v-model="searchParams.executorName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Executor')"></el-input>
-          </div>
-          <div class="list">
-            <el-input v-model="searchParams.processInstanceName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
-          </div>
-          <div class="list">
-            <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Name')"></el-input>
           </div>
         </template>
       </m-conditions>
@@ -97,8 +91,7 @@
         taskGroupList: [],
         searchParams: {
           pageSize: 10,
-          pageNo: 1,
-          searchVal: ''
+          pageNo: 1
         },
         isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
@@ -155,15 +148,22 @@
         }
         this.isLoading = !flag
         this.getTaskGroupListPaging(taskGroupSearchParams).then((values) => {
-          if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo - 1
-          } else {
-            this.taskGroupList = []
-            this.taskGroupList = values.totalList
-            this.total = values.total
-            this.isLoading = false
+          this.taskGroupList = []
+          this.taskGroupList = values.totalList
+          if (this.taskGroupList) {
+            this.searchParams.groupId = this.taskGroupList[0].id
+            console.log(this.searchParams)
+            this.getTaskListInTaskGroupQueueById(this.searchParams).then((res) => {
+              if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
+                this.searchParams.pageNo = this.searchParams.pageNo - 1
+              } else {
+                this.total = res.total
+                this.isLoading = false
+              }
+            }).catch(e => {
+              this.isLoading = false
+            })
           }
-          console.log(this.taskGroupList)
         }).catch(e => {
           this.isLoading = false
         })
