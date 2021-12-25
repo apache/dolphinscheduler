@@ -19,25 +19,24 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
-
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ByChained;
 
-import lombok.Getter;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 public abstract class TaskNodeForm {
-    @FindBy(id = "input-node-name")
+    @FindBy(id = "inputNodeName")
     private WebElement inputNodeName;
-    @FindBy(id = "button-submit")
+    @FindBy(id = "btnSubmit")
     private WebElement buttonSubmit;
     @FindBys({
         @FindBy(className = "input-param-key"),
@@ -55,7 +54,7 @@ public abstract class TaskNodeForm {
     TaskNodeForm(WorkflowForm parent) {
         this.parent = parent;
 
-        final var driver = parent.driver();
+        final WebDriver driver = parent.driver();
 
         PageFactory.initElements(driver, this);
     }
@@ -69,9 +68,9 @@ public abstract class TaskNodeForm {
     public TaskNodeForm addParam(String key, String val) {
         assert inputParamKey().size() == inputParamVal().size();
 
-        final var len = inputParamKey().size();
+        final int len = inputParamKey().size();
 
-        final var driver = parent().driver();
+        final WebDriver driver = parent().driver();
         Stream.concat(
                   driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add"))).stream(),
                   driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add-dp"))).stream())

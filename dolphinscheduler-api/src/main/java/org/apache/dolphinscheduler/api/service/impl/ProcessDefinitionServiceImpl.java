@@ -308,7 +308,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
                 Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
                 if (CollectionUtils.isNotEmpty(codes)) {
-                    logger.error("the task code is not exit");
+                    logger.error("the task code is not exist");
                     putMsg(result, Status.TASK_DEFINE_NOT_EXIST, org.apache.commons.lang.StringUtils.join(codes, Constants.COMMA));
                     return result;
                 }

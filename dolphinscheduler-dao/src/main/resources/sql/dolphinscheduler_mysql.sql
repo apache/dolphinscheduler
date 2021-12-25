@@ -478,6 +478,7 @@ CREATE TABLE `t_ds_task_definition` (
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text COMMENT 'resource id, separated by comma',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
+  `task_group_priority` tinyint(4) DEFAULT 1 COMMENT 'task group priority',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -510,6 +511,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
+  `task_group_priority` tinyint(4) DEFAULT 1 COMMENT 'task group priority',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -600,7 +602,7 @@ CREATE TABLE `t_ds_process_instance` (
   `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
-  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE,
+  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -822,7 +824,7 @@ CREATE TABLE `t_ds_task_instance` (
   `retry_times` int(4) DEFAULT '0' COMMENT 'task retry times',
   `pid` int(4) DEFAULT NULL COMMENT 'pid of task',
   `app_link` text COMMENT 'yarn app id',
-  `task_params` text COMMENT 'job custom parameters',
+  `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `retry_interval` int(4) DEFAULT NULL COMMENT 'retry interval when task failed ',
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
@@ -1051,7 +1053,7 @@ CREATE TABLE `t_ds_task_group` (
    `group_size` int (11) NOT NULL COMMENT'group size',
    `use_size` int (11) DEFAULT '0' COMMENT 'used size',
    `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
-   `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+   `project_code` bigint(20) DEFAULT 0 COMMENT 'project code',
    `status` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
    `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

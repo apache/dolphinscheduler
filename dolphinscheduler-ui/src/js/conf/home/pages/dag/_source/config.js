@@ -280,7 +280,8 @@ const tasksType = {
   },
   PROCEDURE: {
     desc: 'PROCEDURE',
-    color: '#525CCD'
+    color: '#525CCD',
+    helperLinkDisable: true
   },
   SQL: {
     desc: 'SQL',
@@ -296,7 +297,8 @@ const tasksType = {
   },
   MR: {
     desc: 'MapReduce',
-    color: '#A0A5CC'
+    color: '#A0A5CC',
+    helperLinkDisable: true
   },
   PYTHON: {
     desc: 'PYTHON',
@@ -320,7 +322,8 @@ const tasksType = {
   },
   SQOOP: {
     desc: 'SQOOP',
-    color: '#E46F13'
+    color: '#E46F13',
+    helperLinkDisable: true
   },
   CONDITIONS: {
     desc: 'CONDITIONS',
@@ -332,7 +335,8 @@ const tasksType = {
   },
   WATERDROP: {
     desc: 'WATERDROP',
-    color: '#646465'
+    color: '#646465',
+    helperLinkDisable: true
   }
 }
 

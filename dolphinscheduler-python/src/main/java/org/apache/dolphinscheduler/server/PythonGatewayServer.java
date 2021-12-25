@@ -62,21 +62,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
 import py4j.GatewayServer;
 
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.server.master.*",
-        "org.apache.dolphinscheduler.server.worker.*",
-        "org.apache.dolphinscheduler.server.monitor.*",
-        "org.apache.dolphinscheduler.server.log.*",
-        "org.apache.dolphinscheduler.alert.*"
-    })
-})
+@SpringBootApplication
+@ComponentScan(value = "org.apache.dolphinscheduler")
 public class PythonGatewayServer extends SpringBootServletInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
 
@@ -434,6 +427,41 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
             throw new IllegalArgumentException(msg);
         }
 
+        return result;
+    }
+
+    /**
+     * Get project, process definition, task code.
+     * Useful in Python API create dependent task which need processDefinition information.
+     *
+     * @param projectName           project name which process definition belongs to
+     * @param processDefinitionName process definition name
+     * @param taskName              task name
+     */
+    public Map<String, Object> getDependentInfo(String projectName, String processDefinitionName, String taskName) {
+        Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByName(projectName);
+        if (project == null) {
+            String msg = String.format("Can not find valid project by name %s", projectName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        long projectCode = project.getCode();
+        result.put("projectCode", projectCode);
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+        if (processDefinition == null) {
+            String msg = String.format("Can not find valid process definition by name %s", processDefinitionName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        result.put("processDefinitionCode", processDefinition.getCode());
+
+        if (taskName != null) {
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByName(projectCode, taskName);
+            result.put("taskDefinitionCode", taskDefinition.getCode());
+        }
         return result;
     }
 

@@ -42,7 +42,7 @@ public final class WorkflowForm {
     private final WebDriver driver;
     private final WorkflowSaveDialog saveForm;
 
-    @FindBy(id = "button-save")
+    @FindBy(id = "btnSave")
     private WebElement buttonSave;
 
     public WorkflowForm(WebDriver driver) {
@@ -55,11 +55,11 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type) {
-        final var task = driver.findElement(By.className("task-item-" + type.name()));
-        final var canvas = driver.findElement(By.className("dag-container"));
+        final WebElement task = driver.findElement(By.className("task-item-" + type.name()));
+        final WebElement canvas = driver.findElement(By.className("dag-container"));
 
-        final var js = (JavascriptExecutor) driver;
-        final var dragAndDrop = String.join("\n",
+        final JavascriptExecutor js = (JavascriptExecutor) driver;
+        final String dragAndDrop = String.join("\n",
             Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas);
 

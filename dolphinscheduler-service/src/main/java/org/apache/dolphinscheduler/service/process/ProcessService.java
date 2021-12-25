@@ -136,9 +136,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.facebook.presto.jdbc.internal.guava.collect.Lists;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 
 /**
  * process relative dao that some mappers in this.
@@ -415,7 +415,7 @@ public class ProcessService {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.error("process define not exists");
-            return new ArrayList<>();
+            return Lists.newArrayList();
         }
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
@@ -424,8 +424,11 @@ public class ProcessService {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
         }
+        if (taskDefinitionSet.isEmpty()) {
+            return Lists.newArrayList();
+        }
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
-        return new ArrayList<>(taskDefinitionLogs);
+        return Lists.newArrayList(taskDefinitionLogs);
     }
 
     /**
@@ -2410,7 +2413,27 @@ public class ProcessService {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
         }
+        if (taskDefinitionSet.isEmpty()) {
+            return Lists.newArrayList();
+        }
         return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
+    }
+
+    public List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations) {
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        Map<Long, Integer> taskCodeVersionMap = new HashMap<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() > 0) {
+                taskCodeVersionMap.put(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion());
+            }
+            if (processTaskRelation.getPostTaskCode() > 0) {
+                taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
+            }
+        }
+        taskCodeVersionMap.forEach((code,version) -> {
+            taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
+        });
+        return taskDefinitionLogs;
     }
 
     /**
@@ -2488,13 +2511,15 @@ public class ProcessService {
                         taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
+                taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
+                taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNodeList.add(taskNode);
             }
         }
         return taskNodeList;
     }
 
-    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId, int taskId) {
+    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId) {
         HashMap<ProcessInstance, TaskInstance> processTaskMap = new HashMap<>();
         //find sub tasks
         ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryBySubProcessId(processId);

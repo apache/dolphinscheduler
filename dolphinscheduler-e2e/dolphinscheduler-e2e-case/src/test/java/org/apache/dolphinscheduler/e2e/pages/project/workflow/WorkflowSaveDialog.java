@@ -19,9 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import java.util.List;
-import java.util.stream.Stream;
-
+import lombok.Getter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,16 +30,17 @@ import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import lombok.Getter;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 public final class WorkflowSaveDialog {
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBy(id = "input-name")
+    @FindBy(id = "inputName")
     private WebElement inputName;
-    @FindBy(id = "button-submit")
+    @FindBy(id = "btnSubmit")
     private WebElement buttonSubmit;
     @FindBys({
         @FindBy(className = "input-param-key"),
@@ -53,7 +52,7 @@ public final class WorkflowSaveDialog {
         @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamVal;
-    @FindBy(id = "select-tenant")
+    @FindBy(id = "selectTenant")
     private WebElement selectTenant;
 
     public WorkflowSaveDialog(WorkflowForm parent) {
@@ -72,7 +71,7 @@ public final class WorkflowSaveDialog {
     public WorkflowSaveDialog tenant(String tenant) {
         selectTenant().click();
 
-        final var optionsLocator = By.className("option-tenants");
+        final By optionsLocator = By.className("option-tenants");
 
         new WebDriverWait(driver, 10)
             .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
@@ -91,9 +90,9 @@ public final class WorkflowSaveDialog {
     public WorkflowSaveDialog addGlobalParam(String key, String val) {
         assert inputParamKey().size() == inputParamVal().size();
 
-        final var len = inputParamKey().size();
+        final int len = inputParamKey().size();
 
-        final var driver = parent().driver();
+        final WebDriver driver = parent().driver();
         Stream.concat(
                   driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add"))).stream(),
                   driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add-dp"))).stream())

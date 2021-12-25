@@ -25,7 +25,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-dist</artifactId>
-    <packaging>provisio</packaging>
     <name>${project.artifactId}</name>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -50,6 +49,11 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-ui</artifactId>
         </dependency>
     </dependencies>
 
@@ -90,20 +94,6 @@
                                 </configuration>
                             </execution>
 
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>

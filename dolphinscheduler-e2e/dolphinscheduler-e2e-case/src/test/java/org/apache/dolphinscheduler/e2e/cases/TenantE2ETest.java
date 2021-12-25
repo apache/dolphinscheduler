@@ -58,7 +58,7 @@ class TenantE2ETest {
     @Test
     @Order(20)
     void testCreateDuplicateTenant() {
-        final var page = new TenantPage(browser);
+        final TenantPage page = new TenantPage(browser);
 
         page.create(tenant);
 
@@ -73,7 +73,7 @@ class TenantE2ETest {
     @Test
     @Order(30)
     void testDeleteTenant() {
-        final var page = new TenantPage(browser);
+        final TenantPage page = new TenantPage(browser);
         page.delete(tenant);
 
         await().untilAsserted(() -> {
