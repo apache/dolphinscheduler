@@ -32,6 +32,7 @@
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
+        :project-code="projectCode"
         @seeHistory="seeHistory"
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"

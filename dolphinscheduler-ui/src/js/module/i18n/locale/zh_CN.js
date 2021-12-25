@@ -783,7 +783,7 @@ export default {
   'Please enter task group resource pool size': '请输入资源容量大小',
   'Please select project': '请选择项目',
   'Task group queue': '任务组队列',
-  'Task group queue priority': '优先级',
+  'Task group queue priority': '组内优先级',
   'Task group queue force starting status': '是否强制启动',
   'Task group in queue': '是否排队中',
   'Task group queue status': '任务状态'

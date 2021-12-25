@@ -206,6 +206,18 @@ export default {
     })
   },
   /**
+   * get task group list pages
+   */
+  getTaskGroupListPagingByProjectCode ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('task-group/query-list-by-projectCode', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * create task group
    */
   createTaskGroup ({ state }, payload) {

@@ -176,7 +176,9 @@ export default {
           'timeoutFlag',
           'timeoutNotifyStrategy',
           'timeout',
-          'environmentCode'
+          'environmentCode',
+          'taskGroupId',
+          'taskGroupPriority'
         ]))
 
         resolve(res.data)
