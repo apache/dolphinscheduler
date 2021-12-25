@@ -44,7 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -550,25 +549,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Project> projects = projectMapper.selectList(Wrappers.<Project>lambdaQuery()
-                .eq(Project::getUserId, transferredUserId)
-                .in(Project::getId, transferredIds)
-        );
-        Set<Integer> realProjectIds = projects.stream().map(Project::getId).collect(Collectors.toSet());
         // update project owner
         int updatedProjectNum = projectMapper.update(null, Wrappers.<Project>lambdaUpdate()
                 .set(Project::getUserId, receivedUserId)
                 .set(Project::getUpdateTime, new Date())
-                .in(Project::getId, realProjectIds)
+                .eq(Project::getUserId, transferredUserId)
+                .in(Project::getId, transferredIds)
         );
-        if (updatedProjectNum != realProjectIds.size()) {
+        if (updatedProjectNum <= 0) {
             putMsg(result, Status.TRANSFER_PROJECT_ERROR);
             return result;
         }
         // delete project user relation if exist
         projectUserMapper.delete(Wrappers.<ProjectUser>lambdaQuery()
                 .eq(ProjectUser::getUserId, receivedUserId)
-                .in(ProjectUser::getProjectId, realProjectIds)
+                .in(ProjectUser::getProjectId, transferredIds)
         );
 
         putMsg(result, Status.SUCCESS);

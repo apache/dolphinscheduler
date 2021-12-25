@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -466,29 +465,26 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @param transferredIds transferred ids
      * @return transfer result code
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> transferOwnedData(int transferredUserId, int receivedUserId, List<Integer> transferredIds) {
         Map<String, Object> result = new HashMap<>();
 
-        List<DataSource> dataSources = dataSourceMapper.selectList(Wrappers.<DataSource>lambdaQuery()
-                .eq(DataSource::getUserId, transferredUserId)
-                .in(DataSource::getId, transferredIds)
-        );
-        Set<Integer> realDataSourceIds = dataSources.stream().map(DataSource::getId).collect(Collectors.toSet());
         // update datasource owner
         int updatedDatasourceNum = dataSourceMapper.update(null, Wrappers.<DataSource>lambdaUpdate()
                 .set(DataSource::getUserId, receivedUserId)
                 .set(DataSource::getUpdateTime, new Date())
-                .in(DataSource::getId, realDataSourceIds)
+                .eq(DataSource::getUserId, transferredUserId)
+                .in(DataSource::getId, transferredIds)
         );
-        if (updatedDatasourceNum != realDataSourceIds.size()) {
+        if (updatedDatasourceNum <= 0) {
             putMsg(result, Status.TRANSFER_DATASOURCE_ERROR);
             return result;
         }
         // delete datasource user relation if exist
         datasourceUserMapper.delete(Wrappers.<DatasourceUser>lambdaQuery()
                 .eq(DatasourceUser::getUserId, receivedUserId)
-                .in(DatasourceUser::getDatasourceId, realDataSourceIds)
+                .in(DatasourceUser::getDatasourceId, transferredIds)
         );
 
         putMsg(result, Status.SUCCESS);
