@@ -35,9 +35,9 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,8 +52,8 @@ public final class AlertPluginManager {
         this.pluginDao = pluginDao;
     }
 
-    @PostConstruct
-    public void installPlugin() {
+    @EventListener
+    public void installPlugin(ApplicationReadyEvent readyEvent) {
         final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {
