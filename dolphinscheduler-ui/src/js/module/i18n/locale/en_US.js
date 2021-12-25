@@ -766,6 +766,7 @@ export default {
   workflowPublishStatus: 'Workflow Publish Status',
   schedulePublishStatus: 'Schedule Publish Status',
   'Task group manage': 'Task group manage',
+  'Task group option': 'Task group option',
   'Create task group': 'Create task group',
   'Edit task group': 'Edit task group',
   'Delete task group': 'Delete task group',
@@ -774,7 +775,15 @@ export default {
   'Task group resource pool size': 'Resource pool size',
   'Task group resource used pool size': 'Used resource',
   'Task group desc': 'Task group desc',
+  'Task group status': 'Task group status',
+  'Task group enable status': 'Enable',
+  'Task group disable status': 'Disable',
   'Please enter task group desc': 'Please enter task group description',
   'Please enter task group resource pool size': 'Please enter task group resource pool size',
-  'Please select project': 'Please select a project'
+  'Please select project': 'Please select a project',
+  'Task group queue': 'Task group queue',
+  'Task group queue priority': 'Priority',
+  'Task group queue force starting status': 'Starting status',
+  'Task group in queue': 'In queue',
+  'Task group queue status': 'Task status'
 }

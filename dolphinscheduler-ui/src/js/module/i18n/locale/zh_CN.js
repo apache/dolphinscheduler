@@ -767,6 +767,7 @@ export default {
   workflowPublishStatus: '工作流上线状态',
   schedulePublishStatus: '定时状态',
   'Task group manage': '任务组管理',
+  'Task group option': '任务组配置',
   'Create task group': '创建任务组',
   'Edit task group': '编辑任务组',
   'Delete task group': '删除任务组',
@@ -775,7 +776,15 @@ export default {
   'Task group resource pool size': '资源容量',
   'Task group resource used pool size': '已用资源',
   'Task group desc': '描述信息',
+  'Task group status': '任务组状态',
+  'Task group enable status': '启用',
+  'Task group disable status': '不可用',
   'Please enter task group desc': '请输入任务组描述',
   'Please enter task group resource pool size': '请输入资源容量大小',
-  'Please select project': '请选择项目'
+  'Please select project': '请选择项目',
+  'Task group queue': '任务组队列',
+  'Task group queue priority': '优先级',
+  'Task group queue force starting status': '是否强制启动',
+  'Task group in queue': '是否排队中',
+  'Task group queue status': '任务状态'
 }

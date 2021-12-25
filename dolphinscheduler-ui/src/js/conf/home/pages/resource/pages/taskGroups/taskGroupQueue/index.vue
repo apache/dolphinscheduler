@@ -18,19 +18,35 @@
   <m-list-construction :title="$t('Task group manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
-        <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create()">{{$t('Create task group')}}</el-button>
-          <el-dialog
-            :title="item && item.name ? $t('Edit task group') : $t('Create task group')"
-            :v-if="createTaskGroupDialog"
-            :visible.sync="createTaskGroupDialog"
-            width="auto">
-            <m-create-task-group :item="item" @onUpdate="onUpdate" @close="close"></m-create-task-group>
-          </el-dialog>
+        <template slot="search-group">
+          <div class="list">
+            <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
+          </div>
+          <div class="list">
+            <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.stateType" :placeholder="$t('State')" size="mini">
+              <el-option
+                v-for="city in stateTypeList"
+                :key="city.label"
+                :value="city.code"
+                :label="city.label">
+              </el-option>
+            </el-select>
+          </div>
+          <div class="list">
+            <el-input v-model="searchParams.host" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('host')"></el-input>
+          </div>
+          <div class="list">
+            <el-input v-model="searchParams.executorName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Executor')"></el-input>
+          </div>
+          <div class="list">
+            <el-input v-model="searchParams.processInstanceName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
+          </div>
+          <div class="list">
+            <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Name')"></el-input>
+          </div>
         </template>
       </m-conditions>
     </template>
-
     <template slot="content">
       <template v-if="taskGroupList.length || total>0">
         <m-list @on-edit="_onEdit"
@@ -65,7 +81,7 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateTaskGroup from './_source/createTaskGroup'
+  // import mCreateTaskGroup from './_source/createTaskGroup'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
@@ -79,8 +95,6 @@
         isLoading: true,
         modalType: 'create',
         taskGroupList: [],
-        projectList: [],
-        environmentWorkerGroupRelationList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -95,7 +109,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('projects', ['getProjectsList']),
+      ...mapActions('resource', ['getTaskListInTaskGroupQueueById']),
       ...mapActions('resource', ['getTaskGroupListPaging']),
       /**
        * Query
@@ -103,6 +117,9 @@
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
+      },
+      _ckQuery () {
+        this.$emit('on-query', this.searchParams)
       },
       _page (val) {
         this.searchParams.pageNo = val
@@ -127,7 +144,7 @@
         this.createTaskGroupDialog = false
       },
       _getList (flag) {
-        const projectSearchParams = {
+        const taskGroupSearchParams = {
           pageNo: 1,
           pageSize: 2147483647
         }
@@ -137,26 +154,16 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        Promise.all([this.getTaskGroupListPaging(this.searchParams), this.getProjectsList(projectSearchParams)]).then((values) => {
-          console.log(values[0].totalList)
-          if (this.searchParams.pageNo > 1 && values[0].totalList.length === 0) {
+        this.getTaskGroupListPaging(taskGroupSearchParams).then((values) => {
+          if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.taskGroupList = []
-            this.taskGroupList = values[0].totalList
-            this.total = values[0].total
+            this.taskGroupList = values.totalList
+            this.total = values.total
             this.isLoading = false
           }
-          if (values[1] && values[1].totalList) {
-            this.projectList = values[1].totalList
-          }
           console.log(this.taskGroupList)
-          this.taskGroupList.forEach(item => {
-            console.log(item.status)
-            item.status = item.status === 1
-            item.projectOptions = this.projectList
-            item.projectName = _.find(this.projectList, { code: item.projectCode }).name
-          })
         }).catch(e => {
           this.isLoading = false
         })
@@ -172,6 +179,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateTaskGroup }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
   }
 </script>

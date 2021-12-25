@@ -199,11 +199,24 @@ const menu = {
     {
       name: `${i18n.$t('Task group manage')}`,
       id: 2,
-      path: 'task-group-manage',
+      path: '',
       isOpen: true,
       enabled: true,
       icon: 'el-icon-setting',
-      children: []
+      children: [
+        {
+          name: `${i18n.$t('Task group option')}`,
+          path: 'task-group-option',
+          id: 0,
+          enabled: true
+        },
+        {
+          name: `${i18n.$t('Task group queue')}`,
+          path: 'task-group-queue',
+          id: 1,
+          enabled: true
+        }
+      ]
     }
   ],
   user: [

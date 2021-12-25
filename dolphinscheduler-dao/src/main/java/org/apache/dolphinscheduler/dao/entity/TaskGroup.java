@@ -56,7 +56,7 @@ public class TaskGroup implements Serializable {
     /**
      * 0 not available, 1 available
      */
-    private int status;
+    private Integer status;
     /**
      * create time
      */

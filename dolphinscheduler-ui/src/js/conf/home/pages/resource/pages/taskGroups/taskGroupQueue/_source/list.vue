@@ -19,10 +19,14 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="name" :label="$t('Task group name')" width="150"></el-table-column>
-        <el-table-column prop="projectName" :label="$t('Project Name')"></el-table-column>
-        <el-table-column prop="groupSize" :label="$t('Task group resource pool size')" min-width="50"></el-table-column>
-        <el-table-column prop="useSize" :label="$t('Task group resource used pool size')" min-width="50"></el-table-column>
+        <el-table-column prop="name" :label="$t('Project Name')" width="150"></el-table-column>
+        <el-table-column prop="projectName" :label="$t('Task Name')"></el-table-column>
+        <el-table-column prop="groupSize" :label="$t('Process Instance')" min-width="50"></el-table-column>
+        <el-table-column prop="groupSize" :label="$t('Task group name')" min-width="50"></el-table-column>
+        <el-table-column prop="groupSize" :label="$t('Task group queue priority')" min-width="50"></el-table-column>
+        <el-table-column prop="useSize" :label="$t('Task group queue force starting status')" min-width="50"></el-table-column>
+        <el-table-column prop="useSize" :label="$t('Task group in queue')" min-width="50"></el-table-column>
+        <el-table-column prop="useSize" :label="$t('Task group queue status')" min-width="50"></el-table-column>
         <el-table-column prop="description" :label="$t('Task group desc')" min-width="50"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="50">
           <template slot-scope="scope">
@@ -87,6 +91,7 @@
     },
     methods: {
       ...mapActions('resource', ['closeTaskGroup', 'startTaskGroup']),
+      ...mapActions('resource', ['getTaskListInTaskGroupQueueById']),
       _switchTaskGroupStatus (item, i) {
         console.log('switch...')
         console.log(item)

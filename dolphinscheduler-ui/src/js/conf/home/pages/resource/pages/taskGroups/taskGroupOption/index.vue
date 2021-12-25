@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Task group manage')">
+  <m-list-construction :title="$t('Task group option')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
