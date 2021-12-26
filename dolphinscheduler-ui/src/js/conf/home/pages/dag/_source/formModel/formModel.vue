@@ -169,6 +169,7 @@
               type="input"
               v-model="taskGroupPriority"
               maxlength="60"
+              v-on:input="_onUpdateTaskGroupPriority"
               size="small">
             </el-input>
           </div>
@@ -755,9 +756,13 @@
         this.environmentCode = o
       },
       _onUpdateTaskGroupId (o) {
-        console.log('_onUpdateTaskGroupId')
-        console.log(o)
         this.taskGroupId = o
+        if (this.taskGroupId === '') {
+          this.taskGroupPriority = 0
+        }
+      },
+      _onUpdateTaskGroupPriority (o) {
+        this.taskGroupPriority = o
       },
       /**
        * _onCacheParams is reserved
@@ -991,6 +996,7 @@
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
           this.taskGroupId = o.taskGroupId
+          this.taskGroupPriority = o.taskGroupPriority
         } else {
           this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
         }

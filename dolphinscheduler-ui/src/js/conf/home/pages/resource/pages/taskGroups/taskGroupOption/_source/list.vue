@@ -50,18 +50,8 @@
           <el-tooltip :content="$t('Edit')" placement="top">
              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
            </el-tooltip>
-           <el-tooltip :content="$t('Delete')" placement="top">
-             <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
-             <el-popconfirm
-               :confirmButtonText="$t('Confirm')"
-               :cancelButtonText="$t('Cancel')"
-               icon="el-icon-info"
-               iconColor="red"
-               :title="$t('Delete?')"
-               @onConfirm="_delete(scope.row,scope.row.id)"
-             >
-               <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
-             </el-popconfirm>
+           <el-tooltip :content="$t('View task group queue')" placement="top">
+             <el-button type="danger" size="mini" icon="el-icon-tickets" @click="_switchTaskGroupQueue(scope.row)" circle></el-button>
            </el-tooltip>
           </template>
         </el-table-column>
@@ -88,8 +78,6 @@
     methods: {
       ...mapActions('resource', ['closeTaskGroup', 'startTaskGroup']),
       _switchTaskGroupStatus (item, i) {
-        console.log('switch...')
-        console.log(item)
         if (item.status) {
           this.startTaskGroup({
             id: item.id
@@ -121,6 +109,9 @@
             this.$message.error(e.msg || '')
           })
         }
+      },
+      _switchTaskGroupQueue (item) {
+        this.$router.push({ path: `/resource/task-group-queue?id=${item.id}` })
       },
       _edit (item) {
         this.$emit('on-edit', item)

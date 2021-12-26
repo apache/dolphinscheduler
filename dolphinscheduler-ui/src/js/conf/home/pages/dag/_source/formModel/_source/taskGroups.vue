@@ -55,8 +55,6 @@
     },
     methods: {
       _onChange (o) {
-        console.log(this.value)
-        console.log(this.selectedValue)
         this.$emit('taskGroupIdEvent', o)
       }
     },
@@ -67,9 +65,6 @@
     },
     created () {
       let stateTaskGroupList = this.store.state.resource.taskGroupListAll || []
-
-      console.log('created...')
-      console.log(this.value)
       if (stateTaskGroupList.length) {
         this.taskGroupList = stateTaskGroupList
       } else {

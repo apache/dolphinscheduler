@@ -785,5 +785,6 @@ export default {
   'Task group queue priority': 'Priority',
   'Task group queue force starting status': 'Starting status',
   'Task group in queue': 'In queue',
-  'Task group queue status': 'Task status'
+  'Task group queue status': 'Task status',
+  'View task group queue': 'View task group queue'
 }

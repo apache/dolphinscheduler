@@ -103,6 +103,8 @@
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
+        this.searchParams.name = this.searchParams.searchVal
+        this._getList(false)
       },
       _page (val) {
         this.searchParams.pageNo = val
@@ -138,7 +140,6 @@
         }
         this.isLoading = !flag
         Promise.all([this.getTaskGroupListPaging(this.searchParams), this.getProjectsList(projectSearchParams)]).then((values) => {
-          console.log(values[0].totalList)
           if (this.searchParams.pageNo > 1 && values[0].totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
@@ -150,9 +151,7 @@
           if (values[1] && values[1].totalList) {
             this.projectList = values[1].totalList
           }
-          console.log(this.taskGroupList)
           this.taskGroupList.forEach(item => {
-            console.log(item.status)
             item.status = item.status === 1
             item.projectOptions = this.projectList
             item.projectName = _.find(this.projectList, { code: item.projectCode }).name
