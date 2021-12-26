@@ -164,12 +164,12 @@
             </span>
             <span class="text-b">{{ $t("Task group queue priority") }}</span>
             <el-input
+              :disabled="taskGroupId===''"
               style="width: 166px;"
               type="input"
               v-model="taskGroupPriority"
               maxlength="60"
-              size="small"
-              :placeholder="$t('Please enter name')">
+              size="small">
             </el-input>
           </div>
         </m-list-box>
@@ -564,7 +564,7 @@
         environmentCode: '',
         selectedWorkerGroup: '',
         taskGroupId: '',
-        taskGroupPriority: '',
+        taskGroupPriority: 0,
         stateList: [
           {
             value: 'success',
@@ -755,6 +755,8 @@
         this.environmentCode = o
       },
       _onUpdateTaskGroupId (o) {
+        console.log('_onUpdateTaskGroupId')
+        console.log(o)
         this.taskGroupId = o
       },
       /**

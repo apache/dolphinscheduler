@@ -20,6 +20,7 @@
           @change="_onChange"
           v-model="selectedValue"
           size="small"
+          clearable
           style="width: 180px">
     <el-option
             v-for="item in taskGroupList"
@@ -54,6 +55,8 @@
     },
     methods: {
       _onChange (o) {
+        console.log(this.value)
+        console.log(this.selectedValue)
         this.$emit('taskGroupIdEvent', o)
       }
     },
