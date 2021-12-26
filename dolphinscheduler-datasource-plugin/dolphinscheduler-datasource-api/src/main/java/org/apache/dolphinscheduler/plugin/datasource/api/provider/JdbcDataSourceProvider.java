@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceParam;
 import org.apache.dolphinscheduler.spi.datasource.JdbcConnectionParam;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Map;
@@ -62,8 +60,7 @@ public class JdbcDataSourceProvider {
         String driverClassName = dataSourceParam.getProps().getOrDefault(DRIVER_CLASS_NAME, "").toString();
         jdbcConnectionParam.setDriverClassName(StringUtils.isBlank(driverClassName) ? dataSourceParam.getDbType().getDefaultDriverClass() : driverClassName);
 
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        if (kerberosStartupState) {
+        if (CommonUtils.getKerberosStartupState()) {
             jdbcConnectionParam.setKerberosKeytab(dataSourceParam.getProps().get(KERBEROS_KEYTAB).toString());
             jdbcConnectionParam.setKerberosKrb5Conf(dataSourceParam.getProps().get(KERBEROS_KRB5CONF).toString());
             jdbcConnectionParam.setKerberosPrincipal(dataSourceParam.getProps().get(KERBEROS_PRINCIPAL).toString());
