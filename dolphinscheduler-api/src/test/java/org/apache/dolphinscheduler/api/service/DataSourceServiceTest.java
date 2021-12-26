@@ -319,16 +319,15 @@ public class DataSourceServiceTest {
         props.put("user", "test");
         props.put("password", "test");
 
-        Map<String, Object> otherProps = new HashMap<>();
-        otherProps.put("kerberosPrincipal", "hive/hdfs-mycluster@ESZ.COM");
-        otherProps.put("kerberosKeytab", "/opt/hdfs.headless.keytab");
-        otherProps.put("kerberosKrb5Conf", "/opt/krb5.conf");
-        props.put("props", otherProps);
+        props.put("kerberosPrincipal", "hive/hdfs-mycluster@ESZ.COM");
+        props.put("kerberosKeytab", "/opt/hdfs.headless.keytab");
+        props.put("kerberosKrb5Conf", "/opt/krb5.conf");
         dataSourceParam.setProps(props);
 
         connectionParam = JdbcDataSourceProvider.buildConnectionParams(dataSourceParam);
 
-        expected = "{\"dbType\":\"HIVE\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"user\":\"test\",\"password\":\"test\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"props\":{\"kerberosKrb5Conf\":\"/opt/krb5.conf\",\"kerberosPrincipal\":\"hive/hdfs-mycluster@ESZ.COM\",\"kerberosKeytab\":\"/opt/hdfs.headless.keytab\"}}";
+        expected = "{\"dbType\":\"HIVE\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"user\":\"test\",\"password\":\"test\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\","
+                + "\"kerberosPrincipal\":\"hive/hdfs-mycluster@ESZ.COM\",\"kerberosKeytab\":\"/opt/hdfs.headless.keytab\",\"kerberosKrb5Conf\":\"/opt/krb5.conf\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
     }
