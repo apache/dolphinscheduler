@@ -74,13 +74,11 @@ def test_property_task_params(attr, expect):
     [
         (123, 456, hash("123 -> 456")),
         (12345678, 987654321, hash("12345678 -> 987654321")),
-    ]
+    ],
 )
 def test_task_relation_hash_func(pre_code, post_code, expect):
     """Test TaskRelation magic function :func:`__hash__`."""
-    task_param = TaskRelation(
-        pre_task_code=pre_code, post_task_code=post_code
-    )
+    task_param = TaskRelation(pre_task_code=pre_code, post_task_code=post_code)
     assert hash(task_param) == expect
 
 
@@ -94,7 +92,7 @@ def test_task_relation_hash_func(pre_code, post_code, expect):
         (456, 123, 1),
         (0, 456, 1),
         (123, 0, 1),
-    ]
+    ],
 )
 def test_task_relation_add_to_set(pre_code, post_code, size_add):
     """Test TaskRelation with different pre_code and post_code add to set behavior.
@@ -102,9 +100,7 @@ def test_task_relation_add_to_set(pre_code, post_code, size_add):
     Here we use global variable to keep set of :class:`TaskRelation` instance and the number we expect
     of the size when we add a new task relation to exists set.
     """
-    task_relation = TaskRelation(
-        pre_task_code=pre_code, post_task_code=post_code
-    )
+    task_relation = TaskRelation(pre_task_code=pre_code, post_task_code=post_code)
     TEST_TASK_RELATION_SET.add(task_relation)
     # hint python interpreter use global variable instead of local's
     global TEST_TASK_RELATION_SIZE

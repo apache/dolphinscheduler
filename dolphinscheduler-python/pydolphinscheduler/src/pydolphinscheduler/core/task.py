@@ -21,11 +21,11 @@ import logging
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from pydolphinscheduler.constants import (
+    Delimiter,
     ProcessDefinitionDefault,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
-    Delimiter,
 )
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import (
