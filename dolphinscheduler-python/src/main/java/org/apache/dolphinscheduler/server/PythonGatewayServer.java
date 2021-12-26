@@ -392,12 +392,12 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
     public Map<String, Object> getDatasourceInfo(String datasourceName) {
         Map<String, Object> result = new HashMap<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
-        if (dataSourceList.size() > 1) {
-            String msg = String.format("Get more than one datasource by name %s", datasourceName);
+        if (dataSourceList == null || dataSourceList.isEmpty()) {
+            String msg = String.format("Can not find any datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
-        } else if (dataSourceList.size() == 0) {
-            String msg = String.format("Can not find any datasource by name %s", datasourceName);
+        } else if (dataSourceList.size() > 1) {
+            String msg = String.format("Get more than one datasource by name %s", datasourceName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         } else {
