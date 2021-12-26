@@ -75,6 +75,8 @@ class TaskType(str):
     PROCEDURE = "PROCEDURE"
     DATAX = "DATAX"
     DEPENDENT = "DEPENDENT"
+    CONDITIONS = "CONDITIONS"
+    SWITCH = "SWITCH"
 
 
 class DefaultTaskCodeNum(str):
@@ -102,6 +104,7 @@ class Delimiter(str):
     DASH = "/"
     COLON = ":"
     UNDERSCORE = "_"
+    DIRECTION = "->"
 
 
 class Time(str):
