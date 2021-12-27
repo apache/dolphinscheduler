@@ -292,6 +292,7 @@ public enum Status {
     MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
     PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
+    NO_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
