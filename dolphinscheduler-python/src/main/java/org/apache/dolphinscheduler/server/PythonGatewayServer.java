@@ -60,15 +60,21 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 import py4j.GatewayServer;
 
-@SpringBootApplication
-@ComponentScan(value = "org.apache.dolphinscheduler")
+@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
+    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.worker.*",
+        "org.apache.dolphinscheduler.server.monitor.*",
+        "org.apache.dolphinscheduler.server.log.*",
+        "org.apache.dolphinscheduler.alert.*"
+    })
+})
 public class PythonGatewayServer extends SpringBootServletInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PythonGatewayServer.class);
 
@@ -468,10 +474,11 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
         GatewayServer server = new GatewayServer(this);
         GatewayServer.turnLoggingOn();
         // Start server to accept python client socket
+        LOGGER.info("Start python gateway server.");
         server.start();
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(PythonGatewayServer.class, args);
+        new SpringApplicationBuilder(PythonGatewayServer.class).run(args);
     }
 }
