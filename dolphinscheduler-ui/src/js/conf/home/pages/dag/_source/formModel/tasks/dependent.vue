@@ -65,6 +65,7 @@
   import mListBox from './_source/listBox'
   import mDependItemList from './_source/dependItemList'
   import disabledState from '@/module/mixin/disabledState'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'dependent',
@@ -140,7 +141,7 @@
     },
     created () {
       let o = this.backfillItem
-      let dependentResult = $(`#${o.id}`).data('dependent-result') || {}
+      let dependentResult = this.dependResult || {}
       // Does not represent an empty object backfill
       if (!_.isEmpty(o)) {
         this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
@@ -148,7 +149,7 @@
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
-          v1.state = dependentResult[`${v1.definitionId}-${v1.depTaskCode}-${v1.cycle}-${v1.dateValue}`] || defaultState
+          v1.state = dependentResult[`${v1.definitionCode}-${v1.depTaskCode}-${v1.cycle}-${v1.dateValue}`] || defaultState
         }))
       }
     },
@@ -157,6 +158,9 @@
     destroyed () {
     },
     computed: {
+      ...mapState('dag', [
+        'dependResult'
+      ]),
       cacheDependent () {
         return {
           relation: this.relation,
