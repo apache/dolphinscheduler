@@ -164,13 +164,13 @@ class Conditions(Task):
         self._set_dep()
 
     def _set_dep(self) -> None:
-        """Set downstream according to parameter `condition`."""
-        downstream = []
+        """Set upstream according to parameter `condition`."""
+        upstream = []
         for cond in self.condition.args:
             if isinstance(cond, ConditionOperator):
                 for status in cond.args:
-                    downstream.extend(list(status.tasks))
-        self.set_downstream(downstream)
+                    upstream.extend(list(status.tasks))
+        self.set_upstream(upstream)
 
     @property
     def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:

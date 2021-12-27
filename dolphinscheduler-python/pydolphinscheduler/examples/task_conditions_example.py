@@ -22,11 +22,11 @@ This example will create five task in single workflow, with four shell task and 
 condition have one upstream which we declare explicit with syntax `parent >> condition`, and three downstream
 automatically set dependence by condition task by passing parameter `condition`. The graph of this workflow
 like:
-                         --> condition_success_1
-                       /
-parent -> conditions ->  --> condition_success_2
-                       \
-                         --> condition_fail
+pre_task_success_1 ->
+                      \
+pre_task_success_2 ->  --> conditions -> end
+                      /
+pre_task_fail      ->
 .
 """
 
@@ -35,21 +35,22 @@ from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Conditions
 from pydolphinscheduler.tasks.shell import Shell
 
 with ProcessDefinition(name="task_conditions_example", tenant="tenant_exists") as pd:
-    parent = Shell(name="parent", command="echo parent")
-    condition_success_1 = Shell(
-        name="condition_success_1", command="echo condition_success_1"
+    condition_pre_task_1 = Shell(
+        name="pre_task_success_1", command="echo pre_task_success_1"
     )
-    condition_success_2 = Shell(
-        name="condition_success_2", command="echo condition_success_2"
+    condition_pre_task_2 = Shell(
+        name="pre_task_success_2", command="echo pre_task_success_2"
     )
-    condition_fail = Shell(name="condition_fail", command="echo condition_fail")
+    condition_pre_task_3 = Shell(name="pre_task_fail", command="echo pre_task_fail")
     cond_operator = And(
         And(
-            SUCCESS(condition_success_1, condition_success_2),
-            FAILURE(condition_fail),
+            SUCCESS(condition_pre_task_1, condition_pre_task_2),
+            FAILURE(condition_pre_task_3),
         ),
     )
 
+    end = Shell(name="end", command="echo parent")
+
     condition = Conditions(name="conditions", condition=cond_operator)
-    parent >> condition
+    condition >> end
     pd.submit()

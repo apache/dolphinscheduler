@@ -396,44 +396,49 @@ def test_dependent_get_define(mock_condition_code_version, mock_task_code_versio
 def test_condition_set_dep_workflow(mock_task_code_version):
     """Test task condition set dependence in workflow level."""
     with ProcessDefinition(name="test-condition-set-dep-workflow") as pd:
-        parent = Task(name="parent", task_type=TEST_TYPE)
-        condition_success_1 = Task(name="condition_success_1", task_type=TEST_TYPE)
-        condition_success_2 = Task(name="condition_success_2", task_type=TEST_TYPE)
-        condition_fail = Task(name="condition_fail", task_type=TEST_TYPE)
+        condition_pre_task_1 = Task(name="pre_task_success_1", task_type=TEST_TYPE)
+        condition_pre_task_2 = Task(name="pre_task_success_2", task_type=TEST_TYPE)
+        condition_pre_task_3 = Task(name="pre_task_fail", task_type=TEST_TYPE)
         cond_operator = And(
             And(
-                SUCCESS(condition_success_1, condition_success_2),
-                FAILURE(condition_fail),
+                SUCCESS(condition_pre_task_1, condition_pre_task_2),
+                FAILURE(condition_pre_task_3),
             ),
         )
+        end = Task(name="end", task_type=TEST_TYPE)
 
-        condition = Conditions(name=TEST_NAME, condition=cond_operator)
-        parent >> condition
+        condition = Conditions(name="conditions", condition=cond_operator)
+        condition >> end
+
         # General tasks test
         assert len(pd.tasks) == 5
         assert sorted(pd.task_list, key=lambda t: t.name) == sorted(
             [
-                parent,
                 condition,
-                condition_success_1,
-                condition_success_2,
-                condition_fail,
+                condition_pre_task_1,
+                condition_pre_task_2,
+                condition_pre_task_3,
+                end,
             ],
             key=lambda t: t.name,
         )
         # Task dep test
-        assert parent._downstream_task_codes == {condition.code}
-        assert condition._upstream_task_codes == {parent.code}
+        assert end._upstream_task_codes == {condition.code}
+        assert condition._downstream_task_codes == {end.code}
 
         # Condition task dep after ProcessDefinition function get_define called
-        assert condition._downstream_task_codes == {
-            condition_success_1.code,
-            condition_success_2.code,
-            condition_fail.code,
+        assert condition._upstream_task_codes == {
+            condition_pre_task_1.code,
+            condition_pre_task_2.code,
+            condition_pre_task_3.code,
         }
         assert all(
             [
-                child._upstream_task_codes == {condition.code}
-                for child in [condition_success_1, condition_success_2, condition_fail]
+                child._downstream_task_codes == {condition.code}
+                for child in [
+                    condition_pre_task_1,
+                    condition_pre_task_2,
+                    condition_pre_task_3,
+                ]
             ]
         )
