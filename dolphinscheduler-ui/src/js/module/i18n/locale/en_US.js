@@ -786,5 +786,11 @@ export default {
   'Task group queue force starting status': 'Starting status',
   'Task group in queue': 'In queue',
   'Task group queue status': 'Task status',
-  'View task group queue': 'View task group queue'
+  'View task group queue': 'View task group queue',
+  'Task group queue the status of waiting': 'Waiting into the queue',
+  'Task group queue the status of queuing': 'Queuing',
+  'Task group queue the status of releasing': 'Released',
+  'Modify task group queue priority': 'Edit the priority of the task group queue',
+  'Priority not empty': 'The value of priority can not be empty',
+  'Priority must be number': 'The value of priority should be number'
 }

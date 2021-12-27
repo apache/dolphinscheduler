@@ -23,13 +23,13 @@
             <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
           </div>
           <div class="list">
-            <el-input v-model="searchParams.instanceName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
+            <el-input v-model="instanceName" style="width: 140px;" size="mini" :placeholder="$t('Process Instance')" clearable></el-input>
           </div>
           <div class="list">
-            <el-input v-model="searchParams.processeName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Name')"></el-input>
+            <el-input v-model="processName" style="width: 160px;" size="mini" :placeholder="$t('Process Name')" clearable></el-input>
           </div>
           <div class="list">
-            <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.groupId" :placeholder="$t('Task group name')" size="mini">
+            <el-select style="width: 140px;" @change="_onChangeState" v-model="groupId" :placeholder="$t('Task group name')" size="mini" clearable>
               <el-option
                 v-for="taskGroup in taskGroupList"
                 :key="taskGroup.id"
@@ -44,6 +44,8 @@
     <template slot="content">
       <template v-if="taskGroupQueue.length || total>0">
         <m-list @on-edit="_onEdit"
+                @on-force-start="_onForceStart"
+                @on-edit-priority="_onEditPriority"
                 :task-group-queue="taskGroupQueue"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
@@ -75,14 +77,13 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  // import mCreateTaskGroup from './_source/createTaskGroup'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'task-group-index',
+    name: 'task-group-queue-index',
     data () {
       return {
         total: null,
@@ -90,6 +91,9 @@
         modalType: 'create',
         taskGroupList: [],
         taskGroupQueue: [],
+        groupId: '',
+        instanceName: '',
+        processName: '',
         searchParams: {
           pageSize: 10,
           pageNo: 1
@@ -113,7 +117,11 @@
         this.searchParams.pageNo = 1
       },
       _ckQuery () {
-        this.$emit('on-query', this.searchParams)
+        this.searchParams.groupId = this.groupId
+        this.searchParams.instanceName = this.instanceName
+        this.searchParams.processName = this.processName
+        console.log(this.searchParams)
+        this._getList(false)
       },
       _page (val) {
         this.searchParams.pageNo = val
@@ -125,6 +133,12 @@
         this.item = item
         this.item.modalType = 'edit'
         this.createTaskGroupDialog = true
+      },
+      _onForceStart (item) {
+        this._getList(false)
+      },
+      _onEditPriority () {
+        this._getList(false)
       },
       _create () {
         this.item = { projectOptions: this.projectList, modalType: 'create' }
@@ -152,18 +166,23 @@
           this.taskGroupList = []
           this.taskGroupList = values.totalList
           if (this.taskGroupList) {
-            this.searchParams.groupId = this.taskGroupList[0].id
-
-            console.log(this.searchParams)
+            if (this.searchParams.groupId) {
+              this.searchParams.groupId = this.taskGroupList[0].id
+            }
+            this.groupId = this.searchParams.id
+            this.searchParams.groupId = this.searchParams.id
             this.getTaskListInTaskGroupQueueById(this.searchParams).then((res) => {
+              console.log('getTaskListInTaskGroupQueueById')
+              console.log(res)
               if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
                 this.searchParams.pageNo = this.searchParams.pageNo - 1
               } else {
                 this.taskGroupQueue = []
-                if (res.totalList) {
-                  this.taskGroupQueue = res.totalList
+                if (res.data.totalList) {
+                  this.taskGroupQueue = res.data.totalList
                 }
-                this.total = res.total
+                console.log(this.taskGroupQueue)
+                this.total = res.data.total
                 this.isLoading = false
               }
             }).catch(e => {

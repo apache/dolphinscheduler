@@ -125,30 +125,13 @@
 
     <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
-            queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
-             , queue.force_start, queue.create_time, queue.update_time,
-               process.name as processInstanceName,p.name as projectName,p.code as projectCode
+        queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
+        , queue.force_start, queue.create_time, queue.update_time,
+        'processInstanceName' as processInstanceName,p.name as projectName,p.code as projectCode
         from t_ds_task_group_queue queue
-            left join t_ds_process_instance process on queue.process_id = process.id
-            left join t_ds_process_definition p_f on process.process_definition_code = p_f.code
-                                                         and process.process_definition_version = p_f.version
+            left join t_ds_process_definition p_f on queue.process_id = p_f.id
             join t_ds_project as p on p_f.project_code = p.code
         where queue.group_id = #{groupId}
-        <if test="taskName != null and taskName != ''">
-            and task_name =#{taskName}
-        </if>
-        <if test="processName != null and processName != ''">
-            and process.name =#{processName}
-        </if>
-        <if test="status != null">
-            and queue.status =#{status}
-        </if>
-        <if test="projects != null and projects.size() > 0">
-            and p.code in
-            <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
-                #{i.code}
-            </foreach>
-        </if>
     </select>
 
 </mapper>

@@ -787,5 +787,12 @@ export default {
   'Task group queue force starting status': '是否强制启动',
   'Task group in queue': '是否排队中',
   'Task group queue status': '任务状态',
-  'View task group queue': '查看任务组队列'
+  'View task group queue': '查看任务组队列',
+  'Task group queue the status of waiting': '等待入队',
+  'Task group queue the status of queuing': '排队中',
+  'Task group queue the status of releasing': '已释放',
+  'Modify task group queue priority': '修改优先级',
+  'Force to start task': '强制启动',
+  'Priority not empty': '优先级不能为空',
+  'Priority must be number': '优先级必须是数值'
 }
