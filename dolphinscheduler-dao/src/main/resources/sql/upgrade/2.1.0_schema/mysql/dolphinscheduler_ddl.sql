@@ -13,22 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { defineComponent } from 'vue'
-import { NLayout, NLayoutContent } from 'naive-ui'
-
-const Content = defineComponent({
-  name: 'Content',
-  render() {
-    return (
-      <NLayout>
-        <NLayoutContent>
-          <router-view />
-        </NLayoutContent>
-      </NLayout>
-    )
-  },
-})
-
-export default Content
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;

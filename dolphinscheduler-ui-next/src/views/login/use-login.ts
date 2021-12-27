@@ -16,24 +16,27 @@
  */
 
 import { useRouter } from 'vue-router'
+import { login } from '@/service/modules/login'
+import { useUserStore } from '@/store/user/user'
+import { SessionIdRes } from '@/service/modules/login/types'
 import type { Router } from 'vue-router'
-import { queryLog } from '@/service/modules/login'
 
-export function useLogin (state) {
+export function useLogin(state: any) {
   const router: Router = useRouter()
+  const userStore = useUserStore()
+
   const handleLogin = () => {
     state.loginFormRef.validate((valid: any) => {
       if (!valid) {
-        queryLog({...state.loginForm}).then((res: Response) => {
-          console.log('res', res)
+        login({ ...state.loginForm }).then((res: SessionIdRes) => {
+          userStore.setSessionId(res.sessionId)
           router.push({ path: 'home' })
         })
-      } else {
-        console.log('Invalid')
       }
     })
   }
+
   return {
-    handleLogin
+    handleLogin,
   }
 }

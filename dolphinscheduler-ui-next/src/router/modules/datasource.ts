@@ -15,11 +15,27 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
+import type { Component } from 'vue'
+import utils from '@/utils'
 
-export function signOut(): any {
-  return axios({
-    url: '/signOut',
-    method: 'post',
-  })
+// All TSX files under the views folder automatically generate mapping relationship
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
+
+export default {
+  path: '/datasource',
+  name: 'datasource',
+  redirect: { name: 'datasource-list' },
+  meta: { title: '数据源中心' },
+  component: () => import('@/layouts/content'),
+  children: [
+    {
+      path: '/datasource/list',
+      name: 'datasource-list',
+      component: components['home'],
+      meta: {
+        title: '数据源中心',
+      },
+    },
+  ],
 }

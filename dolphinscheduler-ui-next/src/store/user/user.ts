@@ -15,10 +15,23 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineStore } from 'pinia'
+import UserState from '@/store/user/types'
 
-const DSTable = defineComponent({
-  name: 'DSTable',
+export const useUserStore = defineStore({
+  id: 'user',
+  state: (): UserState => ({
+    sessionId: '',
+  }),
+  persist: true,
+  getters: {
+    getSessionId(): string {
+      return this.sessionId
+    },
+  },
+  actions: {
+    setSessionId(sessionId: string): void {
+      this.sessionId = sessionId
+    },
+  },
 })
-
-export default DSTable

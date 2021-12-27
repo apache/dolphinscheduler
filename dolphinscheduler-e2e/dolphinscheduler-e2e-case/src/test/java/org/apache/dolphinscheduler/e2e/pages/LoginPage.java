@@ -33,13 +33,13 @@ import lombok.SneakyThrows;
 
 @Getter
 public final class LoginPage extends NavBarPage {
-    @FindBy(id = "input-username")
+    @FindBy(id = "inputUsername")
     private WebElement inputUsername;
 
-    @FindBy(id = "input-password")
+    @FindBy(id = "inputPassword")
     private WebElement inputPassword;
 
-    @FindBy(id = "button-login")
+    @FindBy(id = "btnLogin")
     private WebElement buttonLogin;
 
     public LoginPage(RemoteWebDriver driver) {
