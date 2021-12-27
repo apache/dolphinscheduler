@@ -253,7 +253,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
-            putMsg(result, Status.NO_SUPPORT_UPDATE_TASK_DEFINITION);
+            putMsg(result, Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
             return result;
         }
         TaskDefinitionLog taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
