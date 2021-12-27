@@ -17,7 +17,10 @@
 
 """Module database."""
 
+import logging
 from typing import Dict
+
+from py4j.protocol import Py4JJavaError
 
 from pydolphinscheduler.java_gateway import launch_gateway
 
@@ -52,5 +55,10 @@ class Database(dict):
             return self._database
         else:
             gateway = launch_gateway()
-            self._database = gateway.entry_point.getDatasourceInfo(name)
+            try:
+                self._database = gateway.entry_point.getDatasourceInfo(name)
+            # Handler database source do not exists error, for now we just terminate the process.
+            except Py4JJavaError:
+                logging.error("Datasource name `%s` do not exists.", name)
+                exit(1)
             return self._database
