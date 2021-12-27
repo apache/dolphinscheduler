@@ -15,21 +15,33 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
 import Language from '../language'
 import User from '../user'
-import { useDataList } from './use-dataList'
 import { useMenuClick } from './use-menuClick'
 
 const navbar = defineComponent({
   name: 'navbar',
+  props: {
+    headerMenuOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+    languageOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+    profileOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+  },
   setup() {
-    const { state } = useDataList()
     const { handleMenuClick } = useMenuClick()
-    return { ...toRefs(state), handleMenuClick }
+    return { handleMenuClick }
   },
   render() {
     return (
@@ -37,15 +49,15 @@ const navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            v-model={[this.activeKey, 'value']}
+            default-value='home'
             mode='horizontal'
-            options={this.menuOptions}
+            options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
           />
         </div>
         <div class={styles.settings}>
-          <Language />
-          <User />
+          <Language languageOptions={this.languageOptions} />
+          <User profileOptions={this.profileOptions} />
         </div>
       </div>
     )

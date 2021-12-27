@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
 import { NDropdown, NIcon, NButton } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
-import { useDataList } from './use-dataList'
 import { useDropDown } from './use-dropdown'
 
 const language = defineComponent({
   name: 'language',
+  props: {
+    languageOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    }
+  },
   setup() {
-    const { state } = useDataList()
-    const { handleSelect } = useDropDown(state)
-    return { ...toRefs(state), handleSelect }
+    const chooseVal = ref('中文')
+    const { handleSelect } = useDropDown(chooseVal)
+    return { handleSelect, chooseVal }
   },
   render() {
     return (

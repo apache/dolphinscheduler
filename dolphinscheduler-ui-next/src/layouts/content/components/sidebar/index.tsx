@@ -15,26 +15,25 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
+import { defineComponent, toRefs } from 'vue'
+import styles from './index.module.scss'
+import { NLayoutSider, NMenu } from 'naive-ui'
 
-export function useDataList() {
-  const languageOptions = [
-    {
-      label: 'English',
-      key: 'en_US',
-    },
-    {
-      label: '中文',
-      key: 'zh_CN',
-    },
-  ]
-
-  const state = reactive({
-    chooseVal: ref('中文'),
-    languageOptions: languageOptions,
-  })
-
-  return {
-    state,
+const sidebar = defineComponent({
+  name: 'sidebar',
+  setup() {
+    return {}
+  },
+  render() {
+    return (
+      <NLayoutSider
+        bordered
+        nativeScrollbar={false}
+        show-trigger="bar">
+        <NMenu />
+      </NLayoutSider>
+    )
   }
-}
+})
+
+export default sidebar
