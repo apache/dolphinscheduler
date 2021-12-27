@@ -52,6 +52,6 @@ ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  echo "$apiServer worker server is stopping"
+  echo "$apiServer api server is stopping"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
 done
