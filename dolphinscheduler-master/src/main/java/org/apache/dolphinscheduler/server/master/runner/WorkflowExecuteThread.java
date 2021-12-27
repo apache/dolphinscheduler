@@ -1083,8 +1083,8 @@ public class WorkflowExecuteThread {
             return DependResult.SUCCESS;
         }
         TaskNode taskNode = dag.getNode(taskCode);
-        List<String> indirectDepCodeList = new ArrayList<>();
-        getIndirectDepList(taskCode, indirectDepCodeList);
+        List<String> emptyList = new ArrayList<>();
+        List<String> indirectDepCodeList = getIndirectDepList(taskCode, emptyList);
         for (String depsNode : indirectDepCodeList) {
             if (dag.containsNode(depsNode) && !skipTaskNodeMap.containsKey(depsNode)) {
                 // dependencies must be fully completed
@@ -1115,8 +1115,9 @@ public class WorkflowExecuteThread {
      *
      * @param taskCode            taskCode
      * @param indirectDepCodeList All indirectly dependent nodes
+     * @return List<String>       All indirect dependencies (when the parent node is a forbidden node)
      */
-    private void getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
+    private List<String> getIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
         TaskNode taskNode = dag.getNode(taskCode);
         List<String> depCodeList = taskNode.getDepList();
         for (String depsNode : depCodeList) {
@@ -1126,6 +1127,7 @@ public class WorkflowExecuteThread {
                 indirectDepCodeList.add(depsNode);
             }
         }
+        return indirectDepCodeList;
     }
 
     /**
