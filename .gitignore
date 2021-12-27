@@ -46,3 +46,17 @@ dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
 docker/build/apache-dolphinscheduler*
+
+# ------------------
+# pydolphinscheduler
+# ------------------
+# Cache
+__pycache__/
+
+# Build
+build/
+*egg-info/
+
+# Test coverage
+.coverage
+htmlcov/

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.plugin;
 
+import static java.lang.String.format;
+
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.PluginDao;
@@ -25,15 +27,20 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.String.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TaskPluginManager {
@@ -56,8 +63,8 @@ public class TaskPluginManager {
         return Collections.unmodifiableMap(taskChannelMap);
     }
 
-    @PostConstruct
-    public void installPlugin() {
+    @EventListener
+    public void installPlugin(ApplicationReadyEvent readyEvent) {
         final Set<String> names = new HashSet<>();
 
         ServiceLoader.load(TaskChannelFactory.class).forEach(factory -> {

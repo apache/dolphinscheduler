@@ -25,6 +25,7 @@ export API_START_ENABLED=false
 export ALERT_START_ENABLED=false
 export LOGGER_START_ENABLED=false
 export STANDALONE_START_ENABLED=false
+export PYTHON_GATEWAY_START_ENABLED=false
 
 # wait database
 waitDatabase() {
@@ -68,13 +69,14 @@ waitZK() {
 printUsage() {
     echo -e "Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system,"
     echo -e "dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.\n"
-    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server | standalone-server ]\n"
-    printf "%-13s:  %s\n" "all"                "Run master-server, worker-server, api-server and alert-server"
-    printf "%-13s:  %s\n" "master-server"      "MasterServer is mainly responsible for DAG task split, task submission monitoring."
-    printf "%-13s:  %s\n" "worker-server"      "WorkerServer is mainly responsible for task execution and providing log services."
-    printf "%-13s:  %s\n" "api-server"         "ApiServer is mainly responsible for processing requests and providing the front-end UI layer."
-    printf "%-13s:  %s\n" "alert-server"       "AlertServer mainly include Alarms."
-    printf "%-13s:  %s\n" "standalone-server"  "Standalone server that uses embedded zookeeper and database, only for testing and demostration."
+    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server | standalone-server | python-gateway-server]\n"
+    printf "%-13s:  %s\n" "all"                    "Run master-server, worker-server, api-server, alert-server, python-gateway-server"
+    printf "%-13s:  %s\n" "master-server"          "MasterServer is mainly responsible for DAG task split, task submission monitoring."
+    printf "%-13s:  %s\n" "worker-server"          "WorkerServer is mainly responsible for task execution and providing log services."
+    printf "%-13s:  %s\n" "api-server"             "ApiServer is mainly responsible for processing requests and providing the front-end UI layer."
+    printf "%-13s:  %s\n" "alert-server"           "AlertServer mainly include Alarms."
+    printf "%-13s:  %s\n" "standalone-server"      "Standalone server that uses embedded zookeeper and database, only for testing and demostration."
+    printf "%-13s:  %s\n" "python-gateway-server"  "Python gateway is a backend server for python API."
 }
 
 # init config file
@@ -114,6 +116,9 @@ case "$1" in
     ;;
     (standalone-server)
         export STANDALONE_START_ENABLED=true
+    ;;
+    (python-gateway-server)
+        export PYTHON_GATEWAY_START_ENABLED=true
     ;;
     (help)
         printUsage

@@ -32,16 +32,16 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.event.EventListener;
 
 @EnableAutoConfiguration
 @ComponentScan(value = {
@@ -73,8 +73,8 @@ public class AlertServer implements Closeable {
             .run(args);
     }
 
-    @PostConstruct
-    public void start() {
+    @EventListener
+    public void start(ApplicationReadyEvent readyEvent) {
         log.info("Starting Alert server");
 
         checkTable();

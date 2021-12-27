@@ -318,8 +318,25 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param tenantCode tenant code
      * @return ture if the tenant code exists, otherwise return false
      */
-    private boolean checkTenantExists(String tenantCode) {
+    public boolean checkTenantExists(String tenantCode) {
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
         return existTenant == Boolean.TRUE;
+    }
+
+    /**
+     * query tenant by tenant code
+     *
+     * @param tenantCode tenant code
+     * @return tenant detail information
+     */
+    @Override
+    public Map<String, Object> queryByTenantCode(String tenantCode) {
+        Map<String, Object> result = new HashMap<>();
+        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+        if (tenant != null) {
+            result.put(Constants.DATA_LIST, tenant);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
     }
 }
