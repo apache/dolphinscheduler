@@ -15,11 +15,23 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
+import { defineStore } from 'pinia'
+import UserState from '@/store/user/types'
 
-export function signOut(): any {
-  return axios({
-    url: '/signOut',
-    method: 'post',
-  })
-}
+export const useUserStore = defineStore({
+  id: 'user',
+  state: (): UserState => ({
+    sessionId: '',
+  }),
+  persist: true,
+  getters: {
+    getSessionId(): string {
+      return this.sessionId
+    },
+  },
+  actions: {
+    setSessionId(sessionId: string): void {
+      this.sessionId = sessionId
+    },
+  },
+})
