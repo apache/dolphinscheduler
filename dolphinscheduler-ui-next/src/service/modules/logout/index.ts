@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-interface LoginReq {
-  userName: string
-  userPassword: string
-}
+import { axios } from '@/service/service'
 
-interface SessionIdRes {
-  sessionId: string
+export function logout(): any {
+  return axios({
+    url: '/signOut',
+    method: 'post',
+  })
 }
-
-export { LoginReq, SessionIdRes }

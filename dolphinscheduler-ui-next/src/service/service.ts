@@ -17,6 +17,9 @@
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import qs from 'qs'
+import { useUserStore } from '@/store/user/user'
+
+const userStore = useUserStore()
 
 const baseRequestConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
@@ -26,6 +29,9 @@ const baseRequestConfig: AxiosRequestConfig = {
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
+  },
+  headers: {
+    sessionId: userStore.getSessionId,
   },
 }
 
