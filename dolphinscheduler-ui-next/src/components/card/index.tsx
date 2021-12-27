@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-import { defineComponent, defineProps } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { NCard } from 'naive-ui'
-import Props from '@/components/card/types'
 
 const headerStyle = {
   borderBottom: '1px solid var(--border-color)',
 }
 
+const props = {
+  title: String as PropType<string>,
+}
+
 const Card = defineComponent({
   name: 'Card',
-  setup() {
-    const props = defineProps<Props>()
-
-    return { ...props }
-  },
+  props,
   render() {
     const { title, $slots } = this
     return (
