@@ -104,6 +104,9 @@ common:
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
     DATAX_HOME: "/opt/soft/datax"
+    SESSION_TIMEOUT_MS: 60000
+    ORG_QUARTZ_THREADPOOL_THREADCOUNT: "25"
+    ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT: "1"
   ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     enabled: false
@@ -165,7 +168,6 @@ master:
     MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER: "true"
     ORG_QUARTZ_THREADPOOL_THREADCOUNT: "25"
     ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT: "1"
-    SESSION_TIMEOUT_MS: 60000
     MASTER_PERSIST_EVENT_STATE_THREADS: 10
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
@@ -234,7 +236,6 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "-1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_GROUPS: "default"
-    SESSION_TIMEOUT_MS: 60000
     WORKER_RETRY_REPORT_TASK_STATUS_INTERVAL: 600
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
