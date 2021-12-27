@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server|python-gateway-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -96,6 +96,9 @@ elif [ "$command" = "logger-server" ]; then
 elif [ "$command" = "standalone-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.StandaloneServer
   export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},standalone,${DATABASE_TYPE}"
+elif [ "$command" = "python-gateway-server" ]; then
+  CLASS=org.apache.dolphinscheduler.server.PythonGatewayServer
+  export SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE},python-gateway,${DATABASE_TYPE}"
 else
   echo "Error: No command named '$command' was found."
   exit 1

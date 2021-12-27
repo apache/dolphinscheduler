@@ -51,6 +51,11 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-server</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-python</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
