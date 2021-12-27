@@ -18,7 +18,7 @@
 import { axios } from '@/service/service'
 import { LoginReq } from './types'
 
-export function queryLog(data: LoginReq): any {
+export function login(data: LoginReq): any {
   return axios({
     url: '/login',
     method: 'post',
