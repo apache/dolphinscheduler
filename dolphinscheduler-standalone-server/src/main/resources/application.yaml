@@ -112,6 +112,8 @@ master:
   task-logger: true
   # failover interval, the unit is minute
   failover-interval: 10
+  # kill yarn jon when failover taskInstance, default true
+  kill-yarn-job-when-task-failover: true
 
 worker:
   # worker listener port

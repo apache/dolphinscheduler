@@ -41,6 +41,7 @@ public class MasterConfig {
     private double reservedMemory;
     private boolean taskLogger;
     private int failoverInterval;
+    private boolean killYarnJobWhenTaskFailover;
 
     public int getListenPort() {
         return listenPort;
@@ -152,5 +153,13 @@ public class MasterConfig {
 
     public void setFailoverInterval(int failoverInterval) {
         this.failoverInterval = failoverInterval;
+    }
+
+    public boolean isKillYarnJobWhenTaskFailover() {
+        return killYarnJobWhenTaskFailover;
+    }
+
+    public void setKillYarnJobWhenTaskFailover(boolean killYarnJobWhenTaskFailover) {
+        this.killYarnJobWhenTaskFailover = killYarnJobWhenTaskFailover;
     }
 }

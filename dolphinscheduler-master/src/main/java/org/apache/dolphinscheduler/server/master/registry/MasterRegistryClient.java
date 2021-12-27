@@ -169,15 +169,18 @@ public class MasterRegistryClient {
         try {
             registryClient.getLock(failoverPath);
 
-            // handle dead server
-            registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+            if (!registryClient.exists(path)) {
+                logger.info("path: {} not exists", path);
+                // handle dead server
+                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+            }
 
             //failover server
             if (failover) {
                 failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed", nodeType, e);
+            logger.error("{} server failover failed, host:{}", nodeType, serverHost, e);
         } finally {
             registryClient.releaseLock(failoverPath);
         }
@@ -186,41 +189,27 @@ public class MasterRegistryClient {
     /**
      * remove worker node path
      *
-     * @param path node path
+     * @param path     node path
      * @param nodeType node type
      * @param failover is failover
      */
     public void removeWorkerNodePath(String path, NodeType nodeType, boolean failover) {
         logger.info("{} node deleted : {}", nodeType, path);
-
-        if (StringUtils.isEmpty(path)) {
-            logger.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
-            return;
-        }
-
-        String serverHost = registryClient.getHostByEventDataPath(path);
-        if (StringUtils.isEmpty(serverHost)) {
-            logger.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
-            return;
-        }
-
-        // when worker node remove, master need to handle dead server with lock
-        String failoverPath = getFailoverLockPath(nodeType, serverHost);
-        boolean lock = false;
         try {
-            if (isNeedToHandleDeadServer(serverHost, nodeType, registryClient.getSessionTimeout())) {
-                lock = registryClient.getLock(failoverPath);
-                registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+            String serverHost = null;
+            if (!StringUtils.isEmpty(path)) {
+                serverHost = registryClient.getHostByEventDataPath(path);
+                if (StringUtils.isEmpty(serverHost)) {
+                    logger.error("server down error: unknown path: {}", path);
+                    return;
+                }
+                if (!registryClient.exists(path)) {
+                    logger.info("path: {} not exists", path);
+                    // handle dead server
+                    registryClient.handleDeadServer(Collections.singleton(path), nodeType, Constants.ADD_OP);
+                }
             }
-        } catch (Exception e) {
-            logger.error("{} server handle dead server failed", nodeType, e);
-        } finally {
-            if (lock) {
-                registryClient.releaseLock(failoverPath);
-            }
-        }
-
-        try {
+            //failover server
             if (failover) {
                 failoverServerWhenDown(serverHost, nodeType);
             }
@@ -356,13 +345,19 @@ public class MasterRegistryClient {
 
     /**
      * failover worker tasks
+     * <p>
+     * 1. kill yarn job if there are yarn jobs in tasks.
+     * 2. change task state from running to need failover.
+     * 3. failover all tasks when workerHost is null
      *
      * @param workerHost worker host
      */
     private void failoverWorker(String workerHost) {
+
         if (StringUtils.isEmpty(workerHost)) {
             return;
         }
+
         List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
 
         long startTime = System.currentTimeMillis();
@@ -405,9 +400,11 @@ public class MasterRegistryClient {
      * @param masterHost master host
      */
     public void failoverMaster(String masterHost) {
+
         if (StringUtils.isEmpty(masterHost)) {
             return;
         }
+
         Date serverStartupTime = getServerStartupTime(NodeType.MASTER, masterHost);
         List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
 
@@ -419,11 +416,6 @@ public class MasterRegistryClient {
             if (Constants.NULL.equals(processInstance.getHost())) {
                 continue;
             }
-            if (serverStartupTime != null && processInstance.getRestartTime() != null
-                    && processInstance.getRestartTime().after(serverStartupTime)) {
-                continue;
-            }
-            logger.info("failover process instance id: {}", processInstance.getId());
 
             List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for (TaskInstance taskInstance : validTaskInstanceList) {
@@ -439,6 +431,13 @@ public class MasterRegistryClient {
                 logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
                 failoverTaskInstance(processInstance, taskInstance);
             }
+
+            if (serverStartupTime != null && processInstance.getRestartTime() != null
+                    && processInstance.getRestartTime().after(serverStartupTime)) {
+                continue;
+            }
+
+            logger.info("failover process instance id: {}", processInstance.getId());
             //updateProcessInstance host is null and insert into command
             processService.processNeedFailoverProcessInstances(processInstance);
         }
@@ -471,8 +470,10 @@ public class MasterRegistryClient {
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .create();
 
-        // only kill yarn job if exists , the local thread has exited
-        ProcessUtils.killYarnJob(taskExecutionContext);
+        if (masterConfig.isKillYarnJobWhenTaskFailover()) {
+            // only kill yarn job if exists , the local thread has exited
+            ProcessUtils.killYarnJob(taskExecutionContext);
+        }
 
         taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
         processService.saveTaskInstance(taskInstance);
@@ -551,7 +552,7 @@ public class MasterRegistryClient {
     /**
      * get local address
      */
-    private String getLocalAddress() {
+    public String getLocalAddress() {
         return NetUtils.getAddr(masterConfig.getListenPort());
     }
 
