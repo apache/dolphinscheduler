@@ -53,7 +53,7 @@ ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-  echo "$apiServer worker server is starting"
+  echo "$apiServer api server is starting"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
 done
 

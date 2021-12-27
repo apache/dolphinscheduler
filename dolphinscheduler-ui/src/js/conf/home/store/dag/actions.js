@@ -37,6 +37,13 @@ export default {
       io.get(`projects/${state.projectCode}/process-instances/${payload}/tasks`, {
         processInstanceId: payload
       }, res => {
+        res.list = _.map(res.data.taskList, v => {
+          return _.cloneDeep({
+            code: v.taskCode,
+            taskType: v.taskType,
+            dependentResult: v.dependentResult
+          })
+        })
         state.taskInstances = res.data.taskList
         resolve(res)
       }).catch(e => {
