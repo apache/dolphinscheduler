@@ -111,6 +111,13 @@ export default {
   },
 
   /**
+   * set depend result
+   */
+  setDependResult (state, payload) {
+    state.dependResult = Object.assign(state.dependResult, {}, payload)
+  },
+
+  /**
    * reset params
    */
   resetParams (state, payload) {
@@ -129,6 +136,7 @@ export default {
     state.runFlag = (payload && payload.runFlag) || ''
     state.locations = (payload && payload.locations) || {}
     state.connects = (payload && payload.connects) || []
+    state.dependResult = (payload && payload.dependResult) || {}
   },
   /**
    * add task

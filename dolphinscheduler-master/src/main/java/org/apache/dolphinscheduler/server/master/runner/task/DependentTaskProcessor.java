@@ -69,7 +69,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     DependResult result;
 
-    ProcessInstance processInstance;
     TaskDefinition taskDefinition;
 
     private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;
