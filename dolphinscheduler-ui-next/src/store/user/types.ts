@@ -15,13 +15,8 @@
  * limitations under the License.
  */
 
-interface LoginReq {
-  userName: string
-  userPassword: string
-}
-
-interface SessionIdRes {
+interface UserState {
   sessionId: string
 }
 
-export { LoginReq, SessionIdRes }
+export default UserState
