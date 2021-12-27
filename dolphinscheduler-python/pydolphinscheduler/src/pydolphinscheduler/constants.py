@@ -104,6 +104,7 @@ class Delimiter(str):
     DASH = "/"
     COLON = ":"
     UNDERSCORE = "_"
+    DIRECTION = "->"
 
 
 class Time(str):
