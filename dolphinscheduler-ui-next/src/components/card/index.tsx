@@ -15,40 +15,28 @@
  * limitations under the License.
  */
 
-.container {
-  .header-model {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 60px;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 5px;
-    position: relative;
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: inherit;
-      .menu {
-        margin-left: 0px;
-        text-align: center;
-        font-size: 15px;
-        color: rgb(255, 255, 255);
-      }
-      .profile {
-        width: 135px;
-        display: flex;
-        justify-content: space-between;
-        margin-right: 20px;
-        text-align: center;
-        .icon {
-          margin-right: 5px;
-          display: inline-flex;
-          align-items: center;
-        }
-      }
-    }
-  }
+import { defineComponent, PropType } from 'vue'
+import { NCard } from 'naive-ui'
+
+const headerStyle = {
+  borderBottom: '1px solid var(--border-color)',
 }
+
+const props = {
+  title: String as PropType<string>,
+}
+
+const Card = defineComponent({
+  name: 'Card',
+  props,
+  render() {
+    const { title, $slots } = this
+    return (
+      <NCard title={title} size='small' headerStyle={headerStyle}>
+        {$slots}
+      </NCard>
+    )
+  },
+})
+
+export default Card

@@ -13,24 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 64px;
-  line-height: 64px;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 280px;
-
-  img {
-    width: auto;
-    height: 46px;
-  }
-
-  .title {
-    margin-bottom: 0;
-  }
-}
+*/
