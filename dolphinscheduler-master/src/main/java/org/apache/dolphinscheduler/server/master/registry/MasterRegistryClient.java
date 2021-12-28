@@ -127,6 +127,9 @@ public class MasterRegistryClient {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
+            // sleep 1s, waiting master failover remove
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             logger.error("master start up exception", e);
@@ -500,6 +503,8 @@ public class MasterRegistryClient {
                 Constants.MASTER_TYPE,
                 registryClient);
 
+        // remove before persist
+        registryClient.remove(localNodePath);
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
         registryClient.addConnectionStateListener(this::handleConnectionState);
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
