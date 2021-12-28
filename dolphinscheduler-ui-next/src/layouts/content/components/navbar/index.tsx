@@ -21,6 +21,7 @@ import { NMenu } from 'naive-ui'
 import Logo from '../logo'
 import Language from '../language'
 import User from '../user'
+import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
 
 const navbar = defineComponent({
@@ -56,6 +57,7 @@ const navbar = defineComponent({
           />
         </div>
         <div class={styles.settings}>
+          <Theme />
           <Language languageOptions={this.languageOptions} />
           <User profileOptions={this.profileOptions} />
         </div>
