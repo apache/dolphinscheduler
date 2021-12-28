@@ -18,18 +18,15 @@
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * procedure parameter
@@ -46,7 +43,7 @@ public class ProcedureParameters extends AbstractParameters {
      */
     private int datasource;
 
-    private Map<String,Property> outProperty;
+    private Map<String, Property> outProperty;
 
     /**
      * procedure name
@@ -96,19 +93,17 @@ public class ProcedureParameters extends AbstractParameters {
                 + '}';
     }
 
-
-    public void dealOutParam4Procedure(Object result,String pop) {
+    public void dealOutParam4Procedure(Object result, String pop) {
         Map<String, Property> properties = getOutProperty();
-        if(this.outProperty == null){
+        if (this.outProperty == null) {
             return;
         }
         properties.get(pop).setValue(String.valueOf(result));
         varPool.add(properties.get(pop));
     }
 
-
     public Map<String, Property> getOutProperty() {
-        if(this.outProperty != null ){
+        if (this.outProperty != null) {
             return this.outProperty;
         }
         if (CollectionUtils.isEmpty(localParams)) {
@@ -116,8 +111,8 @@ public class ProcedureParameters extends AbstractParameters {
         }
         List<Property> outPropertyList = getOutProperty(localParams);
         Map<String, Property> outProperty = new HashMap<>();
-        for(Property info :outPropertyList){
-            outProperty.put(info.getProp(),info);
+        for (Property info : outPropertyList) {
+            outProperty.put(info.getProp(), info);
         }
         this.outProperty = outProperty;
         return this.outProperty;
