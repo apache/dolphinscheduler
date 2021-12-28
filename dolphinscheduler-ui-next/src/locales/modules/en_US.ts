@@ -21,9 +21,15 @@ const login = {
   userName_tips: 'Please enter your username',
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
-  signin: 'Sign In',
+  login: 'Login',
+}
+
+const theme = {
+  light: 'Light',
+  dark: 'Dark',
 }
 
 export default {
   login,
+  theme,
 }

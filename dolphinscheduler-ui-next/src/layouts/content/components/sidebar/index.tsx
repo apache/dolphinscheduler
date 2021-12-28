@@ -15,11 +15,36 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
+import { defineComponent, PropType } from 'vue'
+import styles from './index.module.scss'
+import { NLayoutSider, NMenu } from 'naive-ui'
 
-export function signOut(): any {
-  return axios({
-    url: '/signOut',
-    method: 'post',
-  })
-}
+const Sidebar = defineComponent({
+  name: 'Sidebar',
+  props: {
+    sideMenuOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+    isShowSide: {
+      type: Boolean as PropType<boolean>,
+      default: false,
+    }
+  },
+  setup() {
+    return {}
+  },
+  render() {
+    if (this.isShowSide) {
+      return (
+        <NLayoutSider bordered nativeScrollbar={false} show-trigger='bar'>
+          <NMenu options={this.sideMenuOptions} default-expand-all />
+        </NLayoutSider>
+      )
+    } else {
+      return
+    }
+  },
+})
+
+export default Sidebar

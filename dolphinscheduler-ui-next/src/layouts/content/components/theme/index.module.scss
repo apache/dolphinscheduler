@@ -15,13 +15,6 @@
  * limitations under the License.
  */
 
-interface LoginReq {
-  userName: string
-  userPassword: string
+.theme {
+  margin: 0 12px;
 }
-
-interface SessionIdRes {
-  sessionId: string
-}
-
-export { LoginReq, SessionIdRes }

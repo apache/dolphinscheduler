@@ -15,26 +15,6 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
-
-export function useDataList() {
-  const languageOptions = [
-    {
-      label: 'English',
-      key: 'en_US',
-    },
-    {
-      label: '中文',
-      key: 'zh_CN',
-    },
-  ]
-
-  const state = reactive({
-    chooseVal: ref('中文'),
-    languageOptions: languageOptions,
-  })
-
-  return {
-    state,
-  }
+.content {
+  padding: 12px;
 }
