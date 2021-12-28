@@ -1106,7 +1106,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         HashMap<Long, Project> userProjects =  new HashMap(Constants.DEFAULT_HASH_MAP_SIZE);
         projectMapper.queryAuthedProjectListByUserId(loginUser.getId())
-                .forEach(process -> userProjects.put(process.getCode(), process));
+                .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
         // check processDefinition exist in project
         List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream().
