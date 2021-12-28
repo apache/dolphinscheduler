@@ -39,7 +39,7 @@ const App = defineComponent({
       <NConfigProvider
         theme={this.currentTheme}
         themeOverrides={themeOverrides}
-        style={{ width: '100%', height: '100vh', overflow: 'hidden' }}
+        style={{ width: '100%', height: '100vh' }}
       >
         <router-view />
       </NConfigProvider>
