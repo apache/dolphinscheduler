@@ -261,6 +261,11 @@ public final class Constants {
      */
     public static final int DEFAULT_ADMIN_PERMISSION = 7;
 
+    /**
+     * default hash map size
+     */
+    public static final int DEFAULT_HASH_MAP_SIZE = 16;
+
 
     /**
      * all permissions
