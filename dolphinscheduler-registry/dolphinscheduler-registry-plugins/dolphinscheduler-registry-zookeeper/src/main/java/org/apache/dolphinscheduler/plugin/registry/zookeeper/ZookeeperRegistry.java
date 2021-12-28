@@ -42,6 +42,7 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -231,6 +232,11 @@ public final class ZookeeperRegistry implements Registry {
             throw new RegistryException("zookeeper release lock error", e);
         }
         return true;
+    }
+
+    @Override
+    public Duration getSessionTimeout() {
+        return properties.getSessionTimeout();
     }
 
     @Override

@@ -605,6 +605,7 @@ CREATE TABLE t_ds_process_instance
     tenant_id                  int(11) NOT NULL DEFAULT '-1',
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
+    restart_time               datetime     DEFAULT NULL,
     PRIMARY KEY (id)
 );
 

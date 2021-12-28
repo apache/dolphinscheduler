@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.registry.api;
 
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 
@@ -43,4 +44,6 @@ public interface Registry extends Closeable {
     boolean acquireLock(String key);
 
     boolean releaseLock(String key);
+
+    Duration getSessionTimeout();
 }

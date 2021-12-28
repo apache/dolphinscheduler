@@ -110,6 +110,10 @@ master:
   reserved-memory: 0.3
   # use task logger, default true; if true, it will create log for every task; if false, the task log will append to master log file
   task-logger: true
+  # failover interval, the unit is minute
+  failover-interval: 10
+  # kill yarn jon when failover taskInstance, default true
+  kill-yarn-job-when-task-failover: true
 
 worker:
   # worker listener port
