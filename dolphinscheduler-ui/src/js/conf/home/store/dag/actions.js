@@ -805,7 +805,7 @@ export default {
    */
   getProcessTasksList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/tasks`, payload, res => {
+      io.get(`projects/${payload.projectCode || state.projectCode}/process-definition/${payload.code}/tasks`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -814,7 +814,7 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/batch-query-tasks`, payload, res => {
+      io.get(`projects/${payload.projectCode || state.projectCode}/process-definition/batch-query-tasks`, { codes: payload.codes }, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
