@@ -15,26 +15,31 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
+import { defineComponent } from 'vue'
+import { NButton } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useThemeStore } from '@/store/theme/theme'
+import styles from './index.module.scss'
 
-export function useDataList() {
-  const languageOptions = [
-    {
-      label: 'English',
-      key: 'en_US',
-    },
-    {
-      label: '中文',
-      key: 'zh_CN',
-    },
-  ]
+const Theme = defineComponent({
+  name: 'Theme',
+  setup() {
+    const { t } = useI18n()
+    const themeStore = useThemeStore()
 
-  const state = reactive({
-    chooseVal: ref('中文'),
-    languageOptions: languageOptions,
-  })
+    return { t, themeStore }
+  },
+  render() {
+    return (
+      <NButton
+        class={styles.theme}
+        quaternary
+        onClick={() => (this.themeStore.darkTheme = !this.themeStore.darkTheme)}
+      >
+        {this.t(this.themeStore.darkTheme ? 'theme.light' : 'theme.dark')}
+      </NButton>
+    )
+  },
+})
 
-  return {
-    state,
-  }
-}
+export default Theme

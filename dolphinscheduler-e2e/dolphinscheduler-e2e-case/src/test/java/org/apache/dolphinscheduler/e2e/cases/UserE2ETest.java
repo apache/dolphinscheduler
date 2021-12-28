@@ -27,7 +27,9 @@ import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -36,8 +38,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-class TenantE2ETest {
+class UserE2ETest {
     private static final String tenant = System.getProperty("user.name");
+    private static final String user = "test_user";
+    private static final String password = "test_user123";
+    private static final String email = "test_user@gmail.com";
+    private static final String phone = "15800000000";
+
+    private static final String editUser = "edit_test_user";
+    private static final String editPassword = "edit_test_user123";
+    private static final String editEmail = "edit_test_user@gmail.com";
+    private static final String editPhone = "15800000001";
 
     private static RemoteWebDriver browser;
 
@@ -47,49 +58,81 @@ class TenantE2ETest {
             .login("admin", "dolphinscheduler123")
             .goToNav(SecurityPage.class)
             .goToTab(TenantPage.class)
+            .create(tenant)
+            .goToNav(SecurityPage.class)
+            .goToTab(UserPage.class);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        new SecurityPage(browser)
+            .goToTab(TenantPage.class)
+            .delete(tenant)
         ;
     }
 
     @Test
-    @Order(10)
-    void testCreateTenant() {
-        final TenantPage page = new TenantPage(browser);
-        page.create(tenant);
+    @Order(1)
+    void testCreateUser() {
+        final UserPage page = new UserPage(browser);
 
-        await().untilAsserted(() -> assertThat(page.tenantList())
-            .as("Tenant list should contain newly-created tenant")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(tenant)));
+        page.create(user, password, email, phone);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(page.userList())
+                .as("User list should contain newly-created user")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(user));
+        });
     }
 
     @Test
     @Order(20)
-    void testCreateDuplicateTenant() {
-        final TenantPage page = new TenantPage(browser);
+    void testCreateDuplicateUser() {
+        final UserPage page = new UserPage(browser);
 
-        page.create(tenant);
+        page.create(user, password, email, phone);
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
                 .contains("already exists")
         );
 
-        page.createTenantForm().buttonCancel().click();
+        page.createUserForm().buttonCancel().click();
     }
 
     @Test
     @Order(30)
-    void testDeleteTenant() {
-        final TenantPage page = new TenantPage(browser);
-        page.delete(tenant);
+    void testEditUser() {
+        final UserPage page = new UserPage(browser);
+        page.update(user, editUser, editPassword, editEmail, editPhone);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+            assertThat(page.userList())
+                .as("User list should contain newly-modified User")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(editUser));
+        });
+    }
+
+
+    @Test
+    @Order(40)
+    void testDeleteUser() {
+        final UserPage page = new UserPage(browser);
+
+        page.delete(editUser);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
-                page.tenantList()
+                page.userList()
             ).noneMatch(
-                it -> it.getText().contains(tenant)
+                it -> it.getText().contains(user) || it.getText().contains(editUser)
             );
         });
     }

@@ -19,8 +19,8 @@ import { defineComponent } from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import styles from './index.module.scss'
 
-const logo = defineComponent({
-  name: 'logo',
+const Logo = defineComponent({
+  name: 'Logo',
   setup() {
     const themeStore = useThemeStore()
 
@@ -38,4 +38,4 @@ const logo = defineComponent({
   },
 })
 
-export default logo
+export default Logo
