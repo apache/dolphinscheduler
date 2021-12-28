@@ -1098,13 +1098,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
-        HashMap<Long, Project> userProjects =  new HashMap(Constants.DEFAULT_HASH_MAP_SIZE);
+        HashMap<Long, Project> userProjects =  new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
         projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
             .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
         // check processDefinition exist in project
         List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream()
-                .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
+            .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
