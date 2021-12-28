@@ -2419,15 +2419,19 @@ public class ProcessService {
     }
 
     public List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations) {
-        List<TaskDefinitionLog> taskDefinitionLogs = com.google.common.collect.Lists.newArrayList();
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        Map<Long, Integer> taskCodeVersionMap = new HashMap<>();
         for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
-                taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
+                taskCodeVersionMap.put(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion());
             }
             if (processTaskRelation.getPostTaskCode() > 0) {
-                taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
+                taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
             }
         }
+        taskCodeVersionMap.forEach((code,version) -> {
+            taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
+        });
         return taskDefinitionLogs;
     }
 
@@ -2506,6 +2510,8 @@ public class ProcessService {
                         taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
+                taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
+                taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNodeList.add(taskNode);
             }
         }

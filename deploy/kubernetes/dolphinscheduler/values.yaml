@@ -22,7 +22,7 @@
 timezone: "Asia/Shanghai"
 
 image:
-  repository: "dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler"
+  registry: "dolphinscheduler.docker.scarf.sh/apache"
   tag: "2.0.0-SNAPSHOT"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
@@ -42,7 +42,6 @@ postgresql:
 ## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
-  driver: "org.postgresql.Driver"
   host: "localhost"
   port: "5432"
   username: "root"
@@ -146,18 +145,6 @@ master:
   #   requests:
   #     memory: "2Gi"
   #     cpu: "500m"
-  ## Configmap
-  configmap:
-    MASTER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
-    MASTER_EXEC_THREADS: "100"
-    MASTER_EXEC_TASK_NUM: "20"
-    MASTER_DISPATCH_TASK_NUM: "3"
-    MASTER_HOST_SELECTOR: "LowerWeight"
-    MASTER_HEARTBEAT_INTERVAL: "10"
-    MASTER_TASK_COMMIT_RETRYTIMES: "5"
-    MASTER_TASK_COMMIT_INTERVAL: "1000"
-    MASTER_MAX_CPULOAD_AVG: "-1"
-    MASTER_RESERVED_MEMORY: "0.3"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -186,6 +173,17 @@ master:
     - "ReadWriteOnce"
     storageClassName: "-"
     storage: "20Gi"
+  env:
+    JAVA_OPTS: "-Xms1g -Xmx1g -Xmn512m"
+    MASTER_EXEC_THREADS: "100"
+    MASTER_EXEC_TASK_NUM: "20"
+    MASTER_DISPATCH_TASK_NUM: "3"
+    MASTER_HOST_SELECTOR: "LowerWeight"
+    MASTER_HEARTBEAT_INTERVAL: "10"
+    MASTER_TASK_COMMIT_RETRYTIMES: "5"
+    MASTER_TASK_COMMIT_INTERVAL: "1000"
+    MASTER_MAX_CPU_LOAD_AVG: "-1"
+    MASTER_RESERVED_MEMORY: "0.3"
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -215,16 +213,6 @@ worker:
   #   requests:
   #     memory: "2Gi"
   #     cpu: "500m"
-  ## Configmap
-  configmap:
-    LOGGER_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-    WORKER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
-    WORKER_EXEC_THREADS: "100"
-    WORKER_HEARTBEAT_INTERVAL: "10"
-    WORKER_HOST_WEIGHT: "100"
-    WORKER_MAX_CPULOAD_AVG: "-1"
-    WORKER_RESERVED_MEMORY: "0.3"
-    WORKER_GROUPS: "default"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -263,10 +251,18 @@ worker:
       - "ReadWriteOnce"
       storageClassName: "-"
       storage: "20Gi"
+  env:
+    WORKER_GROUPS_0: default
+    WORKER_MAX_CPU_LOAD_AVG: "-1"
+    WORKER_RESERVED_MEMORY: "0.3"
+    WORKER_EXEC_THREADS: "100"
+    WORKER_HEARTBEAT_INTERVAL: "10"
+    WORKER_HOST_WEIGHT: "100"
+    WORKER_GROUPS: "default"
 
 alert:
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
-  replicas: "1"
+  replicas: 1
   ## The deployment strategy to use to replace existing pods with new ones.
   strategy:
     type: "RollingUpdate"
@@ -296,9 +292,6 @@ alert:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-  ## Configmap
-  configmap:
-    ALERT_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -325,6 +318,8 @@ alert:
     - "ReadWriteOnce"
     storageClassName: "-"
     storage: "20Gi"
+  env:
+    JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
 
 api:
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
@@ -358,9 +353,6 @@ api:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-  ## Configmap
-  configmap:
-    API_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -403,6 +395,8 @@ api:
     ## annotations may need to be set when service.type is LoadBalancer
     ## service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:EXAMPLE_CERT
     annotations: {}
+  env:
+    JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
 
 ingress:
   enabled: false

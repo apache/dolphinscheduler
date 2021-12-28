@@ -31,7 +31,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -45,7 +47,9 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * switch task processor
+ */
 public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
@@ -55,8 +59,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private ProcessInstance processInstance;
     TaskDefinition taskDefinition;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;
 
     /**
      * switch result
@@ -64,8 +67,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private DependResult conditionResult;
 
     @Override
-    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-
+    public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval, boolean isTaskLogger) {
         this.processInstance = processInstance;
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, masterTaskCommitRetryTimes, masterTaskCommitInterval);
 
@@ -75,11 +77,11 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskDefinition = processService.findTaskDefinition(
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),processInstance.getProcessDefinitionCode(),
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
-        setTaskExecutionLogger();
+        setTaskExecutionLogger(isTaskLogger);
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -176,7 +178,13 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         switchParameters.setResultConditionLocation(finalConditionLocation);
         taskInstance.setSwitchDependency(switchParameters);
 
-        logger.info("the switch task depend result : {}", conditionResult);
+        if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
+            conditionResult = DependResult.FAILED;
+            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+            return true;
+        }
+
+        logger.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
         return true;
     }
 
@@ -221,4 +229,18 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         return content;
     }
 
+    /**
+     * check whether switch result is valid
+     */
+    private boolean isValidSwitchResult(SwitchResultVo switchResult) {
+        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
+            return false;
+        }
+        for (String nextNode : switchResult.getNextNode()) {
+            if (StringUtils.isEmpty(nextNode)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

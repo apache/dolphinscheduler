@@ -54,10 +54,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker
-          image: {{ include "dolphinscheduler.image.fullname" . }}
+          image: {{ include "dolphinscheduler.image.fullname.worker" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - "worker-server"
           ports:
             - containerPort: 1234
               name: "worker-port"
@@ -71,13 +69,13 @@ spec:
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
+            {{ range $key, $value :=  .Values.worker.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
-            - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-worker
-            - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.worker.resources }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
@@ -85,7 +83,7 @@ spec:
           {{- if .Values.worker.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "WorkerServer"]
+              command: ["curl", "-s", "http://localhost:1235/actuator/health/liveness"]
             initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
@@ -95,7 +93,7 @@ spec:
           {{- if .Values.worker.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["bash", "/root/checkpoint.sh", "WorkerServer"]
+              command: ["curl", "-s", "http://localhost:1235/actuator/health/readiness"]
             initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}

@@ -247,13 +247,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if (processService.isTaskOnline(taskCode)) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
-            return result;
-        }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
+        if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
+            putMsg(result, Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
             return result;
         }
         TaskDefinitionLog taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
