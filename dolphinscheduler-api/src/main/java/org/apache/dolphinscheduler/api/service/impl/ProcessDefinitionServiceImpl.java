@@ -1102,9 +1102,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
-
+        // check processDefinition exist in project
+        List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream().
+                filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
+            return result;
+        }
         Map<Long, List<TaskDefinition>> taskNodeMap = new HashMap<>();
-        for (ProcessDefinition processDefinition : processDefinitionList) {
+        for (ProcessDefinition processDefinition : processDefinitionListInProject) {
             DagData dagData = processService.genDagData(processDefinition);
             taskNodeMap.put(processDefinition.getCode(), dagData.getTaskDefinitionList());
         }
