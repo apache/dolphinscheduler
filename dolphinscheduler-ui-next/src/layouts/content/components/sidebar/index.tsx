@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import styles from './index.module.scss'
 import { NLayoutSider, NMenu } from 'naive-ui'
 
@@ -29,21 +29,38 @@ const Sidebar = defineComponent({
     isShowSide: {
       type: Boolean as PropType<boolean>,
       default: false,
-    }
+    },
   },
   setup() {
-    return {}
+    const collapsedRef = ref(false)
+    const defaultExpandedKeys = [
+      'workflow',
+      'udf-manage',
+      'service-manage',
+      'statistical-manage',
+    ]
+
+    return { collapsedRef, defaultExpandedKeys }
   },
   render() {
-    if (this.isShowSide) {
-      return (
-        <NLayoutSider bordered nativeScrollbar={false} show-trigger='bar'>
-          <NMenu options={this.sideMenuOptions} default-expand-all />
+    return (
+      this.isShowSide && (
+        <NLayoutSider
+          bordered
+          nativeScrollbar={false}
+          show-trigger='bar'
+          collapse-mode='width'
+          collapsed={this.collapsedRef}
+          onCollapse={() => (this.collapsedRef = true)}
+          onExpand={() => (this.collapsedRef = false)}
+        >
+          <NMenu
+            options={this.sideMenuOptions}
+            defaultExpandedKeys={this.defaultExpandedKeys}
+          />
         </NLayoutSider>
       )
-    } else {
-      return
-    }
+    )
   },
 })
 
