@@ -103,6 +103,8 @@ public class WorkerRegistryClient {
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
+            // remove before persist
+            registryClient.remove(workerZKPath);
             registryClient.persistEphemeral(workerZKPath, "");
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
@@ -110,6 +112,9 @@ public class WorkerRegistryClient {
         while (!this.checkNodeExists()) {
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
+
+        // sleep 1s, waiting master failover remove
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
 
         this.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
 
