@@ -15,32 +15,22 @@
  * limitations under the License.
  */
 
-import { toRaw } from 'vue'
-import { defineStore } from 'pinia'
-import RouteState from './types'
-import { RouteRecordRaw } from 'vue-router'
+import { defineComponent, toRefs } from 'vue'
+import styles from './index.module.scss'
+import { NLayoutSider, NMenu } from 'naive-ui'
 
-export const useAsyncRouteStore = defineStore({
-  id: 'route',
-  state: (): RouteState => ({
-    menus: [],
-    routers: [],
-    addRouters: [],
-  }),
-  getters: {
-    getMenus(): RouteRecordRaw[] {
-      return this.menus
-    },
-    getRouters(): RouteRecordRaw[] {
-      return toRaw(this.addRouters)
-    },
+const sidebar = defineComponent({
+  name: 'sidebar',
+  setup() {
+    return {}
   },
-  actions: {
-    setMenus(menus) {
-      this.menus = menus
-    },
-    async generateRouters(routes) {
-      console.log(routes)
-    },
+  render() {
+    return (
+      <NLayoutSider bordered nativeScrollbar={false} show-trigger='bar'>
+        <NMenu />
+      </NLayoutSider>
+    )
   },
 })
+
+export default sidebar
