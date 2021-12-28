@@ -101,20 +101,6 @@ public class WorkerRegistryClient {
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getHeartbeatInterval();
 
-        for (String workerZKPath : workerZkPaths) {
-            // remove before persist
-            registryClient.remove(workerZKPath);
-            registryClient.persistEphemeral(workerZKPath, "");
-            logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
-        }
-
-        while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.WORKER)) {
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-        }
-
-        // sleep 1s, waiting master failover remove
-        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 workerConfig.getMaxCpuLoadAvg(),
                 workerConfig.getReservedMemory(),
@@ -125,6 +111,23 @@ public class WorkerRegistryClient {
                 workerConfig.getExecThreads(),
                 workerManagerThread.getThreadPoolQueueSize()
         );
+
+        for (String workerZKPath : workerZkPaths) {
+            // remove before persist
+            registryClient.remove(workerZKPath);
+            registryClient.persistEphemeral(workerZKPath, heartBeatTask.getHeartBeatInfo());
+            logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
+        }
+
+        while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.WORKER)) {
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+        }
+
+        // sleep 1s, waiting master failover remove
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+
+        // delete dead server
+        registryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
