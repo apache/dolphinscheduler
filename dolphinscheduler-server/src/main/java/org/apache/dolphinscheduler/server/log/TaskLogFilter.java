@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import org.slf4j.Logger;
@@ -51,8 +50,8 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
         FilterReply filterReply = FilterReply.DENY;
-        if ((event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME)
-                && event.getLoggerName().equals(TaskConstants.TASK_LOG_LOGGER_NAME))
+        if ((event.getThreadName().startsWith(TaskConstants.TASK_LOGGER_THREAD_NAME)
+                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME))
                 || event.getLevel().isGreaterOrEqual(level)) {
             filterReply = FilterReply.ACCEPT;
         }

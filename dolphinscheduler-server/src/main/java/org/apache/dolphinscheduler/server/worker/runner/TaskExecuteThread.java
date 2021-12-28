@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskAlertInfo;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
@@ -173,7 +174,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskRequest.setTaskLogName(taskLogName);
 
             // set the name of the current thread
-            this.setThreadName();
+            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,taskLogName));
 
             task = taskChannel.createTask(taskRequest);
 
@@ -387,14 +388,5 @@ public class TaskExecuteThread implements Runnable, Delayed {
             paramsMap.put(Constants.PARAMETER_DATETIME, p);
         }
         taskExecutionContext.setParamsMap(paramsMap);
-    }
-
-    private void setThreadName() {
-        String threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_THREAD_NAME,
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
-        Thread.currentThread().setName(threadLoggerInfoName);
     }
 }
