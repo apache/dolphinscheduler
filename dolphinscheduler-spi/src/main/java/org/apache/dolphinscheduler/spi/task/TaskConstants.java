@@ -129,6 +129,11 @@ public class TaskConstants {
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     /**
+     * task log logger name
+     */
+    public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
+
+    /**
      * date format of yyyyMMdd
      */
     public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";
