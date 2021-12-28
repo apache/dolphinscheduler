@@ -133,14 +133,13 @@ public class WorkerRegistryClient {
     public void handleConnectionState(ConnectionState state) {
         switch (state) {
             case CONNECTED:
-                logger.info("registry connection state is {}", state);
+                logger.debug("registry connection state is {}", state);
                 break;
             case SUSPENDED:
-                logger.info("registry connection state is {}, ready to stop myself", state);
-                registryClient.getStoppable().stop("registry connection state is SUSPENDED, stop myself");
+                logger.warn("registry connection state is {}, ready to retry connection", state);
                 break;
             case RECONNECTED:
-                logger.info("registry connection state is {}, clean the node info", state);
+                logger.debug("registry connection state is {}, clean the node info", state);
                 String address = NetUtils.getAddr(workerConfig.getListenPort());
                 Set<String> workerZkPaths = getWorkerZkPaths();
                 for (String workerZKPath : workerZkPaths) {
@@ -149,7 +148,7 @@ public class WorkerRegistryClient {
                 }
                 break;
             case DISCONNECTED:
-                logger.info("registry connection state is {}, ready to stop myself", state);
+                logger.warn("registry connection state is {}, ready to stop myself", state);
                 registryClient.getStoppable().stop("registry connection state is DISCONNECTED, stop myself");
                 break;
             default:
