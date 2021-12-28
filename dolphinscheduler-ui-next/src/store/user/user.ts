@@ -14,12 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RouteRecordRaw } from 'vue-router'
 
-interface RouteState {
-  menus: RouteRecordRaw[]
-  routers: any[]
-  addRouters: any[]
-}
+import { defineStore } from 'pinia'
+import UserState from '@/store/user/types'
 
-export default RouteState
+export const useUserStore = defineStore({
+  id: 'user',
+  state: (): UserState => ({
+    sessionId: '',
+  }),
+  persist: true,
+  getters: {
+    getSessionId(): string {
+      return this.sessionId
+    },
+  },
+  actions: {
+    setSessionId(sessionId: string): void {
+      this.sessionId = sessionId
+    },
+  },
+})

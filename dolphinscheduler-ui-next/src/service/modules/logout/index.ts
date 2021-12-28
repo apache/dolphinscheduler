@@ -17,7 +17,7 @@
 
 import { axios } from '@/service/service'
 
-export function signOut(): any {
+export function logout(): any {
   return axios({
     url: '/signOut',
     method: 'post',
