@@ -15,21 +15,6 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  login: 'Login',
-}
-
-const theme = {
-  light: 'Light',
-  dark: 'Dark',
-}
-
-export default {
-  login,
-  theme,
+.theme {
+  margin: 0 12px;
 }

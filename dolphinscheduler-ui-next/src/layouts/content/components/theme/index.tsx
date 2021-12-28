@@ -15,21 +15,31 @@
  * limitations under the License.
  */
 
-const login = {
-  test: 'Test',
-  userName: 'Username',
-  userName_tips: 'Please enter your username',
-  userPassword: 'Password',
-  userPassword_tips: 'Please enter your password',
-  login: 'Login',
-}
+import { defineComponent } from 'vue'
+import { NButton } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useThemeStore } from '@/store/theme/theme'
+import styles from './index.module.scss'
 
-const theme = {
-  light: 'Light',
-  dark: 'Dark',
-}
+const Theme = defineComponent({
+  name: 'Theme',
+  setup() {
+    const { t } = useI18n()
+    const themeStore = useThemeStore()
 
-export default {
-  login,
-  theme,
-}
+    return { t, themeStore }
+  },
+  render() {
+    return (
+      <NButton
+        class={styles.theme}
+        quaternary
+        onClick={() => (this.themeStore.darkTheme = !this.themeStore.darkTheme)}
+      >
+        {this.t(this.themeStore.darkTheme ? 'theme.light' : 'theme.dark')}
+      </NButton>
+    )
+  },
+})
+
+export default Theme

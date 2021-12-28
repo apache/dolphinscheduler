@@ -21,9 +21,15 @@ const login = {
   userName_tips: '请输入用户名',
   userPassword: '密码',
   userPassword_tips: '请输入密码',
-  signin: '登录',
+  login: '登录',
+}
+
+const theme = {
+  light: '浅色',
+  dark: '深色',
 }
 
 export default {
   login,
+  theme,
 }

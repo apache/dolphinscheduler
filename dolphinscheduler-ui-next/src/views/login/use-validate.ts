@@ -21,6 +21,7 @@ import { useI18n } from 'vue-i18n'
 
 export function useValidate() {
   const { t, locale } = useI18n()
+
   const state = reactive({
     loginFormRef: ref(),
     loginForm: {
