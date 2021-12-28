@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive, ref, h } from 'vue'
+import { reactive, h } from 'vue'
 import { NIcon } from 'naive-ui'
 import { UserOutlined, LogoutOutlined } from '@vicons/antd'
 

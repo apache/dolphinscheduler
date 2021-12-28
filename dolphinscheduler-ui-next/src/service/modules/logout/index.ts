@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-interface Props {
-  title: string
-}
+import { axios } from '@/service/service'
 
-export default Props
+export function logout(): any {
+  return axios({
+    url: '/signOut',
+    method: 'post',
+  })
+}
