@@ -21,8 +21,8 @@ import styles from './index.module.scss'
 import { DownOutlined, UserOutlined } from '@vicons/antd'
 import { useDropDown } from './use-dropdown'
 
-const user = defineComponent({
-  name: 'user',
+const User = defineComponent({
+  name: 'User',
   props: {
     profileOptions: {
       type: Array as PropType<any>,
@@ -55,4 +55,4 @@ const user = defineComponent({
   },
 })
 
-export default user
+export default User

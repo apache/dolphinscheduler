@@ -24,8 +24,9 @@ import User from '../user'
 import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
 
-const navbar = defineComponent({
-  name: 'navbar',
+const Navbar = defineComponent({
+  name: 'Navbar',
+  emits: ['handleMenuClick'],
   props: {
     headerMenuOptions: {
       type: Array as PropType<any>,
@@ -66,4 +67,4 @@ const navbar = defineComponent({
   },
 })
 
-export default navbar
+export default Navbar

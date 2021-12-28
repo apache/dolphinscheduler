@@ -26,6 +26,20 @@ import {
   SafetyCertificateOutlined,
   UserOutlined,
   LogoutOutlined,
+  FundProjectionScreenOutlined,
+  PartitionOutlined,
+  SettingOutlined,
+  FileSearchOutlined,
+  RobotOutlined,
+  AppstoreOutlined,
+  UsergroupAddOutlined,
+  UserAddOutlined,
+  WarningOutlined,
+  InfoCircleOutlined,
+  ControlOutlined,
+  SlackOutlined,
+  EnvironmentOutlined,
+  KeyOutlined
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -47,34 +61,31 @@ export function useDataList() {
         {
           label: '工作流监控',
           key: 'workflow-monitoring',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(FundProjectionScreenOutlined),
         },
         {
           label: '工作流关系',
           key: 'workflow-relationships',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(PartitionOutlined),
         },
         {
           label: '工作流',
           key: 'workflow',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(SettingOutlined),
           children: [
             {
               label: '工作流定义',
-              key: 'workflow-definition',
-              icon: renderIcon(ProfileOutlined),
+              key: 'workflow-definition'
             },
             {
               label: '工作流实例',
-              key: 'workflow-instance',
-              icon: renderIcon(ProfileOutlined),
+              key: 'workflow-instance'
             },
             {
               label: '任务实例',
-              key: 'task-instance',
-              icon: renderIcon(ProfileOutlined),
-            },
-          ],
+              key: 'task-instance'
+            }
+          ]
         },
       ],
     },
@@ -86,24 +97,22 @@ export function useDataList() {
         {
           label: '文件管理',
           key: 'file-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(FileSearchOutlined),
         },
         {
           label: 'UDF管理',
           key: 'UDF-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(RobotOutlined),
           children: [
             {
               label: '资源管理',
-              key: 'resource-management',
-              icon: renderIcon(ProfileOutlined),
+              key: 'resource-management'
             },
             {
               label: '函数管理',
-              key: 'function-management',
-              icon: renderIcon(ProfileOutlined),
-            },
-          ],
+              key: 'function-management'
+            }
+          ]
         },
       ],
     },
@@ -120,34 +129,30 @@ export function useDataList() {
         {
           label: '服务管理',
           key: 'service-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(AppstoreOutlined),
           children: [
             {
               label: 'Master',
-              key: 'master',
-              icon: renderIcon(ProfileOutlined),
+              key: 'master'
             },
             {
               label: 'Worker',
-              key: 'worker',
-              icon: renderIcon(ProfileOutlined),
+              key: 'worker'
             },
             {
               label: 'DB',
-              key: 'DB',
-              icon: renderIcon(ProfileOutlined),
-            },
-          ],
+              key: 'DB'
+            }
+          ]
         },
         {
           label: '统计管理',
           key: 'statistical-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(AppstoreOutlined),
           children: [
             {
               label: 'Statistics',
-              key: 'statistics',
-              icon: renderIcon(ProfileOutlined),
+              key: 'statistics'
             },
           ],
         },
@@ -161,42 +166,42 @@ export function useDataList() {
         {
           label: '租户管理',
           key: 'tenant-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(UsergroupAddOutlined),
         },
         {
           label: '用户管理',
           key: 'user-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(UserAddOutlined),
         },
         {
           label: '告警组管理',
           key: 'alarm-group-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(WarningOutlined),
         },
         {
           label: '告警实例管理',
           key: 'alarm-instance-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(InfoCircleOutlined),
         },
         {
           label: 'Worker分组管理',
           key: 'worker-group-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(ControlOutlined),
         },
         {
           label: 'Yarn 队列管理',
           key: 'yarn-queue-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(SlackOutlined),
         },
         {
           label: '环境管理',
           key: 'environmental-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(EnvironmentOutlined),
         },
         {
           label: '令牌管理',
           key: 'token-management',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(KeyOutlined),
         },
       ],
     },
@@ -241,9 +246,10 @@ export function useDataList() {
   }
 
   const state = reactive({
+    isShowSide: false,
     menuOptions: menuOptions,
     languageOptions: languageOptions,
-    profileOptions: profileOptions,
+    profileOptions: profileOptions
   })
 
   return {

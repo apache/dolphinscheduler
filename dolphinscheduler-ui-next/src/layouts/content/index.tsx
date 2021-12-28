@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, ref, toRefs } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
+import styles from './index.module.scss'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 
@@ -26,11 +27,17 @@ const Content = defineComponent({
   name: 'Content',
   setup() {
     const { state, getHeaderMenuOptions } = useDataList()
+
     const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
+
+    const sideMenuOptions = ref()
+
     const getSideMenuOptions = (item: any) => {
-      console.log('123', item)
+      sideMenuOptions.value = state.menuOptions.filter(menu => menu.key === item.key)[0].children || []
+      state.isShowSide = (sideMenuOptions.value.length !== 0)
     }
-    return { ...toRefs(state), headerMenuOptions, getSideMenuOptions }
+    
+    return { ...toRefs(state), headerMenuOptions, getSideMenuOptions, sideMenuOptions }
   },
   render() {
     return (
@@ -41,11 +48,11 @@ const Content = defineComponent({
             headerMenuOptions={this.headerMenuOptions}
             languageOptions={this.languageOptions}
             profileOptions={this.profileOptions}
-          ></NavBar>
+          />
         </NLayoutHeader>
         <NLayout has-sider>
-          <SideBar></SideBar>
-          <NLayoutContent>
+          <SideBar sideMenuOptions={this.sideMenuOptions} isShowSide={this.isShowSide} />
+          <NLayoutContent class={styles.content}>
             <router-view />
           </NLayoutContent>
         </NLayout>

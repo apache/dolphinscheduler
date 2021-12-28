@@ -21,8 +21,8 @@ import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
 import { useDropDown } from './use-dropdown'
 
-const language = defineComponent({
-  name: 'language',
+const Language = defineComponent({
+  name: 'Language',
   props: {
     languageOptions: {
       type: Array as PropType<any>,
@@ -53,4 +53,4 @@ const language = defineComponent({
   },
 })
 
-export default language
+export default Language
