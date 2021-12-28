@@ -102,24 +102,6 @@ public class WorkerRegistryClient {
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
-        for (String workerZKPath : workerZkPaths) {
-            // remove before persist
-            registryClient.remove(workerZKPath);
-            registryClient.persistEphemeral(workerZKPath, "");
-            logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
-        }
-
-        while (!this.checkNodeExists()) {
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-        }
-
-        // sleep 1s, waiting master failover remove
-        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-
-        this.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
-
-        registryClient.addConnectionStateListener(this::handleConnectionState);
-
         HeartBeatTask heartBeatTask = new HeartBeatTask(startupTime,
                 workerConfig.getWorkerMaxCpuloadAvg(),
                 workerConfig.getWorkerReservedMemory(),
@@ -130,6 +112,25 @@ public class WorkerRegistryClient {
                 workerConfig.getWorkerExecThreads(),
                 workerManagerThread
         );
+
+        for (String workerZKPath : workerZkPaths) {
+            // remove before persist
+            registryClient.remove(workerZKPath);
+            registryClient.persistEphemeral(workerZKPath, heartBeatTask.getHeartBeatInfo());
+            logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
+        }
+
+        while (!this.checkNodeExists()) {
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+        }
+
+        // sleep 1s, waiting master failover remove
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+
+        // delete dead server
+        this.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+
+        registryClient.addConnectionStateListener(this::handleConnectionState);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);

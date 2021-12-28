@@ -119,17 +119,6 @@ public class MasterRegistryClient {
             registryClient.getLock(nodeLock);
             // master registry
             registry();
-            String registryPath = getMasterPath();
-            registryClient.handleDeadServer(Collections.singleton(registryPath), NodeType.MASTER, Constants.DELETE_OP);
-
-            // init system node
-
-            while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }
-
-            // sleep 1s, waiting master failover remove
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
@@ -530,6 +519,17 @@ public class MasterRegistryClient {
         // remove before persist
         registryClient.remove(localNodePath);
         registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
+
+        while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+        }
+
+        // sleep 1s, waiting master failover remove
+        ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+
+        // delete dead server
+        registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.MASTER, Constants.DELETE_OP);
+
         registryClient.addConnectionStateListener(this::handleConnectionState);
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
