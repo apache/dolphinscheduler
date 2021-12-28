@@ -36,6 +36,14 @@ from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondi
 with ProcessDefinition(
     name="task_switch_example",
     tenant="tenant_exists",
+    param=[
+        {
+            "prop": "var",
+            "direct": "IN",
+            "type": "VARCHAR",
+            "value": "1"
+        }
+    ]
 ) as pd:
     parent = Shell(name="parent", command="echo parent")
     switch_child_1 = Shell(name="switch_child_1", command="echo switch_child_1")
