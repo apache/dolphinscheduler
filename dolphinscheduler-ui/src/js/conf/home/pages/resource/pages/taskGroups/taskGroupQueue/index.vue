@@ -29,7 +29,7 @@
             <el-input v-model="processName" style="width: 160px;" size="mini" :placeholder="$t('Process Name')" clearable></el-input>
           </div>
           <div class="list">
-            <el-select style="width: 140px;" @change="_onChangeState" v-model="groupId" :placeholder="$t('Task group name')" size="mini" clearable>
+            <el-select style="width: 140px;" v-model="groupId" :placeholder="$t('Task group name')" size="mini" clearable>
               <el-option
                 v-for="taskGroup in taskGroupList"
                 :key="taskGroup.id"
@@ -117,10 +117,10 @@
         this.searchParams.pageNo = 1
       },
       _ckQuery () {
+        console.log(this.groupId)
         this.searchParams.groupId = this.groupId
         this.searchParams.instanceName = this.instanceName
         this.searchParams.processName = this.processName
-        console.log(this.searchParams)
         this._getList(false)
       },
       _page (val) {
@@ -166,14 +166,11 @@
           this.taskGroupList = []
           this.taskGroupList = values.totalList
           if (this.taskGroupList) {
-            if (this.searchParams.groupId) {
-              this.searchParams.groupId = this.taskGroupList[0].id
+            if (this.searchParams.id) {
+              this.groupId = _.parseInt(this.searchParams.id)
+              this.searchParams.groupId = _.parseInt(this.searchParams.id)
             }
-            this.groupId = this.searchParams.id
-            this.searchParams.groupId = this.searchParams.id
             this.getTaskListInTaskGroupQueueById(this.searchParams).then((res) => {
-              console.log('getTaskListInTaskGroupQueueById')
-              console.log(res)
               if (this.searchParams.pageNo > 1 && values.totalList.length === 0) {
                 this.searchParams.pageNo = this.searchParams.pageNo - 1
               } else {
@@ -181,7 +178,12 @@
                 if (res.data.totalList) {
                   this.taskGroupQueue = res.data.totalList
                 }
-                console.log(this.taskGroupQueue)
+                this.taskGroupQueue.forEach(item => {
+                  const taskGroup = _.find(this.taskGroupList, { id: item.groupId })
+                  if (taskGroup) {
+                    item.taskGroupName = taskGroup.name
+                  }
+                })
                 this.total = res.data.total
                 this.isLoading = false
               }

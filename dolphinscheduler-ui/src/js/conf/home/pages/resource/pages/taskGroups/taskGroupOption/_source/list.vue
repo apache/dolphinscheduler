@@ -51,7 +51,7 @@
              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
            </el-tooltip>
            <el-tooltip :content="$t('View task group queue')" placement="top">
-             <el-button type="danger" size="mini" icon="el-icon-tickets" @click="_switchTaskGroupQueue(scope.row)" circle></el-button>
+             <el-button type="success" size="mini" icon="el-icon-tickets" @click="_switchTaskGroupQueue(scope.row)" circle></el-button>
            </el-tooltip>
           </template>
         </el-table-column>

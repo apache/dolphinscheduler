@@ -107,15 +107,12 @@
       _getProjectList () {
         this.getProjectsList().then(res => {
           this.projects = res
-          console.log('get project List')
-          console.log(this.projects)
         })
       },
       _ok () {
         if (!this._verification()) {
           return
         }
-        console.log(this.item)
 
         let param = {
           name: _.trim(this.name),
@@ -143,8 +140,6 @@
             groupSize: _.trim(this.groupSize),
             description: _.trim(this.description)
           }
-          console.log('update....')
-          console.log(updateParam)
           this.store.dispatch('resource/updateTaskGroup', updateParam).then(res => {
             $then(res)
           }).catch(e => {
@@ -160,12 +155,20 @@
         }
       },
       _verification () {
-        if (!this.name.replace(/\s*/g, '')) {
+        if (!this.name || !this.name.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.description.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter environment desc')}`)
+        if (!this.groupSize || !this.groupSize.replace(/\s*/g, '')) {
+          this.$message.warning(`${i18n.$t('Please enter task group resource pool size')}`)
+          return false
+        }
+        if (this.groupSize.replace(/\d+/g, '') || this.groupSize < 1) {
+          this.$message.warning(`${i18n.$t('Task group resource pool size be a number')}`)
+          return false
+        }
+        if (!this.description || !this.description.replace(/\s*/g, '')) {
+          this.$message.warning(`${i18n.$t('Please enter task group desc')}`)
           return false
         }
         return true
@@ -188,8 +191,6 @@
       }
     },
     created () {
-      console.log('created...')
-      console.log(this.item)
       if (this.item && this.item.name) {
         this.name = this.item.name
         this.projectCode = this.item.projectCode
