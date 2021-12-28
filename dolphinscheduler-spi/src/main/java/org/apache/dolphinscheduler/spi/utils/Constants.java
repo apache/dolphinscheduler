@@ -119,6 +119,11 @@ public class Constants {
     public static final String KERBEROS = "kerberos";
 
     /**
+     *  support hive datasource in one session
+     */
+    public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
