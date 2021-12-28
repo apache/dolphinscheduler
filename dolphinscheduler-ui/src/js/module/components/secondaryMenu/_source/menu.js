@@ -107,7 +107,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-user-solid',
-      children: []
+      children: [],
+      classNames: 'tab-user-manage'
     },
     {
       name: `${i18n.$t('Warning group manage')}`,

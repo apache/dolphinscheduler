@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="userList.length">
-          <el-button size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
+          <el-button id="btnCreateUser" size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
           <el-dialog
             :title="item ? $t('Edit User') : $t('Create User')"
             v-if="createUserDialog"

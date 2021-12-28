@@ -16,6 +16,8 @@
  */
 <template>
   <m-popover
+          okId="btnSubmit"
+          cancelId="btnCancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
@@ -26,6 +28,7 @@
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputUserName"
                     type="input"
                     v-model="userName"
                     maxlength="60"
@@ -38,6 +41,7 @@
           <template slot="name"><strong>*</strong>{{$t('Password')}}</template>
           <template slot="content">
             <el-input
+                    id="inputUserPassword"
                     type="password"
                     v-model="userPassword"
                     size="small"
@@ -79,6 +83,7 @@
           <template slot="name"><strong>*</strong>{{$t('Email')}}</template>
           <template slot="content">
             <el-input
+                    id="inputEmail"
                     type="input"
                     v-model="email"
                     size="small"
@@ -90,6 +95,7 @@
           <template slot="name">{{$t('Phone')}}</template>
           <template slot="content">
             <el-input
+                    id="inputPhone"
                     type="input"
                     v-model="phone"
                     size="small"

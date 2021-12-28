@@ -42,6 +42,8 @@ jobs:
         case:
           - name: Tenant
             class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
+          - name: User
+            class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
           - name: Project
             class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
           - name: Workflow
