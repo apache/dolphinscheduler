@@ -34,7 +34,7 @@ from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondition
 
 with ProcessDefinition(
-    name="task_switch_example_abc",
+    name="task_switch_example",
     tenant="tenant_exists",
     param=[
         {
