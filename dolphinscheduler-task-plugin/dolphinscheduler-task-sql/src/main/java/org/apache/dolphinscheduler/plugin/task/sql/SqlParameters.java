@@ -226,6 +226,7 @@ public class SqlParameters extends AbstractParameters {
         return new ArrayList<>();
     }
 
+
     @Override
     public void dealOutParam(String result) {
         if (CollectionUtils.isEmpty(localParams)) {
