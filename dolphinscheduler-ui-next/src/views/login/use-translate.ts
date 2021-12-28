@@ -19,6 +19,7 @@ import { WritableComputedRef } from 'vue'
 
 export function useTranslate(locale: WritableComputedRef<string>) {
   const handleChange = (value: string) => {
+    console.log('value', value)
     locale.value = value
   }
   return {
