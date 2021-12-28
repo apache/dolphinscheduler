@@ -15,21 +15,39 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, toRefs } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
 import NavBar from './components/navbar'
+import SideBar from './components/sidebar'
+import { useDataList } from './use-dataList'
 
 const Content = defineComponent({
   name: 'Content',
+  setup() {
+    const { state, getHeaderMenuOptions } = useDataList()
+    const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
+    const getSideMenuOptions = (item: any) => {
+      console.log('123', item)
+    }
+    return { ...toRefs(state), headerMenuOptions, getSideMenuOptions }
+  },
   render() {
     return (
       <NLayout>
         <NLayoutHeader>
-          <NavBar></NavBar>
+          <NavBar
+            onHandleMenuClick={this.getSideMenuOptions}
+            headerMenuOptions={this.headerMenuOptions}
+            languageOptions={this.languageOptions}
+            profileOptions={this.profileOptions}
+          ></NavBar>
         </NLayoutHeader>
-        <NLayoutContent>
-          <router-view />
-        </NLayoutContent>
+        <NLayout has-sider>
+          <SideBar></SideBar>
+          <NLayoutContent>
+            <router-view />
+          </NLayoutContent>
+        </NLayout>
       </NLayout>
     )
   },
