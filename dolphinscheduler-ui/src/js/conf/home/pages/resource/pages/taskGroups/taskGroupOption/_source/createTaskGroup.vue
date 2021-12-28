@@ -159,11 +159,7 @@
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.groupSize || !this.groupSize.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter task group resource pool size')}`)
-          return false
-        }
-        if (this.groupSize.replace(/\d+/g, '') || this.groupSize < 1) {
+        if (this.groupSize < 1) {
           this.$message.warning(`${i18n.$t('Task group resource pool size be a number')}`)
           return false
         }
