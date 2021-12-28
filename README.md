@@ -63,7 +63,7 @@ Please referer the official website document: [QuickStart in Docker](https://dol
 
 ## QuickStart in Kubernetes
 
-Please referer the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/kubernetes.html)
+Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/kubernetes.html)
 
 ## How to Build
 
