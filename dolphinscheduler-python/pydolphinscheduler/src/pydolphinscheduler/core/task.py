@@ -26,6 +26,7 @@ from pydolphinscheduler.constants import (
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
+    TaskType,
 )
 from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.core.process_definition import (
@@ -156,7 +157,8 @@ class Task(Base):
         self.resource_list = resource_list or []
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
-        self.condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
+        if task_type != TaskType.CONDITIONS:
+            self.condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:

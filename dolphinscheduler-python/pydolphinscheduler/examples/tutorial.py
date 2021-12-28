@@ -34,18 +34,14 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.shell import Shell
 
 with ProcessDefinition(
-    name="tutorial",
-    schedule="0 0 0 * * ? *",
-    start_time="2021-01-01",
+    name="aklsfkkalsfjkol",
     tenant="tenant_exists",
 ) as pd:
-    task_parent = Shell(name="task_parent", command="echo hello pydolphinscheduler")
     task_child_one = Shell(name="task_child_one", command="echo 'child one'")
     task_child_two = Shell(name="task_child_two", command="echo 'child two'")
     task_union = Shell(name="task_union", command="echo union")
 
     task_group = [task_child_one, task_child_two]
-    task_parent.set_downstream(task_group)
 
     task_union << task_group
 

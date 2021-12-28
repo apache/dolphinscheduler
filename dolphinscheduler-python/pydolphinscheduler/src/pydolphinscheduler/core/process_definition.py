@@ -332,7 +332,7 @@ class ProcessDefinition(Base):
             self._project,
             self.name,
             str(self.description) if self.description else "",
-            str(self.param) if self.param else None,
+            json.dumps(self.param) if self.param else None,
             json.dumps(self.schedule_json) if self.schedule_json else None,
             json.dumps(self.task_location),
             self.timeout,

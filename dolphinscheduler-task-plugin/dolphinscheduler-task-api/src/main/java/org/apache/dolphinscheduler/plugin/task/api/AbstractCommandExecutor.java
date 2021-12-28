@@ -307,8 +307,9 @@ public abstract class AbstractCommandExecutor {
      * @param process process
      */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = String.format(TaskConstants.TASK_LOGGER_THREAD_NAME + "-%s", taskRequest.getTaskAppId());
-        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        String threadLoggerInfoName = String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,
+                taskRequest.getTaskLogName() + TaskConstants.GET_OUTPUT_LOG_SERVICE);
+        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
         getOutputLogService.submit(() -> {
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;

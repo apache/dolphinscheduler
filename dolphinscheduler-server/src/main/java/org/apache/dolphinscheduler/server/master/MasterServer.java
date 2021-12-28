@@ -41,8 +41,6 @@ import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
-
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +67,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 })
 @EnableTransactionManagement
 public class MasterServer implements IStoppable {
-
     /**
      * logger of MasterServer
      */
