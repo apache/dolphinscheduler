@@ -16,16 +16,19 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.LoggerContextVO;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Marker;
 
-import java.util.Map;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.LoggerContextVO;
 
 public class TaskLogDiscriminatorTest {
 
@@ -48,7 +51,7 @@ public class TaskLogDiscriminatorTest {
        String result = taskLogDiscriminator.getDiscriminatingValue(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return null;
+                return String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,"-[taskAppId=TASK-1-1-1");
             }
 
             @Override
@@ -73,7 +76,7 @@ public class TaskLogDiscriminatorTest {
 
             @Override
             public String getLoggerName() {
-                return "[taskAppId=TASK-1-1-1";
+                return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
 
             @Override

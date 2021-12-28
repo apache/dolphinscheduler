@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -29,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * logger utils
@@ -50,11 +51,6 @@ public class LoggerUtils {
      * Task Logger's prefix
      */
     public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
      * Task Logger Thread's name
