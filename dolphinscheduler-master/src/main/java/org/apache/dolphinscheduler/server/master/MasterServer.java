@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProce
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
+import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -90,6 +91,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private EventExecuteService eventExecuteService;
 
+    @Autowired
+    private FailoverExecuteThread failoverExecuteThread;
+
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
@@ -122,6 +126,7 @@ public class MasterServer implements IStoppable {
         this.masterSchedulerService.start();
 
         this.eventExecuteService.start();
+        this.failoverExecuteThread.start();
 
         this.scheduler.start();
 
