@@ -66,7 +66,7 @@ public class TaskLogFilterTest {
 
             @Override
             public String getLoggerName() {
-                return null;
+                return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
 
             @Override
