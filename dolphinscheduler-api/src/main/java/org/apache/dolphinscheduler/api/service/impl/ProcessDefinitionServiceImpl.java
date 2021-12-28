@@ -1387,6 +1387,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
                         throw new ServiceException(Status.NOT_SUPPORT_COPY_TASK_TYPE);
                     }
+                    taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setCode(0L);
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
