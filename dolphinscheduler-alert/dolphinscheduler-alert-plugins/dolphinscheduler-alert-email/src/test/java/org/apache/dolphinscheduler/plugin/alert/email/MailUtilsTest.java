@@ -124,7 +124,7 @@ public class MailUtilsTest {
     @Test
     public void testTableAttachmentFile() throws Exception {
         String content = list2String();
-        emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLEATTACHMENT.getDescp());
+        emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE_ATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails("gaojing", content);
     }

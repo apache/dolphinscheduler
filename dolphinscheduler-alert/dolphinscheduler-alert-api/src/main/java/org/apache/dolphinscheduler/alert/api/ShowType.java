@@ -29,7 +29,7 @@ public enum ShowType {
     TABLE(0, "table"),
     TEXT(1, "text"),
     ATTACHMENT(2, "attachment"),
-    TABLEATTACHMENT(3, "table attachment");
+    TABLE_ATTACHMENT(3, "table attachment");
 
     private final int code;
     private final String descp;

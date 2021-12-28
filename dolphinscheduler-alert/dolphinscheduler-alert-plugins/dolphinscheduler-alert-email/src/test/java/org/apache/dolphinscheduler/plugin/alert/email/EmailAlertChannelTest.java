@@ -132,7 +132,7 @@ public class EmailAlertChannelTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
-        emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
+        emailShowTypeList.add(new ParamsOptions(ShowType.TABLE_ATTACHMENT.getDescp(), ShowType.TABLE_ATTACHMENT.getDescp(), false));
         RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, "showType")
                                         .setOptions(emailShowTypeList)
                                         .setValue(ShowType.TABLE.getDescp())
