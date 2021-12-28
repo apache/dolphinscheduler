@@ -25,7 +25,7 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
-  LogoutOutlined
+  LogoutOutlined,
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -74,9 +74,9 @@ export function useDataList() {
               key: 'task-instance',
               icon: renderIcon(ProfileOutlined),
             },
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
       label: '资源中心',
@@ -102,10 +102,10 @@ export function useDataList() {
               label: '函数管理',
               key: 'function-management',
               icon: renderIcon(ProfileOutlined),
-            }
-          ]
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       label: '数据源中心',
@@ -136,8 +136,8 @@ export function useDataList() {
               label: 'DB',
               key: 'DB',
               icon: renderIcon(ProfileOutlined),
-            }
-          ]
+            },
+          ],
         },
         {
           label: '统计管理',
@@ -149,9 +149,9 @@ export function useDataList() {
               key: 'statistics',
               icon: renderIcon(ProfileOutlined),
             },
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
       label: '安全中心',
@@ -198,7 +198,7 @@ export function useDataList() {
           key: 'token-management',
           icon: renderIcon(ProfileOutlined),
         },
-      ]
+      ],
     },
   ]
 
@@ -228,13 +228,15 @@ export function useDataList() {
 
   const getHeaderMenuOptions = (MenuOptions: any) => {
     let headerMenuOptions = []
-    headerMenuOptions = MenuOptions.map((item: { label: string; key: string; icon: any }) => {
-      return {
-        label: item.label,
-        key: item.key,
-        icon: item.icon,
+    headerMenuOptions = MenuOptions.map(
+      (item: { label: string; key: string; icon: any }) => {
+        return {
+          label: item.label,
+          key: item.key,
+          icon: item.icon,
+        }
       }
-    })
+    )
     return headerMenuOptions
   }
 
@@ -246,6 +248,6 @@ export function useDataList() {
 
   return {
     state,
-    getHeaderMenuOptions
+    getHeaderMenuOptions,
   }
 }
