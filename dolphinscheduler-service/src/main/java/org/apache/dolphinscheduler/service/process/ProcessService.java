@@ -2691,6 +2691,8 @@ public class ProcessService {
                                                    String taskName, Integer groupId,
                                                    Integer processId, Integer priority, TaskGroupQueueStatus status) {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+        taskGroupQueue.setCreateTime(new Date());
+        taskGroupQueue.setUpdateTime(new Date());
         taskGroupQueueMapper.insert(taskGroupQueue);
         return taskGroupQueue;
     }
