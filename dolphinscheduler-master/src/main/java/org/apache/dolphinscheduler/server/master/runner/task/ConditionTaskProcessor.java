@@ -50,8 +50,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private DependentParameters dependentParameters;
 
-    ProcessInstance processInstance;
-
     /**
      * condition result
      */
