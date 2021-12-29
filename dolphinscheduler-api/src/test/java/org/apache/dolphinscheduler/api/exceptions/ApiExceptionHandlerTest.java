@@ -50,5 +50,4 @@ public class ApiExceptionHandlerTest {
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
         Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(),result.getCode().intValue());
     }
-
 }

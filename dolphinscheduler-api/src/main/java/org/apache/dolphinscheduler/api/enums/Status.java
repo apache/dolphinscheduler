@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.enums;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -45,7 +46,7 @@ public enum Status {
     DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
     DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
     TENANT_NOT_EXIST(10017, "tenant not exists", "租户不存在"),
-    PROJECT_NOT_FOUNT(10018, "project {0} not found ", "项目[{0}]不存在"),
+    PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
     PROJECT_ALREADY_EXISTS(10019, "project {0} already exists", "项目名称[{0}]已存在"),
     TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
     TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE(10021, "task instance {0} is not sub process instance", "任务实例[{0}]不是子流程实例"),
@@ -211,7 +212,9 @@ public enum Status {
     TRANSFORM_PROJECT_OWNERSHIP(10179, "Please transform project ownership [{0}]", "请先转移项目所有权[{0}]"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
     CURRENT_LOGIN_USER_TENANT_NOT_EXIST(10181, "the tenant of the currently login user is not specified", "未指定当前登录用户的租户"),
-
+    REVOKE_PROJECT_ERROR(10182, "revoke project error", "撤销项目授权错误"),
+    QUERY_AUTHORIZED_USER(10183, "query authorized user error", "查询拥有项目权限的用户错误"),
+    PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -284,10 +287,12 @@ public enum Status {
     MOVE_PROCESS_TASK_RELATION_ERROR(50047, "move process task relation error", "移动任务到其他工作流错误"),
     DELETE_TASK_PROCESS_RELATION_ERROR(50048, "delete process task relation error", "删除工作流任务关系错误"),
     QUERY_TASK_PROCESS_RELATION_ERROR(50049, "query process task relation error", "查询工作流任务关系错误"),
-    TASK_DEFINE_STATE_ONLINE(50050, "task definition {0} is already on line", "任务定义[{0}]已上线"),
-    TASK_HAS_DOWNSTREAM(50051, "Task [{0}] exists downstream dependence", "任务[{0}]存在下游依赖"),
-    MAIN_TABLE_USING_VERSION(50052, "the version that the master table is using", "主表正在使用该版本"),
-    PROJECT_PROCESS_NOT_MATCH(50053, "the project and the process is not match", "项目和工作流不匹配"),
+    TASK_DEFINE_STATE_ONLINE(50050, "task definition [{0}] is already on line", "任务定义[{0}]已上线"),
+    TASK_HAS_DOWNSTREAM(50051, "Task exists downstream [{0}] dependence", "任务存在下游[{0}]依赖"),
+    TASK_HAS_UPSTREAM(50052, "Task [{0}] exists upstream dependence", "任务[{0}]存在上游依赖"),
+    MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
+    PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
+    DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
@@ -301,6 +306,7 @@ public enum Status {
     UPDATE_ACCESS_TOKEN_ERROR(70013, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(70014, "delete access token error", "删除访问token错误"),
     ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist", "访问token不存在"),
+    QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
 
 
     COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
@@ -348,7 +354,23 @@ public enum Status {
     QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(1200018, "query execute result list paging error", "获取数据质量任务结果分页错误"),
     GET_DATASOURCE_OPTIONS_ERROR(1200019, "get datasource options error", "获取数据源Options错误"),
     GET_DATASOURCE_TABLES_ERROR(1200020, "get datasource tables error", "获取数据源表列表错误"),
-    GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200021, "get datasource table columns error", "获取数据源表列名错误");
+    GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200021, "get datasource table columns error", "获取数据源表列名错误"),
+    TASK_GROUP_NAME_EXSIT(130001,"this task group name is repeated in a project","该任务组名称在一个项目中已经使用"),
+    TASK_GROUP_SIZE_ERROR(130002,"task group size error","任务组大小应该为大于1的整数"),
+    TASK_GROUP_STATUS_ERROR(130003,"task group status error","任务组已经被关闭"),
+    TASK_GROUP_FULL(130004,"task group is full","任务组已经满了"),
+    TASK_GROUP_USED_SIZE_ERROR(130005,"the used size number of task group is dirty","任务组使用的容量发生了变化"),
+    TASK_GROUP_QUEUE_RELEASE_ERROR(130006,"relase task group queue failed","任务组资源释放时出现了错误"),
+    TASK_GROUP_QUEUE_AWAKE_ERROR(130007,"awake waiting task failed","任务组使唤醒等待任务时发生了错误"),
+    CREATE_TASK_GROUP_ERROR(130008,"create task group error","创建任务组错误"),
+    UPDATE_TASK_GROUP_ERROR(130009,"update task group list error","更新任务组错误"),
+    QUERY_TASK_GROUP_LIST_ERROR(130010,"query task group list error","查询任务组列表错误"),
+    CLOSE_TASK_GROUP_ERROR(130011,"close task group error","关闭任务组错误"),
+    START_TASK_GROUP_ERROR(130012,"start task group error","启动任务组错误"),
+    QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013,"query task group queue list error","查询任务组队列列表错误"),
+    TASK_GROUP_CACHE_START_FAILED(130014,"cache start failed","任务组相关的缓存启动失败"),
+    TASK_GROUP_QUEUE_ALREADY_START(130015, "task group queue already start", "节点已经获取任务组资源")
+    ;
 
     private final int code;
     private final String enMsg;
@@ -370,5 +392,19 @@ public enum Status {
         } else {
             return this.enMsg;
         }
+    }
+
+    /**
+     * Retrieve Status enum entity by status code.
+     * @param code
+     * @return
+     */
+    public static Optional<Status> findStatusBy(int code) {
+        for (Status status : Status.values()) {
+            if (code == status.getCode()) {
+                return Optional.of(status);
+            }
+        }
+        return Optional.empty();
     }
 }

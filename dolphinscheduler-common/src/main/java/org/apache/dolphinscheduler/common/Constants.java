@@ -39,11 +39,6 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
-     * alter properties
-     */
-    public static final int ALERT_RPC_PORT = 50052;
-
-    /**
      * registry properties
      */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
@@ -306,7 +301,7 @@ public final class Constants {
      *
      * rpc port
      */
-    public static final int RPC_PORT = 50051;
+    public static final String RPC_PORT = "rpc.port";
 
     /**
      * forbid running task
@@ -365,7 +360,15 @@ public final class Constants {
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
 
+    /**
+     * sleep 1000ms
+     */
     public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * short sleep 100ms
+     */
+    public static final int SLEEP_TIME_MILLIS_SHORT = 100;
 
     /**
      * one second mils
@@ -451,6 +454,10 @@ public final class Constants {
      * SUCCEEDED
      */
     public static final String SUCCEEDED = "SUCCEEDED";
+    /**
+     * ENDED
+     */
+    public static final String ENDED = "ENDED";
     /**
      * NEW
      */
@@ -789,5 +796,7 @@ public final class Constants {
      * data.quality.error.output.path
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
+
+    public static final String CACHE_KEY_VALUE_ALL = "'all'";
 
 }

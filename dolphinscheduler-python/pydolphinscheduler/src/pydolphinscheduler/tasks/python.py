@@ -22,29 +22,30 @@ import types
 from typing import Any
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.task import Task, TaskParams
+from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSParamException
-
-
-class PythonTaskParams(TaskParams):
-    """Parameter only for Python task types."""
-
-    def __init__(self, raw_script: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.raw_script = raw_script
 
 
 class Python(Task):
     """Task Python object, declare behavior for Python task to dolphinscheduler."""
 
+    _task_custom_attr = {
+        "raw_script",
+    }
+
     def __init__(self, name: str, code: Any, *args, **kwargs):
-        if isinstance(code, str):
-            task_params = PythonTaskParams(raw_script=code)
-        elif isinstance(code, types.FunctionType):
-            py_function = inspect.getsource(code)
-            task_params = PythonTaskParams(raw_script=py_function)
+        super().__init__(name, TaskType.PYTHON, *args, **kwargs)
+        self._code = code
+
+    @property
+    def raw_script(self) -> str:
+        """Get python task define attribute `raw_script`."""
+        if isinstance(self._code, str):
+            return self._code
+        elif isinstance(self._code, types.FunctionType):
+            py_function = inspect.getsource(self._code)
+            return py_function
         else:
             raise PyDSParamException(
-                "Parameter code do not support % for now.", type(code)
+                "Parameter code do not support % for now.", type(self._code)
             )
-        super().__init__(name, TaskType.PYTHON, task_params, *args, **kwargs)

@@ -303,6 +303,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',

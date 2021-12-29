@@ -122,15 +122,12 @@
         this.store.dispatch('security/getUiPluginById', {
           pluginId: this.pluginDefineId
         }).then(res => {
-          this.rule = JSON.parse(res.pluginParams)
-          this.rule.forEach(item => {
+          this.rule = JSON.parse(res.pluginParams).map(item => {
             if (item.title.indexOf('$t') !== -1) {
               item.title = this.$t(item.field)
             }
-            // fix null pointer exception
-            if (!item.props) {
-              item.props = {}
-            }
+            item.props = item.props || {}
+            return item
           })
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -173,20 +170,17 @@
     },
     watch: {},
     created () {
-      let pluginInstanceParams = []
       if (this.item) {
         this.instanceName = this.item.instanceName
         this.pluginDefineId = this.item.pluginDefineId
-        JSON.parse(this.item.pluginInstanceParams).forEach(item => {
+        this.rule = JSON.parse(this.item.pluginInstanceParams).map(item => {
           if (item.title.indexOf('$t') !== -1) {
             item.title = this.$t(item.field)
           }
-          pluginInstanceParams.push(item)
+          item.props = item.props || {}
+          return item
         })
-        this.rule = pluginInstanceParams
       }
-    },
-    mounted () {
     },
     components: { mPopover, mListBoxF }
   }

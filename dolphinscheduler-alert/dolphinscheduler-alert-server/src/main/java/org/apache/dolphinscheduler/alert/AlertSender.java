@@ -37,11 +37,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class AlertSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(AlertSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertSender.class);
 
     private final AlertDao alertDao;
     private final AlertPluginManager alertPluginManager;
@@ -57,7 +58,7 @@ public final class AlertSender {
             int alertGroupId = alert.getAlertGroupId();
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
-                log.error("send alert msg fail,no bind plugin instance.");
+                logger.error("send alert msg fail,no bind plugin instance.");
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alert.getId());
                 continue;
             }
@@ -100,7 +101,7 @@ public final class AlertSender {
             alertSendResponseResult.setStatus(false);
             alertSendResponseResult.setMessage(message);
             sendResponseResults.add(alertSendResponseResult);
-            log.error("Alert GroupId {} send error : not found alert instance", alertGroupId);
+            logger.error("Alert GroupId {} send error : not found alert instance", alertGroupId);
             return new AlertSendResponseCommand(false, sendResponseResults);
         }
 
@@ -130,7 +131,7 @@ public final class AlertSender {
             String message = String.format("Alert Plugin %s send error : return value is null", pluginInstanceName);
             alertResultExtend.setStatus(String.valueOf(false));
             alertResultExtend.setMessage(message);
-            log.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, instance.getPluginDefineId());
+            logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, instance.getPluginDefineId());
             return alertResultExtend;
         }
 
@@ -143,23 +144,23 @@ public final class AlertSender {
             alertResult = alertChannel.get().process(alertInfo);
         } catch (Exception e) {
             alertResult = new AlertResult("false", e.getMessage());
-            log.error("send alert error alert data id :{},", alertData.getId(), e);
+            logger.error("send alert error alert data id :{},", alertData.getId(), e);
         }
 
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
             alertResultExtend.setStatus(String.valueOf(false));
             alertResultExtend.setMessage(message);
-            log.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
+            logger.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
         } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
             alertResultExtend.setStatus(String.valueOf(false));
             alertResultExtend.setMessage(alertResult.getMessage());
-            log.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
+            logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
         } else {
             String message = String.format("Alert Plugin %s send success", pluginInstanceName);
             alertResultExtend.setStatus(String.valueOf(true));
             alertResultExtend.setMessage(message);
-            log.info("Alert Plugin {} send success", pluginInstanceName);
+            logger.info("Alert Plugin {} send success", pluginInstanceName);
         }
         return alertResultExtend;
     }
