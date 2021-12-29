@@ -50,7 +50,7 @@ const login = defineComponent({
         </div>
         <div class={styles['login-model']}>
           <div class={styles.logo}>
-            <div class={styles['logo-img']}></div>
+            <div class={styles['logo-img']} />
           </div>
           <div class={styles['form-model']}>
             <NForm rules={this.rules} ref='loginFormRef'>
@@ -82,8 +82,13 @@ const login = defineComponent({
                 />
               </NFormItem>
             </NForm>
-            <NButton round type='primary' onClick={this.handleLogin}>
-              {this.t('login.signin')}
+            <NButton
+              round
+              type='info'
+              style={{ width: '100%' }}
+              onClick={this.handleLogin}
+            >
+              {this.t('login.login')}
             </NButton>
           </div>
         </div>

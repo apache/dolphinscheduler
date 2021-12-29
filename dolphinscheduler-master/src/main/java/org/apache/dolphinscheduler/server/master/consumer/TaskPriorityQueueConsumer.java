@@ -75,6 +75,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+
     /**
      * master config
      */

@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { axios } from '@/service/service'
-
-export function signOut(): any {
-  return axios({
-    url: '/signOut',
-    method: 'post',
-  })
-}
+<template>
+  <router-view></router-view>
+</template>
+<script>
+  export default {
+    name: 'task-group-option-index'
+  }
+</script>

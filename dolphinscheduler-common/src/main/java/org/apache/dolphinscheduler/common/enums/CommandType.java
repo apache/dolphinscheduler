@@ -52,7 +52,8 @@ public enum CommandType {
     PAUSE(8, "pause a process"),
     STOP(9, "stop a process"),
     RECOVER_WAITING_THREAD(10, "recover waiting thread"),
-    RECOVER_SERIAL_WAIT(11, "recover serial wait");
+    RECOVER_SERIAL_WAIT(11, "recover serial wait"),
+    ;
 
     CommandType(int code, String descp) {
         this.code = code;

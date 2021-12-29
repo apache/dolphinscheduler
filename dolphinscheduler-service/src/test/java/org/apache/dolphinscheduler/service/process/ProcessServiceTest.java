@@ -120,25 +120,18 @@ public class ProcessServiceTest {
 
     @InjectMocks
     private ProcessService processService;
-
     @Mock
     private CommandMapper commandMapper;
-    
     @Mock
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
-
     @Mock
     private ErrorCommandMapper errorCommandMapper;
-
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
-
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
-
     @Mock
     private UserMapper userMapper;
-
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
     @Mock

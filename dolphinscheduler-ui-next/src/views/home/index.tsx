@@ -16,12 +16,21 @@
  */
 
 import { defineComponent } from 'vue'
-import styles from './index.module.scss'
+import Card from '@/components/card'
+import PieChart from '@/components/chart/modules/Pie'
+import GaugeChart from '@/components/chart/modules/Gauge'
+import BarChart from '@/components/chart/modules/Bar'
 
 export default defineComponent({
   name: 'home',
   setup() {},
   render() {
-    return <div class={styles.container}>Home Test</div>
+    return (
+      <div>
+        <Card title='test'>{{ default: () => <PieChart /> }}</Card>
+        <Card title='test'>{{ default: () => <GaugeChart /> }}</Card>
+        <Card title='test'>{{ default: () => <BarChart /> }}</Card>
+      </div>
+    )
   },
 })

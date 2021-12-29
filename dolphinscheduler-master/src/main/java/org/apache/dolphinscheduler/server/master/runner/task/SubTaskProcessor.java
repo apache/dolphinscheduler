@@ -36,8 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SubTaskProcessor extends BaseTaskProcessor {
 
-    private ProcessInstance processInstance;
-
     private ProcessInstance subProcessInstance = null;
     private TaskDefinition taskDefinition;
 

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -186,6 +185,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
                 accessTokenMapper.selectById(accessToken.getId());
         assertNull(resultAccessToken);
     }
+
 
     /**
      * create accessTokens

@@ -33,9 +33,9 @@ import lombok.Getter;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(id = "project-tab")
+    @FindBy(id = "tabProject")
     private WebElement projectTab;
-    @FindBy(id = "security-tab")
+    @FindBy(id = "tabSecurity")
     private WebElement securityTab;
 
     public NavBarPage(RemoteWebDriver driver) {

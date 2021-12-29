@@ -52,14 +52,14 @@ const menu = {
           path: 'definition',
           id: 0,
           enabled: true,
-          classNames: 'process-definition'
+          classNames: 'tab-process-definition'
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
           enabled: true,
-          classNames: 'process-instance'
+          classNames: 'tab-process-instance'
         },
         {
           name: `${i18n.$t('Task Instance')}`,
@@ -117,7 +117,7 @@ const menu = {
       enabled: true,
       icon: 'el-icon-user-solid',
       children: [],
-      classNames: 'tenant-manage'
+      classNames: 'tab-tenant-manage'
     },
     {
       name: `${i18n.$t('User Manage')}`,
@@ -126,7 +126,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-user-solid',
-      children: []
+      children: [],
+      classNames: 'tab-user-manage'
     },
     {
       name: `${i18n.$t('Warning group manage')}`,
@@ -210,6 +211,28 @@ const menu = {
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-func',
+          id: 1,
+          enabled: true
+        }
+      ]
+    },
+    {
+      name: `${i18n.$t('Task group manage')}`,
+      id: 2,
+      path: '',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-setting',
+      children: [
+        {
+          name: `${i18n.$t('Task group option')}`,
+          path: 'task-group-option',
+          id: 0,
+          enabled: true
+        },
+        {
+          name: `${i18n.$t('Task group queue')}`,
+          path: 'task-group-queue',
           id: 1,
           enabled: true
         }
