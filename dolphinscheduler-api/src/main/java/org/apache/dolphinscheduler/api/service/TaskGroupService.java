@@ -85,7 +85,7 @@ public interface TaskGroupService {
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param name      name
+     * @param projectCode  project code
      * @return the result code and msg
      */
     Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode);
