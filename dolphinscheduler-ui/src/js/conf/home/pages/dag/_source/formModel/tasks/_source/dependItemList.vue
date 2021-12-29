@@ -62,6 +62,9 @@
     name: 'ALL'
   }
 
+  // sessionStorage's Prefix
+  const projectCodePrefix = 'project_code_'
+
   export default {
     name: 'dep-list',
     data () {
@@ -137,15 +140,21 @@
       },
       _getProcessByProjectCode (code) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getProcessByProjectCode', code).then(res => {
-            let definitionList = _.map(_.cloneDeep(res), v => {
-              return {
-                value: v.processDefinition.code,
-                label: v.processDefinition.name
-              }
+          let definitionCacheList = JSON.parse(sessionStorage.getItem(projectCodePrefix + code))
+          if (definitionCacheList) {
+            resolve(definitionCacheList)
+          } else {
+            this.store.dispatch('dag/getProcessByProjectCode', code).then(res => {
+              let definitionList = _.map(_.cloneDeep(res), v => {
+                return {
+                  value: v.processDefinition.code,
+                  label: v.processDefinition.name
+                }
+              })
+              sessionStorage.setItem(projectCodePrefix + code, JSON.stringify(definitionList))
+              resolve(definitionList)
             })
-            resolve(definitionList)
-          })
+          }
         })
       },
       /**
@@ -283,11 +292,22 @@
         } else {
           // get definitionCode codes
           let codes = _.map(this.dependItemList, v => v.definitionCode).join(',')
-          // get item list
-          this._getDependItemList(codes, false).then(res => {
-            _.map(this.dependItemList, (v, i) => {
-              this._getProcessByProjectCode(v.projectCode).then(definitionList => {
-                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, definitionList, [_.cloneDeep(DEP_ALL_TASK)].concat(_.map(res[v.definitionCode] || [], v => ({ code: v.code, name: v.name }))), v))
+
+          // wait _getProcessByProjectCode's cache finished then get item list from cache
+          Promise.all(this.projectList.map(
+            item => this._getProcessByProjectCode(item.value)
+          )).then((res) => {
+            // get item list
+            this._getDependItemList(codes, false).then(res => {
+              _.map(this.dependItemList, (v, i) => {
+                this._getProcessByProjectCode(v.projectCode).then(definitionList => {
+                  this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode,
+                    JSON.parse(sessionStorage.getItem(projectCodePrefix + v.projectCode)),
+                    [_.cloneDeep(DEP_ALL_TASK)].concat(_.map(res[v.definitionCode] || [], v => ({
+                      code: v.code,
+                      name: v.name
+                    }))), v))
+                })
               })
             })
           })
@@ -295,6 +315,12 @@
       })
     },
     mounted () {
+    },
+    beforeDestroy() {
+      // Remove _getProcessByProjectCode's cache
+      this.projectList.map(
+        item => sessionStorage.removeItem(projectCodePrefix + item.value)
+      )
     },
     components: {}
   }
