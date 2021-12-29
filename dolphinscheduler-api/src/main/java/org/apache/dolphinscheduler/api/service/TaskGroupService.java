@@ -35,7 +35,7 @@ public interface TaskGroupService {
      * @param groupSize   task group total size
      * @return the result code and msg
      */
-    Map<String, Object> createTaskGroup(User loginUser, long projectcode,String name,
+    Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name,
                                         String description, int groupSize);
 
     /**
