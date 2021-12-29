@@ -302,9 +302,9 @@
               _.map(this.dependItemList, (v, i) => {
                 this._getProcessByProjectCode(v.projectCode).then(definitionList => {
                   this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, JSON.parse(sessionStorage.getItem(projectCodePrefix + v.projectCode)), [_.cloneDeep(DEP_ALL_TASK)].concat(_.map(res[v.definitionCode] || [], v => ({
-                      code: v.code,
-                      name: v.name
-                    }))), v))
+                    code: v.code,
+                    name: v.name
+                  }))), v))
                 })
               })
             })
@@ -314,7 +314,7 @@
     },
     mounted () {
     },
-    beforeDestroy() {
+    beforeDestroy () {
       // Remove _getProcessByProjectCode's cache
       this.projectList.map(
         item => sessionStorage.removeItem(projectCodePrefix + item.value)
