@@ -28,12 +28,20 @@ const props = {
     type: [String, Number] as PropType<string | number>,
     default: '100%',
   },
+  xAxisData: {
+    type: Array as PropType<Array<string>>,
+    default: () => [],
+  },
+  seriesData: {
+    type: Array as PropType<Array<number>>,
+    default: () => [],
+  },
 }
 
 const BarChart = defineComponent({
   name: 'BarChart',
   props,
-  setup() {
+  setup(props) {
     const barChartRef: Ref<HTMLDivElement | null> = ref(null)
 
     const option = {
@@ -53,7 +61,7 @@ const BarChart = defineComponent({
       xAxis: [
         {
           type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: props.xAxisData,
           axisTick: {
             alignWithLabel: true,
           },
@@ -66,10 +74,9 @@ const BarChart = defineComponent({
       ],
       series: [
         {
-          name: 'Direct',
           type: 'bar',
           barWidth: '60%',
-          data: [10, 52, 200, 334, 390, 330, 220],
+          data: props.seriesData,
         },
       ],
     }
