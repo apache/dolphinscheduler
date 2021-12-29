@@ -32,7 +32,7 @@
     </resultMap>
 
     <sql id = "baseSql">
-        id,name,description,project_code,group_size,use_size,create_time,update_time
+        id,name,description,project_code,group_size,use_size,status,create_time,update_time
     </sql>
 
     <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">

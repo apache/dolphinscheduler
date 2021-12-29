@@ -192,6 +192,114 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * get task group list pages
+   */
+  getTaskGroupListPaging ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('task-group/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get task group list pages
+   */
+  getTaskGroupListPagingByProjectCode ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('task-group/query-list-by-projectCode', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * create task group
+   */
+  createTaskGroup ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/create', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update task group
+   */
+  updateTaskGroup ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/update', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * close task group
+   */
+  closeTaskGroup ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/close-task-group', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * start task group
+   */
+  startTaskGroup ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/start-task-group', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * query the details of task group through group id
+   */
+  getTaskListInTaskGroupQueueById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('task-group/query-list-by-group-id', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * modify the priority of the task in the queue
+   */
+  modifyPriority ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/modifyPriority', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * force to start the task in the queue
+   */
+  forceStartTaskInQueue ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('task-group/forceStart', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 
 }
