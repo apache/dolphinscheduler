@@ -15,7 +15,19 @@
  * limitations under the License.
  */
 
-.card-table {
-  display: flex;
-  justify-content: space-between;
+import { useI18n } from 'vue-i18n'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+
+export function useTable() {
+  const { t } = useI18n()
+
+  const columnsRef: TableColumns<any> = [
+    { title: '#', key: '#' },
+    { title: t('home.number'), key: 'number' },
+    { title: t('home.state'), key: 'state' },
+  ]
+
+  return {
+    columnsRef,
+  }
 }
