@@ -69,6 +69,7 @@ import py4j.GatewayServer;
 
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
     @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+        "org.apache.dolphinscheduler.server.master.*",
         "org.apache.dolphinscheduler.server.worker.*",
         "org.apache.dolphinscheduler.server.monitor.*",
         "org.apache.dolphinscheduler.server.log.*",
