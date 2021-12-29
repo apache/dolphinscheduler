@@ -1073,7 +1073,6 @@ CREATE TABLE t_ds_task_group
    project_code  bigint(20) DEFAULT '0',
    use_size    int(11) DEFAULT '0' ,
    user_id     int(11) DEFAULT NULL ,
-   project_id  int(11) DEFAULT NULL ,
    status      int(4) DEFAULT '1'  ,
    create_time datetime DEFAULT NULL ,
    update_time datetime DEFAULT NULL ,

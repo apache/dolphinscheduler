@@ -177,7 +177,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param name      name
+     * @param projectCode project code
      * @return the result code and msg
      */
     @Override
