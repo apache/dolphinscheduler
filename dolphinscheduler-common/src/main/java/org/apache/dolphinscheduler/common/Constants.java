@@ -210,6 +210,11 @@ public final class Constants {
     public static final int SOCKET_TIMEOUT = 60 * 1000;
 
     /**
+     * registry session timeout
+     */
+    public static final int REGISTRY_SESSION_TIMEOUT = 10 * 1000;
+
+    /**
      * http header
      */
     public static final String HTTP_HEADER_UNKNOWN = "unKnown";
@@ -260,6 +265,11 @@ public final class Constants {
      * default admin permission
      */
     public static final int DEFAULT_ADMIN_PERMISSION = 7;
+
+    /**
+     * default hash map size
+     */
+    public static final int DEFAULT_HASH_MAP_SIZE = 16;
 
 
     /**

@@ -13,24 +13,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+	)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
 
-import { defineComponent } from 'vue'
-import Card from '@/components/card'
-import PieChart from '@/components/chart/modules/Pie'
-import GaugeChart from '@/components/chart/modules/Gauge'
-import BarChart from '@/components/chart/modules/Bar'
+    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_instance ADD COLUMN IF NOT EXISTS "restart_time" timestamp DEFAULT NULL';
+	return 'Success!';
+	exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
 
-export default defineComponent({
-  name: 'home',
-  setup() {},
-  render() {
-    return (
-      <div>
-        <Card title='test'>{{ default: () => <PieChart /> }}</Card>
-        <Card title='test'>{{ default: () => <GaugeChart /> }}</Card>
-        <Card title='test'>{{ default: () => <BarChart /> }}</Card>
-      </div>
-    )
-  },
-})
+select dolphin_update_metadata();
+
+d//

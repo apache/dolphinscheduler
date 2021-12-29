@@ -88,6 +88,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         TaskGroup taskGroup = new TaskGroup(name, projectcode, description,
             groupSize, loginUser.getId(), Flag.YES.getCode());
+
+        taskGroup.setCreateTime(new Date());
+        taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -120,6 +123,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         taskGroup.setGroupSize(groupSize);
         taskGroup.setDescription(description);
+        taskGroup.setUpdateTime(new Date());
         if (StringUtils.isNotEmpty(name)) {
             taskGroup.setName(name);
         }

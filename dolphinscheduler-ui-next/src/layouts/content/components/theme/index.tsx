@@ -15,44 +15,31 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import { NDropdown, NIcon, NButton } from 'naive-ui'
+import { defineComponent } from 'vue'
+import { NButton } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useThemeStore } from '@/store/theme/theme'
 import styles from './index.module.scss'
-import { DownOutlined, UserOutlined } from '@vicons/antd'
-import { useDropDown } from './use-dropdown'
 
-const User = defineComponent({
-  name: 'User',
-  props: {
-    profileOptions: {
-      type: Array as PropType<any>,
-      default: [],
-    },
-  },
+const Theme = defineComponent({
+  name: 'Theme',
   setup() {
-    const { handleSelect } = useDropDown()
-    return { handleSelect }
+    const { t } = useI18n()
+    const themeStore = useThemeStore()
+
+    return { t, themeStore }
   },
   render() {
     return (
-      <NDropdown
-        trigger='hover'
-        show-arrow
-        options={this.profileOptions}
-        on-select={this.handleSelect}
+      <NButton
+        class={styles.theme}
+        quaternary
+        onClick={() => (this.themeStore.darkTheme = !this.themeStore.darkTheme)}
       >
-        <NButton text>
-          <NIcon class={styles.icon}>
-            <UserOutlined />
-          </NIcon>
-          admin
-          <NIcon class={styles.icon}>
-            <DownOutlined />
-          </NIcon>
-        </NButton>
-      </NDropdown>
+        {this.t(this.themeStore.darkTheme ? 'theme.light' : 'theme.dark')}
+      </NButton>
     )
   },
 })
 
-export default User
+export default Theme

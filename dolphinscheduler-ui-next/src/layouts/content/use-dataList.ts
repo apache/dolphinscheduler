@@ -17,6 +17,7 @@
 
 import { reactive, h } from 'vue'
 import { NIcon } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 import {
   HomeOutlined,
   ProfileOutlined,
@@ -25,180 +26,191 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  FundProjectionScreenOutlined,
+  PartitionOutlined,
+  SettingOutlined,
+  FileSearchOutlined,
+  RobotOutlined,
+  AppstoreOutlined,
+  UsergroupAddOutlined,
+  UserAddOutlined,
+  WarningOutlined,
+  InfoCircleOutlined,
+  ControlOutlined,
+  SlackOutlined,
+  EnvironmentOutlined,
+  KeyOutlined,
 } from '@vicons/antd'
 
 export function useDataList() {
+  const { t } = useI18n()
+
   const renderIcon = (icon: any) => {
     return () => h(NIcon, null, { default: () => h(icon) })
   }
 
   const menuOptions = [
     {
-      label: '首页',
+      label: t('menu.home'),
       key: 'home',
       icon: renderIcon(HomeOutlined),
     },
     {
-      label: '项目管理',
+      label: t('menu.project'),
       key: 'project',
       icon: renderIcon(ProfileOutlined),
       children: [
         {
-          label: '工作流监控',
+          label: t('menu.workflow_monitoring'),
           key: 'workflow-monitoring',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(FundProjectionScreenOutlined),
         },
         {
-          label: '工作流关系',
+          label: t('menu.workflow_relationships'),
           key: 'workflow-relationships',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(PartitionOutlined),
         },
         {
-          label: '工作流',
+          label: t('menu.workflow'),
           key: 'workflow',
-          icon: renderIcon(ProfileOutlined),
+          icon: renderIcon(SettingOutlined),
           children: [
             {
-              label: '工作流定义',
+              label: t('menu.workflow_definition'),
               key: 'workflow-definition',
-              icon: renderIcon(ProfileOutlined),
             },
             {
-              label: '工作流实例',
+              label: t('menu.workflow_instance'),
               key: 'workflow-instance',
-              icon: renderIcon(ProfileOutlined),
             },
             {
-              label: '任务实例',
+              label: t('menu.task_instance'),
               key: 'task-instance',
-              icon: renderIcon(ProfileOutlined),
             },
-          ]
+            {
+              label: t('menu.task_definition'),
+              key: 'task-definition',
+            },
+          ],
         },
-      ]
+      ],
     },
     {
-      label: '资源中心',
+      label: t('menu.resources'),
       key: 'resources',
       icon: renderIcon(FolderOutlined),
       children: [
         {
-          label: '文件管理',
-          key: 'file-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.file_manage'),
+          key: 'file-manage',
+          icon: renderIcon(FileSearchOutlined),
         },
         {
-          label: 'UDF管理',
-          key: 'UDF-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.udf_manage'),
+          key: 'udf-manage',
+          icon: renderIcon(RobotOutlined),
           children: [
             {
-              label: '资源管理',
-              key: 'resource-management',
-              icon: renderIcon(ProfileOutlined),
+              label: t('menu.resource_manage'),
+              key: 'resource-manage',
             },
             {
-              label: '函数管理',
-              key: 'function-management',
-              icon: renderIcon(ProfileOutlined),
-            }
-          ]
+              label: t('menu.function_manage'),
+              key: 'function-manage',
+            },
+          ],
         },
-      ]
+      ],
     },
     {
-      label: '数据源中心',
+      label: t('menu.datasource'),
       key: 'datasource',
       icon: renderIcon(DatabaseOutlined),
     },
     {
-      label: '监控中心',
+      label: t('menu.monitor'),
       key: 'monitor',
       icon: renderIcon(DesktopOutlined),
       children: [
         {
-          label: '服务管理',
-          key: 'service-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.service_manage'),
+          key: 'service-manage',
+          icon: renderIcon(AppstoreOutlined),
           children: [
             {
-              label: 'Master',
+              label: t('menu.master'),
               key: 'master',
-              icon: renderIcon(ProfileOutlined),
             },
             {
-              label: 'Worker',
+              label: t('menu.worker'),
               key: 'worker',
-              icon: renderIcon(ProfileOutlined),
             },
             {
-              label: 'DB',
-              key: 'DB',
-              icon: renderIcon(ProfileOutlined),
-            }
-          ]
+              label: t('menu.db'),
+              key: 'db',
+            },
+          ],
         },
         {
-          label: '统计管理',
-          key: 'statistical-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.statistical_manage'),
+          key: 'statistical-manage',
+          icon: renderIcon(AppstoreOutlined),
           children: [
             {
-              label: 'Statistics',
+              label: t('menu.statistics'),
               key: 'statistics',
-              icon: renderIcon(ProfileOutlined),
             },
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
-      label: '安全中心',
+      label: t('menu.security'),
       key: 'security',
       icon: renderIcon(SafetyCertificateOutlined),
       children: [
         {
-          label: '租户管理',
-          key: 'tenant-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.tenant_manage'),
+          key: 'tenant-manage',
+          icon: renderIcon(UsergroupAddOutlined),
         },
         {
-          label: '用户管理',
-          key: 'user-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.user_manage'),
+          key: 'user-manage',
+          icon: renderIcon(UserAddOutlined),
         },
         {
-          label: '告警组管理',
-          key: 'alarm-group-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.alarm_group_manage'),
+          key: 'alarm-group-manage',
+          icon: renderIcon(WarningOutlined),
         },
         {
-          label: '告警实例管理',
-          key: 'alarm-instance-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.alarm_instance_manage'),
+          key: 'alarm-instance-manage',
+          icon: renderIcon(InfoCircleOutlined),
         },
         {
-          label: 'Worker分组管理',
-          key: 'worker-group-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.worker_group_manage'),
+          key: 'worker-group-manage',
+          icon: renderIcon(ControlOutlined),
         },
         {
-          label: 'Yarn 队列管理',
-          key: 'yarn-queue-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.yarn_queue_manage'),
+          key: 'yarn-queue-manage',
+          icon: renderIcon(SlackOutlined),
         },
         {
-          label: '环境管理',
-          key: 'environmental-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.environmental_manage'),
+          key: 'environmental-manage',
+          icon: renderIcon(EnvironmentOutlined),
         },
         {
-          label: '令牌管理',
-          key: 'token-management',
-          icon: renderIcon(ProfileOutlined),
+          label: t('menu.token_manage'),
+          key: 'token-manage',
+          icon: renderIcon(KeyOutlined),
         },
-      ]
+      ],
     },
   ]
 
@@ -215,12 +227,12 @@ export function useDataList() {
 
   const profileOptions = [
     {
-      label: '用户信息',
+      label: t('profile.profile'),
       key: 'profile',
       icon: renderIcon(UserOutlined),
     },
     {
-      label: '退出登录',
+      label: t('profile.logout'),
       key: 'logout',
       icon: renderIcon(LogoutOutlined),
     },
@@ -228,24 +240,27 @@ export function useDataList() {
 
   const getHeaderMenuOptions = (MenuOptions: any) => {
     let headerMenuOptions = []
-    headerMenuOptions = MenuOptions.map((item: { label: string; key: string; icon: any }) => {
-      return {
-        label: item.label,
-        key: item.key,
-        icon: item.icon,
+    headerMenuOptions = MenuOptions.map(
+      (item: { label: string; key: string; icon: any }) => {
+        return {
+          label: item.label,
+          key: item.key,
+          icon: item.icon,
+        }
       }
-    })
+    )
     return headerMenuOptions
   }
 
   const state = reactive({
-    menuOptions: menuOptions,
-    languageOptions: languageOptions,
-    profileOptions: profileOptions,
+    isShowSide: false,
+    menuOptions,
+    languageOptions,
+    profileOptions,
   })
 
   return {
     state,
-    getHeaderMenuOptions
+    getHeaderMenuOptions,
   }
 }
