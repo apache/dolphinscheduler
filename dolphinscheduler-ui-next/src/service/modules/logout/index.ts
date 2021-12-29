@@ -15,32 +15,11 @@
  * limitations under the License.
  */
 
-import { toRaw } from 'vue'
-import { defineStore } from 'pinia'
-import RouteState from './types'
-import { RouteRecordRaw } from 'vue-router'
+import { axios } from '@/service/service'
 
-export const useAsyncRouteStore = defineStore({
-  id: 'route',
-  state: (): RouteState => ({
-    menus: [],
-    routers: [],
-    addRouters: [],
-  }),
-  getters: {
-    getMenus(): RouteRecordRaw[] {
-      return this.menus
-    },
-    getRouters(): RouteRecordRaw[] {
-      return toRaw(this.addRouters)
-    },
-  },
-  actions: {
-    setMenus(menus) {
-      this.menus = menus
-    },
-    async generateRouters(routes) {
-      console.log(routes)
-    },
-  },
-})
+export function logout(): any {
+  return axios({
+    url: '/signOut',
+    method: 'post',
+  })
+}

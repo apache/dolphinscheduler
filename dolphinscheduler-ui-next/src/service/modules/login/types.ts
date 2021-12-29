@@ -20,4 +20,8 @@ interface LoginReq {
   userPassword: string
 }
 
-export { LoginReq }
+interface SessionIdRes {
+  sessionId: string
+}
+
+export { LoginReq, SessionIdRes }

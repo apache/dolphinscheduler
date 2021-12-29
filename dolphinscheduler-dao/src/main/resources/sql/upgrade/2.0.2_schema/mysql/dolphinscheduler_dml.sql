@@ -13,35 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-import { reactive, ref, h } from 'vue'
-import { NIcon } from 'naive-ui'
-import { UserOutlined, LogoutOutlined } from '@vicons/antd'
-
-export function useDataList() {
-  const renderIcon = (icon: any) => {
-    return () => h(NIcon, null, { default: () => h(icon) })
-  }
-
-  const profileOptions = [
-    {
-      label: '用户信息',
-      key: 'profile',
-      icon: renderIcon(UserOutlined),
-    },
-    {
-      label: '退出登录',
-      key: 'logout',
-      icon: renderIcon(LogoutOutlined),
-    },
-  ]
-
-  const state = reactive({
-    profileOptions: profileOptions,
-  })
-
-  return {
-    state,
-  }
-}
+*/

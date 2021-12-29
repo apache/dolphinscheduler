@@ -216,6 +216,7 @@ CREATE TABLE t_ds_alert (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
 --
 -- Table structure for table t_ds_alertgroup
 --
@@ -307,9 +308,6 @@ CREATE TABLE t_ds_error_command (
   process_definition_version int DEFAULT 0,
   PRIMARY KEY (id)
 );
---
--- Table structure for table t_ds_master_server
---
 
 --
 -- Table structure for table t_ds_process_definition
@@ -340,6 +338,10 @@ CREATE TABLE t_ds_process_definition (
 
 create index process_definition_index on t_ds_process_definition (code,id);
 
+--
+-- Table structure for table t_ds_process_definition_log
+--
+
 DROP TABLE IF EXISTS t_ds_process_definition_log;
 CREATE TABLE t_ds_process_definition_log (
   id int NOT NULL  ,
@@ -363,6 +365,10 @@ CREATE TABLE t_ds_process_definition_log (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+--
+-- Table structure for table t_ds_task_definition
+--
 
 DROP TABLE IF EXISTS t_ds_task_definition;
 CREATE TABLE t_ds_task_definition (
@@ -395,6 +401,10 @@ CREATE TABLE t_ds_task_definition (
 
 create index task_definition_index on t_ds_task_definition (project_code,id);
 
+--
+-- Table structure for table t_ds_task_definition_log
+--
+
 DROP TABLE IF EXISTS t_ds_task_definition_log;
 CREATE TABLE t_ds_task_definition_log (
   id int NOT NULL  ,
@@ -426,6 +436,12 @@ CREATE TABLE t_ds_task_definition_log (
   PRIMARY KEY (id)
 ) ;
 
+create index idx_task_definition_log_code_version on t_ds_task_definition_log (code,version);
+
+--
+-- Table structure for table t_ds_process_task_relation
+--
+
 DROP TABLE IF EXISTS t_ds_process_task_relation;
 CREATE TABLE t_ds_process_task_relation (
   id int NOT NULL  ,
@@ -443,6 +459,12 @@ CREATE TABLE t_ds_process_task_relation (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+create index process_task_relation_idx_project_code_process_definition_code on t_ds_process_task_relation (project_code,process_definition_code);
+
+--
+-- Table structure for table t_ds_process_task_relation_log
+--
 
 DROP TABLE IF EXISTS t_ds_process_task_relation_log;
 CREATE TABLE t_ds_process_task_relation_log (
@@ -463,6 +485,8 @@ CREATE TABLE t_ds_process_task_relation_log (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+create index process_task_relation_log_idx_project_code_process_definition_code on t_ds_process_task_relation_log (project_code,process_definition_code);
 
 --
 -- Table structure for table t_ds_process_instance
@@ -505,6 +529,7 @@ CREATE TABLE t_ds_process_instance (
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
+  restart_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
@@ -936,6 +961,7 @@ INSERT INTO t_ds_version(version) VALUES ('1.4.0');
 --
 -- Table structure for table t_ds_plugin_define
 --
+
 DROP TABLE IF EXISTS t_ds_plugin_define;
 CREATE TABLE t_ds_plugin_define (
   id serial NOT NULL,
@@ -951,6 +977,7 @@ CREATE TABLE t_ds_plugin_define (
 --
 -- Table structure for table t_ds_alert_plugin_instance
 --
+
 DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
 CREATE TABLE t_ds_alert_plugin_instance (
   id serial NOT NULL,
@@ -965,6 +992,7 @@ CREATE TABLE t_ds_alert_plugin_instance (
 --
 -- Table structure for table t_ds_environment
 --
+
 DROP TABLE IF EXISTS t_ds_environment;
 CREATE TABLE t_ds_environment (
   id serial NOT NULL,
@@ -983,6 +1011,7 @@ CREATE TABLE t_ds_environment (
 --
 -- Table structure for table t_ds_environment_worker_group_relation
 --
+
 DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
 CREATE TABLE t_ds_environment_worker_group_relation (
   id serial NOT NULL,
@@ -994,6 +1023,10 @@ CREATE TABLE t_ds_environment_worker_group_relation (
   PRIMARY KEY (id) ,
   CONSTRAINT environment_worker_group_unique UNIQUE (environment_code,worker_group)
 );
+
+--
+-- Table structure for table t_ds_task_group_queue
+--
 
 DROP TABLE IF EXISTS t_ds_task_group_queue;
 CREATE TABLE t_ds_task_group_queue (
@@ -1011,6 +1044,10 @@ CREATE TABLE t_ds_task_group_queue (
    PRIMARY KEY (id)
 );
 
+--
+-- Table structure for table t_ds_task_group
+--
+
 DROP TABLE IF EXISTS t_ds_task_group;
 CREATE TABLE t_ds_task_group (
    id serial NOT NULL,
@@ -1020,7 +1057,6 @@ CREATE TABLE t_ds_task_group (
    project_code bigint DEFAULT '0' ,
    use_size    int DEFAULT '0' ,
    user_id     int DEFAULT NULL ,
-   project_id  int DEFAULT NULL ,
    status      int DEFAULT '1'  ,
    create_time timestamp DEFAULT NULL ,
    update_time timestamp DEFAULT NULL ,

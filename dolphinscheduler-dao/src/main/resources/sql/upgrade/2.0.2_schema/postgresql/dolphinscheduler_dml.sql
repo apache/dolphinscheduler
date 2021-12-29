@@ -13,28 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-import { reactive, ref } from 'vue'
-
-export function useDataList() {
-  const languageOptions = [
-    {
-      label: 'English',
-      key: 'en_US',
-    },
-    {
-      label: '中文',
-      key: 'zh_CN',
-    },
-  ]
-
-  const state = reactive({
-    chooseVal: ref('中文'),
-    languageOptions: languageOptions,
-  })
-
-  return {
-    state,
-  }
-}
+*/
