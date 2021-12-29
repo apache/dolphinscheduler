@@ -68,9 +68,18 @@ const menu = {
   token_manage: '令牌管理',
 }
 
+const home = {
+  task_state_statistics: '任务状态统计',
+  process_state_statistics: '流程状态统计',
+  process_definition_statistics: '流程定义统计',
+  number: '数量',
+  state: '状态',
+}
+
 export default {
   login,
   theme,
   profile,
   menu,
+  home,
 }

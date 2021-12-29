@@ -68,9 +68,18 @@ const menu = {
   token_manage: 'Token Manage',
 }
 
+const home = {
+  task_state_statistics: 'Task State Statistics',
+  process_state_statistics: 'Process State Statistics',
+  process_definition_statistics: 'Process Definition Statistics',
+  number: 'Number',
+  state: 'State',
+}
+
 export default {
   login,
   theme,
   profile,
   menu,
+  home,
 }

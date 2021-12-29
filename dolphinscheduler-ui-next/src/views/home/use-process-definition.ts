@@ -15,7 +15,25 @@
  * limitations under the License.
  */
 
-.card-table {
-  display: flex;
-  justify-content: space-between;
+import { useAsyncState } from '@vueuse/core'
+import { countDefinitionByUser } from '@/service/modules/projects-analysis'
+import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
+
+export function useProcessDefinition() {
+  const getProcessDefinition = () => {
+    const { state } = useAsyncState(
+      countDefinitionByUser({ projectCode: 0 }),
+      {}
+    )
+    return state
+  }
+
+  const formatProcessDefinition = (data: ProcessDefinitionRes) => {
+    const xAxisData: Array<string> = data.userList.map((item) => item.userName)
+    const seriesData: Array<number> = data.userList.map((item) => item.count)
+
+    return { xAxisData, seriesData }
+  }
+
+  return { getProcessDefinition, formatProcessDefinition }
 }

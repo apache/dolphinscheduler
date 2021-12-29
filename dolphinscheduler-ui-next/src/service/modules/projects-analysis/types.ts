@@ -24,4 +24,15 @@ interface StateReq extends CodeReq {
   startDate?: string
 }
 
-export { CodeReq, StateReq }
+interface UserList {
+  userName: string
+  userId: number
+  count: number
+}
+
+interface ProcessDefinitionRes {
+  count: number
+  userList: UserList[]
+}
+
+export { CodeReq, StateReq, ProcessDefinitionRes }

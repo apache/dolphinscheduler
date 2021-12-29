@@ -33,6 +33,8 @@ function initChart<Opt extends ECBasicOption>(
   const globalProperties =
     getCurrentInstance()?.appContext.config.globalProperties
 
+  option['backgroundColor'] = ''
+
   const init = () => {
     chart = globalProperties?.echarts.init(
       domRef.value,
