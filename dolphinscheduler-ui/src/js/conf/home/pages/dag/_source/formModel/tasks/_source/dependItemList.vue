@@ -77,7 +77,7 @@
       dependItemList: Array,
       index: Number,
       dependTaskList: Array,
-      projectDefinitionsCache: Object,
+      projectDefinitionsCache: Object
     },
     model: {
       prop: 'dependItemList',
@@ -137,7 +137,7 @@
         })
       },
       _getProcessByProjectCode (code) {
-        if(this.projectDefinitionsCache[code]){
+        if (this.projectDefinitionsCache[code]) {
           return Promise.resolve(this.projectDefinitionsCache[code])
         }
         return new Promise((resolve, reject) => {
@@ -291,25 +291,24 @@
         } else {
           // Get uniq definitionCodes and projectCodes
           const definitionCodes = _.uniq(this.dependItemList.map(dep => dep.definitionCode)).join(',')
-          const projectCodes = _.uniq(this.dependItemList.map(dep => dep.projectCode));
-          
+
           // Query all tasks by definitionCodes, definitionCodes can cross projects
           this._getDependItemList(definitionCodes, false)
-          .then(definitionTasks => {
-            _.map(this.dependItemList, (dep, i) => {
-              const definitionList = this.projectDefinitionsCache[dep.projectCode];
-              const depTasksList = (definitionTasks[dep.definitionCode] || [])
-                .map(task => ({ code: task.code, name: task.name }))
-                .concat(_.cloneDeep(DEP_ALL_TASK));
+            .then(definitionTasks => {
+              _.map(this.dependItemList, (dep, i) => {
+                const definitionList = this.projectDefinitionsCache[dep.projectCode]
+                const depTasksList = (definitionTasks[dep.definitionCode] || [])
+                  .map(task => ({ code: task.code, name: task.name }))
+                  .concat(_.cloneDeep(DEP_ALL_TASK))
 
-              this.$set(this.dependItemList, i, this._rtOldParams(
-                dep.definitionCode, 
-                definitionList,
-                depTasksList,
-                dep
-              ))
+                this.$set(this.dependItemList, i, this._rtOldParams(
+                  dep.definitionCode,
+                  definitionList,
+                  depTasksList,
+                  dep
+                ))
+              })
             })
-          })
         }
       })
     },

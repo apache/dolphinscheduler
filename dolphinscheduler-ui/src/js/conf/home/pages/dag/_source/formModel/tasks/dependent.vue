@@ -148,8 +148,8 @@
           })
         })
       },
-      addProjectDefinitionsCache({ projectCode, definitionList }){
-        this.projectDefinitionsCache[projectCode] = definitionList;
+      addProjectDefinitionsCache ({ projectCode, definitionList }) {
+        this.projectDefinitionsCache[projectCode] = definitionList
       }
     },
     watch: {
@@ -177,16 +177,16 @@
           v1.state = dependentResult[`${v1.definitionCode}-${v1.depTaskCode}-${v1.cycle}-${v1.dateValue}`] || defaultState
         }))
         // cache project definitions
-        const projectCodes = _.uniq(_.flatten(this.dependTaskList.map(dep => dep.dependItemList.map(item => item.projectCode))));
+        const projectCodes = _.uniq(_.flatten(this.dependTaskList.map(dep => dep.dependItemList.map(item => item.projectCode))))
         Promise.all(projectCodes.map(projectCode => this._getProcessByProjectCode(projectCode))).then((arr) => {
-          arr.forEach((item)=>{
-            const {projectCode, definitionList} = item;
-            this.projectDefinitionsCache[projectCode] = definitionList;
+          arr.forEach((item) => {
+            const { projectCode, definitionList } = item
+            this.projectDefinitionsCache[projectCode] = definitionList
           })
-          this.cacheReady = true;
+          this.cacheReady = true
         })
       } else {
-        this.cacheReady = true;
+        this.cacheReady = true
       }
     },
     mounted () {
@@ -209,7 +209,7 @@
         }
       }
     },
-    components: { mListBox, mDependItemList },
+    components: { mListBox, mDependItemList }
   }
 </script>
 
