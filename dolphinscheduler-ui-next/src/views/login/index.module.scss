@@ -37,13 +37,15 @@
     box-shadow: 0 2px 25px 0 rgb(0 0 0 / 30%);
 
     .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding-top: 30px;
 
       .logo-img {
         width: 280px;
         height: 60px;
-        display: block;
-        background: url('../../assets/images/logo.svg') no-repeat 23px;
+        background: url('../../assets/images/logo-light.svg') 50% no-repeat;
         margin: 0 auto;
       }
     }

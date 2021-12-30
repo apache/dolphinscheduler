@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import classification from './classification'
+import mapping from './mapping'
 
 const utils = {
-  classification,
+  mapping,
 }
 
 export default utils

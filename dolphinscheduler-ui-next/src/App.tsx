@@ -27,7 +27,6 @@ const App = defineComponent({
     const currentTheme = computed(() =>
       themeStore.darkTheme ? darkTheme : undefined
     )
-
     return {
       currentTheme,
     }
@@ -35,8 +34,6 @@ const App = defineComponent({
   render() {
     const themeOverrides: GlobalThemeOverrides =
       themeList[this.currentTheme ? 'dark' : 'light']
-
-    console.log(themeOverrides)
 
     return (
       <NConfigProvider

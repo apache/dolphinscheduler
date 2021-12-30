@@ -199,6 +199,10 @@ public class TaskDefinition {
      * task group id
      */
     private int taskGroupId;
+    /**
+     * task group id
+     */
+    private int taskGroupPriority;
 
     public TaskDefinition() {
     }
@@ -468,7 +472,9 @@ public class TaskDefinition {
                 && timeoutFlag == that.timeoutFlag
                 && timeoutNotifyStrategy == that.timeoutNotifyStrategy
                 && Objects.equals(resourceIds, that.resourceIds)
-                && environmentCode == that.environmentCode;
+                && environmentCode == that.environmentCode
+                && taskGroupId == that.taskGroupId
+                && taskGroupPriority == that.taskGroupPriority;
     }
 
     @Override
@@ -492,6 +498,8 @@ public class TaskDefinition {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", failRetryTimes=" + failRetryTimes
                 + ", environmentCode='" + environmentCode + '\''
+                + ", taskGroupId='" + taskGroupId + '\''
+                + ", taskGroupPriority='" + taskGroupPriority + '\''
                 + ", failRetryInterval=" + failRetryInterval
                 + ", timeoutFlag=" + timeoutFlag
                 + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
@@ -501,5 +509,13 @@ public class TaskDefinition {
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';
+    }
+
+    public int getTaskGroupPriority() {
+        return taskGroupPriority;
+    }
+
+    public void setTaskGroupPriority(int taskGroupPriority) {
+        this.taskGroupPriority = taskGroupPriority;
     }
 }

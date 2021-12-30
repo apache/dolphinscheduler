@@ -17,13 +17,69 @@
 
 const login = {
   test: 'Test',
-  username: 'Username',
-  username_tips: 'Please enter your username',
-  password: 'Password',
-  password_tips: 'Please enter your password',
-  signin: 'Sign In',
+  userName: 'Username',
+  userName_tips: 'Please enter your username',
+  userPassword: 'Password',
+  userPassword_tips: 'Please enter your password',
+  login: 'Login',
+}
+
+const theme = {
+  light: 'Light',
+  dark: 'Dark',
+}
+
+const profile = {
+  profile: 'Profile',
+  logout: 'Logout',
+}
+
+const menu = {
+  home: 'Home',
+  project: 'Project',
+  resources: 'Resources',
+  datasource: 'Datasource',
+  monitor: 'Monitor',
+  security: 'Security',
+  workflow_monitoring: 'Workflow Monitoring',
+  workflow_relationships: 'Workflow Relationships',
+  workflow: 'Workflow',
+  workflow_definition: 'Workflow Definition',
+  workflow_instance: 'Workflow Instance',
+  task_instance: 'Task Instance',
+  task_definition: 'Task Definition',
+  file_manage: 'File Manage',
+  udf_manage: 'UDF Manage',
+  resource_manage: 'Resource Manage',
+  function_manage: 'Function Manage',
+  service_manage: 'Service Manage',
+  master: 'Master',
+  worker: 'Worker',
+  db: 'DB',
+  statistical_manage: 'Statistical Manage',
+  statistics: 'Statistics',
+  tenant_manage: 'Tenant Manage',
+  user_manage: 'User Manage',
+  alarm_group_manage: 'Alarm Group Manage',
+  alarm_instance_manage: 'Alarm Instance Manage',
+  worker_group_manage: 'Worker Group Manage',
+  yarn_queue_manage: 'Yarn Queue Manage',
+  environmental_manage: 'Environmental Manage',
+  token_manage: 'Token Manage',
+}
+
+const home = {
+  task_state_statistics: 'Task State Statistics',
+  process_state_statistics: 'Process State Statistics',
+  process_definition_statistics: 'Process Definition Statistics',
+  number: 'Number',
+  state: 'State',
 }
 
 export default {
   login,
+  theme,
+  profile,
+  menu,
+  home,
 }
