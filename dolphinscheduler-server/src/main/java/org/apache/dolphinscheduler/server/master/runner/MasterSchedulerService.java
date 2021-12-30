@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -56,6 +57,12 @@ public class MasterSchedulerService extends Thread {
      * logger of MasterSchedulerService
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
+
+    /**
+     * handle task event
+     */
+    @Autowired
+    private TaskResponseService taskResponseService;
 
     /**
      * dolphinscheduler database interface
@@ -202,6 +209,7 @@ public class MasterSchedulerService extends Thread {
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
+                            , taskResponseService
                             , processService
                             , nettyExecutorManager
                             , processAlertManager

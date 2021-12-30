@@ -146,6 +146,9 @@ public class TaskResponsePersistThread implements Runnable {
                     channel.writeAndFlush(taskResponseCommand.convert2Command());
                 }
                 break;
+            case ACTION_STOP:
+                logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
