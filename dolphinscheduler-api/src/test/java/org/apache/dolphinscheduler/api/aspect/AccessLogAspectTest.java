@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler;
+package org.apache.dolphinscheduler.api.aspect;
 
-import org.apache.curator.test.TestingServer;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+/**
+ * @author Hua Jiang
+ */
 
-@SpringBootApplication
-public class StandaloneServer {
-    public static void main(String[] args) throws Exception {
-        final TestingServer server = new TestingServer(true);
-        System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
-        SpringApplication.run(StandaloneServer.class, args);
+public class AccessLogAspectTest {
+
+    private AccessLogAspect accessLogAspect = new AccessLogAspect();
+
+    @Test
+    public void testHandleSensitiveData() {
+        String data = "userPassword='7ad2410b2f4c074479a8937a28a22b8f', email='xxx@qq.com', database='null', userName='root', password='root', other='null'";
+        String expected = "userPassword='********************************', email='xxx@qq.com', database='null', userName='root', password='****', other='null'";
+
+        String actual = accessLogAspect.handleSensitiveData(data);
+
+        Assert.assertEquals(expected, actual);
+
     }
+
 }

@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler;
-
-import org.apache.curator.test.TestingServer;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class StandaloneServer {
-    public static void main(String[] args) throws Exception {
-        final TestingServer server = new TestingServer(true);
-        System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
-        SpringApplication.run(StandaloneServer.class, args);
-    }
+interface LanguageState {
+  menuKey: string
 }
+
+export default LanguageState
