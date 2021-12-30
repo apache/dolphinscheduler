@@ -77,8 +77,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.mapred.TaskLog.LogName;
-import org.apache.yetus.audience.InterfaceAudience.Public;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -1068,8 +1066,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+        if (processDefinition == null) {
             logger.info("process define not exists");
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
+            return result;
+        }
+        HashMap<Long, Project> userProjects =  new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
+        projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
+                .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
+        if (!userProjects.containsKey(projectCode)) {
+            logger.info("process define not exists, project dismatch");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
             return result;
         }
