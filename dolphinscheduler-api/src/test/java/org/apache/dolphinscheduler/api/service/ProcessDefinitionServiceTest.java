@@ -514,6 +514,7 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processService.genDagData(Mockito.any())).thenReturn(new DagData(processDefinition, null, null));
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Mockito.when(projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())).thenReturn(Lists.newArrayList(project));
         Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, 46L);
         Assert.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
     }
@@ -578,17 +579,17 @@ public class ProcessDefinitionServiceTest {
     public void testViewTree() {
         //process definition not exist
         ProcessDefinition processDefinition = getProcessDefinition();
-        Map<String, Object> processDefinitionNullRes = processDefinitionService.viewTree(processDefinition.getProjectCode(),46, 10);
+        Map<String, Object> processDefinitionNullRes = processDefinitionService.viewTree(processDefinition.getProjectCode(), 46, 10);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         //task instance not exist
         Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
-        Map<String, Object> taskNullRes = processDefinitionService.viewTree(processDefinition.getProjectCode(),46, 10);
+        Map<String, Object> taskNullRes = processDefinitionService.viewTree(processDefinition.getProjectCode(), 46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
 
         //task instance exist
-        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(processDefinition.getProjectCode(),46, 10);
+        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(processDefinition.getProjectCode(), 46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
     }
 
