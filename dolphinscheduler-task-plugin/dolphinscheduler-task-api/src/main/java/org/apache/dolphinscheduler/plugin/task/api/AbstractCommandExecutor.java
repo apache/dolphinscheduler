@@ -315,7 +315,7 @@ public abstract class AbstractCommandExecutor {
                 logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
-                        varPool.append(line, "${setValue(".length(), line.length() - 2);
+                        varPool.append(line, "${setValue(".length(), line.length() - 3);
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
