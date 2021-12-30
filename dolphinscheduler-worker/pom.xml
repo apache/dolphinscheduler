@@ -126,6 +126,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-log-server</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
