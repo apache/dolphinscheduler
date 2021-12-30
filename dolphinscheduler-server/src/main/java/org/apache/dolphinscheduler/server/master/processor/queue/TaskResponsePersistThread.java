@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -147,7 +149,14 @@ public class TaskResponsePersistThread implements Runnable {
                 }
                 break;
             case ACTION_STOP:
-                logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+                if (workflowExecuteThread != null) {
+                    ITaskProcessor taskProcessor = workflowExecuteThread.getActiveTaskProcessorMaps().get(taskResponseEvent.getTaskInstanceId());
+                    if (taskProcessor != null) {
+                        taskProcessor.action(TaskAction.STOP);
+                        logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                    }
+                }
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);

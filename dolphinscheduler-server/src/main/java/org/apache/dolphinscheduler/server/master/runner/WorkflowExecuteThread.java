@@ -1233,7 +1233,6 @@ public class WorkflowExecuteThread implements Runnable {
                 continue;
             }
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskId);
-            taskProcessor.action(TaskAction.STOP);
             if (taskProcessor.taskState().typeIsFinished()) {
                 TaskResponseEvent taskResponseEvent = TaskResponseEvent.newActionStop(
                         taskProcessor.taskState(),
@@ -1403,5 +1402,9 @@ public class WorkflowExecuteThread implements Runnable {
                                       List<String> recoveryNodeCodeList,
                                       TaskDependType depNodeType) throws Exception {
         return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeCodeList, depNodeType);
+    }
+
+    public Map<Integer, ITaskProcessor> getActiveTaskProcessorMaps() {
+        return activeTaskProcessorMaps;
     }
 }
