@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.aspect;
 
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -48,6 +55,12 @@ public class AccessLogAspect {
 
     private static final String TRACE_ID = "traceId";
 
+    public static final String sensitiveDataRegEx = "(password=[\'\"]+)(\\S+)([\'\"]+)";
+
+    private static final Pattern sensitiveDataPattern = Pattern.compile(sensitiveDataRegEx, Pattern.CASE_INSENSITIVE);
+
+    public static final Map<String,String> SENSITIVE_DATA_PATTERN_MAPPING = ImmutableMap.of("password=", "");
+
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
     public void logPointCut(){
         // Do nothing because of it's a pointcut
@@ -78,6 +91,8 @@ public class AccessLogAspect {
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
+                // handle sensitive data in the string
+                argsString = handleSensitiveData(argsString);
                 logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
                         traceId,
                         userName,
@@ -117,6 +132,28 @@ public class AccessLogAspect {
             }
         }
         return argsString;
+    }
+
+    protected String handleSensitiveData(String originalData) {
+        Matcher matcher = sensitiveDataPattern.matcher(originalData.toLowerCase());
+        IntStream stream = IntStream.builder().build();
+        boolean exists = false;
+        while (matcher.find()) {
+            if (matcher.groupCount() == 3) {
+                stream = IntStream.concat(stream, IntStream.range(matcher.end(1),matcher.end(2)));
+                exists = true;
+            }
+        }
+
+        if (exists) {
+            char[] chars = originalData.toCharArray();
+            stream.forEach(idx -> {
+                chars[idx] = '*';
+            });
+            return new String(chars);
+        }
+
+        return originalData;
     }
 
     private String parseLoginInfo(HttpServletRequest request) {
