@@ -15,53 +15,51 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, PropType, ref, watch, onMounted } from 'vue'
 import styles from './index.module.scss'
 import { NLayoutSider, NMenu } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useLanguageStore } from '@/store/language/language'
 
-const Sidebar = defineComponent({
-  name: 'Sidebar',
-  props: {
-    sideMenuOptions: {
-      type: Array as PropType<any>,
-      default: [],
-    },
-    isShowSide: {
-      type: Boolean as PropType<boolean>,
-      default: false,
-    },
-  },
-  setup() {
-    const collapsedRef = ref(false)
-    const defaultExpandedKeys = [
-      'workflow',
-      'udf-manage',
-      'service-manage',
-      'statistical-manage',
-    ]
+interface Props {
+  sideMenuOptions: Array<any>,
+  isShowSide: boolean
+}
 
-    return { collapsedRef, defaultExpandedKeys }
-  },
-  render() {
-    return (
-      this.isShowSide && (
-        <NLayoutSider
-          bordered
-          nativeScrollbar={false}
-          show-trigger='bar'
-          collapse-mode='width'
-          collapsed={this.collapsedRef}
-          onCollapse={() => (this.collapsedRef = true)}
-          onExpand={() => (this.collapsedRef = false)}
-        >
-          <NMenu
-            options={this.sideMenuOptions}
-            defaultExpandedKeys={this.defaultExpandedKeys}
-          />
-        </NLayoutSider>
-      )
-    )
-  },
-})
+const Sidebar = (props: Props) => {
+  // console.log('props', JSON.stringify(props))
+  const collapsedRef = ref(false)
+  const defaultExpandedKeys = [
+    'workflow',
+    'udf-manage',
+    'service-manage',
+    'statistical-manage',
+  ]
+
+  watch(useI18n().locale, () => {
+    const languageStore = useLanguageStore()
+    refreshOptionsRef.value = props.sideMenuOptions
+    // console.log(123, JSON.stringify(props))
+  })
+
+  const refreshOptionsRef = ref()
+
+  return (
+    <NLayoutSider style={{display: props.isShowSide ? 'block' : 'none'}}
+      bordered
+      nativeScrollbar={false}
+      show-trigger='bar'
+      collapse-mode='width'
+      collapsed={collapsedRef.value}
+      onCollapse={() => (collapsedRef.value = true)}
+      onExpand={() => (collapsedRef.value = false)}
+    >
+      <NMenu
+        options={props.sideMenuOptions || refreshOptionsRef.value}
+        defaultExpandedKeys={defaultExpandedKeys}
+      />
+    </NLayoutSider>
+  )
+}
 
 export default Sidebar
