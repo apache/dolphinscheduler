@@ -44,9 +44,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 /**
  * switch task processor
  */
@@ -54,9 +51,6 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
-    private TaskInstance taskInstance;
-
-    private ProcessInstance processInstance;
     TaskDefinition taskDefinition;
 
     private MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);;

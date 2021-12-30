@@ -16,21 +16,76 @@
  */
 
 import { defineComponent } from 'vue'
-import styles from './index.module.scss'
+import { NGrid, NGi, NDataTable } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useTable } from './use-table'
+import { useProcessDefinition } from './use-process-definition'
 import Card from '@/components/card'
 import PieChart from '@/components/chart/modules/Pie'
-import GaugeChart from '@/components/chart/modules/Gauge'
 import BarChart from '@/components/chart/modules/Bar'
+import styles from './index.module.scss'
+import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
 
 export default defineComponent({
   name: 'home',
-  setup() {},
+  setup() {
+    const { t } = useI18n()
+    const { getProcessDefinition, formatProcessDefinition } =
+      useProcessDefinition()
+    const processDefinition = getProcessDefinition()
+
+    return { t, processDefinition, formatProcessDefinition }
+  },
   render() {
+    const { columnsRef } = useTable()
+    const { t, processDefinition, formatProcessDefinition } = this
+    const chartData =
+      Object.keys(processDefinition).length > 0 &&
+      formatProcessDefinition(processDefinition as ProcessDefinitionRes)
+
     return (
-      <div class={styles.container}>
-        <Card title='test'>{{ default: () => <PieChart /> }}</Card>
-        <Card title='test'>{{ default: () => <GaugeChart /> }}</Card>
-        <Card title='test'>{{ default: () => <BarChart /> }}</Card>
+      <div>
+        <NGrid x-gap={12} cols={2}>
+          <NGi>
+            <Card title={t('home.task_state_statistics')}>
+              {{
+                default: () => (
+                  <div class={styles['card-table']}>
+                    <PieChart />
+                    <NDataTable columns={columnsRef} />
+                  </div>
+                ),
+              }}
+            </Card>
+          </NGi>
+          <NGi class={styles['card-table']}>
+            <Card title={t('home.process_state_statistics')}>
+              {{
+                default: () => (
+                  <div class={styles['card-table']}>
+                    <PieChart />
+                    <NDataTable columns={columnsRef} />
+                  </div>
+                ),
+              }}
+            </Card>
+          </NGi>
+        </NGrid>
+        <NGrid cols={1} style='margin-top: 12px;'>
+          <NGi>
+            <Card title={t('home.process_definition_statistics')}>
+              {{
+                default: () =>
+                  chartData && (
+                    <BarChart
+                      xAxisData={chartData.xAxisData}
+                      seriesData={chartData.seriesData}
+                    />
+                  ),
+              }}
+            </Card>
+          </NGi>
+        </NGrid>
       </div>
     )
   },

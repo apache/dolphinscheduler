@@ -529,6 +529,7 @@ CREATE TABLE t_ds_process_instance (
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
+  restart_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
@@ -1056,7 +1057,6 @@ CREATE TABLE t_ds_task_group (
    project_code bigint DEFAULT '0' ,
    use_size    int DEFAULT '0' ,
    user_id     int DEFAULT NULL ,
-   project_id  int DEFAULT NULL ,
    status      int DEFAULT '1'  ,
    create_time timestamp DEFAULT NULL ,
    update_time timestamp DEFAULT NULL ,

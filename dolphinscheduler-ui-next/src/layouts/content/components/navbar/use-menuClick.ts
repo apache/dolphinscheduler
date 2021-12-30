@@ -20,7 +20,7 @@ import type { Router } from 'vue-router'
 import { MenuOption } from 'naive-ui'
 import { SetupContext } from 'vue'
 
-export function useMenuClick(ctx: SetupContext<"handleMenuClick"[]>) {
+export function useMenuClick(ctx: SetupContext<'handleMenuClick'[]>) {
   const router: Router = useRouter()
 
   const handleMenuClick = (key: string, item: MenuOption) => {

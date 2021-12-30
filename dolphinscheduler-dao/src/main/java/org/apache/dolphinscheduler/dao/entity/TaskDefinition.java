@@ -472,7 +472,9 @@ public class TaskDefinition {
                 && timeoutFlag == that.timeoutFlag
                 && timeoutNotifyStrategy == that.timeoutNotifyStrategy
                 && Objects.equals(resourceIds, that.resourceIds)
-                && environmentCode == that.environmentCode;
+                && environmentCode == that.environmentCode
+                && taskGroupId == that.taskGroupId
+                && taskGroupPriority == that.taskGroupPriority;
     }
 
     @Override
@@ -496,6 +498,8 @@ public class TaskDefinition {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", failRetryTimes=" + failRetryTimes
                 + ", environmentCode='" + environmentCode + '\''
+                + ", taskGroupId='" + taskGroupId + '\''
+                + ", taskGroupPriority='" + taskGroupPriority + '\''
                 + ", failRetryInterval=" + failRetryInterval
                 + ", timeoutFlag=" + timeoutFlag
                 + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
