@@ -100,7 +100,7 @@ public class DataSourceClientProvider {
                 Class.forName("org.apache.hadoop.security.UserGroupInformation", true, classLoader);
                 Class.forName("org.apache.hadoop.fs.FileSystem", true, classLoader);
             } catch (ClassNotFoundException cnf) {
-                cnf.printStackTrace();
+                throw DataSourceException.getInstance("hadoop is not in the classpath.", cnf);
             }
         }
 
