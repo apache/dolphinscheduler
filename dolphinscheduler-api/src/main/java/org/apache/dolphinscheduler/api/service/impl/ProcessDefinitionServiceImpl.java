@@ -949,6 +949,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                             sql.append(line).append("\n");
                         }
                     }
+                    // import/sql1.sql -> sql1
                     if (taskName == null) {
                         taskName = entry.getName();
                         index = taskName.indexOf("/");
@@ -962,45 +963,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     DataSource dataSource = dataSourceCache.get(datasourceName);
                     if (dataSource == null) {
-                        if (isAdmin(loginUser)) {
-                            List<DataSource> dataSources  = dataSourceMapper.queryDataSourceByName(datasourceName);
-                            if (CollectionUtils.isNotEmpty(dataSources)) {
-                                dataSource = dataSources.get(0);
-                            }
-                        } else {
-                            dataSource = dataSourceMapper.queryDataSourceByNameAndUserId(loginUser.getId(), datasourceName);
-                        }
+                        dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
                     }
                     if (dataSource == null) {
                         putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
                         return result;
                     }
+                    dataSourceCache.put(datasourceName, dataSource);
 
-                    // build task definition
-                    TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-                    taskDefinition.setName(taskName);
-                    taskDefinition.setFlag(Flag.YES);
-                    SqlParameters sqlParameters = new SqlParameters();
-                    sqlParameters.setType(dataSource.getType().name());
-                    sqlParameters.setDatasource(dataSource.getId());
-                    sqlParameters.setSql(sql.substring(0, sql.length() - 1));
-                    // it may be a query type, but it can only be determined by parsing SQL
-                    sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
-                    sqlParameters.setLocalParams(Collections.emptyList());
-                    taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
-                    taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
-                    taskDefinition.setTaskType(TaskType.SQL.getDesc());
-                    taskDefinition.setFailRetryTimes(0);
-                    taskDefinition.setFailRetryInterval(0);
-                    taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
-                    taskDefinition.setWorkerGroup(DEFAULT_WORKER_GROUP);
-                    taskDefinition.setTaskPriority(Priority.MEDIUM);
-                    taskDefinition.setEnvironmentCode(-1);
-                    taskDefinition.setTimeout(0);
-                    taskDefinition.setDelayTime(0);
-                    taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
-                    taskDefinition.setVersion(0);
-                    taskDefinition.setResourceIds("");
+                    TaskDefinitionLog taskDefinition = buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
 
                     taskDefinitionList.add(taskDefinition);
                     taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
@@ -1018,29 +989,68 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<String> upstreams = taskNameToUpstream.get(entry.getKey());
             if (CollectionUtils.isEmpty(upstreams)
                 || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
-                ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
-                processTaskRelation.setPreTaskCode(0);
-                processTaskRelation.setPreTaskVersion(0);
-                processTaskRelation.setPostTaskCode(entry.getValue());
-                processTaskRelation.setPostTaskVersion(0);
-                processTaskRelation.setConditionType(ConditionType.NONE);
-                processTaskRelation.setName("");
+                ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(0, entry.getValue());
                 processTaskRelationList.add(processTaskRelation);
                 continue;
             }
             for (String upstream : upstreams) {
-                ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
-                processTaskRelation.setPreTaskCode(taskNameToCode.get(upstream));
-                processTaskRelation.setPreTaskVersion(0);
-                processTaskRelation.setPostTaskCode(entry.getValue());
-                processTaskRelation.setPostTaskVersion(0);
-                processTaskRelation.setConditionType(ConditionType.NONE);
-                processTaskRelation.setName("");
+                ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
                 processTaskRelationList.add(processTaskRelation);
             }
         }
 
         return createDagDefine(loginUser, processTaskRelationList, processDefinition, taskDefinitionList);
+    }
+
+    private ProcessTaskRelationLog buildNormalTaskRelation(long preTaskCode, long postTaskCode) {
+        ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
+        processTaskRelation.setPreTaskCode(preTaskCode);
+        processTaskRelation.setPreTaskVersion(0);
+        processTaskRelation.setPostTaskCode(postTaskCode);
+        processTaskRelation.setPostTaskVersion(0);
+        processTaskRelation.setConditionType(ConditionType.NONE);
+        processTaskRelation.setName("");
+        return processTaskRelation;
+    }
+
+    private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
+        if (isAdmin(loginUser)) {
+            List<DataSource> dataSources  = dataSourceMapper.queryDataSourceByName(datasourceName);
+            if (CollectionUtils.isNotEmpty(dataSources)) {
+                return dataSources.get(0);
+            }
+        } else {
+            return dataSourceMapper.queryDataSourceByNameAndUserId(loginUser.getId(), datasourceName);
+        }
+        return null;
+    }
+
+    private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource, String sql) throws CodeGenerateException {
+        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
+        taskDefinition.setName(taskName);
+        taskDefinition.setFlag(Flag.YES);
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType(dataSource.getType().name());
+        sqlParameters.setDatasource(dataSource.getId());
+        sqlParameters.setSql(sql.substring(0, sql.length() - 1));
+        // it may be a query type, but it can only be determined by parsing SQL
+        sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
+        sqlParameters.setLocalParams(Collections.emptyList());
+        taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+        taskDefinition.setTaskType(TaskType.SQL.getDesc());
+        taskDefinition.setFailRetryTimes(0);
+        taskDefinition.setFailRetryInterval(0);
+        taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
+        taskDefinition.setWorkerGroup(DEFAULT_WORKER_GROUP);
+        taskDefinition.setTaskPriority(Priority.MEDIUM);
+        taskDefinition.setEnvironmentCode(-1);
+        taskDefinition.setTimeout(0);
+        taskDefinition.setDelayTime(0);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setVersion(0);
+        taskDefinition.setResourceIds("");
+        return taskDefinition;
     }
 
     /**
