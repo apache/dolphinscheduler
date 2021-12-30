@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.api.aspect;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-import org.apache.commons.lang3.RegExUtils;
-import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -33,7 +26,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,8 +54,6 @@ public class AccessLogAspect {
     public static final String sensitiveDataRegEx = "(password=[\'\"]+)(\\S+)([\'\"]+)";
 
     private static final Pattern sensitiveDataPattern = Pattern.compile(sensitiveDataRegEx, Pattern.CASE_INSENSITIVE);
-
-    public static final Map<String,String> SENSITIVE_DATA_PATTERN_MAPPING = ImmutableMap.of("password=", "");
 
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
     public void logPointCut(){
