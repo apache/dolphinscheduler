@@ -76,6 +76,13 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                                                  .build())
                                             .build();
 
+        RadioParam sendType = RadioParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_SEND_TYPE)
+                .addParamsOptions(new ParamsOptions(WeChatType.APP.getDescp(), WeChatType.APP.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WeChatType.APPCHAT.getDescp(), WeChatType.APPCHAT.getDescp(), false))
+                .setValue(WeChatType.APP.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
+
         RadioParam showType = RadioParam.newBuilder(AlertConstants.NAME_SHOW_TYPE, AlertConstants.SHOW_TYPE)
                                         .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
                                         .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
@@ -83,7 +90,7 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
                                         .addValidate(Validate.newBuilder().setRequired(true).build())
                                         .build();
 
-        return Arrays.asList(corpIdParam, secretParam, usersParam, userSendMsgParam, agentIdParam, showType);
+        return Arrays.asList(corpIdParam, secretParam, usersParam, userSendMsgParam, agentIdParam, sendType, showType);
     }
 
     @Override

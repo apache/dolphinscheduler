@@ -38,9 +38,9 @@ public final class WorkflowSaveDialog {
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBy(id = "input-name")
+    @FindBy(id = "inputName")
     private WebElement inputName;
-    @FindBy(id = "button-submit")
+    @FindBy(id = "btnSubmit")
     private WebElement buttonSubmit;
     @FindBys({
         @FindBy(className = "input-param-key"),
@@ -52,7 +52,7 @@ public final class WorkflowSaveDialog {
         @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamVal;
-    @FindBy(id = "select-tenant")
+    @FindBy(id = "selectTenant")
     private WebElement selectTenant;
 
     public WorkflowSaveDialog(WorkflowForm parent) {

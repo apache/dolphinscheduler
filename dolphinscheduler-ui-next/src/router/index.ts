@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  NavigationGuardNext,
+  RouteLocationNormalized,
+} from 'vue-router'
 import routes from './routes'
 
 // NProgress
@@ -24,7 +29,7 @@ import 'nprogress/nprogress.css'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 /**

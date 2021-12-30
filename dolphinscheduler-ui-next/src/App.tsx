@@ -27,7 +27,6 @@ const App = defineComponent({
     const currentTheme = computed(() =>
       themeStore.darkTheme ? darkTheme : undefined
     )
-
     return {
       currentTheme,
     }

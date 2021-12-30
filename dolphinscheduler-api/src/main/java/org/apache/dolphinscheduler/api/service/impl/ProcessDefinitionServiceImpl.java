@@ -326,7 +326,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
                 Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
                 if (CollectionUtils.isNotEmpty(codes)) {
-                    logger.error("the task code is not exit");
+                    logger.error("the task code is not exist");
                     putMsg(result, Status.TASK_DEFINE_NOT_EXIST, org.apache.commons.lang.StringUtils.join(codes, Constants.COMMA));
                     return result;
                 }
@@ -1279,9 +1279,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
+        HashMap<Long, Project> userProjects =  new HashMap(Constants.DEFAULT_HASH_MAP_SIZE);
+        projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
+                .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
+
         // check processDefinition exist in project
         List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream().
-                filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
+                filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
@@ -1491,7 +1495,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     /**
      * batch move process definition
-     *
+     * Will be deleted
      * @param loginUser loginUser
      * @param projectCode projectCode
      * @param codes processDefinitionCodes
@@ -1561,6 +1565,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ProcessTaskRelationLog> taskRelationList = processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
+                List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
+                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                    if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())
+                        || TaskType.SWITCH.getDesc().equals(taskDefinitionLog.getTaskType())
+                        || TaskType.SUB_PROCESS.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                        putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
+                        throw new ServiceException(Status.NOT_SUPPORT_COPY_TASK_TYPE);
+                    }
+                    taskDefinitionLog.setCode(0L);
+                    taskDefinitionLog.setVersion(0);
+                    taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                }
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
@@ -1571,7 +1587,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
                 try {
-                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, Lists.newArrayList()));
+                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs));
                 } catch (Exception e) {
                     putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
