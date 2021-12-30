@@ -87,6 +87,27 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         return true;
     }
 
+    @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                if (taskInstance.getState().typeIsFinished()) {
+                    return true;
+                }
+                if (StringUtils.isBlank(taskInstance.getHost())) {
+                    taskInstance.setState(ExecutionStatus.KILL);
+                    taskInstance.setEndTime(new Date());
+                    processService.updateTaskInstance(taskInstance);
+                    return true;
+                }
+                break;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+
+        }
+        return false;
+    }
+
     /**
      * common task cannot be paused
      */
@@ -154,7 +175,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (StringUtils.isBlank(taskInstance.getHost())) {
                 taskInstance.setState(ExecutionStatus.KILL);
                 taskInstance.setEndTime(new Date());
-                processService.updateTaskInstance(taskInstance);
                 return true;
             }
 

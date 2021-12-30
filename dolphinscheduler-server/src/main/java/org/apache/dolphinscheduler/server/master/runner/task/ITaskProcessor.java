@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
  */
 public interface ITaskProcessor {
 
+    boolean persist(TaskAction taskAction);
+
     void run();
 
     boolean action(TaskAction taskAction);

@@ -153,7 +153,7 @@ public class TaskResponsePersistThread implements Runnable {
                 if (workflowExecuteThread != null) {
                     ITaskProcessor taskProcessor = workflowExecuteThread.getActiveTaskProcessorMaps().get(taskResponseEvent.getTaskInstanceId());
                     if (taskProcessor != null) {
-                        taskProcessor.action(TaskAction.STOP);
+                        taskProcessor.persist(TaskAction.STOP);
                         logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
                     }
                 }
