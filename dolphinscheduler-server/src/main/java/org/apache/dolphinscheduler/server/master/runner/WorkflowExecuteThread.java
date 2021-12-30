@@ -1233,7 +1233,7 @@ public class WorkflowExecuteThread implements Runnable {
                 continue;
             }
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskId);
-            if (taskProcessor.taskState().typeIsFinished()) {
+            if (taskProcessor != null && taskProcessor.taskState().typeIsFinished()) {
                 TaskResponseEvent taskResponseEvent = TaskResponseEvent.newActionStop(
                         taskProcessor.taskState(),
                         taskInstance.getId(),
