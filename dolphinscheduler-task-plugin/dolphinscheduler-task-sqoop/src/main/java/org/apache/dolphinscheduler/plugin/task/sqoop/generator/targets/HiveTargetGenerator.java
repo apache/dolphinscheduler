@@ -17,16 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets;
 
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.CREATE_HIVE_TABLE;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DELETE_TARGET_DIR;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_DATABASE;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_DELIMS_REPLACEMENT;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_DROP_IMPORT_DELIMS;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_IMPORT;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_OVERWRITE;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_PARTITION_KEY;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_PARTITION_VALUE;
-import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.*;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
@@ -89,6 +80,11 @@ public class HiveTargetGenerator implements ITargetGenerator {
                         .append(SPACE).append(targetHiveParameter.getHivePartitionKey())
                         .append(SPACE).append(HIVE_PARTITION_VALUE)
                         .append(SPACE).append(targetHiveParameter.getHivePartitionValue());
+                }
+
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {
+                    hiveTargetSb.append(SPACE).append(TARGET_DIR)
+                            .append(SPACE).append(targetHiveParameter.getHiveTargetDir());
                 }
 
             }
