@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-r"""A example workflow for task flink."""
+"""A example workflow for task flink."""
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.flink import DeployMode, Flink, ProgramType
