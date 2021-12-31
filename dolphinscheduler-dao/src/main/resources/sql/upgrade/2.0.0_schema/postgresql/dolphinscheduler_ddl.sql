@@ -45,7 +45,7 @@ BEGIN
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ALTER COLUMN project_code TYPE bigint';
 
 	--- add columns
-    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "state" int DEFAULT 1';
+        EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_user ADD COLUMN IF NOT EXISTS "state" int DEFAULT 1';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alertgroup ADD COLUMN IF NOT EXISTS "alert_instance_ids" varchar(255) DEFAULT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_alertgroup ADD COLUMN IF NOT EXISTS "create_user_id" int4 DEFAULT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_project ADD COLUMN IF NOT EXISTS "code" bigint';
@@ -74,10 +74,9 @@ BEGIN
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ADD COLUMN IF NOT EXISTS "code" bigint';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_definition ADD COLUMN IF NOT EXISTS "warning_group_id" int';
 
-    --update default value for not null
-    EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_process_definition SET code = id, description = name';
-    EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_process_definition SET code = id';
-    EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_project SET code = id';
+        --update default value for not null
+        EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_process_definition SET code = id';
+        EXECUTE 'UPDATE ' || quote_ident(v_schema) ||'.t_ds_project SET code = id';
 
 	---drop columns
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_tenant DROP COLUMN IF EXISTS "tenant_name"';
@@ -97,8 +96,7 @@ BEGIN
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_process_definition" ALTER COLUMN "code" SET NOT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_process_definition" ALTER COLUMN "project_code" SET NOT NULL';
 	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_process_definition" ADD CONSTRAINT "process_unique" UNIQUE ("name","project_code")';
-	EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_process_definition" ALTER COLUMN "description" SET NOT NULL';
-    EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_project" ALTER COLUMN "code" SET NOT NULL';
+        EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'."t_ds_project" ALTER COLUMN "code" SET NOT NULL';
 
 	--- drop index
 	EXECUTE 'DROP INDEX IF EXISTS "process_instance_index"';
