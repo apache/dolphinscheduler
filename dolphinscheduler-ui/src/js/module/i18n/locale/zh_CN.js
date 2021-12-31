@@ -605,6 +605,7 @@ export default {
   'Please enter Export Dir(required)': '请输入数据源路径(必填)',
   'Please enter Hive Database(required)': '请输入Hive数据库(必填)',
   'Please enter Hive Table(required)': '请输入Hive表名(必填)',
+  'Please enter hive target dir': '请输入Hive临时目录',
   'Please enter Hive Partition Keys': '请输入分区键',
   'Please enter Hive Partition Values': '请输入分区值',
   'Please enter Replace Delimiter': '请输入替换分隔符',
