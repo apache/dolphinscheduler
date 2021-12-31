@@ -703,7 +703,7 @@
           dropDelimiter: false,
           hiveOverWrite: true,
           replaceDelimiter: '',
-          hiveTargetDir:"",
+          hiveTargetDir: '',
           hivePartitionKey: '',
           hivePartitionValue: ''
         },
