@@ -402,7 +402,7 @@ alter table t_ds_schedules add timezone_id varchar(40) DEFAULT NULL COMMENT 'tim
 alter table t_ds_schedules add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 
 -- t_ds_process_definition
-alter table t_ds_process_definition add `code` bigint(20) NOT NULL COMMENT 'encoding' AFTER `id`;
+alter table t_ds_process_definition add `code` bigint(20) COMMENT 'encoding' AFTER `id`;
 -- update default value for not null
 UPDATE t_ds_process_definition SET code = id;
 alter table t_ds_process_definition modify `code` bigint(20) NOT NULL;
