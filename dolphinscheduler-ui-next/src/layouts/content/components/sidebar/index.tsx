@@ -22,7 +22,7 @@ import { useI18n } from 'vue-i18n'
 import { useLanguageStore } from '@/store/language/language'
 
 interface Props {
-  sideMenuOptions: Array<any>,
+  sideMenuOptions: Array<any>
   isShowSide: boolean
 }
 
@@ -45,7 +45,8 @@ const Sidebar = (props: Props) => {
   const refreshOptionsRef = ref()
 
   return (
-    <NLayoutSider style={{display: props.isShowSide ? 'block' : 'none'}}
+    <NLayoutSider
+      style={{ display: props.isShowSide ? 'block' : 'none' }}
       bordered
       nativeScrollbar={false}
       show-trigger='bar'
