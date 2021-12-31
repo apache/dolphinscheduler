@@ -709,7 +709,7 @@
         },
         item: '',
         scriptBoxDialog: false
-      } 
+      }
     },
     mixins: [disabledState],
     props: {
