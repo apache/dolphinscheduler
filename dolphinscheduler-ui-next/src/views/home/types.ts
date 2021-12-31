@@ -15,19 +15,15 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-
-export function useTable() {
-  const { t } = useI18n()
-
-  const columnsRef: TableColumns<any> = [
-    { title: '#', key: 'id' },
-    { title: t('home.number'), key: 'number' },
-    { title: t('home.state'), key: 'state' },
-  ]
-
-  return {
-    columnsRef,
-  }
+interface ChartData {
+  xAxisData: Array<string>
+  seriesData: Array<number>
 }
+
+interface TaskStateTableData {
+  id: number
+  number: number
+  state: string
+}
+
+export { ChartData, TaskStateTableData }
