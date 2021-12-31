@@ -23,7 +23,6 @@ import { useDataList } from './use-dataList'
 import { useLanguageStore } from '@/store/language/language'
 
 const Content = () => {
-
   const { state, getHeaderMenuOptions } = useDataList()
 
   const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)

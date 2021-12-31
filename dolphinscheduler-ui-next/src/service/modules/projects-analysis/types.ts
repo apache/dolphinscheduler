@@ -30,9 +30,19 @@ interface UserList {
   count: number
 }
 
+interface TaskCountDto {
+  count: number
+  taskStateType: string
+}
+
 interface ProcessDefinitionRes {
   count: number
   userList: UserList[]
 }
 
-export { CodeReq, StateReq, ProcessDefinitionRes }
+interface TaskStateRes {
+  totalCount: number
+  taskCountDtos: TaskCountDto[]
+}
+
+export { CodeReq, StateReq, ProcessDefinitionRes, TaskStateRes }
