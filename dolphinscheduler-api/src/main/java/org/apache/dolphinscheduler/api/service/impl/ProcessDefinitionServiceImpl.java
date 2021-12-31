@@ -77,8 +77,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.mapred.TaskLog.LogName;
-import org.apache.yetus.audience.InterfaceAudience.Public;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -1398,6 +1396,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
                         throw new ServiceException(Status.NOT_SUPPORT_COPY_TASK_TYPE);
                     }
+                    taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setCode(0L);
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
