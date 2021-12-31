@@ -99,12 +99,11 @@ public class JDBCDataSourceProvider {
                 logger.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
                 throw new RuntimeException("Jdbc driver loading error.");
             }
-            if (dbType.equals(DbType.MYSQL)) {
-                if (driver.getMajorVersion() >= 8) {
-                    properties.setDriverClassName(drv);
-                } else {
-                    properties.setDriverClassName(Constants.COM_MYSQL_JDBC_DRIVER);
-                }
+            //Compatible historical version data source connection information
+            if (dbType.equals(DbType.MYSQL) && driver.getMajorVersion() <= 8) {
+                properties.setDriverClassName(Constants.COM_MYSQL_JDBC_DRIVER);
+            } else {
+                properties.setDriverClassName(drv);
             }
         } catch (final Exception e) {
             logger.warn("The specified driver not suitable.");
