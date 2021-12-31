@@ -17,10 +17,10 @@
 
 import { defineComponent, PropType } from 'vue'
 import { useTable } from './use-table'
-import styles from '@/views/home/index.module.scss'
+import { NDataTable, NDatePicker, NGrid, NGi } from 'naive-ui'
 import PieChart from '@/components/chart/modules/Pie'
-import { NDataTable, NDatePicker } from 'naive-ui'
 import Card from '@/components/card'
+import type { StateTableData, StateChartData } from './types'
 
 const props = {
   title: {
@@ -30,7 +30,12 @@ const props = {
     type: Array as PropType<Array<any>>,
   },
   tableData: {
-    type: [Array, Boolean] as PropType<Array<any> | false>,
+    type: Array as PropType<Array<StateTableData>>,
+    default: () => [],
+  },
+  chartData: {
+    type: Array as PropType<Array<StateChartData>>,
+    default: () => [],
   },
 }
 
@@ -46,24 +51,26 @@ const StateCard = defineComponent({
     return { onUpdateDatePickerValue }
   },
   render() {
-    const { title, date, tableData, onUpdateDatePickerValue } = this
+    const { title, date, tableData, chartData, onUpdateDatePickerValue } = this
     const { columnsRef } = useTable()
 
     return (
       <Card title={title}>
         {{
           default: () => (
-            <div class={styles['card-table']}>
-              <PieChart />
-              {tableData && (
-                <NDataTable
-                  columns={columnsRef}
-                  data={tableData}
-                  striped
-                  size={'small'}
-                />
-              )}
-            </div>
+            <NGrid x-gap={12} cols={2}>
+              <NGi>{chartData.length > 0 && <PieChart data={chartData} />}</NGi>
+              <NGi>
+                {tableData && (
+                  <NDataTable
+                    columns={columnsRef}
+                    data={tableData}
+                    striped
+                    size={'small'}
+                  />
+                )}
+              </NGi>
+            </NGrid>
           ),
           'header-extra': () => (
             <NDatePicker

@@ -18,13 +18,13 @@
 import { useAsyncState } from '@vueuse/core'
 import { countDefinitionByUser } from '@/service/modules/projects-analysis'
 import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
-import type { ChartData } from './types'
+import type { DefinitionChartData } from './types'
 
 export function useProcessDefinition() {
   const getProcessDefinition = () => {
     const { state } = useAsyncState(
       countDefinitionByUser({ projectCode: 0 }).then(
-        (res: ProcessDefinitionRes): ChartData => {
+        (res: ProcessDefinitionRes): DefinitionChartData => {
           const xAxisData = res.userList.map((item) => item.userName)
           const seriesData = res.userList.map((item) => item.count)
 

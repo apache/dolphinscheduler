@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, onMounted, onBeforeUnmount, watch } from 'vue'
+import {
+  getCurrentInstance,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+  watchEffect,
+} from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import { throttle } from 'echarts'
 import { useI18n } from 'vue-i18n'
@@ -60,6 +66,17 @@ function initChart<Opt extends ECBasicOption>(
     () => {
       chart?.dispose()
       init()
+    }
+  )
+
+  watch(
+    () => option,
+    () => {
+      chart?.dispose()
+      init()
+    },
+    {
+      deep: true,
     }
   )
 

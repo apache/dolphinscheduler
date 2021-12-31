@@ -15,14 +15,21 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, onMounted, ref, watch } from 'vue'
+import {
+  defineComponent,
+  Ref,
+  onMounted,
+  ref,
+  toRefs,
+  reactive,
+  isReactive,
+} from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import { useTaskState } from './use-task-state'
 import StateCard from './state-card'
 import DefinitionCard from './definition-card'
-import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'home',
@@ -30,7 +37,7 @@ export default defineComponent({
     const { t } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const { getTaskState } = useTaskState()
-    let taskStateRef: Ref<any> = ref([])
+    let taskStateRef = ref()
 
     onMounted(() => {
       taskStateRef.value = getTaskState(dateRef.value)
@@ -52,11 +59,12 @@ export default defineComponent({
             <StateCard
               title={t('home.task_state_statistics')}
               date={dateRef}
-              tableData={this.taskStateRef.value}
+              tableData={this.taskStateRef?.value.table}
+              chartData={this.taskStateRef?.value.chart}
               onUpdateDatePickerValue={handleTaskDate}
             />
           </NGi>
-          <NGi class={styles['card-table']}>
+          <NGi>
             <StateCard
               title={t('home.process_state_statistics')}
               date={dateRef}

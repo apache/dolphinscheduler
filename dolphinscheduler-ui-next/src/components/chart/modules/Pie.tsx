@@ -22,18 +22,21 @@ import type { Ref } from 'vue'
 const props = {
   height: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: 590,
   },
   width: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: '100%',
+  },
+  data: {
+    type: Array as PropType<Array<any>>,
   },
 }
 
 const PieChart = defineComponent({
   name: 'PieChart',
   props,
-  setup() {
+  setup(props) {
     const pieChartRef: Ref<HTMLDivElement | null> = ref(null)
 
     const option = {
@@ -42,12 +45,11 @@ const PieChart = defineComponent({
         backgroundColor: '#fff',
       },
       legend: {
-        top: '5%',
+        bottom: '0%',
         left: 'center',
       },
       series: [
         {
-          name: 'Access From',
           type: 'pie',
           radius: ['40%', '70%'],
           avoidLabelOverlap: false,
@@ -58,13 +60,7 @@ const PieChart = defineComponent({
           labelLine: {
             show: false,
           },
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' },
-          ],
+          data: props.data,
         },
       ],
     }
