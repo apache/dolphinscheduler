@@ -15,15 +15,25 @@
  * limitations under the License.
  */
 
-interface ChartData {
+interface DefinitionChartData {
   xAxisData: Array<string>
   seriesData: Array<number>
 }
 
-interface TaskStateTableData {
+interface StateTableData {
   id: number
   number: number
   state: string
 }
 
-export { ChartData, TaskStateTableData }
+interface StateChartData {
+  value: number
+  name: string
+}
+
+interface StateData {
+  table: Array<StateTableData>
+  chart: Array<StateChartData>
+}
+
+export { DefinitionChartData, StateTableData, StateChartData, StateData }
