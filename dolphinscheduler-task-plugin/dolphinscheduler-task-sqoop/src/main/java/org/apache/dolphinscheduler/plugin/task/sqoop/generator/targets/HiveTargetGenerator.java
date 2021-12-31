@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_PARTITION_KEY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_PARTITION_VALUE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE_TABLE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TARGET_DIR;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
@@ -89,6 +90,11 @@ public class HiveTargetGenerator implements ITargetGenerator {
                         .append(SPACE).append(targetHiveParameter.getHivePartitionKey())
                         .append(SPACE).append(HIVE_PARTITION_VALUE)
                         .append(SPACE).append(targetHiveParameter.getHivePartitionValue());
+                }
+
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {
+                    hiveTargetSb.append(SPACE).append(TARGET_DIR)
+                            .append(SPACE).append(targetHiveParameter.getHiveTargetDir());
                 }
 
             }

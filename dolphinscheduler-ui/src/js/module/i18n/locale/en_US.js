@@ -606,6 +606,7 @@ export default {
   'Please enter Export Dir(required)': 'Please enter Export Dir(required)',
   'Please enter Hive Database(required)': 'Please enter Hive Databasec(required)',
   'Please enter Hive Table(required)': 'Please enter Hive Table(required)',
+  'Please enter hive target dir': 'Please enter hive target dir',
   'Please enter Hive Partition Keys': 'Please enter Hive Partition Key',
   'Please enter Hive Partition Values': 'Please enter Partition Value',
   'Please enter Replace Delimiter': 'Please enter Replace Delimiter',
