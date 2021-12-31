@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -257,18 +258,19 @@ public class TaskDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
+     * @param searchWorkflowName searchWorkflowName
+     * @param searchTaskName searchTaskName
      * @param taskType taskType
-     * @param searchVal search value
-     * @param userId user id
      * @param pageNo page number
      * @param pageSize page size
      * @return task definition page
      */
     @ApiOperation(value = "queryTaskDefinitionListPaging", notes = "QUERY_TASK_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = false, type = "String"),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = false, type = "Long"),
+        @ApiImplicitParam(name = "searchWorkflowName", value = "SEARCH_WORKFLOW_NAME", required = false, type = "String"),
+        @ApiImplicitParam(name = "searchTaskName", value = "SEARCH_TASK_NAME", required = false, type = "String"),
+        @ApiImplicitParam(name = "taskType", value = "TASK_TYPE", required = true, dataType = "TaskType", example = "SHELL"),
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10")
     })
@@ -278,18 +280,18 @@ public class TaskDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskDefinitionListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @RequestParam(value = "taskType", required = false) String taskType,
-                                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
+                                                @RequestParam(value = "searchWorkflowName", required = false) String searchWorkflowName,
+                                                @RequestParam(value = "searchTaskName", required = false) String searchTaskName,
+                                                @RequestParam(value = "taskType", required = true) TaskType taskType,
                                                 @RequestParam("pageNo") Integer pageNo,
                                                 @RequestParam("pageSize") Integer pageSize) {
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
-        taskType = ParameterUtils.handleEscapes(taskType);
-        searchVal = ParameterUtils.handleEscapes(searchVal);
-        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, taskType, searchVal, userId, pageNo, pageSize);
+        searchWorkflowName = ParameterUtils.handleEscapes(searchWorkflowName);
+        searchTaskName = ParameterUtils.handleEscapes(searchTaskName);
+        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName, searchTaskName, taskType, pageNo, pageSize);
     }
 
     /**

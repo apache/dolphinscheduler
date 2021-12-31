@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -102,20 +103,18 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     int batchInsert(@Param("taskDefinitions") List<TaskDefinitionLog> taskDefinitions);
 
     /**
-     * task definition page
+     * task main info page
      *
      * @param page page
-     * @param taskType taskType
-     * @param searchVal searchVal
-     * @param userId userId
      * @param projectCode projectCode
-     * @param isAdmin isAdmin
-     * @return task definition IPage
+     * @param searchWorkflowName searchWorkflowName
+     * @param searchTaskName searchTaskName
+     * @param taskType taskType
+     * @return task main info IPage
      */
-    IPage<TaskDefinition> queryDefineListPaging(IPage<TaskDefinition> page,
-                                                @Param("projectCode") long projectCode,
-                                                @Param("taskType") String taskType,
-                                                @Param("searchVal") String searchVal,
-                                                @Param("userId") int userId,
-                                                @Param("isAdmin") boolean isAdmin);
+    IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
+                                              @Param("projectCode") long projectCode,
+                                              @Param("searchWorkflowName") String searchWorkflowName,
+                                              @Param("searchTaskName") String searchTaskName,
+                                              @Param("taskType") String taskType);
 }

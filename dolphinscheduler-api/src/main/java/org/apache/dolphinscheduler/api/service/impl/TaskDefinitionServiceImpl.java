@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
@@ -65,6 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 /**
  * task definition service impl
@@ -440,9 +443,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public Result queryTaskDefinitionListPaging(User loginUser,
                                                 long projectCode,
-                                                String taskType,
-                                                String searchVal,
-                                                Integer userId,
+                                                String searchWorkflowName,
+                                                String searchTaskName,
+                                                TaskType taskType,
                                                 Integer pageNo,
                                                 Integer pageSize) {
         Result result = new Result();
@@ -454,24 +457,36 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, resultStatus);
             return result;
         }
-        if (StringUtils.isNotBlank(taskType)) {
-            taskType = taskType.toUpperCase();
-        }
-        Page<TaskDefinition> page = new Page<>(pageNo, pageSize);
-        IPage<TaskDefinition> taskDefinitionIPage = taskDefinitionMapper.queryDefineListPaging(
-            page, projectCode, taskType, searchVal, userId, isAdmin(loginUser));
-        if (StringUtils.isNotBlank(taskType)) {
-            List<TaskDefinition> records = taskDefinitionIPage.getRecords();
-            for (TaskDefinition pd : records) {
-                TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-                User user = userMapper.selectById(taskDefinitionLog.getOperator());
-                pd.setModifyBy(user.getUserName());
+        Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
+        IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
+            searchTaskName, taskType == null ? StringUtils.EMPTY : taskType.getDesc());
+        List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
+        if (!records.isEmpty()) {
+            Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
+            for (TaskMainInfo info : records) {
+                taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
+                    if (v == null) {
+                        Map<Long, String> upstreamTaskMap = new HashMap<>();
+                        if (info.getUpstreamTaskCode() != 0) {
+                            upstreamTaskMap.put(info.getUpstreamTaskCode(), info.getUpstreamTaskName());
+                            info.setUpstreamTaskCode(0L);
+                            info.setUpstreamTaskName(StringUtils.EMPTY);
+                        }
+                        info.setUpstreamTaskMap(upstreamTaskMap);
+                        v = info;
+                    }
+                    if (info.getUpstreamTaskCode() != 0) {
+                        v.getUpstreamTaskMap().put(info.getUpstreamTaskCode(), info.getUpstreamTaskName());
+                    }
+                    return v;
+                });
             }
-            taskDefinitionIPage.setRecords(records);
+            taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
+            taskMainInfoIPage.setTotal(taskMainInfoMap.values().size());
         }
-        PageInfo<TaskDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) taskDefinitionIPage.getTotal());
-        pageInfo.setTotalList(taskDefinitionIPage.getRecords());
+        PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
+        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
