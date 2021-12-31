@@ -1063,7 +1063,6 @@ public class ProcessService {
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
         List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
         subPropertyList = new ArrayList<>(subPropertyList);
-
         
         Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
