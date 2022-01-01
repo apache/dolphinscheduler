@@ -74,7 +74,7 @@
           'visible': searchInputVisible
         }"
       >
-        <el-select v-if="searchInputVisible" ref="searchInput" v-model="searchText" size="mini" clearable prefix-icon="el-icon-search" @change="onSearch" @keyup.enter.native="onSearch" filterable placeholder="请选择">
+        <el-select v-if="searchInputVisible" ref="searchInput" v-model="searchText" size="mini" clearable prefix-icon="el-icon-search" @change="onSearch" @keyup.enter.native="onSearch" filterable :placeholder="$t('Please select task name')">
           <el-option
             v-for="item in getTaskNodeOptions()"
             :key="item.id"
