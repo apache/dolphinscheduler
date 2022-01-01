@@ -530,6 +530,39 @@ public class ProcessService {
     }
 
     /**
+     * recursive delete all task instance by process instance id
+     * @param processInstanceId
+     */
+    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            taskInstanceMapper.deleteById(taskInstance.getId());
+            removeTaskLogFile(taskInstance);
+        }
+    }
+
+    /**
+     * remove task log file by task instance
+     *
+     * @param taskInstance taskInstance
+     */
+    public void removeTaskLogFile(TaskInstance taskInstance) {
+        try (LogClientService logClient = new LogClientService()) {
+            String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())) {
+                return;
+            }
+            Host host = Host.of(taskInstance.getHost());
+            // remove task log from loggerserver
+            logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
+        }
+    }
+
+    /**
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode
