@@ -797,5 +797,6 @@ export default {
   'Modify task group queue priority': '修改优先级',
   'Force to start task': '强制启动',
   'Priority not empty': '优先级不能为空',
-  'Priority must be number': '优先级必须是数值'
+  'Priority must be number': '优先级必须是数值',
+  'Please select task name': '请选择节点名称'
 }
