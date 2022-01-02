@@ -539,26 +539,32 @@ public class ProcessService {
             return;
         }
 
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+
         for (TaskInstance taskInstance : taskInstanceList) {
-            taskInstanceMapper.deleteById(taskInstance.getId());
-            removeTaskLogFile(taskInstance);
+            taskInstanceIdList.add(taskInstance.getId());
         }
+
+        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
+        removeTaskLogFile(taskInstanceList);
     }
 
     /**
      * remove task log file by task instance
      *
-     * @param taskInstance taskInstance
+     * @param taskInstanceList<TaskInstance> taskInstanceList
      */
-    public void removeTaskLogFile(TaskInstance taskInstance) {
+    public void removeTaskLogFile(List<TaskInstance> taskInstanceList) {
         try (LogClientService logClient = new LogClientService()) {
-            String taskLogPath = taskInstance.getLogPath();
-            if (StringUtils.isEmpty(taskInstance.getHost())) {
-                return;
+            for (TaskInstance taskInstance : taskInstanceList) {
+                String taskLogPath = taskInstance.getLogPath();
+                if (StringUtils.isEmpty(taskInstance.getHost())) {
+                    return;
+                }
+                Host host = Host.of(taskInstance.getHost());
+                // remove task log from loggerserver
+                logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
             }
-            Host host = Host.of(taskInstance.getHost());
-            // remove task log from loggerserver
-            logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
         }
     }
 
