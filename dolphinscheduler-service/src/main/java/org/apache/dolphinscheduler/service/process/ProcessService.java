@@ -452,6 +452,25 @@ public class ProcessService {
     }
 
     /**
+     * recursive delete all task instance by process instance id
+     * @param processInstanceId
+     */
+    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            taskInstanceIdList.add(taskInstance.getId());
+        }
+
+        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
+    }
+
+    /**
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode
