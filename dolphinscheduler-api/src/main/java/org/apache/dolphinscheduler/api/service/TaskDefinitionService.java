@@ -41,6 +41,22 @@ public interface TaskDefinitionService {
                                              String taskDefinitionJson);
 
     /**
+     * create single task definition that binds the workflow
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processDefinitionCode process definition code
+     * @param taskDefinitionJsonObj task definition json object
+     * @param upstreamCodes         upstream task codes, sep comma
+     * @return create result code
+     */
+    Map<String, Object> createTaskBindsWorkFlow(User loginUser,
+                                                long projectCode,
+                                                long processDefinitionCode,
+                                                String taskDefinitionJsonObj,
+                                                String upstreamCodes);
+
+    /**
      * query task definition
      *
      * @param loginUser login user
