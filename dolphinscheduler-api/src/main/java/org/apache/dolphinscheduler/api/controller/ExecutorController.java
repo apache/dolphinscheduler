@@ -221,9 +221,7 @@ public class ExecutorController extends BaseController {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun);
 
-            Status status = (Status) result.get(Constants.STATUS);
-
-            if (!status.equals(Status.SUCCESS)) {
+            if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
             }
         }
