@@ -215,7 +215,7 @@ public class BaseController {
     protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+            result.put(Constants.MSG, MessageFormat.format("{0} {1} {2}",status.getMsg(), Constants.COLON, statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
         }
