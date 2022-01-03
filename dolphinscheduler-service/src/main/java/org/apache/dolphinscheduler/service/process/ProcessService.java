@@ -546,6 +546,7 @@ public class ProcessService {
         }
 
         taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
+        
     }
 
     /**
