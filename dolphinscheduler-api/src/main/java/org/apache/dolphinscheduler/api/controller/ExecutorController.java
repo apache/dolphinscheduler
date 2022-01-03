@@ -162,7 +162,7 @@ public class ExecutorController extends BaseController {
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return start process result code
      */
-    @ApiOperation(value = "BatchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
+    @ApiOperation(value = "batchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "1,2,3"),
             @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
