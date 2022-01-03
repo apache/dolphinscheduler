@@ -546,26 +546,6 @@ public class ProcessService {
         }
 
         taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
-        removeTaskLogFile(taskInstanceList);
-    }
-
-    /**
-     * remove task log file by task instance
-     *
-     * @param taskInstanceList<TaskInstance> taskInstanceList
-     */
-    public void removeTaskLogFile(List<TaskInstance> taskInstanceList) {
-        try (LogClientService logClient = new LogClientService()) {
-            for (TaskInstance taskInstance : taskInstanceList) {
-                String taskLogPath = taskInstance.getLogPath();
-                if (StringUtils.isEmpty(taskInstance.getHost())) {
-                    return;
-                }
-                Host host = Host.of(taskInstance.getHost());
-                // remove task log from loggerserver
-                logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
-            }
-        }
     }
 
     /**
