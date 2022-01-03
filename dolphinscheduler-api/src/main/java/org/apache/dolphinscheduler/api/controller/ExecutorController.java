@@ -37,10 +37,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -212,22 +209,27 @@ public class ExecutorController extends BaseController {
 
         Map<String, Object> result = new HashMap<>();
         String[] processDefinitionCodeArray = processDefinitionCodes.split(",");
-        List<Long> startFailedProcessDefinitionCodeList = new ArrayList<>();
+        Set<Long> processDefinitionCodeSet = new HashSet<>();
+        List<String> startFailedProcessDefinitionCodeList = new ArrayList<>();
 
-        for (String StrProcessDefinitionCode : processDefinitionCodeArray) {
+        for (String StrProcessDefinitionCode :processDefinitionCodeArray) {
             long processDefinitionCode = Long.parseLong(StrProcessDefinitionCode);
+            processDefinitionCodeSet.add(processDefinitionCode);
+        }
+
+        for (long processDefinitionCode : processDefinitionCodeSet) {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun);
 
             Status status = (Status) result.get(Constants.STATUS);
 
             if (!status.equals(Status.SUCCESS)) {
-                startFailedProcessDefinitionCodeList.add(processDefinitionCode);
+                startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
             }
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, startFailedProcessDefinitionCodeList);
+            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(",", startFailedProcessDefinitionCodeList));
         }
 
         return returnDataList(result);
