@@ -529,7 +529,7 @@
         this.$router.push({
           name: 'task-instance',
           query: {
-            processInstanceId: this.$route.params.code,
+            processInstanceId: this.instanceId,
             taskName: taskName
           }
         })
