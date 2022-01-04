@@ -36,7 +36,7 @@
         <el-table-column prop="description" :label="$t('Description')"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
-            <span>{{scope.row.createTime | formatDate}}</span>
+            <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="100">

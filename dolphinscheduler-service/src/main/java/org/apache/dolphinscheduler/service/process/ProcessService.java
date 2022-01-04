@@ -56,7 +56,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateEx
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -523,18 +522,30 @@ public class ProcessService {
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
                     continue;
                 }
-                int port = PropertyUtils.getInt(Constants.RPC_PORT, 50051);
-                String ip = "";
-                try {
-                    ip = Host.of(taskInstance.getHost()).getIp();
-                } catch (Exception e) {
-                    // compatible old version
-                    ip = taskInstance.getHost();
-                }
+                Host host = Host.of(taskInstance.getHost());
                 // remove task log from loggerserver
-                logClient.removeTaskLog(ip, port, taskLogPath);
+                logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
             }
         }
+    }
+
+    /**
+     * recursive delete all task instance by process instance id
+     * @param processInstanceId
+     */
+    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            taskInstanceIdList.add(taskInstance.getId());
+        }
+
+        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
     }
 
     /**
@@ -1070,7 +1081,8 @@ public class ProcessService {
 
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
         List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
-
+        subPropertyList = new ArrayList<>(subPropertyList);
+        
         Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
         for (Property parent : parentPropertyList) {

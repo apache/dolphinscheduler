@@ -15,58 +15,53 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, toRefs } from 'vue'
+import { ref } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
+import { useLanguageStore } from '@/store/language/language'
 
-const Content = defineComponent({
-  name: 'Content',
-  setup() {
-    const { state, getHeaderMenuOptions } = useDataList()
+const Content = () => {
+  const { state, getHeaderMenuOptions } = useDataList()
 
-    const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
+  const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
 
-    const sideMenuOptions = ref()
+  const sideMenuOptions = ref()
+  const languageStore = useLanguageStore()
 
-    const getSideMenuOptions = (item: any) => {
-      sideMenuOptions.value =
-        state.menuOptions.filter((menu) => menu.key === item.key)[0].children ||
-        []
-      state.isShowSide = sideMenuOptions.value.length !== 0
-    }
+  const getSideMenuOptions = (item: any) => {
+    // console.log('item', item)
+    languageStore.setMenuKey(item.key)
+    sideMenuOptions.value =
+      state.menuOptions.filter((menu) => menu.key === item.key)[0].children ||
+      []
+    state.isShowSide = sideMenuOptions.value.length !== 0
+    // console.log('sideMenuOptions.value', sideMenuOptions.value)
+    // console.log('state.isShowSide', state.isShowSide)
+  }
 
-    return {
-      ...toRefs(state),
-      headerMenuOptions,
-      getSideMenuOptions,
-      sideMenuOptions,
-    }
-  },
-  render() {
-    return (
-      <NLayout style='height: 100%;'>
-        <NLayoutHeader style='height: 65px;'>
-          <NavBar
-            onHandleMenuClick={this.getSideMenuOptions}
-            headerMenuOptions={this.headerMenuOptions}
-            languageOptions={this.languageOptions}
-            profileOptions={this.profileOptions}
-          />
-        </NLayoutHeader>
-        <NLayout has-sider position='absolute' style='top: 65px;'>
-          <SideBar
-            sideMenuOptions={this.sideMenuOptions}
-            isShowSide={this.isShowSide}
-          />
-          <NLayoutContent native-scrollbar={false} style='padding: 16px 22px;'>
-            <router-view />
-          </NLayoutContent>
-        </NLayout>
+  return (
+    <NLayout style='height: 100%;'>
+      <NLayoutHeader style='height: 65px;'>
+        <NavBar
+          onHandleMenuClick={getSideMenuOptions}
+          headerMenuOptions={headerMenuOptions}
+          languageOptions={state.languageOptions}
+          profileOptions={state.profileOptions}
+        />
+      </NLayoutHeader>
+      <NLayout has-sider position='absolute' style='top: 65px;'>
+        <SideBar
+          sideMenuOptions={sideMenuOptions.value}
+          isShowSide={state.isShowSide}
+        />
+        <NLayoutContent native-scrollbar={false} style='padding: 16px 22px;'>
+          <router-view />
+        </NLayoutContent>
       </NLayout>
-    )
-  },
-})
+    </NLayout>
+  )
+}
 
 export default Content

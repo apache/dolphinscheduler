@@ -180,11 +180,11 @@ public class TaskGroupController extends BaseController {
     }
 
     /**
-     * query task group list paging by project id
+     * query task group list paging by project code
      *
      * @param loginUser   login user
      * @param pageNo      page number
-     * @param projectCode project id
+     * @param projectCode project code
      * @param pageSize    page size
      * @return queue list
      */

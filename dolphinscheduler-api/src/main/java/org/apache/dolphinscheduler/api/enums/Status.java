@@ -166,7 +166,7 @@ public enum Status {
     NAME_EXIST(10135, "name {0} already exists", "名称[{0}]已存在"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!", "请先删除全部工作流定义"),
-    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误: {0}"),
     PREVIEW_SCHEDULE_ERROR(10139, "preview schedule error", "预览调度配置错误"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140, "parse cron to cron expression error", "解析调度表达式错误"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141, "The start time must not be the same as the end", "开始时间不能和结束时间一样"),
@@ -294,7 +294,7 @@ public enum Status {
     PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     NOT_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
-    NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{}] does not support copy", "不支持复制的任务类型[{}]"),
+    NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**

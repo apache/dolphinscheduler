@@ -15,21 +15,67 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import Card from '@/components/card'
-import PieChart from '@/components/chart/modules/Pie'
-import GaugeChart from '@/components/chart/modules/Gauge'
-import BarChart from '@/components/chart/modules/Bar'
+import {
+  defineComponent,
+  Ref,
+  onMounted,
+  ref,
+  toRefs,
+  reactive,
+  isReactive,
+} from 'vue'
+import { NGrid, NGi } from 'naive-ui'
+import { startOfToday, getTime } from 'date-fns'
+import { useI18n } from 'vue-i18n'
+import { useTaskState } from './use-task-state'
+import StateCard from './state-card'
+import DefinitionCard from './definition-card'
 
 export default defineComponent({
   name: 'home',
-  setup() {},
+  setup() {
+    const { t } = useI18n()
+    const dateRef = ref([getTime(startOfToday()), Date.now()])
+    const { getTaskState } = useTaskState()
+    let taskStateRef = ref()
+
+    onMounted(() => {
+      taskStateRef.value = getTaskState(dateRef.value)
+    })
+
+    const handleTaskDate = (val: any) => {
+      taskStateRef.value = getTaskState(val)
+    }
+
+    return { t, dateRef, handleTaskDate, taskStateRef }
+  },
   render() {
+    const { t, dateRef, handleTaskDate } = this
+
     return (
       <div>
-        <Card title='test'>{{ default: () => <PieChart /> }}</Card>
-        <Card title='test'>{{ default: () => <GaugeChart /> }}</Card>
-        <Card title='test'>{{ default: () => <BarChart /> }}</Card>
+        <NGrid x-gap={12} cols={2}>
+          <NGi>
+            <StateCard
+              title={t('home.task_state_statistics')}
+              date={dateRef}
+              tableData={this.taskStateRef?.value.table}
+              chartData={this.taskStateRef?.value.chart}
+              onUpdateDatePickerValue={handleTaskDate}
+            />
+          </NGi>
+          <NGi>
+            <StateCard
+              title={t('home.process_state_statistics')}
+              date={dateRef}
+            />
+          </NGi>
+        </NGrid>
+        <NGrid cols={1} style='margin-top: 12px;'>
+          <NGi>
+            <DefinitionCard title={t('home.process_definition_statistics')} />
+          </NGi>
+        </NGrid>
       </div>
     )
   },

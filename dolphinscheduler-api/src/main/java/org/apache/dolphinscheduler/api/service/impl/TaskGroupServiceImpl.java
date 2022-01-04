@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -68,7 +70,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> createTaskGroup(User loginUser, long projectcode, String name, String description, int groupSize) {
+    public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -86,7 +88,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup(name, projectcode, description,
+        TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
             groupSize, loginUser.getId(), Flag.YES.getCode());
 
         taskGroup.setCreateTime(new Date());
@@ -114,6 +116,19 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        if (name == null) {
+            putMsg(result, Status.NAME_NULL);
+            return result;
+        }
+        if (groupSize <= 0) {
+            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
+            return result;
+        }
+        Integer exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda().eq(TaskGroup::getName, name).ne(TaskGroup::getId, id));
+        if (exists > 0) {
+            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
@@ -177,7 +192,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
      * @param loginUser login user
      * @param pageNo    page no
      * @param pageSize  page size
-     * @param name      name
+     * @param projectCode project code
      * @return the result code and msg
      */
     @Override
