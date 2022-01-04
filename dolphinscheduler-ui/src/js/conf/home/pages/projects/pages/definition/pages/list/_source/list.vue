@@ -52,6 +52,7 @@
             <span>{{scope.row.description | filterNull}}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="userName" :label="$t('Create User')"></el-table-column>
         <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
         <el-table-column :label="$t('Timing state')">
           <template slot-scope="scope">

@@ -530,6 +530,25 @@ public class ProcessService {
     }
 
     /**
+     * recursive delete all task instance by process instance id
+     * @param processInstanceId
+     */
+    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            taskInstanceIdList.add(taskInstance.getId());
+        }
+
+        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
+    }
+
+    /**
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode
@@ -1062,7 +1081,8 @@ public class ProcessService {
 
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
         List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
-
+        subPropertyList = new ArrayList<>(subPropertyList);
+        
         Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
         for (Property parent : parentPropertyList) {
