@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.request.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.request.SQLTaskExecutionContext;
@@ -54,6 +55,7 @@ import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +71,7 @@ import com.google.common.base.Strings;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(TaskConstants.TASK_LOG_LOGGER_NAME);
 
     protected boolean killed = false;
 
@@ -91,6 +93,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
+    protected String threadLoggerInfoName;
+
     @Override
     public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
         if (processService == null) {
@@ -104,6 +108,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
         this.commitInterval = masterConfig.getTaskCommitInterval();
         this.isTaskLogger = masterConfig.isTaskLogger();
+        this.setTaskExecutionLogger(isTaskLogger);
     }
 
     /**
@@ -133,13 +138,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     /**
      * dispatch task
-     * @return
      */
     protected abstract boolean dispatchTask();
 
     @Override
     public boolean action(TaskAction taskAction) {
-
+        String threadName = Thread.currentThread().getName();
+        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
         switch (taskAction) {
             case STOP:
                 return stop();
@@ -155,8 +160,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return dispatch();
             default:
                 logger.error("unknown task action: {}", taskAction);
-
         }
+        // reset thread name
+        Thread.currentThread().setName(threadName);
         return false;
     }
 
@@ -203,6 +209,24 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     public ExecutionStatus taskState() {
         return this.taskInstance.getState();
+    }
+
+    /**
+     * set master task running logger.
+     */
+    public void setTaskExecutionLogger(boolean isTaskLogger) {
+        if (!isTaskLogger) {
+            return;
+        }
+        if (StringUtils.isEmpty(threadLoggerInfoName)) {
+            Date firstSubmitTime = taskInstance.getFirstSubmitTime() == null ? new Date() : taskInstance.getFirstSubmitTime();
+            threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    firstSubmitTime,
+                    processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion(),
+                    taskInstance.getProcessInstanceId(),
+                    taskInstance.getId());
+        }
     }
 
     /**
@@ -265,21 +289,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
                 .create();
-    }
-
-    /**
-     * set master task running logger.
-     */
-    public void setTaskExecutionLogger(boolean isTaskLogger) {
-        if (!isTaskLogger) {
-            return;
-        }
-        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskInstance.getFirstSubmitTime(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
     }
 
     /**

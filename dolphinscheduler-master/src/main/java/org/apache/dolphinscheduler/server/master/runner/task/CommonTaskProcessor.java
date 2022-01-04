@@ -48,13 +48,12 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
     @Override
-    public boolean submitTask() {
+    protected boolean submitTask() {
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger(isTaskLogger);
         int taskGroupId = taskInstance.getTaskGroupId();
         if (taskGroupId > 0) {
             boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),

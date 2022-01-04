@@ -66,10 +66,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-
-        setTaskExecutionLogger(isTaskLogger);
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
-        Thread.currentThread().setName(threadLoggerInfoName);
         initTaskParameters();
         logger.info("dependent task start");
         return true;

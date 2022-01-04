@@ -91,10 +91,6 @@ public class HttpTask extends AbstractTaskExecutor {
 
     @Override
     public void handle() throws Exception {
-
-        String threadLoggerInfoName = String.format(TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
-        Thread.currentThread().setName(threadLoggerInfoName);
-
         long startTime = System.currentTimeMillis();
         String formatTimeStamp = DateUtils.formatTimeStamp(startTime);
         String statusCode = null;

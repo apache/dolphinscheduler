@@ -82,10 +82,6 @@ public class ProcedureTask extends AbstractTaskExecutor {
 
     @Override
     public void handle() throws Exception {
-        // set the name of the current thread
-        String threadLoggerInfoName = String.format(TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
-        Thread.currentThread().setName(threadLoggerInfoName);
-
         logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),

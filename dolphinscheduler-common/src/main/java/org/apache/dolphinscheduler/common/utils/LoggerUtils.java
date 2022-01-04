@@ -56,11 +56,6 @@ public class LoggerUtils {
     /**
      * Task Logger Thread's name
      */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
-
-    /**
-     * Task Logger Thread's name
-     */
     public static final String TASK_APPID_LOG_FORMAT = "[taskAppId=";
 
     /**

@@ -125,8 +125,25 @@ public class TaskConstants {
 
     /**
      * task log info format
+     * Task Logger Thread's name
+     */
+    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
+
+    /**
+     * task logger thread name format
+     */
+    public static final String TASK_LOGGER_THREAD_NAME_FORMAT = TASK_LOGGER_THREAD_NAME + "-%s";
+
+    /**
+     * task log info format
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
+    public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
+
+    /**
+     * task log logger name format
+     */
+    public static final String TASK_LOG_LOGGER_NAME_FORMAT = TASK_LOG_LOGGER_NAME + "-%s";
 
     /**
      * date format of yyyyMMdd
@@ -321,9 +338,9 @@ public class TaskConstants {
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
     /**
-     * Task Logger Thread's name
+     * get output log service
      */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
+    public static final String GET_OUTPUT_LOG_SERVICE = "-getOutputLogService";
 
     /**
      * hdfs/s3 configuration
