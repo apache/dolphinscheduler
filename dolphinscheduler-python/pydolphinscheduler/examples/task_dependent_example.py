@@ -49,7 +49,7 @@ with ProcessDefinition(
     pd.submit()
 
 with ProcessDefinition(
-    name="task_dependent",
+    name="task_dependent_example",
     tenant="tenant_exists",
 ) as pd:
     task = Dependent(

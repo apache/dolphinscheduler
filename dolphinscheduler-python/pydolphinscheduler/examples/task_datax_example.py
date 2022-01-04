@@ -32,7 +32,7 @@ from pydolphinscheduler.tasks.datax import CustomDataX, DataX
 JSON_TEMPLATE = ""
 
 with ProcessDefinition(
-    name="task_datax",
+    name="task_datax_example",
     tenant="tenant_exists",
 ) as pd:
     # This task synchronizes the data in `t_ds_project`
