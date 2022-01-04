@@ -629,13 +629,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (null == processInstance) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, String.valueOf(processInstanceId));
             return result;
         }
 
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, String.valueOf(processInstanceId));
             return result;
         }
 
