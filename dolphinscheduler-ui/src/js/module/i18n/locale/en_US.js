@@ -238,6 +238,7 @@ export default {
   'Instance parameter exception': 'Instance parameter exception',
   'Group Type': 'Group Type',
   'Alarm plugin instance': 'Alarm plugin instance',
+  'Please enter alarm plugin instance name': 'Please enter alarm plugin instance name',
   'Select Alarm plugin instance': 'Please select an Alarm plugin instance',
   Remarks: 'Remarks',
   SMS: 'SMS',
