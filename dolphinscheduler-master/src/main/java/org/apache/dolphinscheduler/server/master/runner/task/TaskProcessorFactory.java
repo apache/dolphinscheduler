@@ -31,25 +31,25 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TaskProcessorFactory {
 
-    public static final Map<String, ITaskProcessFactory> PROCESS_FACTORY_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, ITaskProcessor> PROCESS_MAP = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
     static {
-        for (ITaskProcessFactory iTaskProcessor : ServiceLoader.load(ITaskProcessFactory.class)) {
-            PROCESS_FACTORY_MAP.put(iTaskProcessor.type(), iTaskProcessor);
+        for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
+            PROCESS_MAP.put(iTaskProcessor.getType(), iTaskProcessor);
         }
     }
 
-    public static ITaskProcessor getTaskProcessor(String type) {
+    public static ITaskProcessor getTaskProcessor(String type) throws InstantiationException, IllegalAccessException {
         if (StringUtils.isEmpty(type)) {
             type = DEFAULT_PROCESSOR;
         }
-        ITaskProcessFactory taskProcessFactory = PROCESS_FACTORY_MAP.get(type);
-        if (Objects.isNull(taskProcessFactory)) {
-            taskProcessFactory = PROCESS_FACTORY_MAP.get(DEFAULT_PROCESSOR);
+        ITaskProcessor iTaskProcessor = PROCESS_MAP.get(type);
+        if (Objects.isNull(iTaskProcessor)) {
+            iTaskProcessor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
-        return taskProcessFactory.create();
+        return iTaskProcessor.getClass().newInstance();
     }
 }
