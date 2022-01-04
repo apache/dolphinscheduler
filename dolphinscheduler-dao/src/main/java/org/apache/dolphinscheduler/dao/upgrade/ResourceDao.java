@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ import java.util.Map;
  * resource dao
  */
 public class ResourceDao {
-    public static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDao.class);
+    public static final Logger logger = LoggerFactory.getLogger(ResourceDao.class);
 
     /**
      * list all resources
