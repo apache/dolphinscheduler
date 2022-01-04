@@ -137,7 +137,6 @@ public class TaskConstants {
     /**
      * task log info format
      */
-    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
     public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
 
     /**

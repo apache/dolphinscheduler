@@ -62,10 +62,10 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     @Override
     public boolean submitTask() {
         this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-
         if (this.taskInstance == null) {
             return false;
         }
+        this.setTaskExecutionLogger(isTaskLogger);
         initTaskParameters();
         logger.info("dependent task start");
         return true;

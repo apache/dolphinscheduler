@@ -71,7 +71,7 @@ import com.google.common.base.Strings;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected final Logger logger = LoggerFactory.getLogger(TaskConstants.TASK_LOG_LOGGER_NAME);
+    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     protected boolean killed = false;
 
@@ -108,7 +108,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
         this.commitInterval = masterConfig.getTaskCommitInterval();
         this.isTaskLogger = masterConfig.isTaskLogger();
-        this.setTaskExecutionLogger(isTaskLogger);
     }
 
     /**
@@ -144,7 +143,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public boolean action(TaskAction taskAction) {
         String threadName = Thread.currentThread().getName();
-        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
+        if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
+            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
+        }
         switch (taskAction) {
             case STOP:
                 return stop();
@@ -218,15 +219,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (!isTaskLogger) {
             return;
         }
-        if (StringUtils.isEmpty(threadLoggerInfoName)) {
-            Date firstSubmitTime = taskInstance.getFirstSubmitTime() == null ? new Date() : taskInstance.getFirstSubmitTime();
-            threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    firstSubmitTime,
-                    processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(),
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getId());
-        }
+        threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
+        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
     }
 
     /**

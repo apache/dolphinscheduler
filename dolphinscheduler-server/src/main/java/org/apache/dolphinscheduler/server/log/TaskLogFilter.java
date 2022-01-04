@@ -50,17 +50,10 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-//        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME)
-//                || event.getLoggerName().startsWith(" - " + LoggerUtils.TASK_APPID_LOG_FORMAT)
-//                || event.getLevel().isGreaterOrEqual(level)) {
-//            return FilterReply.ACCEPT;
-//        }
-//        return FilterReply.DENY;
-
         FilterReply filterReply = FilterReply.DENY;
-        if ((event.getThreadName().startsWith(TaskConstants.TASK_LOGGER_THREAD_NAME)
-                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME))
-                || event.getLevel().isGreaterOrEqual(level)) {
+        if (event.getThreadName().startsWith(TaskConstants.TASK_LOGGER_THREAD_NAME)
+                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME)
+                && event.getLevel().isGreaterOrEqual(level)) {
             filterReply = FilterReply.ACCEPT;
         }
         logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}", event.getThreadName(), event.getLoggerName(), filterReply.name());

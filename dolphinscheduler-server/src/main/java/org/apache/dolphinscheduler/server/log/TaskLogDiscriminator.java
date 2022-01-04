@@ -57,7 +57,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
             String part1 = threadName.split(Constants.EQUAL_SIGN)[1];
             String prefix = LoggerUtils.TASK_LOGGER_INFO_PREFIX + "-";
             if (part1.startsWith(prefix)) {
-                key = part1.substring(prefix.length()).replace("-", "/");
+                key = part1.substring(prefix.length(), part1.length() - 1).replace("-", "/");
             }
         }
         logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(), event.getLoggerName());

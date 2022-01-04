@@ -50,7 +50,7 @@ public class TaskLogDiscriminatorTest {
        String result = taskLogDiscriminator.getDiscriminatingValue(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,"-[taskAppId=TASK-101-1-1001");
+                return String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,"-[taskAppId=TASK-101-1-1001]");
             }
 
             @Override
