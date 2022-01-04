@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  Ref,
-  onMounted,
-  ref,
-  toRefs,
-  reactive,
-  isReactive,
-} from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import { useTaskState } from './use-task-state'
+import { useProcessState } from './use-process-state'
 import StateCard from './state-card'
 import DefinitionCard from './definition-card'
 
@@ -37,20 +30,34 @@ export default defineComponent({
     const { t } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const { getTaskState } = useTaskState()
+    const { getProcessState } = useProcessState()
     let taskStateRef = ref()
+    let processStateRef = ref()
 
     onMounted(() => {
       taskStateRef.value = getTaskState(dateRef.value)
+      processStateRef.value = getProcessState(dateRef.value)
     })
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
     }
 
-    return { t, dateRef, handleTaskDate, taskStateRef }
+    const handleProcessDate = (val: any) => {
+      processStateRef.value = getProcessState(val)
+    }
+
+    return {
+      t,
+      dateRef,
+      handleTaskDate,
+      handleProcessDate,
+      taskStateRef,
+      processStateRef,
+    }
   },
   render() {
-    const { t, dateRef, handleTaskDate } = this
+    const { t, dateRef, handleTaskDate, handleProcessDate } = this
 
     return (
       <div>
@@ -68,6 +75,9 @@ export default defineComponent({
             <StateCard
               title={t('home.process_state_statistics')}
               date={dateRef}
+              tableData={this.processStateRef?.value.table}
+              chartData={this.processStateRef?.value.chart}
+              onUpdateDatePickerValue={handleProcessDate}
             />
           </NGi>
         </NGrid>
