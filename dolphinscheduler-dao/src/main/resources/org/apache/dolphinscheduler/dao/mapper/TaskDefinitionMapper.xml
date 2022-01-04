@@ -106,4 +106,16 @@
         </if>
         order by td.update_time desc
     </select>
+    <select id="queryByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where 1 = 1
+        <if test="codes != null and codes.size != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
 </mapper>
