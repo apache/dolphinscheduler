@@ -799,5 +799,8 @@ export default {
   'Force to start task': '强制启动',
   'Priority not empty': '优先级不能为空',
   'Priority must be number': '优先级必须是数值',
-  'Please select task name': '请选择节点名称'
+  'Please select task name': '请选择节点名称',
+  'Process State': '工作流状态',
+  'Upstream Tasks': '上游任务',
+  'and {n} more': '…等{n}个'
 }

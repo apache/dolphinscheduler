@@ -23,58 +23,102 @@
         style="width: 100%"
         @selection-change="select"
       >
-        <el-table-column
-          prop="id"
-          :label="$t('#')"
-          min-width="50"
-        ></el-table-column>
         <el-table-column :label="$t('Task Name')" min-width="200">
           <template v-slot="scope">
             <el-popover trigger="hover" placement="top">
-              <p>{{ scope.row.name }}</p>
+              <div>{{ scope.row.taskName }}</div>
               <div slot="reference" class="name-wrapper">
                 <a
                   href="javascript:"
                   class="links"
                   @click="viewTaskDetail(scope.row)"
                 >
-                  {{ scope.row.name }}
+                  <span class="ellipsis name">{{ scope.row.taskName }}</span>
                 </a>
               </div>
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Task Type')" prop="taskType" min-width="135">
+        <el-table-column
+          :label="$t('Process Name')"
+          prop="processDefinitionName"
+          min-width="135"
+        >
         </el-table-column>
         <el-table-column
-          :label="$t('User Name')"
-          prop="userName"
-          width="135"
-        ></el-table-column>
+          :label="$t('Process State')"
+          prop="processReleaseState"
+          min-width="135"
+        >
+        </el-table-column>
+        <el-table-column
+          :label="$t('Task Type')"
+          prop="taskType"
+          min-width="135"
+        >
+        </el-table-column>
+        <el-table-column :label="$t('Upstream Tasks')" min-width="300">
+          <template v-slot="scope">
+            <div class="upstream-tasks">
+              <el-popover
+                trigger="hover"
+                placement="top"
+                v-for="task in scope.row.upstreamTasks.slice(0, 3)"
+                :key="task.taskCode"
+                :content="task.taskName"
+              >
+                <el-tag class="pre-task-tag" size="mini" slot="reference">
+                  {{ task.taskName }}
+                </el-tag>
+              </el-popover>
+              <!-- more popover -->
+              <el-popover
+                v-if="scope.row.upstreamTasks.length > 3"
+                trigger="hover"
+                :title="$t('Upstream Tasks')"
+                placement="top"
+              >
+                <div class="task-definition-upstreams-popover">
+                  <el-tag
+                    size="mini"
+                    slot="reference"
+                    class="popover-tag"
+                    v-for="task in scope.row.upstreamTasks"
+                    :key="task.taskCode"
+                  >
+                    {{ task.taskName }}
+                  </el-tag>
+                </div>
+                <el-tag class="pre-task-tag" size="mini" slot="reference">
+                  {{
+                    $t("and {n} more", {
+                      n: scope.row.upstreamTasks.length - 3,
+                    })
+                  }}
+                </el-tag>
+              </el-popover>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Version Info')" min-width="135">
           <template v-slot="scope">
             <span>
-              {{ 'V' + scope.row.version }}
+              {{ "V" + scope.row.taskVersion }}
             </span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="135">
           <template v-slot="scope">
             <span>
-              {{ scope.row.createTime | formatDate }}
+              {{ scope.row.taskCreateTime | formatDate }}
             </span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Update Time')" min-width="135">
           <template v-slot="scope">
             <span>
-              {{ scope.row.updateTime | formateDate }}
+              {{ scope.row.taskUpdateTime | formateDate }}
             </span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('Description')" min-width="100">
-          <template v-slot="scope">
-            <span>{{ scope.row.description | filterNull }} </span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="100" fixed="right">
@@ -90,7 +134,10 @@
                   size="mini"
                   icon="el-icon-edit-outline"
                   circle
-                  :disabled="scope.row.taskType === 'CONDITIONS' || scope.row.taskType ==='SWITCH' "
+                  :disabled="
+                    scope.row.taskType === 'CONDITIONS' ||
+                    scope.row.taskType === 'SWITCH'
+                  "
                   @click="editTask(scope.row)"
                 ></el-button>
               </span>
@@ -151,9 +198,7 @@
         deep: true
       }
     },
-    created () {
-    // this.list = this.tasksList
-    },
+    created () {},
     methods: {
       ...mapActions('dag', ['deleteTaskDefinition']),
       /**
@@ -193,5 +238,12 @@
   }
 </script>
 
-<style>
+<style lang="scss">
+.task-definition-upstreams-popover {
+  max-width: 500px;
+  .popover-tag {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+}
 </style>

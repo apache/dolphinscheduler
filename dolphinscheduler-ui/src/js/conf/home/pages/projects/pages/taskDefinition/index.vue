@@ -18,11 +18,60 @@
   <div class="task-definition" v-if="!isLoading">
     <m-list-construction :title="$t('Task Definition')">
       <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions" :taskTypeShow="true">
+        <m-conditions>
           <template v-slot:button-group>
             <el-button size="mini" @click="createTask">
               {{ $t("Create task") }}
             </el-button>
+          </template>
+          <template v-slot:search-group>
+            <div class="list">
+              <el-button
+                size="mini"
+                @click="_ckQuery"
+                icon="el-icon-search"
+              ></el-button>
+            </div>
+            <div class="list">
+              <el-select
+                size="mini"
+                style="width: 140px"
+                :placeholder="$t('type')"
+                :value="tempParams.taskType"
+                @change="_onChangeTaskType"
+                clearable
+              >
+                <el-option
+                  v-for="taskType in tasksTypeList"
+                  :key="taskType"
+                  :value="taskType"
+                  :label="taskType"
+                >
+                </el-option>
+              </el-select>
+            </div>
+            <div class="list">
+              <el-input
+                v-model="tempParams.processName"
+                @keyup.enter.native="_ckQuery"
+                size="mini"
+                :placeholder="$t('Process Name')"
+                type="text"
+                style="width: 180px"
+                clearable
+              />
+            </div>
+            <div class="list">
+              <el-input
+                v-model="tempParams.taskName"
+                @keyup.enter.native="_ckQuery"
+                size="mini"
+                :placeholder="$t('Task Name')"
+                type="text"
+                style="width: 180px"
+                clearable
+              />
+            </div>
           </template>
         </m-conditions>
       </template>
@@ -86,10 +135,8 @@
   import { mapActions, mapMutations } from 'vuex'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mFormModel from '@/conf/home/pages/dag/_source/formModel/formModel.vue'
-  /**
-   * tasksType
-   */
   import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
+  import _ from 'lodash'
 
   const DEFAULT_NODE_DATA = {
     id: -1,
@@ -108,9 +155,14 @@
         searchParams: {
           pageSize: 10,
           pageNo: 1,
-          searchVal: '',
-          taskType: '',
-          userId: ''
+          processName: '',
+          taskName: '',
+          taskType: ''
+        },
+        tempParams: {
+          processName: '',
+          taskName: '',
+          taskType: ''
         },
         // whether the task config drawer is visible
         taskDrawer: false,
@@ -216,25 +268,52 @@
         this.searchParams.pageSize = val
       },
       /**
-       * conditions
+       * query tasks
        */
-      _onConditions (o) {
-        this.searchParams.searchVal = o.searchVal
-        this.searchParams.taskType = o.taskType
+      _ckQuery (o) {
+        this.searchParams.processName = this.tempParams.processName
+        this.searchParams.taskType = this.tempParams.taskType
+        this.searchParams.taskName = this.tempParams.taskName
         this.searchParams.pageNo = 1
+      },
+      /**
+       * filter tasks by taskType
+       */
+      _onChangeTaskType (val) {
+        this.tempParams.taskType = val
       },
       /**
        * get task definition list
        */
       _getList (flag) {
         this.isLoading = !flag
-        this.getTaskDefinitionsList(this.searchParams)
+        this.getTaskDefinitionsList({
+          pageNo: this.searchParams.pageNo,
+          pageSize: this.searchParams.pageSize,
+          taskType: this.searchParams.taskType || 'SHELL',
+          searchTaskName: this.searchParams.taskName,
+          searchWorkflowName: this.searchParams.processName
+        })
           .then((res) => {
             if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
               this.searchParams.pageNo = this.searchParams.pageNo - 1
             } else {
-              this.tasksList = []
-              this.tasksList = res.totalList
+              this.tasksList = res.totalList.map((task) => {
+                const upstreamTaskMap = task.upstreamTaskMap || {}
+                const upstreamTasks = Object.keys(upstreamTaskMap).map((code) => {
+                  return {
+                    taskCode: code,
+                    taskName: upstreamTaskMap[code]
+                  }
+                })
+                return {
+                  ...task,
+                  upstreamTasks,
+                  upstreamTaskNames: upstreamTasks
+                    .map((u) => u.taskName)
+                    .join(',')
+                }
+              })
               this.total = res.total
               this.isLoading = false
             }
@@ -280,8 +359,13 @@
         .catch(() => {
           this.isLoading = false
         })
+      // Routing parameter merging
+      if (!_.isEmpty(this.$route.query)) {
+        this.tempParams.processName = this.$route.query.processName || ''
+        this.tempParams.taskType = this.$route.query.taskType || ''
+        this.tempParams.taskName = this.$route.query.taskName || ''
+      }
     },
-    mounted () {},
     components: {
       mListConstruction,
       mConditions,
@@ -296,6 +380,31 @@
 .task-definition {
   .taskGroupBtn {
     width: 300px;
+  }
+
+  ::v-deep .table-box {
+    table {
+      tr {
+        th:first-child,
+        td:first-child {
+          text-align: left;
+          padding-left: 20px;
+        }
+        td:first-child span {
+          text-align: left;
+        }
+      }
+    }
+    .pre-task-tag {
+      margin-right: 10px;
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .upstream-tasks {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 </style>
