@@ -137,11 +137,12 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     protected boolean persistTask(TaskAction taskAction) {
         switch (taskAction) {
             case STOP:
-                if (!this.taskInstance.getState().typeIsFinished()) {
-                    this.taskInstance.setState(ExecutionStatus.KILL);
-                    this.taskInstance.setEndTime(new Date());
-                    processService.saveTaskInstance(taskInstance);
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                    return true;
                 }
+                this.taskInstance.setState(ExecutionStatus.KILL);
+                this.taskInstance.setEndTime(new Date());
+                processService.saveTaskInstance(taskInstance);
                 return true;
             default:
                 logger.error("unknown task action: {}", taskAction.toString());

@@ -91,7 +91,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     protected boolean persistTask(TaskAction taskAction) {
         switch (taskAction) {
             case STOP:
-                if (taskInstance.getState().typeIsFinished()) {
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
                     return true;
                 }
                 if (StringUtils.isBlank(taskInstance.getHost())) {
