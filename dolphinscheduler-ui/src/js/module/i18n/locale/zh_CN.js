@@ -237,6 +237,7 @@ export default {
   'Instance parameter exception': '实例参数异常',
   'Group Type': '组类型',
   'Alarm plugin instance': '告警插件实例',
+  'Please enter alarm plugin instance name': '请输入告警实例名称',
   'Select Alarm plugin instance': '请选择告警插件实例',
   Remarks: '备注',
   SMS: '短信',
