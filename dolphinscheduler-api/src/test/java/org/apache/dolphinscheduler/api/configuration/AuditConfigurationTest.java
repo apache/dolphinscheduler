@@ -17,19 +17,24 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
-
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class AuditConfigurationTest extends AbstractControllerTest {
+@ActiveProfiles("audit")
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = AuditConfiguration.class)
+public class AuditConfigurationTest {
 
     @Autowired
     private AuditConfiguration auditConfiguration;
 
     @Test
     public void isAuditGlobalControlSwitch() {
-        Assert.assertTrue(auditConfiguration.isAuditGlobalControlSwitch());
+        Assert.assertTrue(auditConfiguration.getEnabled());
     }
 }

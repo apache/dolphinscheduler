@@ -775,5 +775,5 @@ export default {
   'Create Operation': '创建',
   'Update Operation': '更新',
   'Delete Operation': '删除',
-  'Read Operation': "读取"
+  'Read Operation': '读取'
 }

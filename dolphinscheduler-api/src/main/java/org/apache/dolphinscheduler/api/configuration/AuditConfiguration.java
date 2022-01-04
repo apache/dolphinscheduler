@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
+@EnableConfigurationProperties
+@ConfigurationProperties(value = "audit", ignoreUnknownFields = false)
 public class AuditConfiguration {
-    @Value("${audit.control.global.switch:true}")
-    private boolean auditGlobalControlSwitch;
+    private boolean enabled;
 
-    public boolean isAuditGlobalControlSwitch() {
-        return auditGlobalControlSwitch;
+    public boolean getEnabled() {
+        return enabled;
     }
 
-    public void setAuditGlobalControlSwitch(boolean auditGlobalControlSwitch) {
-        this.auditGlobalControlSwitch = auditGlobalControlSwitch;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

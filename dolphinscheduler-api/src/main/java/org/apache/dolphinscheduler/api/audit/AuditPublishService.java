@@ -48,7 +48,7 @@ public class AuditPublishService {
      */
     @PostConstruct
     private void init() {
-        if (auditConfiguration.isAuditGlobalControlSwitch()) {
+        if (auditConfiguration.getEnabled()) {
             Thread thread = new Thread(this::doPublish);
             thread.setDaemon(true);
             thread.setName("Audit-Log-Consume-Thread");
@@ -62,7 +62,7 @@ public class AuditPublishService {
      * @param message audit message
      */
     public void publish(AuditMessage message) {
-        if (auditConfiguration.isAuditGlobalControlSwitch() && !auditMessageQueue.offer(message)) {
+        if (auditConfiguration.getEnabled() && !auditMessageQueue.offer(message)) {
             logger.error("add audit message failed {}", message.toString());
         }
     }

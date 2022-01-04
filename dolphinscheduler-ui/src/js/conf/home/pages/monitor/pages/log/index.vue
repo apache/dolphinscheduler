@@ -76,7 +76,7 @@
           // end date
           endDate: '',
           // operator
-          userName: '',
+          userName: ''
         },
         isLeft: true,
         // isEffective: 1,

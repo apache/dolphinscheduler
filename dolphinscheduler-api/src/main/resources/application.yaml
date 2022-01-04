@@ -102,6 +102,8 @@ registry:
     digest: ~
 
 # Override by profile
+audit:
+  enabled: false
 
 ---
 spring:

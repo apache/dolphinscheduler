@@ -775,5 +775,5 @@ export default {
   'Create Operation': 'create',
   'Update Operation': 'update',
   'Delete Operation': 'delete',
-  'Read Operation': "read"
+  'Read Operation': 'read'
 }
