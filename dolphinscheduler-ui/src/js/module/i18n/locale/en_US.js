@@ -238,6 +238,7 @@ export default {
   'Instance parameter exception': 'Instance parameter exception',
   'Group Type': 'Group Type',
   'Alarm plugin instance': 'Alarm plugin instance',
+  'Please enter alarm plugin instance name': 'Please enter alarm plugin instance name',
   'Select Alarm plugin instance': 'Please select an Alarm plugin instance',
   Remarks: 'Remarks',
   SMS: 'SMS',
@@ -606,6 +607,7 @@ export default {
   'Please enter Export Dir(required)': 'Please enter Export Dir(required)',
   'Please enter Hive Database(required)': 'Please enter Hive Databasec(required)',
   'Please enter Hive Table(required)': 'Please enter Hive Table(required)',
+  'Please enter hive target dir': 'Please enter hive target dir',
   'Please enter Hive Partition Keys': 'Please enter Hive Partition Key',
   'Please enter Hive Partition Values': 'Please enter Partition Value',
   'Please enter Replace Delimiter': 'Please enter Replace Delimiter',
@@ -794,5 +796,6 @@ export default {
   'Task group queue the status of releasing': 'Released',
   'Modify task group queue priority': 'Edit the priority of the task group queue',
   'Priority not empty': 'The value of priority can not be empty',
-  'Priority must be number': 'The value of priority should be number'
+  'Priority must be number': 'The value of priority should be number',
+  'Please select task name': 'Please select a task name'
 }

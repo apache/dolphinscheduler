@@ -237,6 +237,7 @@ export default {
   'Instance parameter exception': '实例参数异常',
   'Group Type': '组类型',
   'Alarm plugin instance': '告警插件实例',
+  'Please enter alarm plugin instance name': '请输入告警实例名称',
   'Select Alarm plugin instance': '请选择告警插件实例',
   Remarks: '备注',
   SMS: '短信',
@@ -606,6 +607,7 @@ export default {
   'Please enter Export Dir(required)': '请输入数据源路径(必填)',
   'Please enter Hive Database(required)': '请输入Hive数据库(必填)',
   'Please enter Hive Table(required)': '请输入Hive表名(必填)',
+  'Please enter hive target dir': '请输入Hive临时目录',
   'Please enter Hive Partition Keys': '请输入分区键',
   'Please enter Hive Partition Values': '请输入分区值',
   'Please enter Replace Delimiter': '请输入替换分隔符',
@@ -796,5 +798,6 @@ export default {
   'Modify task group queue priority': '修改优先级',
   'Force to start task': '强制启动',
   'Priority not empty': '优先级不能为空',
-  'Priority must be number': '优先级必须是数值'
+  'Priority must be number': '优先级必须是数值',
+  'Please select task name': '请选择节点名称'
 }
