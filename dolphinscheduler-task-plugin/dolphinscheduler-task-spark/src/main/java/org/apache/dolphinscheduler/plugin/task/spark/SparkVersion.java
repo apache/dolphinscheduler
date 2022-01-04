@@ -24,7 +24,7 @@ public enum SparkVersion {
      * 1 SPARK2
      */
     SPARK1(0, "SPARK1", "${SPARK_HOME1}/bin/spark-submit"),
-    SPARK2(1, "SPARK2", "${SPARK_HOME1}/bin/spark-submit"),
+    SPARK2(1, "SPARK2", "${SPARK_HOME2}/bin/spark-submit"),
     ;
 
     private final int code;
