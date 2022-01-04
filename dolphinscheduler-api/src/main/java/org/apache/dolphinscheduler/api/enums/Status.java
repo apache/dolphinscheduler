@@ -166,7 +166,7 @@ public enum Status {
     NAME_EXIST(10135, "name {0} already exists", "名称[{0}]已存在"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!", "请先删除全部工作流定义"),
-    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error", "批量删除工作流实例错误: {0}"),
     PREVIEW_SCHEDULE_ERROR(10139, "preview schedule error", "预览调度配置错误"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140, "parse cron to cron expression error", "解析调度表达式错误"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141, "The start time must not be the same as the end", "开始时间不能和结束时间一样"),
