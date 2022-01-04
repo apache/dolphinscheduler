@@ -51,7 +51,8 @@ const PieChart = defineComponent({
       series: [
         {
           type: 'pie',
-          radius: ['40%', '70%'],
+          radius: ['35%', '60%'],
+          center: ['50%', '40%'],
           avoidLabelOverlap: false,
           label: {
             show: false,
