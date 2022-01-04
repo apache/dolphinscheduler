@@ -94,13 +94,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
                     return true;
                 }
-                if (StringUtils.isBlank(taskInstance.getHost())) {
-                    taskInstance.setState(ExecutionStatus.KILL);
-                    taskInstance.setEndTime(new Date());
-                    processService.updateTaskInstance(taskInstance);
-                    return true;
-                }
-                break;
+                taskInstance.setState(ExecutionStatus.KILL);
+                taskInstance.setEndTime(new Date());
+                processService.updateTaskInstance(taskInstance);
+                return true;
             default:
                 logger.error("unknown task action: {}", taskAction.toString());
 
