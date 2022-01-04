@@ -18,14 +18,14 @@
 import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
 import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
-import { useValidate } from './use-validate'
+import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
 
 const login = defineComponent({
   name: 'login',
   setup() {
-    const { state, t, locale } = useValidate()
+    const { state, t, locale } = useForm()
 
     const { handleChange } = useTranslate(locale)
 
@@ -85,6 +85,9 @@ const login = defineComponent({
             <NButton
               round
               type='info'
+              disabled={
+                !this.loginForm.userName || !this.loginForm.userPassword
+              }
               style={{ width: '100%' }}
               onClick={this.handleLogin}
             >
