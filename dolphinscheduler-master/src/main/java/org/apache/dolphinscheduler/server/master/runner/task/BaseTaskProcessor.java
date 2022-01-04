@@ -40,6 +40,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -61,7 +63,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
@@ -80,8 +81,30 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstance processInstance;
 
-    @Autowired
-    protected ProcessService processService;
+    protected int maxRetryTimes;
+
+    protected int commitInterval;
+
+    protected boolean isTaskLogger;
+
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
+    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
+    @Override
+    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
+        if (processService == null) {
+            processService = SpringApplicationContext.getBean(ProcessService.class);
+        }
+        if (masterConfig == null) {
+            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        }
+        this.taskInstance = taskInstance;
+        this.processInstance = processInstance;
+        this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
+        this.commitInterval = masterConfig.getTaskCommitInterval();
+        this.isTaskLogger = masterConfig.isTaskLogger();
+    }
 
     /**
      * pause task, common tasks donot need this.
@@ -98,9 +121,21 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected abstract boolean taskTimeout();
 
-    @Override
-    public void run() {
-    }
+    /**
+     * submit task
+     */
+    protected abstract boolean submitTask();
+
+    /**
+     * run task
+     */
+    protected abstract boolean runTask();
+
+    /**
+     * dispatch task
+     * @return
+     */
+    protected abstract boolean dispatchTask();
 
     @Override
     public boolean action(TaskAction taskAction) {
@@ -112,11 +147,29 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return pause();
             case TIMEOUT:
                 return timeout();
+            case SUBMIT:
+                return submit();
+            case RUN:
+                return run();
+            case DISPATCH:
+                return dispatch();
             default:
                 logger.error("unknown task action: {}", taskAction);
 
         }
         return false;
+    }
+
+    protected boolean submit() {
+        return submitTask();
+    }
+
+    protected boolean run() {
+        return runTask();
+    }
+
+    protected boolean dispatch() {
+        return dispatchTask();
     }
 
     protected boolean timeout() {
@@ -127,9 +180,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return timeout;
     }
 
-    /**
-     *
-     */
     protected boolean pause() {
         if (paused) {
             return true;
@@ -151,9 +201,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return null;
     }
 
-    @Override
-    public void dispatch(TaskInstance taskInstance, ProcessInstance processInstance) {
-
+    public ExecutionStatus taskState() {
+        return this.taskInstance.getState();
     }
 
     /**

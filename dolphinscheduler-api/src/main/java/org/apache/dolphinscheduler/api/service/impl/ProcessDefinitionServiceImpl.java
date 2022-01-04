@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -106,6 +107,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -1101,9 +1103,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
+        HashMap<Long, Project> userProjects =  new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
+        projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
+            .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
+
         // check processDefinition exist in project
-        List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream().
-                filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
+        List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream()
+            .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
@@ -1307,13 +1313,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<String> failedProcessList = new ArrayList<>();
         doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, true);
+        if (result.get(Constants.STATUS) == Status.NOT_SUPPORT_COPY_TASK_TYPE) {
+            return result;
+        }
         checkBatchOperateResult(projectCode, targetProjectCode, result, failedProcessList, true);
         return result;
     }
 
     /**
      * batch move process definition
-     *
+     * Will be deleted
      * @param loginUser loginUser
      * @param projectCode projectCode
      * @param codes processDefinitionCodes
@@ -1383,6 +1392,36 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ProcessTaskRelationLog> taskRelationList = processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
             processDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
+                List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
+                Map<Long, Long> taskCodeMap = new HashMap<>();
+                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                    if (TaskType.CONDITIONS.getDesc().equals(taskDefinitionLog.getTaskType())
+                        || TaskType.SWITCH.getDesc().equals(taskDefinitionLog.getTaskType())
+                        || TaskType.SUB_PROCESS.getDesc().equals(taskDefinitionLog.getTaskType())
+                        || TaskType.DEPENDENT.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                        putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
+                        return;
+                    }
+                    try {
+                        long taskCode = CodeGenerateUtils.getInstance().genCode();
+                        taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
+                        taskDefinitionLog.setCode(taskCode);
+                    } catch (CodeGenerateException e) {
+                        putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
+                        throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
+                    }
+                    taskDefinitionLog.setProjectCode(targetProjectCode);
+                    taskDefinitionLog.setVersion(0);
+                    taskDefinitionLog.setName(taskDefinitionLog.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                }
+                for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
+                    if (processTaskRelationLog.getPreTaskCode() > 0) {
+                        processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
+                    }
+                    if (processTaskRelationLog.getPostTaskCode() > 0) {
+                        processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+                    }
+                }
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
@@ -1392,8 +1431,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setId(0);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                if (StringUtils.isNotBlank(processDefinition.getLocations())) {
+                    ArrayNode jsonNodes = JSONUtils.parseArray(processDefinition.getLocations());
+                    for (int i = 0; i < jsonNodes.size(); i++) {
+                        ObjectNode node = (ObjectNode) jsonNodes.path(i);
+                        node.put("taskCode", taskCodeMap.get(node.get("taskCode").asLong()));
+                        jsonNodes.set(i, node);
+                    }
+                    processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
+                }
                 try {
-                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, Lists.newArrayList()));
+                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs));
                 } catch (Exception e) {
                     putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);

@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
@@ -89,12 +90,17 @@ public class WorkflowExecuteThreadTest {
 
     @Before
     public void init() throws Exception {
-        processService = mock(ProcessService.class);
-        taskProcessorFactory = mock(TaskProcessorFactory.class);
-
         applicationContext = mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+
         config = new MasterConfig();
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
+
+        processService = mock(ProcessService.class);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        taskProcessorFactory = mock(TaskProcessorFactory.class);
 
         processInstance = mock(ProcessInstance.class);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
@@ -111,7 +117,7 @@ public class WorkflowExecuteThreadTest {
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
         stateWheelExecuteThread = mock(StateWheelExecuteThread.class);
-        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread, taskProcessorFactory));
+        workflowExecuteThread = PowerMockito.spy(new WorkflowExecuteThread(processInstance, processService, null, null, config, stateWheelExecuteThread));
         // prepareProcess init dag
         Field dag = WorkflowExecuteThread.class.getDeclaredField("dag");
         dag.setAccessible(true);

@@ -17,77 +17,77 @@
 
 import { axios } from '@/service/service'
 import {
-	ListReq,
-	ProjectsReq,
-	UserIdReq,
-	CodeReq,
-	UpdateProjectsReq
+  ListReq,
+  ProjectsReq,
+  UserIdReq,
+  CodeReq,
+  UpdateProjectsReq,
 } from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
-	return axios({
-		url: `/projects`,
-		method: 'get',
-		params,
-	})
+  return axios({
+    url: `/projects`,
+    method: 'get',
+    params,
+  })
 }
 
 export function createProject(data: ProjectsReq): any {
-	return axios({
-		url: `/projects`,
-		method: 'post',
-		data,
-	})
+  return axios({
+    url: `/projects`,
+    method: 'post',
+    data,
+  })
 }
 
 export function queryAuthorizedProject(params: UserIdReq): any {
-	return axios({
-		url: `/projects/authed-project`,
-		method: 'get',
-		params,
-	})
+  return axios({
+    url: `/projects/authed-project`,
+    method: 'get',
+    params,
+  })
 }
 
 export function queryProjectCreatedAndAuthorizedByUser(): any {
-	return axios({
-		url: `/projects/created-and-authed`,
-		method: 'get',
-	})
+  return axios({
+    url: `/projects/created-and-authed`,
+    method: 'get',
+  })
 }
 
 export function queryAllProjectList(): any {
-	return axios({
-		url: `/projects/list`,
-		method: 'get',
-	})
+  return axios({
+    url: `/projects/list`,
+    method: 'get',
+  })
 }
 
 export function queryUnauthorizedProject(params: UserIdReq): any {
-	return axios({
-		url: `/projects/unauth-project`,
-		method: 'get',
-		params
-	})
+  return axios({
+    url: `/projects/unauth-project`,
+    method: 'get',
+    params,
+  })
 }
 
 export function queryProjectByCode(code: CodeReq): any {
-	return axios({
-		url: `/projects/${code}`,
-		method: 'get',
-	})
+  return axios({
+    url: `/projects/${code}`,
+    method: 'get',
+  })
 }
 
 export function updateProject(data: UpdateProjectsReq, code: CodeReq): any {
-	return axios({
-		url: `/projects/${code}`,
-		method: 'put',
-		data
-	})
+  return axios({
+    url: `/projects/${code}`,
+    method: 'put',
+    data,
+  })
 }
 
 export function deleteProject(code: CodeReq): any {
-	return axios({
-		url: `/projects/${code}`,
-		method: 'delete',
-	})
+  return axios({
+    url: `/projects/${code}`,
+    method: 'delete',
+  })
 }

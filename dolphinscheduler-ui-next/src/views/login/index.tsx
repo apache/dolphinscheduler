@@ -15,63 +15,23 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, toRefs, withKeys } from 'vue'
+import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
-import { useI18n } from 'vue-i18n'
-import { NInput, NButton, NSwitch, NForm, NFormItem, FormRules } from 'naive-ui'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import { queryLog } from '@/service/modules/login'
+import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
+import { useValidate } from './use-validate'
+import { useTranslate } from './use-translate'
+import { useLogin } from './use-login'
 
 const login = defineComponent({
   name: 'login',
   setup() {
-    const { t, locale } = useI18n()
-    const state = reactive({
-      loginFormRef: ref(),
-      loginForm: {
-        userName: '',
-        userPassword: '',
-      },
-      rules: {
-        userName: {
-          trigger: ['input', 'blur'],
-          validator() {
-            if (state.loginForm.userName === '') {
-              return new Error(`${t('login.userName_tips')}`)
-            }
-          },
-        },
-        userPassword: {
-          trigger: ['input', 'blur'],
-          validator() {
-            if (state.loginForm.userPassword === '') {
-              return new Error(`${t('login.userPassword_tips')}`)
-            }
-          },
-        },
-      } as FormRules,
-    })
+    const { state, t, locale } = useValidate()
 
-    const handleChange = (value: string) => {
-      locale.value = value
-    }
+    const { handleChange } = useTranslate(locale)
 
-    const router: Router = useRouter()
-    const handleLogin = () => {
-      state.loginFormRef.validate((valid: any) => {
-        if (!valid) {
-          queryLog({...state.loginForm}).then((res: Response) => {
-            console.log('res', res)
-            router.push({ path: 'home' })
-          })
-        } else {
-          console.log('Invalid')
-        }
-      })
-    }
+    const { handleLogin } = useLogin(state)
 
-    return { t, locale, handleChange, handleLogin, ...toRefs(state) }
+    return { t, handleChange, handleLogin, ...toRefs(state) }
   },
   render() {
     return (
@@ -90,7 +50,7 @@ const login = defineComponent({
         </div>
         <div class={styles['login-model']}>
           <div class={styles.logo}>
-            <div class={styles['logo-img']}></div>
+            <div class={styles['logo-img']} />
           </div>
           <div class={styles['form-model']}>
             <NForm rules={this.rules} ref='loginFormRef'>
@@ -122,8 +82,13 @@ const login = defineComponent({
                 />
               </NFormItem>
             </NForm>
-            <NButton round type='primary' onClick={this.handleLogin}>
-              {this.t('login.signin')}
+            <NButton
+              round
+              type='info'
+              style={{ width: '100%' }}
+              onClick={this.handleLogin}
+            >
+              {this.t('login.login')}
             </NButton>
           </div>
         </div>

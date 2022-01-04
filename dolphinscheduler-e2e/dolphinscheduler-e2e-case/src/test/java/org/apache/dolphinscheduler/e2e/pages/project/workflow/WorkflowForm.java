@@ -42,7 +42,7 @@ public final class WorkflowForm {
     private final WebDriver driver;
     private final WorkflowSaveDialog saveForm;
 
-    @FindBy(id = "button-save")
+    @FindBy(id = "btnSave")
     private WebElement buttonSave;
 
     public WorkflowForm(WebDriver driver) {

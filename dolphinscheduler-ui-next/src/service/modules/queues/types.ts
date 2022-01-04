@@ -16,18 +16,18 @@
  */
 
 interface ListReq {
-	pageNo: number
-	pageSize: number
-	searchVal?: string
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
 interface QueueReq {
-	queue: string
-	queueName: string
+  queue: string
+  queueName: string
 }
 
 interface IdReq {
-	id: number
+  id: number
 }
 
 export { ListReq, QueueReq, IdReq }
