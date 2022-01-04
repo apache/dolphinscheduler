@@ -77,6 +77,7 @@ class TaskType(str):
     DEPENDENT = "DEPENDENT"
     CONDITIONS = "CONDITIONS"
     SWITCH = "SWITCH"
+    FLINK = "FLINK"
 
 
 class DefaultTaskCodeNum(str):
