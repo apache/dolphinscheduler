@@ -46,6 +46,14 @@ const basePage: RouteRecordRaw[] = [
           title: '首页',
         },
       },
+      {
+        path: '/password',
+        name: 'password',
+        component: components['password'],
+        meta: {
+          title: '修改密码',
+        },
+      },
     ],
   },
   projectsPage,

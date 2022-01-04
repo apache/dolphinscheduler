@@ -26,15 +26,17 @@ export function useDropDown() {
   const userStore = useUserStore()
 
   const handleSelect = (key: string | number, option: DropdownOption) => {
-    console.log(key, option)
     if (key === 'logout') {
       useLogout()
+    } else if (key === 'password') {
+      router.push({ path: 'password' })
     }
   }
 
   const useLogout = () => {
     logout().then(() => {
       userStore.setSessionId('')
+      userStore.setUserInfo({})
       router.push({ path: 'login' })
     })
   }

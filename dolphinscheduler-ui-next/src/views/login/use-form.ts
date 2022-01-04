@@ -16,10 +16,10 @@
  */
 
 import { reactive, ref } from 'vue'
-import { FormRules } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import type { FormRules } from 'naive-ui'
 
-export function useValidate() {
+export function useForm() {
   const { t, locale } = useI18n()
 
   const state = reactive({
@@ -33,7 +33,7 @@ export function useValidate() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.loginForm.userName === '') {
-            return new Error(`${t('login.userName_tips')}`)
+            return new Error(t('login.userName_tips'))
           }
         },
       },
@@ -41,7 +41,7 @@ export function useValidate() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.loginForm.userPassword === '') {
-            return new Error(`${t('login.userPassword_tips')}`)
+            return new Error(t('login.userPassword_tips'))
           }
         },
       },
