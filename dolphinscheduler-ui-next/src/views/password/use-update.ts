@@ -16,32 +16,37 @@
  */
 
 import { useRouter } from 'vue-router'
-import { login } from '@/service/modules/login'
-import { getUserInfo } from '@/service/modules/users'
+import { updateUser } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
-import type { SessionIdRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function useLogin(state: any) {
+export function useUpdate(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleLogin = () => {
-    state.loginFormRef.validate(async (valid: any) => {
+  const handleUpdate = () => {
+    state.passwordFormRef.validate(async (valid: any) => {
       if (!valid) {
-        const loginRes: SessionIdRes = await login({ ...state.loginForm })
-        await userStore.setSessionId(loginRes.sessionId)
+        await updateUser({
+          userPassword: state.passwordForm.password,
+          id: userInfo.id,
+          userName: userInfo.userName,
+          tenantId: userInfo.tenantId,
+          email: userInfo.email,
+          phone: userInfo.phone,
+          state: userInfo.state,
+        })
 
-        const userInfoRes: UserInfoRes = await getUserInfo()
-        await userStore.setUserInfo(userInfoRes)
-
-        router.push({ path: 'home' })
+        await userStore.setSessionId('')
+        await userStore.setUserInfo({})
+        await router.push({ path: 'login' })
       }
     })
   }
 
   return {
-    handleLogin,
+    handleUpdate,
   }
 }

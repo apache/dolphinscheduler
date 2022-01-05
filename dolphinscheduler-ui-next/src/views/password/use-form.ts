@@ -24,49 +24,28 @@ export function useForm() {
 
   const state = reactive({
     passwordFormRef: ref(),
-    confirmPasswordItemFormRef: ref(),
     passwordForm: {
       password: '',
       confirmPassword: '',
     },
     rules: {
       password: {
-        required: true,
-        message: t('password.password_tips'),
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.passwordForm.password === '') {
+            return new Error(t('password.password_tips'))
+          }
+        },
       },
-      confirmPassword: [
-        {
-          required: true,
-          message: t('password.confirm_password_tips'),
+      confirmPassword: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.passwordForm.confirmPassword === '') {
+            return new Error(t('password.confirm_password_tips'))
+          }
         },
-        {
-          trigger: ['input'],
-          message: t('password.two_password_entries_are_inconsistent'),
-          validator: (rule: any, value: string): any => {
-            return (
-              state.passwordForm.password &&
-              state.passwordForm.password.startsWith(value) &&
-              state.passwordForm.password.length >= value.length
-            )
-          },
-        },
-        {
-          trigger: ['blur', 'password-input'],
-          message: t('password.two_password_entries_are_inconsistent'),
-          validator: (rule: any, value: string): any => {
-            return state.passwordForm.password === value
-          },
-        },
-      ],
+      },
     } as FormRules,
-
-    handlePasswordInput: () => {
-      if (state.passwordForm.confirmPassword) {
-        state.confirmPasswordItemFormRef.value.validate({
-          trigger: 'password-input',
-        })
-      }
-    },
   })
 
   return { state, t }
