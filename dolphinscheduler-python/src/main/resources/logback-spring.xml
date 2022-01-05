@@ -55,4 +55,3 @@
     <appender-ref ref="PYTHONGATEWAYLOGFILE"/>
 </root>
 </configuration>
-

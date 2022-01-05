@@ -58,6 +58,6 @@ done
 pythonGatewayHost=(${pythonGatewayServers//,/ })
 for pythonGatewayServer in "${pythonGatewayHost[@]}"
 do
-  echo "$pythonGatewayServer worker server is stopping"
+  echo "$pythonGatewayServer python gateway server is stopping"
   ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop python-gateway-server;"
 done

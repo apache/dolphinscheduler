@@ -80,5 +80,5 @@ pythonGatewayHost=(${pythonGatewayServers//,/ })
 for pythonGatewayServer in "${pythonGatewayHost[@]}"
 do
   pythonGatewayState=`ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status python-gateway-server;"`
-  echo "$apiServer  $pythonGatewayState"
+  echo "$pythonGatewayServer  $pythonGatewayState"
 done

@@ -20,25 +20,28 @@ spring:
     name: python-gateway-server
   main:
     banner-mode: off
+  sql:
+    init:
+      schema-locations: classpath:sql/dolphinscheduler_h2.sql
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;INIT=runscript from 'classpath:sql/dolphinscheduler_h2.sql'
+    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
     username: sa
     password: ""
-    hikari:
-      connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
-      pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
+  jackson:
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  messages:
+    basename: i18n/messages
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
-  port: 4321
+  port: 54321
 
 management:
   endpoints:
@@ -58,3 +61,4 @@ spring:
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
