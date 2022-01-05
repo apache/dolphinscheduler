@@ -48,6 +48,12 @@ import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>
+ *     https://open.dingtalk.com/document/robots/custom-robot-access
+ *     https://open.dingtalk.com/document/robots/customize-robot-security-settings
+ * </p>
+ */
 public final class DingTalkSender {
 
     private static final Logger logger = LoggerFactory.getLogger(DingTalkSender.class);
