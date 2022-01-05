@@ -37,8 +37,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +53,16 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * executor controller
@@ -202,22 +210,20 @@ public class ExecutorController extends BaseController {
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
+
         Map<String, String> startParamMap = null;
         if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
 
         Map<String, Object> result = new HashMap<>();
-        String[] processDefinitionCodeArray = processDefinitionCodes.split(",");
-        Set<Long> processDefinitionCodeSet = new HashSet<>();
+        List<String> processDefinitionCodeArray = Arrays.asList(processDefinitionCodes.split(Constants.COMMA));
         List<String> startFailedProcessDefinitionCodeList = new ArrayList<>();
 
-        for (String StrProcessDefinitionCode :processDefinitionCodeArray) {
-            long processDefinitionCode = Long.parseLong(StrProcessDefinitionCode);
-            processDefinitionCodeSet.add(processDefinitionCode);
-        }
+        processDefinitionCodeArray = processDefinitionCodeArray.stream().distinct().collect(Collectors.toList());
 
-        for (long processDefinitionCode : processDefinitionCodeSet) {
+        for (String strProcessDefinitionCode : processDefinitionCodeArray) {
+            long processDefinitionCode = Long.parseLong(strProcessDefinitionCode);
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun);
 
@@ -227,7 +233,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(",", startFailedProcessDefinitionCodeList));
+            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
         return returnDataList(result);
