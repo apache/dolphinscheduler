@@ -29,6 +29,6 @@ WORKDIR $DOLPHINSCHEDULER_HOME
 
 ADD ./target/python-gateway-server $DOLPHINSCHEDULER_HOME
 
-EXPOSE 25333
+EXPOSE 25333 54321
 
 CMD [ "/bin/bash", "./bin/start.sh" ]
