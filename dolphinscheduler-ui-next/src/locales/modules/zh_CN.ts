@@ -29,8 +29,9 @@ const theme = {
   dark: '深色',
 }
 
-const profile = {
+const userDropdown = {
   profile: '用户信息',
+  password: '密码管理',
   logout: '退出登录',
 }
 
@@ -76,10 +77,33 @@ const home = {
   state: '状态',
 }
 
+const password = {
+  edit_password: '修改密码',
+  password: '密码',
+  confirm_password: '确认密码',
+  password_tips: '请输入密码',
+  confirm_password_tips: '请输入确认密码',
+  two_password_entries_are_inconsistent: '两次密码输入不一致',
+  submit: '提交',
+}
+
+const profile = {
+  profile: '用户信息',
+  edit: '编辑',
+  username: '用户名',
+  email: '邮箱',
+  phone: '手机',
+  permission: '权限',
+  create_time: '创建时间',
+  update_time: '更新时间',
+}
+
 export default {
   login,
   theme,
-  profile,
+  userDropdown,
   menu,
   home,
+  password,
+  profile,
 }

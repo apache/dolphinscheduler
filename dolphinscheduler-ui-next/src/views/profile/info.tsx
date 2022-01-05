@@ -15,11 +15,29 @@
  * limitations under the License.
  */
 
-import type { UserInfoRes } from '@/service/modules/users/types'
+import { defineComponent } from 'vue'
+import { useProfile } from './use-profile'
+import styles from './info.module.scss'
 
-interface UserState {
-  sessionId: string
-  userInfo: UserInfoRes | {}
-}
+const Info = defineComponent({
+  name: 'Info',
+  setup() {},
+  render() {
+    const { infoOptions } = useProfile()
 
-export { UserState }
+    return (
+      <dl class={styles.container}>
+        {infoOptions.value.map((item) => {
+          return (
+            <dd class={styles.item}>
+              <span class={styles.label}>{item.key}: </span>
+              <span>{item.value}</span>
+            </dd>
+          )
+        })}
+      </dl>
+    )
+  },
+})
+
+export default Info

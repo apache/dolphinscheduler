@@ -41,6 +41,7 @@ import {
   SlackOutlined,
   EnvironmentOutlined,
   KeyOutlined,
+  SafetyOutlined,
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -208,7 +209,7 @@ export function useDataList() {
         {
           label: t('menu.token_manage'),
           key: 'token-manage',
-          icon: renderIcon(KeyOutlined),
+          icon: renderIcon(SafetyOutlined),
         },
       ],
     },
@@ -225,14 +226,19 @@ export function useDataList() {
     },
   ]
 
-  const profileOptions = [
+  const userDropdownOptions = [
     {
-      label: t('profile.profile'),
+      label: t('userDropdown.profile'),
       key: 'profile',
       icon: renderIcon(UserOutlined),
     },
     {
-      label: t('profile.logout'),
+      label: t('userDropdown.password'),
+      key: 'password',
+      icon: renderIcon(KeyOutlined),
+    },
+    {
+      label: t('userDropdown.logout'),
       key: 'logout',
       icon: renderIcon(LogoutOutlined),
     },
@@ -256,7 +262,7 @@ export function useDataList() {
     isShowSide: false,
     menuOptions,
     languageOptions,
-    profileOptions,
+    userDropdownOptions,
   })
 
   return {

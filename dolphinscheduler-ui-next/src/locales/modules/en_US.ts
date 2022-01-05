@@ -29,8 +29,9 @@ const theme = {
   dark: 'Dark',
 }
 
-const profile = {
+const userDropdown = {
   profile: 'Profile',
+  password: 'Password',
   logout: 'Logout',
 }
 
@@ -76,10 +77,34 @@ const home = {
   state: 'State',
 }
 
+const password = {
+  edit_password: 'Edit Password',
+  password: 'Password',
+  confirm_password: 'Confirm Password',
+  password_tips: 'Please enter your password',
+  confirm_password_tips: 'Please enter your confirm password',
+  two_password_entries_are_inconsistent:
+    'Two Password Entries Are Inconsistent',
+  submit: 'Submit',
+}
+
+const profile = {
+  profile: 'Profile',
+  edit: 'Edit',
+  username: 'Username',
+  email: 'Email',
+  phone: 'Phone',
+  permission: 'Permission',
+  create_time: 'Create Time',
+  update_time: 'Update Time',
+}
+
 export default {
   login,
   theme,
-  profile,
+  userDropdown,
   menu,
   home,
+  password,
+  profile,
 }

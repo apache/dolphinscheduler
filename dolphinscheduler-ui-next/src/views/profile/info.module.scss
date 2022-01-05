@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 
-import type { UserInfoRes } from '@/service/modules/users/types'
+.container {
+  > .item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 
-interface UserState {
-  sessionId: string
-  userInfo: UserInfoRes | {}
+    > .label {
+      display: inline-block;
+      width: 100px;
+    }
+  }
 }
-
-export { UserState }
