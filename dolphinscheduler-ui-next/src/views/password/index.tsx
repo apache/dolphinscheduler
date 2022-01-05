@@ -18,51 +18,53 @@
 import { defineComponent, toRefs } from 'vue'
 import { NForm, NFormItem, NButton, NInput } from 'naive-ui'
 import { useForm } from './use-form'
+import { useUpdate } from './use-update'
 import Card from '@/components/card'
 
 const password = defineComponent({
   name: 'password',
   setup() {
     const { state, t } = useForm()
+    const { handleUpdate } = useUpdate(state)
 
-    return { ...toRefs(state), t }
+    return { ...toRefs(state), t, handleUpdate }
   },
   render() {
-    const { rules, passwordForm, t, handlePasswordInput } = this
+    const { t } = this
 
     return (
       <Card title={t('password.edit_password')}>
         {{
           default: () => (
             <div>
-              <NForm rules={rules} ref='passwordFormRef'>
+              <NForm rules={this.rules} ref='passwordFormRef'>
                 <NFormItem label={t('password.password')} path='password'>
                   <NInput
                     type='password'
                     placeholder={t('password.password_tips')}
-                    v-model={[passwordForm.password, 'value']}
-                    onInput={handlePasswordInput}
+                    v-model={[this.passwordForm.password, 'value']}
                   />
                 </NFormItem>
                 <NFormItem
                   label={t('password.confirm_password')}
                   path='confirmPassword'
-                  ref='confirmPasswordItemFormRef'
                 >
                   <NInput
                     type='password'
                     placeholder={t('password.confirm_password_tips')}
-                    v-model={[passwordForm.confirmPassword, 'value']}
+                    v-model={[this.passwordForm.confirmPassword, 'value']}
                   />
                 </NFormItem>
               </NForm>
               <NButton
                 disabled={
-                  !passwordForm.password ||
-                  !passwordForm.confirmPassword ||
-                  passwordForm.password !== passwordForm.confirmPassword
+                  !this.passwordForm.password ||
+                  !this.passwordForm.confirmPassword ||
+                  this.passwordForm.password !==
+                    this.passwordForm.confirmPassword
                 }
                 type='info'
+                onClick={this.handleUpdate}
               >
                 {t('password.submit')}
               </NButton>

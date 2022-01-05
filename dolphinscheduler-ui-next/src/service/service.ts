@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  AxiosRequestHeaders,
+} from 'axios'
 import qs from 'qs'
 import { useUserStore } from '@/store/user/user'
 
@@ -30,9 +35,6 @@ const baseRequestConfig: AxiosRequestConfig = {
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
   },
-  headers: {
-    sessionId: userStore.getSessionId,
-  },
 }
 
 const service = axios.create(baseRequestConfig)
@@ -43,6 +45,9 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
   console.log('config', config)
+
+  config.headers && (config.headers.sessionId = userStore.getSessionId)
+
   return config
 }, err)
 
