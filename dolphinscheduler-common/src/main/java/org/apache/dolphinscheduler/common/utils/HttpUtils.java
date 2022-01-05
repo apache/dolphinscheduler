@@ -154,10 +154,10 @@ public class HttpUtils {
                     logger.warn("http entity is null");
                 }
             } else {
-                logger.error("http get: {} response status code is not 200!", response.getStatusLine().getStatusCode());
+                logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
             }
-        } catch (NullPointerException | IOException exception) {
-            logger.error(exception.getMessage(), exception);
+        } catch (IOException ioe) {
+            logger.error(ioe.getMessage(), ioe);
         } finally {
             try {
                 if (response != null) {
@@ -167,10 +167,11 @@ public class HttpUtils {
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
-            if (httpget!=null && !httpget.isAborted()) {
+            if (!httpget.isAborted()) {
                 httpget.releaseConnection();
                 httpget.abort();
             }
+
         }
         return responseContent;
     }
