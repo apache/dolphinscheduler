@@ -29,7 +29,6 @@ const Sidebar = defineComponent({
   },
   setup() {},
   render() {
-    console.log('props', this)
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',

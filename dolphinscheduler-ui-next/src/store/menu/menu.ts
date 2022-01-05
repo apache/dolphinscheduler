@@ -15,8 +15,22 @@
  * limitations under the License.
  */
 
-interface LanguageState {
-  menuKey: string
-}
+import { defineStore } from 'pinia'
+import MenuState from './types'
 
-export default LanguageState
+export const useMenuStore = defineStore({
+  id: 'menu',
+  state: (): MenuState => ({
+    menuKey: '',
+  }),
+  getters: {
+    getMenuKey(): string {
+      return this.menuKey
+    },
+  },
+  actions: {
+    setMenuKey(menuKey: string): void {
+      this.menuKey = menuKey
+    },
+  },
+})
