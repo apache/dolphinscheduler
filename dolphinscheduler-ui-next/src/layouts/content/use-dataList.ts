@@ -83,7 +83,7 @@ export function useDataList() {
   const state = reactive({
     isShowSide: false,
     languageOptions,
-    profileOptions,
+    userDropdownOptions,
     menuOptions: [],
     headerMenuOptions: [],
     sideMenuOptions: []

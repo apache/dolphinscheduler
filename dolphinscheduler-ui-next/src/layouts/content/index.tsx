@@ -69,7 +69,7 @@ const Content = defineComponent({
             onHandleMenuClick={this.getSideMenuOptions}
             headerMenuOptions={this.headerMenuOptions}
             languageOptions={this.languageOptions}
-            profileOptions={this.profileOptions}
+            profileOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px'>
