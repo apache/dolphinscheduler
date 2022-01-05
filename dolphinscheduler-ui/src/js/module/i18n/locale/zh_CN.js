@@ -725,7 +725,7 @@ export default {
   IsEnableProxy: '启用代理',
   WebHook: 'Web钩子',
   webHook: 'Web钩子',
-  Keyword: '密钥',
+  Keyword: '关键词',
   Proxy: '代理',
   receivers: '收件人',
   receiverCcs: '抄送人',

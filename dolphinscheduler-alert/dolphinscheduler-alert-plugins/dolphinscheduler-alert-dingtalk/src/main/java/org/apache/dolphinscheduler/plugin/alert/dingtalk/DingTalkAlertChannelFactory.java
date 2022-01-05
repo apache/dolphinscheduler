@@ -51,15 +51,21 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                                                                  .build())
                                             .build();
         InputParam keywordParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, DingTalkParamsConstants.DING_TALK_KEYWORD)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+
+        InputParam secretParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_SECRET, DingTalkParamsConstants.DING_TALK_SECRET)
                                             .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
+                                                                 .setRequired(false)
                                                                  .build())
                                             .build();
         RadioParam isEnableProxy =
             RadioParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.DING_TALK_PROXY_ENABLE)
                       .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
                       .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
-                      .setValue(STRING_TRUE)
+                      .setValue(STRING_FALSE)
                       .addValidate(Validate.newBuilder()
                                            .setRequired(false)
                                            .build())
@@ -84,7 +90,7 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                                                    .setPlaceholder("if enable use authentication, you need input password")
                                                    .build();
 
-        return Arrays.asList(webHookParam, keywordParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        return Arrays.asList(webHookParam, keywordParam, secretParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 
     @Override
