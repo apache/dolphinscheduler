@@ -17,13 +17,7 @@
 
 on:
   pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-python/pydolphinscheduler'
   push:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
 
