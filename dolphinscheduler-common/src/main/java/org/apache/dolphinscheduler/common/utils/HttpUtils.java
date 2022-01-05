@@ -145,7 +145,7 @@ public class HttpUtils {
             logger.error("httpget is null");
             return null;
         }
-        if(httpClient == null) {
+        if (httpClient == null) {
             logger.error("httpClient is null");
             return null;
         }
