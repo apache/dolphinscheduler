@@ -19,6 +19,7 @@
 
 from datetime import datetime
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
@@ -203,7 +204,11 @@ def test_property_param_json(param, expect):
     assert pd.param_json == expect
 
 
-def test__pre_submit_check_switch_without_param():
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test__pre_submit_check_switch_without_param(mock_code_version):
     """Test :func:`_pre_submit_check` if process definition with switch but without attribute param."""
     with ProcessDefinition(TEST_PROCESS_DEFINITION_NAME) as pd:
         parent = Task(name="parent", task_type=TEST_TASK_TYPE)
@@ -220,7 +225,7 @@ def test__pre_submit_check_switch_without_param():
             PyDSParamException,
             match="Parameter param must be provider if task Switch in process definition.",
         ):
-            pd.submit()
+            pd._pre_submit_check()
 
 
 def test_process_definition_get_define_without_task():
