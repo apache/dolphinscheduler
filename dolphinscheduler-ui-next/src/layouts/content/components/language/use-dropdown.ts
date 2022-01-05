@@ -22,7 +22,7 @@ export function useDropDown(chooseVal: any) {
   const { locale } = useI18n()
 
   const handleSelect = (key: string | number, option: DropdownOption) => {
-    console.log(key, option)
+    // console.log(key, option)
     chooseVal.value = option.label
     locale.value = key as string
   }
