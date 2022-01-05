@@ -53,7 +53,7 @@ const Sidebar = defineComponent({
         />
       </NLayoutSider>
     )
-  },
+  }
 })
 
 export default Sidebar
