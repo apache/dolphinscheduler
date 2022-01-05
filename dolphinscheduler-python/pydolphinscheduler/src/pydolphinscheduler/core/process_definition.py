@@ -193,7 +193,8 @@ class ProcessDefinition(Base):
     @property
     def param_json(self) -> Optional[List[Dict]]:
         """Return param json base on self.param."""
-        if self.param is None or not self.param:
+        # Handle empty dict and None value
+        if not self.param:
             return None
         return [
             {
