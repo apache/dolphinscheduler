@@ -141,6 +141,14 @@ public class HttpUtils {
      * @return http get request response content
      */
     public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
+        if (httpget == null) {
+            logger.error("httpget is null");
+            return null;
+        }
+        if(httpClient == null) {
+            logger.error("httpClient is null");
+            return null;
+        }
         String responseContent = null;
         CloseableHttpResponse response = null;
         try {
