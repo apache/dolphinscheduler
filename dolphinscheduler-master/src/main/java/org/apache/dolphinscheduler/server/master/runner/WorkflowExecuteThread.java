@@ -425,7 +425,6 @@ public class WorkflowExecuteThread {
             task.getId(),
             task.getState());
         if (task.taskCanRetry()) {
-            addTaskToStandByList(task);
             if (!task.retryTaskIntervalOverTime()) {
                 logger.info("failure task will be submitted: process id: {}, task instance id: {} state:{} retry times:{} / {}, interval:{}",
                     processInstance.getId(),
@@ -437,9 +436,10 @@ public class WorkflowExecuteThread {
                 stateWheelExecuteThread.addTask4TimeoutCheck(task);
                 stateWheelExecuteThread.addTask4RetryCheck(task);
             } else {
-                submitStandByTask();
                 stateWheelExecuteThread.removeTask4TimeoutCheck(task);
                 stateWheelExecuteThread.removeTask4RetryCheck(task);
+                addTaskToStandByList(task);
+                submitStandByTask();
             }
             return;
         }
