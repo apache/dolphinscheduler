@@ -37,11 +37,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class DingTalkSender {
+
     private static final Logger logger = LoggerFactory.getLogger(DingTalkSender.class);
     private final String url;
     private final String keyword;
@@ -206,7 +204,7 @@ public final class DingTalkSender {
         } catch (Exception e) {
             logger.error("generate sign error, message:{}", e);
         }
-        return url + "&timestamp=" + timestamp +"&sign=" + sign;
+        return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
     static final class DingTalkSendMsgResponse {
