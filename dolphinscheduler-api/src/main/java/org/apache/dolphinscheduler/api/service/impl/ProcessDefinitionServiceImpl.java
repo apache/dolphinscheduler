@@ -77,7 +77,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.directory.api.util.Strings;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -940,13 +939,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
             taskRelationLogList.add(processTaskRelationLog);
         }
-        if (Strings.isNotEmpty(processDefinition.getLocations()) && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
+        if (StringUtils.isNotEmpty(processDefinition.getLocations()) && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
             ArrayNode arrayNode = JSONUtils.parseArray(processDefinition.getLocations());
             ArrayNode newArrayNode = JSONUtils.createArrayNode();
             for (int i = 0; i < arrayNode.size(); i++) {
                 ObjectNode newObjectNode = newArrayNode.addObject();
-                if (taskCodeMap.containsKey(arrayNode.get(i).get("taskCode").asLong())) {
-                    newObjectNode.put("taskCode", taskCodeMap.get(arrayNode.get(i).get("taskCode").asLong()));
+                long oldTaskCode = arrayNode.get(i).get("taskCode").asLong();
+                if (taskCodeMap.containsKey(oldTaskCode)) {
+                    newObjectNode.put("taskCode", taskCodeMap.get(oldTaskCode));
                     newObjectNode.set("x", arrayNode.get(i).get("x"));
                     newObjectNode.set("y", arrayNode.get(i).get("y"));
                 }
