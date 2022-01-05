@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-interface LanguageState {
-  menuKey: string
+interface InfoProps {
+  key: string
+  value: string | number | undefined
 }
 
-export default LanguageState
+export { InfoProps }

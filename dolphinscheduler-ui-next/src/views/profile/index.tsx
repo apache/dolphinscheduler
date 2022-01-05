@@ -15,18 +15,35 @@
  * limitations under the License.
  */
 
-import { DropdownOption } from 'naive-ui'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { NButton } from 'naive-ui'
+import Card from '@/components/card'
+import Info from './info'
 
-export function useDropDown(chooseVal: any) {
-  const { locale } = useI18n()
+const profile = defineComponent({
+  name: 'profile',
+  setup() {
+    const { t } = useI18n()
 
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    // console.log(key, option)
-    chooseVal.value = option.label
-    locale.value = key as string
-  }
-  return {
-    handleSelect,
-  }
-}
+    return { t }
+  },
+  render() {
+    const { t } = this
+
+    return (
+      <Card title={t('profile.profile')}>
+        {{
+          default: () => <Info />,
+          'header-extra': () => (
+            <NButton type='info' size='small'>
+              {t('profile.edit')}
+            </NButton>
+          ),
+        }}
+      </Card>
+    )
+  },
+})
+
+export default profile

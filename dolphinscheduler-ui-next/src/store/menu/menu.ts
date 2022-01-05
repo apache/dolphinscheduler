@@ -16,11 +16,11 @@
  */
 
 import { defineStore } from 'pinia'
-import LanguageState from './types'
+import MenuState from './types'
 
-export const useLanguageStore = defineStore({
-  id: 'language',
-  state: (): LanguageState => ({
+export const useMenuStore = defineStore({
+  id: 'menu',
+  state: (): MenuState => ({
     menuKey: '',
   }),
   getters: {

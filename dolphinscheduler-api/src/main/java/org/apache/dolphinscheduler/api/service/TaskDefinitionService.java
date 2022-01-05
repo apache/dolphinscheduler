@@ -92,6 +92,22 @@ public interface TaskDefinitionService {
                                              String taskDefinitionJsonObj);
 
     /**
+     * update task definition and upstream
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
+     * @param taskDefinitionJsonObj task definition json object
+     * @param upstreamCodes         upstream task codes, sep comma
+     * @return update result code
+     */
+    Map<String, Object> updateTaskWithUpstream(User loginUser,
+                                               long projectCode,
+                                               long taskCode,
+                                               String taskDefinitionJsonObj,
+                                               String upstreamCodes);
+
+    /**
      * update task definition
      *
      * @param loginUser login user

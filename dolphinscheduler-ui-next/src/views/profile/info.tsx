@@ -15,18 +15,29 @@
  * limitations under the License.
  */
 
-import { DropdownOption } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { defineComponent } from 'vue'
+import { useProfile } from './use-profile'
+import styles from './info.module.scss'
 
-export function useDropDown(chooseVal: any) {
-  const { locale } = useI18n()
+const Info = defineComponent({
+  name: 'Info',
+  setup() {},
+  render() {
+    const { infoOptions } = useProfile()
 
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    // console.log(key, option)
-    chooseVal.value = option.label
-    locale.value = key as string
-  }
-  return {
-    handleSelect,
-  }
-}
+    return (
+      <dl class={styles.container}>
+        {infoOptions.value.map((item) => {
+          return (
+            <dd class={styles.item}>
+              <span class={styles.label}>{item.key}: </span>
+              <span>{item.value}</span>
+            </dd>
+          )
+        })}
+      </dl>
+    )
+  },
+})
+
+export default Info

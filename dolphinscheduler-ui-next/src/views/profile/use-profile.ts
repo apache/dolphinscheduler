@@ -15,33 +15,39 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import { login } from '@/service/modules/login'
-import { getUserInfo } from '@/service/modules/users'
+import { ref } from 'vue'
 import { useUserStore } from '@/store/user/user'
-import type { Router } from 'vue-router'
-import type { SessionIdRes } from '@/service/modules/login/types'
+import { useI18n } from 'vue-i18n'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import type { InfoProps } from './types'
+import type { Ref } from 'vue'
 
-export function useLogin(state: any) {
-  const router: Router = useRouter()
+export function useProfile() {
+  const { t } = useI18n()
   const userStore = useUserStore()
+  const userInfo = userStore.getUserInfo as UserInfoRes
+  const infoOptions: Ref<Array<InfoProps>> = ref([])
 
-  const handleLogin = () => {
-    state.loginFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        const loginRes: SessionIdRes = await login({ ...state.loginForm })
-        await userStore.setSessionId(loginRes.sessionId)
-
-        const userInfoRes: UserInfoRes = await getUserInfo()
-        await userStore.setUserInfo(userInfoRes)
-
-        router.push({ path: 'home' })
-      }
-    })
-  }
+  infoOptions.value.push({
+    key: t('profile.username'),
+    value: userInfo.userName,
+  })
+  infoOptions.value.push({ key: t('profile.email'), value: userInfo.email })
+  infoOptions.value.push({ key: t('profile.phone'), value: userInfo.phone })
+  infoOptions.value.push({
+    key: t('profile.permission'),
+    value: userInfo.userName,
+  })
+  infoOptions.value.push({
+    key: t('profile.create_time'),
+    value: userInfo.createTime,
+  })
+  infoOptions.value.push({
+    key: t('profile.update_time'),
+    value: userInfo.updateTime,
+  })
 
   return {
-    handleLogin,
+    infoOptions,
   }
 }

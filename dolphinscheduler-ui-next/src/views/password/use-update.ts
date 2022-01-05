@@ -16,34 +16,37 @@
  */
 
 import { useRouter } from 'vue-router'
-import { DropdownOption } from 'naive-ui'
-import { logout } from '@/service/modules/logout'
+import { updateUser } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function useDropDown() {
+export function useUpdate(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
+  const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    if (key === 'logout') {
-      useLogout()
-    } else if (key === 'password') {
-      router.push({ path: 'password' })
-    } else if (key === 'profile') {
-      router.push({ path: 'profile' })
-    }
-  }
+  const handleUpdate = () => {
+    state.passwordFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        await updateUser({
+          userPassword: state.passwordForm.password,
+          id: userInfo.id,
+          userName: userInfo.userName,
+          tenantId: userInfo.tenantId,
+          email: userInfo.email,
+          phone: userInfo.phone,
+          state: userInfo.state,
+        })
 
-  const useLogout = () => {
-    logout().then(() => {
-      userStore.setSessionId('')
-      userStore.setUserInfo({})
-      router.push({ path: 'login' })
+        await userStore.setSessionId('')
+        await userStore.setUserInfo({})
+        await router.push({ path: 'login' })
+      }
     })
   }
 
   return {
-    handleSelect,
+    handleUpdate,
   }
 }
