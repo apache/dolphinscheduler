@@ -944,11 +944,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             ArrayNode newArrayNode = JSONUtils.createArrayNode();
             for (int i = 0; i < arrayNode.size(); i++) {
                 ObjectNode newObjectNode = newArrayNode.addObject();
-                long oldTaskCode = arrayNode.get(i).get("taskCode").asLong();
-                if (taskCodeMap.containsKey(oldTaskCode)) {
-                    newObjectNode.put("taskCode", taskCodeMap.get(oldTaskCode));
-                    newObjectNode.set("x", arrayNode.get(i).get("x"));
-                    newObjectNode.set("y", arrayNode.get(i).get("y"));
+                JsonNode jsonNode = arrayNode.get(i);
+                Long taskCode = taskCodeMap.get(jsonNode.get("taskCode").asLong());
+                if (Objects.nonNull(taskCode)) {
+                    newObjectNode.put("taskCode", taskCode);
+                    newObjectNode.set("x", jsonNode.get("x"));
+                    newObjectNode.set("y", jsonNode.get("y"));
                 }
             }
             processDefinition.setLocations(newArrayNode.toString());
