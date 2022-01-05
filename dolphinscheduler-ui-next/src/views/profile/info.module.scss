@@ -15,35 +15,15 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import { DropdownOption } from 'naive-ui'
-import { logout } from '@/service/modules/logout'
-import { useUserStore } from '@/store/user/user'
-import type { Router } from 'vue-router'
+.container {
+  > .item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 
-export function useDropDown() {
-  const router: Router = useRouter()
-  const userStore = useUserStore()
-
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    if (key === 'logout') {
-      useLogout()
-    } else if (key === 'password') {
-      router.push({ path: 'password' })
-    } else if (key === 'profile') {
-      router.push({ path: 'profile' })
+    > .label {
+      display: inline-block;
+      width: 100px;
     }
-  }
-
-  const useLogout = () => {
-    logout().then(() => {
-      userStore.setSessionId('')
-      userStore.setUserInfo({})
-      router.push({ path: 'login' })
-    })
-  }
-
-  return {
-    handleSelect,
   }
 }

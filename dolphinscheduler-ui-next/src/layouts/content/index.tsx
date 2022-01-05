@@ -36,11 +36,11 @@ const Content = defineComponent({
   },
   render() {
     const { state, getHeaderMenuOptions } = useDataList()
-  
+
     const headerMenuOptions = getHeaderMenuOptions(state.menuOptions)
-  
+
     const sideMenuOptions = ref()
-  
+
     const getSideMenuOptions = (item: any) => {
       this.languageStore.setMenuKey(item.key)
       sideMenuOptions.value =
@@ -48,6 +48,7 @@ const Content = defineComponent({
         []
       state.isShowSide = sideMenuOptions.value.length !== 0
     }
+
     return (
       <NLayout style='height: 100%;'>
         <NLayoutHeader style='height: 65px;'>
@@ -55,19 +56,20 @@ const Content = defineComponent({
             onHandleMenuClick={getSideMenuOptions}
             headerMenuOptions={headerMenuOptions}
             languageOptions={state.languageOptions}
-            profileOptions={state.profileOptions}
+            profileOptions={state.userDropdownOptions}
           />
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px;'>
-          { state.isShowSide && <SideBar sideMenuOptions={sideMenuOptions.value} /> }
+          {state.isShowSide && (
+            <SideBar sideMenuOptions={sideMenuOptions.value} />
+          )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px;'>
             <router-view />
           </NLayoutContent>
         </NLayout>
       </NLayout>
     )
-  }
-
+  },
 })
 
 export default Content

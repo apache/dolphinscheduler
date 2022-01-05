@@ -29,7 +29,7 @@ const theme = {
   dark: 'Dark',
 }
 
-const profile = {
+const userDropdown = {
   profile: 'Profile',
   password: 'Password',
   logout: 'Logout',
@@ -88,11 +88,23 @@ const password = {
   submit: 'Submit',
 }
 
+const profile = {
+  profile: 'Profile',
+  edit: 'Edit',
+  username: 'Username',
+  email: 'Email',
+  phone: 'Phone',
+  permission: 'Permission',
+  create_time: 'Create Time',
+  update_time: 'Update Time',
+}
+
 export default {
   login,
   theme,
-  profile,
+  userDropdown,
   menu,
   home,
   password,
+  profile,
 }

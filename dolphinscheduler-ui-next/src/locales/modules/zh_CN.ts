@@ -29,7 +29,7 @@ const theme = {
   dark: '深色',
 }
 
-const profile = {
+const userDropdown = {
   profile: '用户信息',
   password: '密码管理',
   logout: '退出登录',
@@ -87,11 +87,23 @@ const password = {
   submit: '提交',
 }
 
+const profile = {
+  profile: '用户信息',
+  edit: '编辑',
+  username: '用户名',
+  email: '邮箱',
+  phone: '手机',
+  permission: '权限',
+  create_time: '创建时间',
+  update_time: '更新时间',
+}
+
 export default {
   login,
   theme,
-  profile,
+  userDropdown,
   menu,
   home,
   password,
+  profile,
 }
