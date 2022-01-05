@@ -201,5 +201,4 @@ class Conditions(Task):
         """
         params = super().task_params
         params["dependence"] = self.condition.get_define()
-        params["conditionResult"] = self.condition_result
         return params
