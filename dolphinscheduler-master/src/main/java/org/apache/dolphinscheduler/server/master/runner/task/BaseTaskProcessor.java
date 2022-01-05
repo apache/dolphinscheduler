@@ -144,7 +144,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     public boolean action(TaskAction taskAction) {
         String threadName = Thread.currentThread().getName();
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
-            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
+            Thread.currentThread().setName(threadLoggerInfoName);
         }
         switch (taskAction) {
             case STOP:
@@ -219,13 +219,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (!isTaskLogger) {
             return;
         }
-        threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskInstance.getFirstSubmitTime(),
+        threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId());
-        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
+        Thread.currentThread().setName(threadLoggerInfoName);
     }
 
     /**

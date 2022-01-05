@@ -172,8 +172,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 throw new RuntimeException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
-            String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskExecutionContext.getFirstSubmitTime(),
+            String taskLogName = LoggerUtils.buildTaskId(taskExecutionContext.getFirstSubmitTime(),
                     taskExecutionContext.getProcessDefineCode(),
                     taskExecutionContext.getProcessDefineVersion(),
                     taskExecutionContext.getProcessInstanceId(),
@@ -181,7 +180,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskRequest.setTaskLogName(taskLogName);
 
             // set the name of the current thread
-            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, taskLogName));
+            Thread.currentThread().setName(taskLogName);
 
             task = taskChannel.createTask(taskRequest);
 

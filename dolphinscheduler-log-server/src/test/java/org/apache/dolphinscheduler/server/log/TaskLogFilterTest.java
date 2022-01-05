@@ -41,7 +41,7 @@ public class TaskLogFilterTest {
         FilterReply filterReply = taskLogFilter.decide(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return TaskConstants.TASK_LOGGER_THREAD_NAME;
+                return TaskConstants.TASK_APPID_LOG_FORMAT;
             }
 
             @Override

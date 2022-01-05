@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
 /**
- *  task log filter
+ * task log filter
  */
 public class TaskLogFilter extends Filter<ILoggingEvent> {
 
@@ -45,18 +44,19 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
         FilterReply filterReply = FilterReply.DENY;
-        if (event.getThreadName().startsWith(TaskConstants.TASK_LOGGER_THREAD_NAME)
-                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME)
-                && event.getLevel().isGreaterOrEqual(level)) {
+        if ((event.getThreadName().startsWith(TaskConstants.TASK_APPID_LOG_FORMAT)
+                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME))
+                || event.getLevel().isGreaterOrEqual(level)) {
             filterReply = FilterReply.ACCEPT;
         }
-        logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}", event.getThreadName(), event.getLoggerName(), filterReply.name());
+        logger.info("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(), event.getLoggerName(), filterReply.name(), level);
         return filterReply;
     }
 }
