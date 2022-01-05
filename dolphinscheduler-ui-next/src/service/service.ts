@@ -44,7 +44,7 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  console.log('config', config)
+  // console.log('config', config)
 
   config.headers && (config.headers.sessionId = userStore.getSessionId)
 
