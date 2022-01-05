@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -173,6 +174,10 @@ public class ResourceMapperTest extends BaseDaoTest {
         //update
         int update = resourceMapper.updateById(resource);
         Assert.assertEquals(1, update);
+        resource.setDirectory(true);
+        int updateDirectory = resourceMapper.updateById(resource);
+        Assert.assertEquals(1, updateDirectory);
+
     }
 
     /**
