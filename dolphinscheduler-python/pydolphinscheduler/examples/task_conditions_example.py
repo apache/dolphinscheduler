@@ -22,11 +22,11 @@ This example will create five task in single workflow, with four shell task and 
 condition have one upstream which we declare explicit with syntax `parent >> condition`, and three downstream
 automatically set dependence by condition task by passing parameter `condition`. The graph of this workflow
 like:
-pre_task_success_1 ->
-                      \
-pre_task_success_2 ->  --> conditions -> end
-                      /
-pre_task_fail      ->
+pre_task_1 ->                     -> success_branch
+             \                  /
+pre_task_2 ->  -> conditions ->
+             /                  \
+pre_task_3 ->                     -> fail_branch
 .
 """
 
@@ -35,22 +35,23 @@ from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Conditions
 from pydolphinscheduler.tasks.shell import Shell
 
 with ProcessDefinition(name="task_conditions_example", tenant="tenant_exists") as pd:
-    condition_pre_task_1 = Shell(
-        name="pre_task_success_1", command="echo pre_task_success_1"
-    )
-    condition_pre_task_2 = Shell(
-        name="pre_task_success_2", command="echo pre_task_success_2"
-    )
-    condition_pre_task_3 = Shell(name="pre_task_fail", command="echo pre_task_fail")
+    pre_task_1 = Shell(name="pre_task_1", command="echo pre_task_1")
+    pre_task_2 = Shell(name="pre_task_2", command="echo pre_task_2")
+    pre_task_3 = Shell(name="pre_task_3", command="echo pre_task_3")
     cond_operator = And(
         And(
-            SUCCESS(condition_pre_task_1, condition_pre_task_2),
-            FAILURE(condition_pre_task_3),
+            SUCCESS(pre_task_1, pre_task_2),
+            FAILURE(pre_task_3),
         ),
     )
 
-    end = Shell(name="end", command="echo parent")
+    success_branch = Shell(name="success_branch", command="echo success_branch")
+    fail_branch = Shell(name="fail_branch", command="echo fail_branch")
 
-    condition = Conditions(name="conditions", condition=cond_operator)
-    condition >> end
+    condition = Conditions(
+        name="conditions",
+        condition=cond_operator,
+        success_task=success_branch,
+        failed_task=fail_branch,
+    )
     pd.submit()

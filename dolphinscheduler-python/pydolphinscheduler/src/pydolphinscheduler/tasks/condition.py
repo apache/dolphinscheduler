@@ -157,9 +157,19 @@ class Or(ConditionOperator):
 class Conditions(Task):
     """Task condition object, declare behavior for condition task to dolphinscheduler."""
 
-    def __init__(self, name: str, condition: ConditionOperator, *args, **kwargs):
+    def __init__(
+        self,
+        name: str,
+        condition: ConditionOperator,
+        success_task: Task,
+        failed_task: Task,
+        *args,
+        **kwargs,
+    ):
         super().__init__(name, TaskType.CONDITIONS, *args, **kwargs)
         self.condition = condition
+        self.success_task = success_task
+        self.failed_task = failed_task
         # Set condition tasks as current task downstream
         self._set_dep()
 
@@ -171,6 +181,15 @@ class Conditions(Task):
                 for status in cond.args:
                     upstream.extend(list(status.tasks))
         self.set_upstream(upstream)
+        self.set_downstream([self.success_task, self.failed_task])
+
+    @property
+    def condition_result(self) -> Dict:
+        """Get condition result define for java gateway."""
+        return {
+            "successNode": [self.success_task.code],
+            "failedNode": [self.failed_task.code],
+        }
 
     @property
     def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:
