@@ -38,24 +38,15 @@ JSON_TEMPLATE = {
                     "parameter": {
                         "username": "usr",
                         "password": "pwd",
-                        "column": [
-                            "id",
-                            "name",
-                            "code",
-                            "description"
-                        ],
+                        "column": ["id", "name", "code", "description"],
                         "splitPk": "id",
                         "connection": [
                             {
-                                "table": [
-                                    "source_table"
-                                ],
-                                "jdbcUrl": [
-                                    "jdbc:mysql://127.0.0.1:3306/source_db"
-                                ]
+                                "table": ["source_table"],
+                                "jdbcUrl": ["jdbc:mysql://127.0.0.1:3306/source_db"],
                             }
-                        ]
-                    }
+                        ],
+                    },
                 },
                 "writer": {
                     "name": "mysqlwriter",
@@ -63,22 +54,21 @@ JSON_TEMPLATE = {
                         "writeMode": "insert",
                         "username": "usr",
                         "password": "pwd",
-                        "column": [
-                            "id",
-                            "name"
-                        ],
+                        "column": ["id", "name"],
                         "connection": [
                             {
                                 "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/target_db",
-                                "table": [
-                                    "target_table"
-                                ]
+                                "table": ["target_table"],
                             }
-                        ]
-                    }
-                }
+                        ],
+                    },
+                },
             }
-        ]
+        ],
+        "setting": {
+            "errorLimit": {"percentage": 0, "record": 0},
+            "speed": {"channel": 1, "record": 1000},
+        },
     }
 }
 
