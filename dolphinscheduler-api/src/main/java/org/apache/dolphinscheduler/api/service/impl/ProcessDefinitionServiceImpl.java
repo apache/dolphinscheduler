@@ -77,6 +77,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.util.Strings;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -107,7 +108,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -939,6 +939,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
             taskRelationLogList.add(processTaskRelationLog);
+        }
+        if (Strings.isNotEmpty(processDefinition.getLocations()) && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
+            ArrayNode arrayNode = JSONUtils.parseArray(processDefinition.getLocations());
+            ArrayNode newArrayNode = JSONUtils.createArrayNode();
+            for (int i = 0; i < arrayNode.size(); i++) {
+                ObjectNode newObjectNode = newArrayNode.addObject();
+                if (taskCodeMap.containsKey(arrayNode.get(i).get("taskCode").asLong())) {
+                    newObjectNode.put("taskCode", taskCodeMap.get(arrayNode.get(i).get("taskCode").asLong()));
+                    newObjectNode.set("x", arrayNode.get(i).get("x"));
+                    newObjectNode.set("y", arrayNode.get(i).get("y"));
+                }
+            }
+            processDefinition.setLocations(newArrayNode.toString());
         }
         Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition, Lists.newArrayList());
         if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
