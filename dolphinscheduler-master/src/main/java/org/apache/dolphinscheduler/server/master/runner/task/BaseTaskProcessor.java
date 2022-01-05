@@ -55,7 +55,6 @@ import org.apache.dolphinscheduler.spi.task.request.UdfFuncRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +86,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected int commitInterval;
 
-    protected boolean isTaskLogger;
-
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
@@ -107,7 +104,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
         this.commitInterval = masterConfig.getTaskCommitInterval();
-        this.isTaskLogger = masterConfig.isTaskLogger();
     }
 
     /**
@@ -215,10 +211,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * set master task running logger.
      */
-    public void setTaskExecutionLogger(boolean isTaskLogger) {
-        if (!isTaskLogger) {
-            return;
-        }
+    public void setTaskExecutionLogger() {
         threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),

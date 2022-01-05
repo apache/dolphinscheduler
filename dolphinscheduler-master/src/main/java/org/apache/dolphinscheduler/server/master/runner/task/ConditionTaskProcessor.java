@@ -65,7 +65,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-        this.setTaskExecutionLogger(isTaskLogger);
+        this.setTaskExecutionLogger();
         initTaskParameters();
         logger.info("dependent task start");
         return true;
