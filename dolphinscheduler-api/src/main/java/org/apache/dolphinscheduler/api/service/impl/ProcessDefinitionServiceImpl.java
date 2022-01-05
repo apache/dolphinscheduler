@@ -898,6 +898,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
         List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
 
+        // for Zip Bomb Attack
+        int THRESHOLD_ENTRIES = 10000;
+        int THRESHOLD_SIZE = 1000000000; // 1 GB
+        double THRESHOLD_RATIO = 10;
+        int totalEntryArchive = 0;
+        int totalSizeEntry = 0;
         // In most cases, there will be only one data source
         Map<String, DataSource> dataSourceCache = new HashMap<>(1);
         Map<String, Long> taskNameToCode = new HashMap<>(16);
@@ -911,8 +917,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 "",
                 "[]", null,
                 0, loginUser.getId(), loginUser.getTenantId());
+
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
+                totalEntryArchive ++;
+                int totalSizeArchive = 0;
                 if (!entry.isDirectory()) {
                     StringBuilder sql = new StringBuilder();
                     String taskName = null;
@@ -920,6 +929,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     List<String> upstreams = Collections.emptyList();
                     String line;
                     while ((line = bufferedReader.readLine()) != null) {
+                        int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
+                        totalSizeEntry += nBytes;
+                        totalSizeArchive += nBytes;
+                        long compressionRatio = totalSizeEntry / entry.getCompressedSize();
+                        if(compressionRatio > THRESHOLD_RATIO) {
+                            throw new IllegalStateException("ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack");
+                        }
                         int commentIndex = line.indexOf("-- ");
                         if (commentIndex >= 0) {
                             int colonIndex = line.indexOf(":", commentIndex);
@@ -976,6 +992,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     taskDefinitionList.add(taskDefinition);
                     taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
                     taskNameToUpstream.put(taskDefinition.getName(), upstreams);
+                }
+
+                if(totalSizeArchive > THRESHOLD_SIZE) {
+                    throw new IllegalStateException("the uncompressed data size is too much for the application resource capacity");
+                }
+
+                if(totalEntryArchive > THRESHOLD_ENTRIES) {
+                    throw new IllegalStateException("too much entries in this archive, can lead to inodes exhaustion of the system");
                 }
             }
         } catch (Exception e) {
