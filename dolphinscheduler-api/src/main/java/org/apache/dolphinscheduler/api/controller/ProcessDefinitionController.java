@@ -696,7 +696,12 @@ public class ProcessDefinitionController extends BaseController {
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam("file") MultipartFile file) {
-        Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+        Map<String, Object> result;
+        if ("application/zip".equals(file.getContentType())) {
+            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
+        } else {
+            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+        }
         return returnDataList(result);
     }
 
