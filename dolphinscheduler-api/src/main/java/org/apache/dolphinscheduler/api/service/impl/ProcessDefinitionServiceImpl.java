@@ -106,6 +106,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -934,6 +935,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
             taskRelationLogList.add(processTaskRelationLog);
+        }
+        if (StringUtils.isNotEmpty(processDefinition.getLocations()) && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
+            ArrayNode arrayNode = JSONUtils.parseArray(processDefinition.getLocations());
+            ArrayNode newArrayNode = JSONUtils.createArrayNode();
+            for (int i = 0; i < arrayNode.size(); i++) {
+                ObjectNode newObjectNode = newArrayNode.addObject();
+                JsonNode jsonNode = arrayNode.get(i);
+                Long taskCode = taskCodeMap.get(jsonNode.get("taskCode").asLong());
+                if (Objects.nonNull(taskCode)) {
+                    newObjectNode.put("taskCode", taskCode);
+                    newObjectNode.set("x", jsonNode.get("x"));
+                    newObjectNode.set("y", jsonNode.get("y"));
+                }
+            }
+            processDefinition.setLocations(newArrayNode.toString());
         }
         Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition, Lists.newArrayList());
         if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
