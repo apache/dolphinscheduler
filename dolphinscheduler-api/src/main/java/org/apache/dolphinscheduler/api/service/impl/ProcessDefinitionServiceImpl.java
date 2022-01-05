@@ -377,7 +377,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processDefinitionNode.put("id", processDefinition.getId());
             processDefinitionNode.put("code", processDefinition.getCode());
             processDefinitionNode.put("name", processDefinition.getName());
-            processDefinitionNode.put("projectCode", processDefinition.getCode());
+            processDefinitionNode.put("projectCode", processDefinition.getProjectCode());
             arrayNode.add(processDefinitionNode);
         }
         result.put(Constants.DATA_LIST, arrayNode);
