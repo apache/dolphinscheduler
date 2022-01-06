@@ -73,6 +73,12 @@ public class HttpUtilsTest {
 	httpget.setConfig(requestConfig);
 	String responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
 	Assert.assertNotNull(responseContent);
+	
+	responseContent = HttpUtils.getResponseContentString(null, httpclient);
+	Assert.assertNull(responseContent);
+	
+	responseContent = HttpUtils.getResponseContentString(httpget, null);
+	Assert.assertNull(responseContent);
     }
 
 
