@@ -45,5 +45,27 @@ export default {
         title: '创建资源',
       },
     },
+    {
+      path: '/resource/task-group',
+      name: 'task-group-manage',
+      component: components['home'],
+      meta: {
+        title: 'aaa'
+      },
+      children: [
+        {
+          path: '/resource/task-group',
+          name: 'task-group-option',
+          component: components['home'],
+          meta: { title: 'bbbb' }
+        },
+        {
+          path: '/resource/task-group-queue',
+          name: 'task-group-queue',
+          component: components['home'],
+          meta: { title: 'ccc' }
+        }
+      ]
+    }
   ],
 }

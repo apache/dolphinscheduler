@@ -32,6 +32,7 @@ import {
   SettingOutlined,
   FileSearchOutlined,
   RobotOutlined,
+  GroupOutlined,
   AppstoreOutlined,
   UsergroupAddOutlined,
   UserAddOutlined,
@@ -158,6 +159,21 @@ export function useDataList() {
               {
                 label: t('menu.function_manage'),
                 key: 'function-manage',
+              },
+            ],
+          },
+          {
+            label: t('menu.task_group_manage'),
+            key: 'task-group-manage',
+            icon: renderIcon(GroupOutlined),
+            children: [
+              {
+                label: t('menu.task_group_option'),
+                key: 'task-group-option',
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: 'task-group-queue',
               },
             ],
           },
