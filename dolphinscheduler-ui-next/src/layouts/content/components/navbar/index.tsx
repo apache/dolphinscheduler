@@ -19,7 +19,7 @@ import { defineComponent, PropType } from 'vue'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
-import Language from '../language'
+import Locales from '../locales'
 import User from '../user'
 import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
@@ -32,7 +32,7 @@ const Navbar = defineComponent({
       type: Array as PropType<any>,
       default: [],
     },
-    languageOptions: {
+    localesOptions: {
       type: Array as PropType<any>,
       default: [],
     },
@@ -59,7 +59,7 @@ const Navbar = defineComponent({
         </div>
         <div class={styles.settings}>
           <Theme />
-          <Language languageOptions={this.languageOptions} />
+          <Locales localesOptions={this.localesOptions} />
           <User profileOptions={this.profileOptions} />
         </div>
       </div>

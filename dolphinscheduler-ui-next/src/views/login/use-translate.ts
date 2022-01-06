@@ -16,14 +16,15 @@
  */
 
 import { WritableComputedRef } from 'vue'
-import { useLanguageStore } from '@/store/language/language'
+import { useLocalesStore } from '@/store/locales/locales'
+import type { Locales } from '@/store/locales/types'
 
 export function useTranslate(locale: WritableComputedRef<string>) {
-  const languageStore = useLanguageStore()
+  const localesStore = useLocalesStore()
 
-  const handleChange = (value: string) => {
+  const handleChange = (value: Locales) => {
     locale.value = value
-    languageStore.setLang(value)
+    localesStore.setLocales(value)
   }
   return {
     handleChange,
