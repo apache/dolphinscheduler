@@ -102,6 +102,41 @@ const profile = {
   update_time: 'Update Time',
 }
 
+const resource = {
+  task_group_manage: '任务组管理',
+  task_group_option: '任务组配置',
+  create_task_group: '创建任务组',
+  edit_task_group: '编辑任务组',
+  delete_task_group: '删除任务组',
+  task_group_code: '任务组编号',
+  task_group_name: '任务组名称',
+  task_group_resource_pool_size: '资源容量',
+  task_group_resource_used_pool_size: '已用资源',
+  task_group_desc: '描述信息',
+  task_group_status: '任务组状态',
+  task_group_enable_status: '启用',
+  task_group_disable_status: '不可用',
+  please_enter_task_group_desc: '请输入任务组描述',
+  please_enter_task_group_resource_pool_size: '请输入资源容量大小',
+  task_group_resource_pool_size_be_a_number: '资源容量大小必须大于等于1的数值',
+  please_select_project: '请选择项目',
+  task_group_queue: '任务组队列',
+  task_group_queue_priority: '组内优先级',
+  task_group_queue_priority_be_a_number: '优先级必须是大于等于0的数值',
+  task_group_queue_force_starting_status: '是否强制启动',
+  task_group_in_queue: '是否排队中',
+  task_group_queue_status: '任务状态',
+  view_task_group_queue: '查看任务组队列',
+  task_group_queue_the_status_of_waiting: '等待入队',
+  task_group_queue_the_status_of_queuing: '排队中',
+  task_group_queue_the_status_of_releasing: '已释放',
+  modify_task_group_queue_priority: '修改优先级',
+  force_to_start_task: '强制启动',
+  priority_not_empty: '优先级不能为空',
+  priority_must_be_number: '优先级必须是数值',
+  please_select_task_name: '请选择节点名称'
+}
+
 export default {
   login,
   theme,
@@ -110,4 +145,5 @@ export default {
   home,
   password,
   profile,
+  resource
 }

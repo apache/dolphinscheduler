@@ -101,6 +101,40 @@ const profile = {
   update_time: '更新时间',
 }
 
+const resource = {
+  task_group_manage: 'task group manage',
+  task_group_option: 'task group option',
+  create_task_group: 'Create task group',
+  edit_task_group: 'Edit task group',
+  delete_task_group: 'Delete task group',
+  task_group_code: 'task group code',
+  task_group_name: 'task group name',
+  task_group_resource_pool_size: 'Resource pool size',
+  task_group_resource_pool_size_be_a_number: 'the size of the task group resource pool should be more than 1',
+  task_group_resource_used_pool_size: 'Used resource',
+  task_group_desc: 'task group desc',
+  task_group_status: 'task group status',
+  task_group_enable_status: 'Enable',
+  task_group_disable_status: 'Disable',
+  please_enter_task_group_desc: 'please enter task group description',
+  please_enter_task_group_resource_pool_size: 'please enter task group resource pool size',
+  please_select_project: 'please select a project',
+  task_group_queue: 'task group queue',
+  task_group_queue_priority: 'priority',
+  task_group_queue_priority_be_a_number: 'the priority of the task group queue should be a positive number',
+  task_group_queue_force_starting_status: 'Starting status',
+  task_group_in_queue: 'In queue',
+  task_group_queue_status: 'task status',
+  view_task_group_queue: 'View task group queue',
+  task_group_queue_the_status_of_waiting: 'Waiting into the queue',
+  task_group_queue_the_status_of_queuing: 'Queuing',
+  task_group_queue_the_status_of_releasing: 'Released',
+  modify_task_group_queue_priority: 'Edit the priority of the task group queue',
+  priority_not_empty: 'the value of priority can not be empty',
+  priority_must_be_number: 'the value of priority should be number',
+  please_select_task_name: 'please select a task name'
+}
+
 export default {
   login,
   theme,
@@ -109,4 +143,5 @@ export default {
   home,
   password,
   profile,
+  resource
 }
