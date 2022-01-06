@@ -15,33 +15,23 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, toRefs, withKeys, onMounted } from 'vue'
+import { defineComponent, toRefs, withKeys } from 'vue'
 import styles from './index.module.scss'
 import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
-import { useLanguageStore } from '@/store/language/language'
+import { useLocalesStore } from '@/store/locales/locales'
 
 const login = defineComponent({
   name: 'login',
   setup() {
     const { state, t, locale } = useForm()
-
-    const languageStore = useLanguageStore()
-    const lang = ref()
-    lang.value = languageStore.getLang
-    
     const { handleChange } = useTranslate(locale)
-
     const { handleLogin } = useLogin(state)
+    const localesStore = useLocalesStore()
 
-    onMounted(() => {
-      // console.log('login', lang)
-      handleChange(lang.value)
-    })
-
-    return { t, handleChange, handleLogin, ...toRefs(state), lang }
+    return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
   render() {
     return (
@@ -49,7 +39,7 @@ const login = defineComponent({
         <div class={styles['language-switch']}>
           <NSwitch
             onUpdateValue={this.handleChange}
-            default-value={this.lang}
+            default-value={this.localesStore.getLocales}
             checked-value='en_US'
             unchecked-value='zh_CN'
           >

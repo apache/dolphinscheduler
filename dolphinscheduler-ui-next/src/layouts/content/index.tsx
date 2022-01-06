@@ -21,23 +21,19 @@ import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
 import { useMenuStore } from '@/store/menu/menu'
-import { useLanguageStore } from '@/store/language/language'
+import { useLocalesStore } from '@/store/locales/locales'
 import { useI18n } from 'vue-i18n'
 
 const Content = defineComponent({
   name: 'Content',
   setup() {
     const menuStore = useMenuStore()
-
     const { locale } = useI18n()
-    const languageStore = useLanguageStore()
-    const lang = ref()
-    lang.value = languageStore.getLang
-
+    const localesStore = useLocalesStore()
     const { state, changeMenuOption, changeHeaderMenuOptions } = useDataList()
 
-    locale.value = lang.value
-    
+    locale.value = localesStore.getLocales
+
     onMounted(() => {
       menuStore.setMenuKey('home')
       changeMenuOption(state)
@@ -54,7 +50,8 @@ const Content = defineComponent({
     const genSideMenu = (state: any) => {
       const key = menuStore.getMenuKey
       state.sideMenuOptions =
-        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0].children || []
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          .children || []
       state.isShowSide = state.sideMenuOptions.length !== 0
     }
 
@@ -67,7 +64,7 @@ const Content = defineComponent({
       ...toRefs(state),
       menuStore,
       changeMenuOption,
-      getSideMenuOptions
+      getSideMenuOptions,
     }
   },
   render() {
@@ -77,7 +74,7 @@ const Content = defineComponent({
           <NavBar
             onHandleMenuClick={this.getSideMenuOptions}
             headerMenuOptions={this.headerMenuOptions}
-            languageOptions={this.languageOptions}
+            localesOptions={this.localesOptions}
             profileOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>
