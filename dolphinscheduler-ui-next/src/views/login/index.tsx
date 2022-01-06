@@ -37,7 +37,7 @@ const login = defineComponent({
     const { handleLogin } = useLogin(state)
 
     onMounted(() => {
-      console.log('login', lang)
+      // console.log('login', lang)
       handleChange(lang.value)
     })
 
