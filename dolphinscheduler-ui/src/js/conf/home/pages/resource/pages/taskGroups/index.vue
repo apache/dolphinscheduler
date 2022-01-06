@@ -14,22 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.dolphinscheduler.server.master.runner.task;
-
-import org.apache.dolphinscheduler.common.enums.TaskType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class ConditionTaskProcessFactory implements ITaskProcessFactory {
-    @Override
-    public String type() {
-        return TaskType.CONDITIONS.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new ConditionTaskProcessor();
-    }
-}
+<template>
+  <router-view></router-view>
+</template>
+<script>
+  export default {
+    name: 'task-group-option-index'
+  }
+</script>

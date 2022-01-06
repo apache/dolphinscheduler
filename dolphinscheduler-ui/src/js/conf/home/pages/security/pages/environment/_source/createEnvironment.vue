@@ -116,8 +116,6 @@
       _getWorkerGroupList () {
         this.getWorkerGroupsAll().then(res => {
           this.workerGroups = res
-          console.log('get Worker Group List')
-          console.log(this.workerGroups)
         })
       },
       _ok () {

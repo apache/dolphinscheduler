@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -138,7 +136,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.error("kill task error", e);
         }
         // find log and kill yarn job
-        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
                 taskExecutionContext.getLogPath(),
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTenantCode());
@@ -179,10 +177,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param tenantCode tenantCode
      * @return Pair<Boolean, List < String>> yarn kill result
      */
-    private Pair<Boolean, List<String>> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
+    private Pair<Boolean, List<String>> killYarnJob(Host host, String logPath, String executePath, String tenantCode) {
         try (LogClientService logClient = new LogClientService();) {
-            logger.info("view log host : {},logPath : {}", host, logPath);
-            String log = logClient.viewLog(host, PropertyUtils.getInt(Constants.RPC_PORT, 50051), logPath);
+            logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), logPath,
+                    host.getPort());
+            String log = logClient.viewLog(host.getIp(), host.getPort(), logPath);
             List<String> appIds = Collections.emptyList();
             if (!StringUtils.isEmpty(log)) {
                 appIds = LoggerUtils.getAppIds(log, logger);

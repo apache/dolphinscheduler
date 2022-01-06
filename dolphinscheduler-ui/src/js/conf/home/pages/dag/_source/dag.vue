@@ -32,6 +32,7 @@
       <m-form-model
         v-if="taskDrawer"
         :nodeData="nodeData"
+        :project-code="projectCode"
         @seeHistory="seeHistory"
         @addTaskInfo="addTaskInfo"
         @close="closeTaskDrawer"
@@ -531,7 +532,7 @@
         this.$router.push({
           name: 'task-instance',
           query: {
-            processInstanceId: this.$route.params.code,
+            processInstanceId: this.instanceId,
             taskName: taskName
           }
         })

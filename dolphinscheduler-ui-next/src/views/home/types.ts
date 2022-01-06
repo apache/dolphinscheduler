@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
-
-import org.apache.dolphinscheduler.common.enums.TaskType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class SubTaskProcessFactory implements ITaskProcessFactory {
-    @Override
-    public String type() {
-        return TaskType.SUB_PROCESS.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new SubTaskProcessor();
-    }
+interface DefinitionChartData {
+  xAxisData: Array<string>
+  seriesData: Array<number>
 }
+
+interface StateTableData {
+  id: number
+  number: number
+  state: string
+}
+
+interface StateChartData {
+  value: number
+  name: string
+}
+
+interface StateData {
+  table: Array<StateTableData>
+  chart: Array<StateChartData>
+}
+
+export { DefinitionChartData, StateTableData, StateChartData, StateData }

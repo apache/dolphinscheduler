@@ -15,22 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
-
-import org.apache.dolphinscheduler.common.enums.TaskType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class DependentTaskProcessFactory implements ITaskProcessFactory {
-
-    @Override
-    public String type() {
-        return TaskType.DEPENDENT.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new DependentTaskProcessor();
-    }
+interface InfoProps {
+  key: string
+  value: string | number | undefined
 }
+
+export { InfoProps }

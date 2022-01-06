@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import { defineStore } from 'pinia'
+import MenuState from './types'
 
-import org.apache.dolphinscheduler.common.Constants;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class CommonTaskProcessFactory implements ITaskProcessFactory {
-    @Override
-    public String type() {
-        return Constants.COMMON_TASK_TYPE;
-
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new CommonTaskProcessor();
-    }
-}
+export const useMenuStore = defineStore({
+  id: 'menu',
+  state: (): MenuState => ({
+    menuKey: '',
+  }),
+  getters: {
+    getMenuKey(): string {
+      return this.menuKey
+    },
+  },
+  actions: {
+    setMenuKey(menuKey: string): void {
+      this.menuKey = menuKey
+    },
+  },
+})

@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
-
-public interface ITaskProcessFactory {
-
-    String type();
-
-    ITaskProcessor create();
+interface MenuState {
+  menuKey: string
 }
+
+export default MenuState
