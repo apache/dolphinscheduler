@@ -44,7 +44,6 @@ for worker in ${!workersGroupMap[*]}
 do
   echo "$worker worker server is stopping"
   ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop logger-server;"
 done
 
 ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop alert-server;"
