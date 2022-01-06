@@ -59,7 +59,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -584,54 +583,45 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      *
      * @param loginUser login user
      * @param userId user id
-     * @param projectCodes project code array
+     * @param projectCode project code
      * @return grant result code
      */
     @Override
-    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final String projectCodes) {
+    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        // 1. only admin can operate
-        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
-
-        // 2. check if user is existed
+        // 1. check if user is existed
         User tempUser = this.userMapper.selectById(userId);
         if (tempUser == null) {
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
 
-        // 3. if the selected projectCodes are empty, delete all items associated with the user
-        if (this.check(result, StringUtils.isEmpty(projectCodes), Status.SUCCESS)) {
-            this.projectUserMapper.deleteProjectRelation(0, userId);
+        // 2. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+
+        // 3. only project owner can operate
+        if (!this.hasPerm(loginUser, project.getUserId())) {
+            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         // 4. maintain the relationship between project and user
-        Set<Long> projectCodeSet = Arrays.stream(projectCodes.split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
-        final List<Project> projectList = this.projectMapper.queryByCodes(projectCodeSet);
-        if (CollectionUtils.isEmpty(projectList)) {
-            logger.info("project not exists");
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectCodes);
-            return result;
-        }
-        for (final Project project : projectList) {
-            final Date today = new Date();
+        final Date today = new Date();
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setUserId(userId);
+        projectUser.setProjectId(project.getId());
+        projectUser.setPerm(7);
+        projectUser.setCreateTime(today);
+        projectUser.setUpdateTime(today);
+        this.projectUserMapper.insert(projectUser);
 
-            ProjectUser projectUser = new ProjectUser();
-            projectUser.setUserId(userId);
-            projectUser.setProjectId(project.getId());
-            projectUser.setPerm(7);
-            projectUser.setCreateTime(today);
-            projectUser.setUpdateTime(today);
-            this.projectUserMapper.insert(projectUser);
-        }
-
-        putMsg(result, Status.SUCCESS);
-
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -662,7 +652,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // 3. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 

@@ -56,7 +56,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateEx
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -523,18 +522,30 @@ public class ProcessService {
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
                     continue;
                 }
-                int port = PropertyUtils.getInt(Constants.RPC_PORT, 50051);
-                String ip = "";
-                try {
-                    ip = Host.of(taskInstance.getHost()).getIp();
-                } catch (Exception e) {
-                    // compatible old version
-                    ip = taskInstance.getHost();
-                }
+                Host host = Host.of(taskInstance.getHost());
                 // remove task log from loggerserver
-                logClient.removeTaskLog(ip, port, taskLogPath);
+                logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
             }
         }
+    }
+
+    /**
+     * recursive delete all task instance by process instance id
+     * @param processInstanceId
+     */
+    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            taskInstanceIdList.add(taskInstance.getId());
+        }
+
+        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
     }
 
     /**
@@ -664,6 +675,7 @@ public class ProcessService {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
+        processInstance.setRestartTime(processInstance.getStartTime());
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
         processInstance.setCommandParam(command.getCommandParam());
@@ -853,6 +865,7 @@ public class ProcessService {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+        processInstance.setRestartTime(new Date());
         ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXECUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType) {
@@ -922,6 +935,7 @@ public class ProcessService {
                     updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
+                processInstance.setRestartTime(processInstance.getStartTime());
                 processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime + 1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
@@ -1067,7 +1081,8 @@ public class ProcessService {
 
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
         List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
-
+        subPropertyList = new ArrayList<>(subPropertyList);
+        
         Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
         for (Property parent : parentPropertyList) {
@@ -1862,6 +1877,10 @@ public class ProcessService {
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
+    public List<String> queryNeedFailoverProcessInstanceHost() {
+        return processInstanceMapper.queryNeedFailoverProcessInstanceHost(stateArray);
+    }
+
     /**
      * process need failover process instance
      *
@@ -2332,11 +2351,14 @@ public class ProcessService {
             processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
             processTaskRelationLog.setProcessDefinitionVersion(processDefinitionVersion);
             if (taskDefinitionLogMap != null) {
-                TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(processTaskRelationLog.getPreTaskCode());
-                if (taskDefinitionLog != null) {
-                    processTaskRelationLog.setPreTaskVersion(taskDefinitionLog.getVersion());
+                TaskDefinitionLog preTaskDefinitionLog = taskDefinitionLogMap.get(processTaskRelationLog.getPreTaskCode());
+                if (preTaskDefinitionLog != null) {
+                    processTaskRelationLog.setPreTaskVersion(preTaskDefinitionLog.getVersion());
                 }
-                processTaskRelationLog.setPostTaskVersion(taskDefinitionLogMap.get(processTaskRelationLog.getPostTaskCode()).getVersion());
+                TaskDefinitionLog postTaskDefinitionLog = taskDefinitionLogMap.get(processTaskRelationLog.getPostTaskCode());
+                if (postTaskDefinitionLog != null) {
+                    processTaskRelationLog.setPostTaskVersion(postTaskDefinitionLog.getVersion());
+                }
             }
             processTaskRelationLog.setCreateTime(now);
             processTaskRelationLog.setUpdateTime(now);
@@ -2419,15 +2441,19 @@ public class ProcessService {
     }
 
     public List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations) {
-        List<TaskDefinitionLog> taskDefinitionLogs = com.google.common.collect.Lists.newArrayList();
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        Map<Long, Integer> taskCodeVersionMap = new HashMap<>();
         for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
-                taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
+                taskCodeVersionMap.put(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion());
             }
             if (processTaskRelation.getPostTaskCode() > 0) {
-                taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
+                taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
             }
         }
+        taskCodeVersionMap.forEach((code,version) -> {
+            taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
+        });
         return taskDefinitionLogs;
     }
 
@@ -2506,6 +2532,8 @@ public class ProcessService {
                         taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get).map(TaskDefinition::getCode).collect(Collectors.toList())));
+                taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
+                taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNodeList.add(taskNode);
             }
         }
@@ -2675,6 +2703,8 @@ public class ProcessService {
                                                    String taskName, Integer groupId,
                                                    Integer processId, Integer priority, TaskGroupQueueStatus status) {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue(taskId, taskName, groupId, processId, priority, status);
+        taskGroupQueue.setCreateTime(new Date());
+        taskGroupQueue.setUpdateTime(new Date());
         taskGroupQueueMapper.insert(taskGroupQueue);
         return taskGroupQueue;
     }

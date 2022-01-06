@@ -166,7 +166,7 @@ public class ExecutorController extends BaseController {
     }
 
     /**
-     * check process definition and all of the son process definitions is on line.
+     * check process definition and all the son process definitions is online.
      *
      * @param processDefinitionCode process definition code
      * @return check result code

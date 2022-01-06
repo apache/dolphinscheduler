@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -38,6 +39,22 @@ public interface TaskDefinitionService {
     Map<String, Object> createTaskDefinition(User loginUser,
                                              long projectCode,
                                              String taskDefinitionJson);
+
+    /**
+     * create single task definition that binds the workflow
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processDefinitionCode process definition code
+     * @param taskDefinitionJsonObj task definition json object
+     * @param upstreamCodes         upstream task codes, sep comma
+     * @return create result code
+     */
+    Map<String, Object> createTaskBindsWorkFlow(User loginUser,
+                                                long projectCode,
+                                                long processDefinitionCode,
+                                                String taskDefinitionJsonObj,
+                                                String upstreamCodes);
 
     /**
      * query task definition
@@ -73,6 +90,22 @@ public interface TaskDefinitionService {
                                              long projectCode,
                                              long taskCode,
                                              String taskDefinitionJsonObj);
+
+    /**
+     * update task definition and upstream
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
+     * @param taskDefinitionJsonObj task definition json object
+     * @param upstreamCodes         upstream task codes, sep comma
+     * @return update result code
+     */
+    Map<String, Object> updateTaskWithUpstream(User loginUser,
+                                               long projectCode,
+                                               long taskCode,
+                                               String taskDefinitionJsonObj,
+                                               String upstreamCodes);
 
     /**
      * update task definition
@@ -134,18 +167,18 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
+     * @param searchWorkflowName searchWorkflowName
+     * @param searchTaskName searchTaskName
      * @param taskType taskType
-     * @param searchVal search value
-     * @param userId user id
      * @param pageNo page number
      * @param pageSize page size
      * @return task definition page
      */
     Result queryTaskDefinitionListPaging(User loginUser,
                                          long projectCode,
-                                         String taskType,
-                                         String searchVal,
-                                         Integer userId,
+                                         String searchWorkflowName,
+                                         String searchTaskName,
+                                         TaskType taskType,
                                          Integer pageNo,
                                          Integer pageSize);
 

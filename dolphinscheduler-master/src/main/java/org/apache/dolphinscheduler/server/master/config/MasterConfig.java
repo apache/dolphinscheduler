@@ -39,6 +39,9 @@ public class MasterConfig {
     private int stateWheelInterval;
     private double maxCpuLoadAvg;
     private double reservedMemory;
+    private boolean taskLogger;
+    private int failoverInterval;
+    private boolean killYarnJobWhenTaskFailover;
 
     public int getListenPort() {
         return listenPort;
@@ -134,5 +137,29 @@ public class MasterConfig {
 
     public void setReservedMemory(double reservedMemory) {
         this.reservedMemory = reservedMemory;
+    }
+
+    public boolean isTaskLogger() {
+        return taskLogger;
+    }
+
+    public void setTaskLogger(boolean taskLogger) {
+        this.taskLogger = taskLogger;
+    }
+
+    public int getFailoverInterval() {
+        return failoverInterval;
+    }
+
+    public void setFailoverInterval(int failoverInterval) {
+        this.failoverInterval = failoverInterval;
+    }
+
+    public boolean isKillYarnJobWhenTaskFailover() {
+        return killYarnJobWhenTaskFailover;
+    }
+
+    public void setKillYarnJobWhenTaskFailover(boolean killYarnJobWhenTaskFailover) {
+        this.killYarnJobWhenTaskFailover = killYarnJobWhenTaskFailover;
     }
 }

@@ -65,7 +65,7 @@
               :disabled="isDetails"
               :placeholder="$t('Please enter name (required)')"
               maxlength="100"
-              id="input-node-name"
+              id="inputNodeName"
             >
             </el-input>
           </div>
@@ -148,6 +148,30 @@
               :isNewCreate="isNewCreate"
               v-on:environmentCodeEvent="_onUpdateEnvironmentCode"
             ></m-related-environment>
+          </div>
+        </m-list-box>
+
+        <!-- Worker group and environment -->
+        <m-list-box>
+          <div slot="text">{{ $t("Task group name") }}</div>
+          <div slot="content">
+            <span class="label-box" style="width: 193px; display: inline-block">
+              <m-task-groups
+                v-model="taskGroupId"
+                :project-code="this.projectCode"
+                v-on:taskGroupIdEvent="_onUpdateTaskGroupId"
+              ></m-task-groups>
+            </span>
+            <span class="text-b">{{ $t("Task group queue priority") }}</span>
+            <el-input
+              :disabled="taskGroupId===''"
+              style="width: 166px;"
+              type="input"
+              v-model="taskGroupPriority"
+              maxlength="60"
+              v-on:input="_onUpdateTaskGroupPriority"
+              size="small">
+            </el-input>
           </div>
         </m-list-box>
 
@@ -443,7 +467,7 @@
           :loading="spinnerLoading"
           @click="ok()"
           :disabled="isDetails"
-          id="button-submit"
+          id="btnSubmit"
           >{{ spinnerLoading ? $t("Loading...") : $t("Confirm") }}
         </el-button>
       </div>
@@ -478,6 +502,7 @@
   import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
   import mRelatedEnvironment from './_source/relatedEnvironment'
+  import mTaskGroups from './_source/taskGroups'
   import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
@@ -539,6 +564,8 @@
         // selected environment
         environmentCode: '',
         selectedWorkerGroup: '',
+        taskGroupId: '',
+        taskGroupPriority: 0,
         stateList: [
           {
             value: 'success',
@@ -575,7 +602,10 @@
         type: String,
         default: ''
       },
-      taskDefinition: Object
+      taskDefinition: Object,
+      projectCode: {
+        type: Number
+      }
     },
     inject: ['dagChart'],
     methods: {
@@ -619,7 +649,9 @@
           type: task.taskType,
           waitStartTimeout: task.taskParams.waitStartTimeout,
           workerGroup: task.workerGroup,
-          environmentCode: task.environmentCode
+          environmentCode: task.environmentCode,
+          taskGroupId: task.taskGroupId,
+          taskGroupPriority: task.taskGroupPriority
         }
       },
       /**
@@ -722,6 +754,15 @@
       },
       _onUpdateEnvironmentCode (o) {
         this.environmentCode = o
+      },
+      _onUpdateTaskGroupId (o) {
+        this.taskGroupId = o
+        if (this.taskGroupId === '') {
+          this.taskGroupPriority = 0
+        }
+      },
+      _onUpdateTaskGroupPriority (o) {
+        this.taskGroupPriority = o
       },
       /**
        * _onCacheParams is reserved
@@ -837,7 +878,9 @@
             timeoutNotifyStrategy: this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
-            environmentCode: this.environmentCode || -1
+            environmentCode: this.environmentCode || -1,
+            taskGroupId: this.taskGroupId,
+            taskGroupPriority: this.taskGroupPriority
           },
           fromThis: this
         })
@@ -952,6 +995,8 @@
           this.params = o.params || {}
           this.dependence = o.dependence || {}
           this.cacheDependence = o.dependence || {}
+          this.taskGroupId = o.taskGroupId
+          this.taskGroupPriority = o.taskGroupPriority
         } else {
           this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
         }
@@ -966,7 +1011,6 @@
       // Backfill data
       let o = {}
       this.code = this.nodeData.id
-
       if (this.fromTaskDefinition) {
         if (this.taskDefinition) {
           const backfillItem = this.taskToBackfillItem(this.taskDefinition)
@@ -1061,7 +1105,8 @@
       mPriority,
       mWorkerGroups,
       mRelatedEnvironment,
-      mPreTasks
+      mPreTasks,
+      mTaskGroups
     // ReferenceFromTask
     }
   }

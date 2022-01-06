@@ -26,14 +26,13 @@ import org.junit.Test;
 @Ignore
 public class TaskProcessorFactoryTest {
 
-    private TaskProcessorFactory taskProcessorFactory;
     @Test
-    public void testFactory() {
+    public void testFactory() throws InstantiationException, IllegalAccessException {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("shell");
 
-        ITaskProcessor iTaskProcessor = taskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+        ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
 
         Assert.assertNotNull(iTaskProcessor);
     }
