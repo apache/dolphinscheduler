@@ -76,6 +76,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1171,13 +1172,35 @@ public class WorkflowExecuteThread implements Runnable {
      * @param taskInstance task instance
      */
     private void addTaskToStandByList(TaskInstance taskInstance) {
-        logger.info("add task to stand by list, task name: {} , task id:{}", taskInstance.getName(), taskInstance.getId());
         try {
-            if (!readyToSubmitTaskQueue.contains(taskInstance)) {
-                readyToSubmitTaskQueue.put(taskInstance);
+            if (readyToSubmitTaskQueue.contains(taskInstance)) {
+                logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
+                return;
             }
+            // need to check if the tasks with same task code is active
+            boolean active = false;
+            Map<Integer, TaskInstance> taskInstanceMap = taskInstanceHashMap.column(taskInstance.getTaskCode());
+            if (taskInstanceMap != null && taskInstanceMap.size() > 0) {
+                for (Entry<Integer, TaskInstance> entry : taskInstanceMap.entrySet()) {
+                    Integer taskInstanceId = entry.getKey();
+                    if (activeTaskProcessorMaps.containsKey(taskInstanceId)) {
+                        TaskInstance latestTaskInstance = processService.findTaskInstanceById(taskInstanceId);
+                        if (latestTaskInstance != null && !latestTaskInstance.getState().typeIsFailure()) {
+                            active = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (active) {
+                logger.warn("task was found in active task list, task code:{}", taskInstance.getTaskCode());
+                return;
+            }
+            logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
+                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
+            readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue, taskName: {}, task id: {}", taskInstance.getName(), taskInstance.getId(), e);
+            logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
         }
     }
 
