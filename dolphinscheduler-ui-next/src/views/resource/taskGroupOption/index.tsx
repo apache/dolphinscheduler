@@ -15,34 +15,65 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
+import {defineComponent, toRefs} from 'vue'
+import {NButton, NForm, NFormItem, NInput} from 'naive-ui'
 import Card from '@/components/card'
+import {useForm} from "@/views/password/use-form";
+import {useUpdate} from "@/views/password/use-update";
 
-const profile = defineComponent({
+const taskGroupOption = defineComponent({
   name: 'taskGroupOption',
   setup() {
-    const { t } = useI18n()
+    const { state, t } = useForm()
+    const { handleUpdate } = useUpdate(state)
 
-    return { t }
+    return { ...toRefs(state), t, handleUpdate }
   },
   render() {
     const { t } = this
 
     return (
-      <Card title={t('profile.profile')}>
-        {{
-          default: () => <Info />,
-          'header-extra': () => (
-            <NButton type='info' size='small'>
-              {t('profile.edit')}
-            </NButton>
-          ),
-        }}
-      </Card>
+        <Card title={t('password.edit_password')}>
+          {{
+            default: () => (
+                <div>
+                  <NForm rules={this.rules} ref='passwordFormRef'>
+                    <NFormItem label={t('password.password')} path='password'>
+                      <NInput
+                          type='password'
+                          placeholder={t('password.password_tips')}
+                          v-model={[this.passwordForm.password, 'value']}
+                      />
+                    </NFormItem>
+                    <NFormItem
+                        label={t('password.confirm_password')}
+                        path='confirmPassword'
+                    >
+                      <NInput
+                          type='password'
+                          placeholder={t('password.confirm_password_tips')}
+                          v-model={[this.passwordForm.confirmPassword, 'value']}
+                      />
+                    </NFormItem>
+                  </NForm>
+                  <NButton
+                      disabled={
+                        !this.passwordForm.password ||
+                        !this.passwordForm.confirmPassword ||
+                        this.passwordForm.password !==
+                        this.passwordForm.confirmPassword
+                      }
+                      type='info'
+                      onClick={this.handleUpdate}
+                  >
+                    {t('password.submit')}
+                  </NButton>
+                </div>
+            ),
+          }}
+        </Card>
     )
   },
 })
 
-export default profile
+export default taskGroupOption

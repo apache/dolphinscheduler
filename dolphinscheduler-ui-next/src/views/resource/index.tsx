@@ -16,33 +16,15 @@
  */
 
 import { defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
-import Card from '@/components/card'
 
-const profile = defineComponent({
+const resource = defineComponent({
   name: 'resource',
   setup() {
-    const { t } = useI18n()
-
-    return { t }
   },
   render() {
-    const { t } = this
-
-    return (
-      <Card title={t('profile.profile')}>
-        {{
-          default: () => <Info />,
-          'header-extra': () => (
-            <NButton type='info' size='small'>
-              {t('profile.edit')}
-            </NButton>
-          ),
-        }}
-      </Card>
+    return ( {}
     )
   },
 })
 
-export default profile
+export default resource
