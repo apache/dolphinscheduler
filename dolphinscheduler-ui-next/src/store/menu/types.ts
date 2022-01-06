@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-import { DropdownOption } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
-
-export function useDropDown(chooseVal: any) {
-  const { locale } = useI18n()
-
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    // console.log(key, option)
-    chooseVal.value = option.label
-    locale.value = key as string
-  }
-  return {
-    handleSelect,
-  }
+interface MenuState {
+  menuKey: string
 }
+
+export default MenuState
