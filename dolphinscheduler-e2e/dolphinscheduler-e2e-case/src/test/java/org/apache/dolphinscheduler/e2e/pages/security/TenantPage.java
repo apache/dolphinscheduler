@@ -72,7 +72,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
             .stream()
             .filter(it -> it.getText().contains(tenant))
             .findFirst()
-            .ifPresent(it -> it.findElement(By.className("el-icon-delete")).click());
+            .ifPresent(it -> it.findElement(By.className("el-button--danger")).click());
 
         buttonConfirm().click();
 
