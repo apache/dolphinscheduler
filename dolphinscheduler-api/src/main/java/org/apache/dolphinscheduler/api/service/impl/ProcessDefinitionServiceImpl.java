@@ -900,9 +900,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
 
         // for Zip Bomb Attack
-        int THRESHOLD_ENTRIES = 10000;
-        int THRESHOLD_SIZE = 1000000000; // 1 GB
-        double THRESHOLD_RATIO = 10;
+        final int THRESHOLD_ENTRIES = 10000;
+        final int THRESHOLD_SIZE = 1000000000; // 1 GB
+        final double THRESHOLD_RATIO = 10;
         int totalEntryArchive = 0;
         int totalSizeEntry = 0;
         // In most cases, there will be only one data source
@@ -921,7 +921,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
-                totalEntryArchive ++;
+                totalEntryArchive++;
                 int totalSizeArchive = 0;
                 if (!entry.isDirectory()) {
                     StringBuilder sql = new StringBuilder();
@@ -934,7 +934,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         totalSizeEntry += nBytes;
                         totalSizeArchive += nBytes;
                         long compressionRatio = totalSizeEntry / entry.getCompressedSize();
-                        if(compressionRatio > THRESHOLD_RATIO) {
+                        if (compressionRatio > THRESHOLD_RATIO) {
                             throw new IllegalStateException("ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack");
                         }
                         int commentIndex = line.indexOf("-- ");
@@ -995,11 +995,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     taskNameToUpstream.put(taskDefinition.getName(), upstreams);
                 }
 
-                if(totalSizeArchive > THRESHOLD_SIZE) {
+                if (totalSizeArchive > THRESHOLD_SIZE) {
                     throw new IllegalStateException("the uncompressed data size is too much for the application resource capacity");
                 }
 
-                if(totalEntryArchive > THRESHOLD_ENTRIES) {
+                if (totalEntryArchive > THRESHOLD_ENTRIES) {
                     throw new IllegalStateException("too much entries in this archive, can lead to inodes exhaustion of the system");
                 }
             }
@@ -1166,6 +1166,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             processDefinition.setLocations(newArrayNode.toString());
         }
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
         Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition, Lists.newArrayList());
         if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
             putMsg(createDagResult, Status.SUCCESS);
