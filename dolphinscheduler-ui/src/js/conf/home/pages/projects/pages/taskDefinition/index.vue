@@ -81,7 +81,10 @@
             :tasksList="tasksList"
             @on-update="_onUpdate"
             @editTask="editTask"
+            @showDeleteModal="showDeleteModal"
+            @showMoveModal="showMoveModal"
             @viewTaskDetail="viewTaskDetail"
+            @viewTaskVersions="viewTaskVersions"
           ></m-list>
           <div class="page-box">
             <el-pagination
@@ -124,6 +127,21 @@
       >
       </m-form-model>
     </el-drawer>
+    <task-delete-modal
+      ref="taskDeleteModal"
+      :taskRow="deletingTaskRow"
+      @deleteTask="deleteTask"
+    />
+    <task-move-modal
+      ref="taskMoveModal"
+      :taskRow="movingTaskRow"
+      @moveTask="moveTask"
+    />
+    <version-drawer
+      ref="versionDrawer"
+      :taskRow="versionTaskRow"
+      @reloadList="_onUpdate"
+    />
   </div>
 </template>
 <script>
@@ -136,6 +154,9 @@
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mFormModel from '@/conf/home/pages/dag/_source/formModel/formModel.vue'
   import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
+  import TaskDeleteModal from './_source/taskDeleteModal.vue'
+  import TaskMoveModal from './_source/taskMoveModel.vue'
+  import VersionDrawer from './_source/versions.vue'
   import _ from 'lodash'
 
   const DEFAULT_NODE_DATA = {
@@ -171,7 +192,14 @@
         // tasksType
         tasksTypeList,
         // editing task definition
-        editingTask: null
+        editingTask: null,
+        editingProcess: null,
+        // task to be deleted
+        deletingTaskRow: null,
+        // task ready to move
+        movingTaskRow: null,
+        // the current browse task
+        versionTaskRow: null
       }
     },
     mixins: [listUrlParamHandle],
@@ -179,8 +207,12 @@
       ...mapActions('dag', [
         'getTaskDefinitionsList',
         'genTaskCodeList',
-        'saveTaskDefinition',
-        'updateTaskDefinition'
+        'saveTaskDefinitionWithUpstreams',
+        'updateTaskDefinition',
+        'deleteTaskDefinition',
+        'getTaskDefinition',
+        'moveTaskToProcess',
+        'deleteRelation'
       ]),
       ...mapActions('dag', [
         'getProcessList',
@@ -194,7 +226,7 @@
         'getAlarmGroupsAll'
       ]),
       /**
-       * Toggle task drawer
+       * Toggle task form-model drawer
        */
       showTaskDrawer () {
         this.taskDrawer = true
@@ -203,10 +235,16 @@
         this.setIsDetails(false)
         this.taskDrawer = false
       },
-      saveTask ({ item }) {
+      /**
+       * Save task
+       */
+      saveTask ({ item: taskDefinition, prevTasks, processCode }) {
         const isEditing = !!this.editingTask
         if (isEditing) {
-          this.updateTaskDefinition(item)
+          this.updateTaskDefinition({
+            prevTasks: prevTasks,
+            taskDefinition: taskDefinition
+          })
             .then((res) => {
               this.$message.success(res.msg)
               this._onUpdate()
@@ -224,13 +262,13 @@
               return code
             })
             .then((code) => {
-              return this.saveTaskDefinition({
-                taskDefinitionJson: [
-                  {
-                    ...item,
-                    code
-                  }
-                ]
+              return this.saveTaskDefinitionWithUpstreams({
+                taskDefinition: {
+                  ...taskDefinition,
+                  code
+                },
+                prevTasks: prevTasks,
+                processDefinitionCode: processCode
               })
             })
             .then((res) => {
@@ -243,20 +281,101 @@
             })
         }
       },
+      /**
+       * Show task creation modal
+       */
       createTask () {
         this.editingTask = null
         this.nodeData.taskType = DEFAULT_NODE_DATA.taskType
         this.showTaskDrawer()
       },
-      editTask (task) {
-        this.editingTask = task
-        this.nodeData.id = task.code
-        this.nodeData.taskType = task.taskType
-        this.showTaskDrawer()
+      /**
+       * Show task edit modal
+       */
+      editTask (taskRow) {
+        this.getTaskDefinition(taskRow.taskCode).then((taskDefinition) => {
+          this.editingTask = {
+            ...taskDefinition,
+            processCode: taskRow.processDefinitionCode
+          }
+          this.nodeData.id = taskDefinition.code
+          this.nodeData.taskType = taskDefinition.taskType
+          this.showTaskDrawer()
+        })
       },
-      viewTaskDetail (task) {
+      /**
+       * Show task detail modal
+       */
+      viewTaskDetail (taskRow) {
         this.setIsDetails(true)
-        this.editTask(task)
+        this.editTask(taskRow)
+      },
+      /**
+       * Show delete task modal
+       */
+      showDeleteModal (taskRow) {
+        this.deletingTaskRow = taskRow
+        if (this.$refs.taskDeleteModal) {
+          this.$refs.taskDeleteModal.show()
+        }
+      },
+      /**
+       * Show Move Modal
+       */
+      showMoveModal (taskRow) {
+        this.movingTaskRow = taskRow
+        if (this.$refs.taskMoveModal) {
+          this.$refs.taskMoveModal.show()
+        }
+      },
+      /**
+       * Delete task
+       * @param {Boolean} completely Whether to delete the task completely
+       */
+      deleteTask ({ completely, taskCode, processDefinitionCode }) {
+        const completelyDelete = this.deleteTaskDefinition
+        const deleteRelation = this.deleteRelation
+        const delRequest = completely ? completelyDelete : deleteRelation
+        const params = completely
+          ? { taskCode }
+          : {
+            taskCode,
+            processDefinitionCode
+          }
+        delRequest(params)
+          .then((res) => {
+            this.$message.success(res.msg)
+            this.$refs.taskDeleteModal.close()
+            this.deletingTaskRow = null
+            this._onUpdate()
+          })
+          .catch((err) => {
+            this.$message.error(err.msg || '')
+          })
+      },
+      /**
+       * Move task to another workflow
+       */
+      moveTask (params) {
+        this.moveTaskToProcess(params)
+          .then((res) => {
+            this.$message.success(res.msg)
+            this.$refs.taskMoveModal.close()
+            this.movingTaskRow = null
+            this._onUpdate()
+          })
+          .catch((err) => {
+            this.$message.error(err.msg || '')
+          })
+      },
+      /**
+       * ViewTaskVersion
+       */
+      viewTaskVersions (taskRow) {
+        if (this.$refs.versionDrawer) {
+          this.versionTaskRow = taskRow
+          this.$refs.versionDrawer.show()
+        }
       },
       /**
        * pageNo
@@ -290,7 +409,7 @@
         this.getTaskDefinitionsList({
           pageNo: this.searchParams.pageNo,
           pageSize: this.searchParams.pageSize,
-          taskType: this.searchParams.taskType || 'SHELL',
+          taskType: this.searchParams.taskType,
           searchTaskName: this.searchParams.taskName,
           searchWorkflowName: this.searchParams.processName
         })
@@ -372,7 +491,10 @@
       mList,
       mNoData,
       mSpin,
-      mFormModel
+      mFormModel,
+      TaskMoveModal,
+      TaskDeleteModal,
+      VersionDrawer
     }
   }
 </script>
@@ -394,6 +516,10 @@
           text-align: left;
         }
       }
+      td,
+      th.is-leaf {
+        padding-left: 10px;
+      }
     }
     .pre-task-tag {
       margin-right: 10px;
@@ -404,6 +530,12 @@
     .upstream-tasks {
       display: flex;
       flex-wrap: wrap;
+    }
+  }
+
+  ::v-deep .el-dialog__header {
+    .el-dialog__headerbtn {
+      right: 20px;
     }
   }
 }

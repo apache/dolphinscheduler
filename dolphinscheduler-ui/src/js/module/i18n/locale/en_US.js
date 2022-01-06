@@ -800,5 +800,11 @@ export default {
   'Please select task name': 'Please select a task name',
   'Process State': 'Process State',
   'Upstream Tasks': 'Upstream Tasks',
-  'and {n} more': '… and {n} more'
+  'and {n} more': '… and {n} more',
+  'Move task': 'Move task',
+  'Delete task {taskName} from process {processName}?': 'Delete task {taskName} from process {processName}?',
+  'Delete task completely': 'Delete task completely',
+  'Please select a process': 'Please select a process',
+  'Delete {taskName}?': 'Delete {taskName}?',
+  'Please select a process (required)': 'Please select a process (required)'
 }
