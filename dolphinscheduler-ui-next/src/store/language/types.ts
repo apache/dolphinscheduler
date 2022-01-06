@@ -15,17 +15,10 @@
  * limitations under the License.
  */
 
-import { WritableComputedRef } from 'vue'
-import { useLanguageStore } from '@/store/language/language'
+import { Ref } from 'vue'
 
-export function useTranslate(locale: WritableComputedRef<string>) {
-  const languageStore = useLanguageStore()
-
-  const handleChange = (value: string) => {
-    locale.value = value
-    languageStore.setLang(value)
-  }
-  return {
-    handleChange,
-  }
+interface LanguageStore {
+  storageLang: Ref
 }
+
+export default LanguageStore

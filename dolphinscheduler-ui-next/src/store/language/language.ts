@@ -15,17 +15,25 @@
  * limitations under the License.
  */
 
-import { WritableComputedRef } from 'vue'
-import { useLanguageStore } from '@/store/language/language'
+import { defineStore } from 'pinia'
+import LanguageStore from './types'
+import { useStorage } from '@vueuse/core'
+import { ref } from 'vue'
 
-export function useTranslate(locale: WritableComputedRef<string>) {
-  const languageStore = useLanguageStore()
-
-  const handleChange = (value: string) => {
-    locale.value = value
-    languageStore.setLang(value)
-  }
-  return {
-    handleChange,
-  }
-}
+export const useLanguageStore = defineStore({
+  id: 'language',
+  state: (): LanguageStore => ({
+    storageLang: ref('')
+  }),
+  getters: {
+    getLang(): string | null {
+      return window.localStorage.getItem('lang')
+    },
+  },
+  actions: {
+    setLang(lang: string): void {
+      this.storageLang = useStorage('lang', lang)
+      this.storageLang = lang
+    },
+  },
+})
