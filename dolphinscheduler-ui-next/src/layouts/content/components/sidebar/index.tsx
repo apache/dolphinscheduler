@@ -39,7 +39,7 @@ const Sidebar = defineComponent({
 
     const { handleMenuClick } = useMenuClick()
 
-    return { collapsedRef, defaultExpandedKeys, handleMenuClick } 
+    return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {
     return (
@@ -59,7 +59,7 @@ const Sidebar = defineComponent({
         />
       </NLayoutSider>
     )
-  }
+  },
 })
 
 export default Sidebar
