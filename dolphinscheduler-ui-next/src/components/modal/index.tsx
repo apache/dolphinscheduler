@@ -35,6 +35,10 @@ const props = {
   confirmText: {
     type: String as PropType<string>,
   },
+  confirmDisabled: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
 }
 
 const Modal = defineComponent({
@@ -55,7 +59,7 @@ const Modal = defineComponent({
     return { t, onCancel, onConfirm }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm } = this
+    const { $slots, t, onCancel, onConfirm, confirmDisabled } = this
 
     return (
       <NModal
@@ -63,21 +67,26 @@ const Modal = defineComponent({
         class={styles.container}
         mask-closable={false}
       >
-	      <NCard title={this.title}>
-		      {{
-						default: () => renderSlot($slots, 'default'),
-			      footer: () => (
-				      <div class={styles['btn-box']}>
-					      <NButton quaternary size='small' onClick={onCancel}>
-						      {this.cancelText || t('modal.cancel')}
-					      </NButton>
-					      <NButton type='info' size='small' onClick={onConfirm}>
-						      {this.confirmText || t('modal.confirm')}
-					      </NButton>
-				      </div>
-			      ),
-		      }}
-	      </NCard>
+        <NCard title={this.title}>
+          {{
+            default: () => renderSlot($slots, 'default'),
+            footer: () => (
+              <div class={styles['btn-box']}>
+                <NButton quaternary size='small' onClick={onCancel}>
+                  {this.cancelText || t('modal.cancel')}
+                </NButton>
+                <NButton
+                  type='info'
+                  size='small'
+                  onClick={onConfirm}
+                  disabled={confirmDisabled}
+                >
+                  {this.confirmText || t('modal.confirm')}
+                </NButton>
+              </div>
+            ),
+          }}
+        </NCard>
       </NModal>
     )
   },

@@ -15,25 +15,10 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia'
-import LanguageStore from './types'
-import { useStorage } from '@vueuse/core'
-import { ref } from 'vue'
+type Locales = 'zh_CN' | 'en_US'
 
-export const useLanguageStore = defineStore({
-  id: 'language',
-  state: (): LanguageStore => ({
-    storageLang: ref('')
-  }),
-  getters: {
-    getLang(): string | null {
-      return window.localStorage.getItem('lang')
-    },
-  },
-  actions: {
-    setLang(lang: string): void {
-      this.storageLang = useStorage('lang', lang)
-      this.storageLang = lang
-    },
-  },
-})
+interface LocalesStore {
+  locales: Locales
+}
+
+export { LocalesStore, Locales }

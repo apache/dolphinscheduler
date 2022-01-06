@@ -15,28 +15,28 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, PropType, onMounted } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
 import { NDropdown, NIcon, NButton } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
 import { useDropDown } from './use-dropdown'
-import { useLanguageStore } from '@/store/language/language'
+import { useLocalesStore } from '@/store/locales/locales'
 
-const Language = defineComponent({
-  name: 'Language',
+const Locales = defineComponent({
+  name: 'Locales',
   props: {
-    languageOptions: {
+    localesOptions: {
       type: Array as PropType<any>,
       default: [],
     },
   },
   setup(props) {
-    const languageStore = useLanguageStore()
-    const lang = ref()
-    lang.value = languageStore.getLang
-    
-    const chooseVal = ref(props.languageOptions.filter((item: { key: string }) => item.key === lang.value)[0].label)
-    
+    const localesStore = useLocalesStore()
+    const chooseVal = ref(
+      props.localesOptions.filter(
+        (item: { key: string }) => item.key === localesStore.getLocales
+      )[0].label
+    )
     const { handleSelect } = useDropDown(chooseVal)
 
     return { handleSelect, chooseVal }
@@ -46,7 +46,7 @@ const Language = defineComponent({
       <NDropdown
         trigger='hover'
         show-arrow
-        options={this.languageOptions}
+        options={this.localesOptions}
         on-select={this.handleSelect}
       >
         <NButton text>
@@ -60,4 +60,4 @@ const Language = defineComponent({
   },
 })
 
-export default Language
+export default Locales

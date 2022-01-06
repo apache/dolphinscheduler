@@ -15,32 +15,8 @@
  * limitations under the License.
  */
 
-import { updateUser } from '@/service/modules/users'
-import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
-
-export function useUpdate(state: any) {
-  const userStore = useUserStore()
-  const userInfo = userStore.userInfo as UserInfoRes
-
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: state.profileForm.state,
-          queue: userInfo.queue,
-        })
-      }
-    })
-  }
-
-  return {
-    handleUpdate,
-  }
+const regex = {
+  email: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/, // support Chinese mailbox
 }
+
+export default regex

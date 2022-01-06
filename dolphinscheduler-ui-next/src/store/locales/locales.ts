@@ -15,21 +15,23 @@
  * limitations under the License.
  */
 
-import { DropdownOption } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
-import { useLanguageStore } from '@/store/language/language'
+import { defineStore } from 'pinia'
+import { LocalesStore, Locales } from './types'
 
-export function useDropDown(chooseVal: any) {
-  const { locale } = useI18n()
-  const languageStore = useLanguageStore()
-
-  const handleSelect = (key: string | number, option: DropdownOption) => {
-    // console.log(key, option)
-    chooseVal.value = option.label
-    locale.value = key as string
-    languageStore.setLang(locale.value)
-  }
-  return {
-    handleSelect,
-  }
-}
+export const useLocalesStore = defineStore({
+  id: 'language',
+  state: (): LocalesStore => ({
+    locales: 'zh_CN',
+  }),
+  persist: true,
+  getters: {
+    getLocales(): Locales {
+      return this.locales
+    },
+  },
+  actions: {
+    setLocales(lang: Locales): void {
+      this.locales = lang
+    },
+  },
+})
