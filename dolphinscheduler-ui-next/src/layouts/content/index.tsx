@@ -15,20 +15,29 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, watch, toRefs } from 'vue'
+import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
 import { useMenuStore } from '@/store/menu/menu'
+import { useLanguageStore } from '@/store/language/language'
 import { useI18n } from 'vue-i18n'
 
 const Content = defineComponent({
   name: 'Content',
   setup() {
     const menuStore = useMenuStore()
+
+    const { locale } = useI18n()
+    const languageStore = useLanguageStore()
+    const lang = ref()
+    lang.value = languageStore.getLang
+
     const { state, changeMenuOption, changeHeaderMenuOptions } = useDataList()
 
+    locale.value = lang.value
+    
     onMounted(() => {
       menuStore.setMenuKey('home')
       changeMenuOption(state)

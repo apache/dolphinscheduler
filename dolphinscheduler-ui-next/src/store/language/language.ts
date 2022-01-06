@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import { MenuOption } from 'naive-ui'
-import { SetupContext } from 'vue'
+import { defineStore } from 'pinia'
+import LanguageStore from './types'
+import { useStorage } from '@vueuse/core'
+import { ref } from 'vue'
 
-export function useMenuClick(ctx: SetupContext<'handleMenuClick'[]>) {
-  const router: Router = useRouter()
-
-  const handleMenuClick = (key: string, item: MenuOption) => {
-    console.log(key, item)
-    ctx.emit('handleMenuClick', item)
-    // router.push({ path: 'home' })
-  }
-
-  return {
-    handleMenuClick,
-  }
-}
+export const useLanguageStore = defineStore({
+  id: 'language',
+  state: (): LanguageStore => ({
+    storageLang: ref('')
+  }),
+  getters: {
+    getLang(): string | null {
+      return window.localStorage.getItem('lang')
+    },
+  },
+  actions: {
+    setLang(lang: string): void {
+      this.storageLang = useStorage('lang', lang)
+      this.storageLang = lang
+    },
+  },
+})

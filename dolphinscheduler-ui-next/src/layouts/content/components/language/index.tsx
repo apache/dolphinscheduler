@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, PropType } from 'vue'
+import { defineComponent, ref, PropType, onMounted } from 'vue'
 import { NDropdown, NIcon, NButton } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
 import { useDropDown } from './use-dropdown'
+import { useLanguageStore } from '@/store/language/language'
 
 const Language = defineComponent({
   name: 'Language',
@@ -29,9 +30,15 @@ const Language = defineComponent({
       default: [],
     },
   },
-  setup() {
-    const chooseVal = ref('中文')
+  setup(props) {
+    const languageStore = useLanguageStore()
+    const lang = ref()
+    lang.value = languageStore.getLang
+    
+    const chooseVal = ref(props.languageOptions.filter((item: { key: string }) => item.key === lang.value)[0].label)
+    
     const { handleSelect } = useDropDown(chooseVal)
+
     return { handleSelect, chooseVal }
   },
   render() {
