@@ -60,8 +60,6 @@ elif [ "$command" = "worker-server" ]; then
   :
 elif [ "$command" = "alert-server" ]; then
   :
-elif [ "$command" = "logger-server" ]; then
-  :
 elif [ "$command" = "standalone-server" ]; then
   :
 else

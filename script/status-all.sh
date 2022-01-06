@@ -56,14 +56,11 @@ do
   echo "$master  $masterState"
 done
 
-# 2.worker server and logger-server check state
+# 2.worker server check state
 for worker in ${!workersGroupMap[*]}
 do
   workerState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
-
-  masterState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status logger-server;"`
-  echo "$worker  $masterState"
 done
 
 # 3.alter server check state
