@@ -36,7 +36,7 @@ const Navbar = defineComponent({
       type: Array as PropType<any>,
       default: [],
     },
-    profileOptions: {
+    userDropdownOptions: {
       type: Array as PropType<any>,
       default: [],
     },
@@ -60,7 +60,7 @@ const Navbar = defineComponent({
         <div class={styles.settings}>
           <Theme />
           <Locales localesOptions={this.localesOptions} />
-          <User profileOptions={this.profileOptions} />
+          <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>
     )
