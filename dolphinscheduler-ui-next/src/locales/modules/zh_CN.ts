@@ -24,13 +24,19 @@ const login = {
   login: '登录',
 }
 
+const modal = {
+  cancel: '取消',
+  confirm: '确定',
+}
+
 const theme = {
   light: '浅色',
   dark: '深色',
 }
 
-const profile = {
+const userDropdown = {
   profile: '用户信息',
+  password: '密码管理',
   logout: '退出登录',
 }
 
@@ -68,9 +74,53 @@ const menu = {
   token_manage: '令牌管理',
 }
 
+const home = {
+  task_state_statistics: '任务状态统计',
+  process_state_statistics: '流程状态统计',
+  process_definition_statistics: '流程定义统计',
+  number: '数量',
+  state: '状态',
+}
+
+const password = {
+  edit_password: '修改密码',
+  password: '密码',
+  confirm_password: '确认密码',
+  password_tips: '请输入密码',
+  confirm_password_tips: '请输入确认密码',
+  two_password_entries_are_inconsistent: '两次密码输入不一致',
+  submit: '提交',
+}
+
+const profile = {
+  profile: '用户信息',
+  edit: '编辑',
+  username: '用户名',
+  email: '邮箱',
+  phone: '手机',
+  state: '状态',
+  permission: '权限',
+  create_time: '创建时间',
+  update_time: '更新时间',
+  administrator: '管理员',
+  ordinary_user: '普通用户',
+  edit_profile: '编辑用户',
+  username_tips: '请输入用户名',
+  email_tips: '请输入邮箱',
+  email_correct_tips: '请输入正确格式的邮箱',
+  phone_tips: '请输入手机号',
+  state_tips: '请选择状态',
+  enable: '启用',
+  disable: '禁用',
+}
+
 export default {
   login,
+  modal,
   theme,
-  profile,
+  userDropdown,
   menu,
+  home,
+  password,
+  profile,
 }

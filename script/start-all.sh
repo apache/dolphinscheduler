@@ -45,7 +45,6 @@ do
   echo "$worker worker server is starting"
 
   ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start worker-server;"
-  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start logger-server;"
 done
 
 ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start alert-server;"

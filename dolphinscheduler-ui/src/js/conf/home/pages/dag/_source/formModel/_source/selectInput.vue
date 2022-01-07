@@ -20,7 +20,9 @@
           :disabled="isDetails"
           size="small"
           @change="_onChange"
-          v-model="selectedValue">
+          v-model="selectedValue"
+          filterable
+          allow-create>
       <el-input
               ref="input"
               slot="trigger"

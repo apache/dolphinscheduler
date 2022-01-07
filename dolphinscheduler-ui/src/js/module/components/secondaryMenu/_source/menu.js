@@ -55,6 +55,12 @@ const menu = {
           classNames: 'tab-process-definition'
         },
         {
+          name: `${i18n.$t('Task Definition')}`,
+          path: 'task-definition',
+          id: 5,
+          enabled: true
+        },
+        {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
@@ -78,17 +84,10 @@ const menu = {
           path: 'history-task-record',
           id: 4,
           enabled: config.recordSwitch
-        },
-        {
-          name: `${i18n.$t('Task Definition')}`,
-          path: 'task-definition',
-          id: 5,
-          enabled: true
         }
       ]
     }
   ],
-
   security: [
     {
       name: `${i18n.$t('Tenant Manage')}`,
