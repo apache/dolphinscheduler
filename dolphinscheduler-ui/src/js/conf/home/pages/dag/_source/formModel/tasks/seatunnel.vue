@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 <template>
-  <div class="waterdrop-model">
+  <div class="seatunnel-model">
     <!--deploy mode-->
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
@@ -102,13 +102,13 @@
   import { diGuiTree, searchTree } from './_source/resourceTree'
 
   export default {
-    name: 'waterdrop',
+    name: 'seatunnel',
     data () {
       return {
         valueConsistsOf: 'LEAF_PRIORITY',
         // script
         rawScript: '',
-        // waterdrop script
+        // seatunnel script
         baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh', // eslint-disable-line
         // resourceNameVal
         resourceNameVal: [],
@@ -180,11 +180,11 @@
         }
         // noRes
         if (!this.resourceNameVal.resourceList) {
-          this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
+          this.$message.warning(`${i18n.$t('Please select the seatunnel resources')}`)
           return false
         }
         if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length === 0) {
-          this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
+          this.$message.warning(`${i18n.$t('Please select the seatunnel resources')}`)
           return false
         }
         // Process resourcelist
@@ -209,7 +209,7 @@
           locparams = locparams + ' --variable ' + v.prop + '=' + v.value
         }
         )
-        // get waterdrop script
+        // get seatunnel script
         let tureScript = ''
         this.resourceNameVal.resourceList.forEach(v => {
           tureScript = tureScript + this.baseScript +
