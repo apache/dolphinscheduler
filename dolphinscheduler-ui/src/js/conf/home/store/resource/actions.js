@@ -32,6 +32,7 @@ export default {
   },
   getResourceId ({ state }, payload) {
     return new Promise((resolve, reject) => {
+      payload.id = !payload.id && payload.id !== 0 ? -1 : payload.id
       io.get(`resources/${payload.id}`, payload, res => {
         resolve(res.data)
       }).catch(e => {

@@ -807,7 +807,7 @@ export default {
    */
   getProcessTasksList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectCode}/process-definition/${payload.code}/tasks`, payload, res => {
+      io.get(`projects/${payload.selectedProjectCode ? payload.selectedProjectCode : state.projectCode}/process-definition/${payload.code}/tasks`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

@@ -20,6 +20,7 @@
           :ok-text="$t('Upload')"
           :nameText="$t('ReUpload File')"
           @ok="_ok"
+          @close="close"
           :disabled="progress === 0 ? false : true">
     <template slot="content">
       <form name="files" enctype="multipart/form-data" method="post">
@@ -45,9 +46,9 @@
             <template slot="content">
               <el-input
                       type="input"
-                      size="small"
                       v-model="name"
                       :disabled="progress !== 0"
+                      size="small"
                       :placeholder="$t('Please enter name')">
               </el-input>
             </template>
@@ -57,9 +58,9 @@
             <template slot="content">
               <el-input
                       type="textarea"
-                      size="small"
                       v-model="description"
                       :disabled="progress !== 0"
+                      size="small"
                       :placeholder="$t('Please enter description')">
               </el-input>
             </template>
@@ -70,7 +71,7 @@
               <div class="file-update-box">
                 <template v-if="progress === 0">
                   <input ref="file" name="file" type="file" class="file-update" @change="_onChange">
-                  <el-button size="mini"> {{$t('Upload')}} </el-button>
+                  <el-button size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>
@@ -87,6 +88,7 @@
   import io from '@/module/io'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
+  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mProgressBar from '@/module/components/progressBar/progressBar'
@@ -103,8 +105,9 @@
         // progress
         progress: 0,
         // file
-        file: null,
-        currentDir: '/',
+        file: '',
+        currentDir: localStore.getItem('currentDir'),
+        pid: this.id,
         // Whether to drag upload
         dragOver: false
       }
@@ -140,7 +143,7 @@
             }
           } else {
             this.store.dispatch('resource/resourceVerifyName', {
-              fullName: '/' + this.name,
+              fullName: this.currentDir + '/' + this.name,
               type: this.type
             }).then(res => {
               const isLt1024M = this.file.size / 1024 / 1024 < 1024
@@ -187,14 +190,15 @@
           let self = this
           let formData = new FormData()
           formData.append('file', this.file)
-          formData.append('name', this.name)
-          formData.append('description', this.description)
-          formData.append('id', this.id)
           formData.append('type', this.type)
-          io.post('resources/update', res => {
+          formData.append('name', this.name)
+          formData.append('pid', this.id)
+          formData.append('currentDir', this.currentDir)
+          formData.append('description', this.description)
+          io.put(`resources/${this.id}`, res => {
             this.$message.success(res.msg)
             resolve()
-            self.$emit('onUpdate')
+            self.$emit('onUpdateFileReUpload')
             this.reset()
           }, e => {
             reject(e)
@@ -210,7 +214,7 @@
               // Total attachment size
               let total = progressEvent.total
               self.progress = Math.floor(100 * loaded / total)
-              self.$emit('onProgress', self.progress)
+              self.$emit('onProgressFileReUpload', self.progress)
             }
           })
         })
@@ -220,14 +224,15 @@
        */
       _ckArchive () {
         $('.update-file-modal').hide()
-        this.$emit('onArchive')
+        this.$emit('onArchiveFileReUpload')
       },
       reset () {
         this.name = ''
         this.description = ''
         this.progress = 0
-        this.file = null
-        this.currentDir = '/'
+        this.file = ''
+        this.currentDir = localStore.getItem('currentDir')
+        this.pid = this.id
         this.dragOver = false
       },
       /**
@@ -238,6 +243,9 @@
         this.file = file
         this.name = file.name
         this.dragOver = false
+      },
+      close () {
+        this.$emit('closeFileReUpload')
       },
       _onChange () {
         let file = this.$refs.file.files[0]

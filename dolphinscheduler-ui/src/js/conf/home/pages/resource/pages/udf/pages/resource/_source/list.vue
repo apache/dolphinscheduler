@@ -55,8 +55,11 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" min-width="120">
+        <el-table-column :label="$t('Operation')" min-width="160">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('ReUpload File')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-upload" @click="_reUpload(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
+            </el-tooltip>
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
@@ -90,6 +93,7 @@
   import { mapActions } from 'vuex'
   import mRename from './rename'
   import { downloadFile } from '@/module/download'
+  import { findComponentDownward } from '@/module/util'
   import { bytesToSize } from '@/module/util/util'
   import localStore from '@/module/util/localStorage'
   export default {
@@ -118,6 +122,12 @@
           localStore.setItem('currentDir', `${item.fullName}`)
           this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
         }
+      },
+      /**
+       * File Upload
+       */
+      _reUpload (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload('UDF', item)
       },
       _rtSize (val) {
         return bytesToSize(parseInt(val))

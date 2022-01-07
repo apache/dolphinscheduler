@@ -163,6 +163,20 @@
       width="auto">
       <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="fileReUploadDialog"
+      append-to-body="true"
+      width="auto">
+      <m-file-re-upload :type="type" :id="id" :file-name="fileName" :desc="desc" :@onProgressFileReUpload="onProgressFileReUpload" @onUpdateFileReUpload="onUpdateFileReUpload" @onArchiveFileReUpload="onArchiveFileReUpload" @closeFileReUpload="closeFileReUpload"></m-file-re-upload>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="fileChildReUpdateDialog"
+      append-to-body="true"
+      width="auto">
+      <m-file-child-re-update :type="type" :id="id" :file-name="fileName" :desc="desc"  @onProgressFileChildReUpload="onProgressFileChildReUpload" @onUpdateFileChildReUpload="onUpdateFileChildReUpload" @onArchiveFileChildReUpload="onArchiveFileChildReUpload" @closeFileChildReUpload="closeFileChildReUpload"></m-file-child-re-update>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -172,6 +186,8 @@
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
   import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
+  import mFileReUpload from '@/module/components/fileUpdate/fileReUpload'
+  import mFileChildReUpdate from '@/module/components/fileUpdate/fileChildReUpdate'
   import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
@@ -198,11 +214,15 @@
         // Environmental variable
         docLink: '',
         type: '',
+        fileName: '',
+        desc: '',
         definitionUpdateDialog: false,
         fileUpdateDialog: false,
         fileChildUpdateDialog: false,
         id: null,
-        resourceChildUpdateDialog: false
+        resourceChildUpdateDialog: false,
+        fileReUploadDialog: false,
+        fileChildReUpdateDialog: false
       }
     },
 
@@ -276,6 +296,68 @@
       closeFileUpdate () {
         this.progress = 0
         this.fileUpdateDialog = false
+      },
+
+      /* fileReUpload */
+      _fileReUpload (type, item) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.type = type
+        this.id = item.id
+        this.fileName = item.fileName
+        this.desc = item.description
+        this.fileReUploadDialog = true
+      },
+      onProgressFileReUpload (val) {
+        this.progress = val
+      },
+      onUpdateFileReUpload () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileReUploadDialog = false
+      },
+
+      onArchiveFileReUpload () {
+        this.isUpdate = true
+      },
+      closeFileReUpload () {
+        this.progress = 0
+        this.fileReUploadDialog = false
+      },
+
+      /* fileChildReUpload */
+      _fileChildReUpload (type, item) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.type = type
+        this.id = item.id
+        this.fileName = item.fileName
+        this.desc = item.description
+        this.fileChildReUpdateDialog = true
+      },
+      onProgressFileChildReUpload (val) {
+        this.progress = val
+      },
+      onUpdateFileChildReUpload () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileChildReUpdateDialog = false
+      },
+
+      onArchiveFileChildReUpload () {
+        this.isUpdate = true
+      },
+      closeFileChildReUpload () {
+        this.progress = 0
+        this.fileChildReUpdateDialog = false
       },
 
       _fileChildUpdate (type, data) {
@@ -365,7 +447,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate, mFileReUpload, mFileChildReUpdate }
   }
 </script>
 
