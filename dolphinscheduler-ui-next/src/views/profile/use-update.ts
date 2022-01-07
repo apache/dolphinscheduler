@@ -14,3 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { updateUser } from '@/service/modules/users'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
+
+export function useUpdate(state: any) {
+  const userStore = useUserStore()
+  const userInfo = userStore.userInfo as UserInfoRes
+
+  const handleUpdate = () => {
+    state.profileFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        await updateUser({
+          userPassword: '',
+          id: userInfo.id,
+          userName: state.profileForm.username,
+          tenantId: userInfo.tenantId,
+          email: state.profileForm.email,
+          phone: state.profileForm.phone,
+          state: state.profileForm.state,
+          queue: userInfo.queue,
+        })
+      }
+    })
+  }
+
+  return {
+    handleUpdate,
+  }
+}

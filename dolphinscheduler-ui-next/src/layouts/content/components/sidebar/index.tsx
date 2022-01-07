@@ -17,7 +17,8 @@
 
 import { defineComponent, ref, watch, PropType } from 'vue'
 import styles from './index.module.scss'
-import { NLayoutSider, NMenu } from 'naive-ui'
+import { MenuOption, NLayoutSider, NMenu } from 'naive-ui'
+import { useMenuClick } from './use-menuClick'
 
 const Sidebar = defineComponent({
   name: 'Sidebar',
@@ -27,9 +28,7 @@ const Sidebar = defineComponent({
       default: [],
     },
   },
-  setup() {},
-  render() {
-    console.log('props', this)
+  setup() {
     const collapsedRef = ref(false)
     const defaultExpandedKeys = [
       'workflow',
@@ -38,19 +37,25 @@ const Sidebar = defineComponent({
       'statistical-manage',
     ]
 
+    const { handleMenuClick } = useMenuClick()
+
+    return { collapsedRef, defaultExpandedKeys, handleMenuClick }
+  },
+  render() {
     return (
       <NLayoutSider
         bordered
         nativeScrollbar={false}
         show-trigger='bar'
         collapse-mode='width'
-        collapsed={collapsedRef.value}
-        onCollapse={() => (collapsedRef.value = true)}
-        onExpand={() => (collapsedRef.value = false)}
+        collapsed={this.collapsedRef}
+        onCollapse={() => (this.collapsedRef = true)}
+        onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
           options={this.sideMenuOptions}
-          defaultExpandedKeys={defaultExpandedKeys}
+          defaultExpandedKeys={this.defaultExpandedKeys}
+          onUpdateValue={this.handleMenuClick}
         />
       </NLayoutSider>
     )

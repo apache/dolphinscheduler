@@ -27,7 +27,10 @@ const contentStyle = {
 }
 
 const props = {
-  title: String as PropType<string>,
+  title: {
+    type: String as PropType<string>,
+    required: true,
+  },
 }
 
 const Card = defineComponent({

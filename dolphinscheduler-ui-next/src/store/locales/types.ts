@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-interface LanguageState {
-  menuKey: string
+type Locales = 'zh_CN' | 'en_US'
+
+interface LocalesStore {
+  locales: Locales
 }
 
-export default LanguageState
+export { LocalesStore, Locales }
