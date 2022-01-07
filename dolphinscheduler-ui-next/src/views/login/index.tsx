@@ -21,17 +21,17 @@ import { NInput, NButton, NSwitch, NForm, NFormItem } from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
+import { useLocalesStore } from '@/store/locales/locales'
 
 const login = defineComponent({
   name: 'login',
   setup() {
     const { state, t, locale } = useForm()
-
     const { handleChange } = useTranslate(locale)
-
     const { handleLogin } = useLogin(state)
+    const localesStore = useLocalesStore()
 
-    return { t, handleChange, handleLogin, ...toRefs(state) }
+    return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
   render() {
     return (
@@ -39,6 +39,7 @@ const login = defineComponent({
         <div class={styles['language-switch']}>
           <NSwitch
             onUpdateValue={this.handleChange}
+            default-value={this.localesStore.getLocales}
             checked-value='en_US'
             unchecked-value='zh_CN'
           >

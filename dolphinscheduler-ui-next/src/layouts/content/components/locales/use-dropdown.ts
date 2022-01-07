@@ -15,32 +15,22 @@
  * limitations under the License.
  */
 
-import { updateUser } from '@/service/modules/users'
-import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
+import { DropdownOption } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useLocalesStore } from '@/store/locales/locales'
+import type { Locales } from '@/store/locales/types'
 
-export function useUpdate(state: any) {
-  const userStore = useUserStore()
-  const userInfo = userStore.userInfo as UserInfoRes
+export function useDropDown(chooseVal: any) {
+  const { locale } = useI18n()
+  const localesStore = useLocalesStore()
 
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: state.profileForm.state,
-          queue: userInfo.queue,
-        })
-      }
-    })
+  const handleSelect = (key: string | number, option: DropdownOption) => {
+    // console.log(key, option)
+    chooseVal.value = option.label
+    locale.value = key as Locales
+    localesStore.setLocales(locale.value as Locales)
   }
-
   return {
-    handleUpdate,
+    handleSelect,
   }
 }

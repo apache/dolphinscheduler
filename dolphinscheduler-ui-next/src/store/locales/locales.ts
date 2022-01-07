@@ -15,32 +15,23 @@
  * limitations under the License.
  */
 
-import { updateUser } from '@/service/modules/users'
-import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
+import { defineStore } from 'pinia'
+import { LocalesStore, Locales } from './types'
 
-export function useUpdate(state: any) {
-  const userStore = useUserStore()
-  const userInfo = userStore.userInfo as UserInfoRes
-
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: state.profileForm.state,
-          queue: userInfo.queue,
-        })
-      }
-    })
-  }
-
-  return {
-    handleUpdate,
-  }
-}
+export const useLocalesStore = defineStore({
+  id: 'locales',
+  state: (): LocalesStore => ({
+    locales: 'zh_CN',
+  }),
+  persist: true,
+  getters: {
+    getLocales(): Locales {
+      return this.locales
+    },
+  },
+  actions: {
+    setLocales(lang: Locales): void {
+      this.locales = lang
+    },
+  },
+})

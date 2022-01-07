@@ -15,32 +15,19 @@
  * limitations under the License.
  */
 
-import { updateUser } from '@/service/modules/users'
-import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
+import { MenuOption } from 'naive-ui'
 
-export function useUpdate(state: any) {
-  const userStore = useUserStore()
-  const userInfo = userStore.userInfo as UserInfoRes
+export function useMenuClick() {
+  const router: Router = useRouter()
 
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: state.profileForm.state,
-          queue: userInfo.queue,
-        })
-      }
-    })
+  const handleMenuClick = (key: string, item: MenuOption) => {
+    console.log(key, item)
+    // router.push({ path: 'home' })
   }
 
   return {
-    handleUpdate,
+    handleMenuClick,
   }
 }
