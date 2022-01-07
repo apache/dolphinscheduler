@@ -41,14 +41,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.auto.service.AutoService;
+import org.apache.dolphinscheduler.spi.task.paramparser.ParameterUtils;
 
 /**
  * switch task processor
  */
 @AutoService(ITaskProcessor.class)
 public class SwitchTaskProcessor extends BaseTaskProcessor {
-
-    protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     /**
      * switch result
@@ -148,7 +147,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 finalConditionLocation = i;
                 break;
             }
-            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
+            String content = setTaskParams(info.getCondition().replaceAll("'", "\""));
             logger.info("format condition sentence::{}", content);
             Boolean result = null;
             try {
@@ -189,35 +188,24 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         processService.updateTaskInstance(taskInstance);
     }
 
-    public String setTaskParams(String content, String rgex) {
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils
+    public String setTaskParams(String content) {
+        Map<String, String> globalParams = JSONUtils
                 .toList(processInstance.getGlobalParams(), Property.class)
                 .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String, Property> varParams = JSONUtils
+                .collect(Collectors.toMap(Property::getProp, Property::getValue));
+        Map<String, String> varParams = JSONUtils
                 .toList(taskInstance.getVarPool(), Property.class)
                 .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+                .collect(Collectors.toMap(Property::getProp, Property::getValue));
         if (varParams.size() > 0) {
             varParams.putAll(globalParams);
             globalParams = varParams;
         }
-        while (m.find()) {
-            String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
-            if (property == null) {
-                return "";
-            }
-            String value = property.getValue();
-            if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
-                value = "\"" + value + "\"";
-            }
-            logger.info("paramName:{}，paramValue:{}", paramName, value);
-            content = content.replace("${" + paramName + "}", value);
+        if (varParams.size() > 0) {
+            varParams.putAll(globalParams);
+            globalParams = varParams;
         }
-        return content;
+        return ParameterUtils.convertParameterPlaceholders(content, globalParams);
     }
 
     /**
