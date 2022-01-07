@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.dao.handler.Boolean2IntTypeHandler;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-@TableName("t_ds_resources")
+@TableName(value = "t_ds_resources", autoResultMap = true)
 public class Resource {
   /**
    * id
@@ -52,6 +54,7 @@ public class Resource {
   /**
    * is directory
    */
+  @TableField(typeHandler = Boolean2IntTypeHandler.class)
   private boolean isDirectory=false;
 
   /**

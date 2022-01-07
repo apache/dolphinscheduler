@@ -18,11 +18,16 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceMapper">
+
+    <resultMap id="baseResultMap" type="org.apache.dolphinscheduler.dao.entity.Resource">
+        <result column="is_directory" jdbcType="TINYINT" property="isDirectory" typeHandler="org.apache.dolphinscheduler.dao.handler.Boolean2IntTypeHandler" />
+    </resultMap>
+
     <sql id="baseSqlV2">
        ${alias}.id, ${alias}.alias, ${alias}.file_name, ${alias}.description, ${alias}.user_id, ${alias}.type, ${alias}.size, ${alias}.create_time, ${alias}.update_time,
        ${alias}.pid, ${alias}.full_name, ${alias}.is_directory
     </sql>
-    <select id="queryResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourceList" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -39,7 +44,7 @@
             and r.user_id = #{userId}
         </if>
     </select>
-    <select id="queryResourceListAuthored" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourceListAuthored" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -53,7 +58,7 @@
             and r.user_id=#{userId}
         </if>
     </select>
-    <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourcePaging" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>
@@ -77,7 +82,7 @@
         order by d.update_time desc
     </select>
 
-    <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourceExceptUserId" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -86,7 +91,7 @@
         where r.user_id <![CDATA[ <> ]]> #{userId}
     </select>
 
-    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="listAuthorizedResource" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -102,7 +107,7 @@
             </foreach>
         </if>
     </select>
-    <select id="queryResourceListById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourceListById" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -116,7 +121,7 @@
             </foreach>
         </if>
     </select>
-    <select id="listAuthorizedResourceById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="listAuthorizedResourceById" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -144,7 +149,7 @@
         where pid = #{direcotyId}
     </select>
 
-    <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResource" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
@@ -167,7 +172,7 @@
         </foreach>
     </update>
 
-    <select id="listResourceByIds" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="listResourceByIds" resultMap="baseResultMap">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
