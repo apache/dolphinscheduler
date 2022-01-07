@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -49,37 +50,17 @@ public class LoggerUtils {
     private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
-     * Task Logger's prefix
-     */
-    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_APPID_LOG_FORMAT = "[taskAppId=";
-
-    /**
      * build job id
-     *
-     * @param affix Task Logger's prefix
-     * @param processInstId process instance id
-     * @param taskId task id
      * @return task id format
      */
-    public static String buildTaskId(String affix,
-                                     Date firstSubmitTime,
+    public static String buildTaskId(Date firstSubmitTime,
                                      Long processDefineCode,
                                      int processDefineVersion,
                                      int processInstId,
                                      int taskId) {
-        // - [taskAppId=TASK-20211107-798_1-4084-15210]
+        // like TaskAppId=TASK-20211107-798_1-4084-15210
         String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD);
-        return String.format(" - %s%s-%s-%s_%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
+        return String.format("%s=%s-%s-%s_%s-%s-%s", TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
