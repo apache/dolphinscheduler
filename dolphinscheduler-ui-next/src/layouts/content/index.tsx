@@ -54,12 +54,12 @@ const Content = defineComponent({
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
           .children || []
-      state.isShowSide = state.sideMenuOptions.length !== 0
     }
 
     const getSideMenuOptions = (item: any) => {
       menuStore.setMenuKey(item.key)
       genSideMenu(state)
+      state.isShowSide = item.isShowSide
     }
 
     return {

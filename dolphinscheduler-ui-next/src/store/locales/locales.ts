@@ -19,7 +19,7 @@ import { defineStore } from 'pinia'
 import { LocalesStore, Locales } from './types'
 
 export const useLocalesStore = defineStore({
-  id: 'language',
+  id: 'locales',
   state: (): LocalesStore => ({
     locales: 'zh_CN',
   }),
