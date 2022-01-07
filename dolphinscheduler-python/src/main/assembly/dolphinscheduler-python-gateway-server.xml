@@ -18,56 +18,13 @@
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
-    <id>dolphinscheduler-standalone-server</id>
+    <id>dolphinscheduler-python-gateway-server</id>
     <formats>
         <format>dir</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <baseDirectory>standalone-server</baseDirectory>
+    <baseDirectory>python-gateway-server</baseDirectory>
     <fileSets>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>libs</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-log-server/target/logger-server</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-python-gateway/target/python-gateway</directory>
-            <includes>
-                <include>libs</include>
-            </includes>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
@@ -76,7 +33,6 @@
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
-
         <fileSet>
             <directory>${basedir}/src/main/bin</directory>
             <outputDirectory>bin</outputDirectory>
@@ -92,20 +48,14 @@
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
-
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
+            <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
             <includes>
-                <include>sql/**/*</include>
+                <include>**/*.properties</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
-            <outputDirectory>./ui</outputDirectory>
-        </fileSet>
     </fileSets>
-
     <dependencySets>
         <dependencySet>
             <outputDirectory>libs</outputDirectory>
