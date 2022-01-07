@@ -78,6 +78,7 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         sqlSessionFactoryBean.setTypeHandlersPackage("org.apache.dolphinscheduler.dao.handler");
+        
         return sqlSessionFactoryBean.getObject();
     }
 
