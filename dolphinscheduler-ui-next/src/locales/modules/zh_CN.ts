@@ -24,6 +24,11 @@ const login = {
   login: '登录',
 }
 
+const modal = {
+  cancel: '取消',
+  confirm: '确定',
+}
+
 const theme = {
   light: '浅色',
   dark: '深色',
@@ -93,13 +98,25 @@ const profile = {
   username: '用户名',
   email: '邮箱',
   phone: '手机',
+  state: '状态',
   permission: '权限',
   create_time: '创建时间',
   update_time: '更新时间',
+  administrator: '管理员',
+  ordinary_user: '普通用户',
+  edit_profile: '编辑用户',
+  username_tips: '请输入用户名',
+  email_tips: '请输入邮箱',
+  email_correct_tips: '请输入正确格式的邮箱',
+  phone_tips: '请输入手机号',
+  state_tips: '请选择状态',
+  enable: '启用',
+  disable: '禁用',
 }
 
 export default {
   login,
+  modal,
   theme,
   userDropdown,
   menu,

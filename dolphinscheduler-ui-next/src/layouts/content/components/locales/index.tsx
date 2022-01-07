@@ -20,18 +20,25 @@ import { NDropdown, NIcon, NButton } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined } from '@vicons/antd'
 import { useDropDown } from './use-dropdown'
+import { useLocalesStore } from '@/store/locales/locales'
 
-const Language = defineComponent({
-  name: 'Language',
+const Locales = defineComponent({
+  name: 'Locales',
   props: {
-    languageOptions: {
+    localesOptions: {
       type: Array as PropType<any>,
       default: [],
     },
   },
-  setup() {
-    const chooseVal = ref('中文')
+  setup(props) {
+    const localesStore = useLocalesStore()
+    const chooseVal = ref(
+      props.localesOptions.filter(
+        (item: { key: string }) => item.key === localesStore.getLocales
+      )[0].label
+    )
     const { handleSelect } = useDropDown(chooseVal)
+
     return { handleSelect, chooseVal }
   },
   render() {
@@ -39,7 +46,7 @@ const Language = defineComponent({
       <NDropdown
         trigger='hover'
         show-arrow
-        options={this.languageOptions}
+        options={this.localesOptions}
         on-select={this.handleSelect}
       >
         <NButton text>
@@ -53,4 +60,4 @@ const Language = defineComponent({
   },
 })
 
-export default Language
+export default Locales

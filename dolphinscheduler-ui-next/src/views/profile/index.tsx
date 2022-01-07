@@ -15,33 +15,113 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NButton } from 'naive-ui'
+import { defineComponent, onMounted, ref, toRefs } from 'vue'
+import { useForm } from './use-form'
+import {
+  NButton,
+  NForm,
+  NFormItem,
+  NInput,
+  NRadioGroup,
+  NRadio,
+} from 'naive-ui'
+import { useUserinfo } from './use-userinfo'
+import { useUpdate } from './use-update'
 import Card from '@/components/card'
+import Modal from '@/components/modal'
 import Info from './info'
+import utils from '@/utils'
 
 const profile = defineComponent({
   name: 'profile',
   setup() {
-    const { t } = useI18n()
+    let showModalRef = ref(false)
+    const { state, t } = useForm()
+    const { handleUpdate } = useUpdate(state)
+    const { getUserInfo } = useUserinfo()
 
-    return { t }
+    onMounted(async () => {
+      await getUserInfo()
+    })
+
+    const onCancel = () => {
+      showModalRef.value = false
+    }
+
+    const onConfirm = async () => {
+      showModalRef.value = false
+      await handleUpdate()
+      await getUserInfo()
+    }
+
+    return { ...toRefs(state), showModalRef, t, onCancel, onConfirm }
   },
   render() {
-    const { t } = this
+    const { t, onCancel, onConfirm } = this
 
     return (
-      <Card title={t('profile.profile')}>
-        {{
-          default: () => <Info />,
-          'header-extra': () => (
-            <NButton type='info' size='small'>
-              {t('profile.edit')}
-            </NButton>
-          ),
-        }}
-      </Card>
+      <div>
+        <Card title={t('profile.profile')}>
+          {{
+            default: () => <Info />,
+            'header-extra': () => (
+              <NButton
+                type='info'
+                size='small'
+                onClick={() => (this.showModalRef = !this.showModalRef)}
+              >
+                {t('profile.edit')}
+              </NButton>
+            ),
+          }}
+        </Card>
+        <Modal
+          title={t('profile.edit_profile')}
+          show={this.showModalRef}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          confirmDisabled={
+            !this.profileForm.username ||
+            !this.profileForm.email ||
+            !utils.regex.email.test(this.profileForm.email)
+          }
+        >
+          {{
+            default: () => (
+              <NForm rules={this.rules} ref='profileFormRef'>
+                <NFormItem label={t('profile.username')} path='username'>
+                  <NInput
+                    v-model={[this.profileForm.username, 'value']}
+                    placeholder={t('profile.username_tips')}
+                  />
+                </NFormItem>
+                <NFormItem label={t('profile.email')} path='email'>
+                  <NInput
+                    v-model={[this.profileForm.email, 'value']}
+                    placeholder={t('profile.email_tips')}
+                  />
+                </NFormItem>
+                <NFormItem label={t('profile.phone')} path='phone'>
+                  <NInput
+                    v-model={[this.profileForm.phone, 'value']}
+                    placeholder={t('profile.phone_tips')}
+                  />
+                </NFormItem>
+                <NFormItem label={t('profile.state')} path='state'>
+                  <NRadioGroup v-model={[this.profileForm.state, 'value']}>
+                    {[
+                      { value: 1, label: t('profile.enable') },
+                      { value: 0, label: t('profile.disable') },
+                    ].map((item) => {
+                      return <NRadio value={item.value}>{item.label}</NRadio>
+                    })}
+                  </NRadioGroup>
+                </NFormItem>
+              </NForm>
+            ),
+          }}
+        </Modal>
+      </div>
     )
   },
 })
