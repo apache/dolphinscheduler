@@ -15,8 +15,15 @@
  * limitations under the License.
  */
 
-interface LanguageState {
-  menuKey: string
-}
+.container {
+  > .item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 
-export default LanguageState
+    > .label {
+      display: inline-block;
+      width: 100px;
+    }
+  }
+}

@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
+import { MenuOption } from 'naive-ui'
 
-public interface ITaskProcessFactory {
+export function useMenuClick() {
+  const router: Router = useRouter()
 
-    String type();
+  const handleMenuClick = (key: string, item: MenuOption) => {
+    console.log(key, item)
+    // router.push({ path: 'home' })
+  }
 
-    ITaskProcessor create();
+  return {
+    handleMenuClick,
+  }
 }

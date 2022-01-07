@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import { DropdownOption } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import { useLocalesStore } from '@/store/locales/locales'
+import type { Locales } from '@/store/locales/types'
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
+export function useDropDown(chooseVal: any) {
+  const { locale } = useI18n()
+  const localesStore = useLocalesStore()
 
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class DependentTaskProcessFactory implements ITaskProcessFactory {
-
-    @Override
-    public String type() {
-        return TaskType.DEPENDENT.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new DependentTaskProcessor();
-    }
+  const handleSelect = (key: string | number, option: DropdownOption) => {
+    // console.log(key, option)
+    chooseVal.value = option.label
+    locale.value = key as Locales
+    localesStore.setLocales(locale.value as Locales)
+  }
+  return {
+    handleSelect,
+  }
 }

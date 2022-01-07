@@ -87,7 +87,7 @@
         </foreach>
     </insert>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
-        select td.name task_name,td.code task_code,td.version task_version,td.create_time task_create_time,td.update_time task_update_time,
+        select td.name task_name,td.code task_code,td.version task_version,td.task_type,td.create_time task_create_time,td.update_time task_update_time,
         pd.code process_definition_code,pd.version process_definition_version,pd.name process_definition_name,pd.release_state process_release_state,
         pt.pre_task_code upstream_task_code,up.name upstream_task_name
         from t_ds_task_definition td
@@ -105,5 +105,17 @@
             and td.name like concat('%', #{searchTaskName}, '%')
         </if>
         order by td.update_time desc
+    </select>
+    <select id="queryByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where 1 = 1
+        <if test="codes != null and codes.size != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
     </select>
 </mapper>

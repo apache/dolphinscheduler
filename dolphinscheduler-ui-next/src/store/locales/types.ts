@@ -15,21 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+type Locales = 'zh_CN' | 'en_US'
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class ConditionTaskProcessFactory implements ITaskProcessFactory {
-    @Override
-    public String type() {
-        return TaskType.CONDITIONS.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new ConditionTaskProcessor();
-    }
+interface LocalesStore {
+  locales: Locales
 }
+
+export { LocalesStore, Locales }

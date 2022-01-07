@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.task;
+import { defineStore } from 'pinia'
+import { LocalesStore, Locales } from './types'
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(ITaskProcessFactory.class)
-public class SwitchTaskProcessFactory implements ITaskProcessFactory {
-
-    @Override
-    public String type() {
-        return TaskType.SWITCH.getDesc();
-    }
-
-    @Override
-    public ITaskProcessor create() {
-        return new SwitchTaskProcessor();
-    }
-}
+export const useLocalesStore = defineStore({
+  id: 'language',
+  state: (): LocalesStore => ({
+    locales: 'zh_CN',
+  }),
+  persist: true,
+  getters: {
+    getLocales(): Locales {
+      return this.locales
+    },
+  },
+  actions: {
+    setLocales(lang: Locales): void {
+      this.locales = lang
+    },
+  },
+})
