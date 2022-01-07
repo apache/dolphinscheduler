@@ -77,11 +77,13 @@ export function useDataList() {
         label: t('menu.home'),
         key: 'home',
         icon: renderIcon(HomeOutlined),
+        isShowSide: false
       },
       {
         label: t('menu.project'),
         key: 'project',
         icon: renderIcon(ProfileOutlined),
+        isShowSide: false,
         children: [
           {
             label: t('menu.workflow_monitoring'),
@@ -122,6 +124,7 @@ export function useDataList() {
         label: t('menu.resources'),
         key: 'resources',
         icon: renderIcon(FolderOutlined),
+        isShowSide: true,
         children: [
           {
             label: t('menu.file_manage'),
@@ -149,11 +152,13 @@ export function useDataList() {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
+        isShowSide: false
       },
       {
         label: t('menu.monitor'),
         key: 'monitor',
         icon: renderIcon(DesktopOutlined),
+        isShowSide: true,
         children: [
           {
             label: t('menu.service_manage'),
@@ -191,6 +196,7 @@ export function useDataList() {
         label: t('menu.security'),
         key: 'security',
         icon: renderIcon(SafetyCertificateOutlined),
+        isShowSide: true,
         children: [
           {
             label: t('menu.tenant_manage'),
@@ -239,11 +245,12 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: { label: string; key: string; icon: any }) => {
+      (item: { label: string; key: string; icon: any, isShowSide: boolean }) => {
         return {
           label: item.label,
           key: item.key,
           icon: item.icon,
+          isShowSide: item.isShowSide
         }
       }
     )
