@@ -140,7 +140,7 @@ joda-time-2.10.13.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
 jsp-api-2.1.jar
-jsqlparser-2.1.jar
+jsqlparser-3.2.jar
 jsr305-3.0.0.jar
 jta-1.1.jar
 jul-to-slf4j-1.7.32.jar
