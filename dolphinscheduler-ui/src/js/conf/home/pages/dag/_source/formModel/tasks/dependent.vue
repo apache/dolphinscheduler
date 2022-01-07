@@ -67,7 +67,7 @@
   import mListBox from './_source/listBox'
   import mDependItemList from './_source/dependItemList'
   import disabledState from '@/module/mixin/disabledState'
-  import { mapState, mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'dependent',
