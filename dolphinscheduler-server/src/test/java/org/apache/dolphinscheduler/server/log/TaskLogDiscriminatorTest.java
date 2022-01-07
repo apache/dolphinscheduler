@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
@@ -48,7 +50,7 @@ public class TaskLogDiscriminatorTest {
        String result = taskLogDiscriminator.getDiscriminatingValue(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return null;
+                return "taskAppId=TASK-20220105-101-1-1001";
             }
 
             @Override
@@ -73,7 +75,7 @@ public class TaskLogDiscriminatorTest {
 
             @Override
             public String getLoggerName() {
-                return "[taskAppId=TASK-1-1-1";
+                return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
 
             @Override
@@ -121,7 +123,7 @@ public class TaskLogDiscriminatorTest {
 
             }
         });
-        Assert.assertEquals("1/1-", result);
+        Assert.assertEquals("20220105/101-1-1001", result);
     }
 
     @Test

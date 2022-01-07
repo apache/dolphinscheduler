@@ -16,15 +16,21 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.AbstractDiscriminator;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 
 /**
  * Task Log Discriminator
  */
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
+
+    private static Logger logger = LoggerFactory.getLogger(TaskLogDiscriminator.class);
 
     /**
      * key
@@ -38,19 +44,24 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
     /**
      * logger name should be like:
-     *     Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     * Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
      */
     @Override
     public String getDiscriminatingValue(ILoggingEvent event) {
-        String loggerName = event.getLoggerName()
-                .split(Constants.EQUAL_SIGN)[1];
-        String prefix = LoggerUtils.TASK_LOGGER_INFO_PREFIX + "-";
-        if (loggerName.startsWith(prefix)) {
-            return loggerName.substring(prefix.length(),
-                    loggerName.length() - 1).replaceFirst("-","/");
-        } else {
-            return "unknown_task";
+        String key = "unknown_task";
+        if (event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME)) {
+            String threadName = event.getThreadName();
+            if (threadName.endsWith(TaskConstants.GET_OUTPUT_LOG_SERVICE)) {
+                threadName = threadName.substring(0, threadName.length() - TaskConstants.GET_OUTPUT_LOG_SERVICE.length());
+            }
+            String part1 = threadName.split(Constants.EQUAL_SIGN)[1];
+            String prefix = TaskConstants.TASK_LOGGER_INFO_PREFIX + "-";
+            if (part1.startsWith(prefix)) {
+                key = part1.substring(prefix.length()).replaceFirst("-", "/");
+            }
         }
+        logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(), event.getLoggerName());
+        return key;
     }
 
     @Override
