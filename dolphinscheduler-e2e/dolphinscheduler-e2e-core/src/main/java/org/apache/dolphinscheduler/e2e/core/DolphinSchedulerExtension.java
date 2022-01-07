@@ -127,8 +127,8 @@ final class DolphinSchedulerExtension
         driver = browser.getWebDriver();
 
         driver.manage().timeouts()
-              .implicitlyWait(5, TimeUnit.SECONDS)
-              .pageLoadTimeout(5, TimeUnit.SECONDS);
+              .implicitlyWait(30, TimeUnit.SECONDS)
+              .pageLoadTimeout(30, TimeUnit.SECONDS);
         driver.manage().window()
               .maximize();
         if (address == null) {

@@ -135,7 +135,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-s-custom',
-      children: []
+      children: [],
+      classNames: 'tab-worker-group-manage'
     },
     {
       name: `${i18n.$t('Queue manage')}`,
