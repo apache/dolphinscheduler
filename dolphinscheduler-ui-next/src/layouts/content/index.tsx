@@ -30,7 +30,7 @@ const Content = defineComponent({
     const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
-    const { state, changeMenuOption, changeHeaderMenuOptions } = useDataList()
+    const { state, changeMenuOption, changeHeaderMenuOptions, changeUserDropdown } = useDataList()
 
     locale.value = localesStore.getLocales
 
@@ -39,12 +39,14 @@ const Content = defineComponent({
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       genSideMenu(state)
+      changeUserDropdown(state)
     })
 
     watch(useI18n().locale, () => {
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       genSideMenu(state)
+      changeUserDropdown(state)
     })
 
     const genSideMenu = (state: any) => {
@@ -75,7 +77,7 @@ const Content = defineComponent({
             onHandleMenuClick={this.getSideMenuOptions}
             headerMenuOptions={this.headerMenuOptions}
             localesOptions={this.localesOptions}
-            profileOptions={this.userDropdownOptions}
+            userDropdownOptions={this.userDropdownOptions}
           />
         </NLayoutHeader>
         <NLayout has-sider position='absolute' style='top: 65px'>
