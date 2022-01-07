@@ -918,7 +918,7 @@ export default {
    */
   updateTaskDefinition ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.put(`projects/${state.projectCode}/task-definition/${payload.taskDefinition.code}`, {
+      io.put(`projects/${state.projectCode}/task-definition/${payload.taskDefinition.code}/with-upstream`, {
         taskDefinitionJsonObj: JSON.stringify(payload.taskDefinition),
         upstreamCodes: payload.prevTasks.join(',')
       }, res => {
