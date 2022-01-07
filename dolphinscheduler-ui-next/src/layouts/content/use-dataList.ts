@@ -62,28 +62,10 @@ export function useDataList() {
     },
   ]
 
-  const userDropdownOptions = [
-    {
-      label: t('userDropdown.profile'),
-      key: 'profile',
-      icon: renderIcon(UserOutlined),
-    },
-    {
-      label: t('userDropdown.password'),
-      key: 'password',
-      icon: renderIcon(KeyOutlined),
-    },
-    {
-      label: t('userDropdown.logout'),
-      key: 'logout',
-      icon: renderIcon(LogoutOutlined),
-    },
-  ]
-
   const state = reactive({
     isShowSide: false,
     localesOptions,
-    userDropdownOptions,
+    userDropdownOptions: [],
     menuOptions: [],
     headerMenuOptions: [],
     sideMenuOptions: [],
@@ -267,9 +249,30 @@ export function useDataList() {
     )
   }
 
+  const changeUserDropdown = (state: any) => {
+    state.userDropdownOptions = [
+      {
+        label: t('userDropdown.profile'),
+        key: 'profile',
+        icon: renderIcon(UserOutlined),
+      },
+      {
+        label: t('userDropdown.password'),
+        key: 'password',
+        icon: renderIcon(KeyOutlined),
+      },
+      {
+        label: t('userDropdown.logout'),
+        key: 'logout',
+        icon: renderIcon(LogoutOutlined),
+      },
+    ]
+  }
+
   return {
     state,
     changeHeaderMenuOptions,
     changeMenuOption,
+    changeUserDropdown
   }
 }
