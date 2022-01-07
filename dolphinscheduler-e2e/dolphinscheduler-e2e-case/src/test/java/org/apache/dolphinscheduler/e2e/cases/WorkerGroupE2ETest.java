@@ -48,9 +48,9 @@ class WorkerGroupE2ETest {
     public static void setup() {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
-                .create(tenant)
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant)
             .goToNav(SecurityPage.class)
             .goToTab(WorkerGroupPage.class);
     }
