@@ -128,7 +128,7 @@ final class DolphinSchedulerExtension
 
         driver.manage().timeouts()
               .implicitlyWait(30, TimeUnit.SECONDS)
-              .pageLoadTimeout(30, TimeUnit.SECONDS);
+              .pageLoadTimeout(20, TimeUnit.SECONDS);
         driver.manage().window()
               .maximize();
         if (address == null) {

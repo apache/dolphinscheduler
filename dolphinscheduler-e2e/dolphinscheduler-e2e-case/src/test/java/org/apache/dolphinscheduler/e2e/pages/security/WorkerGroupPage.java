@@ -117,7 +117,7 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
         @FindBy(id = "selectWorkerAddress")
         private WebElement selectWorkerAddress;
 
-        @FindBy(className = "workerAddressList")
+        @FindBy(className = "vue-treeselect__menu")
         private WebElement workerAddressList;
 
         @FindBy(id = "btnSubmit")
