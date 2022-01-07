@@ -24,6 +24,11 @@ const login = {
   login: 'Login',
 }
 
+const modal = {
+  cancel: 'Cancel',
+  confirm: 'Confirm',
+}
+
 const theme = {
   light: 'Light',
   dark: 'Dark',
@@ -87,7 +92,7 @@ const password = {
   password_tips: 'Please enter your password',
   confirm_password_tips: 'Please enter your confirm password',
   two_password_entries_are_inconsistent:
-    'Two Password Entries Are Inconsistent',
+    'Two password entries are inconsistent',
   submit: 'Submit',
 }
 
@@ -97,9 +102,20 @@ const profile = {
   username: 'Username',
   email: 'Email',
   phone: 'Phone',
+  state: 'State',
   permission: 'Permission',
   create_time: 'Create Time',
   update_time: 'Update Time',
+  administrator: 'Administrator',
+  ordinary_user: 'Ordinary User',
+  edit_profile: 'Edit Profile',
+  username_tips: 'Please enter your username',
+  email_tips: 'Please enter your email',
+  email_correct_tips: 'Please enter your email in the correct format',
+  phone_tips: 'Please enter your phone',
+  state_tips: 'Please choose your state',
+  enable: 'Enable',
+  disable: 'Disable',
 }
 
 const resource = {
@@ -139,6 +155,7 @@ const resource = {
 
 export default {
   login,
+  modal,
   theme,
   userDropdown,
   menu,

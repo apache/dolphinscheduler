@@ -52,7 +52,7 @@ export function useDataList() {
     return () => h(NIcon, null, { default: () => h(icon) })
   }
 
-  const languageOptions = [
+  const localesOptions = [
     {
       label: 'English',
       key: 'en_US',
@@ -83,11 +83,11 @@ export function useDataList() {
 
   const state = reactive({
     isShowSide: false,
-    languageOptions,
+    localesOptions,
     userDropdownOptions,
     menuOptions: [],
     headerMenuOptions: [],
-    sideMenuOptions: []
+    sideMenuOptions: [],
   })
 
   const changeMenuOption = (state: any) => {
@@ -286,6 +286,6 @@ export function useDataList() {
   return {
     state,
     changeHeaderMenuOptions,
-    changeMenuOption
+    changeMenuOption,
   }
 }
