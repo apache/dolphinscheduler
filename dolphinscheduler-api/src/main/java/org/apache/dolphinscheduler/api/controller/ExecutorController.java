@@ -146,7 +146,9 @@ public class ExecutorController extends BaseController {
 
     /**
      * batch execute process instance
-     *
+     * If any processDefinitionCode cannot be found, the failure information is returned and the status is set to
+     * failed. The successful task will run normally and will not stop
+     * 
      * @param loginUser login user
      * @param projectCode project code
      * @param processDefinitionCodes process definition codes
