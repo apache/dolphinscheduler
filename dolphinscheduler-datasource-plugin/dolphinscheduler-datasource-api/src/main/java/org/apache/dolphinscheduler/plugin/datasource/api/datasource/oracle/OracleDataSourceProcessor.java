@@ -65,14 +65,16 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         OracleDataSourceParamDTO oracleParam = (OracleDataSourceParamDTO) datasourceParam;
         String address;
+        String jdbcUrl;
         if (DbConnectType.ORACLE_SID.equals(oracleParam.getConnectType())) {
             address = String.format("%s%s:%s",
                     Constants.JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
+            jdbcUrl = address + ":" + oracleParam.getDatabase();
         } else {
             address = String.format("%s%s:%s",
                     Constants.JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
+            jdbcUrl = address + "/" + oracleParam.getDatabase();
         }
-        String jdbcUrl = address + "/" + oracleParam.getDatabase();
 
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setUser(oracleParam.getUserName());
