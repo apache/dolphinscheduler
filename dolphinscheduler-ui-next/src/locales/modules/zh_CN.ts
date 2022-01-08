@@ -114,6 +114,15 @@ const profile = {
   disable: '禁用',
 }
 
+const monitor = {
+  db: {
+    health_state: '健康状态',
+    max_connections: '最大连接数',
+    threads_connections: '当前连接数',
+    threads_running_connections: '数据库当前活跃连接数',
+  },
+}
+
 export default {
   login,
   modal,
@@ -123,4 +132,5 @@ export default {
   home,
   password,
   profile,
+  monitor,
 }

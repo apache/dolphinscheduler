@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
-}
+import { queryDatabaseState } from '@/service/modules/monitor'
+import { useAsyncState } from '@vueuse/core'
 
-export { DatabaseRes }
+export function useDatabase() {
+  const getDatabase = () => {
+    const { state } = useAsyncState(queryDatabaseState(), [])
+    return state
+  }
+
+  return { getDatabase }
+}

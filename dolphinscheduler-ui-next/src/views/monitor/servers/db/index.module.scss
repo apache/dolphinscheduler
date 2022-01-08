@@ -15,14 +15,29 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
+@mixin base {
+  font-size: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 160px;
 }
 
-export { DatabaseRes }
+.health {
+  @include base;
+}
+
+.health-success {
+  color: limegreen;
+}
+
+.health-error {
+  color: indianred;
+}
+
+.connections {
+  @include base;
+  color: dodgerblue;
+}
+
+

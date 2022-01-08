@@ -45,5 +45,13 @@ export default {
         title: '服务管理-Worker',
       },
     },
+    {
+      path: '/monitor/servers/db',
+      name: 'servers-db',
+      component: components['db'],
+      meta: {
+        title: '服务管理-DB',
+      },
+    },
   ],
 }
