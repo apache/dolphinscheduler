@@ -15,52 +15,33 @@
  * limitations under the License.
  */
 
-interface CodeReq {
-  projectCode?: number
-}
-
-interface StateReq extends CodeReq {
-  endDate?: string
-  startDate?: string
-}
-
-interface UserList {
-  userName: string
-  userId: number
-  count: number
-}
-
-interface TaskCountDto {
-  count: number
-  taskStateType: string
-}
-
-interface ProcessDefinitionRes {
-  count: number
-  userList: UserList[]
-}
-
-interface TaskStateRes {
-  totalCount: number
-  taskCountDtos: TaskCountDto[]
-}
-
-interface TaskQueueRes {
-  taskKill: number
-  taskQueue: number
-}
-
-interface CommandStateRes {
-  errorCount: number
-  normalCount: number
-  commandState: string
-}
-
-export {
-  CodeReq,
-  StateReq,
-  ProcessDefinitionRes,
-  TaskStateRes,
+import {
+  countQueueState,
+  countCommandState,
+} from '@/service/modules/projects-analysis'
+import { useAsyncState } from '@vueuse/core'
+import type { Ref } from 'vue'
+import type {
   TaskQueueRes,
   CommandStateRes,
+} from '@/service/modules/projects-analysis/types'
+
+export function useStatistics() {
+  const getTask = () => {
+    const { state } = useAsyncState(countQueueState(), {})
+    return state
+  }
+
+  const getCommand = () => {
+    const { state } = useAsyncState(countCommandState(), [])
+    return state
+  }
+
+  const getStatistics = () => {
+    const task: Ref<TaskQueueRes | {}> = getTask()
+    const command: Ref<Array<CommandStateRes>> = getCommand()
+    return { task, command }
+  }
+
+  return { getStatistics }
 }
