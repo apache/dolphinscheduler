@@ -115,6 +115,15 @@ const profile = {
   disable: 'Disable',
 }
 
+const monitor = {
+  db: {
+    health_state: 'Health State',
+    max_connections: 'Max Connections',
+    threads_connections: 'Threads Connections',
+    threads_running_connections: 'Threads Running Connections',
+  },
+}
+
 export default {
   login,
   modal,
@@ -124,4 +133,5 @@ export default {
   home,
   password,
   profile,
+  monitor,
 }
