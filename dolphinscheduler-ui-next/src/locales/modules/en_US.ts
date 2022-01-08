@@ -122,6 +122,13 @@ const monitor = {
     threads_connections: 'Threads Connections',
     threads_running_connections: 'Threads Running Connections',
   },
+  statistics: {
+    command_number_of_waiting_for_running:
+      'Command Number Of Waiting For Running',
+    failure_command_number: 'Failure Command Number',
+    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
+  },
 }
 
 export default {
