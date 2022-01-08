@@ -107,13 +107,6 @@ public class TaskExecuteProcessorTest {
         PowerMockito.when(SpringApplicationContext.getBean(WorkerConfig.class))
                 .thenReturn(workerConfig);
 
-        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getFirstSubmitTime(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()));
-
         workerManager = PowerMockito.mock(WorkerManagerThread.class);
         PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, alertClientService))).thenReturn(Boolean.TRUE);
 

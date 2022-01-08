@@ -41,6 +41,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Objects;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -141,6 +142,10 @@ public class HttpUtils {
      * @return http get request response content
      */
     public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
+        if (Objects.isNull(httpget) || Objects.isNull(httpClient)) {
+            logger.error("HttpGet or HttpClient parameter is null");
+            return null;
+        }
         String responseContent = null;
         CloseableHttpResponse response = null;
         try {

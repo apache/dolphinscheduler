@@ -59,8 +59,6 @@ spec:
           ports:
             - containerPort: 1234
               name: "worker-port"
-            - containerPort: 50051
-              name: "logger-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
