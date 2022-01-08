@@ -30,7 +30,12 @@ const Content = defineComponent({
     const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
-    const { state, changeMenuOption, changeHeaderMenuOptions, changeUserDropdown } = useDataList()
+    const {
+      state,
+      changeMenuOption,
+      changeHeaderMenuOptions,
+      changeUserDropdown,
+    } = useDataList()
 
     locale.value = localesStore.getLocales
 
