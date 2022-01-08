@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.*;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class DBTaskAckProcessor implements NettyRequestProcessor {
         }
 
         if (taskAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()){
-            ResponceCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
+            ResponseCache.get().removeAckCache(taskAckCommand.getTaskInstanceId());
         }
     }
 
