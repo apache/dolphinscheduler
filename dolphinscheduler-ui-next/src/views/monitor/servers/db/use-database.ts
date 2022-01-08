@@ -15,52 +15,14 @@
  * limitations under the License.
  */
 
-interface CodeReq {
-  projectCode?: number
-}
+import { queryDatabaseState } from '@/service/modules/monitor'
+import { useAsyncState } from '@vueuse/core'
 
-interface StateReq extends CodeReq {
-  endDate?: string
-  startDate?: string
-}
+export function useDatabase() {
+  const getDatabase = () => {
+    const { state } = useAsyncState(queryDatabaseState(), [])
+    return state
+  }
 
-interface UserList {
-  userName: string
-  userId: number
-  count: number
-}
-
-interface TaskCountDto {
-  count: number
-  taskStateType: string
-}
-
-interface ProcessDefinitionRes {
-  count: number
-  userList: UserList[]
-}
-
-interface TaskStateRes {
-  totalCount: number
-  taskCountDtos: TaskCountDto[]
-}
-
-interface TaskQueueRes {
-  taskKill: number
-  taskQueue: number
-}
-
-interface CommandStateRes {
-  errorCount: number
-  normalCount: number
-  commandState: string
-}
-
-export {
-  CodeReq,
-  StateReq,
-  ProcessDefinitionRes,
-  TaskStateRes,
-  TaskQueueRes,
-  CommandStateRes,
+  return { getDatabase }
 }

@@ -78,7 +78,7 @@ export function useDataList() {
         label: t('menu.home'),
         key: 'home',
         icon: renderIcon(HomeOutlined),
-        isShowSide: false
+        isShowSide: false,
       },
       {
         label: t('menu.project'),
@@ -168,7 +168,7 @@ export function useDataList() {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
-        isShowSide: false
+        isShowSide: false,
       },
       {
         label: t('menu.monitor'),
@@ -261,12 +261,17 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: { label: string; key: string; icon: any, isShowSide: boolean }) => {
+      (item: {
+        label: string
+        key: string
+        icon: any
+        isShowSide: boolean
+      }) => {
         return {
           label: item.label,
           key: item.key,
           icon: item.icon,
-          isShowSide: item.isShowSide
+          isShowSide: item.isShowSide,
         }
       }
     )
@@ -296,6 +301,6 @@ export function useDataList() {
     state,
     changeHeaderMenuOptions,
     changeMenuOption,
-    changeUserDropdown
+    changeUserDropdown,
   }
 }

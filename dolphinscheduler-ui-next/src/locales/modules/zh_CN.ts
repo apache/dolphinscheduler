@@ -58,9 +58,6 @@ const menu = {
   udf_manage: 'UDF管理',
   resource_manage: '资源管理',
   function_manage: '函数管理',
-  task_group_manage: '任务组管理',
-  task_group_option: '任务组配置',
-  task_group_queue: '任务组队列',
   service_manage: '服务管理',
   master: 'Master',
   worker: 'Worker',
@@ -155,6 +152,21 @@ const resource = {
   please_select_task_name: '请选择节点名称'
 }
 
+const monitor = {
+  db: {
+    health_state: '健康状态',
+    max_connections: '最大连接数',
+    threads_connections: '当前连接数',
+    threads_running_connections: '数据库当前活跃连接数',
+  },
+  statistics: {
+    command_number_of_waiting_for_running: '待执行的命令数',
+    failure_command_number: '执行失败的命令数',
+    tasks_number_of_waiting_running: '待运行任务数',
+    task_number_of_ready_to_kill: '待杀死任务数',
+  },
+}
+
 export default {
   login,
   modal,
@@ -164,5 +176,4 @@ export default {
   home,
   password,
   profile,
-  resource
 }

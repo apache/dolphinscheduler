@@ -15,52 +15,29 @@
  * limitations under the License.
  */
 
-interface CodeReq {
-  projectCode?: number
+@mixin base {
+  font-size: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 160px;
 }
 
-interface StateReq extends CodeReq {
-  endDate?: string
-  startDate?: string
+.health {
+  @include base;
 }
 
-interface UserList {
-  userName: string
-  userId: number
-  count: number
+.health-success {
+  color: limegreen;
 }
 
-interface TaskCountDto {
-  count: number
-  taskStateType: string
+.health-error {
+  color: indianred;
 }
 
-interface ProcessDefinitionRes {
-  count: number
-  userList: UserList[]
+.connections {
+  @include base;
+  color: dodgerblue;
 }
 
-interface TaskStateRes {
-  totalCount: number
-  taskCountDtos: TaskCountDto[]
-}
 
-interface TaskQueueRes {
-  taskKill: number
-  taskQueue: number
-}
-
-interface CommandStateRes {
-  errorCount: number
-  normalCount: number
-  commandState: string
-}
-
-export {
-  CodeReq,
-  StateReq,
-  ProcessDefinitionRes,
-  TaskStateRes,
-  TaskQueueRes,
-  CommandStateRes,
-}
