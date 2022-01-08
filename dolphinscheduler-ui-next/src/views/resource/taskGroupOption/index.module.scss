@@ -27,3 +27,20 @@
     }
   }
 }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 10px 0;
+
+  .left {
+    align-items: center;
+  }
+  .right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

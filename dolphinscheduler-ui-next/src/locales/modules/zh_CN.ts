@@ -72,6 +72,9 @@ const menu = {
   yarn_queue_manage: 'Yarn队列管理',
   environmental_manage: '环境管理',
   token_manage: '令牌管理',
+  task_group_manage: '任务组管理',
+  task_group_option: '任务组配置',
+  task_group_queue: '任务组队列',
 }
 
 const home = {
@@ -123,6 +126,7 @@ const resource = {
     delete: '删除任务组',
     code: '任务组编号',
     name: '任务组名称',
+    project_name: '项目名称',
     resource_pool_size: '资源容量',
     resource_used_pool_size: '已用资源',
     desc: '描述信息',
@@ -133,14 +137,17 @@ const resource = {
     please_enter_resource_pool_size: '请输入资源容量大小',
     resource_pool_size_be_a_number: '资源容量大小必须大于等于1的数值',
     please_select_project: '请选择项目',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    actions: '操作',
   },
   task_group_queue: {
     queue: '任务组队列',
     priority: '组内优先级',
     priority_be_a_number: '优先级必须是大于等于0的数值',
     force_starting_status: '是否强制启动',
-    task_group_in_queue: '是否排队中',
-    status: '任务状态',
+    in_queue: '是否排队中',
+    task_status: '任务状态',
     view_task_group_queue: '查看任务组队列',
     the_status_of_waiting: '等待入队',
     the_status_of_queuing: '排队中',
@@ -177,4 +184,6 @@ export default {
   home,
   password,
   profile,
+  resource,
+  monitor
 }
