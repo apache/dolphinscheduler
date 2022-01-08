@@ -61,13 +61,13 @@ public class OracleDatasourceProcessorTest {
                 .createConnectionParams(oracleDatasourceParamDTO);
         Assert.assertNotNull(connectionParams);
         Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308/default", connectionParams.getJdbcUrl());
+        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
     }
 
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:oracle:thin:@localhost:3308\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:3308/default\",\"connectType\":\"ORACLE_SID\"}";
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:3308:default\",\"connectType\":\"ORACLE_SID\"}";
         OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
@@ -82,9 +82,9 @@ public class OracleDatasourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
-        oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308/default");
+        oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
         oracleConnectionParam.setOther("other=other");
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308/default?other=other",
+        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
                 oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
     }
 
