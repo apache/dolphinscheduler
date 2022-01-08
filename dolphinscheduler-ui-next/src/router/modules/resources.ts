@@ -48,17 +48,17 @@ export default {
     {
       path: '/resource/task-group',
       name: 'task-group-manage',
-      component: components['password'],
+      component: components['taskGroupOption'],
       children: [
         {
           path: '/resource/task-group',
           name: 'task-group-option',
-          component: components['password']
+          component: components['taskGroupOption']
         },
         {
           path: '/resource/task-group-queue',
           name: 'task-group-queue',
-          component: components['password']
+          component: components['taskGroupQueue']
         }
       ]
     }

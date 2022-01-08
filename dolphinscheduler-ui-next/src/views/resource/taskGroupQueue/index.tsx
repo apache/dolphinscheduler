@@ -18,8 +18,8 @@
 import {defineComponent, toRefs} from 'vue'
 import {NButton, NForm, NFormItem, NInput} from 'naive-ui'
 import Card from '@/components/card'
-import {useForm} from "@/views/password/use-form";
-import {useUpdate} from "@/views/password/use-update";
+import {useForm} from "@/views/resource/taskGroupQueue/use-form";
+import {useUpdate} from "@/views/resource/taskGroupQueue/use-update";
 
 const taskGroupQueue = defineComponent({
   name: 'taskGroupQueue',

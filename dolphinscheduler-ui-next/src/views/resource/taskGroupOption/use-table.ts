@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
-import { MenuOption } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
-export function useMenuClick() {
-  const router: Router = useRouter()
+export function useTable() {
+  const { t } = useI18n()
 
-  const handleMenuClick = (key: string, item: MenuOption) => {
-    console.log(key, item)
-    router.push({ name: key })
-  }
+  const columnsRef: TableColumns<any> = [
+    { title: '#', key: 'id' },
+    { title: t('home.number'), key: 'number' },
+    { title: t('home.state'), key: 'state' },
+  ]
 
   return {
-    handleMenuClick,
+    columnsRef,
   }
 }
