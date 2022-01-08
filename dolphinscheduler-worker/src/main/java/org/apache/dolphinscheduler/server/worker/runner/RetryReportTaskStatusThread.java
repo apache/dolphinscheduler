@@ -21,9 +21,8 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.ResponseCache;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,7 @@ public class RetryReportTaskStatusThread implements Runnable {
      */
     @Override
     public void run() {
-        ResponceCache responceCache = ResponceCache.get();
+        ResponseCache responceCache = ResponseCache.get();
 
         while (Stopper.isRunning()){
 
