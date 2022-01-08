@@ -678,7 +678,7 @@ export default {
   ms: 'ms',
   'Please Enter Url': 'Please Enter Url eg. 127.0.0.1:7077',
   Master: 'Master',
-  'Please select the waterdrop resources': 'Please select the waterdrop resources',
+  'Please select the seatunnel resources': 'Please select the seatunnel resources',
   zkDirectory: 'zkDirectory',
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
@@ -797,5 +797,14 @@ export default {
   'Modify task group queue priority': 'Edit the priority of the task group queue',
   'Priority not empty': 'The value of priority can not be empty',
   'Priority must be number': 'The value of priority should be number',
-  'Please select task name': 'Please select a task name'
+  'Please select task name': 'Please select a task name',
+  'Process State': 'Process State',
+  'Upstream Tasks': 'Upstream Tasks',
+  'and {n} more': '… and {n} more',
+  'Move task': 'Move task',
+  'Delete task {taskName} from process {processName}?': 'Delete task {taskName} from process {processName}?',
+  'Delete task completely': 'Delete task completely',
+  'Please select a process': 'Please select a process',
+  'Delete {taskName}?': 'Delete {taskName}?',
+  'Please select a process (required)': 'Please select a process (required)'
 }

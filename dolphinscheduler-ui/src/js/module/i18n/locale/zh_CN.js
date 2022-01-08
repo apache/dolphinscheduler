@@ -678,7 +678,7 @@ export default {
   ms: '毫秒',
   'Please Enter Url': '请直接填写地址,例如:127.0.0.1:7077',
   Master: 'Master',
-  'Please select the waterdrop resources': '请选择waterdrop配置文件',
+  'Please select the seatunnel resources': '请选择 seatunnel 配置文件',
   zkDirectory: 'zk注册目录',
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
@@ -799,5 +799,14 @@ export default {
   'Force to start task': '强制启动',
   'Priority not empty': '优先级不能为空',
   'Priority must be number': '优先级必须是数值',
-  'Please select task name': '请选择节点名称'
+  'Please select task name': '请选择节点名称',
+  'Process State': '工作流状态',
+  'Upstream Tasks': '上游任务',
+  'and {n} more': '…等{n}个',
+  'Move task': '移动任务',
+  'Delete task {taskName} from process {processName}?': '将任务 {taskName} 从工作流 {processName} 中删除？',
+  'Delete task completely': '彻底删除任务',
+  'Please select a process': '请选择工作流',
+  'Delete {taskName}?': '确定删除 {taskName} ?',
+  'Please select a process (required)': '请选择工作流（必选）'
 }

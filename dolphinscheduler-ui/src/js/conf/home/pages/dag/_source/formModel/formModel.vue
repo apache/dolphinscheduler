@@ -17,11 +17,17 @@
 <template>
   <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
-      <span class="name">{{ $t("Current node settings") }}
-        <a v-if="helpUrlEnable(nodeData.taskType)" class="helper-link" target="_blank"
-           :href="helpUrl(nodeData.taskType)">
+      <span class="name"
+        >{{ $t("Current node settings") }}
+        <a
+          v-if="helpUrlEnable(nodeData.taskType)"
+          class="helper-link"
+          target="_blank"
+          :href="helpUrl(nodeData.taskType)"
+        >
           <i class="el-icon-question" />
-          {{nodeData.taskType}} {{ $t('Instructions') }}</a>
+          {{ nodeData.taskType }} {{ $t("Instructions") }}</a
+        >
       </span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
@@ -90,6 +96,26 @@
                 :disabled="type === 'CONDITIONS' || type === 'SWITCH'"
               >
               </el-option>
+            </el-select>
+          </div>
+        </m-list-box>
+
+        <m-list-box v-if="fromTaskDefinition">
+          <div slot="text">{{ $t("Process Name") }}</div>
+          <div slot="content">
+            <el-select
+              @change="changeProcessCode"
+              :value="processCode"
+              size="small"
+              style="width: 100%"
+              :disabled="isDetails || taskDefinition"
+            >
+              <el-option
+                v-for="process in processListS"
+                :key="process.code"
+                :label="process.name"
+                :value="process.code"
+              />
             </el-select>
           </div>
         </m-list-box>
@@ -164,13 +190,14 @@
             </span>
             <span class="text-b">{{ $t("Task group queue priority") }}</span>
             <el-input
-              :disabled="taskGroupId===''"
-              style="width: 166px;"
+              :disabled="taskGroupId === ''"
+              style="width: 166px"
               type="input"
               v-model="taskGroupPriority"
               maxlength="60"
               v-on:input="_onUpdateTaskGroupPriority"
-              size="small">
+              size="small"
+            >
             </el-input>
           </div>
         </m-list-box>
@@ -437,22 +464,18 @@
             :nodeData="nodeData"
             :postTasks="postTasks"
           ></m-switch>
-          <!-- waterdrop node -->
-          <m-waterdrop
-            v-if="nodeData.taskType === 'WATERDROP'"
+          <!-- seatunnel node -->
+          <m-seatunnel
+            v-if="nodeData.taskType === 'SEATUNNEL'"
             @on-params="_onParams"
             @on-cache-params="_onCacheParams"
-            ref="WATERDROP"
+            ref="SEATUNNEL"
             :backfill-item="backfillItem"
           >
-          </m-waterdrop>
+          </m-seatunnel>
         </div>
         <!-- Pre-tasks in workflow -->
-        <m-pre-tasks
-          ref="preTasks"
-          v-if="!fromTaskDefinition"
-          :code="code"
-        />
+        <m-pre-tasks ref="preTasks" :code="code" :fromTaskDefinition="fromTaskDefinition" :prevTasks="prevTasks" :processDefinition="processDefinition"/>
       </div>
     </div>
     <div class="bottom-box">
@@ -484,7 +507,7 @@
   import { findLocale } from '@/module/i18n/config'
   import mListBox from './tasks/_source/listBox'
   import mShell from './tasks/shell'
-  import mWaterdrop from './tasks/waterdrop'
+  import mSeatunnel from './tasks/seatunnel'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -583,7 +606,10 @@
         backfillRefresh: true,
         // whether this is a new Task
         isNewCreate: true,
-        tasksTypeList: Object.keys(tasksType)
+        tasksTypeList: Object.keys(tasksType),
+        // processCode
+        processCode: undefined,
+        processDefinition: null
       }
     },
     provide () {
@@ -609,7 +635,7 @@
     },
     inject: ['dagChart'],
     methods: {
-      ...mapActions('dag', ['getTaskInstanceList']),
+      ...mapActions('dag', ['getTaskInstanceList', 'getProcessDefinition']),
       helpUrlEnable (typekey) {
         const type = tasksType[typekey]
         if (!type) return false
@@ -850,10 +876,16 @@
         if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
-        // set preTask
-        if (this.$refs.preTasks) {
-          this.$refs.preTasks.setPreNodes()
+        // set dag preTask
+        if (this.dagChart && this.$refs.preTasks) {
+          this.$refs.preTasks.setDagPreNodes()
         }
+
+        // set edge label
+        if (this.dagChart) {
+          this._setEdgeLabel()
+        }
+
         this.successBranch && (this.conditionResult.successNode[0] = this.successBranch)
         this.failedBranch && (this.conditionResult.failedNode[0] = this.failedBranch)
         this.$emit('addTaskInfo', {
@@ -882,11 +914,12 @@
             taskGroupId: this.taskGroupId,
             taskGroupPriority: this.taskGroupPriority
           },
-          fromThis: this
+          fromThis: this,
+          ...(this.fromTaskDefinition ? {
+            prevTasks: this.$refs.preTasks ? this.$refs.preTasks.preTasks : [],
+            processCode: this.processCode
+          } : {})
         })
-
-        // set edge label
-        this._setEdgeLabel()
       },
       /**
        * Sub-workflow selected node echo name
@@ -1005,6 +1038,44 @@
       },
       changeTaskType (value) {
         this.$emit('changeTaskType', value)
+      },
+      calculateRelatedTasks () {
+        if (this.processDefinition && this.taskDefinition) {
+          const relations = this.processDefinition.processTaskRelationList || []
+          const tasks = this.processDefinition.taskDefinitionList || []
+          const tasksMap = {}
+          tasks.forEach(task => {
+            tasksMap[task.code] = task
+          })
+          const taskCode = this.taskDefinition.code
+          const buildTask = (task) => ({
+            code: task.code,
+            name: task.name,
+            type: task.taskType
+          })
+          // Downstream tasks
+          const postTasks = relations
+            .filter(relation => relation.preTaskCode === taskCode)
+            .map(relation => buildTask(tasksMap[relation.postTaskCode]))
+
+          // Upstream tasks
+          const prevTasks = relations
+            .filter(relation => relation.postTaskCode === taskCode && relation.preTaskCode !== 0)
+            .map(relation => buildTask(tasksMap[relation.preTaskCode]))
+
+          this.postTasks = postTasks
+          this.prevTasks = prevTasks
+        }
+      },
+      getProcessDetails () {
+        this.getProcessDefinition(this.processCode).then(res => {
+          this.processDefinition = res
+          this.calculateRelatedTasks()
+        })
+      },
+      changeProcessCode (code) {
+        this.processCode = code
+        this.getProcessDetails()
       }
     },
     created () {
@@ -1046,6 +1117,11 @@
         this.postTasks = postNodes.map(buildTask)
         this.prevTasks = prevNodes.map(buildTask)
       }
+
+      if (this.fromTaskDefinition && this.taskDefinition) {
+        this.processCode = this.taskDefinition.processCode
+        this.getProcessDetails()
+      }
     },
     mounted () {
       let self = this
@@ -1084,7 +1160,7 @@
       mListBox,
       mMr,
       mShell,
-      mWaterdrop,
+      mSeatunnel,
       mSubProcess,
       mProcedure,
       mSql,
