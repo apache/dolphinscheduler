@@ -19,7 +19,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   AxiosError,
-  AxiosRequestHeaders,
+  AxiosRequestHeaders, AxiosProxyConfig,
 } from 'axios'
 import qs from 'qs'
 import { useUserStore } from '@/store/user/user'
@@ -34,7 +34,7 @@ const baseRequestConfig: AxiosRequestConfig = {
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
-  },
+  }
 }
 
 const service = axios.create(baseRequestConfig)

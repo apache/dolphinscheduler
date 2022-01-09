@@ -25,6 +25,9 @@ import { SearchOutlined, EditTwotone, UnorderedListOutlined } from '@vicons/antd
 import {useI18n} from "vue-i18n"
 import styles from './index.module.scss'
 
+import { queryTaskGroupListPaging } from '@/service/modules/resources'
+import { ListReq } from "@/service/modules/resources/types";
+
 const createData = () => [
   {
     id: 1,
@@ -58,7 +61,6 @@ const createData = () => [
   }
 ]
 
-
 const taskGroupOption = defineComponent({
   name: 'taskGroupOption',
   setup() {
@@ -86,6 +88,15 @@ const taskGroupOption = defineComponent({
       )
     }
     const onSearch = () => {
+
+      const params = {
+        pageNo:1,
+        pageSize:10,
+      } as ListReq
+
+      queryTaskGroupListPaging(params).then(res => {
+        console.log(res)
+      })
       console.log('search....')
     }
 
