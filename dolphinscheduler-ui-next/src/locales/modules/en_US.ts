@@ -120,6 +120,7 @@ const profile = {
 
 const resource = {
   task_group_option: {
+    id: 'No.',
     manage: 'Task group manage',
     option: 'Task group option',
     create: 'Create task group',
@@ -141,6 +142,7 @@ const resource = {
     create_time: 'Create time',
     update_time: 'Update time',
     actions: 'Actions',
+    please_enter_keywords: 'Please enter keywords',
   },
   task_group_queue: {
     queue: 'Task group queue',

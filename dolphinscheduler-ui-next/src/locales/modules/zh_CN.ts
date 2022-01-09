@@ -119,6 +119,7 @@ const profile = {
 
 const resource = {
   task_group_option: {
+    id: '编号',
     manage: '任务组管理',
     option: '任务组配置',
     create: '创建任务组',
@@ -140,6 +141,7 @@ const resource = {
     create_time: '创建时间',
     update_time: '更新时间',
     actions: '操作',
+    please_enter_keywords: '请输入搜索关键词',
   },
   task_group_queue: {
     queue: '任务组队列',

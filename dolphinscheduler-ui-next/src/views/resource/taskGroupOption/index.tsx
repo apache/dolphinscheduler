@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-import {h, defineComponent, toRefs} from 'vue'
-import {NButton, NIcon, NInput, NTag, NDataTable, NDatePicker} from 'naive-ui'
+import {h, ref, defineComponent, toRefs} from 'vue'
+import {NButton, NIcon, NInput, NTag, NDataTable, NSwitch} from 'naive-ui'
 import Card from '@/components/card'
 import {useForm} from "@/views/resource/taskGroupOption/use-form"
 import {useUpdate} from "@/views/resource/taskGroupOption/use-update"
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { SearchOutlined } from '@vicons/antd'
+import { SearchOutlined, EditTwotone, UnorderedListOutlined } from '@vicons/antd'
 import {useI18n} from "vue-i18n"
 import styles from './index.module.scss'
 
@@ -47,7 +47,7 @@ const createData = () => [
     updateTime: '2021-01-01'
   },
   {
-    id: 1,
+    id: 3,
     name: 'g3',
     projectName: 'test-tech',
     groupSize: 10,
@@ -66,17 +66,45 @@ const taskGroupOption = defineComponent({
     const { state } = useForm()
     const { handleUpdate } = useUpdate(state)
 
-    const columnsRef: TableColumns<any> = [
-      { title: '#', key: 'id' },
-      { title: t('resource.task_group_option.name'), key: 'name' },
-      { title: t('resource.task_group_option.project_name'), key: 'projectName' },
-      { title: t('resource.task_group_option.resource_pool_size'), key: 'groupSize' },
-      { title: t('resource.task_group_option.resource_used_pool_size'), key: 'useSize' },
-      { title: t('resource.task_group_option.desc'), key: 'description' },
-      { title: t('resource.task_group_option.create_time'), key: 'createTime' },
-      { title: t('resource.task_group_option.update_time'), key: 'updateTime' },
-      { title: t('resource.task_group_option.actions'), key: 'actions' },
-    ]
+    const searchParamRef = ref()
+
+    const renderIcon = (icon: any) => {
+      return () => h(NIcon, null, { default: () => h(icon) })
+    }
+    const renderTableAction = (row: any) => {
+      return () => h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            circle: true,
+            onClick: () => onEdit(row),
+          },
+          {
+            icon: renderIcon(EditTwotone)
+          }
+      )
+    }
+    const onSearch = () => {
+      console.log('search....')
+    }
+
+    const onCreateTaskGroupOption = () => {
+      console.log('create task...')
+    }
+
+    const onSwitchStatus = (value: any, item: any) => {
+      console.log(value)
+      console.log(item)
+    }
+
+    const onEdit = (item: any) => {
+      console.log(item)
+    }
+
+    const onViewTaskGroupQueue = (item: any) => {
+      console.log(item)
+    }
 
     const pageSizes = [
       {
@@ -92,6 +120,44 @@ const taskGroupOption = defineComponent({
         value: 50
       }
     ]
+    const columnsRef: TableColumns<any> = [
+      { title: t('resource.task_group_option.id'), key: 'id' },
+      { title: t('resource.task_group_option.name'), key: 'name' },
+      { title: t('resource.task_group_option.project_name'), key: 'projectName' },
+      { title: t('resource.task_group_option.resource_pool_size'), key: 'groupSize' },
+      { title: t('resource.task_group_option.resource_used_pool_size'), key: 'useSize' },
+      { title: t('resource.task_group_option.desc'), key: 'description' },
+      { title: t('resource.task_group_option.create_time'), key: 'createTime' },
+      { title: t('resource.task_group_option.update_time'), key: 'updateTime' },
+      {
+        title: t('resource.task_group_option.status'),
+        key: 'status',
+        render(row) {
+          return (
+              <NSwitch checkedValue={1} uncheckedValue={0} onUpdate:value={(value) => onSwitchStatus(value,row)}/>
+          )
+        },
+      },
+      {
+        title: t('resource.task_group_option.actions'), key: 'actions', width: 150,
+        render(row) {
+          return (
+              <div class={styles.tableAction}>
+                <NButton size={"small"} type={"info"} circle={true} onClick={() => onEdit(row)}>
+                  <NIcon>
+                    <EditTwotone/>
+                  </NIcon>
+                </NButton>
+                <NButton size={"small"} type={"primary"} circle={true} onClick={() => onViewTaskGroupQueue(row)}>
+                  <NIcon>
+                    <UnorderedListOutlined/>
+                  </NIcon>
+                </NButton>
+              </div>
+          )
+        },
+      }
+    ]
 
     return {
       ...toRefs(state),
@@ -99,6 +165,10 @@ const taskGroupOption = defineComponent({
       handleUpdate,
       data: createData(),
       columnsRef,
+      onEdit,
+      onCreateTaskGroupOption,
+      onSearch,
+      searchParamRef,
       pagination: {
         pageSize: 10,
         pageCount: 100,
@@ -117,11 +187,13 @@ const taskGroupOption = defineComponent({
                 <div>
                   <div class={styles.toolbar}>
                     <div class={styles.left}>
-                      <NButton type={"primary"}>{t('resource.task_group_option.create')}</NButton>
+                      <NButton type={"primary"} onClick={() => this.onCreateTaskGroupOption()}>
+                        {t('resource.task_group_option.create')}
+                      </NButton>
                     </div>
                     <div class={styles.right}>
-                      <NInput></NInput>
-                      <NButton type={"tertiary"}>
+                      <NInput placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
+                      <NButton type={"tertiary"} onClick={() => this.onSearch()}>
                         <NIcon>
                           <SearchOutlined />
                         </NIcon>
