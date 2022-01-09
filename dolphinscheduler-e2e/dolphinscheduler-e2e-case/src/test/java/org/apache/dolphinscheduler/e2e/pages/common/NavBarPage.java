@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.pages.common;
 
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
 import org.openqa.selenium.WebElement;
@@ -38,6 +39,9 @@ public class NavBarPage {
     @FindBy(id = "tabSecurity")
     private WebElement securityTab;
 
+    @FindBy(id = "tabResource")
+    private WebElement resourceTab;
+
     public NavBarPage(RemoteWebDriver driver) {
         this.driver = driver;
 
@@ -49,9 +53,15 @@ public class NavBarPage {
             projectTab().click();
             return nav.cast(new ProjectPage(driver));
         }
+
         if (nav == SecurityPage.class) {
             securityTab().click();
             return nav.cast(new SecurityPage(driver));
+        }
+
+        if (nav == ResourcePage.class) {
+            resourceTab().click();
+            return nav.cast(new ResourcePage(driver));
         }
 
         throw new UnsupportedOperationException("Unknown nav bar");

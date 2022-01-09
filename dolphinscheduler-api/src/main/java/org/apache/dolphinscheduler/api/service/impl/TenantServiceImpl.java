@@ -190,10 +190,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState()) {
                     String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-                    String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+                    String hdfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
                     //init hdfs resource
                     HadoopUtils.getInstance().mkdir(resourcePath);
-                    HadoopUtils.getInstance().mkdir(udfsPath);
+                    HadoopUtils.getInstance().mkdir(hdfsPath);
                 }
             } else {
                 putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
