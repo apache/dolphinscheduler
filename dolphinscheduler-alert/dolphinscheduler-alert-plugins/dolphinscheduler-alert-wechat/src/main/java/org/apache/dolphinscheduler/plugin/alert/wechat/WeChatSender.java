@@ -63,6 +63,7 @@ public final class WeChatSender {
     private final String weChatUserSendMsg;
     private final String weChatTokenUrlReplace;
     private final String weChatToken;
+    private final String sendType;
     private final String showType;
 
     WeChatSender(Map<String, String> config) {
@@ -72,6 +73,7 @@ public final class WeChatSender {
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
+        sendType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE);
         showType = config.get(AlertConstants.NAME_SHOW_TYPE);
         requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
@@ -257,7 +259,12 @@ public final class WeChatSender {
             alertResult.setStatus(ALERT_STATUS);
             return alertResult;
         }
-        String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        String enterpriseWeChatPushUrlReplace = "";
+        if (sendType.equals(WeChatType.APP.getDescp())) {
+            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
+            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
+        }
 
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));

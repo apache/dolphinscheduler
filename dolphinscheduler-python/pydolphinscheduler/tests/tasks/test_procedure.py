@@ -29,22 +29,6 @@ TEST_PROCEDURE_SQL = (
 TEST_PROCEDURE_DATASOURCE_NAME = "test_datasource"
 
 
-@patch(
-    "pydolphinscheduler.core.task.Task.gen_code_and_version",
-    return_value=(123, 1),
-)
-@patch(
-    "pydolphinscheduler.tasks.procedure.Procedure.get_datasource_info",
-    return_value=({"id": 1, "type": "mock_type"}),
-)
-def test_get_datasource_detail(mock_datasource, mock_code_version):
-    """Test :func:`get_datasource_type` and :func:`get_datasource_id` can return expect value."""
-    name = "test_get_datasource_detail"
-    task = Procedure(name, TEST_PROCEDURE_DATASOURCE_NAME, TEST_PROCEDURE_SQL)
-    assert 1 == task.get_datasource_id()
-    assert "mock_type" == task.get_datasource_type()
-
-
 @pytest.mark.parametrize(
     "attr, expect",
     [
@@ -52,10 +36,10 @@ def test_get_datasource_detail(mock_datasource, mock_code_version):
             {
                 "name": "test-procedure-task-params",
                 "datasource_name": TEST_PROCEDURE_DATASOURCE_NAME,
-                "sql": TEST_PROCEDURE_SQL,
+                "method": TEST_PROCEDURE_SQL,
             },
             {
-                "sql": TEST_PROCEDURE_SQL,
+                "method": TEST_PROCEDURE_SQL,
                 "type": "MYSQL",
                 "datasource": 1,
                 "localParams": [],
@@ -72,7 +56,7 @@ def test_get_datasource_detail(mock_datasource, mock_code_version):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.procedure.Procedure.get_datasource_info",
+    "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "MYSQL"}),
 )
 def test_property_task_params(mock_datasource, mock_code_version, attr, expect):
@@ -86,7 +70,7 @@ def test_property_task_params(mock_datasource, mock_code_version, attr, expect):
     return_value=(123, 1),
 )
 @patch(
-    "pydolphinscheduler.tasks.procedure.Procedure.get_datasource_info",
+    "pydolphinscheduler.core.database.Database.get_database_info",
     return_value=({"id": 1, "type": "MYSQL"}),
 )
 def test_sql_get_define(mock_datasource, mock_code_version):
@@ -102,7 +86,7 @@ def test_sql_get_define(mock_datasource, mock_code_version):
         "taskParams": {
             "type": "MYSQL",
             "datasource": 1,
-            "sql": TEST_PROCEDURE_SQL,
+            "method": TEST_PROCEDURE_SQL,
             "localParams": [],
             "resourceList": [],
             "dependence": {},

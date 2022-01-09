@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MysqlConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JdbcDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -39,7 +39,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest(value = {HikariDataSource.class, CommonDataSourceClient.class, JdbcDataSourceProvider.class, JdbcTemplate.class, Connection.class})
+@PrepareForTest(value = {HikariDataSource.class, CommonDataSourceClient.class, JDBCDataSourceProvider.class, JdbcTemplate.class, Connection.class})
 public class CommonDataSourceClientTest {
 
     @Mock
@@ -54,7 +54,7 @@ public class CommonDataSourceClientTest {
 
     @Test
     public void testCheckEnv() {
-        BaseConnectionParam baseConnectionParam = new MysqlConnectionParam();
+        BaseConnectionParam baseConnectionParam = new MySQLConnectionParam();
         PowerMockito.doNothing().when(commonDataSourceClient).checkEnv(Mockito.any(BaseConnectionParam.class));
         commonDataSourceClient.checkEnv(baseConnectionParam);
         Mockito.verify(commonDataSourceClient).checkEnv(Mockito.any(BaseConnectionParam.class));
@@ -79,7 +79,7 @@ public class CommonDataSourceClientTest {
 
     @Test
     public void testInitClient() {
-        BaseConnectionParam baseConnectionParam = new MysqlConnectionParam();
+        BaseConnectionParam baseConnectionParam = new MySQLConnectionParam();
         PowerMockito.doNothing().when(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());
         commonDataSourceClient.initClient(baseConnectionParam, DbType.MYSQL);
         Mockito.verify(commonDataSourceClient).initClient(Mockito.any(BaseConnectionParam.class), Mockito.any());

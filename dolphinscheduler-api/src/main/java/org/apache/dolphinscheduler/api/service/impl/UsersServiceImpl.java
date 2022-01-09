@@ -59,7 +59,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -408,6 +407,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
             return result;
         }
+
+        if (state == 0 && user.getState() != state && loginUser.getId() == user.getId()) {
+            putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
+            return result;
+        }
+
         user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
@@ -602,7 +607,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // 2. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 
@@ -653,7 +658,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // 3. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 

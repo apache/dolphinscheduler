@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" row-class-name="rows-project">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items-project">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Project Name')">
           <template slot-scope="scope">

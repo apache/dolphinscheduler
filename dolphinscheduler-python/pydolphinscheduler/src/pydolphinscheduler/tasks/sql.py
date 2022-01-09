@@ -18,10 +18,11 @@
 """Task sql."""
 
 import re
-from typing import Optional
+from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.tasks.database import Database
+from pydolphinscheduler.core.database import Database
+from pydolphinscheduler.core.task import Task
 
 
 class SqlType:
@@ -31,7 +32,7 @@ class SqlType:
     NOT_SELECT = 1
 
 
-class Sql(Database):
+class Sql(Task):
     """Task SQL object, declare behavior for SQL task to dolphinscheduler.
 
     It should run sql job in multiply sql lik engine, such as:
@@ -66,7 +67,9 @@ class Sql(Database):
         *args,
         **kwargs
     ):
-        super().__init__(TaskType.SQL, name, datasource_name, sql, *args, **kwargs)
+        super().__init__(name, TaskType.SQL, *args, **kwargs)
+        self.sql = sql
+        self.datasource_name = datasource_name
         self.pre_statements = pre_statements or []
         self.post_statements = post_statements or []
         self.display_rows = display_rows
@@ -82,3 +85,15 @@ class Sql(Database):
             return SqlType.NOT_SELECT
         else:
             return SqlType.SELECT
+
+    @property
+    def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:
+        """Override Task.task_params for sql task.
+
+        sql task have some specials attribute for task_params, and is odd if we
+        directly set as python property, so we Override Task.task_params here.
+        """
+        params = super().task_params
+        datasource = Database(self.datasource_name, "type", "datasource")
+        params.update(datasource)
+        return params

@@ -19,9 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
@@ -37,10 +34,10 @@ import lombok.Getter;
 
 @Getter
 public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "button-create-tenant")
+    @FindBy(id = "btnCreateTenant")
     private WebElement buttonCreateTenant;
 
-    @FindBy(className = "rows-tenant")
+    @FindBy(className = "items")
     private List<WebElement> tenantList;
 
     @FindBys({
@@ -67,11 +64,6 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         createTenantForm().inputDescription().sendKeys(description);
         createTenantForm().buttonSubmit().click();
 
-        await().untilAsserted(() -> assertThat(tenantList())
-            .as("Tenant list should contain newly-created tenant")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(tenant)));
-
         return this;
     }
 
@@ -79,8 +71,11 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
         tenantList()
             .stream()
             .filter(it -> it.getText().contains(tenant))
+            .flatMap(it -> it.findElements(By.className("delete")).stream())
+            .filter(WebElement::isDisplayed)
             .findFirst()
-            .ifPresent(it -> it.findElement(By.className("delete")).click());
+            .orElseThrow(() -> new RuntimeException("No delete button in user list"))
+            .click();
 
         buttonConfirm().click();
 
@@ -93,19 +88,19 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "input-tenant-code")
+        @FindBy(id = "inputTenantCode")
         private WebElement inputTenantCode;
 
-        @FindBy(id = "select-queue")
+        @FindBy(id = "selectQueue")
         private WebElement selectQueue;
 
-        @FindBy(id = "input-description")
+        @FindBy(id = "inputDescription")
         private WebElement inputDescription;
 
-        @FindBy(id = "button-submit")
+        @FindBy(id = "btnSubmit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "button-cancel")
+        @FindBy(id = "btnCancel")
         private WebElement buttonCancel;
     }
 }

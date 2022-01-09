@@ -17,11 +17,14 @@
 
 """Task procedure."""
 
+from typing import Dict
+
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.tasks.database import Database
+from pydolphinscheduler.core.database import Database
+from pydolphinscheduler.core.task import Task
 
 
-class Procedure(Database):
+class Procedure(Task):
     """Task Procedure object, declare behavior for Procedure task to dolphinscheduler.
 
     It should run database procedure job in multiply sql lik engine, such as:
@@ -37,7 +40,21 @@ class Procedure(Database):
     database type and database instance would run this sql.
     """
 
-    def __init__(self, name: str, datasource_name: str, sql: str, *args, **kwargs):
-        super().__init__(
-            TaskType.PROCEDURE, name, datasource_name, sql, *args, **kwargs
-        )
+    _task_custom_attr = {"method"}
+
+    def __init__(self, name: str, datasource_name: str, method: str, *args, **kwargs):
+        super().__init__(name, TaskType.PROCEDURE, *args, **kwargs)
+        self.datasource_name = datasource_name
+        self.method = method
+
+    @property
+    def task_params(self, camel_attr: bool = True, custom_attr: set = None) -> Dict:
+        """Override Task.task_params for produce task.
+
+        produce task have some specials attribute for task_params, and is odd if we
+        directly set as python property, so we Override Task.task_params here.
+        """
+        params = super().task_params
+        datasource = Database(self.datasource_name, "type", "datasource")
+        params.update(datasource)
+        return params

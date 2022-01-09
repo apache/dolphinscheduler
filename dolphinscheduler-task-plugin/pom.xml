@@ -41,5 +41,6 @@
         <module>dolphinscheduler-task-sqoop</module>
         <module>dolphinscheduler-task-procedure</module>
         <module>dolphinscheduler-task-pigeon</module>
+        <module>dolphinscheduler-task-seatunnel</module>
     </modules>
 </project>

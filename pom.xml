@@ -92,7 +92,6 @@
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.1.2</checkstyle.version>
-        <zookeeper.version>3.4.14</zookeeper.version>
         <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -239,6 +238,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-worker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-log-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -461,6 +465,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-sqoop</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-task-seatunnel</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -868,13 +877,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>ca.vanzyl.maven.plugins</groupId>
-                    <artifactId>provisio-maven-plugin</artifactId>
-                    <version>1.0.4</version>
-                    <extensions>true</extensions>
-                </plugin>
-
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>rpm-maven-plugin</artifactId>
                     <version>${rpm-maven-plugion.version}</version>
@@ -947,11 +949,12 @@
                                 <workingDirectory>${project.basedir}</workingDirectory>
                                 <arguments>
                                     <argument>build</argument>
+                                    <argument>--no-cache</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>.</argument>
+                                    <argument>${project.basedir}</argument>
                                     <argument>--file=src/main/docker/Dockerfile</argument>
                                 </arguments>
                             </configuration>
@@ -971,12 +974,13 @@
                                 <arguments>
                                     <argument>buildx</argument>
                                     <argument>build</argument>
+                                    <argument>--no-cache</argument>
                                     <argument>--push</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:latest</argument>
-                                    <argument>.</argument>
+                                    <argument>${project.basedir}</argument>
                                     <argument>--file=src/main/docker/Dockerfile</argument>
                                 </arguments>
                             </configuration>
@@ -987,11 +991,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>ca.vanzyl.maven.plugins</groupId>
-                <artifactId>provisio-maven-plugin</artifactId>
-                <extensions>true</extensions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
