@@ -42,6 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -553,79 +554,142 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testUnauthorizedFile() {
+    public void testAuthorizeResourceTree() {
         User user = getUser();
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = resourcesService.unauthorizedFile(user, 1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-
-        //SUCCESS
+        user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcesMapper.queryResourceExceptUserId(1)).thenReturn(getResourceList());
-        result = resourcesService.unauthorizedFile(user, 1);
+        int userId = 3;
+
+        // test admin user
+        List<Integer> resIds = new ArrayList<>();
+        resIds.add(1);
+        Mockito.when(resourcesMapper.queryResourceExceptUserId(userId)).thenReturn(getResourceList());
+        Map<String, Object> result = resourcesService.authorizeResourceTree(user, userId);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<Resource> resources = (List<Resource>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
 
+        // test non-admin user
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourcesMapper.queryResourceListAuthored(user.getId(), -1)).thenReturn(getResourceList());
+        result = resourcesService.authorizeResourceTree(user, userId);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        resources = (List<Resource>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
+    }
+
+    @Test
+    public void testUnauthorizedFile() {
+        User user = getUser();
+        user.setId(1);
+        user.setUserType(UserType.ADMIN_USER);
+        int userId = 3;
+
+        // test admin user
+        List<Integer> resIds = new ArrayList<>();
+        resIds.add(1);
+        Mockito.when(resourcesMapper.queryResourceExceptUserId(userId)).thenReturn(getResourceList());
+        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
+        Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getSingleResourceList());
+        Map<String, Object> result = resourcesService.unauthorizedFile(user, userId);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        List<Resource> resources = (List<Resource>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
+
+        // test non-admin user
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourcesMapper.queryResourceListAuthored(user.getId(), -1)).thenReturn(getResourceList());
+        result = resourcesService.unauthorizedFile(user, userId);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        resources = (List<Resource>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
     }
 
     @Test
     public void testUnauthorizedUDFFunction() {
-
         User user = getUser();
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = resourcesService.unauthorizedUDFFunction(user, 1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-
-        //SUCCESS
+        user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(udfFunctionMapper.queryUdfFuncExceptUserId(1)).thenReturn(getUdfFuncList());
-        result = resourcesService.unauthorizedUDFFunction(user, 1);
+        int userId = 3;
+
+        // test admin user
+        Mockito.when(udfFunctionMapper.queryUdfFuncExceptUserId(userId)).thenReturn(getUdfFuncList());
+        Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(userId)).thenReturn(getSingleUdfFuncList());
+        Map<String, Object> result = resourcesService.unauthorizedUDFFunction(user, userId);
+        logger.info(result.toString());
+        List<UdfFunc> udfFuncs = (List<UdfFunc>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(udfFuncs));
+
+        // test non-admin user
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(udfFunctionMapper.selectByMap(Collections.singletonMap("user_id", user.getId()))).thenReturn(getUdfFuncList());
+        result = resourcesService.unauthorizedUDFFunction(user, userId);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        List<UdfFunc> udfFuncs = (List<UdfFunc>) result.get(Constants.DATA_LIST);
+        udfFuncs = (List<UdfFunc>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(udfFuncs));
     }
 
     @Test
     public void testAuthorizedUDFFunction() {
         User user = getUser();
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = resourcesService.authorizedUDFFunction(user, 1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        //SUCCESS
+        user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(1)).thenReturn(getUdfFuncList());
-        result = resourcesService.authorizedUDFFunction(user, 1);
+        int userId = 3;
+
+        // test admin user
+        Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(userId)).thenReturn(getUdfFuncList());
+        Map<String, Object> result = resourcesService.authorizedUDFFunction(user, userId);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<UdfFunc> udfFuncs = (List<UdfFunc>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(udfFuncs));
+
+        // test non-admin user
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(2);
+        Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(userId)).thenReturn(getUdfFuncList());
+        result = resourcesService.authorizedUDFFunction(user, userId);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        udfFuncs = (List<UdfFunc>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(udfFuncs));
     }
 
     @Test
     public void testAuthorizedFile() {
-
         User user = getUser();
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = resourcesService.authorizedFile(user, 1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        //SUCCESS
+        user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
+        int userId = 3;
 
+        // test admin user
         List<Integer> resIds = new ArrayList<>();
         resIds.add(1);
         Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
         Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getResourceList());
-        result = resourcesService.authorizedFile(user, 1);
+        Map<String, Object> result = resourcesService.authorizedFile(user, userId);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<Resource> resources = (List<Resource>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
+
+        // test non-admin user
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
+        Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getResourceList());
+        result = resourcesService.authorizedFile(user, userId);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        resources = (List<Resource>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(resources));
     }
 
@@ -650,8 +714,14 @@ public class ResourcesServiceTest {
     private List<Resource> getResourceList() {
 
         List<Resource> resources = new ArrayList<>();
-        resources.add(getResource());
+        resources.add(getResource(1));
+        resources.add(getResource(2));
+        resources.add(getResource(3));
         return resources;
+    }
+
+    private List<Resource> getSingleResourceList() {
+        return Collections.singletonList(getResource(1));
     }
 
     private Tenant getTenant() {
@@ -663,6 +733,19 @@ public class ResourcesServiceTest {
     private Resource getResource() {
 
         Resource resource = new Resource();
+        resource.setPid(-1);
+        resource.setUserId(1);
+        resource.setDescription("ResourcesServiceTest.jar");
+        resource.setAlias("ResourcesServiceTest.jar");
+        resource.setFullName("/ResourcesServiceTest.jar");
+        resource.setType(ResourceType.FILE);
+        return resource;
+    }
+
+    private Resource getResource(int resourceId) {
+
+        Resource resource = new Resource();
+        resource.setId(resourceId);
         resource.setPid(-1);
         resource.setUserId(1);
         resource.setDescription("ResourcesServiceTest.jar");
@@ -690,11 +773,24 @@ public class ResourcesServiceTest {
         return udfFunc;
     }
 
+    private UdfFunc getUdfFunc(int udfId) {
+
+        UdfFunc udfFunc = new UdfFunc();
+        udfFunc.setId(udfId);
+        return udfFunc;
+    }
+
     private List<UdfFunc> getUdfFuncList() {
 
         List<UdfFunc> udfFuncs = new ArrayList<>();
-        udfFuncs.add(getUdfFunc());
+        udfFuncs.add(getUdfFunc(1));
+        udfFuncs.add(getUdfFunc(2));
+        udfFuncs.add(getUdfFunc(3));
         return udfFuncs;
+    }
+
+    private List<UdfFunc> getSingleUdfFuncList() {
+        return Collections.singletonList(getUdfFunc(3));
     }
 
     private User getUser() {

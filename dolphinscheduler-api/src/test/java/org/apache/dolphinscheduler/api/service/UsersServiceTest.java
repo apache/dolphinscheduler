@@ -321,19 +321,21 @@ public class UsersServiceTest {
 
     @Test
     public void testGrantProject() {
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
         String projectIds = "100000,120000";
-        Map<String, Object> result = usersService.grantProject(loginUser, 1, projectIds);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        User loginUser = new User();
+        int userId = 3;
+
         //user not exist
+        loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = usersService.grantProject(loginUser, 2, projectIds);
+        when(userMapper.selectById(userId)).thenReturn(null);
+        Map<String, Object> result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        //success
-        result = usersService.grantProject(loginUser, 1, projectIds);
+
+        //SUCCESS
+        when(userMapper.selectById(userId)).thenReturn(getUser());
+        result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -411,12 +413,10 @@ public class UsersServiceTest {
         String resourceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
-        Map<String, Object> result = usersService.grantResources(loginUser, 1, resourceIds);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
         //user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = usersService.grantResources(loginUser, 2, resourceIds);
+        Map<String, Object> result = usersService.grantResources(loginUser, 2, resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
@@ -433,12 +433,10 @@ public class UsersServiceTest {
         String udfIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
-        Map<String, Object> result = usersService.grantUDFFunction(loginUser, 1, udfIds);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
         //user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = usersService.grantUDFFunction(loginUser, 2, udfIds);
+        Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
@@ -451,19 +449,28 @@ public class UsersServiceTest {
     @Test
     public void testGrantDataSource() {
         String datasourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
-        Map<String, Object> result = usersService.grantDataSource(loginUser, 1, datasourceIds);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        int userId = 3;
+
         //user not exist
+        loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = usersService.grantDataSource(loginUser, 2, datasourceIds);
+        when(userMapper.selectById(userId)).thenReturn(null);
+        Map<String, Object> result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        //success
+
+        // test admin user
+        when(userMapper.selectById(userId)).thenReturn(getUser());
         when(datasourceUserMapper.deleteByUserId(Mockito.anyInt())).thenReturn(1);
-        result = usersService.grantDataSource(loginUser, 1, datasourceIds);
+        result = usersService.grantDataSource(loginUser, userId, datasourceIds);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // test non-admin user
+        loginUser.setId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
