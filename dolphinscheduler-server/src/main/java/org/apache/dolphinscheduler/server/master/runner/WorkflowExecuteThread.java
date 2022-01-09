@@ -48,9 +48,11 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
@@ -530,9 +532,11 @@ public class WorkflowExecuteThread implements Runnable {
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+        if (processAlertManager.isNeedToSendWarning(processInstance)) {
+            List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+        }
     }
 
     /**
@@ -544,11 +548,11 @@ public class WorkflowExecuteThread implements Runnable {
         if (this.dag != null) {
             return;
         }
-        processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+        processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
-        List<TaskNode> taskNodeList =
-                processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
+        List<ProcessTaskRelation> processTaskRelationList = processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<TaskDefinitionLog> taskDefinitionLogList = processService.getTaskDefineLogListByRelation(processTaskRelationList);
+        List<TaskNode> taskNodeList = processService.transformTask(processTaskRelationList, taskDefinitionLogList);
         forbiddenTaskList.clear();
 
         taskNodeList.forEach(taskNode -> {

@@ -365,6 +365,7 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
+        Mockito.when(processDefineMapper.queryByCode(parentProcessDefineCode)).thenReturn(processDefinition);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
                 , parentProcessDefineVersion)).thenReturn(relationLogList);
 
