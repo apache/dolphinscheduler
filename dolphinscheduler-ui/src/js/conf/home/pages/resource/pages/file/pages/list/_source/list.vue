@@ -64,6 +64,7 @@
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
+                id="delete"
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
                 icon="el-icon-info"

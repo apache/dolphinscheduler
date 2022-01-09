@@ -21,6 +21,8 @@ package org.apache.dolphinscheduler.e2e.pages.resource;
 
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -34,13 +36,18 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(id = "btnCreateDirectory")
     private WebElement buttonCreateDirectory;
 
-    @FindBy(className = "items")
+    private final CreateDirectoryBox createDirectoryBox;
+
+    @FindBy(className = "el-table__row")
     private List<WebElement> fileList;
 
-    private final CreateDirectoryBox createDirectoryBox = new CreateDirectoryBox();
+    @FindBy(id = "delete")
+    private WebElement buttonDelete;
 
     public FileManagePage(RemoteWebDriver driver) {
         super(driver);
+
+        createDirectoryBox = new CreateDirectoryBox();
     }
 
     public FileManagePage createDirectory(String name, String description) {
@@ -49,6 +56,21 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         createDirectoryBox().inputDirectoryName().sendKeys(name);
         createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit();
+
+        return this;
+    }
+
+    public FileManagePage delete(String name) {
+        fileList()
+                .stream()
+                .filter(it -> it.getText().contains(name))
+                .flatMap(it -> it.findElements(By.id("delete")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
+                .click();
+
+        buttonDelete().click();
 
         return this;
     }

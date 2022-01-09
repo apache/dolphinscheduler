@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -38,6 +39,8 @@ import static org.awaitility.Awaitility.await;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class ResourceE2ETest {
     private static RemoteWebDriver browser;
+
+    String testDiretoryName = "test_directory";
 
     @BeforeAll
     public static void setup() {
@@ -52,11 +55,46 @@ public class ResourceE2ETest {
     @Order(10)
     void testCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
-        page.createDirectory("test_directory", "test_desc");
 
-        await().untilAsserted(() -> assertThat(page.tenantList())
-                .as("Tenant list should contain newly-created tenant")
+//        String testDiretoryName = "test_directory";
+        page.createDirectory(testDiretoryName, "test_desc");
+
+        await().untilAsserted(() -> assertThat(page.fileList())
+                .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+                .anyMatch(it -> it.contains(testDiretoryName)));
+    }
+
+    @Test
+    @Order(20)
+    void testCreateDuplicateDirectory() {
+        final FileManagePage page = new FileManagePage(browser);
+
+//        String testDiretoryName = "test_directory";
+        page.createDirectory(testDiretoryName, "test_desc");
+
+        await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("resource already exists")
+        );
+
+        page.createDirectoryBox().buttonCancel().click();
+    }
+
+    @Test
+    @Order(30)
+    void testDeleteDirectory() {
+        final FileManagePage page = new FileManagePage(browser);
+
+        page.delete(testDiretoryName);
+
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                    page.fileList()
+            ).noneMatch(
+                    it -> it.getText().contains(testDiretoryName)
+            );
+        });
     }
 }

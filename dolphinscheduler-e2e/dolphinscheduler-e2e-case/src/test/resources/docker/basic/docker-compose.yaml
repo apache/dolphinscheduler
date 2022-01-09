@@ -32,6 +32,26 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+    command:
+      - /bin/bash
+      - -c
+      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/common.properties'
+  hdfs:
+    image: mdouchement/hdfs:latest
+    ports:
+      - 22022:22
+      - 8020:8020
+      - 50010:50010
+      - 50020:50020
+      - 50070:50070
+      - 50075:50075
+    networks:
+      - e2e
+    healthcheck:
+      test: [ "CMD", "hdfs", "dfs", "-put", "/opt/hadoop/LICENSE.txt /" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
 
 networks:
   e2e:
