@@ -152,7 +152,7 @@ case $startStop in
 
   (status)
     # more details about the status can be added later
-    serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
+    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
     state="STOP"
     #  font color - red
     state="[ \033[1;31m $state \033[0m ]"
