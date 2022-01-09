@@ -116,17 +116,6 @@ public class Resource {
         this.isDirectory = isDirectory;
     }
 
-  /*public Resource(String alias, String fileName, String description, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
-    this.alias = alias;
-    this.fileName = fileName;
-    this.description = description;
-    this.userId = userId;
-    this.type = type;
-    this.size = size;
-    this.createTime = createTime;
-    this.updateTime = updateTime;
-  }*/
-
     public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
         this.pid = pid;
         this.alias = alias;
