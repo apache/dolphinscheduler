@@ -20,6 +20,7 @@ version: "2.1"
 services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
+    container_name: dolphinscheduler
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -38,6 +39,7 @@ services:
       - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/common.properties'
   hdfs:
     image: mdouchement/hdfs:latest
+    container_name: hdfs
     ports:
       - "22022:22"
       - 8020:8020
