@@ -278,10 +278,10 @@
         if (!this.dependItemList.length) {
           if (!this.projectList.length) return
           let projectCode = this.projectList[0].value
-          this._getDependItemList(definitionCode, true, projectCode).then(depTasksList => {
+          this._getProcessByProjectCode(projectCode).then(definitionList => {
             if (definitionList && definitionList.length > 0) {
               let definitionCode = definitionList[0].value
-              this._getDependItemList(definitionCode).then(depTasksList => {
+              this._getDependItemList(definitionCode, true, projectCode).then(depTasksList => {
                 this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(definitionCode, definitionList, depTasksList || [_.cloneDeep(DEP_ALL_TASK)], projectCode)))
               })
             } else {
