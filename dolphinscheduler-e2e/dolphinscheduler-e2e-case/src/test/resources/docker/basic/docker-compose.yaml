@@ -38,13 +38,14 @@ services:
       - /bin/bash
       - -c
       - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/conf/common.properties'
+    tty: true
+    stdin_open: true
   hdfs:
     image: mdouchement/hdfs:latest
     hostname: hdfs
     tty: true
     stdin_open: true
     ports:
-      - "22022:22"
       - 8020:8020
       - 50010:50010
       - 50020:50020
