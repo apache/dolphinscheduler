@@ -27,7 +27,7 @@
             <em v-if="isLoading" class="el-icon-loading as as-spin" data-toggle="tooltip" :title="$t('Add')"></em>
           </a>
         </div>
-        <div class="dep-box">
+        <div class="dep-box" v-if="cacheReady">
           <span
             class="dep-relation"
             @click="!isDetails && _setGlobalRelation()"
@@ -49,9 +49,11 @@
             </em>
             <m-depend-item-list
               :dependTaskList='dependTaskList'
+              :projectDefinitionsCache='projectDefinitionsCache'
               v-model="el.dependItemList"
               @on-delete-all="_onDeleteAll"
               @getDependTaskList="getDependTaskList"
+              @addProjectDefinitionsCache="addProjectDefinitionsCache"
               :index="$index">
             </m-depend-item-list>
           </div>
@@ -65,7 +67,7 @@
   import mListBox from './_source/listBox'
   import mDependItemList from './_source/dependItemList'
   import disabledState from '@/module/mixin/disabledState'
-  import { mapState } from 'vuex'
+  import { mapState, mapActions } from 'vuex'
 
   export default {
     name: 'dependent',
@@ -73,7 +75,10 @@
       return {
         relation: 'AND',
         dependTaskList: [],
-        isLoading: false
+        isLoading: false,
+        // Reduce repeated requests
+        projectDefinitionsCache: {},
+        cacheReady: false
       }
     },
     mixins: [disabledState],
@@ -81,6 +86,7 @@
       backfillItem: Object
     },
     methods: {
+      ...mapActions('dag', ['getProcessByProjectCode']),
       _addDep () {
         if (!this.isLoading) {
           this.isLoading = true
@@ -125,6 +131,25 @@
           })
         })
         return true
+      },
+      _getProcessByProjectCode (code) {
+        return new Promise((resolve, reject) => {
+          this.getProcessByProjectCode(code).then(res => {
+            let definitionList = _.map(_.cloneDeep(res), v => {
+              return {
+                value: v.processDefinition.code,
+                label: v.processDefinition.name
+              }
+            })
+            resolve({
+              definitionList,
+              projectCode: code
+            })
+          })
+        })
+      },
+      addProjectDefinitionsCache ({ projectCode, definitionList }) {
+        this.projectDefinitionsCache[projectCode] = definitionList
       }
     },
     watch: {
@@ -151,6 +176,17 @@
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
           v1.state = dependentResult[`${v1.definitionCode}-${v1.depTaskCode}-${v1.cycle}-${v1.dateValue}`] || defaultState
         }))
+        // cache project definitions
+        const projectCodes = _.uniq(_.flatten(this.dependTaskList.map(dep => dep.dependItemList.map(item => item.projectCode))))
+        Promise.all(projectCodes.map(projectCode => this._getProcessByProjectCode(projectCode))).then((arr) => {
+          arr.forEach((item) => {
+            const { projectCode, definitionList } = item
+            this.projectDefinitionsCache[projectCode] = definitionList
+          })
+          this.cacheReady = true
+        })
+      } else {
+        this.cacheReady = true
       }
     },
     mounted () {

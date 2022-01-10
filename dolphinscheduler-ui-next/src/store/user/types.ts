@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
+import type { UserInfoRes } from '@/service/modules/users/types'
+
 interface UserState {
   sessionId: string
+  userInfo: UserInfoRes | {}
 }
 
-export default UserState
+export { UserState }

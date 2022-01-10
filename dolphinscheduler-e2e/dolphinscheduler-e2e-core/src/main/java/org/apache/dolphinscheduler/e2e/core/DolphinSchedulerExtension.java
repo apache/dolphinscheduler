@@ -73,8 +73,8 @@ final class DolphinSchedulerExtension
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
-        Awaitility.setDefaultTimeout(Duration.ofSeconds(10));
-        Awaitility.setDefaultPollInterval(Duration.ofSeconds(1));
+        Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
+        Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
 
         Network network = null;
         HostAndPort address = null;

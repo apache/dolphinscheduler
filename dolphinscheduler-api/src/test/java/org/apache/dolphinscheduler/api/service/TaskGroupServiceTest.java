@@ -109,7 +109,7 @@ public class TaskGroupServiceTest {
         TaskGroup taskGroup = getTaskGroup();
         Mockito.when(taskGroupMapper.insert(taskGroup)).thenReturn(1);
         Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser,0, taskGroupName, taskGroupDesc, 100);
+        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser,0L, taskGroupName, taskGroupDesc, 100);
         Assert.assertNotNull(result);
 
     }

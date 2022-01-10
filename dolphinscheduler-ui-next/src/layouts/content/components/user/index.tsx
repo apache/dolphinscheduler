@@ -15,26 +15,30 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { NDropdown, NIcon, NButton } from 'naive-ui'
 import styles from './index.module.scss'
 import { DownOutlined, UserOutlined } from '@vicons/antd'
-import { useDataList } from './use-dataList'
 import { useDropDown } from './use-dropdown'
 
-const user = defineComponent({
-  name: 'user',
+const User = defineComponent({
+  name: 'User',
+  props: {
+    userDropdownOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+  },
   setup() {
-    const { state } = useDataList()
     const { handleSelect } = useDropDown()
-    return { ...toRefs(state), handleSelect }
+    return { handleSelect }
   },
   render() {
     return (
       <NDropdown
         trigger='hover'
         show-arrow
-        options={this.profileOptions}
+        options={this.userDropdownOptions}
         on-select={this.handleSelect}
       >
         <NButton text>
@@ -51,4 +55,4 @@ const user = defineComponent({
   },
 })
 
-export default user
+export default User

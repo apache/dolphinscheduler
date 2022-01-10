@@ -51,6 +51,11 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/../dolphinscheduler-python/target/python-gateway-server</directory>
+            <outputDirectory>python-gateway-server</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
         </fileSet>
@@ -73,6 +78,8 @@
         <fileSet>
             <directory>${basedir}/../script</directory>
             <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
         </fileSet>
 
         <fileSet>
