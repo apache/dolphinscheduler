@@ -40,7 +40,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            WebElement element = new WebDriverWait(driver(), 5).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
+            WebElement element = new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
             element.click();
             return tab.cast(new FileManagePage(driver));
         }
