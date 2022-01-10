@@ -1,0 +1,80 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Umbrella
+title: "[Umbrella] "
+description: An umbrella issue with multiple sub-tasks
+labels: [ "umbrella" ]
+body:
+
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      description: The Code of Conduct helps create a safe space for everyone. We require that everyone agrees to it.
+      options:
+        - label: >
+            I agree to follow this project's [Code of Conduct](https://www.apache.org/foundation/policies/conduct)
+          required: true
+
+  - type: checkboxes
+    attributes:
+      label: Search before asking
+      description: >
+        Please make sure to search in the [issues](https://github.com/apache/incubator-seatunnel/issues?q=is%3Aissue+label%3A%22bug%22)
+        first to see whether the same issue was reported already.
+      options:
+        - label: >
+            I had searched in the [issues](https://github.com/apache/incubator-seatunnel/issues?q=is%3Aissue+label%3A%22bug%22) and found
+            no similar issues.
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Describe the proposal
+      placeholder: >
+        Please describe the content of the proposal clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Task list
+      description: >
+        For more details, please refer to [github docs](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-task-lists).
+      placeholder: >
+        Please create sub-tasks with the pre-create issues here and @ the assignees if you know any of them. A simple example is as follows:
+          - [ ] #1
+            - [ ] #2 @user1
+            - [ ] #3
+          - [ ] #2 @user2
+          - [ ] #3
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Are you willing to submit PR?
+      description: >
+        This is absolutely not required, but we are happy to guide you in the contribution process
+        especially if you already have a good understanding of how to implement the fix.
+        seatunnel is a totally community-driven project and we love to bring new contributors in.
+      options:
+        - label: Yes I am willing to submit a PR!
+
+  - type: markdown
+    attributes:
+      value: "Thanks for taking the time to propose an umbrella issue!"
