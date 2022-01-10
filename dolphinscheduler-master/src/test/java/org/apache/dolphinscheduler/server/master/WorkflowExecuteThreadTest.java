@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -154,15 +155,19 @@ public class WorkflowExecuteThreadTest {
             taskInstance4.setId(4);
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
-            Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance1);
-            Mockito.when(processService.findTaskInstanceById(2)).thenReturn(taskInstance2);
-            Mockito.when(processService.findTaskInstanceById(3)).thenReturn(taskInstance3);
-            Mockito.when(processService.findTaskInstanceById(4)).thenReturn(taskInstance4);
+            Mockito.when(processService.findTaskInstanceByIdList(
+                Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(), taskInstance4.getId()))
+            ).thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
             Class<WorkflowExecuteThread> masterExecThreadClass = WorkflowExecuteThread.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getStartTaskInstanceList", String.class);
             method.setAccessible(true);
             List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
+
+            cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "");
+            List<TaskInstance> taskInstanceEmpty = (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
+            Assert.assertTrue(taskInstanceEmpty.isEmpty());
+
         } catch (Exception e) {
             Assert.fail();
         }
