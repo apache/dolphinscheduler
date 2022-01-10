@@ -98,6 +98,24 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                    return true;
+                }
+                this.taskInstance.setState(ExecutionStatus.KILL);
+                this.taskInstance.setEndTime(new Date());
+                processService.saveTaskInstance(taskInstance);
+                return true;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+
+        }
+        return false;
+    }
+
+    @Override
     protected boolean pauseTask() {
         this.taskInstance.setState(ExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
@@ -109,7 +127,6 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
         return true;
     }
 

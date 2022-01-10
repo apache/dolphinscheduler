@@ -389,4 +389,8 @@ public class TaskExecuteThread implements Runnable, Delayed {
         }
         taskExecutionContext.setParamsMap(paramsMap);
     }
+
+    public AbstractTask getTask() {
+        return task;
+    }
 }

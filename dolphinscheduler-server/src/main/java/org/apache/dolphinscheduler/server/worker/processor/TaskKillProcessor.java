@@ -32,10 +32,12 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
@@ -118,6 +120,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         try {
             Integer processId = taskExecutionContext.getProcessId();
             if (processId.equals(0)) {
+                TaskExecuteThread taskExecuteThread = workerManager.getTaskExecuteThread(taskInstanceId);
+                if (null != taskExecuteThread) {
+                    AbstractTask task = taskExecuteThread.getTask();
+                    if (task != null) {
+                        task.cancelApplication(true);
+                        logger.info("kill task by cancelApplication, task id:{}", taskInstanceId);
+                    }
+                }
                 workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
@@ -165,6 +175,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskKillResponseCommand.setHost(taskExecutionContext.getHost());
             taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
+            taskKillResponseCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         }
         return taskKillResponseCommand;
     }

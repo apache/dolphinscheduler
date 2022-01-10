@@ -115,9 +115,19 @@ public class TaskResponseService {
         try {
             this.taskResponseWorker.interrupt();
             this.taskResponseEventHandler.interrupt();
-            this.eventExecService.shutdown();
         } catch (Exception e) {
             logger.error("stop error:", e);
+        }
+        this.eventExecService.shutdown();
+        long waitSec = 5;
+        boolean terminated = false;
+        try {
+            terminated = eventExecService.awaitTermination(waitSec, TimeUnit.SECONDS);
+        } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
+        }
+        if (!terminated) {
+            logger.warn("TaskResponseService: eventExecService shutdown without terminated: {}s, increase await time", waitSec);
         }
     }
 

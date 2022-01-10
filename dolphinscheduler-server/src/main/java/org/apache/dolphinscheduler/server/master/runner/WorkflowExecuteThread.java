@@ -57,6 +57,8 @@ import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
@@ -102,6 +104,11 @@ public class WorkflowExecuteThread implements Runnable {
      * runing TaskNode
      */
     private final Map<Integer, ITaskProcessor> activeTaskProcessorMaps = new ConcurrentHashMap<>();
+
+    /**
+     * handle task event
+     */
+    private TaskResponseService taskResponseService;
 
     /**
      * process instance
@@ -205,6 +212,7 @@ public class WorkflowExecuteThread implements Runnable {
      * @param nettyExecutorManager nettyExecutorManager
      */
     public WorkflowExecuteThread(ProcessInstance processInstance
+            , TaskResponseService taskResponseService
             , ProcessService processService
             , NettyExecutorManager nettyExecutorManager
             , ProcessAlertManager processAlertManager
@@ -212,7 +220,7 @@ public class WorkflowExecuteThread implements Runnable {
             , ConcurrentHashMap<Integer, TaskInstance> taskTimeoutCheckList
             , ConcurrentHashMap<Integer, TaskInstance> taskRetryCheckList) {
         this.processService = processService;
-
+        this.taskResponseService = taskResponseService;
         this.processInstance = processInstance;
         this.masterConfig = masterConfig;
         this.nettyExecutorManager = nettyExecutorManager;
@@ -1249,13 +1257,12 @@ public class WorkflowExecuteThread implements Runnable {
             }
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskId);
             taskProcessor.action(TaskAction.STOP);
-            if (taskProcessor.taskState().typeIsFinished()) {
-                StateEvent stateEvent = new StateEvent();
-                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-                stateEvent.setProcessInstanceId(this.processInstance.getId());
-                stateEvent.setTaskInstanceId(taskInstance.getId());
-                stateEvent.setExecutionStatus(taskProcessor.taskState());
-                this.addStateEvent(stateEvent);
+            if (taskProcessor != null && taskProcessor.taskState().typeIsFinished()) {
+                TaskResponseEvent taskResponseEvent = TaskResponseEvent.newActionStop(
+                        taskProcessor.taskState(),
+                        taskInstance.getId(),
+                        this.processInstance.getId());
+                taskResponseService.addResponse(taskResponseEvent);
             }
         }
     }
@@ -1419,5 +1426,9 @@ public class WorkflowExecuteThread implements Runnable {
                                       List<String> recoveryNodeCodeList,
                                       TaskDependType depNodeType) throws Exception {
         return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeCodeList, depNodeType);
+    }
+
+    public Map<Integer, ITaskProcessor> getActiveTaskProcessorMaps() {
+        return activeTaskProcessorMaps;
     }
 }

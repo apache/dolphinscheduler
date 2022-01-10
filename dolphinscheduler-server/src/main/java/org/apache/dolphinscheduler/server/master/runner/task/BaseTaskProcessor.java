@@ -83,6 +83,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     /**
+     * persist task
+     *
+     * @return
+     */
+    protected abstract boolean persistTask(TaskAction taskAction);
+
+    /**
      * pause task, common tasks donot need this.
      *
      * @return
@@ -101,6 +108,16 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @return
      */
     protected abstract boolean taskTimeout();
+
+    /**
+     * persist
+     *
+     * @return
+     */
+    @Override
+    public boolean persist(TaskAction taskAction) {
+        return persistTask(taskAction);
+    }
 
     @Override
     public void run() {

@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -156,10 +155,27 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                    return true;
+                }
+                this.taskInstance.setState(ExecutionStatus.KILL);
+                this.taskInstance.setEndTime(new Date());
+                processService.saveTaskInstance(taskInstance);
+                return true;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+
+        }
+        return false;
+    }
+
+    @Override
     protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
         return true;
     }
 

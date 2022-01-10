@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -56,6 +57,12 @@ public class MasterSchedulerService extends Thread {
      * logger of MasterSchedulerService
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
+
+    /**
+     * handle task event
+     */
+    @Autowired
+    private TaskResponseService taskResponseService;
 
     /**
      * dolphinscheduler database interface
@@ -92,7 +99,12 @@ public class MasterSchedulerService extends Thread {
     /**
      * master exec service
      */
-    private ThreadPoolExecutor masterExecService;
+    private MasterExecService masterExecService;
+
+    /**
+     * start process failed map
+     */
+    private final ConcurrentHashMap<Integer, WorkflowExecuteThread> startProcessFailedMap = new ConcurrentHashMap<>();
 
     /**
      * process instance execution list
@@ -126,11 +138,15 @@ public class MasterSchedulerService extends Thread {
      */
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
         this.processInstanceExecMaps = processInstanceExecMaps;
-        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+        this.masterExecService = new MasterExecService(this.startProcessFailedMap,
+                (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads()));
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
-        stateWheelExecuteThread = new StateWheelExecuteThread(processService,
+        stateWheelExecuteThread = new StateWheelExecuteThread(
+                masterExecService,
+                processService,
+                startProcessFailedMap,
                 processTimeoutCheckList,
                 taskTimeoutCheckList,
                 taskRetryCheckList,
@@ -202,6 +218,7 @@ public class MasterSchedulerService extends Thread {
                 if (processInstance != null) {
                     WorkflowExecuteThread workflowExecuteThread = new WorkflowExecuteThread(
                             processInstance
+                            , taskResponseService
                             , processService
                             , nettyExecutorManager
                             , processAlertManager

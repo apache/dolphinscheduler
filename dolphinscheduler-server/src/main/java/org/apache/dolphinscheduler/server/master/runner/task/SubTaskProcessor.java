@@ -114,6 +114,17 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                return true;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+        }
+        return false;
+    }
+
+    @Override
     protected boolean pauseTask() {
         pauseSubWorkFlow();
         return true;
