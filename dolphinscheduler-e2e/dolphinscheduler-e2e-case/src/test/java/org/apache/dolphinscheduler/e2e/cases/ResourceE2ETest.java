@@ -52,8 +52,7 @@ public class ResourceE2ETest {
 
     private static final String phone = "15800000000";
 
-
-    String testDiretoryName = "test_directory";
+    private static final String testDiretoryName = "test_directory";
 
     @BeforeAll
     public static void setup() {
