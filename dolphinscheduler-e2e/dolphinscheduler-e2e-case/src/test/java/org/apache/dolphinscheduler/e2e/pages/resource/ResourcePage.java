@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 @Getter
@@ -38,7 +40,8 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            fileMagageManage().click();
+            WebElement element = new WebDriverWait(driver(), 5).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
+            element.click();
             return tab.cast(new FileManagePage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());

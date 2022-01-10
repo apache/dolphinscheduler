@@ -66,7 +66,7 @@ public class NavBarPage {
         }
 
         if (nav == ResourcePage.class) {
-            WebElement element = new WebDriverWait(driver(), 5)
+            WebElement element = new WebDriverWait(driver(), 10)
                 .until(ExpectedConditions.elementToBeClickable(resourceTab));
             element.click();
             return nav.cast(new ResourcePage(driver));
