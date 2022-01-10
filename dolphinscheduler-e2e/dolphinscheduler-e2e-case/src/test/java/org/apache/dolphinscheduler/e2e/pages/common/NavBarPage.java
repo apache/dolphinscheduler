@@ -53,21 +53,21 @@ public class NavBarPage {
 
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
-            WebElement element = new WebDriverWait(driver, 20)
+            WebElement element = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(projectTab));
             ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
-            WebElement element = new WebDriverWait(driver, 20)
+            WebElement element = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(securityTab));
             ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
-            WebElement element = new WebDriverWait(driver, 20)
+            WebElement element = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(resourceTab));
             ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new ResourcePage(driver));
