@@ -38,6 +38,7 @@ services:
 #      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/standalone-server/conf/common.properties'
   hdfs:
     image: mdouchement/hdfs:latest
+    hostname: hdfs
     ports:
       - "22022:22"
       - 8020:8020
