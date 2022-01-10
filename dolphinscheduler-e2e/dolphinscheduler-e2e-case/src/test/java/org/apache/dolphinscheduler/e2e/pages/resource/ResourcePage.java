@@ -22,6 +22,7 @@ package org.apache.dolphinscheduler.e2e.pages.resource;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -40,8 +41,8 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            WebElement element = new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
-            element.click();
+            WebElement fileMagageManageElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", fileMagageManageElement);
             return tab.cast(new FileManagePage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
