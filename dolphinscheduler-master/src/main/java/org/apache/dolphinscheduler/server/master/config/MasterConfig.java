@@ -39,7 +39,6 @@ public class MasterConfig {
     private int stateWheelInterval;
     private double maxCpuLoadAvg;
     private double reservedMemory;
-    private boolean taskLogger;
     private int failoverInterval;
     private boolean killYarnJobWhenTaskFailover;
 
@@ -137,14 +136,6 @@ public class MasterConfig {
 
     public void setReservedMemory(double reservedMemory) {
         this.reservedMemory = reservedMemory;
-    }
-
-    public boolean isTaskLogger() {
-        return taskLogger;
-    }
-
-    public void setTaskLogger(boolean taskLogger) {
-        this.taskLogger = taskLogger;
     }
 
     public int getFailoverInterval() {

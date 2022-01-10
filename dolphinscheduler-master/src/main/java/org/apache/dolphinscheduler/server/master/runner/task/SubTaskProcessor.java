@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
+import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -53,7 +54,13 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (this.taskInstance == null) {
             return false;
         }
-        setTaskExecutionLogger(isTaskLogger);
+        this.setTaskExecutionLogger();
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+
         return true;
     }
 

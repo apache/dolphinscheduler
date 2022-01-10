@@ -407,6 +407,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
             return result;
         }
+
+        if (state == 0 && user.getState() != state && loginUser.getId() == user.getId()) {
+            putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
+            return result;
+        }
+
         user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);

@@ -333,7 +333,7 @@ const tasksType = {
     desc: 'SWITCH',
     color: '#E46F13'
   },
-  WATERDROP: {
+  SEATUNNEL: {
     desc: 'WATERDROP',
     color: '#646465',
     helperLinkDisable: true

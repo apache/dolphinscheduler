@@ -23,6 +23,7 @@ export const useMenuStore = defineStore({
   state: (): MenuState => ({
     menuKey: '',
   }),
+  persist: true,
   getters: {
     getMenuKey(): string {
       return this.menuKey
