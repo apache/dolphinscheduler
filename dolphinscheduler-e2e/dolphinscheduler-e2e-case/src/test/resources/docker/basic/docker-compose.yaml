@@ -34,10 +34,10 @@ services:
       retries: 120
     depends_on:
       - hdfs
-    command:
-      - /bin/bash
-      - -c
-      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/conf/common.properties'
+#    command:
+#      - /bin/bash
+#      - -c
+#      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/conf/common.properties'
     tty: true
     stdin_open: true
   hdfs:
