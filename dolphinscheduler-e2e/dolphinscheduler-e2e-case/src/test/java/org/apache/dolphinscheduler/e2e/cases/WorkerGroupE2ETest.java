@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
-import org.junit.jupiter.api.AfterAll;
+//import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -55,13 +55,14 @@ class WorkerGroupE2ETest {
             .goToTab(WorkerGroupPage.class);
     }
 
-    @AfterAll
-    public static void cleanup() {
-        new SecurityPage(browser)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
-    }
+
+//    @AfterAll
+//    public static void cleanup() {
+//        new SecurityPage(browser)
+//            .goToTab(TenantPage.class)
+//            .delete(tenant)
+//        ;
+//    }
 
     @Test
     @Order(1)

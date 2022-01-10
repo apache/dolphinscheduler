@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
-import org.junit.jupiter.api.AfterAll;
+//import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -63,13 +63,13 @@ class UserE2ETest {
             .goToTab(UserPage.class);
     }
 
-    @AfterAll
-    public static void cleanup() {
-        new SecurityPage(browser)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
-    }
+//    @AfterAll
+//    public static void cleanup() {
+//        new SecurityPage(browser)
+//            .goToTab(TenantPage.class)
+//            .delete(tenant)
+//        ;
+//    }
 
     @Test
     @Order(1)

@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
-import org.junit.jupiter.api.AfterAll;
+//import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -60,23 +60,23 @@ class WorkflowE2ETest {
         ;
     }
 
-    @AfterAll
-    public static void cleanup() {
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
-            .deleteAll()
-        ;
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .delete(project)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
-    }
+//    @AfterAll
+//    public static void cleanup() {
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .goTo(project)
+//            .goToTab(WorkflowDefinitionTab.class)
+//            .cancelPublishAll()
+//            .deleteAll()
+//        ;
+//        new NavBarPage(browser)
+//            .goToNav(ProjectPage.class)
+//            .delete(project)
+//            .goToNav(SecurityPage.class)
+//            .goToTab(TenantPage.class)
+//            .delete(tenant)
+//        ;
+//    }
 
     @Test
     @Order(1)
