@@ -28,12 +28,15 @@ const props = {
     type: [String, Number] as PropType<string | number>,
     default: 400,
   },
+  data: {
+    type: [String, Number] as PropType<string | number>,
+  },
 }
 
 const GaugeChart = defineComponent({
   name: 'GaugeChart',
   props,
-  setup() {
+  setup(props) {
     const gaugeChartRef: Ref<HTMLDivElement | null> = ref(null)
 
     const option = {
@@ -73,12 +76,12 @@ const GaugeChart = defineComponent({
           },
           detail: {
             valueAnimation: true,
-            formatter: '{value} km/h',
+            formatter: '{value} %',
             color: 'auto',
           },
           data: [
             {
-              value: 70,
+              value: props.data,
             },
           ],
         },

@@ -15,24 +15,14 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
-}
+import { useAsyncState } from '@vueuse/core'
+import { listMaster } from '@/service/modules/monitor'
 
-interface MasterRes {
-  id: number
-  host: string
-  port: number
-  zkDirectory: string
-  resInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
+export function useMaster() {
+  const getMaster = () => {
+    const { state } = useAsyncState(listMaster(), [])
+    return state
+  }
 
-export { DatabaseRes, MasterRes }
+  return { getMaster }
+}
