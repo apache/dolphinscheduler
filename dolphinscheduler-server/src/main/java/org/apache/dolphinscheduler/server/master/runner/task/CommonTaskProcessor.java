@@ -38,8 +38,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,11 +50,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Autowired
     NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
-
-    /**
-     * logger of MasterBaseTaskExecThread
-     */
-    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public boolean submitTask() {
