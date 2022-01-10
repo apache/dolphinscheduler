@@ -435,8 +435,9 @@ public class ProcessInstanceServiceTest {
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
 
+        when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE)).thenReturn(1);
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, taskJson,"2020-02-21 00:00:00", false, "", "", 0, "root");
+            shellJson, taskJson,"2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
