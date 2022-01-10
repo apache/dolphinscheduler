@@ -22,7 +22,7 @@ spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
 
 # hikari configuration
-spring.hikari.maximum-pool-size=${HIKARI_MAXIMUM_POOL_SIZE}
+spring.datasource.hikari.maximum-pool-size=${HIKARI_MAXIMUM_POOL_SIZE}
 
 # mysql example
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
