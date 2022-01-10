@@ -140,4 +140,26 @@ public class TaskInstanceController extends BaseController {
         return returnDataList(result);
     }
 
+    /**
+     * query rank of execution time costs
+     * @param top
+     * @param stateType
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @GetMapping("query/rank/execute-time")
+    public Result<Object> queryRankExecuteTime(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam(value = "top", required = false, defaultValue = "10") Integer top,
+                                          @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
+                                          @RequestParam(value = "startDate", required = false) String startTime,
+                                          @RequestParam(value = "endDate", required = false) String endTime) {
+        // check top number is not more than 100 to cause performance degration
+        if (top < 1 || top > 1000) {
+            throw new IllegalStateException("top is between 1 and 1000");
+        }
+        return taskInstanceService.queryRankExecuteTime(loginUser, projectCode, top, stateType, startTime, endTime);
+    }
+
 }

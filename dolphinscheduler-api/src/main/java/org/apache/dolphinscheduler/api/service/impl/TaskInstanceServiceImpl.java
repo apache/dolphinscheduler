@@ -44,7 +44,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -55,6 +57,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
+
+    @Value(value = "${spring.datasource.driver-class-name:org.postgresql.Driver}")
+    private String driverClassName;
 
     @Autowired
     ProjectMapper projectMapper;
@@ -198,6 +203,30 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         } else {
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
+        return result;
+    }
+
+    @Override
+    public Result<Object> queryRankExecuteTime(User loginUser, long projectCode, Integer top, ExecutionStatus stateType, String startTime, String endTime) {
+        Result result = new Result();
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            putMsg(result,status);
+            return result;
+        }
+
+        String orderBy = "";
+        if (driverClassName.contains("postgresql")) {
+            orderBy = "order by (extract(epoch FROM end_time) - extract(epoch FROM start_time)) desc";
+        } else if (driverClassName.contains("mysql")) {
+            orderBy = "order by TIMESTAMPDIFF(SECOND, start_time, end_time) desc";
+        }
+        List<TaskInstance> taskInstances = taskInstanceMapper.rankExecuteTime(top, projectCode, stateType, startTime, endTime, orderBy);
+        result.setData(taskInstances);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }

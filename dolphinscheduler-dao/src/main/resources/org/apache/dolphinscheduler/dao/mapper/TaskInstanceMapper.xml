@@ -137,7 +137,10 @@
         left join t_ds_process_instance process on process.id=instance.process_instance_id
         where define.project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and instance.start_time > #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="processInstanceId != 0">
             and instance.process_instance_id = #{processInstanceId}
@@ -174,5 +177,31 @@
         left join t_ds_task_group_queue que on instance.id = que.task_id
         where instance.process_instance_id = #{processInstanceId}
         and que.status = #{status}
+    </select>
+
+    <select id="rankExecuteTime" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        from
+            (
+                select * from t_ds_task_instance
+                <where>
+                    <if test="startTime != null">
+                        and t.start_time <![CDATA[ > ]]> #{startTime}
+                    </if>
+                    <if test="endTime != null">
+                        and instance.start_time <![CDATA[ <=]]> #{endTime}
+                    </if>
+                    <if test="state != null">
+                        and state = #{state}
+                    </if>
+                </where>
+            ) instance
+        left join t_ds_task_definition_log define on define.code = instance.task_code and define.version = instance.task_definition_version
+        where define.project_code = #{projectCode}
+        ${orderBy}
+        limit ${top}
     </select>
 </mapper>

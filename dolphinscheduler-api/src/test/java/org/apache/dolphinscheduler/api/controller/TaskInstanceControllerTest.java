@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -89,6 +87,25 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Ignore
+    @Test
+    public void testQueryRankExecuteTime() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.MSG, Status.SUCCESS.getMsg());
+        when(taskInstanceService.queryRankExecuteTime(any(User.class), anyLong(), anyInt(),
+                any(ExecutionStatus.class), anyString(), anyString()));
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/task-instances/query/rank/execute-time")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

@@ -85,4 +85,19 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     );
 
     List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,@Param("status") int status);
+
+    /**
+     *
+     * @param top
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCode Project codes list to filter
+     * @return
+     */
+    List<TaskInstance> rankExecuteTime(@Param("top") Integer top,
+                                       @Param("projectCode") Long projectCode,
+                                       @Param("state") ExecutionStatus state,
+                                       @Param("startTime") String startTime,
+                                       @Param("endTime") String endTime,
+                                       @Param("orderBy") String orderBy);
 }

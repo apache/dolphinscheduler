@@ -69,4 +69,15 @@ public interface TaskInstanceService {
     Map<String, Object> forceTaskSuccess(User loginUser,
                                          long projectCode,
                                          Integer taskInstanceId);
+
+    /**
+     * query rank of execution time costs
+     * @param projectCode
+     * @param top
+     * @param stateType
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Result<Object> queryRankExecuteTime(User loginUser, long projectCode, Integer top, ExecutionStatus stateType, String startTime, String endTime);
 }
