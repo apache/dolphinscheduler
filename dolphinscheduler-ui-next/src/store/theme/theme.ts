@@ -23,6 +23,7 @@ export const useThemeStore = defineStore({
   state: (): ThemeState => ({
     darkTheme: false,
   }),
+  persist: true,
   getters: {
     getTheme(): boolean {
       return this.darkTheme

@@ -14,3 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { useAsyncState } from '@vueuse/core'
+import { listMaster } from '@/service/modules/monitor'
+
+export function useMaster() {
+  const getMaster = () => {
+    const { state } = useAsyncState(listMaster(), [])
+    return state
+  }
+
+  return { getMaster }
+}

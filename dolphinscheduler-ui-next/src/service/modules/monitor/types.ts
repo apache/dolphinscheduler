@@ -25,4 +25,14 @@ interface DatabaseRes {
   date: string
 }
 
-export { DatabaseRes }
+interface MasterRes {
+  id: number
+  host: string
+  port: number
+  zkDirectory: string
+  resInfo: string
+  createTime: string
+  lastHeartbeatTime: string
+}
+
+export { DatabaseRes, MasterRes }
