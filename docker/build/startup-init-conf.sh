@@ -38,7 +38,7 @@ echo "init env variables"
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
 # export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
-export HIKARI_MAXIMUM_POOL_SIZE=${HIKARI_MAXIMUM_POOL_SIZE:-"50"}
+export SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=${HIKARI_MAXIMUM_POOL_SIZE:-"50"}
 
 #============================================================================
 # Quartz
