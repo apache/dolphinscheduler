@@ -28,13 +28,11 @@ public interface ITaskProcessor {
 
     boolean persist(TaskAction taskAction);
 
-    void run();
+    void init(TaskInstance taskInstance, ProcessInstance processInstance);
 
     boolean action(TaskAction taskAction);
 
     String getType();
-
-    boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval);
 
     ExecutionStatus taskState();
 

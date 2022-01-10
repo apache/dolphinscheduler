@@ -359,7 +359,7 @@ public class WorkflowExecuteThread implements Runnable {
             taskFinished(task);
         } else if (activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
-            iTaskProcessor.run();
+            iTaskProcessor.action(TaskAction.RUN);
 
             if (iTaskProcessor.taskState().typeIsFinished()) {
                 task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
@@ -630,11 +630,12 @@ public class WorkflowExecuteThread implements Runnable {
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
-            boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getMasterTaskCommitRetryTimes(), masterConfig.getMasterTaskCommitInterval());
+            taskProcessor.init(taskInstance, processInstance);
+            boolean submit = taskProcessor.action(TaskAction.SUBMIT);
             if (submit) {
                 this.taskInstanceHashMap.put(taskInstance.getId(), taskInstance.getTaskCode(), taskInstance);
                 activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
-                taskProcessor.run();
+                taskProcessor.action(TaskAction.RUN);
                 addTimeoutCheck(taskInstance);
                 addRetryCheck(taskInstance);
                 TaskDefinition taskDefinition = processService.findTaskDefinition(

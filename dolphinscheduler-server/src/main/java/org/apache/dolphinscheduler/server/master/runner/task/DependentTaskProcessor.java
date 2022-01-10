@@ -27,13 +27,9 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,18 +65,13 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     DependResult result;
 
-    ProcessInstance processInstance;
     TaskDefinition taskDefinition;
-
-    MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
     boolean allDependentItemFinished;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-        this.processInstance = processInstance;
-        this.taskInstance = task;
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
@@ -88,6 +79,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         taskDefinition = processService.findTaskDefinition(
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
+        setTaskExecutionLogger();
         taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
@@ -106,7 +98,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
         }
@@ -114,6 +106,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             getTaskDependResult();
             endTask();
         }
+        return true;
     }
 
     @Override

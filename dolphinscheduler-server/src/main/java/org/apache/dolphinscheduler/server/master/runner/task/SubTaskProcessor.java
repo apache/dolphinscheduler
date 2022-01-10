@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -36,8 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SubTaskProcessor extends BaseTaskProcessor {
 
-    private ProcessInstance processInstance;
-
     private ProcessInstance subProcessInstance = null;
     private TaskDefinition taskDefinition;
 
@@ -49,16 +46,17 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     private StateEventCallbackService stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-        this.processInstance = processInstance;
+    public boolean submitTask() {
         taskDefinition = processService.findTaskDefinition(
-                task.getTaskCode(), task.getTaskDefinitionVersion()
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+        this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
+
+        setTaskExecutionLogger();
 
         return true;
     }
@@ -69,7 +67,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         try {
             this.runLock.lock();
             if (setSubWorkFlow()) {
@@ -83,6 +81,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         } finally {
             this.runLock.unlock();
         }
+        return true;
     }
 
     @Override
