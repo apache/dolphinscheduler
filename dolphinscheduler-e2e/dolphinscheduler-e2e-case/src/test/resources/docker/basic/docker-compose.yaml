@@ -52,11 +52,11 @@ services:
       - 50075:50075
     networks:
       - e2e
-#    healthcheck:
-#      test: [ "CMD", "hdfs", "dfs", "-put", "/opt/hadoop/LICENSE.txt /" ]
-#      interval: 5s
-#      timeout: 60s
-#      retries: 120
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:50070" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
 
 networks:
   e2e:
