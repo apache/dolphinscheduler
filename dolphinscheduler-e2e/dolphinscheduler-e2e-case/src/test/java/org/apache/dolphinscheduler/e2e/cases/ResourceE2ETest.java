@@ -75,7 +75,6 @@ public class ResourceE2ETest {
     void testCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-//        String testDiretoryName = "test_directory";
         page.createDirectory(testDiretoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(page.fileList())
@@ -89,7 +88,6 @@ public class ResourceE2ETest {
     void testCreateDuplicateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-//        String testDiretoryName = "test_directory";
         page.createDirectory(testDiretoryName, "test_desc");
 
         await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())

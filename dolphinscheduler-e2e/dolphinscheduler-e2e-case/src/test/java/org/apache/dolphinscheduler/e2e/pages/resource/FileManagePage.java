@@ -55,7 +55,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
         createDirectoryBox().inputDescription().sendKeys(description);
-        createDirectoryBox().buttonSubmit();
+        createDirectoryBox().buttonSubmit().click();
 
         return this;
     }
