@@ -63,6 +63,7 @@ class UserE2ETest {
             .goToTab(UserPage.class);
     }
 
+// Temporary comment due to flaky test, more detail in https://github.com/apache/dolphinscheduler/issues/7656
 //    @AfterAll
 //    public static void cleanup() {
 //        new SecurityPage(browser)

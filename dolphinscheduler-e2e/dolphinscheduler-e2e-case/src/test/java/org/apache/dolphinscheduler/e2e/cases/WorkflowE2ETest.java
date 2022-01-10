@@ -60,6 +60,7 @@ class WorkflowE2ETest {
         ;
     }
 
+// Temporary comment due to flaky test, more detail in https://github.com/apache/dolphinscheduler/issues/7656
 //    @AfterAll
 //    public static void cleanup() {
 //        new NavBarPage(browser)
