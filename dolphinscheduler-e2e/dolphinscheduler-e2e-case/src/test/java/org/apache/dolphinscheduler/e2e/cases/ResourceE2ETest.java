@@ -38,10 +38,19 @@ import static org.awaitility.Awaitility.await;
 public class ResourceE2ETest {
     private static RemoteWebDriver browser;
 
+    private static TenantE2ETest tenantE2ETest;
+
+    private static UserE2ETest userE2ETest;
+
+
     String testDiretoryName = "test_directory";
 
     @BeforeAll
     public static void setup() {
+        tenantE2ETest.testCreateTenant();
+
+        userE2ETest.testCreateUser();
+
         new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(ResourcePage.class)
