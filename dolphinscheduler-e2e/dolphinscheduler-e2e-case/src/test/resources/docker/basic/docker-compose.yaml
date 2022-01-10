@@ -32,6 +32,8 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+    depends_on:
+      - hdfs
 #    command:
 #      - /bin/bash
 #      - -c
