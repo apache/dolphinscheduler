@@ -27,6 +27,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import lombok.Getter;
 
@@ -48,19 +50,24 @@ public class NavBarPage {
         PageFactory.initElements(driver, this);
     }
 
-    public <T extends NavBarItem> T goToNav(Class<T> nav) throws InterruptedException {
+    public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
+            new WebDriverWait(driver(), 5)
+                .until(ExpectedConditions.elementToBeClickable(projectTab));
             projectTab().click();
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
-            Thread.sleep(1000);
+            new WebDriverWait(driver(), 5)
+                .until(ExpectedConditions.elementToBeClickable(securityTab));
             securityTab().click();
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
+            new WebDriverWait(driver(), 5)
+                .until(ExpectedConditions.elementToBeClickable(resourceTab));
             resourceTab().click();
             return nav.cast(new ResourcePage(driver));
         }

@@ -53,7 +53,7 @@ class UserE2ETest {
     private static RemoteWebDriver browser;
 
     @BeforeAll
-    public static void setup() throws InterruptedException {
+    public static void setup() {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
             .goToNav(SecurityPage.class)
