@@ -152,7 +152,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     public boolean action(TaskAction taskAction) {
         String threadName = Thread.currentThread().getName();
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
-            Thread.currentThread().setName(threadLoggerInfoName);
+            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
         }
 
         switch (taskAction) {
