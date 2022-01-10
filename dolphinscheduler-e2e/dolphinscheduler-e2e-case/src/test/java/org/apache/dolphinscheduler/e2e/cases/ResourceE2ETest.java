@@ -24,6 +24,10 @@ import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
+import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,23 +42,32 @@ import static org.awaitility.Awaitility.await;
 public class ResourceE2ETest {
     private static RemoteWebDriver browser;
 
-    private static TenantE2ETest tenantE2ETest;
+    private static final String tenant = System.getProperty("user.name");
 
-    private static UserE2ETest userE2ETest;
+    private static final String user = "admin";
+
+    private static final String password = "dolphinscheduler123";
+
+    private static final String email = "admin@gmail.com";
+
+    private static final String phone = "15800000000";
 
 
     String testDiretoryName = "test_directory";
 
     @BeforeAll
     public static void setup() {
-        tenantE2ETest.testCreateTenant();
-
-        userE2ETest.testCreateUser();
 
         new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
-                .goToNav(ResourcePage.class)
-                .goToTab(FileManagePage.class)
+            .login(user, password)
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant)
+            .goToNav(SecurityPage.class)
+            .goToTab(UserPage.class)
+            .update(user, user, password, email, phone)
+            .goToNav(ResourcePage.class)
+            .goToTab(FileManagePage.class)
         ;
     }
 
