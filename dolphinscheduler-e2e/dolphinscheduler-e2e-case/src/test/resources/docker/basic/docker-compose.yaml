@@ -32,10 +32,10 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
-    command:
-      - /bin/bash
-      - -c
-      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/standalone-server/conf/common.properties'
+#    command:
+#      - /bin/bash
+#      - -c
+#      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/standalone-server/conf/common.properties'
   hdfs:
     image: mdouchement/hdfs:latest
     ports:
