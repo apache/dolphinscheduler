@@ -1082,7 +1082,7 @@ public class ProcessService {
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
         List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
         subPropertyList = new ArrayList<>(subPropertyList);
-        
+
         Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
         for (Property parent : parentPropertyList) {
@@ -1547,10 +1547,23 @@ public class ProcessService {
      * find task instance by id
      *
      * @param taskId task id
-     * @return task intance
+     * @return task instance
      */
     public TaskInstance findTaskInstanceById(Integer taskId) {
         return taskInstanceMapper.selectById(taskId);
+    }
+
+    /**
+     * find task instance list by id list
+     *
+     * @param idList task id list
+     * @return task instance list
+     */
+    public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new ArrayList<>();
+        }
+        return taskInstanceMapper.selectBatchIds(idList);
     }
 
     /**

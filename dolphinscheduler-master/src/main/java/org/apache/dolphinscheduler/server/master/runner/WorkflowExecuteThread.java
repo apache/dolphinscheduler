@@ -1506,6 +1506,28 @@ public class WorkflowExecuteThread {
     }
 
     /**
+     * get recovery task instance list
+     *
+     * @param taskIdArray task id array
+     * @return recovery task instance list
+     */
+    private List<TaskInstance> getRecoverTaskInstanceList(String[] taskIdArray) {
+        if (taskIdArray == null || taskIdArray.length == 0) {
+            return new ArrayList<>();
+        }
+        List<Integer> taskIdList = new ArrayList<>(taskIdArray.length);
+        for (String taskId : taskIdArray) {
+            try {
+                Integer id = Integer.valueOf(taskId);
+                taskIdList.add(id);
+            } catch (Exception e) {
+                logger.error("get recovery task instance failed ", e);
+            }
+        }
+        return processService.findTaskInstanceByIdList(taskIdList);
+    }
+
+    /**
      * get recovery task instance
      *
      * @param taskId task id
@@ -1542,12 +1564,7 @@ public class WorkflowExecuteThread {
 
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            for (String nodeId : idList) {
-                TaskInstance task = getRecoveryTaskInstance(nodeId);
-                if (task != null) {
-                    instanceList.add(task);
-                }
-            }
+            instanceList = getRecoverTaskInstanceList(idList);
         }
         return instanceList;
     }
