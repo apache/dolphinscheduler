@@ -15,35 +15,14 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
+import { useAsyncState } from '@vueuse/core'
+import {listWorker} from '@/service/modules/monitor'
+
+export function useWorker() {
+  const getWorker = () => {
+    const { state } = useAsyncState(listWorker(), [])
+    return state
+  }
+
+  return { getWorker }
 }
-
-
-interface MasterRes {
-  id: number
-  host: string
-  port: number
-  zkDirectory: string
-  resInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
-
-interface WorkerRes {
-  id: number
-  host: string
-  port: number
-  zkDirectories: string[]
-  resInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
-
-export { DatabaseRes, MasterRes, WorkerRes }
