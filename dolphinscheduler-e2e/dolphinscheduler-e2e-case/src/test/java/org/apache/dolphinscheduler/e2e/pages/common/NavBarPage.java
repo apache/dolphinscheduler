@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -54,21 +55,21 @@ public class NavBarPage {
         if (nav == ProjectPage.class) {
             WebElement element = new WebDriverWait(driver, 20)
                 .until(ExpectedConditions.elementToBeClickable(projectTab));
-            element.click();
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
             WebElement element = new WebDriverWait(driver, 20)
                 .until(ExpectedConditions.elementToBeClickable(securityTab));
-            element.click();
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
             WebElement element = new WebDriverWait(driver, 20)
                 .until(ExpectedConditions.elementToBeClickable(resourceTab));
-            element.click();
+            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", element);
             return nav.cast(new ResourcePage(driver));
         }
 
