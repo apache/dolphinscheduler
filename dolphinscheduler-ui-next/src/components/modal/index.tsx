@@ -32,6 +32,10 @@ const props = {
   cancelText: {
     type: String as PropType<string>,
   },
+  cancelShow: {
+    type: Boolean as PropType<boolean>,
+    default: true,
+  },
   confirmText: {
     type: String as PropType<string>,
   },
@@ -72,9 +76,11 @@ const Modal = defineComponent({
             default: () => renderSlot($slots, 'default'),
             footer: () => (
               <div class={styles['btn-box']}>
-                <NButton quaternary size='small' onClick={onCancel}>
-                  {this.cancelText || t('modal.cancel')}
-                </NButton>
+                {this.cancelShow && (
+                  <NButton quaternary size='small' onClick={onCancel}>
+                    {this.cancelText || t('modal.cancel')}
+                  </NButton>
+                )}
                 <NButton
                   type='info'
                   size='small'
