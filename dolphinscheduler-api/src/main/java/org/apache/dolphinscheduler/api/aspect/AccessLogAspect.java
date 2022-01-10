@@ -19,14 +19,17 @@ package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,6 +49,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AccessLogAspect {
     private static final Logger logger = LoggerFactory.getLogger(AccessLogAspect.class);
 
+    private static final String TRACE_ID = "traceId";
+
+    public static final String sensitiveDataRegEx = "(password=[\'\"]+)(\\S+)([\'\"]+)";
+
+    private static final Pattern sensitiveDataPattern = Pattern.compile(sensitiveDataRegEx, Pattern.CASE_INSENSITIVE);
+
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
     public void logPointCut(){
         // Do nothing because of it's a pointcut
@@ -60,21 +69,26 @@ public class AccessLogAspect {
         Method method = sign.getMethod();
         AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
-        String tranceId = UUID.randomUUID().toString();
+        String traceId = UUID.randomUUID().toString();
 
         // log request
         if (!annotation.ignoreRequest()) {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
-
+                String traceIdFromHeader = request.getHeader(TRACE_ID);
+                if (!StringUtils.isEmpty(traceIdFromHeader)) {
+                    traceId = traceIdFromHeader;
+                }
                 // handle login info
                 String userName = parseLoginInfo(request);
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
-                logger.info("REQUEST TRANCE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
-                        tranceId,
+                // handle sensitive data in the string
+                argsString = handleSensitiveData(argsString);
+                logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                        traceId,
                         userName,
                         request.getRequestURI(),
                         request.getMethod(),
@@ -88,7 +102,7 @@ public class AccessLogAspect {
 
         // log response
         if (!annotation.ignoreResponse()) {
-            logger.info("RESPONSE TRANCE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", tranceId, ob, (System.currentTimeMillis() - startTime));
+            logger.info("RESPONSE TRACE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", traceId, ob, (System.currentTimeMillis() - startTime));
         }
 
         return ob;
@@ -112,6 +126,28 @@ public class AccessLogAspect {
             }
         }
         return argsString;
+    }
+
+    protected String handleSensitiveData(String originalData) {
+        Matcher matcher = sensitiveDataPattern.matcher(originalData.toLowerCase());
+        IntStream stream = IntStream.builder().build();
+        boolean exists = false;
+        while (matcher.find()) {
+            if (matcher.groupCount() == 3) {
+                stream = IntStream.concat(stream, IntStream.range(matcher.end(1),matcher.end(2)));
+                exists = true;
+            }
+        }
+
+        if (exists) {
+            char[] chars = originalData.toCharArray();
+            stream.forEach(idx -> {
+                chars[idx] = '*';
+            });
+            return new String(chars);
+        }
+
+        return originalData;
     }
 
     private String parseLoginInfo(HttpServletRequest request) {

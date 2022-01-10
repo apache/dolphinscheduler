@@ -243,6 +243,18 @@ public interface ProcessDefinitionService {
                                                 MultipartFile file);
 
     /**
+     * import sql process definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param file sql file, zip
+     * @return import process
+     */
+    Map<String, Object> importSqlProcessDefinition(User loginUser,
+                                                   long projectCode,
+                                                   MultipartFile file);
+
+    /**
      * check the process task relation json
      *
      * @param processTaskRelationJson process task relation json
@@ -285,11 +297,12 @@ public interface ProcessDefinitionService {
     /**
      * Encapsulates the TreeView structure
      *
+     * @param projectCode project code
      * @param code process definition code
      * @param limit limit
      * @return tree view json data
      */
-    Map<String, Object> viewTree(long code, Integer limit);
+    Map<String, Object> viewTree(long projectCode, long code, Integer limit);
 
     /**
      * switch the defined process definition version
@@ -397,17 +410,5 @@ public interface ProcessDefinitionService {
                                                    long projectCode,
                                                    long code,
                                                    ReleaseState releaseState);
-
-    /**
-     * delete process definition and schedule
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
-     * @return update result code
-     */
-    Map<String, Object> deleteWorkflowAndSchedule(User loginUser,
-                                                  long projectCode,
-                                                  long code);
 }
 

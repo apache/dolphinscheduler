@@ -27,6 +27,11 @@
       left: 24px;
       top: 18px;
       font-size: 16px;
+      .helper-link {
+        font-size: 12px;
+        display: inline-block;
+        margin-left: 10px;
+      }
     }
     .go-subtask {
       position: absolute;

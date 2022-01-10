@@ -187,9 +187,8 @@ public class ProcessUtils {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             String log;
             try (LogClientService logClient = new LogClientService()) {
-                log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
-                        Constants.RPC_PORT,
-                        taskExecutionContext.getLogPath());
+                Host host = Host.of(taskExecutionContext.getHost());
+                log = logClient.viewLog(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
             }
             if (!StringUtils.isEmpty(log)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {

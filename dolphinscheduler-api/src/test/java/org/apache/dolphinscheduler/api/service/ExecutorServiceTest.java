@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,8 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -122,6 +126,7 @@ public class ExecutorServiceTest {
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
         processDefinition.setCode(1L);
+        processDefinition.setProjectCode(projectCode);
 
         // processInstance
         processInstance.setId(processInstanceId);
@@ -339,22 +344,35 @@ public class ExecutorServiceTest {
         listDate.add(1);
         listDate.add(2);
         listDate.add(3);
+        listDate.add(4);
 
+        int listDateSize = listDate.size();
         int createCount = Math.min(listDate.size(), expectedParallelismNumber);
         logger.info("In parallel mode, current expectedParallelismNumber:{}", createCount);
 
-        listDate.addLast(4);
-        int chunkSize = listDate.size() / createCount;
-        for (int i = 0; i < createCount; i++) {
-            int rangeStart = i == 0 ? i : (i * chunkSize);
-            int rangeEnd = i == createCount - 1 ? listDate.size() - 1 : rangeStart + chunkSize;
-            logger.info("rangeStart:{}, rangeEnd:{}",rangeStart, rangeEnd);
-            result.add(listDate.get(rangeStart) + "," + listDate.get(rangeEnd));
+        int itemsPerCommand = (listDateSize / createCount);
+        int remainingItems = (listDateSize % createCount);
+        int startDateIndex = 0;
+        int endDateIndex = 0;
+
+        for (int i = 1; i <= createCount; i++) {
+            int extra = (i <= remainingItems) ? 1 : 0;
+            int singleCommandItems = (itemsPerCommand + extra);
+
+            if (i == 1) {
+                endDateIndex += singleCommandItems - 1;
+            } else {
+                startDateIndex = endDateIndex + 1;
+                endDateIndex += singleCommandItems;
+            }
+
+            logger.info("startDate:{}, endDate:{}", listDate.get(startDateIndex), listDate.get(endDateIndex));
+            result.add(listDate.get(startDateIndex) + "," + listDate.get(endDateIndex));
         }
 
         Assert.assertEquals("0,1", result.get(0));
-        Assert.assertEquals("1,2", result.get(1));
-        Assert.assertEquals("2,4", result.get(2));
-
+        Assert.assertEquals("2,3", result.get(1));
+        Assert.assertEquals("4,4", result.get(2));
     }
+    
 }

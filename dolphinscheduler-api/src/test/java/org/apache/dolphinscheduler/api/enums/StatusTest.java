@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -41,4 +42,15 @@ public class StatusTest {
         Assert.assertEquals("成功", Status.SUCCESS.getMsg());
     }
 
+    @Test
+    public void testGetStatusByCode() {
+        // FAILURE
+        Optional<Status> optional = Status.findStatusBy(1);
+        Assert.assertFalse(optional.isPresent());
+
+        // SUCCESS
+        optional = Status.findStatusBy(10018);
+        Assert.assertTrue(optional.isPresent());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND, optional.get());
+    }
 }

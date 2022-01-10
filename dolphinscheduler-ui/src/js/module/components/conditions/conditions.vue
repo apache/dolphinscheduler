@@ -33,7 +33,7 @@
           <div class="list">
             <el-input
               v-model="searchVal"
-              @keyup.enter="_ckQuery"
+              @keyup.enter.native="_ckQuery"
               size="mini"
               :placeholder="$t('Please enter keyword')"
               type="text"
@@ -42,24 +42,6 @@
             >
             </el-input>
           </div>
-          <div class="list" v-if="taskTypeShow">
-            <el-select
-              size="mini"
-              style="width: 140px"
-              :placeholder="$t('type')"
-              :value="taskType"
-              @change="_onChangeTaskType"
-              clearable
-            >
-              <el-option
-                v-for="(task, index) in taskTypeList"
-                :key="index"
-                :value="task.desc"
-                :label="index"
-              >
-              </el-option>
-            </el-select>
-          </div>
         </template>
       </div>
     </div>
@@ -67,40 +49,24 @@
 </template>
 <script>
   import _ from 'lodash'
-  /**
-   * taskType list
-   */
-  import { tasksType } from '@/conf/home/pages/dag/_source/config.js'
   export default {
     name: 'conditions',
     data () {
       return {
-        // taskType list
-        taskTypeList: tasksType,
         // search value
-        searchVal: '',
-        // taskType switch
-        taskType: ''
+        searchVal: ''
       }
     },
     props: {
-      taskTypeShow: Boolean,
       operation: Array
     },
     methods: {
-      /**
-       * switch taskType
-       */
-      _onChangeTaskType (val) {
-        this.taskType = val
-      },
       /**
        * emit Query parameter
        */
       _ckQuery () {
         this.$emit('on-conditions', {
-          searchVal: _.trim(this.searchVal),
-          taskType: this.taskType
+          searchVal: _.trim(this.searchVal)
         })
       }
     },
@@ -114,7 +80,6 @@
       // Routing parameter merging
       if (!_.isEmpty(this.$route.query)) {
         this.searchVal = this.$route.query.searchVal || ''
-        this.taskType = this.$route.query.taskType || ''
       }
     },
     components: {}

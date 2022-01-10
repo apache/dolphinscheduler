@@ -49,16 +49,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class WorkerGroupServiceTest {
 
-    @MockBean
+    @MockBean(name = "registryClient")
     private RegistryClient registryClient;
 
     @Autowired
     private WorkerGroupServiceImpl workerGroupService;
 
-    @MockBean
+    @MockBean(name = "workerGroupMapper")
     private WorkerGroupMapper workerGroupMapper;
 
-    @MockBean
+    @MockBean(name = "processInstanceMapper")
     private ProcessInstanceMapper processInstanceMapper;
 
     private String groupName = "groupName000001";

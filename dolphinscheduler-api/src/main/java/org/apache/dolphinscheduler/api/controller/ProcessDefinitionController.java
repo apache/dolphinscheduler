@@ -518,7 +518,7 @@ public class ProcessDefinitionController extends BaseController {
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("code") long code,
                            @RequestParam("limit") Integer limit) {
-        Map<String, Object> result = processDefinitionService.viewTree(code, limit);
+        Map<String, Object> result = processDefinitionService.viewTree(projectCode, code, limit);
         return returnDataList(result);
     }
 
@@ -696,7 +696,12 @@ public class ProcessDefinitionController extends BaseController {
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam("file") MultipartFile file) {
-        Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+        Map<String, Object> result;
+        if ("application/zip".equals(file.getContentType())) {
+            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
+        } else {
+            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+        }
         return returnDataList(result);
     }
 
@@ -813,28 +818,4 @@ public class ProcessDefinitionController extends BaseController {
                                              @RequestParam(value = "releaseState", required = true, defaultValue = "OFFLINE") ReleaseState releaseState) {
         return returnDataList(processDefinitionService.releaseWorkflowAndSchedule(loginUser, projectCode, code, releaseState));
     }
-
-    /**
-     * delete process definition and schedule
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
-     * @return update result code
-     */
-    @ApiOperation(value = "deleteWorkflowAndSchedule", notes = "DELETE_WORKFLOW_SCHEDULE_NOTES")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROCESS_DEFINITION_NAME", required = true, type = "Long"),
-        @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789")
-    })
-    @DeleteMapping(value = "/{code}/delete-workflow")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteWorkflowAndSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @PathVariable(value = "code", required = true) long code) {
-        return returnDataList(processDefinitionService.deleteWorkflowAndSchedule(loginUser, projectCode, code));
-    }
-
 }

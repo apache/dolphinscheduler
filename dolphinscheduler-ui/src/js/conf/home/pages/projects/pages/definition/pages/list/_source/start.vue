@@ -191,7 +191,7 @@
     </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? $t('Loading...') : $t('Start')}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" id="btnSubmit">{{spinnerLoading ? $t('Loading...') : $t('Start')}} </el-button>
     </div>
   </div>
 </template>

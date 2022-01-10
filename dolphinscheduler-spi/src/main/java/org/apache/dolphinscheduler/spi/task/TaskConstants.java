@@ -126,7 +126,27 @@ public class TaskConstants {
     /**
      * task log info format
      */
-    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
+    public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
+
+    /**
+     * task log logger name format
+     */
+    public static final String TASK_LOG_LOGGER_NAME_FORMAT = TASK_LOG_LOGGER_NAME + "-%s";
+
+    /**
+     * Task Logger's prefix
+     */
+    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
+
+    /**
+     * Task Logger Thread's name
+     */
+    public static final String TASK_APPID_LOG_FORMAT = "taskAppId";
+
+    /**
+     * get output log service
+     */
+    public static final String GET_OUTPUT_LOG_SERVICE = "-getOutputLogService";
 
     /**
      * date format of yyyyMMdd
@@ -259,7 +279,7 @@ public class TaskConstants {
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
-    public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
@@ -319,11 +339,6 @@ public class TaskConstants {
      * hadoop.security.authentication
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
      * hdfs/s3 configuration

@@ -46,7 +46,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * query process instance by host and stateArray
      *
-     * @param host host
+     * @param host       host
      * @param stateArray stateArray
      * @return process instance list
      */
@@ -54,10 +54,17 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                @Param("states") int[] stateArray);
 
     /**
+     * query process instance host by stateArray
+     * @param stateArray
+     * @return
+     */
+    List<String> queryNeedFailoverProcessInstanceHost(@Param("states") int[] stateArray);
+
+    /**
      * query process instance by tenantId and stateArray
      *
      * @param tenantId tenantId
-     * @param states states array
+     * @param states   states array
      * @return process instance list
      */
     List<ProcessInstance> queryByTenantIdAndStatus(@Param("tenantId") int tenantId,
@@ -65,7 +72,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     /**
      * @param workerGroupName workerGroupName
-     * @param states states array
+     * @param states          states array
      * @return process instance list
      */
     List<ProcessInstance> queryByWorkerGroupNameAndStatus(@Param("workerGroupName") String workerGroupName,
@@ -88,15 +95,15 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * process instance page
      *
-     * @param page page
-     * @param projectCode projectCode
+     * @param page                  page
+     * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
-     * @param searchVal searchVal
-     * @param executorId executorId
-     * @param statusArray statusArray
-     * @param host host
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param searchVal             searchVal
+     * @param executorId            executorId
+     * @param statusArray           statusArray
+     * @param host                  host
+     * @param startTime             startTime
+     * @param endTime               endTime
      * @return process instance page
      */
     IPage<ProcessInstance> queryProcessInstanceListPaging(Page<ProcessInstance> page,
@@ -112,7 +119,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * set failover by host and state array
      *
-     * @param host host
+     * @param host       host
      * @param stateArray stateArray
      * @return set result
      */
@@ -123,7 +130,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * update process instance by state
      *
      * @param originState originState
-     * @param destState destState
+     * @param destState   destState
      * @return update result
      */
     int updateProcessInstanceByState(@Param("originState") ExecutionStatus originState,
@@ -133,7 +140,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * update process instance by tenantId
      *
      * @param originTenantId originTenantId
-     * @param destTenantId destTenantId
+     * @param destTenantId   destTenantId
      * @return update result
      */
     int updateProcessInstanceByTenantId(@Param("originTenantId") int originTenantId,
@@ -143,30 +150,32 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * update process instance by worker groupId
      *
      * @param originWorkerGroupName originWorkerGroupName
-     * @param destWorkerGroupName destWorkerGroupName
+     * @param destWorkerGroupName   destWorkerGroupName
      * @return update result
      */
     int updateProcessInstanceByWorkerGroupName(@Param("originWorkerGroupName") String originWorkerGroupName,
                                                @Param("destWorkerGroupName") String destWorkerGroupName);
 
     /**
-     * count process instance state by user
+     * Statistics process instance state by given project codes list
+     * <p>
+     * We only need project codes to determine whether the process instance belongs to the user or not.
      *
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime    startTime
+     * @param endTime      endTime
      * @param projectCodes projectCodes
      * @return ExecuteStatusCount list
      */
-    List<ExecuteStatusCount> countInstanceStateByUser(
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectCodes") Long[] projectCodes);
+    List<ExecuteStatusCount> countInstanceStateByProjectCodes(
+        @Param("startTime") Date startTime,
+        @Param("endTime") Date endTime,
+        @Param("projectCodes") Long[] projectCodes);
 
     /**
      * query process instance by processDefinitionCode
      *
      * @param processDefinitionCode processDefinitionCode
-     * @param size size
+     * @param size                  size
      * @return process instance list
      */
     List<ProcessInstance> queryByProcessDefineCode(@Param("processDefinitionCode") Long processDefinitionCode,
@@ -176,8 +185,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query last scheduler process instance
      *
      * @param definitionCode definitionCode
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime      startTime
+     * @param endTime        endTime
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionCode") Long definitionCode,
@@ -188,9 +197,9 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query last running process instance
      *
      * @param definitionCode definitionCode
-     * @param startTime startTime
-     * @param endTime endTime
-     * @param stateArray stateArray
+     * @param startTime      startTime
+     * @param endTime        endTime
+     * @param stateArray     stateArray
      * @return process instance
      */
     ProcessInstance queryLastRunningProcess(@Param("processDefinitionCode") Long definitionCode,
@@ -202,8 +211,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query last manual process instance
      *
      * @param definitionCode definitionCode
-     * @param startTime startTime
-     * @param endTime endTime
+     * @param startTime      startTime
+     * @param endTime        endTime
      * @return process instance
      */
     ProcessInstance queryLastManualProcess(@Param("processDefinitionCode") Long definitionCode,
@@ -213,20 +222,25 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * query top n process instance order by running duration
      *
+     * @param size size
+     * @param startTime start time
+     * @param startTime end time
      * @param status process instance status
+     * @param projectCode project code
      * @return ProcessInstance list
      */
 
     List<ProcessInstance> queryTopNProcessInstance(@Param("size") int size,
                                                    @Param("startTime") Date startTime,
                                                    @Param("endTime") Date endTime,
-                                                   @Param("status") ExecutionStatus status);
+                                                   @Param("status") ExecutionStatus status,
+                                                   @Param("projectCode") long projectCode);
 
     /**
      * query process instance by processDefinitionCode and stateArray
      *
      * @param processDefinitionCode processDefinitionCode
-     * @param states states array
+     * @param states                states array
      * @return process instance list
      */
 
@@ -234,12 +248,12 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                             @Param("states") int[] states);
 
     List<ProcessInstance> queryByProcessDefineCodeAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
-                                                            @Param("states") int[] states, @Param("id") int id);
+                                                                     @Param("states") int[] states, @Param("id") int id);
 
     int updateGlobalParamsById(@Param("globalParams") String globalParams,
                                @Param("id") int id);
 
-    boolean updateNextProcessIdById(@Param("thisInstanceId") int thisInstanceId, @Param("runningInstanceId")int runningInstanceId);
+    boolean updateNextProcessIdById(@Param("thisInstanceId") int thisInstanceId, @Param("runningInstanceId") int runningInstanceId);
 
-    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode,@Param("state") int state);
+    ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode, @Param("state") int state);
 }

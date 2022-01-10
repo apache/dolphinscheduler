@@ -50,10 +50,9 @@ import org.springframework.util.MultiValueMap;
  * executor controller test
  */
 public class ExecutorControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
-    private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
-
-    @MockBean
+    @MockBean(name = "executorServiceImpl")
     private ExecutorService executorService;
 
     @Ignore
@@ -79,7 +78,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .header("sessionId", sessionId)
             .params(paramsMap))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -97,7 +96,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .header("sessionId", sessionId)
             .params(paramsMap))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());
@@ -114,7 +113,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .header(SESSION_ID, sessionId)
             .param("processDefinitionCode", "40"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertTrue(result != null && result.isSuccess());

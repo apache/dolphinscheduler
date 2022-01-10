@@ -17,24 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.BASE_SLEEP_TIME;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.BLOCK_UNTIL_CONNECTED_WAIT_MS;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.CONNECTION_TIMEOUT_MS;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.DIGEST;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.MAX_RETRIES;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.NAME_SPACE;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.SERVERS;
-import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.SESSION_TIMEOUT_MS;
-
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.RegistryProperties;
+import org.apache.dolphinscheduler.registry.api.RegistryProperties.ZookeeperProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
-import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
@@ -50,31 +42,55 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+
 import com.google.common.base.Strings;
 
+@Component
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 public final class ZookeeperRegistry implements Registry {
-
-    private CuratorFramework client;
+    private final ZookeeperProperties properties;
+    private final CuratorFramework client;
 
     private final Map<String, TreeCache> treeCacheMap = new ConcurrentHashMap<>();
 
     private static final ThreadLocal<Map<String, InterProcessMutex>> threadLocalLockMap = new ThreadLocal<>();
 
-    private static RetryPolicy buildRetryPolicy(Map<String, String> registerData) {
-        int baseSleepTimeMs = BASE_SLEEP_TIME.getParameterValue(registerData.get(BASE_SLEEP_TIME.getName()));
-        int maxRetries = MAX_RETRIES.getParameterValue(registerData.get(MAX_RETRIES.getName()));
-        int maxSleepMs = baseSleepTimeMs * maxRetries;
-        return new ExponentialBackoffRetry(baseSleepTimeMs, maxRetries, maxSleepMs);
+    public ZookeeperRegistry(RegistryProperties registryProperties) {
+        properties = registryProperties.getZookeeper();
+
+        final ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(
+            (int) properties.getRetryPolicy().getBaseSleepTime().toMillis(),
+            properties.getRetryPolicy().getMaxRetries(),
+            (int) properties.getRetryPolicy().getMaxSleep().toMillis());
+
+        CuratorFrameworkFactory.Builder builder =
+            CuratorFrameworkFactory.builder()
+                                   .connectString(properties.getConnectString())
+                                   .retryPolicy(retryPolicy)
+                                   .namespace(properties.getNamespace())
+                                   .sessionTimeoutMs((int) properties.getSessionTimeout().toMillis())
+                                   .connectionTimeoutMs((int) properties.getConnectionTimeout().toMillis());
+
+        final String digest = properties.getDigest();
+        if (!Strings.isNullOrEmpty(digest)) {
+            buildDigest(builder, digest);
+        }
+        client = builder.build();
     }
 
-    private static void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
-        builder.authorization(DIGEST.getName(), digest.getBytes(StandardCharsets.UTF_8))
+    private void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
+        builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
                .aclProvider(new ACLProvider() {
                    @Override
                    public List<ACL> getDefaultAcl() {
@@ -88,31 +104,16 @@ public final class ZookeeperRegistry implements Registry {
                });
     }
 
-    @Override
-    public void start(Map<String, String> config) {
-        CuratorFrameworkFactory.Builder builder =
-            CuratorFrameworkFactory.builder()
-                                   .connectString(SERVERS.getParameterValue(config.get(SERVERS.getName())))
-                                   .retryPolicy(buildRetryPolicy(config))
-                                   .namespace(NAME_SPACE.getParameterValue(config.get(NAME_SPACE.getName())))
-                                   .sessionTimeoutMs(SESSION_TIMEOUT_MS.getParameterValue(config.get(SESSION_TIMEOUT_MS.getName())))
-                                   .connectionTimeoutMs(CONNECTION_TIMEOUT_MS.getParameterValue(config.get(CONNECTION_TIMEOUT_MS.getName())));
-
-        String digest = DIGEST.getParameterValue(config.get(DIGEST.getName()));
-        if (!Strings.isNullOrEmpty(digest)) {
-            buildDigest(builder, digest);
-        }
-        client = builder.build();
-
+    @PostConstruct
+    public void start() {
         client.start();
         try {
-            if (!client.blockUntilConnected(BLOCK_UNTIL_CONNECTED_WAIT_MS.getParameterValue(config.get(BLOCK_UNTIL_CONNECTED_WAIT_MS.getName())), MILLISECONDS)) {
+            if (!client.blockUntilConnected((int) properties.getBlockUntilConnected().toMillis(), MILLISECONDS)) {
                 client.close();
-                throw new RegistryException("zookeeper connect timeout");
+                throw new RegistryException("zookeeper connect timeout: " + properties.getConnectString());
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RegistryException("zookeeper connect error", e);
         }
     }
 
@@ -231,6 +232,11 @@ public final class ZookeeperRegistry implements Registry {
             throw new RegistryException("zookeeper release lock error", e);
         }
         return true;
+    }
+
+    @Override
+    public Duration getSessionTimeout() {
+        return properties.getSessionTimeout();
     }
 
     @Override

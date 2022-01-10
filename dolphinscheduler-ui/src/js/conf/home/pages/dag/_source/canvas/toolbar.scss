@@ -110,4 +110,18 @@
       }
     }
   }
+
+  .process-online-tag{
+    margin-left: 10px;
+  }
+
+  .search-box{
+    width: 0;
+    overflow: hidden;
+    transition: all 0.5s;
+
+    &.visible{
+      width: 200px;
+    }
+  }
 }

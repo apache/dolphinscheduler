@@ -20,7 +20,7 @@
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
-            <el-button size="mini"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</el-button>
+            <el-button size="mini"  @click="() => this.$router.push({name: 'definition-create'})" id="btnCreateProcess">{{$t('Create process')}}</el-button>
             <el-button size="mini"  @click="_uploading">{{$t('Import process')}}</el-button>
           </template>
         </m-conditions>
@@ -157,9 +157,6 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .wrap-definition {
-    .table-box {
-      overflow-y: scroll;
-    }
     .table-box {
       .fixed {
         table-layout: auto;

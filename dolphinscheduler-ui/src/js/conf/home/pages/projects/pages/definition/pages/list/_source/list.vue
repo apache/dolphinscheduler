@@ -17,8 +17,8 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
-        <el-table-column type="selection" width="50" :selectable="selectable"></el-table-column>
+      <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange" row-class-name="items">
+        <el-table-column type="selection" width="50" :selectable="selectable" class-name="select-all"></el-table-column>
         <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
@@ -26,7 +26,7 @@
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
                 <router-link :to="{ path: `/projects/${projectCode}/definition/list/${scope.row.code}` }" tag="a" class="links">
-                  <span class="ellipsis">{{scope.row.name}}</span>
+                  <span class="ellipsis name">{{scope.row.name}}</span>
                 </router-link>
               </div>
             </el-popover>
@@ -52,6 +52,7 @@
             <span>{{scope.row.description | filterNull}}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="userName" :label="$t('Create User')"></el-table-column>
         <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
         <el-table-column :label="$t('Timing state')">
           <template slot-scope="scope">
@@ -66,16 +67,16 @@
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Start')" placement="top" :enterable="false">
-              <span><el-button type="success" size="mini" :disabled="scope.row.releaseState !== 'ONLINE'"  icon="el-icon-video-play" @click="_start(scope.row)" circle></el-button></span>
+              <span><el-button type="success" size="mini" :disabled="scope.row.releaseState !== 'ONLINE'"  icon="el-icon-video-play" @click="_start(scope.row)" circle class="button-run"></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Timing')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('online')" placement="top" :enterable="false">
-              <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle></el-button></span>
+              <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle class="button-publish"></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('offline')" placement="top" :enterable="false">
-              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button></span>
+              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle class="btn-cancel-publish"></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Copy Workflow')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" :disabled="scope.row.releaseState === 'ONLINE'"  icon="el-icon-document-copy" @click="_copyProcess(scope.row)" circle></el-button></span>
@@ -115,12 +116,12 @@
         :title="$t('Delete?')"
         @onConfirm="_delete({},-1)"
       >
-        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strSelectCodes" slot="reference">{{$t('Delete')}}</el-button>
+        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strSelectCodes" slot="reference" class="btn-delete-all">{{$t('Delete')}}</el-button>
       </el-popconfirm>
     </el-tooltip>
     <el-button type="primary" size="mini" :disabled="!strSelectCodes" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</el-button>
     <span><el-button type="primary" size="mini" :disabled="!strSelectCodes" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</el-button></span>
-    <el-button type="primary" size="mini" :disabled="!strSelectCodes" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>
+<!--    <el-button type="primary" size="mini" :disabled="!strSelectCodes" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>-->
     <el-drawer
       :visible.sync="drawer"
       size=""
