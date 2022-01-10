@@ -80,8 +80,7 @@ public class MasterExecService {
 
             @Override
             public void onFailure(Throwable throwable) {
-                logger.error("handle events {} failed.", processInstanceId);
-                logger.error("handle events failed.", throwable);
+                logger.error("handle events {} failed", processInstanceId, throwable);
                 if (!workflowExecuteThread.isStart()) {
                     startProcessFailedMap.putIfAbsent(processInstanceId, workflowExecuteThread);
                 } else {
