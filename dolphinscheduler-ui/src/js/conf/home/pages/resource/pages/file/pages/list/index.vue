@@ -29,7 +29,11 @@
     </template>
     <template slot="content">
       <template v-if="fileResourcesList.length || total>0">
-        <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        <m-list id="items"
+                @on-update="_onUpdate"
+                :file-resources-list="fileResourcesList"
+                :page-no="searchParams.pageNo"
+                :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <el-pagination

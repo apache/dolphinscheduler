@@ -38,7 +38,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final CreateDirectoryBox createDirectoryBox;
 
-    @FindBy(className = "el-table__row")
+    @FindBy(id = "items")
     private List<WebElement> fileList;
 
     @FindBy(id = "delete")
