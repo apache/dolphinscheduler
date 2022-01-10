@@ -49,7 +49,7 @@ class WorkflowE2ETest {
     private static RemoteWebDriver browser;
 
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws InterruptedException {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
             .goToNav(SecurityPage.class)
@@ -61,7 +61,7 @@ class WorkflowE2ETest {
     }
 
     @AfterAll
-    public static void cleanup() {
+    public static void cleanup() throws InterruptedException {
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .goTo(project)
@@ -113,7 +113,7 @@ class WorkflowE2ETest {
 
     @Test
     @Order(10)
-    void testCreateSubWorkflow() {
+    void testCreateSubWorkflow() throws InterruptedException {
         final String workflow = "test-sub-workflow-1";
 
         final WorkflowDefinitionTab workflowDefinitionPage =
@@ -144,7 +144,7 @@ class WorkflowE2ETest {
 
     @Test
     @Order(30)
-    void testRunWorkflow() {
+    void testRunWorkflow() throws InterruptedException {
         final String workflow = "test-workflow-1";
 
         final ProjectDetailPage projectPage =

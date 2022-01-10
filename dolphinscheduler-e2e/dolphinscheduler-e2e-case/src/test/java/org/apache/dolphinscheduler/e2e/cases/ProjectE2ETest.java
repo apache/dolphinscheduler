@@ -38,7 +38,7 @@ class ProjectE2ETest {
     private static RemoteWebDriver browser;
 
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws InterruptedException {
         new LoginPage(browser)
             .login("admin", "dolphinscheduler123")
             .goToNav(ProjectPage.class);

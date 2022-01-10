@@ -48,13 +48,14 @@ public class NavBarPage {
         PageFactory.initElements(driver, this);
     }
 
-    public <T extends NavBarItem> T goToNav(Class<T> nav) {
+    public <T extends NavBarItem> T goToNav(Class<T> nav) throws InterruptedException {
         if (nav == ProjectPage.class) {
             projectTab().click();
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
+            Thread.sleep(1000);
             securityTab().click();
             return nav.cast(new SecurityPage(driver));
         }

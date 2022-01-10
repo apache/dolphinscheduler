@@ -56,7 +56,7 @@ public class ResourceE2ETest {
     String testDiretoryName = "test_directory";
 
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws InterruptedException {
 
         new LoginPage(browser)
             .login(user, password)
