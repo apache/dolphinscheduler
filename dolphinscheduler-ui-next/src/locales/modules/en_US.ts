@@ -115,6 +115,22 @@ const profile = {
   disable: 'Disable',
 }
 
+const monitor = {
+  db: {
+    health_state: 'Health State',
+    max_connections: 'Max Connections',
+    threads_connections: 'Threads Connections',
+    threads_running_connections: 'Threads Running Connections',
+  },
+  statistics: {
+    command_number_of_waiting_for_running:
+      'Command Number Of Waiting For Running',
+    failure_command_number: 'Failure Command Number',
+    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
+  },
+}
+
 export default {
   login,
   modal,
@@ -124,4 +140,5 @@ export default {
   home,
   password,
   profile,
+  monitor,
 }
