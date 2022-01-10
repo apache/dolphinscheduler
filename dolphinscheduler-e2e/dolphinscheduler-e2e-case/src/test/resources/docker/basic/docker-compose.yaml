@@ -35,7 +35,7 @@ services:
     command:
       - /bin/bash
       - -c
-      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/common.properties'
+      - 'sed -i "s|resource.storage.type=.*|resource.storage.type=hdfs|g" /opt/dolphinscheduler/standalone-server/conf/common.properties'
   hdfs:
     image: mdouchement/hdfs:latest
     ports:
