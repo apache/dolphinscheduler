@@ -99,7 +99,12 @@ public class MasterSchedulerService extends Thread {
     /**
      * master exec service
      */
-    private ThreadPoolExecutor masterExecService;
+    private MasterExecService masterExecService;
+
+    /**
+     * start process failed map
+     */
+    private final ConcurrentHashMap<Integer, WorkflowExecuteThread> startProcessFailedMap = new ConcurrentHashMap<>();
 
     /**
      * process instance execution list
@@ -133,11 +138,15 @@ public class MasterSchedulerService extends Thread {
      */
     public void init(ConcurrentHashMap<Integer, WorkflowExecuteThread> processInstanceExecMaps) {
         this.processInstanceExecMaps = processInstanceExecMaps;
-        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+        this.masterExecService = new MasterExecService(this.startProcessFailedMap,
+                (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads()));
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
 
-        stateWheelExecuteThread = new StateWheelExecuteThread(processService,
+        stateWheelExecuteThread = new StateWheelExecuteThread(
+                masterExecService,
+                processService,
+                startProcessFailedMap,
                 processTimeoutCheckList,
                 taskTimeoutCheckList,
                 taskRetryCheckList,
