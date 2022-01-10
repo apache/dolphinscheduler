@@ -243,6 +243,18 @@ public interface ProcessDefinitionService {
                                                 MultipartFile file);
 
     /**
+     * import sql process definition
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param file sql file, zip
+     * @return import process
+     */
+    Map<String, Object> importSqlProcessDefinition(User loginUser,
+                                                   long projectCode,
+                                                   MultipartFile file);
+
+    /**
      * check the process task relation json
      *
      * @param processTaskRelationJson process task relation json

@@ -15,21 +15,37 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
-import Language from '../language'
+import Locales from '../locales'
 import User from '../user'
-import { useDataList } from './use-dataList'
+import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
+import { useMenuStore } from '@/store/menu/menu'
 
-const navbar = defineComponent({
-  name: 'navbar',
-  setup() {
-    const { state } = useDataList()
-    const { handleMenuClick } = useMenuClick()
-    return { ...toRefs(state), handleMenuClick }
+const Navbar = defineComponent({
+  name: 'Navbar',
+  emits: ['handleMenuClick'],
+  props: {
+    headerMenuOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+    localesOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+    userDropdownOptions: {
+      type: Array as PropType<any>,
+      default: [],
+    },
+  },
+  setup(props, ctx) {
+    const { handleMenuClick } = useMenuClick(ctx)
+    const menuStore = useMenuStore()
+    return { handleMenuClick, menuStore }
   },
   render() {
     return (
@@ -37,19 +53,20 @@ const navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            v-model={[this.activeKey, 'value']}
+            default-value={this.menuStore.getMenuKey}
             mode='horizontal'
-            options={this.menuOptions}
+            options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
           />
         </div>
         <div class={styles.settings}>
-          <Language />
-          <User />
+          <Theme />
+          <Locales localesOptions={this.localesOptions} />
+          <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>
     )
   },
 })
 
-export default navbar
+export default Navbar

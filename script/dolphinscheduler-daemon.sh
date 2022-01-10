@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|python-gateway-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -60,9 +60,9 @@ elif [ "$command" = "worker-server" ]; then
   :
 elif [ "$command" = "alert-server" ]; then
   :
-elif [ "$command" = "logger-server" ]; then
-  :
 elif [ "$command" = "standalone-server" ]; then
+  :
+elif [ "$command" = "python-gateway-server" ]; then
   :
 else
   echo "Error: No command named '$command' was found."

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
@@ -52,7 +53,13 @@ class TenantE2ETest {
     @Test
     @Order(10)
     void testCreateTenant() {
-        new TenantPage(browser).create(tenant);
+        final TenantPage page = new TenantPage(browser);
+        page.create(tenant);
+
+        await().untilAsserted(() -> assertThat(page.tenantList())
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
     }
 
     @Test
@@ -78,6 +85,7 @@ class TenantE2ETest {
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
+
             assertThat(
                 page.tenantList()
             ).noneMatch(
