@@ -70,6 +70,7 @@ public class ResourceE2ETest {
 //                .extracting(WebElement::getText)
 //                .anyMatch(it -> it.contains(tenant)));
 
+        
         new UserPage(browser).update(user, user, password, email, phone)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);

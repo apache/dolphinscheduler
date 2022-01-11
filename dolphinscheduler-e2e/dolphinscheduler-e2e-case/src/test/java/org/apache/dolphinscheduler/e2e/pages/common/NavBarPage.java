@@ -39,6 +39,7 @@ public class NavBarPage {
 
     @FindBy(id = "tabProject")
     private WebElement projectTab;
+
     @FindBy(id = "tabSecurity")
     private WebElement securityTab;
 
