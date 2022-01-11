@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-.container {
-  width: 600px;
-}
+import { useAsyncState } from '@vueuse/core'
+import { listMaster } from '@/service/modules/monitor'
 
-.btn-box {
-  display: flex;
-  justify-content: flex-end;
-
-  button:last-child {
-    margin-left: 20px;
+export function useMaster() {
+  const getMaster = () => {
+    const { state } = useAsyncState(listMaster(), [])
+    return state
   }
+
+  return { getMaster }
 }

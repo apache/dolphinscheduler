@@ -116,6 +116,26 @@ const profile = {
 }
 
 const monitor = {
+  master: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
+  worker: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
   db: {
     health_state: 'Health State',
     max_connections: 'Max Connections',

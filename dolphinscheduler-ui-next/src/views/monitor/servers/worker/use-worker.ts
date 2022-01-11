@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-.container {
-  width: 600px;
-}
+import { useAsyncState } from '@vueuse/core'
+import {listWorker} from '@/service/modules/monitor'
 
-.btn-box {
-  display: flex;
-  justify-content: flex-end;
-
-  button:last-child {
-    margin-left: 20px;
+export function useWorker() {
+  const getWorker = () => {
+    const { state } = useAsyncState(listWorker(), [])
+    return state
   }
+
+  return { getWorker }
 }

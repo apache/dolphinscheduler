@@ -115,6 +115,26 @@ const profile = {
 }
 
 const monitor = {
+  master: {
+    cpu_usage: '处理器使用量',
+    memory_usage: '内存使用量',
+    load_average: '平均负载量',
+    create_time: '创建时间',
+    last_heartbeat_time: '最后心跳时间',
+    directory_detail: '目录详情',
+    host: '主机',
+    directory: '注册目录',
+  },
+  worker: {
+    cpu_usage: '处理器使用量',
+    memory_usage: '内存使用量',
+    load_average: '平均负载量',
+    create_time: '创建时间',
+    last_heartbeat_time: '最后心跳时间',
+    directory_detail: '目录详情',
+    host: '主机',
+    directory: '注册目录',
+  },
   db: {
     health_state: '健康状态',
     max_connections: '最大连接数',
