@@ -197,17 +197,15 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         //Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
-        paramsMap.add("scheduleTime", scheduleTime);
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("warningType", String.valueOf(warningType));
-        paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
-                eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
-                eq(warningGroupId), eq(null), eq(null), eq("default"), eq(-1L),
+				eq(null), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
+                eq(0), eq(null), eq(null), eq("default"), eq(-1L),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0))).thenReturn(executeServiceResult);
 
-        //When
+		//When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
