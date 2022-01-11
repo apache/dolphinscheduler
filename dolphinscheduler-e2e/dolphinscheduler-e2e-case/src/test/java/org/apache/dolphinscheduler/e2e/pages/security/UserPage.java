@@ -37,10 +37,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(id = "btnCreateUser")
     private WebElement buttonCreateUser;
 
-    @FindBys({
-        @FindBy(className = "items"),
-        @FindBy(xpath = "//*[contains(text(), 'User Manage')]")
-    })
+    @FindBy(className = "items")
     private List<WebElement> userList;
 
     @FindBys({
@@ -70,8 +67,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone) {
-        userList()
-            .stream()
+        List<WebElement> userList = driver.findElementsByClassName("items");
+        userList.stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
