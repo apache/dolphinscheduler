@@ -17,11 +17,14 @@
  * under the License.
  *
  */
+
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
 import lombok.Getter;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -62,13 +65,13 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage delete(String name) {
         fileList()
-                .stream()
-                .filter(it -> it.getText().contains(name))
-                .flatMap(it -> it.findElements(By.id("delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(name))
+            .flatMap(it -> it.findElements(By.id("delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
+            .click();
 
         buttonDelete().click();
 
@@ -77,7 +80,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class CreateDirectoryBox {
-        CreateDirectoryBox()  {
+        CreateDirectoryBox() {
             PageFactory.initElements(driver, this);
         }
 
