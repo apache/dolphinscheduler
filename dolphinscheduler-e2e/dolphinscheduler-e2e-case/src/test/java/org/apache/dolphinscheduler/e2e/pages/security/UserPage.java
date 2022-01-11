@@ -76,15 +76,17 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in user list"))
             .click();
 
-        editUserForm().inputUserName().clear();
-        editUserForm().inputUserName().sendKeys(editUser);
-        editUserForm().inputUserPassword().clear();
-        editUserForm().inputUserPassword().sendKeys(editPassword);
-        editUserForm().inputEmail().clear();
-        editUserForm().inputEmail().sendKeys(editEmail);
-        editUserForm().inputPhone().clear();
-        editUserForm().inputPhone().sendKeys(editPhone);
-        editUserForm().buttonSubmit().click();
+        UserForm editUserForm = new UserForm();
+
+        editUserForm.inputUserName().clear();
+        editUserForm.inputUserName().sendKeys(editUser);
+        editUserForm.inputUserPassword().clear();
+        editUserForm.inputUserPassword().sendKeys(editPassword);
+        editUserForm.inputEmail().clear();
+        editUserForm.inputEmail().sendKeys(editEmail);
+        editUserForm.inputPhone().clear();
+        editUserForm.inputPhone().sendKeys(editPhone);
+        editUserForm.buttonSubmit().click();
 
         return this;
     }
