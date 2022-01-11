@@ -36,8 +36,8 @@ services:
       retries: 120
     depends_on:
       - hdfs
-    init: true
-    command: bash -c "sed -i 's|resource.storage.type=.*|resource.storage.type=hdfs|g' /opt/dolphinscheduler/conf/common.properties"
+#    init: true
+#    command: bash -c "sed -i 's|resource.storage.type=.*|resource.storage.type=hdfs|g' /opt/dolphinscheduler/conf/common.properties"
   hdfs:
     image: mdouchement/hdfs:latest
     hostname: hdfs
