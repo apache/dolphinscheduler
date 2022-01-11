@@ -57,20 +57,20 @@ public class ResourceE2ETest {
     @BeforeAll
     public static void setup() {
 
-        TenantPage tenantPage = new LoginPage(browser)
+        new LoginPage(browser)
                 .login(user, password)
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
-                .create(tenant);
+                .create(tenant)
+                .goToNav(SecurityPage.class)
+                .goToTab(UserPage.class);
 
-        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+//        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+//                .as("Tenant list should contain newly-created tenant")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(tenant)));
 
-        new TenantPage(browser).goToNav(SecurityPage.class)
-            .goToTab(UserPage.class)
-            .update(user, user, password, email, phone)
+        new UserPage(browser).update(user, user, password, email, phone)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);
     }
