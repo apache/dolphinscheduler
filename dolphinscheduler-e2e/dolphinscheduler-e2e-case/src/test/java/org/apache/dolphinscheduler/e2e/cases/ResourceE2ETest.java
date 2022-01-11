@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -57,7 +58,7 @@ public class ResourceE2ETest {
     @BeforeAll
     public static void setup() {
 
-        new LoginPage(browser)
+        UserPage userPage = new LoginPage(browser)
                 .login(user, password)
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
@@ -71,7 +72,7 @@ public class ResourceE2ETest {
 //                .anyMatch(it -> it.contains(tenant)));
 
 
-        new UserPage(browser).update(user, user, password, email, phone)
+        userPage.update(user, user, password, email, phone)
             .goToNav(ResourcePage.class)
             .goToTab(FileManagePage.class);
     }
