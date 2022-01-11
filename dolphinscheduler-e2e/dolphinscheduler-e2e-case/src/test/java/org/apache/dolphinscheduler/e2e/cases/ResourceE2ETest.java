@@ -31,12 +31,9 @@ import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -70,8 +67,6 @@ public class ResourceE2ETest {
                 .as("Tenant list should contain newly-created tenant")
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
-
-        new WebDriverWait(tenantPage.driver(), 10).until(ExpectedConditions.attributeContains((By) tenantPage.tenantList(), tenant, tenant));
 
         tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class)
