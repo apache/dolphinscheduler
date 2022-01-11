@@ -73,6 +73,7 @@ export default defineComponent({
           ref='fileFormRef'
           label-placement='left'
           label-width='160'
+          class={styles['form-content']}
         >
           <NFormItem label={t('resource.file_name')} path='fileName'>
             <NInput
@@ -108,7 +109,7 @@ export default defineComponent({
             </div>
           </NFormItem>
           <div class={styles['file-edit-content']}>
-            <div class={styles['submit-c']}>
+            <div class={styles.submit}>
               <NButton type='info' size='small' round onClick={this.handleFile}>
                 {t('resource.save')}
               </NButton>

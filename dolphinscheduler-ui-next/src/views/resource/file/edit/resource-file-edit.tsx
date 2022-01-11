@@ -17,7 +17,7 @@
 
 import { useRouter } from 'vue-router'
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NButton, NForm, NFormItem } from 'naive-ui'
+import { NButton, NForm, NFormItem, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
@@ -33,8 +33,9 @@ export default defineComponent({
     const router: Router = useRouter()
 
     const resourceViewRef = ref()
-    const idRef = ref(Number(router.currentRoute.value.params.id))
     const codeEditorRef = ref()
+    const routeNameRef = ref(router.currentRoute.value.name)
+    const idRef = ref(Number(router.currentRoute.value.params.id))
 
     const { state } = useForm()
     const { getResourceView, handleUpdateContent } = useEdit(state)
@@ -54,6 +55,7 @@ export default defineComponent({
 
     return {
       idRef,
+      routeNameRef,
       codeEditorRef,
       resourceViewRef,
       handleReturn,
@@ -69,7 +71,11 @@ export default defineComponent({
           <h2>
             <span>{this.resourceViewRef?.value.alias}</span>
           </h2>
-          <NForm rules={this.rules} ref='fileFormRef'>
+          <NForm
+            rules={this.rules}
+            ref='fileFormRef'
+            class={styles['form-content']}
+          >
             <NFormItem path='content'>
               <div
                 class={styles.cont}
@@ -83,25 +89,29 @@ export default defineComponent({
                 />
               </div>
             </NFormItem>
-            <div class={styles['submit-c']}>
-              <NButton
-                type='info'
-                size='small'
-                text
-                style={{ marginRight: '15px' }}
-                onClick={this.handleReturn}
-              >
-                {t('resource.return')}
-              </NButton>
-              <NButton
-                type='info'
-                size='small'
-                round
-                onClick={() => this.handleFileContent()}
-              >
-                {t('resource.save')}
-              </NButton>
-            </div>
+            {this.routeNameRef === 'resource-file-edit' ? (
+              <NSpace>
+                <NButton
+                  type='info'
+                  size='small'
+                  text
+                  style={{ marginRight: '15px' }}
+                  onClick={this.handleReturn}
+                >
+                  {t('resource.return')}
+                </NButton>
+                <NButton
+                  type='info'
+                  size='small'
+                  round
+                  onClick={() => this.handleFileContent()}
+                >
+                  {t('resource.save')}
+                </NButton>
+              </NSpace>
+            ) : (
+              ''
+            )}
           </NForm>
         </div>
       </Card>

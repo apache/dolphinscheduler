@@ -16,7 +16,15 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref, watch, inject } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  reactive,
+  Ref,
+  watch,
+  inject,
+} from 'vue'
 import { NDataTable, NButtonGroup, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'

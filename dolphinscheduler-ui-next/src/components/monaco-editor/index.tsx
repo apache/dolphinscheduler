@@ -30,7 +30,6 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
-import { getModeFromValue } from 'naive-ui/lib/color-picker/src/utils'
 
 const props = {
   modelValue: {
@@ -114,6 +113,7 @@ export default defineComponent({
         id='monaco-container'
         style={{
           height: '300px',
+          border: '1px solid #eee',
         }}
       ></div>
     )

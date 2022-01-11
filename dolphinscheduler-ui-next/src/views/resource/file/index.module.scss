@@ -22,13 +22,17 @@
   >h2 {
     line-height: 60px;
     text-align: center;
-    padding-bottom: 6px;
+    padding-right: 170px;
     position: relative;
   }
+}
 
-  .submit-c {
-    text-align: center;
-    padding-top: 12px;
-  }
+.form-content {
+  padding: 0 50px 0 50px;
+}
 
+.submit {
+  text-align: left;
+  padding-top: 12px;
+  margin-left: 160px;
 }
