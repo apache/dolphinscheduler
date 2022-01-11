@@ -716,7 +716,7 @@ public class WorkflowExecuteThread {
 
         List<TaskInstance> recoverNodeList = getStartTaskInstanceList(processInstance.getCommandParam());
 
-        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
         List<TaskDefinitionLog> taskDefinitionLogs = processService.getTaskDefineLogListByRelation(processTaskRelations);
         List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();

@@ -566,7 +566,7 @@ public class ProcessServiceTest {
         Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(), taskDefinition.getVersion())).thenReturn(taskDefinition);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
         Mockito.when(taskDefinitionMapper.queryByCode(taskDefinition.getCode())).thenReturn(taskDefinition);
-        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs);
+        int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
         Assert.assertEquals(0, result);
     }
 
@@ -579,7 +579,7 @@ public class ProcessServiceTest {
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
         processTaskRelation.setName("def 1");
         processTaskRelation.setProcessDefinitionVersion(1);
         processTaskRelation.setProjectCode(1L);
@@ -588,7 +588,7 @@ public class ProcessServiceTest {
         processTaskRelation.setPreTaskCode(2L);
         processTaskRelation.setUpdateTime(new Date());
         processTaskRelation.setCreateTime(new Date());
-        List<ProcessTaskRelation> list = new ArrayList<>();
+        List<ProcessTaskRelationLog> list = new ArrayList<>();
         list.add(processTaskRelation);
 
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
@@ -616,7 +616,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(Mockito.anyLong(), Mockito.anyLong())).thenReturn(list);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
 
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
         Assert.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
