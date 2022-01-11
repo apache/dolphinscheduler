@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
-
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
-
-declare global {
-  interface Window {
-    $message: any
+.file-edit-content {
+  width: 100%;
+  background: #fff;
+  padding-bottom: 20px;
+  >h2 {
+    line-height: 60px;
+    text-align: center;
+    padding-bottom: 6px;
+    position: relative;
   }
+
+  .submit-c {
+    text-align: center;
+    padding-top: 12px;
+  }
+
 }
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'

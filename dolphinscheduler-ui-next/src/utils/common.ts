@@ -15,23 +15,34 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
+/**
+ * Intelligent display kb m
+ */
+export const bytesToSize = (bytes: number) => {
+  if (bytes === 0) return '0 B'
+  const k = 1024 // or 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
+  return parseInt((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
 }
 
-declare global {
-  interface Window {
-    $message: any
-  }
-}
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'
+export const fileTypeArr = [
+  'txt',
+  'log',
+  'sh',
+  'bat',
+  'conf',
+  'cfg',
+  'py',
+  'java',
+  'sql',
+  'xml',
+  'hql',
+  'properties',
+  'json',
+  'yml',
+  'yaml',
+  'ini',
+  'js',
+]

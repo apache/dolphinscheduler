@@ -15,23 +15,17 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
-
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
-
-declare global {
-  interface Window {
-    $message: any
+ .conditions-model {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  .right {
+    > .form-box {
+      .list {
+        float: right;
+        margin: 3px 0 3px 4px;
+      }
+    }
   }
 }
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'

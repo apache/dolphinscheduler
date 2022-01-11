@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
-import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
+import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
@@ -27,6 +27,8 @@ import { useI18n } from 'vue-i18n'
 const Content = defineComponent({
   name: 'Content',
   setup() {
+    window.$message = useMessage()
+
     const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()

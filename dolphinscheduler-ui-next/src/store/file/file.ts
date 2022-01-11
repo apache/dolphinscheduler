@@ -15,23 +15,30 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
+import { defineStore } from 'pinia'
+import type { FileState } from '@/store/file/types'
 
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
-
-declare global {
-  interface Window {
-    $message: any
-  }
-}
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'
+export const useFileStore = defineStore({
+  id: 'file',
+  state: (): FileState => ({
+    file: '',
+    currentDir: '/',
+  }),
+  persist: true,
+  getters: {
+    getFileInfo(): string {
+      return this.file
+    },
+    getCurrentDir(): string | {} {
+      return this.currentDir
+    },
+  },
+  actions: {
+    setFileInfo(file: string): void {
+      this.file = file
+    },
+    setCurrentDir(currentDir: string): void {
+      this.currentDir = currentDir
+    },
+  },
+})

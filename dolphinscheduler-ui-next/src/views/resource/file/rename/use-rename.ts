@@ -15,23 +15,40 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
+import { useI18n } from 'vue-i18n'
+import { IEmit } from '../types'
+import { updateResource } from '@/service/modules/resources'
 
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+export function useRename(state: any) {
+  const { t } = useI18n()
 
-declare global {
-  interface Window {
-    $message: any
+  const handleRenameFile = (
+    emit: IEmit,
+    hideModal: () => void,
+    resetForm: () => void,
+  ) => {
+    state.renameFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        try {
+          await updateResource(
+            {
+              ...state.renameForm,
+            },
+            state.renameForm.id,
+          )
+          window.$message.success(t('resource.success'))
+          emit('updateList')
+        } catch (error: any) {
+          window.$message.error(error.message)
+        }
+      }
+
+      hideModal()
+      resetForm()
+    })
+  }
+
+  return {
+    handleRenameFile,
   }
 }
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'

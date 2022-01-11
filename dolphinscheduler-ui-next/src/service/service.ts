@@ -22,6 +22,8 @@ import axios, {
   AxiosRequestHeaders,
 } from 'axios'
 import qs from 'qs'
+import _ from 'lodash'
+import $ from 'jquery'
 import { useUserStore } from '@/store/user/user'
 
 const userStore = useUserStore()
@@ -30,7 +32,12 @@ const baseRequestConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
   timeout: 10000,
   transformRequest: (params) => {
-    return qs.stringify(params, { arrayFormat: 'repeat' })
+    if (_.isPlainObject(params)) {
+      console.log(params)
+      return qs.stringify(params, { arrayFormat: 'repeat' })
+    } else {
+      return params
+    }
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
@@ -66,4 +73,53 @@ service.interceptors.response.use((res: AxiosResponse) => {
   }
 }, err)
 
-export { service as axios }
+const apiPrefix = '/dolphinscheduler'
+const reSlashPrefix = /^\/+/
+
+const resolveURL = (url: string) => {
+  if (url.indexOf('http') === 0) {
+    return url
+  }
+  if (url.charAt(0) !== '/') {
+    return `${apiPrefix}/${url.replace(reSlashPrefix, '')}`
+  }
+
+  return url
+}
+
+/**
+ * download file
+ */
+const downloadFile = ($url: string, $obj?: any) => {
+  const param = {
+    url: resolveURL($url),
+    obj: $obj || {},
+  }
+  console.log(param.url)
+
+  if (!param.url) {
+    // TODO: useI18n
+    window.$message.warning('Unable to download without proper url')
+    return
+  }
+
+  const generatorInput = function (obj: any) {
+    let result = ''
+    const keyArr = Object.keys(obj)
+    keyArr.forEach(function (key) {
+      result += `<input type='hidden' name = '${key}' value='${obj[key]}'>`
+    })
+    return result
+  }
+
+  $(
+    `<form action='${param.url}' method='get'>${generatorInput(
+      param.obj,
+    )}</form>`,
+  )
+    .appendTo('body')
+    .trigger('submit')
+    .remove()
+}
+
+export { service as axios, downloadFile }

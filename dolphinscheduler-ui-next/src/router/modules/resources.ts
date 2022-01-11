@@ -32,7 +32,7 @@ export default {
     {
       path: '/resource/file',
       name: 'file',
-      component: components['home'],
+      component: components['file'],
       meta: {
         title: '文件管理',
       },
@@ -40,9 +40,41 @@ export default {
     {
       path: '/resource/file/create',
       name: 'resource-file-create',
-      component: components['home'],
+      component: components['resource-file-create'],
       meta: {
-        title: '创建资源',
+        title: '文件创建',
+      },
+    },
+    {
+      path: '/resource/file/edit/:id',
+      name: 'resource-file-edit',
+      component: components['resource-file-edit'],
+      meta: {
+        title: '文件编辑',
+      },
+    },
+    {
+      path: '/resource/file/subdirectory/:id',
+      name: 'resource-file-subdirectory',
+      component: components['file'],
+      meta: {
+        title: '文件管理',
+      },
+    },
+    {
+      path: '/resource/file/list/:id',
+      name: 'resource-file-list',
+      component: components['resource-file-edit'],
+      meta: {
+        title: '文件详情',
+      },
+    },
+    {
+      path: '/resource/file/create/:id',
+      name: 'resource-subfile-create',
+      component: components['resource-file-create'],
+      meta: {
+        title: '文件创建',
       },
     },
   ],

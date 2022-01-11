@@ -15,23 +15,39 @@
  * limitations under the License.
  */
 
-import { DefineComponent } from 'vue'
-// import * as $ from 'jquery'
+import { reactive, ref, unref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { FormRules } from 'naive-ui'
 
-declare module '*.vue' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+const defaultValue = () => ({
+  content: '',
+})
 
-declare global {
-  interface Window {
-    $message: any
+export function useForm() {
+  const { t } = useI18n()
+
+  const resetForm = () => {
+    state.fileForm = Object.assign(unref(state.fileForm), defaultValue())
+  }
+
+  const state = reactive({
+    fileFormRef: ref(),
+    fileForm: defaultValue(),
+    rules: {
+      content: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.fileForm.content === '') {
+            return new Error(t('resource.enter_content_tips'))
+          }
+        },
+      },
+    } as FormRules,
+  })
+
+  return {
+    state,
+    resetForm,
   }
 }
-
-declare namespace jquery {}
-
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.jpeg'
