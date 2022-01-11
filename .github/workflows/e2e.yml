@@ -34,18 +34,18 @@ jobs:
     strategy:
       matrix:
         case:
-          - name: Tenant
-            class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
+#          - name: Tenant
+#            class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
           - name: User
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
-          - name: WorkerGroup
-            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
-          - name: Project
-            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
-          - name: Workflow
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
-          - name: Resource
-            class: org.apache.dolphinscheduler.e2e.cases.ResourceE2ETest
+#          - name: WorkerGroup
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
+#          - name: Project
+#            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
+#          - name: Workflow
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
+#          - name: Resource
+#            class: org.apache.dolphinscheduler.e2e.cases.ResourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
