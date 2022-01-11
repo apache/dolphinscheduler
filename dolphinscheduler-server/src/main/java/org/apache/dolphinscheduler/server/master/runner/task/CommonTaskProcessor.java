@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
@@ -39,8 +38,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -52,24 +49,16 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private TaskPriorityQueue taskUpdateQueue;
 
     @Autowired
-    MasterConfig masterConfig;
-
-    @Autowired
     NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
-    /**
-     * logger of MasterBaseTaskExecThread
-     */
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
+        setTaskExecutionLogger();
         return dispatchTask(taskInstance, processInstance);
     }
 
@@ -79,7 +68,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
+        return true;
     }
 
     @Override

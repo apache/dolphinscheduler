@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParamete
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -39,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
@@ -68,7 +70,7 @@ import com.google.common.base.Strings;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME, getClass()));
+    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     protected boolean killed = false;
 
@@ -78,9 +80,31 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected TaskInstance taskInstance = null;
 
-    protected ProcessInstance processInstance;
+    protected ProcessInstance processInstance = null;
+
+    protected int maxRetryTimes;
+
+    protected int commitInterval;
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
+    protected MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
+    protected String threadLoggerInfoName;
+
+    @Override
+    public void init(TaskInstance taskInstance, ProcessInstance processInstance) {
+        if (processService == null) {
+            processService = SpringApplicationContext.getBean(ProcessService.class);
+        }
+        if (masterConfig == null) {
+            masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        }
+        this.taskInstance = taskInstance;
+        this.processInstance = processInstance;
+        this.maxRetryTimes = masterConfig.getMasterTaskCommitRetryTimes();
+        this.commitInterval = masterConfig.getMasterTaskCommitInterval();
+    }
 
     /**
      * persist task
@@ -91,21 +115,16 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     /**
      * pause task, common tasks donot need this.
-     *
-     * @return
      */
     protected abstract boolean pauseTask();
 
     /**
      * kill task, all tasks need to realize this function
-     *
-     * @return
      */
     protected abstract boolean killTask();
 
     /**
      * task timeout process
-     * @return
      */
     protected abstract boolean taskTimeout();
 
@@ -119,12 +138,22 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return persistTask(taskAction);
     }
 
-    @Override
-    public void run() {
-    }
+    /*
+     * submit task
+     */
+    protected abstract boolean submitTask();
+
+    /**
+     * run task
+     */
+    protected abstract boolean runTask();
 
     @Override
     public boolean action(TaskAction taskAction) {
+        String threadName = Thread.currentThread().getName();
+        if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
+            Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
+        }
 
         switch (taskAction) {
             case STOP:
@@ -133,11 +162,25 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 return pause();
             case TIMEOUT:
                 return timeout();
+            case SUBMIT:
+                return submit();
+            case RUN:
+                return run();
             default:
                 logger.error("unknown task action: {}", taskAction.toString());
-
         }
+
+        // reset thread name
+        Thread.currentThread().setName(threadName);
         return false;
+    }
+
+    protected boolean submit() {
+        return submitTask();
+    }
+
+    protected boolean run() {
+        return runTask();
     }
 
     protected boolean timeout() {
@@ -148,9 +191,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         return timeout;
     }
 
-    /**
-     * @return
-     */
     protected boolean pause() {
         if (paused) {
             return true;
@@ -170,6 +210,18 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     @Override
     public String getType() {
         return null;
+    }
+
+    /**
+     * set master task running logger.
+     */
+    public void setTaskExecutionLogger() {
+        threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
+        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
     }
 
     /**
@@ -321,7 +373,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // whether udf type
         boolean udfTypeFlag = Enums.getIfPresent(UdfType.class, Strings.nullToEmpty(sqlParameters.getType())).isPresent()
-            && !StringUtils.isEmpty(sqlParameters.getUdfs());
+                && !StringUtils.isEmpty(sqlParameters.getUdfs());
 
         if (udfTypeFlag) {
             String[] udfFunIds = sqlParameters.getUdfs().split(",");
