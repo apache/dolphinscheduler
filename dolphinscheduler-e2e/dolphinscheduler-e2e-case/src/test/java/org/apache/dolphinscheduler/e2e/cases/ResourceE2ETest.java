@@ -56,8 +56,7 @@ public class ResourceE2ETest {
 
     @BeforeAll
     public static void setup() {
-
-         TenantPage tenantPage = new LoginPage(browser)
+        TenantPage tenantPage = new LoginPage(browser)
                 .login(user, password)
                 .create(tenant);
 

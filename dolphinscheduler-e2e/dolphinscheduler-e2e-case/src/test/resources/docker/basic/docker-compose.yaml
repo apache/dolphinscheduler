@@ -23,8 +23,6 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
-#    ports:
-#      - 12345:12345
     expose:
       - 12345
     networks:
@@ -36,19 +34,13 @@ services:
       retries: 120
     depends_on:
       - hdfs
-#    init: true
-#    command: bash -c "sed -i 's|resource.storage.type=.*|resource.storage.type=hdfs|g' /opt/dolphinscheduler/conf/common.properties"
   hdfs:
     image: mdouchement/hdfs:latest
     hostname: hdfs
     tty: true
     stdin_open: true
-    ports:
-      - 8020:8020
-      - 50010:50010
-      - 50020:50020
-      - 50070:50070
-      - 50075:50075
+    expose:
+      - 8020
     networks:
       - e2e
     healthcheck:
