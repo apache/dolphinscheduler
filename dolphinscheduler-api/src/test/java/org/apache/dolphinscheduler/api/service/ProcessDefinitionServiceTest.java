@@ -289,7 +289,7 @@ public class ProcessDefinitionServiceTest {
         processDefinitionList.add(definition);
         Set<Long> definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
-        Mockito.when(processService.saveProcessDefine(loginUser, definition, true)).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(loginUser, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
                 loginUser, projectCode, "46", 1L);
         Assert.assertEquals(Status.SUCCESS, map3.get(Constants.STATUS));
@@ -321,7 +321,7 @@ public class ProcessDefinitionServiceTest {
         processDefinitionList.add(definition);
         Set<Long> definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
         Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
-        Mockito.when(processService.saveProcessDefine(loginUser, definition, true)).thenReturn(2);
+        Mockito.when(processService.saveProcessDefine(loginUser, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 46L)).thenReturn(getProcessTaskRelation(projectCode));
         putMsg(result, Status.SUCCESS);
 
@@ -432,7 +432,7 @@ public class ProcessDefinitionServiceTest {
         processTaskRelation.setProcessDefinitionCode(46L);
         processTaskRelation.setPostTaskCode(123L);
         processTaskRelationList.add(processTaskRelation);
-        Mockito.when(processService.findRelationByCode(projectCode, 46L)).thenReturn(processTaskRelationList);
+        Mockito.when(processService.findRelationByCode(46L, 1)).thenReturn(processTaskRelationList);
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, projectCode, 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));

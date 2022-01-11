@@ -540,7 +540,7 @@ public class WorkflowExecuteThread implements Runnable {
                 processInstance.getProcessDefinitionVersion());
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
         List<TaskNode> taskNodeList =
-                processService.transformTask(processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode()), Lists.newArrayList());
+                processService.transformTask(processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion()), Lists.newArrayList());
         forbiddenTaskList.clear();
 
         taskNodeList.forEach(taskNode -> {
