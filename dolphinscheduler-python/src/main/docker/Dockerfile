@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,33 +15,20 @@
 # limitations under the License.
 #
 
-workDir=`dirname $0`
-workDir=`cd ${workDir};pwd`
+FROM openjdk:8-jre-slim-buster
 
-source ${workDir}/env/install_env.sh
-source ${workDir}/env/dolphinscheduler_env.sh
+ENV DOCKER true
+ENV TZ Asia/Shanghai
+ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-echo "1.create directory"
+RUN apt update ; \
+    apt install -y curl sudo ; \
+    rm -rf /var/lib/apt/lists/*
 
-if [ ! -d $installPath ];then
-  sudo mkdir -p $installPath
-  sudo chown -R $deployUser:$deployUser $installPath
-fi
+WORKDIR $DOLPHINSCHEDULER_HOME
 
-echo "2.scp resources"
-sh ${workDir}/scp-hosts.sh
-if [ $? -eq 0 ];then
-	echo 'scp copy completed'
-else
-	echo 'scp copy failed to exit'
-	exit 1
-fi
+ADD ./target/python-gateway-server $DOLPHINSCHEDULER_HOME
 
-echo "3.stop server"
-sh ${workDir}/stop-all.sh
+EXPOSE 25333 54321
 
-echo "4.delete zk node"
-sh ${workDir}/remove-zk-node.sh $zkRoot
-
-echo "5.startup"
-sh ${workDir}/start-all.sh
+CMD [ "/bin/bash", "./bin/start.sh" ]

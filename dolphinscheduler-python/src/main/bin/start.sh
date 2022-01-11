@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,33 +16,17 @@
 # limitations under the License.
 #
 
-workDir=`dirname $0`
-workDir=`cd ${workDir};pwd`
+BIN_DIR=$(dirname $0)
+DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
-source ${workDir}/env/install_env.sh
-source ${workDir}/env/dolphinscheduler_env.sh
+source "$BIN_DIR/dolphinscheduler_env.sh"
 
-echo "1.create directory"
+JAVA_OPTS=${JAVA_OPTS:-"-server -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
-if [ ! -d $installPath ];then
-  sudo mkdir -p $installPath
-  sudo chown -R $deployUser:$deployUser $installPath
+if [[ "$DOCKER" == "true" ]]; then
+  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
 fi
 
-echo "2.scp resources"
-sh ${workDir}/scp-hosts.sh
-if [ $? -eq 0 ];then
-	echo 'scp copy completed'
-else
-	echo 'scp copy failed to exit'
-	exit 1
-fi
-
-echo "3.stop server"
-sh ${workDir}/stop-all.sh
-
-echo "4.delete zk node"
-sh ${workDir}/remove-zk-node.sh $zkRoot
-
-echo "5.startup"
-sh ${workDir}/start-all.sh
+java $JAVA_OPTS \
+  -cp "$DOLPHINSCHEDULER_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*" \
+  org.apache.dolphinscheduler.server.PythonGatewayServer

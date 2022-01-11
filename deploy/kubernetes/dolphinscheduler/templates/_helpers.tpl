@@ -44,6 +44,9 @@ Create default docker images' fullname.
 {{- define "dolphinscheduler.image.fullname.tools" -}}
 {{- .Values.image.registry }}/dolphinscheduler-tools:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
+{{- define "dolphinscheduler.image.fullname.python-gateway" -}}
+{{- .Values.image.registry }}/dolphinscheduler-python-gateway:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
 
 {{/*
 Create a default common labels.

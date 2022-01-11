@@ -56,14 +56,11 @@ do
   echo "$master  $masterState"
 done
 
-# 2.worker server and logger-server check state
+# 2.worker server check state
 for worker in ${!workersGroupMap[*]}
 do
   workerState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status worker-server;"`
   echo "$worker  $workerState"
-
-  masterState=`ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status logger-server;"`
-  echo "$worker  $masterState"
 done
 
 # 3.alter server check state
@@ -76,4 +73,12 @@ for apiServer in ${apiServersHost[@]}
 do
   apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
+done
+
+# python gateway server check state
+pythonGatewayHost=(${pythonGatewayServers//,/ })
+for pythonGatewayServer in "${pythonGatewayHost[@]}"
+do
+  pythonGatewayState=`ssh -p $sshPort $pythonGatewayServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status python-gateway-server;"`
+  echo "$pythonGatewayServer  $pythonGatewayState"
 done

@@ -36,7 +36,10 @@ export function useProfile() {
   infoOptions.value.push({ key: t('profile.phone'), value: userInfo.phone })
   infoOptions.value.push({
     key: t('profile.permission'),
-    value: userInfo.userName,
+    value:
+      userInfo.userType === 'ADMIN_USER'
+        ? t('profile.administrator')
+        : t('profile.ordinary_user'),
   })
   infoOptions.value.push({
     key: t('profile.create_time'),
