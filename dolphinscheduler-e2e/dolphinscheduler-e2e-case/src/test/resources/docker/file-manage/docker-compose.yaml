@@ -44,7 +44,7 @@ services:
       - 8020
     networks:
       - e2e
-    volumns:
+    volumes:
       - docker/file-manage/common.properties:/opt/dolphinscheduler/conf/common.properties
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50070" ]
