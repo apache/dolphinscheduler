@@ -45,7 +45,7 @@ services:
     networks:
       - e2e
     volumes:
-      - ./docker/file-manage/common.properties:/opt/dolphinscheduler/conf/common.properties
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50070" ]
       interval: 5s
