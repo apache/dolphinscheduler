@@ -32,6 +32,8 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+    volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     depends_on:
       hdfs:
         condition: service_healthy
@@ -44,8 +46,6 @@ services:
       - 8020
     networks:
       - e2e
-    volumes:
-      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50070" ]
       interval: 5s
