@@ -15,75 +15,75 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { NGrid, NGi, NDataTable } from 'naive-ui'
+import { defineComponent, onMounted, ref } from 'vue'
+import { NGrid, NGi } from 'naive-ui'
+import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
-import { useTable } from './use-table'
-import { useProcessDefinition } from './use-process-definition'
-import Card from '@/components/card'
-import PieChart from '@/components/chart/modules/Pie'
-import BarChart from '@/components/chart/modules/Bar'
-import styles from './index.module.scss'
-import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
+import { useTaskState } from './use-task-state'
+import { useProcessState } from './use-process-state'
+import StateCard from './state-card'
+import DefinitionCard from './definition-card'
 
 export default defineComponent({
   name: 'home',
   setup() {
     const { t } = useI18n()
-    const { getProcessDefinition, formatProcessDefinition } =
-      useProcessDefinition()
-    const processDefinition = getProcessDefinition()
+    const dateRef = ref([getTime(startOfToday()), Date.now()])
+    const { getTaskState } = useTaskState()
+    const { getProcessState } = useProcessState()
+    let taskStateRef = ref()
+    let processStateRef = ref()
 
-    return { t, processDefinition, formatProcessDefinition }
+    onMounted(() => {
+      taskStateRef.value = getTaskState(dateRef.value)
+      processStateRef.value = getProcessState(dateRef.value)
+    })
+
+    const handleTaskDate = (val: any) => {
+      taskStateRef.value = getTaskState(val)
+    }
+
+    const handleProcessDate = (val: any) => {
+      processStateRef.value = getProcessState(val)
+    }
+
+    return {
+      t,
+      dateRef,
+      handleTaskDate,
+      handleProcessDate,
+      taskStateRef,
+      processStateRef,
+    }
   },
   render() {
-    const { columnsRef } = useTable()
-    const { t, processDefinition, formatProcessDefinition } = this
-    const chartData =
-      Object.keys(processDefinition).length > 0 &&
-      formatProcessDefinition(processDefinition as ProcessDefinitionRes)
+    const { t, dateRef, handleTaskDate, handleProcessDate } = this
 
     return (
       <div>
         <NGrid x-gap={12} cols={2}>
           <NGi>
-            <Card title={t('home.task_state_statistics')}>
-              {{
-                default: () => (
-                  <div class={styles['card-table']}>
-                    <PieChart />
-                    <NDataTable columns={columnsRef} />
-                  </div>
-                ),
-              }}
-            </Card>
+            <StateCard
+              title={t('home.task_state_statistics')}
+              date={dateRef}
+              tableData={this.taskStateRef?.value.table}
+              chartData={this.taskStateRef?.value.chart}
+              onUpdateDatePickerValue={handleTaskDate}
+            />
           </NGi>
-          <NGi class={styles['card-table']}>
-            <Card title={t('home.process_state_statistics')}>
-              {{
-                default: () => (
-                  <div class={styles['card-table']}>
-                    <PieChart />
-                    <NDataTable columns={columnsRef} />
-                  </div>
-                ),
-              }}
-            </Card>
+          <NGi>
+            <StateCard
+              title={t('home.process_state_statistics')}
+              date={dateRef}
+              tableData={this.processStateRef?.value.table}
+              chartData={this.processStateRef?.value.chart}
+              onUpdateDatePickerValue={handleProcessDate}
+            />
           </NGi>
         </NGrid>
         <NGrid cols={1} style='margin-top: 12px;'>
           <NGi>
-            <Card title={t('home.process_definition_statistics')}>
-              {{
-                default: () =>
-                  chartData && (
-                    <BarChart
-                      xAxisData={chartData.xAxisData}
-                      seriesData={chartData.seriesData}
-                    />
-                  ),
-              }}
-            </Card>
+            <DefinitionCard title={t('home.process_definition_statistics')} />
           </NGi>
         </NGrid>
       </div>

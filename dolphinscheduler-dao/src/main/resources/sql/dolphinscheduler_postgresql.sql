@@ -392,7 +392,7 @@ CREATE TABLE t_ds_task_definition (
   timeout int DEFAULT '0' ,
   delay_time int DEFAULT '0' ,
   task_group_id int DEFAULT NULL,
-  task_group_priority int(4) DEFAULT '0',
+  task_group_priority int DEFAULT '0',
   resource_ids text ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -429,7 +429,7 @@ CREATE TABLE t_ds_task_definition_log (
   resource_ids text ,
   operator int DEFAULT NULL ,
   task_group_id int DEFAULT NULL,
-  task_group_priority int(4) DEFAULT '0',
+  task_group_priority int DEFAULT '0',
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -664,7 +664,7 @@ CREATE TABLE t_ds_resources (
   update_time timestamp DEFAULT NULL ,
   pid int,
   full_name varchar(64),
-  is_directory int,
+  is_directory boolean DEFAULT FALSE,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
 ) ;

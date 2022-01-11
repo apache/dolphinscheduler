@@ -17,13 +17,7 @@
 
 on:
   pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-python/pydolphinscheduler'
   push:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
 
@@ -44,6 +38,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
           - name: User
             class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
+          - name: WorkerGroup
+            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
           - name: Project
             class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
           - name: Workflow

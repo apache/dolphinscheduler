@@ -19,10 +19,11 @@ import { defineComponent, PropType } from 'vue'
 import styles from './index.module.scss'
 import { NMenu } from 'naive-ui'
 import Logo from '../logo'
-import Language from '../language'
+import Locales from '../locales'
 import User from '../user'
 import Theme from '../theme'
 import { useMenuClick } from './use-menuClick'
+import { useMenuStore } from '@/store/menu/menu'
 
 const Navbar = defineComponent({
   name: 'Navbar',
@@ -32,18 +33,19 @@ const Navbar = defineComponent({
       type: Array as PropType<any>,
       default: [],
     },
-    languageOptions: {
+    localesOptions: {
       type: Array as PropType<any>,
       default: [],
     },
-    profileOptions: {
+    userDropdownOptions: {
       type: Array as PropType<any>,
       default: [],
     },
   },
   setup(props, ctx) {
     const { handleMenuClick } = useMenuClick(ctx)
-    return { handleMenuClick }
+    const menuStore = useMenuStore()
+    return { handleMenuClick, menuStore }
   },
   render() {
     return (
@@ -51,7 +53,7 @@ const Navbar = defineComponent({
         <Logo />
         <div class={styles.nav}>
           <NMenu
-            default-value='home'
+            default-value={this.menuStore.getMenuKey}
             mode='horizontal'
             options={this.headerMenuOptions}
             onUpdateValue={this.handleMenuClick}
@@ -59,8 +61,8 @@ const Navbar = defineComponent({
         </div>
         <div class={styles.settings}>
           <Theme />
-          <Language languageOptions={this.languageOptions} />
-          <User profileOptions={this.profileOptions} />
+          <Locales localesOptions={this.localesOptions} />
+          <User userDropdownOptions={this.userDropdownOptions} />
         </div>
       </div>
     )

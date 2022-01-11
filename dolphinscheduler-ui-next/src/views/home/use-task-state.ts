@@ -14,3 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { useAsyncState } from '@vueuse/core'
+import { format } from 'date-fns'
+import { countTaskState } from '@/service/modules/projects-analysis'
+import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import type { StateData } from './types'
+
+export function useTaskState() {
+  const getTaskState = (date: Array<number>) => {
+    const { state } = useAsyncState(
+      countTaskState({
+        startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        projectCode: 0,
+      }).then((res: TaskStateRes): StateData => {
+        const table = res.taskCountDtos.map((item, index) => {
+          return {
+            id: index + 1,
+            state: item.taskStateType,
+            number: item.count,
+          }
+        })
+
+        const chart = res.taskCountDtos.map((item) => {
+          return {
+            value: item.count,
+            name: item.taskStateType,
+          }
+        })
+
+        return { table, chart }
+      }),
+      { table: [], chart: [] }
+    )
+
+    return state
+  }
+
+  return { getTaskState }
+}

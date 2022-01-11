@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref } from 'vue'
-import styles from './index.module.scss'
+import { defineComponent, ref, PropType } from 'vue'
 import { NLayoutSider, NMenu } from 'naive-ui'
+import { useMenuClick } from './use-menuClick'
 
 const Sidebar = defineComponent({
   name: 'Sidebar',
@@ -25,10 +25,6 @@ const Sidebar = defineComponent({
     sideMenuOptions: {
       type: Array as PropType<any>,
       default: [],
-    },
-    isShowSide: {
-      type: Boolean as PropType<boolean>,
-      default: false,
     },
   },
   setup() {
@@ -40,26 +36,28 @@ const Sidebar = defineComponent({
       'statistical-manage',
     ]
 
-    return { collapsedRef, defaultExpandedKeys }
+    const { handleMenuClick } = useMenuClick()
+
+    return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {
     return (
-      this.isShowSide && (
-        <NLayoutSider
-          bordered
-          nativeScrollbar={false}
-          show-trigger='bar'
-          collapse-mode='width'
-          collapsed={this.collapsedRef}
-          onCollapse={() => (this.collapsedRef = true)}
-          onExpand={() => (this.collapsedRef = false)}
-        >
-          <NMenu
-            options={this.sideMenuOptions}
-            defaultExpandedKeys={this.defaultExpandedKeys}
-          />
-        </NLayoutSider>
-      )
+      <NLayoutSider
+        bordered
+        nativeScrollbar={false}
+        show-trigger='bar'
+        collapse-mode='width'
+        collapsed={this.collapsedRef}
+        onCollapse={() => (this.collapsedRef = true)}
+        onExpand={() => (this.collapsedRef = false)}
+      >
+        <NMenu
+          default-value={this.sideMenuOptions[0].key}
+          options={this.sideMenuOptions}
+          defaultExpandedKeys={this.defaultExpandedKeys}
+          onUpdateValue={this.handleMenuClick}
+        />
+      </NLayoutSider>
     )
   },
 })

@@ -24,13 +24,19 @@ const login = {
   login: 'Login',
 }
 
+const modal = {
+  cancel: 'Cancel',
+  confirm: 'Confirm',
+}
+
 const theme = {
   light: 'Light',
   dark: 'Dark',
 }
 
-const profile = {
+const userDropdown = {
   profile: 'Profile',
+  password: 'Password',
   logout: 'Logout',
 }
 
@@ -76,10 +82,83 @@ const home = {
   state: 'State',
 }
 
+const password = {
+  edit_password: 'Edit Password',
+  password: 'Password',
+  confirm_password: 'Confirm Password',
+  password_tips: 'Please enter your password',
+  confirm_password_tips: 'Please enter your confirm password',
+  two_password_entries_are_inconsistent:
+    'Two password entries are inconsistent',
+  submit: 'Submit',
+}
+
+const profile = {
+  profile: 'Profile',
+  edit: 'Edit',
+  username: 'Username',
+  email: 'Email',
+  phone: 'Phone',
+  state: 'State',
+  permission: 'Permission',
+  create_time: 'Create Time',
+  update_time: 'Update Time',
+  administrator: 'Administrator',
+  ordinary_user: 'Ordinary User',
+  edit_profile: 'Edit Profile',
+  username_tips: 'Please enter your username',
+  email_tips: 'Please enter your email',
+  email_correct_tips: 'Please enter your email in the correct format',
+  phone_tips: 'Please enter your phone',
+  state_tips: 'Please choose your state',
+  enable: 'Enable',
+  disable: 'Disable',
+}
+
+const monitor = {
+  master: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
+  worker: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
+  db: {
+    health_state: 'Health State',
+    max_connections: 'Max Connections',
+    threads_connections: 'Threads Connections',
+    threads_running_connections: 'Threads Running Connections',
+  },
+  statistics: {
+    command_number_of_waiting_for_running:
+      'Command Number Of Waiting For Running',
+    failure_command_number: 'Failure Command Number',
+    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
+  },
+}
+
 export default {
   login,
+  modal,
   theme,
-  profile,
+  userDropdown,
   menu,
   home,
+  password,
+  profile,
+  monitor,
 }

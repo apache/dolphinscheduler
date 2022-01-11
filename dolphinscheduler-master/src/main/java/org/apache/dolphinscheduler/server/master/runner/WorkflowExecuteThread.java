@@ -54,7 +54,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -333,7 +332,8 @@ public class WorkflowExecuteThread {
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
             TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-            taskProcessor.dispatch(taskInstance, processInstance);
+            taskProcessor.init(taskInstance, processInstance);
+            taskProcessor.action(TaskAction.DISPATCH);
             this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
             return true;
         }
@@ -343,7 +343,8 @@ public class WorkflowExecuteThread {
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
                 TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ProcessInstance processInstance = this.processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
-                taskProcessor.dispatch(taskInstance, processInstance);
+                taskProcessor.init(taskInstance, processInstance);
+                taskProcessor.action(TaskAction.DISPATCH);
                 return true;
             }
         }
@@ -406,7 +407,7 @@ public class WorkflowExecuteThread {
             }
         } else if (activeTaskProcessorMaps.containsKey(stateEvent.getTaskInstanceId())) {
             ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(stateEvent.getTaskInstanceId());
-            iTaskProcessor.run();
+            iTaskProcessor.action(TaskAction.RUN);
 
             if (iTaskProcessor.taskState().typeIsFinished()) {
                 task = processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
@@ -715,7 +716,7 @@ public class WorkflowExecuteThread {
 
         List<TaskInstance> recoverNodeList = getStartTaskInstanceList(processInstance.getCommandParam());
 
-        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
         List<TaskDefinitionLog> taskDefinitionLogs = processService.getTaskDefineLogListByRelation(processTaskRelations);
         List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();
@@ -800,15 +801,18 @@ public class WorkflowExecuteThread {
      */
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         try {
+            // package task instance before submit
+            processService.packageTaskInstance(taskInstance, processInstance);
+
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
+            taskProcessor.init(taskInstance, processInstance);
+
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
                 && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
-            // package task instance before submit
-            processService.packageTaskInstance(taskInstance, processInstance);
 
-            boolean submit = taskProcessor.submit(taskInstance, processInstance, masterConfig.getTaskCommitRetryTimes(), masterConfig.getTaskCommitInterval(), masterConfig.isTaskLogger());
+            boolean submit = taskProcessor.action(TaskAction.SUBMIT);
             if (!submit) {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
                     processInstance.getId(), processInstance.getName(),
@@ -818,7 +822,7 @@ public class WorkflowExecuteThread {
             validTaskMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getId(), taskProcessor);
-            taskProcessor.run();
+            taskProcessor.action(TaskAction.RUN);
 
             stateWheelExecuteThread.addTask4TimeoutCheck(taskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(taskInstance);
