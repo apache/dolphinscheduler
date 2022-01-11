@@ -109,14 +109,14 @@ public class ResourceE2ETest {
 
         page.delete(testDiretoryName);
 
-//        await().untilAsserted(() -> {
-//            browser.navigate().refresh();
-//
-//            assertThat(
-//                    page.fileList()
-//            ).noneMatch(
-//                    it -> it.getText().contains(testDiretoryName)
-//            );
-//        });
+        await().untilAsserted(() -> {
+            browser.navigate().refresh();
+
+            assertThat(
+                    page.fileList()
+            ).noneMatch(
+                    it -> it.getText().contains(testDiretoryName)
+            );
+        });
     }
 }

@@ -29,6 +29,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import java.util.List;
@@ -46,6 +47,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @FindBy(id = "delete")
     private WebElement buttonDelete;
+
+    @FindBys({
+        @FindBy(className = "el-popconfirm"),
+        @FindBy(className = "el-button--primary"),
+    })
+    private List<WebElement> buttonConfirm;
 
     public FileManagePage(RemoteWebDriver driver) {
         super(driver);
@@ -73,7 +80,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
             .click();
 
-        buttonDelete().click();
+        buttonConfirm()
+            .stream()
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
+            .click();
 
         return this;
     }
