@@ -38,7 +38,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FileManageE2ETest {
     private static RemoteWebDriver browser;
 

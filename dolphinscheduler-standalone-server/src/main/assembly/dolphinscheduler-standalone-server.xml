@@ -73,7 +73,6 @@
             <includes>
                 <include>*.yaml</include>
                 <include>*.xml</include>
-                <include>*.properties</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>

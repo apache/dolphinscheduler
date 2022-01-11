@@ -32,6 +32,25 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+    depends_on:
+      hdfs:
+        condition: service_healthy
+  hdfs:
+    image: mdouchement/hdfs:latest
+    hostname: hdfs
+    tty: true
+    stdin_open: true
+    expose:
+      - 8020
+    networks:
+      - e2e
+    volumns:
+      - docker/file-manage/common.properties:/opt/dolphinscheduler/conf/common.properties
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:50070" ]
+      interval: 5s
+      timeout: 120s
+      retries: 120
 
 networks:
   e2e:
