@@ -59,8 +59,6 @@ public class ResourceE2ETest {
 
          TenantPage tenantPage = new LoginPage(browser)
                 .login(user, password)
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
                 .create(tenant);
 
         await().untilAsserted(() -> assertThat(tenantPage.tenantList())
