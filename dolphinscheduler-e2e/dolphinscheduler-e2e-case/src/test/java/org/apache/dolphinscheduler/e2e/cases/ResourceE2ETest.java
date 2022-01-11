@@ -68,11 +68,11 @@ public class ResourceE2ETest {
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
 
-        tenantPage.goToNav(SecurityPage.class)
-                .goToTab(UserPage.class)
-                .update(user, user, password, email, phone)
-                .goToNav(ResourcePage.class)
-                .goToTab(FileManagePage.class);
+        new TenantPage(browser).goToNav(SecurityPage.class)
+            .goToTab(UserPage.class)
+            .update(user, user, password, email, phone)
+            .goToNav(ResourcePage.class)
+            .goToTab(FileManagePage.class);
     }
 
     @Test

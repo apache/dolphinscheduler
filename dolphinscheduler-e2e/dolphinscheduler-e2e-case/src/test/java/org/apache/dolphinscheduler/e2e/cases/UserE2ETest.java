@@ -65,8 +65,8 @@ class UserE2ETest {
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
 
-        tenantPage.goToNav(SecurityPage.class)
-                .goToTab(UserPage.class);
+//        tenantPage.goToNav(SecurityPage.class)
+//                .goToTab(UserPage.class);
     }
 
     @AfterAll
