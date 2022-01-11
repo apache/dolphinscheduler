@@ -37,7 +37,10 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     @FindBy(id = "btnCreateUser")
     private WebElement buttonCreateUser;
 
-    @FindBy(className = "items")
+    @FindBys(
+        @FindBy(className = "items"),
+        @FindBy(xpath = "//*[contains(text(), 'User Manage')]")
+    )
     private List<WebElement> userList;
 
     @FindBys({
