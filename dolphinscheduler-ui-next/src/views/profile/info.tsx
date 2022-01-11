@@ -21,7 +21,6 @@ import styles from './info.module.scss'
 
 const Info = defineComponent({
   name: 'Info',
-  setup() {},
   render() {
     const { infoOptions } = useProfile()
 
