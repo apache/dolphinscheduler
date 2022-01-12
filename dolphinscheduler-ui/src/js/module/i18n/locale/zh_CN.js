@@ -726,6 +726,7 @@ export default {
   WebHook: 'Web钩子',
   webHook: 'Web钩子',
   Keyword: '关键词',
+  Secret: '密钥',
   Proxy: '代理',
   receivers: '收件人',
   receiverCcs: '抄送人',

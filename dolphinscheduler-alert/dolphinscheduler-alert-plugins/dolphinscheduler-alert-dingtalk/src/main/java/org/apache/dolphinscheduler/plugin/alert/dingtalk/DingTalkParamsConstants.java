@@ -28,7 +28,7 @@ public final class DingTalkParamsConstants {
     static final String NAME_DING_TALK_KEYWORD = "Keyword";
 
     static final String DING_TALK_SECRET = "$t('secret')";
-    static final String NAME_DING_TALK_SECRET = "secret";
+    static final String NAME_DING_TALK_SECRET = "Secret";
 
     static final String DING_TALK_PROXY = "$t('proxy')";
     static final String NAME_DING_TALK_PROXY = "Proxy";
