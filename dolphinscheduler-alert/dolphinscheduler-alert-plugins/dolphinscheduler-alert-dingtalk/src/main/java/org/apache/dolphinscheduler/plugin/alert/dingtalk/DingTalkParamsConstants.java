@@ -18,12 +18,18 @@
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
 public final class DingTalkParamsConstants {
+
     static final String DING_TALK_PROXY_ENABLE = "isEnableProxy";
+    static final String NAME_DING_TALK_PROXY_ENABLE = "IsEnableProxy";
+
     static final String DING_TALK_WEB_HOOK = "webhook";
     static final String NAME_DING_TALK_WEB_HOOK = "WebHook";
     static final String DING_TALK_KEYWORD = "keyword";
     static final String NAME_DING_TALK_KEYWORD = "Keyword";
-    static final String NAME_DING_TALK_PROXY_ENABLE = "IsEnableProxy";
+
+    static final String DING_TALK_SECRET = "secret";
+    static final String NAME_DING_TALK_SECRET = "Secret";
+
     static final String DING_TALK_PROXY = "proxy";
     static final String NAME_DING_TALK_PROXY = "Proxy";
     static final String DING_TALK_PORT = "port";
