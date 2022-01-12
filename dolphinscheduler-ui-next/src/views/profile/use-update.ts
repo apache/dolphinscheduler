@@ -33,7 +33,7 @@ export function useUpdate(state: any) {
           tenantId: userInfo.tenantId,
           email: state.profileForm.email,
           phone: state.profileForm.phone,
-          state: state.profileForm.state,
+          state: userInfo.state,
           queue: userInfo.queue,
         })
       }

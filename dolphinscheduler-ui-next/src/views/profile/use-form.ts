@@ -32,7 +32,6 @@ export function useForm() {
       username: userInfo.userName,
       email: userInfo.email,
       phone: userInfo.phone,
-      state: userInfo.state,
     },
     rules: {
       username: {
@@ -63,7 +62,6 @@ export function useForm() {
       username: userInfo.userName,
       email: userInfo.email,
       phone: userInfo.phone,
-      state: userInfo.state,
     }
   })
 
