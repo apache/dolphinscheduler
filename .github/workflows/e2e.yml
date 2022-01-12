@@ -51,11 +51,11 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Check Docker Info
+        uses: docker info
       - name: Export Docker Images
         run: |
-          docker save $(docker images | grep -v REPOSITORY | awk 'BEGIN{OFS=":";ORS=" "}{print $1,$2}') -o /tmp/docker-images.tar
+          docker save $(docker images -q) -o /tmp/docker-images.tar
       - uses: actions/upload-artifact@v2
         name: Upload Docker Images
         with:
