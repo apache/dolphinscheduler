@@ -55,13 +55,19 @@ class UserE2ETest {
 
     @BeforeAll
     public static void setup() {
-        new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .create(tenant)
-            .goToNav(SecurityPage.class)
-            .goToTab(UserPage.class);
+        TenantPage tenantPage = new LoginPage(browser)
+                .login("admin", "dolphinscheduler123")
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
+                .create(tenant);
+
+        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+                .as("Tenant list should contain newly-created tenant")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(tenant)));
+
+        tenantPage.goToNav(SecurityPage.class)
+                .goToTab(UserPage.class);
     }
 
     @AfterAll
