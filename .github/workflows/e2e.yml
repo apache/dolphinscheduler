@@ -51,6 +51,14 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
+      - name: Export Docker Images
+        run: |
+          docker save $(docker images | grep -v REPOSITORY | awk 'BEGIN{OFS=":";ORS=" "}{print $1,$2}') -o /tmp/docker-images.tar
+      - uses: actions/upload-artifact@v2
+        name: Upload Docker Images
+        with:
+          name: docker-images
+          path: /tmp/docker-images.tar
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
@@ -84,6 +92,13 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
+      - uses: actions/download-artifact@v2
+        with:
+          name: docker-images
+          path: /tmp/docker-images.tar
+      - name: Load Docker Images
+        run: |
+            docker load -i /tmp/docker-images.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
