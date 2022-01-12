@@ -15,9 +15,16 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, onMounted, onBeforeUnmount, watch } from 'vue'
+import {
+  getCurrentInstance,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+  watchEffect,
+} from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import { throttle } from 'echarts'
+import { useI18n } from 'vue-i18n'
 import type { Ref } from 'vue'
 import type { ECharts } from 'echarts'
 import type { ECBasicOption } from 'echarts/types/dist/shared'
@@ -28,8 +35,11 @@ function initChart<Opt extends ECBasicOption>(
 ): ECharts | null {
   let chart: ECharts | null = null
   const themeStore = useThemeStore()
+  const { locale } = useI18n()
   const globalProperties =
     getCurrentInstance()?.appContext.config.globalProperties
+
+  option['backgroundColor'] = ''
 
   const init = () => {
     chart = globalProperties?.echarts.init(
@@ -48,6 +58,25 @@ function initChart<Opt extends ECBasicOption>(
     () => {
       chart?.dispose()
       init()
+    }
+  )
+
+  watch(
+    () => locale.value,
+    () => {
+      chart?.dispose()
+      init()
+    }
+  )
+
+  watch(
+    () => option,
+    () => {
+      chart?.dispose()
+      init()
+    },
+    {
+      deep: true,
     }
   )
 

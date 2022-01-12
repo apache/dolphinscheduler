@@ -17,17 +17,19 @@
 
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { MenuOption } from 'naive-ui' 
+import { MenuOption } from 'naive-ui'
+import { SetupContext } from 'vue'
 
-export function useMenuClick() {
+export function useMenuClick(ctx: SetupContext<'handleMenuClick'[]>) {
   const router: Router = useRouter()
 
   const handleMenuClick = (key: string, item: MenuOption) => {
-    console.log(key, item)
-    router.push({ path: 'home' })
+    // console.log(key, item)
+    ctx.emit('handleMenuClick', item)
+    router.push({ path: `/${key}` })
   }
 
   return {
-    handleMenuClick
+    handleMenuClick,
   }
 }

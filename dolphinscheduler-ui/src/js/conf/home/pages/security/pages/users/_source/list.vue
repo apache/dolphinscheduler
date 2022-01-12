@@ -17,9 +17,9 @@
 <template>
   <div class="list-model user-list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
+        <el-table-column prop="userName" :label="$t('User Name')" class-name="name"></el-table-column>
         <el-table-column :label="$t('User Type')" width="80">
           <template slot-scope="scope">
             {{scope.row.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
@@ -62,7 +62,7 @@
               </el-dropdown>
             </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle class="edit"></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
@@ -73,7 +73,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" class="delete"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>

@@ -138,16 +138,20 @@ public class FileUtils {
      * @return true if write success
      */
     public static boolean writeContent2File(String content, String filePath) {
+        FileOutputStream fos = null;
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
                 logger.error("mkdir parent failed");
                 return false;
             }
-            IOUtils.write(content, new FileOutputStream(filePath), StandardCharsets.UTF_8);
+            fos = new FileOutputStream(filePath);
+            IOUtils.write(content, fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             return false;
+        } finally {
+            IOUtils.closeQuietly(fos);
         }
         return true;
     }

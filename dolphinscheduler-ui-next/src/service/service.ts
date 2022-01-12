@@ -15,8 +15,16 @@
  * limitations under the License.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  AxiosRequestHeaders,
+} from 'axios'
 import qs from 'qs'
+import { useUserStore } from '@/store/user/user'
+
+const userStore = useUserStore()
 
 const baseRequestConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
@@ -36,7 +44,10 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  console.log('config', config)
+  // console.log('config', config)
+
+  config.headers && (config.headers.sessionId = userStore.getSessionId)
+
   return config
 }, err)
 

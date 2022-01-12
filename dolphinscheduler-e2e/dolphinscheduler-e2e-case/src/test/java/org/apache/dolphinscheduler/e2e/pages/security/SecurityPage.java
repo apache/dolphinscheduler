@@ -33,6 +33,15 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-tenant-manage")
     private WebElement menuTenantManage;
 
+    @FindBy(className = "tab-user-manage")
+    private WebElement menUserManage;
+
+    @FindBy(className = "tab-worker-group-manage")
+    private WebElement menWorkerGroupManage;
+
+    @FindBy(className = "tab-queue-manage")
+    private WebElement menuQueueManage;
+
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
     }
@@ -42,7 +51,18 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
             menuTenantManage().click();
             return tab.cast(new TenantPage(driver));
         }
-
+        if (tab == UserPage.class) {
+            menUserManage().click();
+            return tab.cast(new UserPage(driver));
+        }
+        if (tab == WorkerGroupPage.class) {
+            menWorkerGroupManage().click();
+            return tab.cast(new WorkerGroupPage(driver));
+        }
+        if (tab == QueuePage.class) {
+            menuQueueManage().click();
+            return tab.cast(new QueuePage(driver));
+        }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
 

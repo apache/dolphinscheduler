@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANC
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -35,8 +36,6 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,6 +53,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * executor controller
@@ -89,13 +95,13 @@ public class ExecutorController extends BaseController {
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
-        @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", dataType = "String"),
         @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
         @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
         @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
         @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
         @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
-        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
         @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
@@ -111,12 +117,12 @@ public class ExecutorController extends BaseController {
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
                                        @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
-                                       @RequestParam(value = "failureStrategy", required = true) FailureStrategy failureStrategy,
+                                       @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
                                        @RequestParam(value = "startNodeList", required = false) String startNodeList,
                                        @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
                                        @RequestParam(value = "execType", required = false) CommandType execType,
-                                       @RequestParam(value = "warningType", required = true) WarningType warningType,
-                                       @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                       @RequestParam(value = "warningType") WarningType warningType,
+                                       @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
@@ -135,6 +141,100 @@ public class ExecutorController extends BaseController {
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
             startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode,timeout, startParamMap, expectedParallelismNumber, dryRun);
+        return returnDataList(result);
+    }
+
+    /**
+     * batch execute process instance
+     * If any processDefinitionCode cannot be found, the failure information is returned and the status is set to
+     * failed. The successful task will run normally and will not stop
+     * 
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processDefinitionCodes process definition codes
+     * @param scheduleTime schedule time
+     * @param failureStrategy failure strategy
+     * @param startNodeList start nodes list
+     * @param taskDependType task depend type
+     * @param execType execute type
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param runMode run mode
+     * @param processInstancePriority process instance priority
+     * @param workerGroup worker group
+     * @param timeout timeout
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @return start process result code
+     */
+    @ApiOperation(value = "batchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "1,2,3"),
+            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
+            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
+            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
+            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
+            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8")
+    })
+    @PostMapping(value = "batch-start-process-instance")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result batchStartProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                       @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
+                                       @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
+                                       @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
+                                       @RequestParam(value = "startNodeList", required = false) String startNodeList,
+                                       @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
+                                       @RequestParam(value = "execType", required = false) CommandType execType,
+                                       @RequestParam(value = "warningType") WarningType warningType,
+                                       @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                       @RequestParam(value = "runMode", required = false) RunMode runMode,
+                                       @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
+                                       @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                       @RequestParam(value = "timeout", required = false) Integer timeout,
+                                       @RequestParam(value = "startParams", required = false) String startParams,
+                                       @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
+                                       @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
+
+        if (timeout == null) {
+            timeout = Constants.MAX_TASK_TIMEOUT;
+        }
+
+        Map<String, String> startParamMap = null;
+        if (startParams != null) {
+            startParamMap = JSONUtils.toMap(startParams);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        List<String> processDefinitionCodeArray = Arrays.asList(processDefinitionCodes.split(Constants.COMMA));
+        List<String> startFailedProcessDefinitionCodeList = new ArrayList<>();
+
+        processDefinitionCodeArray = processDefinitionCodeArray.stream().distinct().collect(Collectors.toList());
+
+        for (String strProcessDefinitionCode : processDefinitionCodeArray) {
+            long processDefinitionCode = Long.parseLong(strProcessDefinitionCode);
+            result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
+                    startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun);
+
+            if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
+                startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
+            }
+        }
+
+        if (!startFailedProcessDefinitionCodeList.isEmpty()) {
+            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR, String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
+        }
+
         return returnDataList(result);
     }
 
@@ -166,7 +266,7 @@ public class ExecutorController extends BaseController {
     }
 
     /**
-     * check process definition and all of the son process definitions is on line.
+     * check process definition and all the son process definitions is online.
      *
      * @param processDefinitionCode process definition code
      * @return check result code
