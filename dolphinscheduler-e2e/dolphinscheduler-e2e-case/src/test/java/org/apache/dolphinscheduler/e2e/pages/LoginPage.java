@@ -52,7 +52,7 @@ public final class LoginPage extends NavBarPage {
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        new WebDriverWait(driver(), 10)
+        new WebDriverWait(driver, 10)
             .until(ExpectedConditions.urlContains("/#/security"));
 
         return new TenantPage(driver);

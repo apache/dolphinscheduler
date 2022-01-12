@@ -20,16 +20,19 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button-group size="small" >
-            <el-button size="mini" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</el-button>
-            <el-button size="mini" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</el-button>
-            <el-button size="mini" @click="_uploading">{{$t('Upload Files')}}</el-button>
+            <el-button id="btnCreateDirectory" size="mini" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</el-button>
+            <el-button id="btnCreateFile" size="mini" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</el-button>
+            <el-button id="btnUploadFile" size="mini" @click="_uploading">{{$t('Upload Files')}}</el-button>
           </el-button-group>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
       <template v-if="fileResourcesList.length || total>0">
-        <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        <m-list @on-update="_onUpdate"
+                :file-resources-list="fileResourcesList"
+                :page-no="searchParams.pageNo"
+                :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <el-pagination

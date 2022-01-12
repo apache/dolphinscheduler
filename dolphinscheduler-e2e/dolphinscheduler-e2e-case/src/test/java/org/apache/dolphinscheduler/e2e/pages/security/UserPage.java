@@ -67,8 +67,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     }
 
     public UserPage update(String user, String editUser, String editPassword, String editEmail, String editPhone) {
-        userList()
-            .stream()
+        List<WebElement> userList = driver.findElementsByClassName("items");
+        userList.stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
             .filter(WebElement::isDisplayed)
@@ -76,15 +76,17 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in user list"))
             .click();
 
-        editUserForm().inputUserName().clear();
-        editUserForm().inputUserName().sendKeys(editUser);
-        editUserForm().inputUserPassword().clear();
-        editUserForm().inputUserPassword().sendKeys(editPassword);
-        editUserForm().inputEmail().clear();
-        editUserForm().inputEmail().sendKeys(editEmail);
-        editUserForm().inputPhone().clear();
-        editUserForm().inputPhone().sendKeys(editPhone);
-        editUserForm().buttonSubmit().click();
+        UserForm editUserForm = new UserForm();
+
+        editUserForm.inputUserName().clear();
+        editUserForm.inputUserName().sendKeys(editUser);
+        editUserForm.inputUserPassword().clear();
+        editUserForm.inputUserPassword().sendKeys(editPassword);
+        editUserForm.inputEmail().clear();
+        editUserForm.inputEmail().sendKeys(editEmail);
+        editUserForm.inputPhone().clear();
+        editUserForm.inputPhone().sendKeys(editPhone);
+        editUserForm.buttonSubmit().click();
 
         return this;
     }
