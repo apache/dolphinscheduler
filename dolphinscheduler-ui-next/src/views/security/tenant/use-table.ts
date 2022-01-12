@@ -82,28 +82,27 @@ export function useTable() {
               {
                 icon: () => h(EditOutlined)
               }
-              ),
-              h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => { handleDelete(row) }
-                },
-                {
-                  trigger: () => h(
-                    NButton,
-                    {
-                      size: 'small',
-                      style: {'margin-left': '5px'},
-                    },
-                    {
-                      icon: () => h(DeleteOutlined),
-                    }
-                  ),
-                  default: () => {return '确定删除吗?'}
-                }
-              )
-            ]
-          )
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => { handleDelete(row) }
+              },
+              {
+                trigger: () => h(
+                  NButton,
+                  {
+                    size: 'small',
+                    style: {'margin-left': '5px'},
+                  },
+                  {
+                    icon: () => h(DeleteOutlined),
+                  }
+                ),
+                default: () => {return '确定删除吗?'}
+              }
+            )
+          ])
         }
       }
     ]
