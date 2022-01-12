@@ -20,7 +20,6 @@
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark
 
-
 with ProcessDefinition(name="task_spark_example", tenant="tenant_exists") as pd:
     task = Spark(
         name="task_spark",
