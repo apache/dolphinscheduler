@@ -22,6 +22,7 @@ import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
 import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
+import { useThemeStore } from "@/store/theme/theme";
 
 const login = defineComponent({
   name: 'login',
@@ -30,6 +31,11 @@ const login = defineComponent({
     const { handleChange } = useTranslate(locale)
     const { handleLogin } = useLogin(state)
     const localesStore = useLocalesStore()
+    const themeStore = useThemeStore()
+
+    if (themeStore.getTheme) {
+      themeStore.setDarkTheme()
+    }
 
     return { t, handleChange, handleLogin, ...toRefs(state), localesStore }
   },
