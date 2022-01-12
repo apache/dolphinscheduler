@@ -107,16 +107,6 @@ const profile = defineComponent({
                     placeholder={t('profile.phone_tips')}
                   />
                 </NFormItem>
-                <NFormItem label={t('profile.state')} path='state'>
-                  <NRadioGroup v-model={[this.profileForm.state, 'value']}>
-                    {[
-                      { value: 1, label: t('profile.enable') },
-                      { value: 0, label: t('profile.disable') },
-                    ].map((item) => {
-                      return <NRadio value={item.value}>{item.label}</NRadio>
-                    })}
-                  </NRadioGroup>
-                </NFormItem>
               </NForm>
             ),
           }}
