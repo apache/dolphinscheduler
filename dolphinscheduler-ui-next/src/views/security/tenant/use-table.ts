@@ -77,10 +77,11 @@ export function useTable() {
                 size: 'small',
                 onClick: () => {
                   handleEdit(row)
-                },
-                {
-                  icon: () => h(EditOutlined)
                 }
+              },
+              {
+                icon: () => h(EditOutlined)
+              }
               ),
               h(
                 NPopconfirm,
