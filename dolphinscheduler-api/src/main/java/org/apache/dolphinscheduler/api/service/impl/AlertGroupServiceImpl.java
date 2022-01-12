@@ -228,12 +228,20 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
+
+        // Not allow to delete the default alarm group ,because the module of service need to use it.
+        if (id == 1) {
+            putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
+            return result;
+        }
+
         //check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
+
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;

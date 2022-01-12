@@ -35,6 +35,7 @@ import java.util.Date;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,6 +201,20 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void test090DelAlertGroupById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
