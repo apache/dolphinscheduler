@@ -37,6 +37,7 @@ const tenementManage = defineComponent({
 
     const handleModalChange = () => {
       variables.showModalRef = true
+      variables.statusRef = 0
     }
 
     const onCancelModal = () => {
@@ -45,6 +46,7 @@ const tenementManage = defineComponent({
 
     const onConfirmModal = () => {
       variables.showModalRef = false
+      requestData()
     }
 
     onMounted(() => {
@@ -82,7 +84,7 @@ const tenementManage = defineComponent({
             onUpdatePageSize={this.requestData}
           />
         </div>
-        <TenantModal showModalRef={this.showModalRef} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
+        <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
       </div>
     )
   },

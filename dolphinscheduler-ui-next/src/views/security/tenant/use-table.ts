@@ -16,9 +16,9 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging } from '@/service/modules/tenants'
+import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton } from 'naive-ui'
+import { NButton, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined, EditOutlined
@@ -28,11 +28,18 @@ export function useTable() {
   const { t } = useI18n()
 
   const handleEdit= (row: any) => {
-    console.log('click', row)
+    variables.showModalRef = true
+    variables.statusRef = 1
   }
 
   const handleDelete = (row: any) => {
-    console.log('click2', row)
+    deleteTenantById(row.id).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
   }
 
   const createColumns = () => {
@@ -79,13 +86,22 @@ export function useTable() {
                 }
               ),
               h(
-                NButton,
+                NPopconfirm,
                 {
-                  size: 'small',
-                  onClick: () => { handleDelete(row) }
+                  onPositiveClick: () => { handleDelete(row) }
                 },
                 {
-                  icon: () => h(DeleteOutlined)
+                  trigger: () => h(
+                    NButton,
+                    {
+                      size: 'small',
+                      style: {'margin-left': '5px'},
+                    },
+                    {
+                      icon: () => h(DeleteOutlined),
+                    }
+                  ),
+                  default: () => {return '确定删除吗?'}
                 }
               )
             ]
@@ -102,7 +118,8 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(null),
     totalPage: ref(1),
-    showModalRef: ref(false)
+    showModalRef: ref(false),
+    statusRef: ref(0),
   })
 
   const getTableData = (params: any) => {
