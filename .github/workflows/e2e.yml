@@ -52,7 +52,7 @@ jobs:
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Check Docker Info
-        uses: docker info
+        run: docker info
       - name: Export Docker Images
         run: |
           docker save $(docker images -q) -o /tmp/docker-images.tar
