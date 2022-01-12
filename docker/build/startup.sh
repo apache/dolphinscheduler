@@ -97,6 +97,7 @@ case "$1" in
         waitZK
         waitDatabase
         export MASTER_START_ENABLED=true
+        export LOGGER_START_ENABLED=true
     ;;
     (worker-server)
         waitZK
