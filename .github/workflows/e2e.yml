@@ -52,10 +52,10 @@ jobs:
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Check Docker Info
-        run: docker info
+        run: docker images
       - name: Export Docker Images
         run: |
-          docker save $(docker images -q) -o /tmp/docker-images.tar
+          docker save $(docker images --format '{{.Repository}}:{{.Tag}}') -o /tmp/docker-images.tar
       - uses: actions/upload-artifact@v2
         name: Upload Docker Images
         with:
