@@ -49,7 +49,6 @@ fi
 
 pid=$DOLPHINSCHEDULER_HOME/$command/pid
 
-
 cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
