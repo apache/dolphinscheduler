@@ -29,7 +29,7 @@ export const useFileStore = defineStore({
     getFileInfo(): string {
       return this.file
     },
-    getCurrentDir(): string | {} {
+    getCurrentDir(): string {
       return this.currentDir
     },
   },

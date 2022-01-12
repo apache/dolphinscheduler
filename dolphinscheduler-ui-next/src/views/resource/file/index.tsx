@@ -168,7 +168,7 @@ export default defineComponent({
       pagination,
     } = this
     return (
-      <Card title={t('resource.file.file_manage')}>
+      <div>
         <Conditions onConditions={handleConditions}>
           <NButtonGroup>
             <NButton onClick={handleCreateFolder}>
@@ -182,30 +182,32 @@ export default defineComponent({
             </NButton>
           </NButtonGroup>
         </Conditions>
-        <NDataTable
-          remote
-          columns={columnsRef}
-          data={this.resourceListRef?.value.table}
-          striped
-          size={'small'}
-          pagination={pagination}
-        />
-        <ResourceFolderModal
-          v-model:show={this.folderShowRef}
-          onUpdateList={this.updateList}
-        />
-        <ResourceUploadModal
-          v-model:show={this.uploadShowRef}
-          onUpdateList={this.updateList}
-        />
-        <ResourceRenameModal
-          v-model:show={this.renameShowRef}
-          id={this.renameInfo.id}
-          name={this.renameInfo.name}
-          description={this.renameInfo.description}
-          onUpdateList={this.updateList}
-        />
-      </Card>
+        <Card title={t('resource.file.file_manage')}>
+          <NDataTable
+            remote
+            columns={columnsRef}
+            data={this.resourceListRef?.value.table}
+            striped
+            size={'small'}
+            pagination={pagination}
+          />
+          <ResourceFolderModal
+            v-model:show={this.folderShowRef}
+            onUpdateList={this.updateList}
+          />
+          <ResourceUploadModal
+            v-model:show={this.uploadShowRef}
+            onUpdateList={this.updateList}
+          />
+          <ResourceRenameModal
+            v-model:show={this.renameShowRef}
+            id={this.renameInfo.id}
+            name={this.renameInfo.name}
+            description={this.renameInfo.description}
+            onUpdateList={this.updateList}
+          />
+        </Card>
+      </div>
     )
   },
 })

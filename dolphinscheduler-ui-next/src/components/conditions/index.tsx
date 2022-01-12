@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
+import { useI18n } from 'vue-i18n'
 import { defineComponent, ref } from 'vue'
 import { SearchOutlined } from '@vicons/antd'
 import { NButton, NIcon, NInput, NSpace } from 'naive-ui'
-import _ from 'lodash'
-import { useI18n } from 'vue-i18n'
-
+import Card from '@/components/card'
 import styles from './index.module.scss'
 
 const Conditions = defineComponent({
@@ -38,26 +38,28 @@ const Conditions = defineComponent({
     const { t } = useI18n()
     const { $slots, handleConditions } = this
     return (
-      <div class={styles['conditions-model']}>
-        <NSpace>{$slots}</NSpace>
-        <div class={styles.right}>
-          <div class={styles['form-box']}>
-            <div class={styles.list}>
-              <NButton onClick={handleConditions}>
-                <NIcon>
-                  <SearchOutlined />
-                </NIcon>
-              </NButton>
-            </div>
-            <div class={styles.list}>
-              <NInput
-                placeholder={t('resource.file.enter_keyword_tips')}
-                v-model={[this.searchVal, 'value']}
-              />
+      <Card style={{ marginBottom: '5px' }}>
+        <div class={styles['conditions-model']}>
+          <NSpace>{$slots}</NSpace>
+          <div class={styles.right}>
+            <div class={styles['form-box']}>
+              <div class={styles.list}>
+                <NButton onClick={handleConditions}>
+                  <NIcon>
+                    <SearchOutlined />
+                  </NIcon>
+                </NButton>
+              </div>
+              <div class={styles.list}>
+                <NInput
+                  placeholder={t('resource.file.enter_keyword_tips')}
+                  v-model={[this.searchVal, 'value']}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     )
   },
 })
