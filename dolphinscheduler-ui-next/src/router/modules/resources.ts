@@ -51,7 +51,7 @@ export default {
       component: components['taskGroupOption'],
       children: [
         {
-          path: '/resource/task-group',
+          path: '/resource/task-group-option',
           name: 'task-group-option',
           component: components['taskGroupOption']
         },

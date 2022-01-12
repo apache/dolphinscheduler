@@ -25,41 +25,41 @@ import { SearchOutlined, EditTwotone, UnorderedListOutlined } from '@vicons/antd
 import {useI18n} from "vue-i18n"
 import styles from './index.module.scss'
 
-import { queryTaskGroupListPaging } from '@/service/modules/resources'
+import { queryTaskGroupListPaging, startTaskGroup, closeTaskGroup } from '@/service/modules/task-group'
 import { ListReq } from "@/service/modules/resources/types";
-
-const createData = () => [
-  {
-    id: 1,
-    name: 'g1',
-    projectName: 'test-tech',
-    groupSize: 10,
-    useSize: 0,
-    description: 'aaaa',
-    createTime: '2021-01-01',
-    updateTime: '2021-01-01'
-  },
-  {
-    id: 2,
-    name: 'g2',
-    projectName: 'test-tech',
-    groupSize: 10,
-    useSize: 0,
-    description: 'aaaa',
-    createTime: '2021-01-01',
-    updateTime: '2021-01-01'
-  },
-  {
-    id: 3,
-    name: 'g3',
-    projectName: 'test-tech',
-    groupSize: 10,
-    useSize: 0,
-    description: 'aaaa',
-    createTime: '2021-01-01',
-    updateTime: '2021-01-01'
-  }
-]
+//
+// const createData = () => [
+//   {
+//     id: 1,
+//     name: 'g1',
+//     projectName: 'test-tech',
+//     groupSize: 10,
+//     useSize: 0,
+//     description: 'aaaa',
+//     createTime: '2021-01-01',
+//     updateTime: '2021-01-01'
+//   },
+//   {
+//     id: 2,
+//     name: 'g2',
+//     projectName: 'test-tech',
+//     groupSize: 10,
+//     useSize: 0,
+//     description: 'aaaa',
+//     createTime: '2021-01-01',
+//     updateTime: '2021-01-01'
+//   },
+//   {
+//     id: 3,
+//     name: 'g3',
+//     projectName: 'test-tech',
+//     groupSize: 10,
+//     useSize: 0,
+//     description: 'aaaa',
+//     createTime: '2021-01-01',
+//     updateTime: '2021-01-01'
+//   }
+// ]
 
 const taskGroupOption = defineComponent({
   name: 'taskGroupOption',
@@ -69,6 +69,8 @@ const taskGroupOption = defineComponent({
     const { handleUpdate } = useUpdate(state)
 
     const searchParamRef = ref()
+    const searchVal = ref()
+    const data = ref([])
 
     const renderIcon = (icon: any) => {
       return () => h(NIcon, null, { default: () => h(icon) })
@@ -88,25 +90,45 @@ const taskGroupOption = defineComponent({
       )
     }
     const onSearch = () => {
-
       const params = {
         pageNo:1,
         pageSize:10,
+        name: searchVal.value
       } as ListReq
 
       queryTaskGroupListPaging(params).then(res => {
-        console.log(res)
+        console.log(res.totalList)
+        data.value.push(...res.totalList)
+        // data = res.dataList
+        // console.log(data)
+        // console.log(data)
       })
       console.log('search....')
     }
 
     const onCreateTaskGroupOption = () => {
       console.log('create task...')
+
     }
 
     const onSwitchStatus = (value: any, item: any) => {
       console.log(value)
       console.log(item)
+      const params = {
+        id: item.id
+      }
+      if (value === 1) {
+        startTaskGroup(params).catch(e => {
+          console.log(e)
+        })
+      } else if (value ===0) {
+        closeTaskGroup(params).catch(e => {
+          console.log(e)
+        })
+      }
+      item.id
+
+
     }
 
     const onEdit = (item: any) => {
@@ -145,7 +167,7 @@ const taskGroupOption = defineComponent({
         key: 'status',
         render(row) {
           return (
-              <NSwitch checkedValue={1} uncheckedValue={0} onUpdate:value={(value) => onSwitchStatus(value,row)}/>
+              <NSwitch v-model={[row.status, 'value']} checkedValue={1} uncheckedValue={0} onUpdate:value={(value) => onSwitchStatus(value,row)}/>
           )
         },
       },
@@ -154,7 +176,7 @@ const taskGroupOption = defineComponent({
         render(row) {
           return (
               <div class={styles.tableAction}>
-                <NButton size={"small"} type={"info"} circle={true} onClick={() => onEdit(row)}>
+                <NButton class={styles.btn} size={"small"} type={"info"} circle={true} onClick={() => onEdit(row)}>
                   <NIcon>
                     <EditTwotone/>
                   </NIcon>
@@ -174,12 +196,13 @@ const taskGroupOption = defineComponent({
       ...toRefs(state),
       t,
       handleUpdate,
-      data: createData(),
+      data,
       columnsRef,
       onEdit,
       onCreateTaskGroupOption,
       onSearch,
       searchParamRef,
+      searchVal,
       pagination: {
         pageSize: 10,
         pageCount: 100,
@@ -203,7 +226,7 @@ const taskGroupOption = defineComponent({
                       </NButton>
                     </div>
                     <div class={styles.right}>
-                      <NInput placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
+                      <NInput v-model={[this.searchVal, 'value']} placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
                       <NButton type={"tertiary"} onClick={() => this.onSearch()}>
                         <NIcon>
                           <SearchOutlined />

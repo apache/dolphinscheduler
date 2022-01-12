@@ -122,8 +122,8 @@ export function useDataList() {
         ],
       },
       {
-        label: t('menu.resources'),
-        key: 'resources',
+        label: t('menu.resource'),
+        key: 'resource',
         icon: renderIcon(FolderOutlined),
         isShowSide: true,
         children: [

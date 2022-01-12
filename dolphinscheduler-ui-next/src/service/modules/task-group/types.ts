@@ -15,41 +15,23 @@
  * limitations under the License.
  */
 
-.container {
-  > .item {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    > .label {
-      display: inline-block;
-      width: 100px;
-    }
-  }
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
 }
 
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0 0 10px 0;
-
-  .left {
-    align-items: center;
-  }
-  .right {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+interface TaskGroupIdReq {
+  id: number
 }
 
-.table-action {
-  display: flex;;
-  justify-content: space-between;
-  align-items: center;
-  .btn {
-    margin: 0 10px 0 0;
-  }
+interface TaskGroupReq {
+
+}
+
+
+export {
+  ListReq,
+  TaskGroupIdReq,
+  TaskGroupReq
 }
