@@ -159,11 +159,11 @@ def test__parse_datetime_not_support_type(val: Any):
     [
         (
             None,
-            None,
+            [],
         ),
         (
             {},
-            None,
+            [],
         ),
         (
             {"key1": "val1"},
