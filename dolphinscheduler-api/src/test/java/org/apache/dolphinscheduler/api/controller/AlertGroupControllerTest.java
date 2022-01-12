@@ -53,7 +53,6 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     private static final String defaultTestAlertGroupName = "cxc test group name";
-    private static final Integer defaultTestAlertGroupId = 2;
 
     @Autowired
     AlertGroupMapper alertGroupMapper;
@@ -142,13 +141,13 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
 
     @Test
     public void test050UpdateAlertGroup() throws Exception {
-        createEntity();
+        int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
         paramsMap.add("groupType", AlertType.EMAIL.toString());
         paramsMap.add("description", "update alter group");
         paramsMap.add("alertInstanceIds", "");
-        MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + defaultTestAlertGroupId)
+        MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
