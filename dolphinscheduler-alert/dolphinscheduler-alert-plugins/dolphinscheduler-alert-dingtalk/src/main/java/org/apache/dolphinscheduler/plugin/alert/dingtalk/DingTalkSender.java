@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -36,17 +37,29 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>
+ *     https://open.dingtalk.com/document/robots/custom-robot-access
+ *     https://open.dingtalk.com/document/robots/customize-robot-security-settings
+ * </p>
+ */
 public final class DingTalkSender {
+
     private static final Logger logger = LoggerFactory.getLogger(DingTalkSender.class);
     private final String url;
     private final String keyword;
+    private final String secret;
     private final Boolean enableProxy;
 
     private String proxy;
@@ -60,6 +73,7 @@ public final class DingTalkSender {
     DingTalkSender(Map<String, String> config) {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
+        secret = config.get(DingTalkParamsConstants.NAME_DING_TALK_SECRET);
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
@@ -145,8 +159,18 @@ public final class DingTalkSender {
 
     private String sendMsg(String title, String content) throws IOException {
 
-        String msgToJson = textToJsonString(title + content + "#" + keyword);
-        HttpPost httpPost = constructHttpPost(url, msgToJson);
+        StringBuilder text = new StringBuilder();
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
+            text.append(keyword);
+            text.append(":");
+        }
+        text.append(title);
+        text.append("\n");
+        text.append(content);
+
+        String msgToJson = textToJsonString(text.toString());
+
+        HttpPost httpPost = constructHttpPost(org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msgToJson);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -172,6 +196,21 @@ public final class DingTalkSender {
         } finally {
             httpClient.close();
         }
+    }
+
+    private String generateSignedUrl() {
+        Long timestamp = System.currentTimeMillis();
+        String stringToSign = timestamp + "\n" + secret;
+        String sign = org.apache.dolphinscheduler.spi.utils.StringUtils.EMPTY;
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
+            byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
+            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)),"UTF-8");
+        } catch (Exception e) {
+            logger.error("generate sign error, message:{}", e);
+        }
+        return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
     static final class DingTalkSendMsgResponse {
