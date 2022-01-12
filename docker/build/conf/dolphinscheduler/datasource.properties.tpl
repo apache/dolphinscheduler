@@ -21,6 +21,9 @@ spring.datasource.url=jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/
 spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
 
+# hikari configuration
+spring.datasource.hikari.maximum-pool-size=${HIKARI_MAXIMUM_POOL_SIZE}
+
 # mysql example
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 #spring.datasource.url=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8

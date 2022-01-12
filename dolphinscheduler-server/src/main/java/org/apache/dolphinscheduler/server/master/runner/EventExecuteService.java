@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -146,9 +147,11 @@ public class EventExecuteService extends Thread {
                 }
 
                 private void notifyProcessChanged() {
-                    Map<ProcessInstance, TaskInstance> fatherMaps
-                            = processService.notifyProcessList(processInstanceId, 0);
+                    if (Flag.NO == workflowExecuteThread.getProcessInstance().getIsSubProcess()) {
+                        return;
+                    }
 
+                    Map<ProcessInstance, TaskInstance> fatherMaps = processService.notifyProcessList(processInstanceId);
                     for (ProcessInstance processInstance : fatherMaps.keySet()) {
                         String address = NetUtils.getAddr(masterConfig.getListenPort());
                         if (processInstance.getHost().equalsIgnoreCase(address)) {

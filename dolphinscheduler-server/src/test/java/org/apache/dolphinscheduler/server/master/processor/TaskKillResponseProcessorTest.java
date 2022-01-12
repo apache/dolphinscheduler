@@ -20,19 +20,26 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import io.netty.channel.Channel;
 
 /**
  *  task response processor test
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({SpringApplicationContext.class})
 public class TaskKillResponseProcessorTest {
 
     private TaskKillResponseProcessor taskKillResponseProcessor;
@@ -41,8 +48,14 @@ public class TaskKillResponseProcessorTest {
 
     private Channel channel;
 
+    private TaskResponseService taskResponseService;
+
     @Before
     public void before() {
+        PowerMockito.mockStatic(SpringApplicationContext.class);
+
+        taskResponseService = PowerMockito.mock(TaskResponseService.class);
+        PowerMockito.when(SpringApplicationContext.getBean(TaskResponseService.class)).thenReturn(taskResponseService);
         taskKillResponseProcessor = new TaskKillResponseProcessor();
         channel = PowerMockito.mock(Channel.class);
         taskKillResponseCommand = new TaskKillResponseCommand();

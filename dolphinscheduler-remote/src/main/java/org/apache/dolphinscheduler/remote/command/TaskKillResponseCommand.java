@@ -49,6 +49,11 @@ public class TaskKillResponseCommand implements Serializable {
     private int processId;
 
     /**
+     * process instance id
+     */
+    private int processInstanceId;
+
+    /**
      * other resource manager appId , for example : YARN etc
      */
     private List<String> appIds;
@@ -85,6 +90,14 @@ public class TaskKillResponseCommand implements Serializable {
         this.processId = processId;
     }
 
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
     public List<String> getAppIds() {
         return appIds;
     }
@@ -114,6 +127,7 @@ public class TaskKillResponseCommand implements Serializable {
                 + ", status=" + status
                 + ", processId=" + processId
                 + ", appIds=" + appIds
+                + ", processInstanceId=" + processInstanceId
                 + '}';
     }
 }
