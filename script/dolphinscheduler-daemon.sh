@@ -52,17 +52,17 @@ pid=$DOLPHINSCHEDULER_HOME/$command/pid
 cd $DOLPHINSCHEDULER_HOME/$command
 
 if [ "$command" = "api-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/api-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/api-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "master-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/master-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/master-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "worker-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/worker-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/worker-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "alert-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/alert-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "standalone-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/standalone-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "python-gateway-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/python-gateway-server/$command-$HOSTNAME.out
+  log=$DOLPHINSCHEDULER_HOME/python-gateway-server/logs/$command-$HOSTNAME.out
 else
   echo "Error: No command named '$command' was found."
   exit 1
