@@ -51,6 +51,8 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Export Docker Images
         run: |
           docker save $(docker images | grep -v REPOSITORY | awk 'BEGIN{OFS=":";ORS=" "}{print $1,$2}') -o /tmp/docker-images.tar
@@ -93,9 +95,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v2
+        name: Download Docker Images
         with:
           name: docker-images
           path: /tmp/docker-images.tar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Load Docker Images
         run: |
             docker load -i /tmp/docker-images.tar
