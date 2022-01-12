@@ -478,7 +478,7 @@ CREATE TABLE `t_ds_task_definition` (
   `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
   `resource_ids` text COMMENT 'resource id, separated by comma',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
-  `task_group_priority` tinyint(4) DEFAULT 1 COMMENT 'task group priority',
+  `task_group_priority` tinyint(4) DEFAULT '0' COMMENT 'task group priority',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
@@ -511,7 +511,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `resource_ids` text DEFAULT NULL COMMENT 'resource id, separated by comma',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id',
-  `task_group_priority` tinyint(4) DEFAULT 1 COMMENT 'task group priority',
+  `task_group_priority` tinyint(4) DEFAULT 0 COMMENT 'task group priority',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -538,7 +538,7 @@ CREATE TABLE `t_ds_process_task_relation` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_project_code_project_code` (`project_code`,`process_definition_code`)
+  KEY `idx_code` (`project_code`,`process_definition_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -562,7 +562,7 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_project_code_project_code` (`project_code`,`process_definition_code`)
+  KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
