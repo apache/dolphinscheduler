@@ -39,21 +39,19 @@ const TenantModal = defineComponent({
     showModalRef: {
       type: Boolean as PropType<boolean>,
       default: false,
-    }
+    },
   },
   render() {
     return (
       <div>
         <Modal
-          title="创建租户"
+          title='创建租户'
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
         >
           {{
-            default: () => (
-              <div>这里是弹框</div>
-            ),
+            default: () => <div>这里是弹框</div>,
           }}
         </Modal>
       </div>

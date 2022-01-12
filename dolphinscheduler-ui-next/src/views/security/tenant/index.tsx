@@ -16,7 +16,14 @@
  */
 
 import { defineComponent, toRefs, onMounted } from 'vue'
-import { NButton, NInput, NIcon, NDataTable, NPagination, NCard } from 'naive-ui'
+import {
+  NButton,
+  NInput,
+  NIcon,
+  NDataTable,
+  NPagination,
+  NCard,
+} from 'naive-ui'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
@@ -31,7 +38,7 @@ const tenementManage = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
       })
     }
 
@@ -50,8 +57,14 @@ const tenementManage = defineComponent({
     onMounted(() => {
       requestData()
     })
-    
-    return { ...toRefs(variables), requestData, handleModalChange, onCancelModal, onConfirmModal }
+
+    return {
+      ...toRefs(variables),
+      requestData,
+      handleModalChange,
+      onCancelModal,
+      onConfirmModal,
+    }
   },
   render() {
     return (
@@ -59,11 +72,23 @@ const tenementManage = defineComponent({
         <NCard>
           <div class={styles.header}>
             <div>
-              <NButton size="small" onClick={this.handleModalChange}>创建租户</NButton>
+              <NButton size='small' onClick={this.handleModalChange}>
+                创建租户
+              </NButton>
             </div>
             <div class={styles.search}>
-              <NInput size="small" v-model={[this.searchVal, 'value']} on-input={this.requestData} placeholder="请输入关键词" clearable />
-              <NButton size="small"><NIcon><SearchOutlined /></NIcon></NButton>
+              <NInput
+                size='small'
+                v-model={[this.searchVal, 'value']}
+                on-input={this.requestData}
+                placeholder='请输入关键词'
+                clearable
+              />
+              <NButton size='small'>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
             </div>
           </div>
         </NCard>
@@ -82,7 +107,11 @@ const tenementManage = defineComponent({
             onUpdatePageSize={this.requestData}
           />
         </div>
-        <TenantModal showModalRef={this.showModalRef} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
+        <TenantModal
+          showModalRef={this.showModalRef}
+          onCancelModal={this.onCancelModal}
+          onConfirmModal={this.onConfirmModal}
+        ></TenantModal>
       </div>
     )
   },

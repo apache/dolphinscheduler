@@ -16,7 +16,7 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import {listWorker} from '@/service/modules/monitor'
+import { listWorker } from '@/service/modules/monitor'
 
 export function useWorker() {
   const getWorker = () => {
