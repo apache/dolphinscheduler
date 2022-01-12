@@ -168,17 +168,17 @@ export default defineComponent({
       pagination,
     } = this
     return (
-      <Card title={t('resource.file_manage')}>
+      <Card title={t('resource.file.file_manage')}>
         <Conditions onConditions={handleConditions}>
           <NButtonGroup>
             <NButton onClick={handleCreateFolder}>
-              {t('resource.create_folder')}
+              {t('resource.file.create_folder')}
             </NButton>
             <NButton onClick={handleCreateFile}>
-              {t('resource.create_file')}
+              {t('resource.file.create_file')}
             </NButton>
             <NButton onClick={handleUploadFile}>
-              {t('resource.upload_files')}
+              {t('resource.file.upload_files')}
             </NButton>
           </NButtonGroup>
         </Conditions>

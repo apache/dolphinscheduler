@@ -18,7 +18,6 @@
 import { h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-
 import { bytesToSize } from '@/utils/common'
 import { useFileStore } from '@/store/file/file'
 import TableAction from './table-action'
@@ -44,9 +43,13 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
   const router: Router = useRouter()
 
   const columnsRef: TableColumns<any> = [
-    { title: t('resource.id'), key: 'id', render: (row, index) => index + 1 },
     {
-      title: t('resource.name'),
+      title: t('resource.file.id'),
+      key: 'id',
+      render: (_row, index) => index + 1,
+    },
+    {
+      title: t('resource.file.name'),
       key: 'name',
       render: (row) =>
         h(
@@ -63,22 +66,23 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
           },
         ),
     },
-    { title: t('resource.user_name'), key: 'user_name' },
+    { title: t('resource.file.user_name'), key: 'user_name' },
     {
-      title: t('resource.whether_directory'),
+      title: t('resource.file.whether_directory'),
       key: 'whether_directory',
-      render: (row) => (row.directory ? t('resource.yes') : t('resource.no')),
+      render: (row) =>
+        row.directory ? t('resource.file.yes') : t('resource.file.no'),
     },
-    { title: t('resource.file_name'), key: 'file_name' },
-    { title: t('resource.description'), key: 'description' },
+    { title: t('resource.file.file_name'), key: 'file_name' },
+    { title: t('resource.file.description'), key: 'description' },
     {
-      title: t('resource.size'),
+      title: t('resource.file.size'),
       key: 'size',
       render: (row) => bytesToSize(row.size),
     },
-    { title: t('resource.update_time'), key: 'update_time' },
+    { title: t('resource.file.update_time'), key: 'update_time' },
     {
-      title: t('resource.operation'),
+      title: t('resource.file.operation'),
       key: 'operation',
       render: (row) =>
         h(TableAction, {

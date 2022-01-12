@@ -37,7 +37,7 @@ export function useCreate(state: any) {
             ...{ pid, currentDir },
           })
 
-          window.$message.success(t('resource.success'))
+          window.$message.success(t('resource.file.success'))
           const name = pid ? 'resource-file-subdirectory' : 'file'
           router.push({ name, params: { id: pid } })
         } catch (error: any) {

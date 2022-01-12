@@ -45,7 +45,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.fileForm.fileName === '') {
-            return new Error(t('resource.enter_name_tips'))
+            return new Error(t('resource.file.enter_name_tips'))
           }
         },
       },
@@ -54,7 +54,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.fileForm.suffix === '') {
-            return new Error(t('resource.enter_suffix_tips'))
+            return new Error(t('resource.file.enter_suffix_tips'))
           }
         },
       },
@@ -63,7 +63,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.fileForm.content === '') {
-            return new Error(t('resource.enter_content_tips'))
+            return new Error(t('resource.file.enter_content_tips'))
           }
         },
       },

@@ -56,7 +56,7 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.create_folder')}
+        title={t('resource.file.create_folder')}
         onCancel={this.hideModal}
         onConfirm={this.handleFolder}
       >
@@ -66,17 +66,17 @@ export default defineComponent({
           label-placement='left'
           label-width='160'
         >
-          <NFormItem label={t('resource.folder_name')} path='name'>
+          <NFormItem label={t('resource.file.folder_name')} path='name'>
             <NInput
               v-model={[this.folderForm.name, 'value']}
-              placeholder={t('resource.enter_name_tips')}
+              placeholder={t('resource.file.enter_name_tips')}
             />
           </NFormItem>
-          <NFormItem label={t('resource.description')} path='description'>
+          <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
-              placeholder={t('resource.enter_description_tips')}
+              placeholder={t('resource.file.enter_description_tips')}
             />
           </NFormItem>
         </NForm>

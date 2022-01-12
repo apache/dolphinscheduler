@@ -67,7 +67,7 @@ export default defineComponent({
   render() {
     const { t } = useI18n()
     return (
-      <Card title={t('resource.file_details')}>
+      <Card title={t('resource.file.file_details')}>
         <NForm
           rules={this.rules}
           ref='fileFormRef'
@@ -75,14 +75,14 @@ export default defineComponent({
           label-width='160'
           class={styles['form-content']}
         >
-          <NFormItem label={t('resource.file_name')} path='fileName'>
+          <NFormItem label={t('resource.file.file_name')} path='fileName'>
             <NInput
               v-model={[this.fileForm.fileName, 'value']}
-              placeholder={t('resource.enter_name_tips')}
+              placeholder={t('resource.file.enter_name_tips')}
               style={{ width: '300px' }}
             />
           </NFormItem>
-          <NFormItem label={t('resource.file_format')} path='suffix'>
+          <NFormItem label={t('resource.file.file_format')} path='suffix'>
             <NSelect
               defaultValue={[this.fileForm.suffix]}
               v-model={[this.fileForm.suffix, 'value']}
@@ -90,15 +90,15 @@ export default defineComponent({
               style={{ width: '100px' }}
             />
           </NFormItem>
-          <NFormItem label={t('resource.description')} path='description'>
+          <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
               type='textarea'
               v-model={[this.fileForm.description, 'value']}
-              placeholder={t('resource.enter_description_tips')}
+              placeholder={t('resource.file.enter_description_tips')}
               style={{ width: '430px' }}
             />
           </NFormItem>
-          <NFormItem label={t('resource.file_content')} path='content'>
+          <NFormItem label={t('resource.file.file_content')} path='content'>
             <div
               class={styles.cont}
               style={{
@@ -111,7 +111,7 @@ export default defineComponent({
           <div class={styles['file-edit-content']}>
             <div class={styles.submit}>
               <NButton type='info' size='small' round onClick={this.handleFile}>
-                {t('resource.save')}
+                {t('resource.file.save')}
               </NButton>
               <NButton
                 type='info'
@@ -120,7 +120,7 @@ export default defineComponent({
                 style={{ marginLeft: '15px' }}
                 onClick={this.handleReturn}
               >
-                {t('resource.return')}
+                {t('resource.file.return')}
               </NButton>
             </div>
           </div>

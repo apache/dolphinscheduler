@@ -43,7 +43,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.folderForm.name === '') {
-            return new Error(t('resource.enter_name_tips'))
+            return new Error(t('resource.file.enter_name_tips'))
           }
         },
       },

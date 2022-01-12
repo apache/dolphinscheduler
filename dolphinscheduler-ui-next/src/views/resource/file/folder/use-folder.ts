@@ -42,7 +42,7 @@ export function useFolder(state: any) {
             ...{ pid, currentDir },
           })
 
-          window.$message.success(t('resource.success'))
+          window.$message.success(t('resource.file.success'))
           emit('updateList')
         } catch (error: any) {
           window.$message.error(error.message)

@@ -70,12 +70,7 @@ export function useFileState(
       skipLineNum: 0,
       limit: 3000,
     }
-    const { state } = useAsyncState(
-      viewResource(params, id).then((res: any) => {
-        return res
-      }),
-      {},
-    )
+    const { state } = useAsyncState(viewResource(params, id), {})
     return state
   }
 

@@ -62,7 +62,7 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.upload_files')}
+        title={t('resource.file.upload_files')}
         onCancel={this.hideModal}
         onConfirm={this.handleFile}
       >
@@ -72,25 +72,25 @@ export default defineComponent({
           label-placement='left'
           label-width='160'
         >
-          <NFormItem label={t('resource.file_name')} path='name'>
+          <NFormItem label={t('resource.file.file_name')} path='name'>
             <NInput
               v-model={[this.uploadForm.name, 'value']}
-              placeholder={t('resource.enter_name_tips')}
+              placeholder={t('resource.file.enter_name_tips')}
             />
           </NFormItem>
-          <NFormItem label={t('resource.description')} path='description'>
+          <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
               type='textarea'
               v-model={[this.uploadForm.description, 'value']}
-              placeholder={t('resource.enter_description_tips')}
+              placeholder={t('resource.file.enter_description_tips')}
             />
           </NFormItem>
-          <NFormItem label={t('resource.upload_files')} path='file'>
+          <NFormItem label={t('resource.file.upload_files')} path='file'>
             <NUpload
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
             >
-              <NButton>{t('resource.upload_files')}</NButton>
+              <NButton>{t('resource.file.upload_files')}</NButton>
             </NUpload>
           </NFormItem>
         </NForm>

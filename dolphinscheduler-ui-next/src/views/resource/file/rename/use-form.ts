@@ -42,7 +42,7 @@ export function useForm(name: string, description: string) {
         trigger: ['input', 'blur'],
         validator() {
           if (state.renameForm.name === '') {
-            return new Error(t('resource.enter_name_tips'))
+            return new Error(t('resource.file.enter_name_tips'))
           }
         },
       },

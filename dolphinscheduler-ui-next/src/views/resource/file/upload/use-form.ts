@@ -43,7 +43,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.uploadForm.name === '') {
-            return new Error(t('resource.enter_name_tips'))
+            return new Error(t('resource.file.enter_name_tips'))
           }
         },
       },
@@ -52,7 +52,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.uploadForm.file === '') {
-            return new Error(t('resource.enter_content_tips'))
+            return new Error(t('resource.file.enter_content_tips'))
           }
         },
       },

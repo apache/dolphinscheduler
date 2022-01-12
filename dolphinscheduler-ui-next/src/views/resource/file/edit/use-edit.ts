@@ -33,12 +33,7 @@ export function useEdit(state: any) {
       skipLineNum: 0,
       limit: 3000,
     }
-    const { state } = useAsyncState(
-      viewResource(params, id).then((res: any) => {
-        return res
-      }),
-      {},
-    )
+    const { state } = useAsyncState(viewResource(params, id), {})
     return state
   }
 
@@ -53,7 +48,7 @@ export function useEdit(state: any) {
             id,
           )
 
-          window.$message.success(t('resource.success'))
+          window.$message.success(t('resource.file.success'))
           router.go(-1)
         } catch (error: any) {
           window.$message.error(error.message)

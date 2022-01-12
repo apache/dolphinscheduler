@@ -66,7 +66,7 @@ export default defineComponent({
   render() {
     const { t } = useI18n()
     return (
-      <Card title={t('resource.file_details')}>
+      <Card title={t('resource.file.file_details')}>
         <div class={styles['file-edit-content']}>
           <h2>
             <span>{this.resourceViewRef?.value.alias}</span>
@@ -89,7 +89,7 @@ export default defineComponent({
                 />
               </div>
             </NFormItem>
-            {this.routeNameRef === 'resource-file-edit' ? (
+            {this.routeNameRef === 'resource-file-edit' && (
               <NSpace>
                 <NButton
                   type='info'
@@ -98,7 +98,7 @@ export default defineComponent({
                   style={{ marginRight: '15px' }}
                   onClick={this.handleReturn}
                 >
-                  {t('resource.return')}
+                  {t('resource.file.return')}
                 </NButton>
                 <NButton
                   type='info'
@@ -106,11 +106,9 @@ export default defineComponent({
                   round
                   onClick={() => this.handleFileContent()}
                 >
-                  {t('resource.save')}
+                  {t('resource.file.save')}
                 </NButton>
               </NSpace>
-            ) : (
-              ''
             )}
           </NForm>
         </div>

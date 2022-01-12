@@ -39,7 +39,7 @@ export function useForm() {
         trigger: ['input', 'blur'],
         validator() {
           if (state.fileForm.content === '') {
-            return new Error(t('resource.enter_content_tips'))
+            return new Error(t('resource.file.enter_content_tips'))
           }
         },
       },

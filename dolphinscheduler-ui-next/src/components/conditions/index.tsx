@@ -51,7 +51,7 @@ const Conditions = defineComponent({
             </div>
             <div class={styles.list}>
               <NInput
-                placeholder={t('resource.enter_keyword_tips')}
+                placeholder={t('resource.file.enter_keyword_tips')}
                 v-model={[this.searchVal, 'value']}
               />
             </div>

@@ -36,7 +36,7 @@ export function useRename(state: any) {
             },
             state.renameForm.id,
           )
-          window.$message.success(t('resource.success'))
+          window.$message.success(t('resource.file.success'))
           emit('updateList')
         } catch (error: any) {
           window.$message.error(error.message)

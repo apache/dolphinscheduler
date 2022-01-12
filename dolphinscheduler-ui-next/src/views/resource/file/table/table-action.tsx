@@ -59,13 +59,8 @@ export default defineComponent({
     const rtDisb: IRtDisb = (name, size) => {
       const i = name.lastIndexOf('.')
       const a = name.substring(i, name.length)
-      let flag = _.includes(fileTypeArr, _.trimStart(a, '.'))
-      if (flag && size < 1000000) {
-        flag = true
-      } else {
-        flag = false
-      }
-      return !flag
+      const flag = _.includes(fileTypeArr, _.trimStart(a, '.'))
+      return !(flag && size < 1000000)
     }
 
     const handleEditFile = (item: { id: number }) => {
@@ -95,7 +90,7 @@ export default defineComponent({
       <NSpace>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.edit'),
+            default: () => t('resource.file.edit'),
             trigger: () => (
               <NButton
                 size='small'
@@ -116,7 +111,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.rename'),
+            default: () => t('resource.file.rename'),
             trigger: () => (
               <NButton
                 size='small'
@@ -139,7 +134,7 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.download'),
+            default: () => t('resource.file.download'),
             trigger: () => (
               <NButton
                 size='small'
@@ -158,18 +153,18 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('resource.delete'),
+            default: () => t('resource.file.delete'),
             trigger: () => (
               <NButton size='small' type='error' circle>
                 <NPopconfirm
-                  positive-text={t('resource.confirm')}
-                  negative-text={t('resource.cancel')}
+                  positive-text={t('resource.file.confirm')}
+                  negative-text={t('resource.file.cancel')}
                   onPositiveClick={() => {
                     this.handleDeleteFile(this.row.id)
                   }}
                 >
                   {{
-                    default: () => t('resource.delete_confirm'),
+                    default: () => t('resource.file.delete_confirm'),
                     icon: () => (
                       <NIcon>
                         <InfoCircleFilled />
