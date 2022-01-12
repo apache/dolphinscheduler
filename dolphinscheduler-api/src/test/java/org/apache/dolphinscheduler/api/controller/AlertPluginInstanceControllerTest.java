@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -45,13 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * alert plugin instance controller test
  */
 public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
-    private static final Gson gson = new Gson();
     private static final int pluginDefineId = 1;
     private static final String instanceName = "instanceName";
     private static final String pluginInstanceParams = "pluginInstanceParams";
-    private static final JsonObject expectResponseContent = gson
-            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
-                    , JsonObject.class);
+    private static final Result expectResponseContent = JSONUtils.parseObject(
+            "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
+            , Result.class);
     private static final ImmutableMap<String, Object> alertPluginInstanceServiceResult =
             ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
     
@@ -78,8 +75,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -102,8 +99,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -126,8 +123,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -148,8 +145,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -166,8 +163,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -180,9 +177,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName)))
                 .thenReturn(false);
         
-        JsonObject expectResponseContent = gson
-                .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":null,\"failed\":false,\"success\":true}"
-                        , JsonObject.class);
+        Result expectResponseContent = JSONUtils.parseObject("{\"code\":0,\"msg\":\"success\",\"data\":null,\"failed\":false,\"success\":true}"
+                , Result.class);
         
         //When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
@@ -193,8 +189,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -207,9 +203,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName)))
                 .thenReturn(true);
         
-        JsonObject expectResponseContent = gson
-                .fromJson("{\"code\":110010,\"msg\":\"plugin instance already exit\",\"data\":null,\"failed\":true,\"success\":false}"
-                        , JsonObject.class);
+        Result expectResponseContent = JSONUtils.parseObject("{\"code\":110010,\"msg\":\"plugin instance already exit\",\"data\":null,\"failed\":true,\"success\":false}"
+                , Result.class);
         
         //When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
@@ -220,8 +215,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
@@ -247,14 +242,14 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
     
     @Test
     public void testListPagingResultFalse() throws Exception {
         //Given
-        final JsonObject expectResponseContent = gson.fromJson("{\"code\":10001,\"msg\":\"request parameter pageNo is not valid\",\"data\":null,\"success\":false,\"failed\":true}", JsonObject.class);
+        final Result expectResponseContent = JSONUtils.parseObject("{\"code\":10001,\"msg\":\"request parameter pageNo is not valid\",\"data\":null,\"success\":false,\"failed\":true}", Result.class);
         
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
@@ -271,7 +266,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         
         //Then
-        final JsonObject actualResponseContent = gson.fromJson(mvcResult.getResponse().getContentAsString(), JsonObject.class);
-        assertThat(actualResponseContent).isEqualTo(expectResponseContent);
+        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
 }
