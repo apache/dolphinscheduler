@@ -959,7 +959,7 @@ CREATE TABLE t_ds_version
 -- Records of t_ds_version
 -- ----------------------------
 INSERT INTO t_ds_version
-VALUES ('1', '2.0.2');
+VALUES ('1', '2.0.3');
 
 
 -- ----------------------------
