@@ -32,7 +32,7 @@ export default {
     {
       path: '/security/tenant',
       name: 'tenement-manage',
-      component: components['home'],
+      component: components['tenant'],
       meta: {
         title: '租户管理',
       },

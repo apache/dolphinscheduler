@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia'
-import MenuState from './types'
+.container {
+  width: 100%;
 
-export const useMenuStore = defineStore({
-  id: 'menu',
-  state: (): MenuState => ({
-    menuKey: 'home',
-  }),
-  persist: true,
-  getters: {
-    getMenuKey(): string {
-      return this.menuKey
-    },
-  },
-  actions: {
-    setMenuKey(menuKey: string): void {
-      this.menuKey = menuKey
-    },
-  },
-})
+  .header {
+    display: flex;
+    justify-content: space-between;
+
+    .search {
+      display: flex;
+    }
+  }
+
+  .form, .pagination {
+    margin-top: 16px;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+  }
+}
