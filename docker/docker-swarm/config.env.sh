@@ -82,7 +82,7 @@ DATAX_HOME=/opt/soft/datax
 #============================================================================
 # Master Server
 #============================================================================
-MASTER_SERVER_OPTS=-Xms1g -Xmx1g -Xmn512m
+MASTER_SERVER_OPTS="-Xms1g -Xmx1g -Xmn512m"
 MASTER_EXEC_THREADS=100
 MASTER_EXEC_TASK_NUM=20
 MASTER_DISPATCH_TASK_NUM=3
@@ -96,7 +96,7 @@ MASTER_RESERVED_MEMORY=0.3
 #============================================================================
 # Worker Server
 #============================================================================
-WORKER_SERVER_OPTS=-Xms1g -Xmx1g -Xmn512m
+WORKER_SERVER_OPTS="-Xms1g -Xmx1g -Xmn512m"
 WORKER_EXEC_THREADS=100
 WORKER_HEARTBEAT_INTERVAL=10
 WORKER_HOST_WEIGHT=100
@@ -108,14 +108,14 @@ ALERT_LISTEN_HOST=dolphinscheduler-alert
 #============================================================================
 # Alert Server
 #============================================================================
-ALERT_SERVER_OPTS=-Xms512m -Xmx512m -Xmn256m
+ALERT_SERVER_OPTS="-Xms512m -Xmx512m -Xmn256m"
 
 #============================================================================
 # Api Server
 #============================================================================
-API_SERVER_OPTS=-Xms512m -Xmx512m -Xmn256m
+API_SERVER_OPTS="-Xms512m -Xmx512m -Xmn256m"
 
 #============================================================================
 # Logger Server
 #============================================================================
-LOGGER_SERVER_OPTS=-Xms512m -Xmx512m -Xmn256m
+LOGGER_SERVER_OPTS="-Xms512m -Xmx512m -Xmn256m"
