@@ -14,7 +14,6 @@
     "axios": "^0.24.0",
     "date-fns": "^2.28.0",
     "echarts": "^5.2.2",
-    "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.31.1",
     "naive-ui": "2.23.2",
@@ -28,7 +27,6 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@types/jquery": "^3.5.11",
     "@types/node": "^16.11.19",
     "@types/nprogress": "^0.2.0",
     "@types/qs": "^6.9.7",

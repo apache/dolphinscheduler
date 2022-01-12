@@ -23,7 +23,6 @@ import axios, {
 } from 'axios'
 import qs from 'qs'
 import _ from 'lodash'
-import $ from 'jquery'
 import { useUserStore } from '@/store/user/user'
 
 const userStore = useUserStore()
@@ -90,36 +89,29 @@ const resolveURL = (url: string) => {
 /**
  * download file
  */
-const downloadFile = ($url: string, $obj?: any) => {
-  const param = {
-    url: resolveURL($url),
-    obj: $obj || {},
-  }
-  console.log(param.url)
-
-  if (!param.url) {
-    // TODO: useI18n
-    window.$message.warning('Unable to download without proper url')
-    return
+const downloadFile = (url: string, obj?: any) => {
+  const param: any = {
+    url: resolveURL(url),
+    obj: obj || {},
   }
 
-  const generatorInput = function (obj: any) {
-    let result = ''
-    const keyArr = Object.keys(obj)
-    keyArr.forEach(function (key) {
-      result += `<input type='hidden' name = '${key}' value='${obj[key]}'>`
-    })
-    return result
-  }
-
-  $(
-    `<form action='${param.url}' method='get'>${generatorInput(
-      param.obj,
-    )}</form>`,
-  )
-    .appendTo('body')
-    .trigger('submit')
-    .remove()
+  const form = document.createElement('form')
+  form.action = param.url
+  form.method = 'get'
+  form.style.display = 'none'
+  Object.keys(param.obj).forEach((key) => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = key
+    input.value = param.obj[key]
+    form.appendChild(input)
+  })
+  const button = document.createElement('input')
+  button.type = 'submit'
+  form.appendChild(button)
+  document.body.appendChild(form)
+  form.submit()
+  document.body.removeChild(form)
 }
 
 export { service as axios, downloadFile }
