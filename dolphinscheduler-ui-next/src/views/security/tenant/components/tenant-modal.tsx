@@ -19,6 +19,7 @@ import { defineComponent, PropType } from 'vue'
 // import {  } from 'naive-ui'
 // import styles from './index.module.scss'
 import Modal from '@/components/modal'
+import { NForm, NFormItem, NInput } from 'naive-ui'
 
 const TenantModal = defineComponent({
   name: 'tenant-modal',
@@ -48,7 +49,13 @@ const TenantModal = defineComponent({
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
-        ></Modal>
+        >
+          {{
+            default: () => (
+              <div>这里是弹框</div>
+            ),
+          }}
+        </Modal>
       </div>
     )
   },
