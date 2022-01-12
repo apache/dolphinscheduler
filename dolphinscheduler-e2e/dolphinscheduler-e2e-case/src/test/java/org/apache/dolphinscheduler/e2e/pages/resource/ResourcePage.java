@@ -42,7 +42,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
             WebElement fileMagageManageElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", fileMagageManageElement);
+            fileMagageManageElement.click();
             return tab.cast(new FileManagePage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());

@@ -51,19 +51,19 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
         if (tab == TenantPage.class) {
             WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
                     .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menuTenantManageElement);
+            menuTenantManageElement.click();
             return tab.cast(new TenantPage(driver));
         }
         if (tab == UserPage.class) {
             WebElement menUserManageElement = new WebDriverWait(driver, 60)
                     .until(ExpectedConditions.elementToBeClickable(menUserManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
+            menUserManageElement.click();
             return tab.cast(new UserPage(driver));
         }
         if (tab == WorkerGroupPage.class) {
             WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
                     .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
+            menWorkerGroupManageElement.click();
             return tab.cast(new WorkerGroupPage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());

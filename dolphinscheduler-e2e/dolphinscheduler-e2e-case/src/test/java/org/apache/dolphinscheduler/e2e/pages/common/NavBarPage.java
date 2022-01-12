@@ -56,21 +56,21 @@ public class NavBarPage {
         if (nav == ProjectPage.class) {
             WebElement projectTabElement = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(projectTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", projectTabElement);
+            projectTabElement.click();
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
             WebElement securityTabElement = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(securityTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", securityTabElement);
+            securityTabElement.click();
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
             WebElement resourceTabElement = new WebDriverWait(driver, 60)
                 .until(ExpectedConditions.elementToBeClickable(resourceTab));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", resourceTabElement);
+            resourceTabElement.click();
             return nav.cast(new ResourcePage(driver));
         }
 
