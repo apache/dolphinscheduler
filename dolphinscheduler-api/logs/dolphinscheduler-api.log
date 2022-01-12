@@ -1,0 +1,278 @@
+[INFO] 2022-01-12 12:16:54.189 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[55] - Starting AlertGroupControllerTest using Java 1.8.0_191 on bogon with PID 35997 (started by calvin in /Users/calvin/MyCloud/zhilian/workspace/dolphinscheduler/dolphinscheduler-api)
+[INFO] 2022-01-12 12:16:54.202 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[659] - No active profile set, falling back to default profiles: default
+[INFO] 2022-01-12 12:16:59.885 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.isalist
+[INFO] 2022-01-12 12:16:59.887 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: ftp.nonProxyHosts
+[INFO] 2022-01-12 12:16:59.887 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksNonProxyHosts
+[INFO] 2022-01-12 12:16:59.887 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyPort
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.io.unicode.encoding
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.endian
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: idea.test.cyclic.buffer.size
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url.bug
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.separator
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.headless
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor
+[INFO] 2022-01-12 12:16:59.888 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.class.path
+[INFO] 2022-01-12 12:16:59.889 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyHost
+[INFO] 2022-01-12 12:16:59.889 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.ext.dirs
+[INFO] 2022-01-12 12:16:59.889 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.version
+[INFO] 2022-01-12 12:16:59.889 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.info
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: awt.toolkit
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.language
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.vendor
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.command
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.home
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.arch.data.model
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: jacoco-agent.destfile
+[INFO] 2022-01-12 12:16:59.890 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.version
+[INFO] 2022-01-12 12:16:59.891 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyHost
+[INFO] 2022-01-12 12:16:59.891 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.path
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.name
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.version
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.printerjob
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.timezone
+[INFO] 2022-01-12 12:16:59.892 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: registry.zookeeper.connect-string
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.home
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.nonProxyHosts
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.version
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.management.compiler
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.name
+[INFO] 2022-01-12 12:16:59.893 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.version
+[INFO] 2022-01-12 12:16:59.894 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: spring.beaninfo.ignore
+[INFO] 2022-01-12 12:16:59.894 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.library.path
+[INFO] 2022-01-12 12:16:59.894 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyPort
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.jnu.encoding
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: FILE_LOG_CHARSET
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.name
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyHost
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.vendor
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyPort
+[INFO] 2022-01-12 12:16:59.895 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.io.tmpdir
+[INFO] 2022-01-12 12:16:59.896 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: line.separator
+[INFO] 2022-01-12 12:16:59.896 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: CONSOLE_LOG_CHARSET
+[INFO] 2022-01-12 12:16:59.896 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.endorsed.dirs
+[INFO] 2022-01-12 12:16:59.896 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.arch
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.graphicsenv
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.version
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: PID
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.name
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.dir
+[INFO] 2022-01-12 12:16:59.897 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.country
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.launcher
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.os.patch.level
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.name
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding.pkg
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: path.separator
+[INFO] 2022-01-12 12:16:59.898 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.vendor
+[INFO] 2022-01-12 12:16:59.899 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url
+[INFO] 2022-01-12 12:16:59.899 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: gopherProxySet
+[INFO] 2022-01-12 12:16:59.899 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.library.path
+[INFO] 2022-01-12 12:16:59.899 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.version
+[INFO] 2022-01-12 12:16:59.899 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.name
+[INFO] 2022-01-12 12:17:00.275 org.apache.curator.utils.Compatibility:[48] - Running in ZooKeeper 3.4.x compatibility mode
+[INFO] 2022-01-12 12:17:00.279 org.apache.curator.utils.Compatibility:[61] - Using emulated InjectSessionExpiration
+[INFO] 2022-01-12 12:17:00.344 org.apache.curator.framework.imps.CuratorFrameworkImpl:[308] - Starting
+[INFO] 2022-01-12 12:17:00.372 org.apache.curator.framework.imps.CuratorFrameworkImpl:[356] - Default schema
+[INFO] 2022-01-12 12:17:00.452 org.apache.curator.framework.state.ConnectionStateManager:[251] - State change: CONNECTED
+[INFO] 2022-01-12 12:17:01.444 ru.yandex.clickhouse.ClickHouseDriver:[42] - Driver registered
+[INFO] 2022-01-12 12:17:01.890 com.zaxxer.hikari.HikariDataSource:[110] - HikariPool-1 - Starting...
+[INFO] 2022-01-12 12:17:02.254 com.zaxxer.hikari.HikariDataSource:[123] - HikariPool-1 - Start completed.
+[INFO] 2022-01-12 12:17:07.126 org.quartz.impl.StdSchedulerFactory:[1220] - Using default implementation for ThreadExecutor
+[INFO] 2022-01-12 12:17:07.147 org.quartz.core.SchedulerSignalerImpl:[61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+[INFO] 2022-01-12 12:17:07.148 org.quartz.core.QuartzScheduler:[229] - Quartz Scheduler v.2.3.2 created.
+[INFO] 2022-01-12 12:17:07.149 org.quartz.simpl.RAMJobStore:[155] - RAMJobStore initialized.
+[INFO] 2022-01-12 12:17:07.149 org.quartz.core.QuartzScheduler:[294] - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+[INFO] 2022-01-12 12:17:07.149 org.quartz.impl.StdSchedulerFactory:[1374] - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+[INFO] 2022-01-12 12:17:07.150 org.quartz.impl.StdSchedulerFactory:[1378] - Quartz scheduler version: 2.3.2
+[INFO] 2022-01-12 12:17:07.150 org.quartz.core.QuartzScheduler:[2293] - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@54941dfd
+[INFO] 2022-01-12 12:17:09.645 org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver:[58] - Exposing 1 endpoint(s) beneath base path '/actuator'
+[INFO] 2022-01-12 12:17:10.111 springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:[69] - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+[INFO] 2022-01-12 12:17:10.344 org.eclipse.jetty.util.log:[170] - Logging initialized @19417ms to org.eclipse.jetty.util.log.Slf4jLog
+[INFO] 2022-01-12 12:17:11.881 org.springframework.boot.test.mock.web.SpringBootMockServletContext:[455] - Initializing Spring TestDispatcherServlet ''
+[INFO] 2022-01-12 12:17:11.882 org.springframework.test.web.servlet.TestDispatcherServlet:[525] - Initializing Servlet ''
+[INFO] 2022-01-12 12:17:11.886 org.springframework.test.web.servlet.TestDispatcherServlet:[547] - Completed initialization in 3 ms
+[INFO] 2022-01-12 12:17:12.010 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[160] - Context refreshed
+[INFO] 2022-01-12 12:17:12.033 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[163] - Found 1 custom documentation plugin(s)
+[INFO] 2022-01-12 12:17:12.238 springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:[41] - Scanning for api listing references
+[INFO] 2022-01-12 12:17:12.545 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: getAlertPluginInstanceUsingGET_1
+[INFO] 2022-01-12 12:17:12.555 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: listPagingUsingGET_1
+[INFO] 2022-01-12 12:17:12.563 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: verifyGroupNameUsingGET_1
+[INFO] 2022-01-12 12:17:12.896 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: downloadTaskLogUsingGET_1
+[INFO] 2022-01-12 12:17:12.916 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryLogUsingGET_1
+[INFO] 2022-01-12 12:17:13.192 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: viewTreeUsingGET_1
+[INFO] 2022-01-12 12:17:13.231 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: createProjectUsingPOST_1
+[INFO] 2022-01-12 12:17:13.544 org.springframework.scheduling.quartz.SchedulerFactoryBean:[727] - Starting Quartz Scheduler now
+[INFO] 2022-01-12 12:17:13.546 org.quartz.core.QuartzScheduler:[547] - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+[INFO] 2022-01-12 12:17:13.587 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[61] - Started AlertGroupControllerTest in 20.783 seconds (JVM running for 22.66)
+[INFO] 2022-01-12 12:17:14.267 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:53e34a32-2083-4eb7-a4f7-3b4eeb636998, LOGIN_USER:admin, URI:/alert-groups/2, METHOD:PUT, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.updateAlertgroup, ARGS:{groupName=cxc test group name, description=update alter group, alertInstanceIds=, id=2}
+[INFO] 2022-01-12 12:17:14.477 org.apache.dolphinscheduler.api.controller.AlertGroupController:[157] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.588 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:722adc2a-8f27-41ed-8558-68433cc69208, LOGIN_USER:admin, URI:/alert-groups/list, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.list, ARGS:{}
+[INFO] 2022-01-12 12:17:14.643 org.apache.dolphinscheduler.api.controller.AlertGroupController:[103] - {"code":0,"msg":"success","data":[{"id":3,"groupName":"cxc test group name","alertInstanceIds":null,"description":null,"createTime":"2022-01-12T04:17:14.575+0000","updateTime":"2022-01-12T04:17:14.575+0000","createUserId":0},{"id":1,"groupName":"default admin warning group","alertInstanceIds":"1,2","description":"default admin warning group","createTime":"2018-11-29T02:20:39.000+0000","updateTime":"2018-11-29T02:20:39.000+0000","createUserId":1}],"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.673 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:97b5539b-7a4d-4c6e-bce1-83bdf0cab00b, LOGIN_USER:admin, URI:/alert-groups/query, METHOD:POST, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.queryAlertGroupById, ARGS:{id=4}
+[INFO] 2022-01-12 12:17:14.682 org.apache.dolphinscheduler.api.controller.AlertGroupController:[138] - {"code":0,"msg":"success","data":{"id":4,"groupName":"cxc test group name","alertInstanceIds":null,"description":null,"createTime":"2022-01-12T04:17:14.664+0000","updateTime":"2022-01-12T04:17:14.664+0000","createUserId":0},"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.710 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:aaaef8ed-abc6-4d0a-83ea-617ed9850db9, LOGIN_USER:admin, URI:/alert-groups/verify-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.verifyGroupName, ARGS:{groupName=cxc test group name}
+[INFO] 2022-01-12 12:17:14.715 org.apache.dolphinscheduler.api.controller.AlertGroupController:[172] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.741 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:1c5ae6ae-445c-4b17-8f28-3b70d0545009, LOGIN_USER:admin, URI:/alert-groups, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.listPaging, ARGS:{searchVal=EMAIL, pageNo=1, pageSize=1}
+[INFO] 2022-01-12 12:17:14.791 org.apache.dolphinscheduler.api.controller.AlertGroupController:[122] - {"code":0,"msg":"success","data":{"totalList":[],"total":0,"totalPage":1,"pageSize":1,"currentPage":1,"start":0},"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.816 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:b8836e1c-cabe-4dba-9a7c-b2e78e7f6e48, LOGIN_USER:admin, URI:/alert-groups/verify-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.verifyGroupName, ARGS:{groupName=cxc test group name xx}
+[INFO] 2022-01-12 12:17:14.818 org.apache.dolphinscheduler.api.controller.AlertGroupController:[187] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.847 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:b6e1ae27-1a91-4d65-9041-b4ebf1ee502b, LOGIN_USER:admin, URI:/alert-groups, METHOD:POST, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.createAlertgroup, ARGS:{groupName=cxc test group name, description=cxc junit 测试告警描述, alertInstanceIds=}
+[INFO] 2022-01-12 12:17:14.872 org.apache.dolphinscheduler.api.controller.AlertGroupController:[88] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.925 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:7ee08225-495b-4aa9-8613-eacec89818e2, LOGIN_USER:admin, URI:/alert-groups/7, METHOD:DELETE, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.delAlertgroupById, ARGS:{id=7}
+[INFO] 2022-01-12 12:17:14.931 org.apache.dolphinscheduler.api.controller.AlertGroupController:[202] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:17:14.948 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-01-12 12:17:14.955 org.springframework.scheduling.quartz.SchedulerFactoryBean:[845] - Shutting down Quartz Scheduler
+[INFO] 2022-01-12 12:17:14.955 org.quartz.core.QuartzScheduler:[666] - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+[INFO] 2022-01-12 12:17:14.955 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-01-12 12:17:14.956 org.quartz.core.QuartzScheduler:[740] - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+[INFO] 2022-01-12 12:17:14.966 org.apache.dolphinscheduler.remote.NettyRemotingClient:[390] - netty client closed
+[INFO] 2022-01-12 12:17:14.967 org.apache.dolphinscheduler.service.log.LogClientService:[74] - logger client closed
+[INFO] 2022-01-12 12:17:14.973 com.zaxxer.hikari.HikariDataSource:[350] - HikariPool-1 - Shutdown initiated...
+[INFO] 2022-01-12 12:17:14.981 com.zaxxer.hikari.HikariDataSource:[352] - HikariPool-1 - Shutdown completed.
+[INFO] 2022-01-12 12:17:14.987 org.apache.curator.framework.imps.CuratorFrameworkImpl:[955] - backgroundOperationsLoop exiting
+[INFO] 2022-01-12 12:20:02.260 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[55] - Starting AlertGroupControllerTest using Java 1.8.0_191 on bogon with PID 36045 (started by calvin in /Users/calvin/MyCloud/zhilian/workspace/dolphinscheduler/dolphinscheduler-api)
+[INFO] 2022-01-12 12:20:02.269 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[659] - No active profile set, falling back to default profiles: default
+[INFO] 2022-01-12 12:20:08.045 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.isalist
+[INFO] 2022-01-12 12:20:08.047 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: ftp.nonProxyHosts
+[INFO] 2022-01-12 12:20:08.047 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksNonProxyHosts
+[INFO] 2022-01-12 12:20:08.047 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyPort
+[INFO] 2022-01-12 12:20:08.047 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.io.unicode.encoding
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.cpu.endian
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: idea.test.cyclic.buffer.size
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url.bug
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.separator
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.headless
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor
+[INFO] 2022-01-12 12:20:08.048 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.class.path
+[INFO] 2022-01-12 12:20:08.049 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyHost
+[INFO] 2022-01-12 12:20:08.049 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.ext.dirs
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.version
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.info
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: awt.toolkit
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.language
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.vendor
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.command
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.home
+[INFO] 2022-01-12 12:20:08.050 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.arch.data.model
+[INFO] 2022-01-12 12:20:08.051 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: jacoco-agent.destfile
+[INFO] 2022-01-12 12:20:08.051 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.version
+[INFO] 2022-01-12 12:20:08.051 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyHost
+[INFO] 2022-01-12 12:20:08.051 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.path
+[INFO] 2022-01-12 12:20:08.051 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.name
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.version
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.printerjob
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.timezone
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: registry.zookeeper.connect-string
+[INFO] 2022-01-12 12:20:08.052 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.home
+[INFO] 2022-01-12 12:20:08.053 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.nonProxyHosts
+[INFO] 2022-01-12 12:20:08.053 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.version
+[INFO] 2022-01-12 12:20:08.053 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.management.compiler
+[INFO] 2022-01-12 12:20:08.053 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.specification.name
+[INFO] 2022-01-12 12:20:08.053 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.class.version
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: spring.beaninfo.ignore
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.library.path
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: http.proxyPort
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.jnu.encoding
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: FILE_LOG_CHARSET
+[INFO] 2022-01-12 12:20:08.054 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.name
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: https.proxyHost
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.vendor
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: socksProxyPort
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.io.tmpdir
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: line.separator
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: CONSOLE_LOG_CHARSET
+[INFO] 2022-01-12 12:20:08.055 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.endorsed.dirs
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: os.arch
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.awt.graphicsenv
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.version
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: PID
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.specification.name
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.dir
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: user.country
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.java.launcher
+[INFO] 2022-01-12 12:20:08.056 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.os.patch.level
+[INFO] 2022-01-12 12:20:08.057 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.name
+[INFO] 2022-01-12 12:20:08.057 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: file.encoding.pkg
+[INFO] 2022-01-12 12:20:08.057 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: path.separator
+[INFO] 2022-01-12 12:20:08.057 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.vendor
+[INFO] 2022-01-12 12:20:08.057 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vendor.url
+[INFO] 2022-01-12 12:20:08.058 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: gopherProxySet
+[INFO] 2022-01-12 12:20:08.058 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: sun.boot.library.path
+[INFO] 2022-01-12 12:20:08.058 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.vm.version
+[INFO] 2022-01-12 12:20:08.058 org.apache.dolphinscheduler.common.utils.PropertyUtils:[65] - Overriding property from system property: java.runtime.name
+[INFO] 2022-01-12 12:20:08.377 org.apache.curator.utils.Compatibility:[48] - Running in ZooKeeper 3.4.x compatibility mode
+[INFO] 2022-01-12 12:20:08.380 org.apache.curator.utils.Compatibility:[61] - Using emulated InjectSessionExpiration
+[INFO] 2022-01-12 12:20:08.440 org.apache.curator.framework.imps.CuratorFrameworkImpl:[308] - Starting
+[INFO] 2022-01-12 12:20:08.465 org.apache.curator.framework.imps.CuratorFrameworkImpl:[356] - Default schema
+[INFO] 2022-01-12 12:20:08.558 org.apache.curator.framework.state.ConnectionStateManager:[251] - State change: CONNECTED
+[INFO] 2022-01-12 12:20:09.532 ru.yandex.clickhouse.ClickHouseDriver:[42] - Driver registered
+[INFO] 2022-01-12 12:20:09.905 com.zaxxer.hikari.HikariDataSource:[110] - HikariPool-1 - Starting...
+[INFO] 2022-01-12 12:20:10.332 com.zaxxer.hikari.HikariDataSource:[123] - HikariPool-1 - Start completed.
+[INFO] 2022-01-12 12:20:14.988 org.quartz.impl.StdSchedulerFactory:[1220] - Using default implementation for ThreadExecutor
+[INFO] 2022-01-12 12:20:15.014 org.quartz.core.SchedulerSignalerImpl:[61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+[INFO] 2022-01-12 12:20:15.014 org.quartz.core.QuartzScheduler:[229] - Quartz Scheduler v.2.3.2 created.
+[INFO] 2022-01-12 12:20:15.015 org.quartz.simpl.RAMJobStore:[155] - RAMJobStore initialized.
+[INFO] 2022-01-12 12:20:15.016 org.quartz.core.QuartzScheduler:[294] - Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+[INFO] 2022-01-12 12:20:15.016 org.quartz.impl.StdSchedulerFactory:[1374] - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+[INFO] 2022-01-12 12:20:15.016 org.quartz.impl.StdSchedulerFactory:[1378] - Quartz scheduler version: 2.3.2
+[INFO] 2022-01-12 12:20:15.016 org.quartz.core.QuartzScheduler:[2293] - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@40c28b0d
+[INFO] 2022-01-12 12:20:17.768 org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver:[58] - Exposing 1 endpoint(s) beneath base path '/actuator'
+[INFO] 2022-01-12 12:20:18.290 springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping:[69] - Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+[INFO] 2022-01-12 12:20:18.526 org.eclipse.jetty.util.log:[170] - Logging initialized @19419ms to org.eclipse.jetty.util.log.Slf4jLog
+[INFO] 2022-01-12 12:20:20.170 org.springframework.boot.test.mock.web.SpringBootMockServletContext:[455] - Initializing Spring TestDispatcherServlet ''
+[INFO] 2022-01-12 12:20:20.172 org.springframework.test.web.servlet.TestDispatcherServlet:[525] - Initializing Servlet ''
+[INFO] 2022-01-12 12:20:20.173 org.springframework.test.web.servlet.TestDispatcherServlet:[547] - Completed initialization in 1 ms
+[INFO] 2022-01-12 12:20:20.258 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[160] - Context refreshed
+[INFO] 2022-01-12 12:20:20.280 springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper:[163] - Found 1 custom documentation plugin(s)
+[INFO] 2022-01-12 12:20:20.490 springfox.documentation.spring.web.scanners.ApiListingReferenceScanner:[41] - Scanning for api listing references
+[INFO] 2022-01-12 12:20:20.786 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: getAlertPluginInstanceUsingGET_1
+[INFO] 2022-01-12 12:20:20.792 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: listPagingUsingGET_1
+[INFO] 2022-01-12 12:20:20.800 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: verifyGroupNameUsingGET_1
+[INFO] 2022-01-12 12:20:21.055 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: downloadTaskLogUsingGET_1
+[INFO] 2022-01-12 12:20:21.069 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: queryLogUsingGET_1
+[INFO] 2022-01-12 12:20:21.331 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: viewTreeUsingGET_1
+[INFO] 2022-01-12 12:20:21.363 springfox.documentation.spring.web.readers.operation.CachingOperationNameGenerator:[40] - Generating unique operation named: createProjectUsingPOST_1
+[INFO] 2022-01-12 12:20:21.673 org.springframework.scheduling.quartz.SchedulerFactoryBean:[727] - Starting Quartz Scheduler now
+[INFO] 2022-01-12 12:20:21.674 org.quartz.core.QuartzScheduler:[547] - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+[INFO] 2022-01-12 12:20:21.697 org.apache.dolphinscheduler.api.controller.AlertGroupControllerTest:[61] - Started AlertGroupControllerTest in 20.833 seconds (JVM running for 22.591)
+[INFO] 2022-01-12 12:20:22.337 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:2ebc6da8-b923-4bef-a896-0beacb36d18b, LOGIN_USER:admin, URI:/alert-groups/2, METHOD:PUT, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.updateAlertgroup, ARGS:{groupName=cxc test group name, description=update alter group, alertInstanceIds=, id=2}
+[INFO] 2022-01-12 12:20:22.606 org.apache.dolphinscheduler.api.controller.AlertGroupController:[159] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:22.752 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:5096ad74-b07c-474a-9c1b-56d0b5cce286, LOGIN_USER:admin, URI:/alert-groups/list, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.list, ARGS:{}
+[INFO] 2022-01-12 12:20:22.780 org.apache.dolphinscheduler.api.controller.AlertGroupController:[105] - {"code":0,"msg":"success","data":[{"id":3,"groupName":"cxc test group name","alertInstanceIds":null,"description":null,"createTime":"2022-01-12T04:20:22.729+0000","updateTime":"2022-01-12T04:20:22.729+0000","createUserId":0},{"id":1,"groupName":"default admin warning group","alertInstanceIds":"1,2","description":"default admin warning group","createTime":"2018-11-29T02:20:39.000+0000","updateTime":"2018-11-29T02:20:39.000+0000","createUserId":1}],"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:22.835 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:110e2da0-97eb-4193-a247-c90ad22fcf31, LOGIN_USER:admin, URI:/alert-groups/query, METHOD:POST, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.queryAlertGroupById, ARGS:{id=4}
+[INFO] 2022-01-12 12:20:22.848 org.apache.dolphinscheduler.api.controller.AlertGroupController:[140] - {"code":0,"msg":"success","data":{"id":4,"groupName":"cxc test group name","alertInstanceIds":null,"description":null,"createTime":"2022-01-12T04:20:22.820+0000","updateTime":"2022-01-12T04:20:22.820+0000","createUserId":0},"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:22.888 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:ad9851a8-967f-4b7d-a867-2562f5887618, LOGIN_USER:admin, URI:/alert-groups/verify-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.verifyGroupName, ARGS:{groupName=cxc test group name}
+[INFO] 2022-01-12 12:20:22.893 org.apache.dolphinscheduler.api.controller.AlertGroupController:[174] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:22.929 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:ec873c31-7fcf-45e8-886b-f8cfd8118388, LOGIN_USER:admin, URI:/alert-groups, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.listPaging, ARGS:{searchVal=EMAIL, pageNo=1, pageSize=1}
+[INFO] 2022-01-12 12:20:22.986 org.apache.dolphinscheduler.api.controller.AlertGroupController:[124] - {"code":0,"msg":"success","data":{"totalList":[],"total":0,"totalPage":1,"pageSize":1,"currentPage":1,"start":0},"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:23.009 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:9057ad94-23fb-4705-9ca7-771cb573e109, LOGIN_USER:admin, URI:/alert-groups/verify-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.verifyGroupName, ARGS:{groupName=cxc test group name xx}
+[INFO] 2022-01-12 12:20:23.012 org.apache.dolphinscheduler.api.controller.AlertGroupController:[189] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:23.041 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:2172c275-1ca7-4cbe-8e1a-40085313b1e8, LOGIN_USER:admin, URI:/alert-groups, METHOD:POST, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.createAlertgroup, ARGS:{groupName=cxc test group name, description=cxc junit 测试告警描述, alertInstanceIds=}
+[INFO] 2022-01-12 12:20:23.065 org.apache.dolphinscheduler.api.controller.AlertGroupController:[90] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:23.110 org.apache.dolphinscheduler.api.aspect.AccessLogAspect:[90] - REQUEST TRACE_ID:3e98a559-b824-4dba-a9d3-8d720285a751, LOGIN_USER:admin, URI:/alert-groups/7, METHOD:DELETE, HANDLER:org.apache.dolphinscheduler.api.controller.AlertGroupController.delAlertgroupById, ARGS:{id=7}
+[INFO] 2022-01-12 12:20:23.116 org.apache.dolphinscheduler.api.controller.AlertGroupController:[204] - {"code":0,"msg":"success","data":null,"success":true,"failed":false}
+[INFO] 2022-01-12 12:20:23.139 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-01-12 12:20:23.152 org.springframework.scheduling.quartz.SchedulerFactoryBean:[845] - Shutting down Quartz Scheduler
+[INFO] 2022-01-12 12:20:23.152 org.quartz.core.QuartzScheduler:[666] - Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+[INFO] 2022-01-12 12:20:23.152 org.quartz.core.QuartzScheduler:[585] - Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+[INFO] 2022-01-12 12:20:23.153 org.quartz.core.QuartzScheduler:[740] - Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+[INFO] 2022-01-12 12:20:23.159 org.apache.dolphinscheduler.remote.NettyRemotingClient:[390] - netty client closed
+[INFO] 2022-01-12 12:20:23.160 org.apache.dolphinscheduler.service.log.LogClientService:[74] - logger client closed
+[INFO] 2022-01-12 12:20:23.164 com.zaxxer.hikari.HikariDataSource:[350] - HikariPool-1 - Shutdown initiated...
+[INFO] 2022-01-12 12:20:23.170 com.zaxxer.hikari.HikariDataSource:[352] - HikariPool-1 - Shutdown completed.
+[INFO] 2022-01-12 12:20:23.173 org.apache.curator.framework.imps.CuratorFrameworkImpl:[955] - backgroundOperationsLoop exiting
