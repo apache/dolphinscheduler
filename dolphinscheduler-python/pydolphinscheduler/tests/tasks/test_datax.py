@@ -119,6 +119,4 @@ def test_custom_datax_get_define(json_template):
         return_value=(code, version),
     ):
         task = CustomDataX(name, json_template)
-        print(task.get_define())
-        print(expect)
         assert task.get_define() == expect
