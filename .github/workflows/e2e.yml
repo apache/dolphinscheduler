@@ -55,7 +55,8 @@ jobs:
         run: docker images
       - name: Export Docker Images
         run: |
-          docker save $(docker images --format '{{.Repository}}:{{.Tag}}') -o /tmp/docker-images.tar
+          images_name=$(docker images --format '{{.Repository}}:{{.Tag}}' | grep dolphinscheduler | grep ci) \
+          docker save %{images_name} -o /tmp/docker-images.tar
       - uses: actions/upload-artifact@v2
         name: Upload Docker Images
         with:
