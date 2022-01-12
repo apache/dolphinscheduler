@@ -17,9 +17,9 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%">
+      <el-table :data="list" size="mini" style="width: 100%" row-class-name="items">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="queueName" :label="$t('Name')"></el-table-column>
+        <el-table-column prop="queueName" :label="$t('Name')" class-name="queueName"></el-table-column>
         <el-table-column prop="queue" :label="$t('Queue value')"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
@@ -34,7 +34,7 @@
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle class="edit"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>

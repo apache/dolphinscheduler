@@ -144,7 +144,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-s-grid',
-      children: []
+      children: [],
+      classNames: 'tab-queue-manage'
     },
     {
       name: `${i18n.$t('Environment manage')}`,
