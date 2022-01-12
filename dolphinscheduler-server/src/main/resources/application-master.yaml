@@ -14,10 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 spring:
   application:
-    name: standalone-server
+    name: master-server
   cache:
     # default unable cache, you can enable by `type: caffeine`
     type: none
@@ -33,23 +32,13 @@ spring:
       spec: maximumSize=100,expireAfterWrite=300s,recordStats
 
 server:
-  port: 12345
+  port: 5679
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
-  server:
-    port: 8080
   metrics:
     tags:
       application: ${spring.application.name}
-
-logging:
-  level:
-    org:
-      apache:
-        zookeeper: WARN
-        hbase: WARN
-        hadoop: WARN
