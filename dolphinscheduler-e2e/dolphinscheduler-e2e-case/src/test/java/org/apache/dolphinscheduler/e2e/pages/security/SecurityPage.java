@@ -39,6 +39,8 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-worker-group-manage")
     private WebElement menWorkerGroupManage;
 
+    @FindBy(className = "tab-queue-manage")
+    private WebElement menuQueueManage;
 
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
@@ -56,6 +58,10 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
         if (tab == WorkerGroupPage.class) {
             menWorkerGroupManage().click();
             return tab.cast(new WorkerGroupPage(driver));
+        }
+        if (tab == QueuePage.class) {
+            menuQueueManage().click();
+            return tab.cast(new QueuePage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
