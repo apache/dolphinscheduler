@@ -16,6 +16,8 @@
  */
 <template>
   <m-popover
+          okId="btnSubmit"
+          cancelId="btnCancel"
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
@@ -26,6 +28,7 @@
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
             <el-input
+                    id="inputQueueName"
                     type="input"
                     v-model="queueName"
                     maxlength="60"
@@ -38,6 +41,7 @@
           <template slot="name"><strong>*</strong>{{$t('Queue value')}}</template>
           <template slot="content">
             <el-input
+                    id="inputQueueValue"
                     type="input"
                     v-model="queue"
                     maxlength="60"
