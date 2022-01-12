@@ -15,43 +15,85 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-// import {  } from 'naive-ui'
-// import styles from './index.module.scss'
+import { defineComponent, onMounted, PropType, toRefs } from 'vue'
 import Modal from '@/components/modal'
-import { NForm, NFormItem, NInput } from 'naive-ui'
+import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
+import { useModalData } from './use-modalData'
 
 const TenantModal = defineComponent({
   name: 'tenant-modal',
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
+    const { variables, getListData, handleValidate} = useModalData(props, ctx)
+
     const cancelModal = () => {
+      if (props.statusRef === 0) {
+        variables.model.tenantCode = ''
+        variables.model.description = ''
+      }
       ctx.emit('cancelModal', props.showModalRef)
     }
 
-    const confirmModal = async () => {
-      ctx.emit('confirmModal', props.showModalRef)
+    const confirmModal = () => {
+      handleValidate()
     }
 
-    return { cancelModal, confirmModal }
+    onMounted(() => {
+      getListData()
+    })
+
+    return { ...toRefs(variables), cancelModal, confirmModal }
   },
   props: {
     showModalRef: {
       type: Boolean as PropType<boolean>,
       default: false,
     },
+    statusRef: {
+      type: Number as PropType<number>,
+      default: 0,
+    }
   },
   render() {
     return (
       <div>
         <Modal
-          title='创建租户'
+          title={this.statusRef === 0 ? '创建租户' : '编辑租户'}
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
         >
           {{
-            default: () => <div>这里是弹框</div>,
+            default: () => (
+              <NForm
+                model={this.model}
+                rules={this.rules}
+                ref="tenantFormRef"
+                label-placement="left"
+                label-width={140}
+                require-mark-placement="left"
+                size="small"
+                style="{ maxWidth: '240px' }"
+              >
+                <NFormItem label="操作系统租户" path="tenantCode">
+                  <NInput disabled={this.statusRef === 1} placeholder="请输入操作系统租户" v-model={[this.model.tenantCode, 'value']} />
+                </NFormItem>
+                <NFormItem label="队列" path="queueId">
+                  <NSelect
+                    placeholder="Select"
+                    options={this.model.generalOptions}
+                    v-model={[this.model.queueId, 'value']}
+                  />
+                </NFormItem>
+                <NFormItem label="描述" path="description">
+                  <NInput
+                    placeholder="请输入描述"
+                    v-model={[this.model.description, 'value']}
+                    type="textarea"
+                  />
+                </NFormItem>
+              </NForm>
+            ),
           }}
         </Modal>
       </div>
