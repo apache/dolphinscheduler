@@ -20,6 +20,18 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
+        <el-table-column :label="$t('Alarm plugin instance')">
+          <template slot-scope="scope">
+            <el-tag
+              style="margin: 0 2px 0 0"
+              v-for="item in scope.row.instanceNames"
+              :key="item"
+              size="mini"
+              effect="light">
+              {{ item }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="description" :label="$t('Remarks')" width="200">
           <template slot-scope="scope">
             <span>{{scope.row.description | filterNull}}</span>
@@ -49,7 +61,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button v-if="scope.row.id !== 1" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -60,6 +72,7 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
+  import _ from 'lodash'
 
   export default {
     name: 'user-list',
@@ -67,7 +80,8 @@
       return {
         list: [],
         transferDialog: false,
-        item: {}
+        item: {},
+        allAlertPluginInstance: []
       }
     },
     props: {
@@ -76,7 +90,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization']),
+      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization', 'queryAllAlertPluginInstance']),
       _delete (item, i) {
         this.deleteAlertgrou({
           id: item.id
@@ -116,12 +130,48 @@
       alertgroupList (a) {
         this.list = []
         setTimeout(() => {
-          this.list = a
+          this.queryAllAlertPluginInstance().then(res => {
+            const alertPluginInstanceMapping = {}
+            res.forEach(instance => {
+              alertPluginInstanceMapping[instance.id] = instance.instanceName
+            })
+            if (a) {
+              a.forEach(item => {
+                let alertInstanceArray = _.split(item.alertInstanceIds, ',')
+                let instanceNames = []
+                alertInstanceArray.forEach(id => {
+                  instanceNames.push(alertPluginInstanceMapping[id])
+                })
+                item.instanceNames = instanceNames
+              })
+            }
+            this.list = a
+          }).catch(e => {
+            this.$message.error(e.msg)
+          })
         })
       }
     },
     created () {
-      this.list = this.alertgroupList
+      this.queryAllAlertPluginInstance().then(res => {
+        const alertPluginInstanceMapping = {}
+        res.forEach(instance => {
+          alertPluginInstanceMapping[instance.id] = instance.instanceName
+        })
+        if (this.alertgroupList) {
+          this.alertgroupList.forEach(item => {
+            let alertInstanceArray = _.split(item.alertInstanceIds, ',')
+            let instanceNames = []
+            alertInstanceArray.forEach(id => {
+              instanceNames.push(alertPluginInstanceMapping[id])
+            })
+            item.instanceNames = instanceNames
+          })
+        }
+        this.list = this.alertgroupList
+      }).catch(e => {
+        this.$message.error(e.msg)
+      })
     },
     mounted () {
     },

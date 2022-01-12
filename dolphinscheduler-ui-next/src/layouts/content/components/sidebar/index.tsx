@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, watch, PropType } from 'vue'
-import styles from './index.module.scss'
-import { MenuOption, NLayoutSider, NMenu } from 'naive-ui'
+import { defineComponent, ref, PropType } from 'vue'
+import { NLayoutSider, NMenu } from 'naive-ui'
 import { useMenuClick } from './use-menuClick'
 
 const Sidebar = defineComponent({
@@ -39,6 +38,7 @@ const Sidebar = defineComponent({
 
     const { handleMenuClick } = useMenuClick()
 
+    
     return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {
@@ -53,6 +53,7 @@ const Sidebar = defineComponent({
         onExpand={() => (this.collapsedRef = false)}
       >
         <NMenu
+          default-value={this.sideMenuOptions[0].key}
           options={this.sideMenuOptions}
           defaultExpandedKeys={this.defaultExpandedKeys}
           onUpdateValue={this.handleMenuClick}
