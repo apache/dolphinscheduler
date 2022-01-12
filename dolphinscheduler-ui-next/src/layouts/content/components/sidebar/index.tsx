@@ -38,7 +38,6 @@ const Sidebar = defineComponent({
 
     const { handleMenuClick } = useMenuClick()
 
-    
     return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {

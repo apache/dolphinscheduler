@@ -35,7 +35,7 @@ const master = defineComponent({
     const { getMaster } = useMaster()
     const masterRef: Ref<Array<MasterRes>> = ref(getMaster())
     const columnsRef: TableColumns<any> = [
-      { title: '#', key: 'id' },
+      { title: '#', key: 'index' },
       { title: t('monitor.master.directory'), key: 'directory' },
     ]
 
@@ -121,7 +121,7 @@ const master = defineComponent({
               masterRef[0] && (
                 <NDataTable
                   columns={columnsRef}
-                  data={[{ id: 1, directory: masterRef[0].zkDirectory }]}
+                  data={[{ index: 1, directory: masterRef[0].zkDirectory }]}
                   striped
                   size={'small'}
                 />
