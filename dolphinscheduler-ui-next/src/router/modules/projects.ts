@@ -32,7 +32,7 @@ export default {
     {
       path: '/projects/list',
       name: 'projects-list',
-      component: components['home'],
+      component: components['list'],
       meta: {
         title: '项目',
       },
