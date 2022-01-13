@@ -71,10 +71,9 @@
     },
     methods: {
       _onChange (o) {
+        // this.$emit('valueEvent', +o)
+        console.log("新增:", o)
         this._setIconState(+o)
-        if (!this.isIconState) {
-          this.$emit('valueEvent', +o)
-        }
       },
       _setIconState (value) {
         // Whether there is a list
