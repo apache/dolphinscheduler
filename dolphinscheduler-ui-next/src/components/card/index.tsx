@@ -29,7 +29,6 @@ const contentStyle = {
 const props = {
   title: {
     type: String as PropType<string>,
-    required: true,
   },
 }
 
