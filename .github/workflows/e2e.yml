@@ -61,6 +61,7 @@ jobs:
         with:
           name: standalone-image
           path: /tmp/standalone-image.tar
+          retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
