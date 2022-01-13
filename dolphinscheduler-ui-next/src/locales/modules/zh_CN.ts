@@ -214,20 +214,23 @@ const project = {
 
 const security = {
   tenant: {
+    tenant_manage: '租户管理',
     create_tenant: '创建租户',
     search_tips: '请输入关键词',
     num: '编号',
-    tenantCode: '操作系统租户',
+    tenant_code: '操作系统租户',
     description: '描述',
-    queueName: '队列',
-    createTime: '创建时间',
-    updateTime: '更新时间',
+    queue_name: '队列',
+    create_time: '创建时间',
+    update_time: '更新时间',
     actions: '操作',
     edit_tenant: '编辑租户',
-    tenantCode_tips: '请输入操作系统租户',
-    queueName_tips: '请选择队列',
+    tenant_code_tips: '请输入操作系统租户',
+    queue_name_tips: '请选择队列',
     description_tips: '请输入描述',
     delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除',
   }
 }
 

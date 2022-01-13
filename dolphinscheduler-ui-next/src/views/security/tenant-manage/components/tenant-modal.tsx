@@ -40,8 +40,20 @@ const TenantModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
-    onMounted(() => {
-      getListData()
+    watch(() => props.showModalRef, () => {
+      props.showModalRef && getListData()
+    })
+    
+    watch(() => props.statusRef, () => {
+      if (props.statusRef === 0) {
+        variables.model.tenantCode = ''
+        variables.model.description = ''
+      } else {
+        variables.model.id = props.row.id
+        variables.model.tenantCode = props.row.tenantCode
+        variables.model.queueId = props.row.queueId
+        variables.model.description = props.row.description
+      }
     })
 
     watch(() => props.row, () => {
@@ -89,12 +101,12 @@ const TenantModal = defineComponent({
                 size="small"
                 style="{ maxWidth: '240px' }"
               >
-                <NFormItem label={t('security.tenant.tenantCode')} path="tenantCode">
-                  <NInput disabled={this.statusRef === 1} placeholder={t('security.tenant.tenantCode_tips')} v-model={[this.model.tenantCode, 'value']} />
+                <NFormItem label={t('security.tenant.tenant_code')} path="tenantCode">
+                  <NInput disabled={this.statusRef === 1} placeholder={t('security.tenant.tenant_code_tips')} v-model={[this.model.tenantCode, 'value']} />
                 </NFormItem>
-                <NFormItem label={t('security.tenant.queueName')} path="queueId">
+                <NFormItem label={t('security.tenant.queue_name')} path="queueId">
                   <NSelect
-                    placeholder={t('security.tenant.queueName_tips')}
+                    placeholder={t('security.tenant.queue_name_tips')}
                     options={this.model.generalOptions}
                     v-model={[this.model.queueId, 'value']}
                   />
