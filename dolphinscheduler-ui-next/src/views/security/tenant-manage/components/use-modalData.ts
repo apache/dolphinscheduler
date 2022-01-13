@@ -27,10 +27,10 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
   const variables = reactive({
     tenantFormRef: ref(),
     model: {
-      id: ref<number>(0),
+      id: ref<number>(-1),
       tenantCode: ref(''),
       description: ref(''),
-      queueId: ref<number>(0),
+      queueId: ref<number>(-1),
       generalOptions: []
     },
     rules: {
@@ -82,6 +82,8 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
         description: variables.model.description
       }
       createTenant(data).then((res: any) => {
+        variables.model.tenantCode = ''
+        variables.model.description = ''
         ctx.emit('confirmModal', props.showModalRef)
       }, (err: any) => {
         console.log('err', err)

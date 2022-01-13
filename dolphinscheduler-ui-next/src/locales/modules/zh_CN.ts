@@ -229,6 +229,8 @@ const security = {
     queue_name_tips: '请选择队列',
     description_tips: '请输入描述',
     delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除',
   }
 }
 

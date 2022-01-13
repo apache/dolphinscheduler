@@ -40,8 +40,20 @@ const TenantModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
-    onMounted(() => {
-      getListData()
+    watch(() => props.showModalRef, () => {
+      props.showModalRef && getListData()
+    })
+    
+    watch(() => props.statusRef, () => {
+      if (props.statusRef === 0) {
+        variables.model.tenantCode = ''
+        variables.model.description = ''
+      } else {
+        variables.model.id = props.row.id
+        variables.model.tenantCode = props.row.tenantCode
+        variables.model.queueId = props.row.queueId
+        variables.model.description = props.row.description
+      }
     })
 
     watch(() => props.row, () => {

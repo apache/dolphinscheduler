@@ -59,6 +59,16 @@ const tenementManage = defineComponent({
       requestData()
     }
 
+    const handleChangePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const handleSearch = () => {
+      variables.page = 1
+      requestData()
+    }
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -75,6 +85,8 @@ const tenementManage = defineComponent({
       handleModalChange,
       onCancelModal,
       onConfirmModal,
+      handleSearch,
+      handleChangePageSize
     }
   },
   render() {
@@ -92,11 +104,10 @@ const tenementManage = defineComponent({
               <NInput
                 size='small'
                 v-model={[this.searchVal, 'value']}
-                on-input={this.requestData}
                 placeholder={t('security.tenant.search_tips')}
                 clearable
               />
-              <NButton size='small'>
+              <NButton size='small' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
@@ -118,7 +129,7 @@ const tenementManage = defineComponent({
               page-sizes={[10, 30, 50]}
               show-quick-jumper
               onUpdatePage={this.requestData}
-              onUpdatePageSize={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
             />
           </div>
         </Card>

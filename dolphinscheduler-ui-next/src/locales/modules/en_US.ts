@@ -230,6 +230,8 @@ const security = {
     queue_name_tips: 'Please select queue',
     description_tips: 'Please enter a description',
     delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete',
   }
 }
 
