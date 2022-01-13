@@ -215,6 +215,7 @@ const project = {
 
 const security = {
   tenant: {
+    tenant_manage: 'Tenant Manage',
     create_tenant: 'Create Tenant',
     search_tips: 'Please enter keywords',
     num: 'Serial number',
