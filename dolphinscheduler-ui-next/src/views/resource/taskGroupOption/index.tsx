@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import {h, ref, defineComponent, toRefs} from 'vue'
-import {NButton, NIcon, NInput, NTag, NDataTable, NSwitch} from 'naive-ui'
+import {h, ref, defineComponent, toRefs, reactive} from 'vue'
+import {NButton, NIcon, NInput, NCard, NDataTable, NSwitch, NPagination} from 'naive-ui'
 import Card from '@/components/card'
 import {useForm} from "@/views/resource/taskGroupOption/use-form"
 import {useUpdate} from "@/views/resource/taskGroupOption/use-update"
@@ -71,6 +71,14 @@ const taskGroupOption = defineComponent({
     const searchParamRef = ref()
     const searchVal = ref()
     const data = ref([])
+
+    const variables = reactive({
+      tableData: [],
+      page: ref(1),
+      pageSize: ref(10),
+      searchVal: ref(null),
+      totalPage: ref(1),
+    })
 
     const renderIcon = (icon: any) => {
       return () => h(NIcon, null, { default: () => h(icon) })
@@ -127,8 +135,18 @@ const taskGroupOption = defineComponent({
         })
       }
       item.id
+    }
 
+    const resetTableData = () => {
+      // getTableData({
+      //   pageSize: variables.pageSize,
+      //   pageNo: variables.page,
+      //   searchVal: variables.searchVal,
+      // })
+    }
 
+    const onUpdatePageSize = () => {
+      resetTableData()
     }
 
     const onEdit = (item: any) => {
@@ -172,11 +190,11 @@ const taskGroupOption = defineComponent({
         },
       },
       {
-        title: t('resource.task_group_option.actions'), key: 'actions', width: 150,
+        title: t('resource.task_group_option.actions'), key: 'actions', width: 100,
         render(row) {
           return (
-              <div class={styles.tableAction}>
-                <NButton class={styles.btn} size={"small"} type={"info"} circle={true} onClick={() => onEdit(row)}>
+              <div class={styles['table-action']}>
+                <NButton size={"small"} type={"info"} circle={true} onClick={() => onEdit(row)}>
                   <NIcon>
                     <EditTwotone/>
                   </NIcon>
@@ -194,6 +212,7 @@ const taskGroupOption = defineComponent({
 
     return {
       ...toRefs(state),
+      ...toRefs(variables),
       t,
       handleUpdate,
       data,
@@ -202,43 +221,58 @@ const taskGroupOption = defineComponent({
       onCreateTaskGroupOption,
       onSearch,
       searchParamRef,
-      searchVal,
-      pagination: {
-        pageSize: 10,
-        pageCount: 100,
-        showSizePicker: true,
-        pageSizes: pageSizes
-      }
+      resetTableData,
+      onUpdatePageSize,
     }
   },
   render() {
-    const { t } = this
+    const {
+      t,
+      resetTableData,
+      onUpdatePageSize,
+    } = this
 
     return (
-        <Card title={t('resource.task_group_option.option')}>
-          {{
-            default: () => (
-                <div>
-                  <div class={styles.toolbar}>
-                    <div class={styles.left}>
-                      <NButton type={"primary"} onClick={() => this.onCreateTaskGroupOption()}>
-                        {t('resource.task_group_option.create')}
-                      </NButton>
-                    </div>
-                    <div class={styles.right}>
-                      <NInput v-model={[this.searchVal, 'value']} placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
-                      <NButton type={"tertiary"} onClick={() => this.onSearch()}>
-                        <NIcon>
-                          <SearchOutlined />
-                        </NIcon>
-                      </NButton>
+        <div>
+          <NCard>
+            <div class={styles.toolbar}>
+              <div class={styles.left}>
+                <NButton size='small' type={"primary"} onClick={() => this.onCreateTaskGroupOption()}>
+                  {t('resource.task_group_option.create')}
+                </NButton>
+              </div>
+              <div class={styles.right}>
+                <NInput size='small' v-model={[this.searchVal, 'value']} placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
+                <NButton size='small' type='primary' onClick={() => this.onSearch()}>
+                  <NIcon>
+                    <SearchOutlined />
+                  </NIcon>
+                </NButton>
+              </div>
+            </div>
+          </NCard>
+          <Card class={styles['table-card']} title={t('resource.task_group_option.option')}>
+            {{
+              default: () => (
+                  <div>
+                    <NDataTable size={'small'} columns={this.columnsRef} data={this.data} striped/>
+                    <div class={styles.pagination}>
+                      <NPagination
+                          v-model:page={this.page}
+                          v-model:page-size={this.pageSize}
+                          page-count={this.totalPage}
+                          show-size-picker
+                          page-sizes={[10, 30, 50]}
+                          show-quick-jumper
+                          onUpdatePage={resetTableData}
+                          onUpdatePageSize={onUpdatePageSize}
+                      />
                     </div>
                   </div>
-                  <NDataTable columns={this.columnsRef} data={this.data} pagination={this.pagination}></NDataTable>
-                </div>
-            )
-          }}
-        </Card>
+              )
+            }}
+          </Card>
+        </div>
     )
   },
 })

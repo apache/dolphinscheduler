@@ -43,7 +43,7 @@ const userDropdown = {
 const menu = {
   home: 'Home',
   project: 'Project',
-  resources: 'Resources',
+  resource: 'Resources',
   datasource: 'Datasource',
   monitor: 'Monitor',
   security: 'Security',
@@ -232,4 +232,6 @@ export default {
   password,
   profile,
   monitor,
+  project,
+  resource,
 }

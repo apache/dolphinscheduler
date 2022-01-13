@@ -15,26 +15,11 @@
  * limitations under the License.
  */
 
-.container {
-  > .item {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    > .label {
-      display: inline-block;
-      width: 100px;
-    }
-  }
-}
-
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  padding: 0 0 10px 0;
-
+  padding: 0 0 0 0;
   .left {
     align-items: center;
   }
@@ -42,14 +27,30 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    button {
+      margin-left: 10px;
+    }
   }
 }
 
-.table-action {
-  display: flex;;
-  justify-content: space-between;
-  align-items: center;
-  .btn {
-    margin: 0 10px 0 0;
+
+.table-card {
+  margin-top: 2px;
+
+  .table-action {
+    display: flex;;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin: 0 2px 0 0;
+    }
   }
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
 }
+
+
