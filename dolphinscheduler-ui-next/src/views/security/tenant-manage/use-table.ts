@@ -18,7 +18,7 @@
 import { useAsyncState } from '@vueuse/core'
 import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm } from 'naive-ui'
+import { NButton, NPopconfirm, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
@@ -71,7 +71,7 @@ export function useTable() {
         title: t('security.tenant.actions'),
         key: 'actions',
         render(row: any) {
-          return h('div', null, [
+          return h(NSpace, null, [
             h(
               NButton,
               {
@@ -97,8 +97,7 @@ export function useTable() {
                   {
                     circle: true,
                     type: 'error',
-                    size: 'small',
-                    style: {'margin-left': '5px'},
+                    size: 'small'
                   },
                   {
                     icon: () => h(DeleteOutlined),
