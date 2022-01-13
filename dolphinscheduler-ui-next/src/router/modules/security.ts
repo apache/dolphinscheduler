@@ -30,9 +30,9 @@ export default {
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/security/tenant',
+      path: '/security/tenant-manage',
       name: 'tenement-manage',
-      component: components['tenant'],
+      component: components['tenant-manage'],
       meta: {
         title: '租户管理',
       },

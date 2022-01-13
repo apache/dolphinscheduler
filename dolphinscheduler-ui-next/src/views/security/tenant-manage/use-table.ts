@@ -41,40 +41,42 @@ export function useTable() {
     })
   }
 
-  const createColumns = () => {
-    return [
+  const createColumns = (variables: any) => {
+    variables.columns = [
       {
-        title: '编号',
+        title: t('security.tenant.num'),
         key: 'num',
       },
       {
-        title: '操作系统租户',
+        title: t('security.tenant.tenantCode'),
         key: 'tenantCode',
       },
       {
-        title: '描述',
+        title: t('security.tenant.description'),
         key: 'description',
       },
       {
-        title: '队列',
+        title: t('security.tenant.queueName'),
         key: 'queueName',
       },
       {
-        title: '创建时间',
+        title: t('security.tenant.createTime'),
         key: 'createTime',
       },
       {
-        title: '更新时间',
+        title: t('security.tenant.updateTime'),
         key: 'updateTime',
       },
       {
-        title: '操作',
+        title: t('security.tenant.actions'),
         key: 'actions',
         render(row: any) {
           return h('div', null, [
             h(
               NButton,
               {
+                circle: true,
+                type: 'info',
                 size: 'small',
                 onClick: () => {
                   handleEdit(row)
@@ -93,6 +95,8 @@ export function useTable() {
                 trigger: () => h(
                   NButton,
                   {
+                    circle: true,
+                    type: 'error',
                     size: 'small',
                     style: {'margin-left': '5px'},
                   },
@@ -100,7 +104,7 @@ export function useTable() {
                     icon: () => h(DeleteOutlined),
                   }
                 ),
-                default: () => {return '确定删除吗?'}
+                default: () => {return t('security.tenant.delete_confirm')}
               }
             )
           ])
@@ -110,7 +114,7 @@ export function useTable() {
   }
 
   const variables = reactive({
-    columns: createColumns(),
+    columns: [],
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
@@ -141,5 +145,6 @@ export function useTable() {
   return {
     variables,
     getTableData,
+    createColumns
   }
 }

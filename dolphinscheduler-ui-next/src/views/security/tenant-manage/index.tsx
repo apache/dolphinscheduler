@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, onMounted } from 'vue'
+import { defineComponent, toRefs, onMounted, watch } from 'vue'
 import {
   NButton,
   NInput,
@@ -28,11 +28,13 @@ import styles from './index.module.scss'
 import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
 import TenantModal from './components/tenant-modal'
+import { useI18n } from 'vue-i18n'
 
 const tenementManage = defineComponent({
   name: 'tenement-manage',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, getTableData, createColumns } = useTable()
+    const { t } = useI18n()
 
     const requestData = () => {
       getTableData({
@@ -57,10 +59,16 @@ const tenementManage = defineComponent({
     }
 
     onMounted(() => {
+      createColumns(variables)
       requestData()
     })
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     return {
+      t,
       ...toRefs(variables),
       requestData,
       handleModalChange,
@@ -69,13 +77,14 @@ const tenementManage = defineComponent({
     }
   },
   render() {
+    const { t } = this
     return (
       <div class={styles.container}>
         <NCard>
           <div class={styles.header}>
             <div>
               <NButton size='small' onClick={this.handleModalChange}>
-                创建租户
+                {t('security.tenant.create_tenant')}
               </NButton>
             </div>
             <div class={styles.search}>
@@ -83,7 +92,7 @@ const tenementManage = defineComponent({
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 on-input={this.requestData}
-                placeholder='请输入关键词'
+                placeholder={t('security.tenant.search_tips')}
                 clearable
               />
               <NButton size='small'>
