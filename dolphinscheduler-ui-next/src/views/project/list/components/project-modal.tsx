@@ -17,7 +17,7 @@
 
 import { defineComponent, PropType, toRefs, onMounted } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
-import { useForm } from './use-form'
+import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createProject, updateProject } from '@/service/modules/projects'
 
