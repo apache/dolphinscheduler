@@ -391,7 +391,7 @@ CREATE TABLE t_ds_task_definition (
   PRIMARY KEY (id)
 ) ;
 
-create index task_definition_index on t_ds_task_definition (project_code,id);
+create index task_definition_index on t_ds_task_definition (code,id);
 
 DROP TABLE IF EXISTS t_ds_task_definition_log;
 CREATE TABLE t_ds_task_definition_log (
@@ -422,6 +422,8 @@ CREATE TABLE t_ds_task_definition_log (
   PRIMARY KEY (id)
 ) ;
 
+create index idx_code_version on t_ds_task_definition_log (code,version);
+
 DROP TABLE IF EXISTS t_ds_process_task_relation;
 CREATE TABLE t_ds_process_task_relation (
   id serial NOT NULL  ,
@@ -440,7 +442,7 @@ CREATE TABLE t_ds_process_task_relation (
   PRIMARY KEY (id)
 ) ;
 
-create index project_code_process_definition_code_index on t_ds_process_task_relation (project_code,process_definition_code);
+create index idx_code on t_ds_process_task_relation (project_code,process_definition_code);
 
 DROP TABLE IF EXISTS t_ds_process_task_relation_log;
 CREATE TABLE t_ds_process_task_relation_log (
@@ -461,7 +463,7 @@ CREATE TABLE t_ds_process_task_relation_log (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-
+create index idx_process_code_version on t_ds_process_task_relation_log (process_definition_code,process_definition_version);
 --
 -- Table structure for table t_ds_process_instance
 --
