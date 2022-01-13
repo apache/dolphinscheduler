@@ -87,30 +87,6 @@ const TableAction = defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.list.edit'),
-            trigger: () => (
-              <NButton
-                size='small'
-                type='info'
-                tag='div'
-                onClick={() =>
-                  handleEditProject(
-                    this.row.code,
-                    this.row.name,
-                    this.row.description
-                  )
-                }
-                circle
-              >
-                <NIcon>
-                  <EditOutlined />
-                </NIcon>
-              </NButton>
-            ),
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
             default: () => t('project.list.delete'),
             trigger: () => (
               <NButton size='small' type='error' circle>

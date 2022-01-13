@@ -16,11 +16,11 @@
  */
 
 import { defineComponent, PropType } from 'vue'
-import { useTable } from './use-table'
+import { useTable } from '../use-table'
 import { NDataTable, NDatePicker, NGrid, NGi } from 'naive-ui'
 import PieChart from '@/components/chart/modules/Pie'
 import Card from '@/components/card'
-import type { StateTableData, StateChartData } from './types'
+import type { StateTableData, StateChartData } from '../types'
 
 const props = {
   title: {

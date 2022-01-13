@@ -29,7 +29,7 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
 import Card from '@/components/card'
-import ProjectModal from './project-modal'
+import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
   name: 'list',

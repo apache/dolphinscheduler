@@ -29,7 +29,7 @@ import { useUserinfo } from './use-userinfo'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
 import Modal from '@/components/modal'
-import Info from './info'
+import Info from './components/info'
 import utils from '@/utils'
 
 const profile = defineComponent({

@@ -15,28 +15,19 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useProfile } from './use-profile'
-import styles from './info.module.scss'
+import { useI18n } from 'vue-i18n'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
-const Info = defineComponent({
-  name: 'Info',
-  render() {
-    const { infoOptions } = useProfile()
+export function useTable() {
+  const { t } = useI18n()
 
-    return (
-      <dl class={styles.container}>
-        {infoOptions.value.map((item) => {
-          return (
-            <dd class={styles.item}>
-              <span class={styles.label}>{item.key}: </span>
-              <span>{item.value}</span>
-            </dd>
-          )
-        })}
-      </dl>
-    )
-  },
-})
+  const columnsRef: TableColumns<any> = [
+    { title: '#', key: 'index' },
+    { title: t('home.number'), key: 'number' },
+    { title: t('home.state'), key: 'state' },
+  ]
 
-export default Info
+  return {
+    columnsRef,
+  }
+}

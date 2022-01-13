@@ -20,8 +20,10 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
 import { format } from 'date-fns'
-import TableAction from './table-action'
+import { useRouter } from 'vue-router'
+import TableAction from './components/table-action'
 import styles from './index.module.scss'
+import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
 
@@ -34,6 +36,7 @@ export function useTable(
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
+  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
     { title: '#', key: 'index' },
@@ -45,7 +48,8 @@ export function useTable(
           'a',
           {
             class: styles.links,
-            onClick: () => {},
+            onClick: () =>
+              router.push({ path: `/projects/${row.code}/workflow-monitor` }),
           },
           {
             default: () => {
