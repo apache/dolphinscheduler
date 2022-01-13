@@ -173,6 +173,25 @@ const project = {
   },
 }
 
+const security = {
+  tenant: {
+    create_tenant: '创建租户',
+    search_tips: '请输入关键词',
+    num: '编号',
+    tenantCode: '操作系统租户',
+    description: '描述',
+    queueName: '队列',
+    createTime: '创建时间',
+    updateTime: '更新时间',
+    actions: '操作',
+    edit_tenant: '编辑租户',
+    tenantCode_tips: '请输入操作系统租户',
+    queueName_tips: '请选择队列',
+    description_tips: '请输入描述',
+    delete_confirm: '确定删除吗?',
+  }
+}
+
 export default {
   login,
   modal,
@@ -184,4 +203,5 @@ export default {
   profile,
   monitor,
   project,
+  security
 }
