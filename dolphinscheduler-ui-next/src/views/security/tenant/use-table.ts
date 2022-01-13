@@ -16,21 +16,28 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging } from '@/service/modules/tenants'
+import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton } from 'naive-ui'
+import { NButton, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
 export function useTable() {
   const { t } = useI18n()
 
-  const handleEdit = (row: any) => {
-    console.log('click', row)
+  const handleEdit= (row: any) => {
+    variables.showModalRef = true
+    variables.statusRef = 1
   }
 
   const handleDelete = (row: any) => {
-    console.log('click2', row)
+    deleteTenantById(row.id).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
   }
 
   const createColumns = () => {
@@ -70,27 +77,35 @@ export function useTable() {
                 size: 'small',
                 onClick: () => {
                   handleEdit(row)
-                },
+                }
               },
               {
-                icon: () => h(EditOutlined),
+                icon: () => h(EditOutlined)
               }
-            ),
-            h(
-              NButton,
-              {
-                size: 'small',
-                onClick: () => {
-                  handleDelete(row)
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => { handleDelete(row) }
                 },
-              },
-              {
-                icon: () => h(DeleteOutlined),
-              }
-            ),
-          ])
-        },
-      },
+                {
+                  trigger: () => h(
+                    NButton,
+                    {
+                      size: 'small',
+                      style: {'margin-left': '5px'},
+                    },
+                    {
+                      icon: () => h(DeleteOutlined),
+                    }
+                  ),
+                  default: () => {return '确定删除吗?'}
+                }
+              )
+            ]
+          )
+        }
+      }
     ]
   }
 
@@ -102,6 +117,7 @@ export function useTable() {
     searchVal: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
+    statusRef: ref(0),
   })
 
   const getTableData = (params: any) => {
