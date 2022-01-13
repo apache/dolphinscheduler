@@ -109,7 +109,7 @@ const tenementManage = defineComponent({
             onUpdatePageSize={this.requestData}
           />
         </div>
-        <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
+        <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} row={this.row} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
       </div>
     )
   },

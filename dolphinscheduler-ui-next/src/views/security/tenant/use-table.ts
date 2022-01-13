@@ -28,6 +28,7 @@ export function useTable() {
   const handleEdit= (row: any) => {
     variables.showModalRef = true
     variables.statusRef = 1
+    variables.row = row
   }
 
   const handleDelete = (row: any) => {
@@ -82,28 +83,27 @@ export function useTable() {
               {
                 icon: () => h(EditOutlined)
               }
-              ),
-              h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => { handleDelete(row) }
-                },
-                {
-                  trigger: () => h(
-                    NButton,
-                    {
-                      size: 'small',
-                      style: {'margin-left': '5px'},
-                    },
-                    {
-                      icon: () => h(DeleteOutlined),
-                    }
-                  ),
-                  default: () => {return '确定删除吗?'}
-                }
-              )
-            ]
-          )
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => { handleDelete(row) }
+              },
+              {
+                trigger: () => h(
+                  NButton,
+                  {
+                    size: 'small',
+                    style: {'margin-left': '5px'},
+                  },
+                  {
+                    icon: () => h(DeleteOutlined),
+                  }
+                ),
+                default: () => {return '确定删除吗?'}
+              }
+            )
+          ])
         }
       }
     ]
@@ -118,6 +118,7 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
+    row: {}
   })
 
   const getTableData = (params: any) => {

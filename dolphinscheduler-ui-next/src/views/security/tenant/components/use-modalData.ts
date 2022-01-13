@@ -19,7 +19,7 @@ import { reactive, ref, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryList } from '@/service/modules/queues'
-import { verifyTenantCode, createTenant } from '@/service/modules/tenants'
+import { verifyTenantCode, createTenant, updateTenant } from '@/service/modules/tenants'
 
 export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "confirmModal")[]>) {
   const { t } = useI18n()
@@ -27,9 +27,10 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
   const variables = reactive({
     tenantFormRef: ref(),
     model: {
+      id: ref<number>(0),
       tenantCode: ref(''),
       description: ref(''),
-      queueId: ref<number>(-1),
+      queueId: ref<number>(0),
       generalOptions: []
     },
     rules: {
@@ -59,11 +60,13 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
     return state
   }
 
-  const handleValidate = () => {
+  const handleValidate = (statusRef: number) => {
     variables.tenantFormRef.validate((errors: any) => {
       if (!errors) {
         console.log('验证成功')
-        submitTenantModal()
+
+        console.log('statusRef', statusRef)
+        statusRef === 0 ? submitTenantModal() : updateTenantModal()
       } else {
         console.log(errors, '验证失败')
         return
@@ -83,6 +86,18 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
       }, (err: any) => {
         console.log('err', err)
       })
+    })
+  }
+
+  const updateTenantModal = () => {
+    const data = {
+      tenantCode: variables.model.tenantCode,
+      queueId: variables.model.queueId,
+      description: variables.model.description,
+      id: variables.model.id
+    }
+    updateTenant(data, {id: variables.model.id}).then((res: any) => {
+      ctx.emit('confirmModal', props.showModalRef)
     })
   }
 

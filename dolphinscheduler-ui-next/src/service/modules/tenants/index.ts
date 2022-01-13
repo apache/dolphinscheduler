@@ -49,15 +49,15 @@ export function verifyTenantCode(params: TenantCodeReq): any {
   })
 }
 
-export function updateTenant(data: TenantCodeReq, id: IdReq): any {
+export function updateTenant(data: TenantCodeReq, idReq: IdReq): any {
   return axios({
-    url: `/tenants/${id}`,
+    url: `/tenants/${idReq.id}`,
     method: 'put',
     data,
   })
 }
 
-export function deleteTenantById(id: IdReq): any {
+export function deleteTenantById(id: number): any {
   return axios({
     url: `/tenants/${id}`,
     method: 'delete',
