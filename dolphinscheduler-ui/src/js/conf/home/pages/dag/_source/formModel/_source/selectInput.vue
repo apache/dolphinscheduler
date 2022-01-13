@@ -39,7 +39,7 @@
         <em slot="suffix" class="el-icon-arrow-down" style="font-size: 12px;" v-show="isIconState"></em>
       </el-input>
     <el-option
-            v-for="city in new Set(list)"
+            v-for="city in Array.from(new Set(list))"
             :key="city"
             :value="city"
             :label="city">
