@@ -25,7 +25,7 @@ import {
   watch,
   inject,
 } from 'vue'
-import { NDataTable, NButtonGroup, NButton } from 'naive-ui'
+import { NDataTable, NButtonGroup, NButton, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
 import Conditions from '@/components/conditions'
@@ -36,6 +36,7 @@ import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
 import { IRenameFile } from './types'
 import type { Router } from 'vue-router'
+import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'File',
@@ -61,28 +62,29 @@ export default defineComponent({
       page: 1,
       pageSize: 10,
       itemCount: 0,
-      showSizePicker: true,
       pageSizes: [10, 30, 50],
-      onChange: (page: number) => {
-        paginationReactive.page = page
-        resourceListRef.value = getResourceListState(
-          fileId.value,
-          serachRef.value,
-          paginationReactive.page,
-          paginationReactive.pageSize,
-        )
-      },
-      onPageSizeChange: (pageSize: number) => {
-        paginationReactive.page = 1
-        paginationReactive.pageSize = pageSize
-        resourceListRef.value = getResourceListState(
-          fileId.value,
-          serachRef.value,
-          paginationReactive.page,
-          paginationReactive.pageSize,
-        )
-      },
     })
+
+    const handleUpdatePage = (page: number) => {
+      paginationReactive.page = page
+      resourceListRef.value = getResourceListState(
+        fileId.value,
+        serachRef.value,
+        paginationReactive.page,
+        paginationReactive.pageSize,
+      )
+    }
+
+    const handleUpdatePageSize = (pageSize: number) => {
+      paginationReactive.page = 1
+      paginationReactive.pageSize = pageSize
+      resourceListRef.value = getResourceListState(
+        fileId.value,
+        serachRef.value,
+        paginationReactive.page,
+        paginationReactive.pageSize,
+      )
+    }
 
     const handleShowModal = (showRef: Ref<Boolean>) => {
       showRef.value = true
@@ -153,6 +155,8 @@ export default defineComponent({
       handleCreateFile,
       handleUploadFile,
       handleRenameFile,
+      handleUpdatePage,
+      handleUpdatePageSize,
       pagination: paginationReactive,
       renameInfo,
     }
@@ -165,7 +169,6 @@ export default defineComponent({
       handleCreateFolder,
       handleCreateFile,
       handleUploadFile,
-      pagination,
     } = this
     return (
       <div>
@@ -189,8 +192,19 @@ export default defineComponent({
             data={this.resourceListRef?.value.table}
             striped
             size={'small'}
-            pagination={pagination}
           />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.pagination.page}
+              v-model:pageSize={this.pagination.pageSize}
+              pageSizes={this.pagination.pageSizes}
+              item-count={this.pagination.itemCount}
+              onUpdatePage={this.handleUpdatePage}
+              onUpdatePageSize={this.handleUpdatePageSize}
+              show-quick-jumper
+              show-size-picker
+            />
+          </div>
           <ResourceFolderModal
             v-model:show={this.folderShowRef}
             onUpdateList={this.updateList}

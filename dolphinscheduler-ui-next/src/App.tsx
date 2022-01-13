@@ -17,12 +17,15 @@
 
 import { defineComponent, computed, ref, nextTick, provide } from 'vue'
 import {
+  zhCN,
+  enUS,
   NConfigProvider,
   darkTheme,
   GlobalThemeOverrides,
   NMessageProvider,
 } from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
+import { useLocalesStore } from '@/store/locales/locales'
 import themeList from '@/themes'
 
 const App = defineComponent({
@@ -31,9 +34,9 @@ const App = defineComponent({
     const isRouterAlive = ref(true)
     const themeStore = useThemeStore()
     const currentTheme = computed(() =>
-      themeStore.darkTheme ? darkTheme : undefined
+      themeStore.darkTheme ? darkTheme : undefined,
     )
-
+    const localesStore = useLocalesStore()
     /*refresh page when router params change*/
     const reload = () => {
       isRouterAlive.value = false
@@ -48,6 +51,7 @@ const App = defineComponent({
       reload,
       isRouterAlive,
       currentTheme,
+      localesStore,
     }
   },
   render() {
@@ -59,6 +63,7 @@ const App = defineComponent({
         theme={this.currentTheme}
         themeOverrides={themeOverrides}
         style={{ width: '100%', height: '100vh' }}
+        locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
         <NMessageProvider>
           {this.isRouterAlive ? <router-view /> : ''}
