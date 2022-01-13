@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { countProcessInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
@@ -22,12 +23,14 @@ import { TaskStateRes } from '@/service/modules/projects-analysis/types'
 import { StateData } from './types'
 
 export function useProcessState() {
+  const route = useRoute()
+
   const getProcessState = (date: Array<number>) => {
     const { state } = useAsyncState(
       countProcessInstanceState({
         startDate: format(date[0], 'yyyy-MM-dd HH:mm:ss'),
         endDate: format(date[1], 'yyyy-MM-dd HH:mm:ss'),
-        projectCode: 0,
+        projectCode: Number(route.params.projectCode),
       }).then((res: TaskStateRes): StateData => {
         const table = res.taskCountDtos.map((item, index) => {
           return {

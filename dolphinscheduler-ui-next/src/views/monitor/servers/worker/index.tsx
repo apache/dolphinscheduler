@@ -35,7 +35,7 @@ const master = defineComponent({
     const { getWorker } = useWorker()
     const workerRef: Ref<Array<WorkerRes>> = ref(getWorker())
     const columnsRef: TableColumns<any> = [
-      { title: '#', key: 'id' },
+      { title: '#', key: 'index' },
       { title: t('monitor.worker.directory'), key: 'directory' },
     ]
 
@@ -121,7 +121,9 @@ const master = defineComponent({
               workerRef[0] && (
                 <NDataTable
                   columns={columnsRef}
-                  data={workerRef[0].zkDirectories.map((item, index) => { return {id: index + 1, directory: item} })}
+                  data={workerRef[0].zkDirectories.map((item, index) => {
+                    return { index: index + 1, directory: item }
+                  })}
                   striped
                   size={'small'}
                 />

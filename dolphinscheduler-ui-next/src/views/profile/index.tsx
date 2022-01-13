@@ -29,7 +29,7 @@ import { useUserinfo } from './use-userinfo'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
 import Modal from '@/components/modal'
-import Info from './info'
+import Info from './components/info'
 import utils from '@/utils'
 
 const profile = defineComponent({
@@ -106,16 +106,6 @@ const profile = defineComponent({
                     v-model={[this.profileForm.phone, 'value']}
                     placeholder={t('profile.phone_tips')}
                   />
-                </NFormItem>
-                <NFormItem label={t('profile.state')} path='state'>
-                  <NRadioGroup v-model={[this.profileForm.state, 'value']}>
-                    {[
-                      { value: 1, label: t('profile.enable') },
-                      { value: 0, label: t('profile.disable') },
-                    ].map((item) => {
-                      return <NRadio value={item.value}>{item.label}</NRadio>
-                    })}
-                  </NRadioGroup>
                 </NFormItem>
               </NForm>
             ),

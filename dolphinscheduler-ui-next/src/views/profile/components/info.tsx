@@ -15,53 +15,28 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
+import { defineComponent } from 'vue'
+import { useProfile } from '../use-profile'
+import styles from '../info.module.scss'
 
-interface ProjectsReq {
-  description?: string
-  projectName: string
-}
+const Info = defineComponent({
+  name: 'Info',
+  render() {
+    const { infoOptions } = useProfile()
 
-interface UserIdReq {
-  userId?: number
-}
+    return (
+      <dl class={styles.container}>
+        {infoOptions.value.map((item) => {
+          return (
+            <dd class={styles.item}>
+              <span class={styles.label}>{item.key}: </span>
+              <span>{item.value}</span>
+            </dd>
+          )
+        })}
+      </dl>
+    )
+  },
+})
 
-interface UpdateProjectsReq extends ProjectsReq {
-  userName?: string
-}
-
-interface ProjectList {
-  id: number
-  userId: number
-  userName: string
-  code: any
-  name: string
-  description: string
-  createTime: string
-  updateTime: string
-  perm: number
-  defCount: number
-  instRunningCount: number
-}
-
-interface ProjectRes {
-  totalList: ProjectList[]
-  total: number
-  totalPage: number
-  pageSize: number
-  currentPage: number
-  start: number
-}
-
-export {
-  ListReq,
-  ProjectsReq,
-  UserIdReq,
-  UpdateProjectsReq,
-  ProjectRes,
-  ProjectList,
-}
+export default Info

@@ -117,6 +117,65 @@ const profile = {
   disable: '禁用',
 }
 
+const monitor = {
+  master: {
+    cpu_usage: '处理器使用量',
+    memory_usage: '内存使用量',
+    load_average: '平均负载量',
+    create_time: '创建时间',
+    last_heartbeat_time: '最后心跳时间',
+    directory_detail: '目录详情',
+    host: '主机',
+    directory: '注册目录',
+  },
+  worker: {
+    cpu_usage: '处理器使用量',
+    memory_usage: '内存使用量',
+    load_average: '平均负载量',
+    create_time: '创建时间',
+    last_heartbeat_time: '最后心跳时间',
+    directory_detail: '目录详情',
+    host: '主机',
+    directory: '注册目录',
+  },
+  db: {
+    health_state: '健康状态',
+    max_connections: '最大连接数',
+    threads_connections: '当前连接数',
+    threads_running_connections: '数据库当前活跃连接数',
+  },
+  statistics: {
+    command_number_of_waiting_for_running: '待执行的命令数',
+    failure_command_number: '执行失败的命令数',
+    tasks_number_of_waiting_running: '待运行任务数',
+    task_number_of_ready_to_kill: '待杀死任务数',
+  },
+}
+
+const project = {
+  list: {
+    create_project: '创建项目',
+    project_list: '项目列表',
+    project_tips: '请输入项目名称',
+    description_tips: '请输入项目描述',
+    username_tips: '请输入所属用户',
+    project_name: '项目名称',
+    project_description: '项目描述',
+    owned_users: '所属用户',
+    workflow_define_count: '工作流定义数',
+    process_instance_running_count: '正在运行的流程数',
+    description: '描述',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    confirm: '确定',
+    cancel: '取消',
+    delete_confirm: '确定删除吗?',
+  },
+}
+
 const resource = {
   task_group_option: {
     id: '编号',
@@ -162,41 +221,6 @@ const resource = {
   }
 }
 
-const monitor = {
-  master: {
-    cpu_usage: '处理器使用量',
-    memory_usage: '内存使用量',
-    load_average: '平均负载量',
-    create_time: '创建时间',
-    last_heartbeat_time: '最后心跳时间',
-    directory_detail: '目录详情',
-    host: '主机',
-    directory: '注册目录',
-  },
-  worker: {
-    cpu_usage: '处理器使用量',
-    memory_usage: '内存使用量',
-    load_average: '平均负载量',
-    create_time: '创建时间',
-    last_heartbeat_time: '最后心跳时间',
-    directory_detail: '目录详情',
-    host: '主机',
-    directory: '注册目录',
-  },
-  db: {
-    health_state: '健康状态',
-    max_connections: '最大连接数',
-    threads_connections: '当前连接数',
-    threads_running_connections: '数据库当前活跃连接数',
-  },
-  statistics: {
-    command_number_of_waiting_for_running: '待执行的命令数',
-    failure_command_number: '执行失败的命令数',
-    tasks_number_of_waiting_running: '待运行任务数',
-    task_number_of_ready_to_kill: '待杀死任务数',
-  },
-}
-
 export default {
   login,
   modal,
@@ -206,6 +230,5 @@ export default {
   home,
   password,
   profile,
-  resource,
-  monitor
+  monitor,
 }

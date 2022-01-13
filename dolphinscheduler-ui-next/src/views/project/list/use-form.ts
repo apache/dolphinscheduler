@@ -15,32 +15,44 @@
  * limitations under the License.
  */
 
-import { updateUser } from '@/service/modules/users'
+import { useI18n } from 'vue-i18n'
+import { reactive, ref } from 'vue'
 import { useUserStore } from '@/store/user/user'
+import type { FormRules } from 'naive-ui'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
-export function useUpdate(state: any) {
+export function useForm() {
+  const { t } = useI18n()
   const userStore = useUserStore()
-  const userInfo = userStore.userInfo as UserInfoRes
 
-  const handleUpdate = () => {
-    state.profileFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        await updateUser({
-          userPassword: '',
-          id: userInfo.id,
-          userName: state.profileForm.username,
-          tenantId: userInfo.tenantId,
-          email: state.profileForm.email,
-          phone: state.profileForm.phone,
-          state: userInfo.state,
-          queue: userInfo.queue,
-        })
-      }
-    })
-  }
+  const state = reactive({
+    projectFormRef: ref(),
+    projectForm: {
+      projectName: '',
+      description: '',
+      userName: (userStore.getUserInfo as UserInfoRes).userName,
+    },
+    rules: {
+      projectName: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.projectForm.projectName === '') {
+            return new Error(t('project.list.project_tips'))
+          }
+        },
+      },
+      userName: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.projectForm.userName === '') {
+            return new Error(t('project.list.username_tips'))
+          }
+        },
+      },
+    } as FormRules,
+  })
 
-  return {
-    handleUpdate,
-  }
+  return { state, t }
 }

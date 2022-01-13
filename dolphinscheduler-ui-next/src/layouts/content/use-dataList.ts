@@ -82,7 +82,7 @@ export function useDataList() {
       },
       {
         label: t('menu.project'),
-        key: 'project',
+        key: 'projects',
         icon: renderIcon(ProfileOutlined),
         isShowSide: false,
         children: [

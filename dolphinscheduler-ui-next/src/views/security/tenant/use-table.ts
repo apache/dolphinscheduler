@@ -16,80 +16,94 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging } from '@/service/modules/tenants'
+import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton } from 'naive-ui'
+import { NButton, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import {
-  DeleteOutlined, EditOutlined
-} from '@vicons/antd'
+import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 
 export function useTable() {
   const { t } = useI18n()
 
   const handleEdit= (row: any) => {
-    console.log('click', row)
+    variables.showModalRef = true
+    variables.statusRef = 1
+    variables.row = row
   }
 
   const handleDelete = (row: any) => {
-    console.log('click2', row)
+    deleteTenantById(row.id).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
   }
 
   const createColumns = () => {
     return [
       {
         title: '编号',
-        key: 'num'
+        key: 'num',
       },
       {
         title: '操作系统租户',
-        key: 'tenantCode'
+        key: 'tenantCode',
       },
       {
         title: '描述',
-        key: 'description'
+        key: 'description',
       },
       {
         title: '队列',
-        key: 'queueName'
+        key: 'queueName',
       },
       {
         title: '创建时间',
-        key: 'createTime'
+        key: 'createTime',
       },
       {
         title: '更新时间',
-        key: 'updateTime'
+        key: 'updateTime',
       },
       {
         title: '操作',
         key: 'actions',
-        render (row: any) {
-          return h(
-            'div',
-            null, [
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  onClick: () => { handleEdit(row) }
-                },
-                {
-                  icon: () => h(EditOutlined)
+        render(row: any) {
+          return h('div', null, [
+            h(
+              NButton,
+              {
+                size: 'small',
+                onClick: () => {
+                  handleEdit(row)
                 }
-              ),
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  onClick: () => { handleDelete(row) }
-                },
-                {
-                  icon: () => h(DeleteOutlined)
-                }
-              )
-            ]
-          )
+              },
+              {
+                icon: () => h(EditOutlined)
+              }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => { handleDelete(row) }
+              },
+              {
+                trigger: () => h(
+                  NButton,
+                  {
+                    size: 'small',
+                    style: {'margin-left': '5px'},
+                  },
+                  {
+                    icon: () => h(DeleteOutlined),
+                  }
+                ),
+                default: () => {return '确定删除吗?'}
+              }
+            )
+          ])
         }
       }
     ]
@@ -102,16 +116,18 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(null),
     totalPage: ref(1),
-    showModalRef: ref(false)
+    showModalRef: ref(false),
+    statusRef: ref(0),
+    row: {}
   })
 
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
-      queryTenantListPaging({...params}).then((res: any) => {
+      queryTenantListPaging({ ...params }).then((res: any) => {
         variables.tableData = res.totalList.map((item: any, index: number) => {
           return {
             num: index + 1,
-            ...item
+            ...item,
           }
         })
         variables.totalPage = res.totalPage
@@ -124,6 +140,6 @@ export function useTable() {
 
   return {
     variables,
-    getTableData
+    getTableData,
   }
 }

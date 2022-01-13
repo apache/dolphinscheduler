@@ -15,14 +15,29 @@
  * limitations under the License.
  */
 
+import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import { listWorker } from '@/service/modules/monitor'
+import { countDefinitionByUser } from '@/service/modules/projects-analysis'
+import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
+import type { DefinitionChartData } from './types'
 
-export function useWorker() {
-  const getWorker = () => {
-    const { state } = useAsyncState(listWorker(), [])
+export function useProcessDefinition() {
+  const route = useRoute()
+
+  const getProcessDefinition = () => {
+    const { state } = useAsyncState(
+      countDefinitionByUser({
+        projectCode: Number(route.params.projectCode),
+      }).then((res: ProcessDefinitionRes): DefinitionChartData => {
+        const xAxisData = res.userList.map((item) => item.userName)
+        const seriesData = res.userList.map((item) => item.count)
+
+        return { xAxisData, seriesData }
+      }),
+      { xAxisData: [], seriesData: [] }
+    )
     return state
   }
 
-  return { getWorker }
+  return { getProcessDefinition }
 }

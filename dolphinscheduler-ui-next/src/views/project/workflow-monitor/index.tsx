@@ -24,8 +24,8 @@ import { useProcessState } from './use-process-state'
 import StateCard from './components/state-card'
 import DefinitionCard from './components/definition-card'
 
-export default defineComponent({
-  name: 'home',
+const workflowMonitor = defineComponent({
+  name: 'workflow-monitor',
   setup() {
     const { t } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
@@ -90,3 +90,5 @@ export default defineComponent({
     )
   },
 })
+
+export default workflowMonitor

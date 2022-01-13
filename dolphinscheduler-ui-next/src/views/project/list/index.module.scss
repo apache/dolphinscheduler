@@ -15,53 +15,39 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+.search-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
+
+    button {
+      margin-left: 10px;
+    }
+  }
 }
 
-interface ProjectsReq {
-  description?: string
-  projectName: string
+.table-card {
+  margin-top: 8px;
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }
 
-interface UserIdReq {
-  userId?: number
-}
+.links {
+  color: dodgerblue;
+  text-decoration: none;
+  cursor: pointer;
 
-interface UpdateProjectsReq extends ProjectsReq {
-  userName?: string
-}
-
-interface ProjectList {
-  id: number
-  userId: number
-  userName: string
-  code: any
-  name: string
-  description: string
-  createTime: string
-  updateTime: string
-  perm: number
-  defCount: number
-  instRunningCount: number
-}
-
-interface ProjectRes {
-  totalList: ProjectList[]
-  total: number
-  totalPage: number
-  pageSize: number
-  currentPage: number
-  start: number
-}
-
-export {
-  ListReq,
-  ProjectsReq,
-  UserIdReq,
-  UpdateProjectsReq,
-  ProjectRes,
-  ProjectList,
+  &:hover {
+    text-decoration: underline;
+  }
 }

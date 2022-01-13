@@ -43,7 +43,7 @@ const userDropdown = {
 const menu = {
   home: 'Home',
   project: 'Project',
-  resource: 'Resources',
+  resources: 'Resources',
   datasource: 'Datasource',
   monitor: 'Monitor',
   security: 'Security',
@@ -118,6 +118,66 @@ const profile = {
   disable: 'Disable',
 }
 
+const monitor = {
+  master: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
+  worker: {
+    cpu_usage: 'CPU Usage',
+    memory_usage: 'Memory Usage',
+    load_average: 'Load Average',
+    create_time: 'Create Time',
+    last_heartbeat_time: 'Last Heartbeat Time',
+    directory_detail: 'Directory Detail',
+    host: 'Host',
+    directory: 'Directory',
+  },
+  db: {
+    health_state: 'Health State',
+    max_connections: 'Max Connections',
+    threads_connections: 'Threads Connections',
+    threads_running_connections: 'Threads Running Connections',
+  },
+  statistics: {
+    command_number_of_waiting_for_running:
+        'Command Number Of Waiting For Running',
+    failure_command_number: 'Failure Command Number',
+    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
+  },
+}
+
+const project = {
+  list: {
+    create_project: 'Create Project',
+    project_list: 'Project List',
+    project_tips: 'Please enter your project',
+    description_tips: 'Please enter your description',
+    username_tips: 'Please enter your username',
+    project_name: 'Project Name',
+    project_description: 'Project Description',
+    owned_users: 'Owned Users',
+    workflow_define_count: 'Workflow Define Count',
+    process_instance_running_count: 'Process Instance Running Count',
+    description: 'Description',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    delete_confirm: 'Delete?',
+  },
+}
+
 const resource = {
   task_group_option: {
     id: 'No.',
@@ -162,42 +222,6 @@ const resource = {
   }
 }
 
-const monitor = {
-  master: {
-    cpu_usage: 'CPU Usage',
-    memory_usage: 'Memory Usage',
-    load_average: 'Load Average',
-    create_time: 'Create Time',
-    last_heartbeat_time: 'Last Heartbeat Time',
-    directory_detail: 'Directory Detail',
-    host: 'Host',
-    directory: 'Directory',
-  },
-  worker: {
-    cpu_usage: 'CPU Usage',
-    memory_usage: 'Memory Usage',
-    load_average: 'Load Average',
-    create_time: 'Create Time',
-    last_heartbeat_time: 'Last Heartbeat Time',
-    directory_detail: 'Directory Detail',
-    host: 'Host',
-    directory: 'Directory',
-  },
-  db: {
-    health_state: 'Health State',
-    max_connections: 'Max Connections',
-    threads_connections: 'Threads Connections',
-    threads_running_connections: 'Threads Running Connections',
-  },
-  statistics: {
-    command_number_of_waiting_for_running:
-        'Command Number Of Waiting For Running',
-    failure_command_number: 'Failure Command Number',
-    tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
-    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
-  },
-}
-
 export default {
   login,
   modal,
@@ -207,6 +231,5 @@ export default {
   home,
   password,
   profile,
-  resource,
-  monitor
+  monitor,
 }
