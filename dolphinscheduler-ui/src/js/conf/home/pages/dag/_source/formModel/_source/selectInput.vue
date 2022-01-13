@@ -71,9 +71,9 @@
     },
     methods: {
       _onChange (o) {
-        this.isDetails = false
         this.$emit('valueEvent', +o)
         this._setIconState(+o)
+        this.isDetails = false
       },
       _setIconState (value) {
         // Whether there is a list
