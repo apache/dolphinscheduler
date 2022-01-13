@@ -52,6 +52,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
     {
       title: t('resource.file.name'),
       key: 'name',
+      width: 120,
       render: (row) =>
         h(
           'a',
@@ -67,7 +68,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
           },
         ),
     },
-    { title: t('resource.file.user_name'), key: 'user_name' },
+    { title: t('resource.file.user_name'), width: 100, key: 'user_name' },
     {
       title: t('resource.file.whether_directory'),
       key: 'whether_directory',
@@ -76,13 +77,13 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
         row.directory ? t('resource.file.yes') : t('resource.file.no'),
     },
     { title: t('resource.file.file_name'), key: 'file_name' },
-    { title: t('resource.file.description'), width: 200, key: 'description' },
+    { title: t('resource.file.description'), width: 150, key: 'description' },
     {
       title: t('resource.file.size'),
       key: 'size',
       render: (row) => bytesToSize(row.size),
     },
-    { title: t('resource.file.update_time'), width: 120, key: 'update_time' },
+    { title: t('resource.file.update_time'), width: 150, key: 'update_time' },
     {
       title: t('resource.file.operation'),
       key: 'operation',

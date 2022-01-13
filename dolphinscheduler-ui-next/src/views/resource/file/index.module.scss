@@ -43,3 +43,29 @@
   align-items: center;
   margin-top: 20px;
 }
+
+.table-box {
+  table {
+    width: 100%;
+    tr {
+      height: 40px;
+      font-size: 12px;
+      th,td{
+        &:nth-child(1) {
+          width: 50px;
+          text-align: center;
+        }
+      }
+      th {
+        &:nth-child(1) {
+          width: 60px;
+          text-align: center;
+        }
+        >span {
+          font-size: 12px;
+          color: #555;
+        }
+      }
+    }
+  }
+}

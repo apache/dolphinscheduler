@@ -93,13 +93,14 @@ export default defineComponent({
             default: () => t('resource.file.edit'),
             trigger: () => (
               <NButton
-                size='small'
+                size='tiny'
                 type='info'
                 disabled={this.rtDisb(this.row.name, this.row.size)}
                 tag='div'
                 onClick={() => {
                   this.handleEditFile(this.row)
                 }}
+                style={{ marginRight: '-5px' }}
                 circle
               >
                 <NIcon>
@@ -114,7 +115,7 @@ export default defineComponent({
             default: () => t('resource.file.rename'),
             trigger: () => (
               <NButton
-                size='small'
+                size='tiny'
                 type='info'
                 onClick={() =>
                   this.handleRenameFile(
@@ -123,6 +124,7 @@ export default defineComponent({
                     this.row.description,
                   )
                 }
+                style={{ marginRight: '-5px' }}
                 circle
               >
                 <NIcon>
@@ -137,11 +139,12 @@ export default defineComponent({
             default: () => t('resource.file.download'),
             trigger: () => (
               <NButton
-                size='small'
+                size='tiny'
                 type='info'
                 disabled={this.row?.directory ? true : false}
                 tag='div'
                 circle
+                style={{ marginRight: '-5px' }}
                 onClick={() => downloadResource(this.row.id)}
               >
                 <NIcon>
@@ -155,7 +158,7 @@ export default defineComponent({
           {{
             default: () => t('resource.file.delete'),
             trigger: () => (
-              <NButton size='small' type='error' circle>
+              <NButton size='tiny' type='error' circle>
                 <NPopconfirm
                   positive-text={t('resource.file.confirm')}
                   negative-text={t('resource.file.cancel')}

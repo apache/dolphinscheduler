@@ -192,6 +192,7 @@ export default defineComponent({
             data={this.resourceListRef?.value.table}
             striped
             size={'small'}
+            class={styles['table-box']}
           />
           <div class={styles.pagination}>
             <NPagination
