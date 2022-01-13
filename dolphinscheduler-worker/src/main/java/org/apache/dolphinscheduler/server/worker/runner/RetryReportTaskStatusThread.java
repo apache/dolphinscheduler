@@ -57,7 +57,7 @@ public class RetryReportTaskStatusThread implements Runnable {
      */
     @Override
     public void run() {
-        ResponseCache instance = ResponseCache.get();
+        ResponseCache responseCache = ResponseCache.get();
 
         while (Stopper.isRunning()){
 
@@ -65,8 +65,8 @@ public class RetryReportTaskStatusThread implements Runnable {
             ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_INTERVAL);
 
             try {
-                if (!instance.getAckCache().isEmpty()){
-                    Map<Integer,Command> ackCache =  instance.getAckCache();
+                if (!responseCache.getAckCache().isEmpty()){
+                    Map<Integer,Command> ackCache =  responseCache.getAckCache();
                     for (Map.Entry<Integer, Command> entry : ackCache.entrySet()){
                         Integer taskInstanceId = entry.getKey();
                         Command ackCommand = entry.getValue();
@@ -74,9 +74,9 @@ public class RetryReportTaskStatusThread implements Runnable {
                     }
                 }
 
-                if (!instance.getResponseCache().isEmpty()){
-                    Map<Integer,Command> responseCache =  instance.getResponseCache();
-                    for (Map.Entry<Integer, Command> entry : responseCache.entrySet()){
+                if (!responseCache.getResponseCache().isEmpty()){
+                    Map<Integer,Command> localResponseCache =  responseCache.getResponseCache();
+                    for (Map.Entry<Integer, Command> entry : localResponseCache.entrySet()){
                         Integer taskInstanceId = entry.getKey();
                         Command responseCommand = entry.getValue();
                         taskCallbackService.sendResult(taskInstanceId,responseCommand);
