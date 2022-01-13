@@ -363,6 +363,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     return result;
             }
         } catch (Exception e) {
+            logger.error("set online failure", e);
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
             throw new ServiceException(result.get(Constants.MSG).toString());
         }

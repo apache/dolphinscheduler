@@ -17,27 +17,46 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static org.apache.dolphinscheduler.common.Constants.CACHE_KEY_VALUE_ALL;
+
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * worker group mapper interface
  */
+@CacheConfig(cacheNames = "workerGroup", keyGenerator = "cacheKeyGenerator")
 public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
     /**
      * query all worker group
+     *
      * @return worker group list
      */
+    @Cacheable(sync = true, key = CACHE_KEY_VALUE_ALL)
     List<WorkerGroup> queryAllWorkerGroup();
+
+    @CacheEvict(key = CACHE_KEY_VALUE_ALL)
+    int deleteById(Integer id);
+
+    @CacheEvict(key = CACHE_KEY_VALUE_ALL)
+    int insert(WorkerGroup entity);
+
+    @CacheEvict(key = CACHE_KEY_VALUE_ALL)
+    int updateById(@Param("et") WorkerGroup entity);
 
     /**
      * query worer grouop by name
+     *
      * @param name name
      * @return worker group list
      */

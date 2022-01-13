@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -48,29 +49,33 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CommonTaskProcessor extends BaseTaskProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommonTaskProcessor.class);
+
     @Autowired
     private TaskPriorityQueue taskUpdateQueue;
 
     @Autowired
-    MasterConfig masterConfig;
-
-    @Autowired
     NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
-    /**
-     * logger of MasterBaseTaskExecThread
-     */
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, maxRetryTimes, commitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
+        setTaskExecutionLogger();
         return dispatchTask(taskInstance, processInstance);
+    }
+
+    @Override
+    public void setTaskExecutionLogger() {
+        threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
+        Thread.currentThread().setName(String.format(TaskConstants.MASTER_COMMON_TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
     }
 
     @Override
@@ -79,12 +84,31 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
+        return true;
     }
 
     @Override
     protected boolean taskTimeout() {
         return true;
+    }
+
+    @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                    return true;
+                }
+                taskInstance.setState(ExecutionStatus.KILL);
+                taskInstance.setEndTime(new Date());
+                processService.updateTaskInstance(taskInstance);
+                return true;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+
+        }
+        return false;
     }
 
     /**
@@ -154,7 +178,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             if (StringUtils.isBlank(taskInstance.getHost())) {
                 taskInstance.setState(ExecutionStatus.KILL);
                 taskInstance.setEndTime(new Date());
-                processService.updateTaskInstance(taskInstance);
                 return true;
             }
 

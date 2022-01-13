@@ -119,8 +119,6 @@ public class ProcessServiceTest {
     @Mock
     private ResourceMapper resourceMapper;
 
-    private HashMap<String, ProcessDefinition> processDefinitionCacheMaps = new HashMap<>();
-
     @Test
     public void testCreateSubCommand() {
         ProcessInstance parentInstance = new ProcessInstance();
@@ -247,7 +245,7 @@ public class ProcessServiceTest {
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
                 + CMD_PARAM_SUB_PROCESS_DEFINE_CODE + "\":\"222\"}");
-        Assert.assertNull(processService.handleCommand(logger, host, command, processDefinitionCacheMaps));
+        Assert.assertNull(processService.handleCommand(logger, host, command));
 
         int definitionVersion = 1;
         long definitionCode = 123;
@@ -274,7 +272,7 @@ public class ProcessServiceTest {
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Assert.assertNotNull(processService.handleCommand(logger, host, command1, processDefinitionCacheMaps));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command1));
 
         Command command2 = new Command();
         command2.setId(2);
@@ -284,8 +282,7 @@ public class ProcessServiceTest {
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
         command2.setProcessInstanceId(processInstanceId);
         Mockito.when(commandMapper.deleteById(2)).thenReturn(1);
-
-        Assert.assertNotNull(processService.handleCommand(logger, host, command2, processDefinitionCacheMaps));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command2));
 
         Command command3 = new Command();
         command3.setId(3);
@@ -295,8 +292,7 @@ public class ProcessServiceTest {
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Mockito.when(commandMapper.deleteById(3)).thenReturn(1);
-
-        Assert.assertNotNull(processService.handleCommand(logger, host, command3, processDefinitionCacheMaps));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command3));
 
         Command command4 = new Command();
         command4.setId(4);
@@ -306,8 +302,7 @@ public class ProcessServiceTest {
         command4.setCommandType(CommandType.REPEAT_RUNNING);
         command4.setProcessInstanceId(processInstanceId);
         Mockito.when(commandMapper.deleteById(4)).thenReturn(1);
-
-        Assert.assertNotNull(processService.handleCommand(logger, host, command4, processDefinitionCacheMaps));
+        Assert.assertNotNull(processService.handleCommand(logger, host, command4));
 
         Command command5 = new Command();
         command5.setId(5);
@@ -322,7 +317,7 @@ public class ProcessServiceTest {
         command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
         Mockito.when(commandMapper.deleteById(5)).thenReturn(1);
 
-        ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5, processDefinitionCacheMaps);
+        ProcessInstance processInstance1 = processService.handleCommand(logger, host, command5);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
     }
 
@@ -370,6 +365,9 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
+        Mockito.when(processDefineMapper.queryByCode(parentProcessDefineCode)).thenReturn(processDefinition);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
+                , parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();

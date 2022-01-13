@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.netty.channel.Channel;
 
@@ -94,6 +94,17 @@ public class TaskResponseEvent {
     private Channel channel;
 
     private int processInstanceId;
+
+    public static TaskResponseEvent newActionStop(ExecutionStatus state,
+                                                  int taskInstanceId,
+                                                  int processInstanceId) {
+        TaskResponseEvent event = new TaskResponseEvent();
+        event.setState(state);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setEvent(Event.ACTION_STOP);
+        event.setProcessInstanceId(processInstanceId);
+        return event;
+    }
     
     public static TaskResponseEvent newAck(ExecutionStatus state,
                                            Date startTime,

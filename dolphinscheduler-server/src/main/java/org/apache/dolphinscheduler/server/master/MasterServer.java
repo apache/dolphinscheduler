@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
 import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
@@ -49,6 +50,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.event.EventListener;
@@ -66,6 +68,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     })
 })
 @EnableTransactionManagement
+@EnableCaching
 public class MasterServer implements IStoppable {
     /**
      * logger of MasterServer
@@ -138,12 +141,15 @@ public class MasterServer implements IStoppable {
         ackProcessor.init(processInstanceExecMaps);
         TaskResponseProcessor taskResponseProcessor = new TaskResponseProcessor();
         taskResponseProcessor.init(processInstanceExecMaps);
+        TaskKillResponseProcessor taskKillResponseProcessor = new TaskKillResponseProcessor();
+        taskKillResponseProcessor.init(processInstanceExecMaps);
         StateEventProcessor stateEventProcessor = new StateEventProcessor();
         stateEventProcessor.init(processInstanceExecMaps);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, ackProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, new CacheProcessor());
         this.nettyRemotingServer.start();
 
         // self tolerant

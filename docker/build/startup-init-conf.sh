@@ -38,14 +38,20 @@ echo "init env variables"
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
 [ "h2" == ${DATABASE_TYPE} ] || export SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
 # export SPRING_DATASOURCE_DRIVER_CLASS_NAME=${DATABASE_DRIVER}
+export SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=${HIKARI_MAXIMUM_POOL_SIZE:-"50"}
 
+#============================================================================
+# Quartz
+#============================================================================
+export ORG_QUARTZ_THREADPOOL_THREADCOUNT=${ORG_QUARTZ_THREADPOOL_THREADCOUNT:-"25"}
+export ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT=${ORG_QUARTZ_SCHEDULER_BATCHTRIGGERACQUISTITIONMAXCOUNT:-"1"}
 
 #============================================================================
 # Registry
 #============================================================================
 export REGISTRY_PLUGIN_NAME=${REGISTRY_PLUGIN_NAME:-"zookeeper"}
 export REGISTRY_SERVERS=${REGISTRY_SERVERS:-"127.0.0.1:2181"}
-
+export SESSION_TIMEOUT_MS=${SESSION_TIMEOUT_MS:-"30000"}
 #============================================================================
 # Common
 #============================================================================

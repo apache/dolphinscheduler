@@ -60,9 +60,6 @@ public class MasterConfig {
     @Value("${master.reserved.memory:0.3}")
     private double masterReservedMemory;
 
-    @Value("${master.cache.process.definition:true}")
-    private boolean masterCacheProcessDefinition;
-
     @Value("${master.failover.interval:10}")
     private int failoverInterval;
 
@@ -161,14 +158,6 @@ public class MasterConfig {
 
     public void setStateWheelInterval(int stateWheelInterval) {
         this.stateWheelInterval = stateWheelInterval;
-    }
-
-    public boolean getMasterCacheProcessDefinition() {
-        return masterCacheProcessDefinition;
-    }
-
-    public void setMasterCacheProcessDefinition(boolean masterCacheProcessDefinition) {
-        this.masterCacheProcessDefinition = masterCacheProcessDefinition;
     }
 
     public int getFailoverInterval() {

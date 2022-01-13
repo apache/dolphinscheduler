@@ -26,15 +26,10 @@ import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,22 +37,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * condition task processor
  */
 public class ConditionTaskProcessor extends BaseTaskProcessor {
 
-    protected static final Logger logger = LoggerFactory.getLogger(TaskConstants.TASK_LOG_LOGGER_NAME);
-
     /**
      * dependent parameters
      */
     private DependentParameters dependentParameters;
-
-    ProcessInstance processInstance;
 
     /**
      * condition result
@@ -69,14 +57,11 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      */
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
-    MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-
     private TaskDefinition taskDefinition;
 
     @Override
-    public boolean submit(TaskInstance task, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {
-        this.processInstance = processInstance;
-        this.taskInstance = processService.submitTask(task, masterTaskCommitRetryTimes, masterTaskCommitInterval);
+    public boolean submitTask() {
+        this.taskInstance = processService.submitTask(taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
@@ -85,12 +70,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion()
         );
 
-        String threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId());
-        Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,threadLoggerInfoName));
+        setTaskExecutionLogger();
         initTaskParameters();
         logger.info("dependent task start");
         return true;
@@ -102,13 +82,14 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
-    public void run() {
+    public boolean runTask() {
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
+        return true;
     }
 
     @Override
@@ -134,10 +115,26 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean persistTask(TaskAction taskAction) {
+        switch (taskAction) {
+            case STOP:
+                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                    return true;
+                }
+                this.taskInstance.setState(ExecutionStatus.KILL);
+                this.taskInstance.setEndTime(new Date());
+                processService.saveTaskInstance(taskInstance);
+                return true;
+            default:
+                logger.error("unknown task action: {}", taskAction.toString());
+        }
+        return false;
+    }
+
+    @Override
     protected boolean killTask() {
         this.taskInstance.setState(ExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
         return true;
     }
 

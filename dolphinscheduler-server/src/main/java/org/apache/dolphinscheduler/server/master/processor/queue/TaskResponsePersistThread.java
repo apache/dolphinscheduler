@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThread;
+import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
+import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -144,6 +146,16 @@ public class TaskResponsePersistThread implements Runnable {
                     logger.error("worker response master error", e);
                     DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(), -1);
                     channel.writeAndFlush(taskResponseCommand.convert2Command());
+                }
+                break;
+            case ACTION_STOP:
+                WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+                if (workflowExecuteThread != null) {
+                    ITaskProcessor taskProcessor = workflowExecuteThread.getActiveTaskProcessorMaps().get(taskResponseEvent.getTaskInstanceId());
+                    if (taskProcessor != null) {
+                        taskProcessor.persist(TaskAction.STOP);
+                        logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
+                    }
                 }
                 break;
             default:

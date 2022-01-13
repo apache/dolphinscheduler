@@ -31,9 +31,8 @@ import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +52,11 @@ public class WorkerManagerThread implements Runnable {
     private final DelayQueue<TaskExecuteThread> workerExecuteQueue = new DelayQueue<>();
 
     /**
+     * running task
+     */
+    private final ConcurrentHashMap<Integer, TaskExecuteThread> taskExecuteThreadMap = new ConcurrentHashMap<>();
+
+    /**
      * worker config
      */
     private final WorkerConfig workerConfig;
@@ -60,7 +64,7 @@ public class WorkerManagerThread implements Runnable {
     /**
      * thread executor service
      */
-    private final ExecutorService workerExecService;
+    private final WorkerExecService workerExecService;
 
     /**
      * task callback service
@@ -69,8 +73,15 @@ public class WorkerManagerThread implements Runnable {
 
     public WorkerManagerThread() {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads());
+        this.workerExecService = new WorkerExecService(
+                ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads()),
+                taskExecuteThreadMap
+        );
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+    }
+
+    public TaskExecuteThread getTaskExecuteThread(Integer taskInstanceId) {
+        return this.taskExecuteThreadMap.get(taskInstanceId);
     }
 
     /**
@@ -88,7 +99,7 @@ public class WorkerManagerThread implements Runnable {
      * @return queue size
      */
     public int getThreadPoolQueueSize() {
-        return ((ThreadPoolExecutor) workerExecService).getQueue().size();
+        return this.workerExecService.getThreadPoolQueueSize();
     }
 
     /**

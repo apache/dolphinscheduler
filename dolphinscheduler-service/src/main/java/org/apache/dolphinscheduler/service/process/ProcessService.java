@@ -212,8 +212,8 @@ public class ProcessService {
      * @return process instance
      */
     @Transactional
-    public ProcessInstance handleCommand(Logger logger, String host, Command command, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
-        ProcessInstance processInstance = constructProcessInstance(command, host, processDefinitionCacheMaps);
+    public ProcessInstance handleCommand(Logger logger, String host, Command command) {
+        ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
             logger.error("scan command, command parameter is error: {}", command);
@@ -731,19 +731,12 @@ public class ProcessService {
      * @param host host
      * @return process instance
      */
-    private ProcessInstance constructProcessInstance(Command command, String host, HashMap<String, ProcessDefinition> processDefinitionCacheMaps) {
+    private ProcessInstance constructProcessInstance(Command command, String host) {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
-        String key = String.format("%d-%d", command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-        if (processDefinitionCacheMaps.containsKey(key)) {
-            processDefinition = processDefinitionCacheMaps.get(key);
-        } else {
-            processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
-            if (processDefinition != null) {
-                processDefinitionCacheMaps.put(key, processDefinition);
-            }
-        }
+
+        processDefinition = this.findProcessDefinition(command.getProcessDefinitionCode(), command.getProcessDefinitionVersion());
         if (processDefinition == null) {
             logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
             return null;
@@ -1008,17 +1001,21 @@ public class ProcessService {
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
 
-        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
-        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
+        // Since JSONUtils.toList return unmodified list, we need to creat a new List here.
+        List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(parentGlobalParams, Property.class));
+        List<Property> subParams = JSONUtils.toList(subGlobalParams, Property.class);
 
-        Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        Set<String> parentParamKeys = parentParams.stream().map(Property::getProp).collect(toSet());
 
-        for (Property parent : parentPropertyList) {
-            if (!subMap.containsKey(parent.getProp())) {
-                subPropertyList.add(parent);
-            }
-        }
-        return JSONUtils.toJsonString(subPropertyList);
+        // We will combine the params of parent workflow and sub workflow
+        // If the params are defined in both, we will use parent's params to override the sub workflow(ISSUE-7962)
+        // todo: Do we need to consider the other attribute of Property?
+        //      e.g. the subProp's type is not equals with parent, or subProp's direct is not equals with parent
+        //      It's suggested to add node name in property, this kind of problem can be solved.
+        List<Property> extraSubParams = subParams.stream()
+                .filter(subProp -> !parentParamKeys.contains(subProp.getProp())).collect(Collectors.toList());
+        parentParams.addAll(extraSubParams);
+        return JSONUtils.toJsonString(parentParams);
     }
 
     /**
@@ -1952,7 +1949,7 @@ public class ProcessService {
         if (Objects.isNull(user)) {
             return StringUtils.EMPTY;
         }
-        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (Objects.isNull(tenant)) {
             return StringUtils.EMPTY;
         }
@@ -2423,6 +2420,23 @@ public class ProcessService {
         return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
     }
 
+    public List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations) {
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        Map<Long, Integer> taskCodeVersionMap = new HashMap<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() > 0) {
+                taskCodeVersionMap.put(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion());
+            }
+            if (processTaskRelation.getPostTaskCode() > 0) {
+                taskCodeVersionMap.put(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion());
+            }
+        }
+        taskCodeVersionMap.forEach((code,version) -> {
+            taskDefinitionLogs.add((TaskDefinitionLog) this.findTaskDefinition(code, version));
+        });
+        return taskDefinitionLogs;
+    }
+
     /**
      * find task definition by code and version
      */
@@ -2505,7 +2519,7 @@ public class ProcessService {
         return taskNodeList;
     }
 
-    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId, int taskId) {
+    public Map<ProcessInstance, TaskInstance> notifyProcessList(int processId) {
         HashMap<ProcessInstance, TaskInstance> processTaskMap = new HashMap<>();
         //find sub tasks
         ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryBySubProcessId(processId);
