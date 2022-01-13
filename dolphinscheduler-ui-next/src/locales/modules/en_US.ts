@@ -151,6 +151,44 @@ const monitor = {
   },
 }
 
+const resource = {
+  file: {
+    file_manage: 'File Manage',
+    create_folder: 'Create Folder',
+    create_file: 'Create File',
+    upload_files: 'Upload Files',
+    enter_keyword_tips: 'Please enter keyword',
+    id: '#',
+    name: 'Name',
+    user_name: 'Resource userName',
+    whether_directory: 'Whether directory',
+    file_name: 'File Name',
+    description: 'Description',
+    size: 'Size',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    rename: 'Rename',
+    download: 'Download',
+    delete: 'Delete',
+    yes: 'Yes',
+    no: 'No',
+    folder_name: 'Folder Name',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description',
+    enter_content_tips: 'Please enter the resource content',
+    file_format: 'File Format',
+    file_content: 'File Content',
+    delete_confirm: 'Delete?',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    success: 'Success',
+    file_details: 'File Details',
+    return: 'Return',
+    save: 'Save',
+  }
+}
+
 const project = {
   list: {
     create_project: 'Create Project',
@@ -185,5 +223,6 @@ export default {
   password,
   profile,
   monitor,
+  resource,
   project,
 }

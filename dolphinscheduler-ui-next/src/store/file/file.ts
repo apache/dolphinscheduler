@@ -15,39 +15,30 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import { NCard } from 'naive-ui'
+import { defineStore } from 'pinia'
+import type { FileState } from '@/store/file/types'
 
-const headerStyle = {
-  borderBottom: '1px solid var(--n-border-color)',
-}
-
-const contentStyle = {
-  padding: '8px 10px',
-}
-
-const props = {
-  title: {
-    type: String as PropType<string>,
+export const useFileStore = defineStore({
+  id: 'file',
+  state: (): FileState => ({
+    file: '',
+    currentDir: '/',
+  }),
+  persist: true,
+  getters: {
+    getFileInfo(): string {
+      return this.file
+    },
+    getCurrentDir(): string {
+      return this.currentDir
+    },
   },
-}
-
-const Card = defineComponent({
-  name: 'Card',
-  props,
-  render() {
-    const { title, $slots } = this
-    return (
-      <NCard
-        title={title}
-        size='small'
-        headerStyle={headerStyle}
-        contentStyle={contentStyle}
-      >
-        {$slots}
-      </NCard>
-    )
+  actions: {
+    setFileInfo(file: string): void {
+      this.file = file
+    },
+    setCurrentDir(currentDir: string): void {
+      this.currentDir = currentDir
+    },
   },
 })
-
-export default Card
