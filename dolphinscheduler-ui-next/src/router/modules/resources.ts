@@ -25,13 +25,13 @@ const components: { [key: string]: Component } = utils.mapping(modules)
 export default {
   path: '/resource',
   name: 'resource',
-  redirect: { name: 'file' },
+  redirect: { name: 'file-manage' },
   meta: { title: '资源中心' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/resource/file',
-      name: 'file',
+      path: '/resource/file-manage',
+      name: 'file-manage',
       component: components['file'],
       meta: {
         title: '文件管理',

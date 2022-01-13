@@ -69,3 +69,18 @@
     }
   }
 }
+
+.conditions-model {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  .right {
+    > .form-box {
+      .list {
+        float: right;
+        margin: 3px 0 3px 4px;
+      }
+    }
+  }
+}

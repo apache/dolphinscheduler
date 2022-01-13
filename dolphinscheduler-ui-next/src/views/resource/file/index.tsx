@@ -25,10 +25,18 @@ import {
   watch,
   inject,
 } from 'vue'
-import { NDataTable, NButtonGroup, NButton, NPagination } from 'naive-ui'
+import {
+  NIcon,
+  NSpace,
+  NDataTable,
+  NButtonGroup,
+  NButton,
+  NPagination,
+  NInput,
+} from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+import { SearchOutlined } from '@vicons/antd'
 import Card from '@/components/card'
-import Conditions from '@/components/conditions'
 import { useTable } from './table/use-table'
 import { useFileState } from './use-file'
 import ResourceFolderModal from './folder'
@@ -96,9 +104,11 @@ export default defineComponent({
 
     const { getResourceListState } = useFileState(setPagination)
 
-    const handleConditions = (val: string) => {
-      serachRef.value = val
-      resourceListRef.value = getResourceListState(fileId.value, val)
+    const handleConditions = () => {
+      resourceListRef.value = getResourceListState(
+        fileId.value,
+        serachRef.value,
+      )
     }
 
     const handleCreateFolder = () => {
@@ -144,6 +154,7 @@ export default defineComponent({
 
     return {
       fileId,
+      serachRef,
       folderShowRef,
       uploadShowRef,
       renameShowRef,
@@ -172,19 +183,40 @@ export default defineComponent({
     } = this
     return (
       <div>
-        <Conditions onConditions={handleConditions}>
-          <NButtonGroup>
-            <NButton onClick={handleCreateFolder}>
-              {t('resource.file.create_folder')}
-            </NButton>
-            <NButton onClick={handleCreateFile}>
-              {t('resource.file.create_file')}
-            </NButton>
-            <NButton onClick={handleUploadFile}>
-              {t('resource.file.upload_files')}
-            </NButton>
-          </NButtonGroup>
-        </Conditions>
+        <Card style={{ marginBottom: '8px' }}>
+          <div class={styles['conditions-model']}>
+            <NSpace>
+              <NButtonGroup>
+                <NButton onClick={handleCreateFolder}>
+                  {t('resource.file.create_folder')}
+                </NButton>
+                <NButton onClick={handleCreateFile}>
+                  {t('resource.file.create_file')}
+                </NButton>
+                <NButton onClick={handleUploadFile}>
+                  {t('resource.file.upload_files')}
+                </NButton>
+              </NButtonGroup>
+            </NSpace>
+            <div class={styles.right}>
+              <div class={styles['form-box']}>
+                <div class={styles.list}>
+                  <NButton onClick={handleConditions}>
+                    <NIcon>
+                      <SearchOutlined />
+                    </NIcon>
+                  </NButton>
+                </div>
+                <div class={styles.list}>
+                  <NInput
+                    placeholder={t('resource.file.enter_keyword_tips')}
+                    v-model={[this.serachRef, 'value']}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
         <Card title={t('resource.file.file_manage')}>
           <NDataTable
             remote
