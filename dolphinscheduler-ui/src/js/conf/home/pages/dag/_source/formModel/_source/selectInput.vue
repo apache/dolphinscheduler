@@ -63,7 +63,7 @@
     mixins: [disabledState],
     props: {
       value: String,
-      list: Array
+      list: ref(Array)
     },
     model: {
       prop: 'value',
@@ -71,8 +71,8 @@
     },
     methods: {
       _onChange (o) {
+        this.isDetails = true
         this.$emit('valueEvent', +o)
-        this.list = Array.from(new Set(this.list))
         this._setIconState(+o)
       },
       _setIconState (value) {
