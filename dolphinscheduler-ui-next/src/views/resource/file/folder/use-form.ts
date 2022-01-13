@@ -15,39 +15,43 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import { NCard } from 'naive-ui'
+import { reactive, ref, unref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { FormRules } from 'naive-ui'
 
-const headerStyle = {
-  borderBottom: '1px solid var(--n-border-color)',
-}
-
-const contentStyle = {
-  padding: '8px 10px',
-}
-
-const props = {
-  title: {
-    type: String as PropType<string>,
-  },
-}
-
-const Card = defineComponent({
-  name: 'Card',
-  props,
-  render() {
-    const { title, $slots } = this
-    return (
-      <NCard
-        title={title}
-        size='small'
-        headerStyle={headerStyle}
-        contentStyle={contentStyle}
-      >
-        {$slots}
-      </NCard>
-    )
-  },
+const defaultValue = () => ({
+  pid: -1,
+  type: 'FILE',
+  name: '',
+  description: '',
+  currentDir: '/',
 })
 
-export default Card
+export function useForm() {
+  const { t } = useI18n()
+
+  const resetForm = () => {
+    state.folderForm = Object.assign(unref(state.folderForm), defaultValue())
+  }
+
+  const state = reactive({
+    folderFormRef: ref(),
+    folderForm: defaultValue(),
+    rules: {
+      name: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.folderForm.name === '') {
+            return new Error(t('resource.file.enter_name_tips'))
+          }
+        },
+      },
+    } as FormRules,
+  })
+
+  return {
+    state,
+    resetForm,
+  }
+}
