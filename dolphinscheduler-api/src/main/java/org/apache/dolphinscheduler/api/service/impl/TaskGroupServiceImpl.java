@@ -306,7 +306,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
             return result;
         }
-        taskGroup.setStatus(1);
+        taskGroup.setStatus(Flag.YES.getCode());
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int update = taskGroupMapper.updateById(taskGroup);
         putMsg(result, Status.SUCCESS);
