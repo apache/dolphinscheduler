@@ -18,19 +18,19 @@
 import { useAsyncState } from '@vueuse/core'
 import {
   queryResourceListPaging,
-  viewResource,
+  viewResource
 } from '@/service/modules/resources'
 import type { ResourceListRes } from '@/service/modules/resources/types'
 import { IResourceListState, ISetPagination } from './types'
 
 export function useFileState(
-  setPagination: ISetPagination = {} as ISetPagination,
+  setPagination: ISetPagination = {} as ISetPagination
 ) {
   const getResourceListState: IResourceListState = (
     id = -1,
     searchVal = '',
     pageNo = 1,
-    pageSize = 10,
+    pageSize = 10
   ) => {
     const { state } = useAsyncState(
       queryResourceListPaging({
@@ -38,7 +38,7 @@ export function useFileState(
         type: 'FILE',
         searchVal,
         pageNo,
-        pageSize,
+        pageSize
       }).then((res: ResourceListRes): any => {
         const { total } = res
         setPagination(total)
@@ -53,13 +53,13 @@ export function useFileState(
             file_name: item.fileName,
             description: item.description,
             size: item.size,
-            update_time: item.updateTime,
+            update_time: item.updateTime
           }
         })
 
         return { total, table }
       }),
-      { total: 0, table: [] },
+      { total: 0, table: [] }
     )
 
     return state
@@ -68,7 +68,7 @@ export function useFileState(
   const getResourceView = (id: number) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000,
+      limit: 3000
     }
     const { state } = useAsyncState(viewResource(params, id), {})
     return state

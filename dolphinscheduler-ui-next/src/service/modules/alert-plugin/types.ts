@@ -46,5 +46,5 @@ export {
   PluginInstanceReq,
   InstanceNameReq,
   IdReq,
-  UpdatePluginInstanceReq,
+  UpdatePluginInstanceReq
 }

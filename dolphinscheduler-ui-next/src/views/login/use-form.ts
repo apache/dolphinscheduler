@@ -26,7 +26,7 @@ export function useForm() {
     loginFormRef: ref(),
     loginForm: {
       userName: '',
-      userPassword: '',
+      userPassword: ''
     },
     rules: {
       userName: {
@@ -35,7 +35,7 @@ export function useForm() {
           if (state.loginForm.userName === '') {
             return new Error(t('login.userName_tips'))
           }
-        },
+        }
       },
       userPassword: {
         trigger: ['input', 'blur'],
@@ -43,14 +43,14 @@ export function useForm() {
           if (state.loginForm.userPassword === '') {
             return new Error(t('login.userPassword_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
     t,
-    locale,
+    locale
   }
 }

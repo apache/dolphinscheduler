@@ -22,7 +22,7 @@ import {
   NIcon,
   NDataTable,
   NPagination,
-  NCard,
+  NCard
 } from 'naive-ui'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
@@ -41,7 +41,7 @@ const tenementManage = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
+        searchVal: variables.searchVal
       })
     }
 
@@ -136,7 +136,7 @@ const tenementManage = defineComponent({
         <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} row={this.row} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
       </div>
     )
-  },
+  }
 })
 
 export default tenementManage

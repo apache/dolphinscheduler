@@ -22,8 +22,8 @@ import Card from '@/components/card'
 
 const props = {
   title: {
-    type: String as PropType<string>,
-  },
+    type: String as PropType<string>
+  }
 }
 
 const DefinitionCard = defineComponent({
@@ -48,12 +48,12 @@ const DefinitionCard = defineComponent({
                 xAxisData={processDefinition.xAxisData}
                 seriesData={processDefinition.seriesData}
               />
-            ),
+            )
           }}
         </Card>
       )
     )
-  },
+  }
 })
 
 export default DefinitionCard

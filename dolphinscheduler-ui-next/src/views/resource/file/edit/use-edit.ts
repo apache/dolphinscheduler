@@ -21,7 +21,7 @@ import type { Router } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import {
   viewResource,
-  updateResourceContent,
+  updateResourceContent
 } from '@/service/modules/resources'
 
 export function useEdit(state: any) {
@@ -31,7 +31,7 @@ export function useEdit(state: any) {
   const getResourceView = (id: number) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000,
+      limit: 3000
     }
     const { state } = useAsyncState(viewResource(params, id), {})
     return state
@@ -43,9 +43,9 @@ export function useEdit(state: any) {
         try {
           await updateResourceContent(
             {
-              ...state.fileForm,
+              ...state.fileForm
             },
-            id,
+            id
           )
 
           window.$message.success(t('resource.file.success'))
@@ -59,6 +59,6 @@ export function useEdit(state: any) {
 
   return {
     getResourceView,
-    handleUpdateContent,
+    handleUpdateContent
   }
 }
