@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, toRefs } from 'vue'
+import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModalData } from './use-modalData'
@@ -35,11 +35,18 @@ const TenantModal = defineComponent({
     }
 
     const confirmModal = () => {
-      handleValidate()
+      handleValidate(props.statusRef)
     }
 
     onMounted(() => {
       getListData()
+    })
+
+    watch(() => props.row, () => {
+      variables.model.id = props.row.id
+      variables.model.tenantCode = props.row.tenantCode
+      variables.model.queueId = props.row.queueId
+      variables.model.description = props.row.description
     })
 
     return { ...toRefs(variables), cancelModal, confirmModal }
@@ -52,6 +59,10 @@ const TenantModal = defineComponent({
     statusRef: {
       type: Number as PropType<number>,
       default: 0,
+    },
+    row: {
+      type: Object as PropType<any>,
+      default: {},
     }
   },
   render() {
