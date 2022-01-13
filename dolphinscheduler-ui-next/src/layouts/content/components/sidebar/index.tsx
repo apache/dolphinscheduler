@@ -24,8 +24,10 @@ const Sidebar = defineComponent({
   props: {
     sideMenuOptions: {
       type: Array as PropType<any>,
-      default: [],
-    },
+      default() {
+        return []
+      }
+    }
   },
   setup() {
     const collapsedRef = ref(false)
@@ -33,12 +35,11 @@ const Sidebar = defineComponent({
       'workflow',
       'udf-manage',
       'service-manage',
-      'statistical-manage',
+      'statistical-manage'
     ]
 
     const { handleMenuClick } = useMenuClick()
 
-    
     return { collapsedRef, defaultExpandedKeys, handleMenuClick }
   },
   render() {
@@ -60,7 +61,7 @@ const Sidebar = defineComponent({
         />
       </NLayoutSider>
     )
-  },
+  }
 })
 
 export default Sidebar

@@ -25,7 +25,7 @@ import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 
 const login = defineComponent({
-  name: 'login',
+  name: 'Login',
   setup() {
     const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
@@ -51,7 +51,7 @@ const login = defineComponent({
           >
             {{
               checked: () => 'en_US',
-              unchecked: () => 'zh_CN',
+              unchecked: () => 'zh_CN'
             }}
           </NSwitch>
         </div>
@@ -104,7 +104,7 @@ const login = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default login

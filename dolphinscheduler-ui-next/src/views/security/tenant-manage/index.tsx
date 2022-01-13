@@ -22,7 +22,7 @@ import {
   NIcon,
   NDataTable,
   NPagination,
-  NCard,
+  NCard
 } from 'naive-ui'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
@@ -31,7 +31,7 @@ import TenantModal from './components/tenant-modal'
 import { useI18n } from 'vue-i18n'
 
 const tenementManage = defineComponent({
-  name: 'tenement-manage',
+  name: 'TenementManage',
   setup() {
     const { variables, getTableData, createColumns } = useTable()
     const { t } = useI18n()
@@ -40,7 +40,7 @@ const tenementManage = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
+        searchVal: variables.searchVal
       })
     }
 
@@ -73,7 +73,7 @@ const tenementManage = defineComponent({
       requestData,
       handleModalChange,
       onCancelModal,
-      onConfirmModal,
+      onConfirmModal
     }
   },
   render() {
@@ -118,10 +118,16 @@ const tenementManage = defineComponent({
             onUpdatePageSize={this.requestData}
           />
         </div>
-        <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} row={this.row} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
+        <TenantModal
+          showModalRef={this.showModalRef}
+          statusRef={this.statusRef}
+          row={this.row}
+          onCancelModal={this.onCancelModal}
+          onConfirmModal={this.onConfirmModal}
+        ></TenantModal>
       </div>
     )
-  },
+  }
 })
 
 export default tenementManage

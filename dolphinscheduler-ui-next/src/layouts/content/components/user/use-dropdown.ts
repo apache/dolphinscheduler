@@ -16,7 +16,6 @@
  */
 
 import { useRouter } from 'vue-router'
-import { DropdownOption } from 'naive-ui'
 import { logout } from '@/service/modules/logout'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
@@ -25,7 +24,7 @@ export function useDropDown() {
   const router: Router = useRouter()
   const userStore = useUserStore()
 
-  const handleSelect = (key: string | number, option: DropdownOption) => {
+  const handleSelect = (key: string | number) => {
     if (key === 'logout') {
       useLogout()
     } else if (key === 'password') {
@@ -44,6 +43,6 @@ export function useDropDown() {
   }
 
   return {
-    handleSelect,
+    handleSelect
   }
 }

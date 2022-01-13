@@ -21,23 +21,23 @@ const login = {
   userName_tips: '请输入用户名',
   userPassword: '密码',
   userPassword_tips: '请输入密码',
-  login: '登录',
+  login: '登录'
 }
 
 const modal = {
   cancel: '取消',
-  confirm: '确定',
+  confirm: '确定'
 }
 
 const theme = {
   light: '浅色',
-  dark: '深色',
+  dark: '深色'
 }
 
 const userDropdown = {
   profile: '用户信息',
   password: '密码管理',
-  logout: '退出登录',
+  logout: '退出登录'
 }
 
 const menu = {
@@ -71,7 +71,7 @@ const menu = {
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
   environmental_manage: '环境管理',
-  token_manage: '令牌管理',
+  token_manage: '令牌管理'
 }
 
 const home = {
@@ -79,7 +79,7 @@ const home = {
   process_state_statistics: '流程状态统计',
   process_definition_statistics: '流程定义统计',
   number: '数量',
-  state: '状态',
+  state: '状态'
 }
 
 const password = {
@@ -89,7 +89,7 @@ const password = {
   password_tips: '请输入密码',
   confirm_password_tips: '请输入确认密码',
   two_password_entries_are_inconsistent: '两次密码输入不一致',
-  submit: '提交',
+  submit: '提交'
 }
 
 const profile = {
@@ -111,7 +111,7 @@ const profile = {
   phone_tips: '请输入手机号',
   state_tips: '请选择状态',
   enable: '启用',
-  disable: '禁用',
+  disable: '禁用'
 }
 
 const monitor = {
@@ -123,7 +123,7 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录',
+    directory: '注册目录'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -133,20 +133,20 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录',
+    directory: '注册目录'
   },
   db: {
     health_state: '健康状态',
     max_connections: '最大连接数',
     threads_connections: '当前连接数',
-    threads_running_connections: '数据库当前活跃连接数',
+    threads_running_connections: '数据库当前活跃连接数'
   },
   statistics: {
     command_number_of_waiting_for_running: '待执行的命令数',
     failure_command_number: '执行失败的命令数',
     tasks_number_of_waiting_running: '待运行任务数',
-    task_number_of_ready_to_kill: '待杀死任务数',
-  },
+    task_number_of_ready_to_kill: '待杀死任务数'
+  }
 }
 
 const resource = {
@@ -184,7 +184,7 @@ const resource = {
     success: '成功',
     file_details: '文件详情',
     return: '返回',
-    save: '保存',
+    save: '保存'
   }
 }
 
@@ -208,8 +208,8 @@ const project = {
     delete: '删除',
     confirm: '确定',
     cancel: '取消',
-    delete_confirm: '确定删除吗?',
-  },
+    delete_confirm: '确定删除吗?'
+  }
 }
 
 const security = {
@@ -227,7 +227,7 @@ const security = {
     tenantCode_tips: '请输入操作系统租户',
     queueName_tips: '请选择队列',
     description_tips: '请输入描述',
-    delete_confirm: '确定删除吗?',
+    delete_confirm: '确定删除吗?'
   }
 }
 

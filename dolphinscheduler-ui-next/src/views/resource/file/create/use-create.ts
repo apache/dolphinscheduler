@@ -34,7 +34,7 @@ export function useCreate(state: any) {
         try {
           await onlineCreateResource({
             ...state.fileForm,
-            ...{ pid, currentDir },
+            ...{ pid, currentDir }
           })
 
           window.$message.success(t('resource.file.success'))
@@ -48,6 +48,6 @@ export function useCreate(state: any) {
   }
 
   return {
-    handleCreateFile,
+    handleCreateFile
   }
 }

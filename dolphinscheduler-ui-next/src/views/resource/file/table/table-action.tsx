@@ -23,7 +23,7 @@ import {
   DownloadOutlined,
   FormOutlined,
   EditOutlined,
-  InfoCircleFilled,
+  InfoCircleFilled
 } from '@vicons/antd'
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -36,16 +36,16 @@ import type { Router } from 'vue-router'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   row: {
     type: Object as PropType<ResourceFileTableData>,
     default: {
       id: -1,
       name: '',
-      description: '',
-    },
-  },
+      description: ''
+    }
+  }
 }
 
 export default defineComponent({
@@ -81,7 +81,7 @@ export default defineComponent({
       handleEditFile,
       handleDeleteFile,
       handleRenameFile,
-      ...props,
+      ...props
     }
   },
   render() {
@@ -107,7 +107,7 @@ export default defineComponent({
                   <FormOutlined />
                 </NIcon>
               </NButton>
-            ),
+            )
           }}
         </NTooltip>
         <NTooltip trigger={'hover'}>
@@ -121,7 +121,7 @@ export default defineComponent({
                   this.handleRenameFile(
                     this.row.id,
                     this.row.name,
-                    this.row.description,
+                    this.row.description
                   )
                 }
                 style={{ marginRight: '-5px' }}
@@ -131,7 +131,7 @@ export default defineComponent({
                   <EditOutlined />
                 </NIcon>
               </NButton>
-            ),
+            )
           }}
         </NTooltip>
         <NTooltip trigger={'hover'}>
@@ -151,7 +151,7 @@ export default defineComponent({
                   <DownloadOutlined />
                 </NIcon>
               </NButton>
-            ),
+            )
           }}
         </NTooltip>
         <NTooltip trigger={'hover'}>
@@ -177,14 +177,14 @@ export default defineComponent({
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
-                    ),
+                    )
                   }}
                 </NPopconfirm>
               </NButton>
-            ),
+            )
           }}
         </NTooltip>
       </NSpace>
     )
-  },
+  }
 })

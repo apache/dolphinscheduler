@@ -30,7 +30,7 @@ export function useForm() {
     projectForm: {
       projectName: '',
       description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName,
+      userName: (userStore.getUserInfo as UserInfoRes).userName
     },
     rules: {
       projectName: {
@@ -40,7 +40,7 @@ export function useForm() {
           if (state.projectForm.projectName === '') {
             return new Error(t('project.list.project_tips'))
           }
-        },
+        }
       },
       userName: {
         required: true,
@@ -49,9 +49,9 @@ export function useForm() {
           if (state.projectForm.userName === '') {
             return new Error(t('project.list.username_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return { state, t }

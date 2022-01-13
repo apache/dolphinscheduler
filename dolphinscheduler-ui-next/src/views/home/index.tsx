@@ -25,14 +25,14 @@ import StateCard from './components/state-card'
 import DefinitionCard from './components/definition-card'
 
 export default defineComponent({
-  name: 'home',
+  name: 'Home',
   setup() {
     const { t } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const { getTaskState } = useTaskState()
     const { getProcessState } = useProcessState()
-    let taskStateRef = ref()
-    let processStateRef = ref()
+    const taskStateRef = ref()
+    const processStateRef = ref()
 
     onMounted(() => {
       taskStateRef.value = getTaskState(dateRef.value)
@@ -53,7 +53,7 @@ export default defineComponent({
       handleTaskDate,
       handleProcessDate,
       taskStateRef,
-      processStateRef,
+      processStateRef
     }
   },
   render() {
@@ -88,5 +88,5 @@ export default defineComponent({
         </NGrid>
       </div>
     )
-  },
+  }
 })

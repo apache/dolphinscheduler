@@ -42,7 +42,7 @@ export default defineComponent({
     const fileSuffixOptions = fileTypeArr.map((suffix) => ({
       key: suffix,
       label: suffix,
-      value: suffix,
+      value: suffix
     }))
 
     const handleFile = () => {
@@ -61,7 +61,7 @@ export default defineComponent({
       fileSuffixOptions,
       handleFile,
       handleReturn,
-      ...toRefs(state),
+      ...toRefs(state)
     }
   },
   render() {
@@ -102,7 +102,7 @@ export default defineComponent({
             <div
               class={styles.cont}
               style={{
-                width: '90%',
+                width: '90%'
               }}
             >
               <MonacoEditor ref='codeEditorRef' />
@@ -127,5 +127,5 @@ export default defineComponent({
         </NForm>
       </Card>
     )
-  },
+  }
 })

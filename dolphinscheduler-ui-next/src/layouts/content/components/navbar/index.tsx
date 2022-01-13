@@ -27,21 +27,27 @@ import { useMenuStore } from '@/store/menu/menu'
 
 const Navbar = defineComponent({
   name: 'Navbar',
-  emits: ['handleMenuClick'],
   props: {
     headerMenuOptions: {
       type: Array as PropType<any>,
-      default: [],
+      default() {
+        return []
+      }
     },
     localesOptions: {
       type: Array as PropType<any>,
-      default: [],
+      default() {
+        return []
+      }
     },
     userDropdownOptions: {
       type: Array as PropType<any>,
-      default: [],
-    },
+      default() {
+        return []
+      }
+    }
   },
+  emits: ['handleMenuClick'],
   setup(props, ctx) {
     const { handleMenuClick } = useMenuClick(ctx)
     const menuStore = useMenuStore()
@@ -66,7 +72,7 @@ const Navbar = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default Navbar

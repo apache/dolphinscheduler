@@ -22,7 +22,7 @@ import { useUpdate } from './use-update'
 import Card from '@/components/card'
 
 const password = defineComponent({
-  name: 'password',
+  name: 'Password',
   setup() {
     const { state, t } = useForm()
     const { handleUpdate } = useUpdate(state)
@@ -69,11 +69,11 @@ const password = defineComponent({
                 {t('password.submit')}
               </NButton>
             </div>
-          ),
+          )
         }}
       </Card>
     )
-  },
+  }
 })
 
 export default password

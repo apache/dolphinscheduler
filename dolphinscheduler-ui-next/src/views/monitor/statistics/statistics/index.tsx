@@ -24,7 +24,7 @@ import styles from './index.module.scss'
 import type { TaskQueueRes } from '@/service/modules/projects-analysis/types'
 
 const statistics = defineComponent({
-  name: 'statistics',
+  name: 'Statistics',
   setup() {
     const { t } = useI18n()
     const { getStatistics } = useStatistics()
@@ -95,7 +95,7 @@ const statistics = defineComponent({
         </NGi>
       </NGrid>
     )
-  },
+  }
 })
 
 export default statistics

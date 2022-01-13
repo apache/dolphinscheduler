@@ -15,12 +15,7 @@
  * limitations under the License.
  */
 
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-  AxiosRequestHeaders,
-} from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import qs from 'qs'
 import _ from 'lodash'
 import { useUserStore } from '@/store/user/user'
@@ -40,7 +35,7 @@ const baseRequestConfig: AxiosRequestConfig = {
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
-  },
+  }
 }
 
 const service = axios.create(baseRequestConfig)
@@ -92,7 +87,7 @@ const resolveURL = (url: string) => {
 const downloadFile = (url: string, obj?: any) => {
   const param: any = {
     url: resolveURL(url),
-    obj: obj || {},
+    obj: obj || {}
   }
 
   const form = document.createElement('form')

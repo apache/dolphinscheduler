@@ -34,13 +34,13 @@ export function useUpdate(state: any) {
           email: state.profileForm.email,
           phone: state.profileForm.phone,
           state: userInfo.state,
-          queue: userInfo.queue,
+          queue: userInfo.queue
         })
       }
     })
   }
 
   return {
-    handleUpdate,
+    handleUpdate
   }
 }

@@ -26,8 +26,10 @@ const User = defineComponent({
   props: {
     userDropdownOptions: {
       type: Array as PropType<any>,
-      default: [],
-    },
+      default() {
+        return []
+      }
+    }
   },
   setup() {
     const { handleSelect } = useDropDown()
@@ -52,7 +54,7 @@ const User = defineComponent({
         </NButton>
       </NDropdown>
     )
-  },
+  }
 })
 
 export default User

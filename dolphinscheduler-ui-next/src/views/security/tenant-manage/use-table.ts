@@ -16,7 +16,10 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
+import {
+  queryTenantListPaging,
+  deleteTenantById
+} from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
 import { NButton, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -25,7 +28,7 @@ import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 export function useTable() {
   const { t } = useI18n()
 
-  const handleEdit= (row: any) => {
+  const handleEdit = (row: any) => {
     variables.showModalRef = true
     variables.statusRef = 1
     variables.row = row
@@ -45,27 +48,27 @@ export function useTable() {
     variables.columns = [
       {
         title: t('security.tenant.num'),
-        key: 'num',
+        key: 'num'
       },
       {
         title: t('security.tenant.tenantCode'),
-        key: 'tenantCode',
+        key: 'tenantCode'
       },
       {
         title: t('security.tenant.description'),
-        key: 'description',
+        key: 'description'
       },
       {
         title: t('security.tenant.queueName'),
-        key: 'queueName',
+        key: 'queueName'
       },
       {
         title: t('security.tenant.createTime'),
-        key: 'createTime',
+        key: 'createTime'
       },
       {
         title: t('security.tenant.updateTime'),
-        key: 'updateTime',
+        key: 'updateTime'
       },
       {
         title: t('security.tenant.actions'),
@@ -89,22 +92,27 @@ export function useTable() {
             h(
               NPopconfirm,
               {
-                onPositiveClick: () => { handleDelete(row) }
+                onPositiveClick: () => {
+                  handleDelete(row)
+                }
               },
               {
-                trigger: () => h(
-                  NButton,
-                  {
-                    circle: true,
-                    type: 'error',
-                    size: 'small',
-                    style: {'margin-left': '5px'},
-                  },
-                  {
-                    icon: () => h(DeleteOutlined),
-                  }
-                ),
-                default: () => {return t('security.tenant.delete_confirm')}
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      circle: true,
+                      type: 'error',
+                      size: 'small',
+                      style: { 'margin-left': '5px' }
+                    },
+                    {
+                      icon: () => h(DeleteOutlined)
+                    }
+                  ),
+                default: () => {
+                  return t('security.tenant.delete_confirm')
+                }
               }
             )
           ])
@@ -131,7 +139,7 @@ export function useTable() {
         variables.tableData = res.totalList.map((item: any, index: number) => {
           return {
             num: index + 1,
-            ...item,
+            ...item
           }
         })
         variables.totalPage = res.totalPage

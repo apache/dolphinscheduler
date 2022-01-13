@@ -30,7 +30,7 @@ export function useProfile() {
 
   infoOptions.value.push({
     key: t('profile.username'),
-    value: userInfo.userName,
+    value: userInfo.userName
   })
   infoOptions.value.push({ key: t('profile.email'), value: userInfo.email })
   infoOptions.value.push({ key: t('profile.phone'), value: userInfo.phone })
@@ -39,18 +39,18 @@ export function useProfile() {
     value:
       userInfo.userType === 'ADMIN_USER'
         ? t('profile.administrator')
-        : t('profile.ordinary_user'),
+        : t('profile.ordinary_user')
   })
   infoOptions.value.push({
     key: t('profile.create_time'),
-    value: userInfo.createTime,
+    value: userInfo.createTime
   })
   infoOptions.value.push({
     key: t('profile.update_time'),
-    value: userInfo.updateTime,
+    value: userInfo.updateTime
   })
 
   return {
-    infoOptions,
+    infoOptions
   }
 }

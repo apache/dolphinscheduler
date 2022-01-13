@@ -22,10 +22,26 @@ import { useModalData } from './use-modalData'
 import { useI18n } from 'vue-i18n'
 
 const TenantModal = defineComponent({
-  name: 'tenant-modal',
+  name: 'TenantModal',
+  props: {
+    showModalRef: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
+    statusRef: {
+      type: Number as PropType<number>,
+      default: 0
+    },
+    row: {
+      type: Object as PropType<any>,
+      default() {
+        return {}
+      }
+    }
+  },
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, getListData, handleValidate} = useModalData(props, ctx)
+    const { variables, getListData, handleValidate } = useModalData(props, ctx)
     const { t } = useI18n()
 
     const cancelModal = () => {
@@ -44,35 +60,28 @@ const TenantModal = defineComponent({
       getListData()
     })
 
-    watch(() => props.row, () => {
-      variables.model.id = props.row.id
-      variables.model.tenantCode = props.row.tenantCode
-      variables.model.queueId = props.row.queueId
-      variables.model.description = props.row.description
-    })
+    watch(
+      () => props.row,
+      () => {
+        variables.model.id = props.row.id
+        variables.model.tenantCode = props.row.tenantCode
+        variables.model.queueId = props.row.queueId
+        variables.model.description = props.row.description
+      }
+    )
 
     return { t, ...toRefs(variables), cancelModal, confirmModal }
-  },
-  props: {
-    showModalRef: {
-      type: Boolean as PropType<boolean>,
-      default: false,
-    },
-    statusRef: {
-      type: Number as PropType<number>,
-      default: 0,
-    },
-    row: {
-      type: Object as PropType<any>,
-      default: {},
-    }
   },
   render() {
     const { t } = this
     return (
       <div>
         <Modal
-          title={this.statusRef === 0 ? t('security.tenant.create_tenant') : t('security.tenant.edit_tenant')}
+          title={
+            this.statusRef === 0
+              ? t('security.tenant.create_tenant')
+              : t('security.tenant.edit_tenant')
+          }
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
@@ -82,37 +91,50 @@ const TenantModal = defineComponent({
               <NForm
                 model={this.model}
                 rules={this.rules}
-                ref="tenantFormRef"
-                label-placement="left"
+                ref='tenantFormRef'
+                label-placement='left'
                 label-width={140}
-                require-mark-placement="left"
-                size="small"
+                require-mark-placement='left'
+                size='small'
                 style="{ maxWidth: '240px' }"
               >
-                <NFormItem label={t('security.tenant.tenantCode')} path="tenantCode">
-                  <NInput disabled={this.statusRef === 1} placeholder={t('security.tenant.tenantCode_tips')} v-model={[this.model.tenantCode, 'value']} />
+                <NFormItem
+                  label={t('security.tenant.tenantCode')}
+                  path='tenantCode'
+                >
+                  <NInput
+                    disabled={this.statusRef === 1}
+                    placeholder={t('security.tenant.tenantCode_tips')}
+                    v-model={[this.model.tenantCode, 'value']}
+                  />
                 </NFormItem>
-                <NFormItem label={t('security.tenant.queueName')} path="queueId">
+                <NFormItem
+                  label={t('security.tenant.queueName')}
+                  path='queueId'
+                >
                   <NSelect
                     placeholder={t('security.tenant.queueName_tips')}
                     options={this.model.generalOptions}
                     v-model={[this.model.queueId, 'value']}
                   />
                 </NFormItem>
-                <NFormItem label={t('security.tenant.description')} path="description">
+                <NFormItem
+                  label={t('security.tenant.description')}
+                  path='description'
+                >
                   <NInput
                     placeholder={t('security.tenant.description_tips')}
                     v-model={[this.model.description, 'value']}
-                    type="textarea"
+                    type='textarea'
                   />
                 </NFormItem>
               </NForm>
-            ),
+            )
           }}
         </Modal>
       </div>
     )
-  },
+  }
 })
 
 export default TenantModal

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
+import { defineComponent, onMounted, watch, toRefs } from 'vue'
 import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
@@ -36,7 +36,7 @@ const Content = defineComponent({
       state,
       changeMenuOption,
       changeHeaderMenuOptions,
-      changeUserDropdown,
+      changeUserDropdown
     } = useDataList()
 
     locale.value = localesStore.getLocales
@@ -74,7 +74,7 @@ const Content = defineComponent({
       ...toRefs(state),
       menuStore,
       changeMenuOption,
-      getSideMenuOptions,
+      getSideMenuOptions
     }
   },
   render() {
@@ -98,7 +98,7 @@ const Content = defineComponent({
         </NLayout>
       </NLayout>
     )
-  },
+  }
 })
 
 export default Content

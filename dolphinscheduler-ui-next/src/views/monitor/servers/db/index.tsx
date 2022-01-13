@@ -26,7 +26,7 @@ import type { Ref } from 'vue'
 import type { DatabaseRes } from '@/service/modules/monitor/types'
 
 const db = defineComponent({
-  name: 'db',
+  name: 'Db',
   setup() {
     const { t } = useI18n()
     const { getDatabase } = useDatabase()
@@ -94,7 +94,7 @@ const db = defineComponent({
         </NGi>
       </NGrid>
     )
-  },
+  }
 })
 
 export default db
