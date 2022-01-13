@@ -611,6 +611,14 @@ public class WorkflowExecuteThread {
             scheduleDate = complementListDate.get(index + 1);
         }
         //the next process complement
+        int create = this.createComplementDataCommand(scheduleDate);
+        if (create > 0) {
+            logger.info("create complement data command successfully.");
+        }
+        return true;
+    }
+
+    private int createComplementDataCommand(Date scheduleDate) {
         Command command = new Command();
         command.setScheduleTime(scheduleDate);
         command.setCommandType(CommandType.COMPLEMENT_DATA);
@@ -621,7 +629,7 @@ public class WorkflowExecuteThread {
         }
         cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, "yyyy-MM-dd HH:mm:ss"));
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        command.setTaskDependType(TaskDependType.TASK_POST);
+        command.setTaskDependType(processInstance.getTaskDependType());
         command.setFailureStrategy(processInstance.getFailureStrategy());
         command.setWarningType(processInstance.getWarningType());
         command.setWarningGroupId(processInstance.getWarningGroupId());
@@ -634,9 +642,7 @@ public class WorkflowExecuteThread {
         command.setDryRun(processInstance.getDryRun());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
-        processService.createCommand(command);
-        this.taskInstanceMap.clear();
-        return true;
+        return processService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
