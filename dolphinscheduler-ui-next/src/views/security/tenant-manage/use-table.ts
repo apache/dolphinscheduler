@@ -48,7 +48,7 @@ export function useTable() {
         key: 'num',
       },
       {
-        title: t('security.tenant.tenantCode'),
+        title: t('security.tenant.tenant_code'),
         key: 'tenantCode',
       },
       {
@@ -56,15 +56,15 @@ export function useTable() {
         key: 'description',
       },
       {
-        title: t('security.tenant.queueName'),
+        title: t('security.tenant.queue_name'),
         key: 'queueName',
       },
       {
-        title: t('security.tenant.createTime'),
+        title: t('security.tenant.create_time'),
         key: 'createTime',
       },
       {
-        title: t('security.tenant.updateTime'),
+        title: t('security.tenant.update_time'),
         key: 'updateTime',
       },
       {
