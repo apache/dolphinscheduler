@@ -133,6 +133,9 @@ public class TaskConstants {
      */
     public static final String TASK_LOGGER_THREAD_NAME_FORMAT = TASK_LOGGER_THREAD_NAME + "-%s";
 
+    public static final String MASTER_COMMON_TASK_LOGGER_THREAD_NAME = "CommonTask";
+
+    public static final String MASTER_COMMON_TASK_LOGGER_THREAD_NAME_FORMAT = MASTER_COMMON_TASK_LOGGER_THREAD_NAME + "-%s";
     /**
      * task log logger name
      */

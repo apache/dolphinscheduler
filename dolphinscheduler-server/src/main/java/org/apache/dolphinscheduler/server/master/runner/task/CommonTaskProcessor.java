@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -33,17 +34,22 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * common task processor
  */
 public class CommonTaskProcessor extends BaseTaskProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(CommonTaskProcessor.class);
 
     @Autowired
     private TaskPriorityQueue taskUpdateQueue;
@@ -60,6 +66,16 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         }
         setTaskExecutionLogger();
         return dispatchTask(taskInstance, processInstance);
+    }
+
+    @Override
+    public void setTaskExecutionLogger() {
+        threadLoggerInfoName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
+        Thread.currentThread().setName(String.format(TaskConstants.MASTER_COMMON_TASK_LOGGER_THREAD_NAME_FORMAT, threadLoggerInfoName));
     }
 
     @Override
