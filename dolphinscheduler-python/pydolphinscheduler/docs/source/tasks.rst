@@ -15,31 +15,7 @@
    specific language governing permissions and limitations
    under the License.
 
-PyDolphinScheduler
-==================
+Tasks
+=====
 
-**PyDolphinScheduler** is Python API for `Apache DolphinScheduler <https://dolphinscheduler.apache.org>`_,
-which allow you definition your workflow by Python code, aka workflow-as-codes.
-
-I could go and find how to :ref:`install <getting started>` the project. Or if you wish to
-see simply example then go and see :doc:`tutorial` for more detail.
-.. note::
-
-   This project is under active development.
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   start
-   tutorial
-   concept
-   tasks
-   api
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+here it the task page

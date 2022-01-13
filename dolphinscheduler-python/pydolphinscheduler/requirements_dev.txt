@@ -27,3 +27,4 @@ flake8-black
 isort
 # Document
 sphinx
+sphinxcontrib-spelling
