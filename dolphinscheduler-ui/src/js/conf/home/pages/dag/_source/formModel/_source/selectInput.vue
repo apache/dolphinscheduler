@@ -71,8 +71,7 @@
     },
     methods: {
       _onChange (o) {
-        // this.$emit('valueEvent', +o)
-        console.log("新增:", o)
+        this.$emit('valueEvent', +o)
         this._setIconState(+o)
       },
       _setIconState (value) {
@@ -92,6 +91,7 @@
         }, 1)
       },
       _onBlur () {
+        console.log("进入onblur")
         let val = $(this.$refs.input.$el).find('input')[0].value
         if (this._validation(val)) {
           this.$emit('valueEvent', val)
