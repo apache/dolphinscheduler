@@ -63,7 +63,7 @@
     mixins: [disabledState],
     props: {
       value: String,
-      list: ref(Array)
+      list: Array
     },
     model: {
       prop: 'value',
