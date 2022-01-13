@@ -26,12 +26,12 @@ export default {
   path: '/security',
   name: 'security',
   meta: { title: '安全中心' },
-  redirect: { name: 'tenement-manage' },
+  redirect: { name: 'tenant-manage' },
   component: () => import('@/layouts/content'),
   children: [
     {
       path: '/security/tenant-manage',
-      name: 'tenement-manage',
+      name: 'tenant-manage',
       component: components['tenant-manage'],
       meta: {
         title: '租户管理',
