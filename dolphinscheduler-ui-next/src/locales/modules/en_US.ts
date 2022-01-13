@@ -213,6 +213,25 @@ const project = {
   },
 }
 
+const security = {
+  tenant: {
+    create_tenant: 'Create Tenant',
+    search_tips: 'Please enter keywords',
+    num: 'Serial number',
+    tenantCode: 'Operating System Tenant',
+    description: 'Description',
+    queueName: 'QueueName',
+    createTime: 'Create Time',
+    updateTime: 'Update Time',
+    actions: 'Operation',
+    edit_tenant: 'Edit Tenant',
+    tenantCode_tips: 'Please enter the operating system tenant',
+    queueName_tips: 'Please select queue',
+    description_tips: 'Please enter a description',
+    delete_confirm: 'Delete?',
+  }
+}
+
 export default {
   login,
   modal,
@@ -225,4 +244,5 @@ export default {
   monitor,
   resource,
   project,
+  security
 }

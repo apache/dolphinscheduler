@@ -19,12 +19,14 @@ import { defineComponent, onMounted, PropType, toRefs, watch } from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModalData } from './use-modalData'
+import { useI18n } from 'vue-i18n'
 
 const TenantModal = defineComponent({
   name: 'tenant-modal',
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
     const { variables, getListData, handleValidate} = useModalData(props, ctx)
+    const { t } = useI18n()
 
     const cancelModal = () => {
       if (props.statusRef === 0) {
@@ -49,7 +51,7 @@ const TenantModal = defineComponent({
       variables.model.description = props.row.description
     })
 
-    return { ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal }
   },
   props: {
     showModalRef: {
@@ -66,10 +68,11 @@ const TenantModal = defineComponent({
     }
   },
   render() {
+    const { t } = this
     return (
       <div>
         <Modal
-          title={this.statusRef === 0 ? '创建租户' : '编辑租户'}
+          title={this.statusRef === 0 ? t('security.tenant.create_tenant') : t('security.tenant.edit_tenant')}
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
@@ -86,19 +89,19 @@ const TenantModal = defineComponent({
                 size="small"
                 style="{ maxWidth: '240px' }"
               >
-                <NFormItem label="操作系统租户" path="tenantCode">
-                  <NInput disabled={this.statusRef === 1} placeholder="请输入操作系统租户" v-model={[this.model.tenantCode, 'value']} />
+                <NFormItem label={t('security.tenant.tenantCode')} path="tenantCode">
+                  <NInput disabled={this.statusRef === 1} placeholder={t('security.tenant.tenantCode_tips')} v-model={[this.model.tenantCode, 'value']} />
                 </NFormItem>
-                <NFormItem label="队列" path="queueId">
+                <NFormItem label={t('security.tenant.queueName')} path="queueId">
                   <NSelect
-                    placeholder="Select"
+                    placeholder={t('security.tenant.queueName_tips')}
                     options={this.model.generalOptions}
                     v-model={[this.model.queueId, 'value']}
                   />
                 </NFormItem>
-                <NFormItem label="描述" path="description">
+                <NFormItem label={t('security.tenant.description')} path="description">
                   <NInput
-                    placeholder="请输入描述"
+                    placeholder={t('security.tenant.description_tips')}
                     v-model={[this.model.description, 'value']}
                     type="textarea"
                   />
