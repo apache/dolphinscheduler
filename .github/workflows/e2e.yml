@@ -54,7 +54,7 @@ jobs:
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          du -sh /tmp/standalone-image.tar
+          && du -sh /tmp/standalone-image.tar
       - uses: actions/upload-artifact@v2
         name: Upload Docker Images
         with:
