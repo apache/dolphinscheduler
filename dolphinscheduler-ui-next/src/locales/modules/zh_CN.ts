@@ -185,6 +185,30 @@ const resource = {
     file_details: '文件详情',
     return: '返回',
     save: '保存',
+  }
+}
+
+const project = {
+  list: {
+    create_project: '创建项目',
+    project_list: '项目列表',
+    project_tips: '请输入项目名称',
+    description_tips: '请输入项目描述',
+    username_tips: '请输入所属用户',
+    project_name: '项目名称',
+    project_description: '项目描述',
+    owned_users: '所属用户',
+    workflow_define_count: '工作流定义数',
+    process_instance_running_count: '正在运行的流程数',
+    description: '描述',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    delete: '删除',
+    confirm: '确定',
+    cancel: '取消',
+    delete_confirm: '确定删除吗?',
   },
 }
 
@@ -199,4 +223,5 @@ export default {
   profile,
   monitor,
   resource,
+  project,
 }

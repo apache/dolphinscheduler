@@ -186,6 +186,30 @@ const resource = {
     file_details: 'File Details',
     return: 'Return',
     save: 'Save',
+  }
+}
+
+const project = {
+  list: {
+    create_project: 'Create Project',
+    project_list: 'Project List',
+    project_tips: 'Please enter your project',
+    description_tips: 'Please enter your description',
+    username_tips: 'Please enter your username',
+    project_name: 'Project Name',
+    project_description: 'Project Description',
+    owned_users: 'Owned Users',
+    workflow_define_count: 'Workflow Define Count',
+    process_instance_running_count: 'Process Instance Running Count',
+    description: 'Description',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    delete_confirm: 'Delete?',
   },
 }
 
@@ -200,4 +224,5 @@ export default {
   profile,
   monitor,
   resource,
+  project,
 }

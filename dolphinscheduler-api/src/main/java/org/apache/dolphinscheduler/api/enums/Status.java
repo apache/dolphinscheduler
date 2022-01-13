@@ -366,7 +366,10 @@ public enum Status {
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016,"You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",
             "您不能修改工作组选项，因为该工作组 [{0}] 和 该环境 [{1}] 已经被用在任务 [{2}] 中"),
     TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),
+    TASK_GROUP_STATUS_CLOSED(130018,"The task group has been closed.","任务组已经被关闭"),
+    TASK_GROUP_STATUS_OPENED(130019,"The task group has been opened.","任务组已经被开启"),
     NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
+    NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
     ;
 
     private final int code;

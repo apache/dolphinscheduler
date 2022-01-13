@@ -21,7 +21,7 @@ import MenuState from './types'
 export const useMenuStore = defineStore({
   id: 'menu',
   state: (): MenuState => ({
-    menuKey: '',
+    menuKey: 'home',
   }),
   persist: true,
   getters: {
