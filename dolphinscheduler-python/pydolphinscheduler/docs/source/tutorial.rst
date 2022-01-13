@@ -30,7 +30,6 @@ Here have an overview of our tutorial, and it look a little complex but do not
 worry about that because we explain this example below as detailed as possible.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :start-after: [start tutorial]
    :end-before: [end tutorial]
 
@@ -43,7 +42,6 @@ like other Python package. We just create a minimum demo here, so we just import
 :class:`pydolphinscheduler.tasks.shell`.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :start-after: [start package_import]
    :end-before: [end package_import]
 
@@ -55,14 +53,14 @@ Process Definition Declaration
 
 We should instantiate object after we import them from `import necessary module`_.
 Here we declare basic arguments for process definition(aka, workflow). We define
-the name of process definition, and it **the only required argument** for object process
-definition. Beside that we also declare three arguments named `schedule`, `start_time`
-which setting workflow schedule interval and schedule start_time, and argument `tenant`
-which changing workflow's task running user in the worker, :ref:`section tenant <concepts>`
-in *PyDolphinScheduler* :ref:`concepts` page have more detail information.
+the name of process definition, using `Python context manager`_ and it
+**the only required argument** for object process definition. Beside that we also
+declare three arguments named `schedule`, `start_time` which setting workflow schedule
+interval and schedule start_time, and argument `tenant` which changing workflow's
+task running user in the worker, :ref:`section tenant <concepts>` in *PyDolphinScheduler*
+:ref:`concepts` page have more detail information.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :start-after: [start workflow_declare]
    :end-before: [end workflow_declare]
 
@@ -80,7 +78,6 @@ Beside the argument `command`, we also need setting argument `name` for each tas
 only shell task, `name` is required for each type of task)*.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :dedent: 0
    :start-after: [start task_declare]
    :end-before: [end task_declare]
@@ -103,7 +100,6 @@ In this example, we set task `task_parent` is the upstream task of task
 task of both these two task.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :dedent: 0
    :start-after: [start task_relation_declare]
    :end-before: [end task_relation_declare]
@@ -129,7 +125,6 @@ Now, we could run the Python code like other Python script, for the basic usage 
 :code:`python tutorial.py` to trigger and run it.
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
    :dedent: 0
    :start-after: [start submit_or_run]
    :end-before: [end submit_or_run]
@@ -148,7 +143,8 @@ go and see the `DolphinScheduler project page`_. they is a new process definitio
 created and named "Tutorial". It create by *PyDolphinScheduler* and the DAG graph as below
 
 .. literalinclude:: ../../examples/tutorial.py
-   :language: python
+   :language: text
    :lines: 24-28
 
 .. _`DolphinScheduler project page`: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/project.html
+.. _`Python context manager`: https://docs.python.org/3/library/stdtypes.html#context-manager-types
