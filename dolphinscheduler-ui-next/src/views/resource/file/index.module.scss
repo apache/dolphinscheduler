@@ -15,39 +15,57 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import { NCard } from 'naive-ui'
-
-const headerStyle = {
-  borderBottom: '1px solid var(--n-border-color)',
+.file-edit-content {
+  width: 100%;
+  background: #fff;
+  padding-bottom: 20px;
+  >h2 {
+    line-height: 60px;
+    text-align: center;
+    padding-right: 170px;
+    position: relative;
+  }
 }
 
-const contentStyle = {
-  padding: '8px 10px',
+.form-content {
+  padding: 0 50px 0 50px;
 }
 
-const props = {
-  title: {
-    type: String as PropType<string>,
-  },
+.submit {
+  text-align: left;
+  padding-top: 12px;
+  margin-left: 160px;
 }
 
-const Card = defineComponent({
-  name: 'Card',
-  props,
-  render() {
-    const { title, $slots } = this
-    return (
-      <NCard
-        title={title}
-        size='small'
-        headerStyle={headerStyle}
-        contentStyle={contentStyle}
-      >
-        {$slots}
-      </NCard>
-    )
-  },
-})
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
 
-export default Card
+.table-box {
+  table {
+    width: 100%;
+    tr {
+      height: 40px;
+      font-size: 12px;
+      th,td{
+        &:nth-child(1) {
+          width: 50px;
+          text-align: center;
+        }
+      }
+      th {
+        &:nth-child(1) {
+          width: 60px;
+          text-align: center;
+        }
+        >span {
+          font-size: 12px;
+          color: #555;
+        }
+      }
+    }
+  }
+}

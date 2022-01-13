@@ -15,39 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
-import { NCard } from 'naive-ui'
-
-const headerStyle = {
-  borderBottom: '1px solid var(--n-border-color)',
+ .conditions-model {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  .right {
+    > .form-box {
+      .list {
+        float: right;
+        margin: 3px 0 3px 4px;
+      }
+    }
+  }
 }
-
-const contentStyle = {
-  padding: '8px 10px',
-}
-
-const props = {
-  title: {
-    type: String as PropType<string>,
-  },
-}
-
-const Card = defineComponent({
-  name: 'Card',
-  props,
-  render() {
-    const { title, $slots } = this
-    return (
-      <NCard
-        title={title}
-        size='small'
-        headerStyle={headerStyle}
-        contentStyle={contentStyle}
-      >
-        {$slots}
-      </NCard>
-    )
-  },
-})
-
-export default Card

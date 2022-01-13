@@ -26,7 +26,7 @@ export const useMenuStore = defineStore({
   persist: true,
   getters: {
     getMenuKey(): string {
-      return this.menuKey
+      return this.menuKey || 'home'
     },
   },
   actions: {

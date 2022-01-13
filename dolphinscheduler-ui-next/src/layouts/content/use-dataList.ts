@@ -122,7 +122,7 @@ export function useDataList() {
       },
       {
         label: t('menu.resources'),
-        key: 'resources',
+        key: 'resource',
         icon: renderIcon(FolderOutlined),
         isShowSide: true,
         children: [
@@ -153,6 +153,7 @@ export function useDataList() {
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
         isShowSide: false,
+        children: [],
       },
       {
         label: t('menu.monitor'),
