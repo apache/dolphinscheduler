@@ -72,7 +72,7 @@
     methods: {
       _onChange (o) {
         this.$emit('valueEvent', +o)
-        Array.from(new Set(this.value))
+        this.list = Array.from(new Set(this.list))
         this._setIconState(+o)
       },
       _setIconState (value) {
