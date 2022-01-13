@@ -91,7 +91,6 @@
         }, 1)
       },
       _onBlur () {
-        console.log("进入onblur")
         let val = $(this.$refs.input.$el).find('input')[0].value
         if (this._validation(val)) {
           this.$emit('valueEvent', val)
