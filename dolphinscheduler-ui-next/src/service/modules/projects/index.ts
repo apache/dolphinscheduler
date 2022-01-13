@@ -16,13 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import {
-  ListReq,
-  ProjectsReq,
-  UserIdReq,
-  CodeReq,
-  UpdateProjectsReq,
-} from './types'
+import { ListReq, ProjectsReq, UserIdReq, UpdateProjectsReq } from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
   return axios({
@@ -70,14 +64,14 @@ export function queryUnauthorizedProject(params: UserIdReq): any {
   })
 }
 
-export function queryProjectByCode(code: CodeReq): any {
+export function queryProjectByCode(code: number): any {
   return axios({
     url: `/projects/${code}`,
     method: 'get',
   })
 }
 
-export function updateProject(data: UpdateProjectsReq, code: CodeReq): any {
+export function updateProject(data: UpdateProjectsReq, code: number): any {
   return axios({
     url: `/projects/${code}`,
     method: 'put',
@@ -85,7 +79,7 @@ export function updateProject(data: UpdateProjectsReq, code: CodeReq): any {
   })
 }
 
-export function deleteProject(code: CodeReq): any {
+export function deleteProject(code: number): any {
   return axios({
     url: `/projects/${code}`,
     method: 'delete',

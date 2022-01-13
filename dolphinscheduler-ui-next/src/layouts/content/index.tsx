@@ -40,7 +40,6 @@ const Content = defineComponent({
     locale.value = localesStore.getLocales
 
     onMounted(() => {
-      menuStore.setMenuKey('home')
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       genSideMenu(state)
@@ -59,12 +58,14 @@ const Content = defineComponent({
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
           .children || []
+      state.isShowSide =
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          .isShowSide || false
     }
 
     const getSideMenuOptions = (item: any) => {
       menuStore.setMenuKey(item.key)
       genSideMenu(state)
-      state.isShowSide = item.isShowSide
     }
 
     return {

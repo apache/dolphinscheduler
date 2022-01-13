@@ -32,7 +32,7 @@ export default {
     {
       path: '/monitor/servers/master',
       name: 'servers-master',
-      component: components['home'],
+      component: components['master'],
       meta: {
         title: '服务管理-Master',
       },
@@ -40,7 +40,7 @@ export default {
     {
       path: '/monitor/servers/worker',
       name: 'servers-worker',
-      component: components['home'],
+      component: components['worker'],
       meta: {
         title: '服务管理-Worker',
       },
