@@ -39,7 +39,7 @@
         <em slot="suffix" class="el-icon-arrow-down" style="font-size: 12px;" v-show="isIconState"></em>
       </el-input>
     <el-option
-            v-for="city in Array.from(new Set(list))"
+            v-for="city in list"
             :key="city"
             :value="city"
             :label="city">
@@ -71,8 +71,9 @@
     },
     methods: {
       _onChange (o) {
-        this.$emit('valueEvent', +o)
-        this._setIconState(+o)
+        let listData = [...new Set(o)]
+        this.$emit('valueEvent', +listData)
+        this._setIconState(+listData)
       },
       _setIconState (value) {
         // Whether there is a list
