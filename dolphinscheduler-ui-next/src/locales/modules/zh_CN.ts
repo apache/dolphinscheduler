@@ -214,6 +214,7 @@ const project = {
 
 const security = {
   tenant: {
+    tenant_manage: '租户管理',
     create_tenant: '创建租户',
     search_tips: '请输入关键词',
     num: '编号',

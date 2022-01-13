@@ -29,6 +29,7 @@ import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
 import TenantModal from './components/tenant-modal'
 import { useI18n } from 'vue-i18n'
+import Card from '@/components/card'
 
 const tenementManage = defineComponent({
   name: 'tenement-manage',
@@ -103,21 +104,24 @@ const tenementManage = defineComponent({
             </div>
           </div>
         </NCard>
-        <div class={styles.form}>
+        <Card
+          title={t('security.tenant.tenant_manage')}
+          class={styles['table-card']}
+        >
           <NDataTable columns={this.columns} data={this.tableData} />
-        </div>
-        <div class={styles.pagination}>
-          <NPagination
-            v-model:page={this.page}
-            v-model:page-size={this.pageSize}
-            page-count={this.totalPage}
-            show-size-picker
-            page-sizes={[10, 30, 50]}
-            show-quick-jumper
-            onUpdatePage={this.requestData}
-            onUpdatePageSize={this.requestData}
-          />
-        </div>
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              show-size-picker
+              page-sizes={[10, 30, 50]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.requestData}
+            />
+          </div>
+        </Card>
         <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} row={this.row} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
       </div>
     )
