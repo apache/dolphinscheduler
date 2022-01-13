@@ -51,17 +51,15 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
-      - name: Check Docker Info
-        run: docker images
       - name: Export Docker Images
         run: |
-          images_name=$(docker images --format '{{.Repository}}:{{.Tag}}' | grep dolphinscheduler | grep ci) \
-          docker save %{images_name} -o /tmp/docker-images.tar
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
+          du -sh /tmp/standalone-image.tar
       - uses: actions/upload-artifact@v2
         name: Upload Docker Images
         with:
-          name: docker-images
-          path: /tmp/docker-images.tar
+          name: standalone-image
+          path: /tmp/standalone-image.tar
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
@@ -87,8 +85,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
@@ -98,13 +94,11 @@ jobs:
       - uses: actions/download-artifact@v2
         name: Download Docker Images
         with:
-          name: docker-images
-          path: /tmp/docker-images.tar
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+          name: standalone-image
+          path: /tmp/standalone-image.tar
       - name: Load Docker Images
         run: |
-            docker load -i /tmp/docker-images.tar
+            docker load -i /tmp/standalone-image.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
