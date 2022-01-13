@@ -71,9 +71,9 @@
     },
     methods: {
       _onChange (o) {
-        let listData = [...new Set(o)]
-        this.$emit('valueEvent', +listData)
-        this._setIconState(+listData)
+        this.$emit('valueEvent', +o)
+        Array.from(new Set(this.value))
+        this._setIconState(+o)
       },
       _setIconState (value) {
         // Whether there is a list
