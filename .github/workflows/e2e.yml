@@ -95,7 +95,7 @@ jobs:
         name: Download Docker Images
         with:
           name: standalone-image
-          path: /tmp/standalone-image.tar
+          path: /tmp
       - name: Load Docker Images
         run: |
             docker load -i /tmp/standalone-image.tar
