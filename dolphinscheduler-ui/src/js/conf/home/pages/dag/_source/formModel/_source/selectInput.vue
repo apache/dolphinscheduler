@@ -71,7 +71,7 @@
     },
     methods: {
       _onChange (o) {
-        this.isDetails = true
+        this.isDetails = false
         this.$emit('valueEvent', +o)
         this._setIconState(+o)
       },
