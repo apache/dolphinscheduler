@@ -28,6 +28,7 @@ export function useTable() {
   const handleEdit= (row: any) => {
     variables.showModalRef = true
     variables.statusRef = 1
+    variables.row = row
   }
 
   const handleDelete = (row: any) => {
@@ -118,6 +119,7 @@ export function useTable() {
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),
+    row: {}
   })
 
   const getTableData = (params: any) => {
