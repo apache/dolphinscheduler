@@ -951,6 +951,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             processDefinition.setLocations(newArrayNode.toString());
         }
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
         Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition, Lists.newArrayList());
         if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
             putMsg(createDagResult, Status.SUCCESS);
