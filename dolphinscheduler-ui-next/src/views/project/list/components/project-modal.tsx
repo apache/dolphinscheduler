@@ -68,10 +68,14 @@ const ProjectModal = defineComponent({
     return { ...toRefs(state), t, onConfirm, onCancel }
   },
   render() {
-    const { t, onConfirm, onCancel, show } = this
+    const { t, onConfirm, onCancel, show, status } = this
     return (
       <Modal
-        title={t('project.list.create_project')}
+        title={
+          status === 0
+            ? t('project.list.create_project')
+            : t('project.list.edit_project')
+        }
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}

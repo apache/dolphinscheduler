@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, onMounted, watch } from 'vue'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import {
   NButton,
-  NInput,
-  NIcon,
+  NCard,
   NDataTable,
-  NPagination,
-  NCard
+  NIcon,
+  NInput,
+  NPagination
 } from 'naive-ui'
-import styles from './index.module.scss'
-import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
-import TenantModal from './components/tenant-modal'
 import { useI18n } from 'vue-i18n'
+import { useTable } from './use-table'
 import Card from '@/components/card'
+import YarnQueueModal from './components/yarn-queue-modal'
+import styles from './index.module.scss'
 
-const tenementManage = defineComponent({
-  name: 'tenement-manage',
+const yarnQueueManage = defineComponent({
+  name: 'yarn-queue-manage',
   setup() {
-    const { variables, getTableData, createColumns } = useTable()
     const { t } = useI18n()
+    const { variables, getTableData, createColumns } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -43,6 +43,16 @@ const tenementManage = defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal
       })
+    }
+
+    const onUpdatePageSize = () => {
+      variables.page = 1
+      requestData()
+    }
+
+    const onSearch = () => {
+      variables.page = 1
+      requestData()
     }
 
     const handleModalChange = () => {
@@ -59,16 +69,6 @@ const tenementManage = defineComponent({
       requestData()
     }
 
-    const handleChangePageSize = () => {
-      variables.page = 1
-      requestData()
-    }
-
-    const handleSearch = () => {
-      variables.page = 1
-      requestData()
-    }
-
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -82,43 +82,53 @@ const tenementManage = defineComponent({
       t,
       ...toRefs(variables),
       requestData,
-      handleModalChange,
       onCancelModal,
       onConfirmModal,
-      handleSearch,
-      handleChangePageSize
+      onUpdatePageSize,
+      handleModalChange,
+      onSearch
     }
   },
   render() {
-    const { t } = this
+    const {
+      t,
+      requestData,
+      onUpdatePageSize,
+      onCancelModal,
+      onConfirmModal,
+      handleModalChange,
+      onSearch
+    } = this
+
     return (
-      <div class={styles.container}>
+      <div>
         <NCard>
-          <div class={styles.header}>
+          <div class={styles['search-card']}>
             <div>
-              <NButton size='small' onClick={this.handleModalChange}>
-                {t('security.tenant.create_tenant')}
+              <NButton size='small' type='primary' onClick={handleModalChange}>
+                {t('security.yarn_queue.create_queue')}
               </NButton>
             </div>
-            <div class={styles.search}>
+            <div class={styles.box}>
               <NInput
                 size='small'
-                v-model={[this.searchVal, 'value']}
-                placeholder={t('security.tenant.search_tips')}
                 clearable
+                v-model={[this.searchVal, 'value']}
+                placeholder={t('security.yarn_queue.search_tips')}
               />
-              <NButton size='small' onClick={this.handleSearch}>
-                <NIcon>
-                  <SearchOutlined />
-                </NIcon>
+              <NButton size='small' type='primary' onClick={onSearch}>
+                {{
+                  icon: () => (
+                    <NIcon>
+                      <SearchOutlined />
+                    </NIcon>
+                  )
+                }}
               </NButton>
             </div>
           </div>
         </NCard>
-        <Card
-          title={t('security.tenant.tenant_manage')}
-          class={styles['table-card']}
-        >
+        <Card class={styles['table-card']}>
           <NDataTable columns={this.columns} data={this.tableData} />
           <div class={styles.pagination}>
             <NPagination
@@ -128,21 +138,21 @@ const tenementManage = defineComponent({
               show-size-picker
               page-sizes={[10, 30, 50]}
               show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+              onUpdatePage={requestData}
+              onUpdatePageSize={onUpdatePageSize}
             />
           </div>
         </Card>
-        <TenantModal
+        <YarnQueueModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}
           row={this.row}
-          onCancelModal={this.onCancelModal}
-          onConfirmModal={this.onConfirmModal}
+          onCancelModal={onCancelModal}
+          onConfirmModal={onConfirmModal}
         />
       </div>
     )
   }
 })
 
-export default tenementManage
+export default yarnQueueManage

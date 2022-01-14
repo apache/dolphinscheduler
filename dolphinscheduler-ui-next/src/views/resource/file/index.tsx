@@ -149,6 +149,7 @@ export default defineComponent({
 
     watch(
       () => router.currentRoute.value.params.id,
+      // @ts-ignore
       () => reload()
     )
 

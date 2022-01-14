@@ -49,9 +49,9 @@ export function verifyQueue(data: QueueReq): any {
   })
 }
 
-export function updateQueue(data: QueueReq, id: IdReq): any {
+export function updateQueue(data: QueueReq, idReq: IdReq): any {
   return axios({
-    url: `/queues/${id}`,
+    url: `/queues/${idReq.id}`,
     method: 'put',
     data
   })
