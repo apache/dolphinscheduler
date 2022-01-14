@@ -225,7 +225,8 @@
         'setIsEditDag',
         'setName',
         'setLocations',
-        'resetLocalParam'
+        'resetLocalParam',
+        'setDependResult'
       ]),
       /**
        * Toggle full screen
@@ -561,6 +562,7 @@
           .then((res) => {
             this.$message(this.$t('Refresh status succeeded'))
             const { taskList } = res.data
+            const list = res.list
             if (taskList) {
               this.taskInstances = taskList
               taskList.forEach((taskInstance) => {
@@ -569,6 +571,13 @@
                   state: taskInstance.state,
                   taskInstance
                 })
+              })
+            }
+            if (list) {
+              list.forEach((dependent) => {
+                if (dependent.dependentResult) {
+                  this.setDependResult(JSON.parse(dependent.dependentResult))
+                }
               })
             }
           })
