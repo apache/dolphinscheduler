@@ -35,7 +35,7 @@ class ProgramType(str):
 
 
 class Engine(Task):
-    """Task spark object, declare behavior for spark task to dolphinscheduler.
+    """Task engine object, declare behavior for spark task to dolphinscheduler.
 
     This is the parent class of spark, flink and mr tasks,
     and is used to provide the programType, mainClass and mainJar task parameters for reuse.
