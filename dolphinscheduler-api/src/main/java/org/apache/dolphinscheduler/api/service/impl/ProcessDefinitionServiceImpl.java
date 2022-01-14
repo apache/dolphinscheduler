@@ -104,6 +104,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -135,6 +137,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionServiceImpl.class);
 
     private static final String RELEASESTATE = "releaseState";
+
+    private static final Pattern SWITCH_NODE_REGEX = Pattern.compile("nextNode\":\\s?(\\d+)");
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -1130,6 +1134,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return false;
             }
             taskDefinitionLogList.add(taskDefinitionLog);
+        }
+        //fix taskParams when taskType is SWITCH
+        for (TaskDefinitionLog taskDefinitionLog: taskDefinitionLogList) {
+            if (TaskType.SWITCH.getDesc().equals(taskDefinitionLog.getTaskType())) {
+                String taskParams = taskDefinitionLog.getTaskParams();
+                Matcher matcher = SWITCH_NODE_REGEX.matcher(taskParams);
+                while (matcher.find()) {
+                    String oldTaskCode = matcher.group(1).trim();
+                    Long newTaskCode = taskCodeMap.get(Long.parseLong(oldTaskCode));
+                    taskParams = taskParams.replaceAll(oldTaskCode, newTaskCode == null ? oldTaskCode : newTaskCode.toString());
+                }
+                taskDefinitionLog.setTaskParams(taskParams);
+            }
         }
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
