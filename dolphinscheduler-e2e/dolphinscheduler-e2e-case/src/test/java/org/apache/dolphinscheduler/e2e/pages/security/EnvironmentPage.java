@@ -72,7 +72,7 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in queue list"))
+                .orElseThrow(() -> new RuntimeException("No edit button in environment list"))
                 .click();
 
         editEnvironmentForm().inputEnvironmentName().sendKeys(name);

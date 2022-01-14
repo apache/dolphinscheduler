@@ -40,10 +40,10 @@
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
           <el-tooltip :content="$t('Edit')" placement="top">
-             <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+             <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle class="edit"></el-button>
            </el-tooltip>
            <el-tooltip :content="$t('Delete')" placement="top">
-             <el-button type="danger" size="mini" icon="el-icon-delete" circle class="edit"></el-button>
+             <el-button type="danger" size="mini" icon="el-icon-delete" circle class="delete"></el-button>
              <el-popconfirm
                :confirmButtonText="$t('Confirm')"
                :cancelButtonText="$t('Cancel')"
