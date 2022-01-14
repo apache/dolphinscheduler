@@ -125,7 +125,7 @@ class EnvironmentE2ETest {
     }
 
     @Test
-    @Order(30)
+    @Order(40)
     void testDeleteEnvironment() {
         final EnvironmentPage page = new EnvironmentPage(browser);
 
