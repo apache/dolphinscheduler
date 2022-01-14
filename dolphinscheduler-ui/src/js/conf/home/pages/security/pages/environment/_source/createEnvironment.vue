@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popover ref="popover" :ok-text="item && item.name ? $t('Edit') : $t('Submit')" @ok="_ok" @close="close okId="btnSubmit" cancelId="btnCancel">
+  <m-popover okId="btnSubmit" cancelId="btnCancel" ref="popover" :ok-text="item && item.name ? $t('Edit') : $t('Submit')" @ok="_ok" @close="close">
     <template slot="content">
       <div class="create-environment-model">
         <m-list-box-f>
