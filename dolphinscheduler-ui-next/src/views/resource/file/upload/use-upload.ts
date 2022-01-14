@@ -30,7 +30,7 @@ export function useUpload(state: any) {
   const handleUploadFile = (
     emit: IEmit,
     hideModal: () => void,
-    resetForm: () => void,
+    resetForm: () => void
   ) => {
     state.uploadFormRef.validate(async (valid: any) => {
       const pid = router.currentRoute.value.params.id || -1
@@ -59,6 +59,6 @@ export function useUpload(state: any) {
   }
 
   return {
-    handleUploadFile,
+    handleUploadFile
   }
 }

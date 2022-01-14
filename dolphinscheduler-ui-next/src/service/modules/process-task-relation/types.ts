@@ -51,5 +51,5 @@ export {
   PostTaskCodesReq,
   TaskCodeReq,
   SaveReq,
-  MoveReq,
+  MoveReq
 }

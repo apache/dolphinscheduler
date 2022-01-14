@@ -25,16 +25,16 @@ export function useRename(state: any) {
   const handleRenameFile = (
     emit: IEmit,
     hideModal: () => void,
-    resetForm: () => void,
+    resetForm: () => void
   ) => {
     state.renameFormRef.validate(async (valid: any) => {
       if (!valid) {
         try {
           await updateResource(
             {
-              ...state.renameForm,
+              ...state.renameForm
             },
-            state.renameForm.id,
+            state.renameForm.id
           )
           window.$message.success(t('resource.file.success'))
           emit('updateList')
@@ -49,6 +49,6 @@ export function useRename(state: any) {
   }
 
   return {
-    handleRenameFile,
+    handleRenameFile
   }
 }

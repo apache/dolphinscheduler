@@ -63,5 +63,5 @@ export {
   UserIdReq,
   UpdateProjectsReq,
   ProjectRes,
-  ProjectList,
+  ProjectList
 }

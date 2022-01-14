@@ -22,7 +22,7 @@ export function queryTenantListPaging(params: ListReq): any {
   return axios({
     url: '/tenants',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -30,14 +30,14 @@ export function createTenant(data: TenantReq): any {
   return axios({
     url: '/tenants',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryTenantList(): any {
   return axios({
     url: '/tenants/list',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -45,7 +45,7 @@ export function verifyTenantCode(params: TenantCodeReq): any {
   return axios({
     url: '/tenants/verify-code',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -53,13 +53,13 @@ export function updateTenant(data: TenantCodeReq, idReq: IdReq): any {
   return axios({
     url: `/tenants/${idReq.id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteTenantById(id: number): any {
   return axios({
     url: `/tenants/${id}`,
-    method: 'delete',
+    method: 'delete'
   })
 }

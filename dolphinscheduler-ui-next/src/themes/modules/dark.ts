@@ -18,7 +18,7 @@
 const dark = {
   common: {
     // bodyColor: '#28292d',
-  },
+  }
 }
 
 export default dark

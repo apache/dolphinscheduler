@@ -47,7 +47,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       title: t('resource.file.id'),
       key: 'id',
       width: 50,
-      render: (_row, index) => index + 1,
+      render: (_row, index) => index + 1
     },
     {
       title: t('resource.file.name'),
@@ -59,14 +59,14 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
           {
             href: 'javascript:',
             class: styles.links,
-            onClick: () => goSubFolder(router, row),
+            onClick: () => goSubFolder(router, row)
           },
           {
             default: () => {
               return row.name
-            },
-          },
-        ),
+            }
+          }
+        )
     },
     { title: t('resource.file.user_name'), width: 100, key: 'user_name' },
     {
@@ -74,14 +74,14 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       key: 'whether_directory',
       width: 100,
       render: (row) =>
-        row.directory ? t('resource.file.yes') : t('resource.file.no'),
+        row.directory ? t('resource.file.yes') : t('resource.file.no')
     },
     { title: t('resource.file.file_name'), key: 'file_name' },
     { title: t('resource.file.description'), width: 150, key: 'description' },
     {
       title: t('resource.file.size'),
       key: 'size',
-      render: (row) => bytesToSize(row.size),
+      render: (row) => bytesToSize(row.size)
     },
     { title: t('resource.file.update_time'), width: 150, key: 'update_time' },
     {
@@ -93,12 +93,12 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
           row,
           onRenameResource: (id, name, description) =>
             renameResource(id, name, description),
-          onUpdateList: () => updateList(),
-        }),
-    },
+          onUpdateList: () => updateList()
+        })
+    }
   ]
 
   return {
-    columnsRef,
+    columnsRef
   }
 }

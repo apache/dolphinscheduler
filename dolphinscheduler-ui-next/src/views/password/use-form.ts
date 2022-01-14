@@ -26,7 +26,7 @@ export function useForm() {
     passwordFormRef: ref(),
     passwordForm: {
       password: '',
-      confirmPassword: '',
+      confirmPassword: ''
     },
     rules: {
       password: {
@@ -35,7 +35,7 @@ export function useForm() {
           if (state.passwordForm.password === '') {
             return new Error(t('password.password_tips'))
           }
-        },
+        }
       },
       confirmPassword: {
         trigger: ['input', 'blur'],
@@ -43,9 +43,9 @@ export function useForm() {
           if (state.passwordForm.confirmPassword === '') {
             return new Error(t('password.confirm_password_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return { state, t }

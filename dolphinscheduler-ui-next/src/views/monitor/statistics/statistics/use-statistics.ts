@@ -17,13 +17,13 @@
 
 import {
   countQueueState,
-  countCommandState,
+  countCommandState
 } from '@/service/modules/projects-analysis'
 import { useAsyncState } from '@vueuse/core'
 import type { Ref } from 'vue'
 import type {
   TaskQueueRes,
-  CommandStateRes,
+  CommandStateRes
 } from '@/service/modules/projects-analysis/types'
 
 export function useStatistics() {

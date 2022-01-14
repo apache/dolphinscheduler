@@ -31,6 +31,6 @@ export function useDropDown(chooseVal: any) {
     localesStore.setLocales(locale.value as Locales)
   }
   return {
-    handleSelect,
+    handleSelect
   }
 }

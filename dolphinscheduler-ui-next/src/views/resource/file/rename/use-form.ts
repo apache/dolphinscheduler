@@ -23,7 +23,7 @@ const defaultValue = (name = '', description = '') => ({
   id: -1,
   name,
   type: 'FILE',
-  description,
+  description
 })
 
 export function useForm(name: string, description: string) {
@@ -44,13 +44,13 @@ export function useForm(name: string, description: string) {
           if (state.renameForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
-    resetForm,
+    resetForm
   }
 }

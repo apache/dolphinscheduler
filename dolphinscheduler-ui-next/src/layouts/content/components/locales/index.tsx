@@ -27,8 +27,8 @@ const Locales = defineComponent({
   props: {
     localesOptions: {
       type: Array as PropType<any>,
-      default: [],
-    },
+      default: []
+    }
   },
   setup(props) {
     const localesStore = useLocalesStore()
@@ -57,7 +57,7 @@ const Locales = defineComponent({
         </NButton>
       </NDropdown>
     )
-  },
+  }
 })
 
 export default Locales

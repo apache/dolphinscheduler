@@ -60,7 +60,7 @@ export default defineComponent({
       resourceViewRef,
       handleReturn,
       handleFileContent,
-      ...toRefs(state),
+      ...toRefs(state)
     }
   },
   render() {
@@ -80,7 +80,7 @@ export default defineComponent({
               <div
                 class={styles.cont}
                 style={{
-                  width: '90%',
+                  width: '90%'
                 }}
               >
                 <MonacoEditor
@@ -114,5 +114,5 @@ export default defineComponent({
         </div>
       </Card>
     )
-  },
+  }
 })

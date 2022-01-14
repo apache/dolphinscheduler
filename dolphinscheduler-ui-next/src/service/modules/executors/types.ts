@@ -71,5 +71,5 @@ export {
   ExecuteReq,
   ProjectCodeReq,
   ProcessDefinitionCodeReq,
-  ProcessInstanceReq,
+  ProcessInstanceReq
 }

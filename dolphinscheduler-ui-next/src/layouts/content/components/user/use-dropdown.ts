@@ -16,7 +16,6 @@
  */
 
 import { useRouter } from 'vue-router'
-import { DropdownOption } from 'naive-ui'
 import { logout } from '@/service/modules/logout'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
@@ -44,6 +43,6 @@ export function useDropDown() {
   }
 
   return {
-    handleSelect,
+    handleSelect
   }
 }

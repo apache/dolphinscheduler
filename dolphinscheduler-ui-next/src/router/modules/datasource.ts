@@ -34,8 +34,8 @@ export default {
       name: 'datasource-list',
       component: components['home'],
       meta: {
-        title: '数据源中心',
-      },
-    },
-  ],
+        title: '数据源中心'
+      }
+    }
+  ]
 }

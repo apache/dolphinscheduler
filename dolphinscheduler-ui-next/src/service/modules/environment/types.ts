@@ -45,5 +45,5 @@ export {
   EnvironmentCodeReq,
   EnvironmentNameReq,
   ListReq,
-  CodeReq,
+  CodeReq
 }

@@ -34,32 +34,32 @@ export default {
       name: 'servers-master',
       component: components['master'],
       meta: {
-        title: '服务管理-Master',
-      },
+        title: '服务管理-Master'
+      }
     },
     {
       path: '/monitor/servers/worker',
       name: 'servers-worker',
       component: components['worker'],
       meta: {
-        title: '服务管理-Worker',
-      },
+        title: '服务管理-Worker'
+      }
     },
     {
       path: '/monitor/servers/db',
       name: 'servers-db',
       component: components['db'],
       meta: {
-        title: '服务管理-DB',
-      },
+        title: '服务管理-DB'
+      }
     },
     {
       path: '/monitor/statistics/statistics',
       name: 'statistics-statistics',
       component: components['statistics'],
       meta: {
-        title: '统计管理-Statistics',
-      },
-    },
-  ],
+        title: '统计管理-Statistics'
+      }
+    }
+  ]
 }

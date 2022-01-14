@@ -25,8 +25,8 @@ import { useFolder } from './use-folder'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
-  },
+    default: false
+  }
 }
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
     return {
       hideModal,
       handleFolder,
-      ...toRefs(state),
+      ...toRefs(state)
     }
   },
   render() {
@@ -82,5 +82,5 @@ export default defineComponent({
         </NForm>
       </Modal>
     )
-  },
+  }
 })

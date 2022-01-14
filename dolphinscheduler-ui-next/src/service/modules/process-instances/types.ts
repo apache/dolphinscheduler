@@ -90,5 +90,5 @@ export {
   TaskReq,
   LongestReq,
   IdReq,
-  ProcessInstanceReq,
+  ProcessInstanceReq
 }

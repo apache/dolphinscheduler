@@ -84,5 +84,5 @@ export {
   WorkerGroupIdReq,
   ScheduleListReq,
   CreateScheduleReq,
-  DeleteScheduleReq,
+  DeleteScheduleReq
 }

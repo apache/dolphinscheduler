@@ -26,7 +26,7 @@ const defaultValue = () => ({
   fileName: '',
   description: '',
   content: '',
-  currentDir: '/',
+  currentDir: '/'
 })
 
 export function useForm() {
@@ -47,7 +47,7 @@ export function useForm() {
           if (state.fileForm.fileName === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
-        },
+        }
       },
       suffix: {
         required: true,
@@ -56,7 +56,7 @@ export function useForm() {
           if (state.fileForm.suffix === '') {
             return new Error(t('resource.file.enter_suffix_tips'))
           }
-        },
+        }
       },
       content: {
         required: true,
@@ -65,13 +65,13 @@ export function useForm() {
           if (state.fileForm.content === '') {
             return new Error(t('resource.file.enter_content_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
-    resetForm,
+    resetForm
   }
 }

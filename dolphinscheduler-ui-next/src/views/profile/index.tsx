@@ -17,14 +17,7 @@
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
 import { useForm } from './use-form'
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NRadioGroup,
-  NRadio,
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput } from 'naive-ui'
 import { useUserinfo } from './use-userinfo'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
@@ -35,7 +28,7 @@ import utils from '@/utils'
 const profile = defineComponent({
   name: 'profile',
   setup() {
-    let showModalRef = ref(false)
+    const showModalRef = ref(false)
     const { state, t } = useForm()
     const { handleUpdate } = useUpdate(state)
     const { getUserInfo } = useUserinfo()
@@ -72,7 +65,7 @@ const profile = defineComponent({
               >
                 {t('profile.edit')}
               </NButton>
-            ),
+            )
           }}
         </Card>
         <Modal
@@ -108,12 +101,12 @@ const profile = defineComponent({
                   />
                 </NFormItem>
               </NForm>
-            ),
+            )
           }}
         </Modal>
       </div>
     )
-  },
+  }
 })
 
 export default profile

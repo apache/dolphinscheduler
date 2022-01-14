@@ -21,14 +21,14 @@ import {
   PluginInstanceReq,
   InstanceNameReq,
   IdReq,
-  UpdatePluginInstanceReq,
+  UpdatePluginInstanceReq
 } from './types'
 
 export function queryAlertPluginInstanceListPaging(params: ListReq): any {
   return axios({
     url: '/alert-plugin-instances',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -36,14 +36,14 @@ export function createAlertPluginInstance(data: PluginInstanceReq): any {
   return axios({
     url: '/alert-plugin-instances',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryAlertPluginInstanceList(): any {
   return axios({
     url: '/alert-plugin-instances/list',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -51,14 +51,14 @@ export function verifyAlertInstanceName(params: InstanceNameReq): any {
   return axios({
     url: '/alert-plugin-instances/verify-name',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function getAlertPluginInstance(id: IdReq): any {
   return axios({
     url: `/alert-plugin-instances/${id}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -69,13 +69,13 @@ export function updateAlertPluginInstance(
   return axios({
     url: `/alert-plugin-instances/${id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteAlertPluginInstance(id: IdReq): any {
   return axios({
     url: `/alert-plugin-instances/${id}`,
-    method: 'delete',
+    method: 'delete'
   })
 }

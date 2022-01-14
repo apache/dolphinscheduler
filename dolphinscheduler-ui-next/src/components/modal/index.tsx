@@ -23,26 +23,26 @@ import styles from './index.module.scss'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   title: {
     type: String as PropType<string>,
-    required: true,
+    required: true
   },
   cancelText: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   cancelShow: {
     type: Boolean as PropType<boolean>,
-    default: true,
+    default: true
   },
   confirmText: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   confirmDisabled: {
     type: Boolean as PropType<boolean>,
-    default: false,
-  },
+    default: false
+  }
 }
 
 const Modal = defineComponent({
@@ -90,12 +90,12 @@ const Modal = defineComponent({
                   {this.confirmText || t('modal.confirm')}
                 </NButton>
               </div>
-            ),
+            )
           }}
         </NCard>
       </NModal>
     )
-  },
+  }
 })
 
 export default Modal

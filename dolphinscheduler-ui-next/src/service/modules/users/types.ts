@@ -112,5 +112,5 @@ export {
   ListAllReq,
   ListReq,
   RegisterUserReq,
-  UserInfoRes,
+  UserInfoRes
 }

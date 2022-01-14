@@ -67,5 +67,5 @@ export {
   CodeReq,
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
-  VersionReq,
+  VersionReq
 }

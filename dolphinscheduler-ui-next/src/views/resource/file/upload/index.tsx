@@ -25,8 +25,8 @@ import { useUpload } from './use-upload'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
-  },
+    default: false
+  }
 }
 
 export default defineComponent({
@@ -54,7 +54,7 @@ export default defineComponent({
       hideModal,
       customRequest,
       handleFile,
-      ...toRefs(state),
+      ...toRefs(state)
     }
   },
   render() {
@@ -96,5 +96,5 @@ export default defineComponent({
         </NForm>
       </Modal>
     )
-  },
+  }
 })

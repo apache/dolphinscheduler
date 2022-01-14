@@ -24,7 +24,7 @@ const defaultValue = () => ({
   type: 'FILE',
   name: '',
   description: '',
-  currentDir: '/',
+  currentDir: '/'
 })
 
 export function useForm() {
@@ -45,13 +45,13 @@ export function useForm() {
           if (state.folderForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
-    resetForm,
+    resetForm
   }
 }

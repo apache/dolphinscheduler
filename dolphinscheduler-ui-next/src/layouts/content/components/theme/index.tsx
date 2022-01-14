@@ -39,7 +39,7 @@ const Theme = defineComponent({
         {this.t(this.themeStore.darkTheme ? 'theme.light' : 'theme.dark')}
       </NButton>
     )
-  },
+  }
 })
 
 export default Theme

@@ -78,5 +78,5 @@ export {
   PageReq,
   ListReq,
   ProcessDefinitionReq,
-  TargetCodeReq,
+  TargetCodeReq
 }

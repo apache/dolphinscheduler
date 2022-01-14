@@ -20,7 +20,7 @@ import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
 
 const defaultValue = () => ({
-  content: '',
+  content: ''
 })
 
 export function useForm() {
@@ -41,13 +41,13 @@ export function useForm() {
           if (state.fileForm.content === '') {
             return new Error(t('resource.file.enter_content_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
-    resetForm,
+    resetForm
   }
 }

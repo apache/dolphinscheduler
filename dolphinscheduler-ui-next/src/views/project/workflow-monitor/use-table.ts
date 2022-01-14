@@ -24,10 +24,10 @@ export function useTable() {
   const columnsRef: TableColumns<any> = [
     { title: '#', key: 'index' },
     { title: t('home.number'), key: 'number' },
-    { title: t('home.state'), key: 'state' },
+    { title: t('home.state'), key: 'state' }
   ]
 
   return {
-    columnsRef,
+    columnsRef
   }
 }

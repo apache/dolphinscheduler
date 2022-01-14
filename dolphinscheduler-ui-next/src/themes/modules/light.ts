@@ -16,8 +16,8 @@
  */
 const light = {
   common: {
-    bodyColor: '#f8f8fc',
-  },
+    bodyColor: '#f8f8fc'
+  }
 }
 
 export default light

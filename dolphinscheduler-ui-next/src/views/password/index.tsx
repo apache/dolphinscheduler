@@ -69,11 +69,11 @@ const password = defineComponent({
                 {t('password.submit')}
               </NButton>
             </div>
-          ),
+          )
         }}
       </Card>
     )
-  },
+  }
 })
 
 export default password

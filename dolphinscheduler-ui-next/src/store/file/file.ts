@@ -22,7 +22,7 @@ export const useFileStore = defineStore({
   id: 'file',
   state: (): FileState => ({
     file: '',
-    currentDir: '/',
+    currentDir: '/'
   }),
   persist: true,
   getters: {
@@ -31,7 +31,7 @@ export const useFileStore = defineStore({
     },
     getCurrentDir(): string {
       return this.currentDir
-    },
+    }
   },
   actions: {
     setFileInfo(file: string): void {
@@ -39,6 +39,6 @@ export const useFileStore = defineStore({
     },
     setCurrentDir(currentDir: string): void {
       this.currentDir = currentDir
-    },
-  },
+    }
+  }
 })

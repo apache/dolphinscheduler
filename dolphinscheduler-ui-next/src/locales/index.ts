@@ -24,8 +24,8 @@ const i18n = createI18n({
   locale: 'zh_CN',
   messages: {
     zh_CN,
-    en_US,
-  },
+    en_US
+  }
 })
 
 export default i18n

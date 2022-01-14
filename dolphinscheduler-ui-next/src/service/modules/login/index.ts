@@ -22,6 +22,6 @@ export function login(data: LoginReq): any {
   return axios({
     url: '/login',
     method: 'post',
-    data,
+    data
   })
 }

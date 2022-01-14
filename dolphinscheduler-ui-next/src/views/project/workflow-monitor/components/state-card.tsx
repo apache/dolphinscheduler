@@ -24,19 +24,19 @@ import type { StateTableData, StateChartData } from '../types'
 
 const props = {
   title: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   date: {
-    type: Array as PropType<Array<any>>,
+    type: Array as PropType<Array<any>>
   },
   tableData: {
     type: Array as PropType<Array<StateTableData>>,
-    default: () => [],
+    default: () => []
   },
   chartData: {
     type: Array as PropType<Array<StateChartData>>,
-    default: () => [],
-  },
+    default: () => []
+  }
 }
 
 const StateCard = defineComponent({
@@ -80,11 +80,11 @@ const StateCard = defineComponent({
               type='datetimerange'
               clearable
             />
-          ),
+          )
         }}
       </Card>
     )
-  },
+  }
 })
 
 export default StateCard

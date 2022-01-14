@@ -19,7 +19,7 @@ import {
   createRouter,
   createWebHistory,
   NavigationGuardNext,
-  RouteLocationNormalized,
+  RouteLocationNormalized
 } from 'vue-router'
 import routes from './routes'
 
@@ -29,7 +29,7 @@ import 'nprogress/nprogress.css'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
 /**

@@ -30,6 +30,6 @@ export function useMenuClick() {
   }
 
   return {
-    handleMenuClick,
+    handleMenuClick
   }
 }

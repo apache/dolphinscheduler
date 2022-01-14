@@ -62,5 +62,5 @@ export {
   ProcessDefinitionRes,
   TaskStateRes,
   TaskQueueRes,
-  CommandStateRes,
+  CommandStateRes
 }
