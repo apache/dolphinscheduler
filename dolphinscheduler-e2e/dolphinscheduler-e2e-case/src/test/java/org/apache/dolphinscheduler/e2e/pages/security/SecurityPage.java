@@ -60,6 +60,7 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
             WebElement menUserManageElement = new WebDriverWait(driver, 60)
                     .until(ExpectedConditions.elementToBeClickable(menUserManage));
             ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
+            new WebDriverWait(driver, 20).until(ExpectedConditions.urlContains("/#/security/users"));
             return tab.cast(new UserPage(driver));
         }
         if (tab == WorkerGroupPage.class) {
