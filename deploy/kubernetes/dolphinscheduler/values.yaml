@@ -184,6 +184,8 @@ master:
     MASTER_TASK_COMMIT_INTERVAL: "1000"
     MASTER_MAX_CPU_LOAD_AVG: "-1"
     MASTER_RESERVED_MEMORY: "0.3"
+    MASTER_FAILOVER_INTERVAL: 10
+    MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER: "true"
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
