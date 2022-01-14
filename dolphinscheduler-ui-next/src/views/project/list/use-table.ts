@@ -73,7 +73,12 @@ export function useTable(
       render: (row: any) =>
         h(TableAction, {
           row,
-          onResetTableData: () => resetTableData(),
+          onResetTableData: () => {
+            if (variables.page > 1 && variables.tableData.length === 1) {
+              variables.page -= 1
+            }
+            resetTableData()
+          },
           onUpdateProjectItem: (code, name, description) =>
             updateProjectItem(code, name, description)
         })
