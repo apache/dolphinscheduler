@@ -17,19 +17,10 @@
 
 """Task Spark."""
 
-from typing import Dict, Optional
+from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core.resource import Resource
-from pydolphinscheduler.core.task import Task
-
-
-class ProgramType(str):
-    """Type of program spark runs, for now it just contain `JAVA`, `SCALA` and `PYTHON`."""
-
-    JAVA = "JAVA"
-    SCALA = "SCALA"
-    PYTHON = "PYTHON"
+from pydolphinscheduler.core.engine import Engine, ProgramType
 
 
 class SparkVersion(str):
@@ -47,12 +38,10 @@ class DeployMode(str):
     CLUSTER = "cluster"
 
 
-class Spark(Task):
+class Spark(Engine):
     """Task spark object, declare behavior for spark task to dolphinscheduler."""
 
     _task_custom_attr = {
-        "main_class",
-        "main_jar",
         "deploy_mode",
         "spark_version",
         "driver_cores",
@@ -61,7 +50,6 @@ class Spark(Task):
         "executor_memory",
         "executor_cores",
         "app_name",
-        "program_type",
         "main_args",
         "others",
     }
@@ -85,11 +73,15 @@ class Spark(Task):
         *args,
         **kwargs
     ):
-        super().__init__(name, TaskType.SPARK, *args, **kwargs)
-        self._resource = Resource()
-        self.main_class = main_class
-        self.main_package = main_package
-        self.program_type = program_type
+        super().__init__(
+            name,
+            TaskType.SPARK,
+            main_class,
+            main_package,
+            program_type,
+            *args,
+            **kwargs
+        )
         self.deploy_mode = deploy_mode
         self.spark_version = spark_version
         self.app_name = app_name
@@ -100,11 +92,3 @@ class Spark(Task):
         self.executor_cores = executor_cores
         self.main_args = main_args
         self.others = others
-
-    @property
-    def main_jar(self) -> Dict:
-        """Return main package of dict."""
-        resource_info = self._resource.get_resource_info(
-            self.program_type, self.main_package
-        )
-        return {"id": resource_info.get("id")}

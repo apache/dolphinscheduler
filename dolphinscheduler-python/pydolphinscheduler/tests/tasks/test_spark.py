@@ -23,7 +23,7 @@ from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark, Spark
 
 
 @patch(
-    "pydolphinscheduler.core.resource.Resource.get_resource_info",
+    "pydolphinscheduler.core.engine.Engine.get_resource_info",
     return_value=({"id": 1, "name": "test"}),
 )
 def test_spark_get_define(mock_resource):
