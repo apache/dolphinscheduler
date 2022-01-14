@@ -79,6 +79,15 @@ const list = defineComponent({
       })
     }
 
+    const onSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    }
+
     const onUpdatePageSize = () => {
       variables.page = 1
       resetTableData()
@@ -110,6 +119,7 @@ const list = defineComponent({
       updateProjectItem,
       resetTableData,
       onUpdatePageSize,
+      onSearch,
       updateProjectData,
       modelStatusRef
     }
@@ -124,6 +134,7 @@ const list = defineComponent({
       updateProjectItem,
       resetTableData,
       onUpdatePageSize,
+      onSearch,
       updateProjectData,
       modelStatusRef
     } = this
@@ -143,8 +154,9 @@ const list = defineComponent({
                 size='small'
                 v-model:value={this.searchVal}
                 placeholder={t('project.list.project_tips')}
+                clearable
               />
-              <NButton size='small' type='primary' onClick={resetTableData}>
+              <NButton size='small' type='primary' onClick={onSearch}>
                 {{
                   icon: () => (
                     <NIcon>

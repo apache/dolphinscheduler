@@ -192,6 +192,7 @@ const resource = {
 const project = {
   list: {
     create_project: 'Create Project',
+    edit_project: 'Edit Project',
     project_list: 'Project List',
     project_tips: 'Please enter your project',
     description_tips: 'Please enter your description',
@@ -232,6 +233,19 @@ const security = {
     delete_confirm: 'Delete?',
     edit: 'Edit',
     delete: 'Delete'
+  },
+  yarn_queue: {
+    create_queue: 'Create Queue',
+    edit_queue: 'Edit Queue',
+    search_tips: 'Please enter keywords',
+    queue_name: 'Queue Name',
+    queue_value: 'Queue Value',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    queue_name_tips: 'Please enter your queue name',
+    queue_value_tips: 'Please enter your queue value'
   }
 }
 

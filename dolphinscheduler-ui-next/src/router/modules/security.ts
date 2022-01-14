@@ -44,6 +44,14 @@ export default {
       meta: {
         title: '用户管理'
       }
+    },
+    {
+      path: '/security/yarn-queue-manage',
+      name: 'yarn-queue-manage',
+      component: components['yarn-queue-manage'],
+      meta: {
+        title: 'Yarn队列管理'
+      }
     }
   ]
 }

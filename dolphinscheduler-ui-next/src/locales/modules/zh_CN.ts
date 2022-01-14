@@ -191,6 +191,7 @@ const resource = {
 const project = {
   list: {
     create_project: '创建项目',
+    edit_project: '编辑项目',
     project_list: '项目列表',
     project_tips: '请输入项目名称',
     description_tips: '请输入项目描述',
@@ -231,6 +232,19 @@ const security = {
     delete_confirm: '确定删除吗?',
     edit: '编辑',
     delete: '删除'
+  },
+  yarn_queue: {
+    create_queue: '创建队列',
+    edit_queue: '编辑队列',
+    search_tips: '请输入关键词',
+    queue_name: '队列名',
+    queue_value: '队列值',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    queue_name_tips: '请输入队列名称',
+    queue_value_tips: '请输入队列值'
   }
 }
 
