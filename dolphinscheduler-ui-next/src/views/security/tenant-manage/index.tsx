@@ -133,7 +133,13 @@ const tenementManage = defineComponent({
             />
           </div>
         </Card>
-        <TenantModal showModalRef={this.showModalRef} statusRef={this.statusRef} row={this.row} onCancelModal={this.onCancelModal} onConfirmModal={this.onConfirmModal}></TenantModal>
+        <TenantModal
+          showModalRef={this.showModalRef}
+          statusRef={this.statusRef}
+          row={this.row}
+          onCancelModal={this.onCancelModal}
+          onConfirmModal={this.onConfirmModal}
+        ></TenantModal>
       </div>
     )
   }
