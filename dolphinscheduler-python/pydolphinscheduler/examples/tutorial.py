@@ -34,8 +34,10 @@ it will instantiate and run all the task it have.
 # [start package_import]
 # Import ProcessDefinition object to define your workflow attributes
 from pydolphinscheduler.core.process_definition import ProcessDefinition
+
 # Import task Shell object cause we would create some shell tasks later
 from pydolphinscheduler.tasks.shell import Shell
+
 # [end package_import]
 
 # [start workflow_declare]
