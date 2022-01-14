@@ -95,7 +95,7 @@ const statistics = defineComponent({
         </NGi>
       </NGrid>
     )
-  },
+  }
 })
 
 export default statistics

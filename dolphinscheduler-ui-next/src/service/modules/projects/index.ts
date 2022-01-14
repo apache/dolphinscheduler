@@ -20,54 +20,54 @@ import { ListReq, ProjectsReq, UserIdReq, UpdateProjectsReq } from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
   return axios({
-    url: `/projects`,
+    url: '/projects',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function createProject(data: ProjectsReq): any {
   return axios({
-    url: `/projects`,
+    url: '/projects',
     method: 'post',
-    data,
+    data
   })
 }
 
 export function queryAuthorizedProject(params: UserIdReq): any {
   return axios({
-    url: `/projects/authed-project`,
+    url: '/projects/authed-project',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryProjectCreatedAndAuthorizedByUser(): any {
   return axios({
-    url: `/projects/created-and-authed`,
-    method: 'get',
+    url: '/projects/created-and-authed',
+    method: 'get'
   })
 }
 
 export function queryAllProjectList(): any {
   return axios({
-    url: `/projects/list`,
-    method: 'get',
+    url: '/projects/list',
+    method: 'get'
   })
 }
 
 export function queryUnauthorizedProject(params: UserIdReq): any {
   return axios({
-    url: `/projects/unauth-project`,
+    url: '/projects/unauth-project',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryProjectByCode(code: number): any {
   return axios({
     url: `/projects/${code}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -75,13 +75,13 @@ export function updateProject(data: UpdateProjectsReq, code: number): any {
   return axios({
     url: `/projects/${code}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteProject(code: number): any {
   return axios({
     url: `/projects/${code}`,
-    method: 'delete',
+    method: 'delete'
   })
 }

@@ -30,4 +30,21 @@ interface IdReq {
   id: number
 }
 
-export { ListReq, QueueReq, IdReq }
+interface QueueList {
+  id: number
+  queueName: string
+  queue: string
+  createTime: string
+  updateTime: string
+}
+
+interface QueueRes {
+  totalList: QueueList[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export { ListReq, QueueReq, IdReq, QueueRes }

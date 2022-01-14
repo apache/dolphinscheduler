@@ -15,15 +15,43 @@
  * limitations under the License.
  */
 
-module.exports = {
-  "useTabs": false,
-  "semi": false,
-  "vueIndentScriptAndStyle": true,
-  "singleQuote": true,
-  "quoteProps": "as-needed",
-  "jsxBracketSameLine": false,
-  "jsxSingleQuote": true,
-  "arrowParens": "always",
-  "htmlWhitespaceSensitivity": "strict",
-  "endOfLine": "lf"
-};
+import { reactive, ref, unref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { FormRules } from 'naive-ui'
+
+const defaultValue = () => ({
+  pid: -1,
+  type: 'FILE',
+  name: '',
+  description: '',
+  currentDir: '/'
+})
+
+export function useForm() {
+  const { t } = useI18n()
+
+  const resetForm = () => {
+    state.folderForm = Object.assign(unref(state.folderForm), defaultValue())
+  }
+
+  const state = reactive({
+    folderFormRef: ref(),
+    folderForm: defaultValue(),
+    rules: {
+      name: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.folderForm.name === '') {
+            return new Error(t('resource.file.enter_name_tips'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
+  return {
+    state,
+    resetForm
+  }
+}

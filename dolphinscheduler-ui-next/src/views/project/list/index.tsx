@@ -22,7 +22,7 @@ import {
   NInput,
   NIcon,
   NDataTable,
-  NPagination,
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
@@ -41,14 +41,14 @@ const list = defineComponent({
     let updateProjectData = reactive({
       code: 0,
       projectName: '',
-      description: '',
+      description: ''
     })
 
     const requestData = () => {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
+        searchVal: variables.searchVal
       })
     }
 
@@ -61,7 +61,7 @@ const list = defineComponent({
       updateProjectData = {
         code: 0,
         projectName: '',
-        description: '',
+        description: ''
       }
       resetTableData()
     }
@@ -75,7 +75,16 @@ const list = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
+        searchVal: variables.searchVal
+      })
+    }
+
+    const onSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
       })
     }
 
@@ -110,8 +119,9 @@ const list = defineComponent({
       updateProjectItem,
       resetTableData,
       onUpdatePageSize,
+      onSearch,
       updateProjectData,
-      modelStatusRef,
+      modelStatusRef
     }
   },
   render() {
@@ -124,8 +134,9 @@ const list = defineComponent({
       updateProjectItem,
       resetTableData,
       onUpdatePageSize,
+      onSearch,
       updateProjectData,
-      modelStatusRef,
+      modelStatusRef
     } = this
     const { columns } = useTable(updateProjectItem, resetTableData)
 
@@ -143,14 +154,15 @@ const list = defineComponent({
                 size='small'
                 v-model:value={this.searchVal}
                 placeholder={t('project.list.project_tips')}
+                clearable
               />
-              <NButton size='small' type='primary' onClick={resetTableData}>
+              <NButton size='small' type='primary' onClick={onSearch}>
                 {{
                   icon: () => (
                     <NIcon>
                       <SearchOutlined />
                     </NIcon>
-                  ),
+                  )
                 }}
               </NButton>
             </div>
@@ -190,7 +202,7 @@ const list = defineComponent({
         )}
       </div>
     )
-  },
+  }
 })
 
 export default list

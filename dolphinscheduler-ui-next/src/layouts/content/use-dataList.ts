@@ -32,7 +32,6 @@ import {
   SettingOutlined,
   FileSearchOutlined,
   RobotOutlined,
-  GroupOutlined,
   AppstoreOutlined,
   UsergroupAddOutlined,
   UserAddOutlined,
@@ -43,6 +42,7 @@ import {
   EnvironmentOutlined,
   KeyOutlined,
   SafetyOutlined,
+  GroupOutlined,
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -123,7 +123,7 @@ export function useDataList() {
       },
       {
         label: t('menu.resources'),
-        key: 'resource',
+        key: 'resources',
         icon: renderIcon(FolderOutlined),
         isShowSide: true,
         children: [

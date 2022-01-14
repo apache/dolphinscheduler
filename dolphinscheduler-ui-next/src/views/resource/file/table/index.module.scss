@@ -15,24 +15,11 @@
  * limitations under the License.
  */
 
-.container {
-  width: 100%;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-
-    .search {
-      display: flex;
-    }
-  }
-
-  .form, .pagination {
-    margin-top: 16px;
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
+.links {
+  color: #2080f0;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
 }

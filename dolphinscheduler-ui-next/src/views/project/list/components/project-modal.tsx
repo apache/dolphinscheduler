@@ -24,15 +24,15 @@ import { createProject, updateProject } from '@/service/modules/projects'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   data: {
-    type: Object as PropType<any>,
+    type: Object as PropType<any>
   },
   status: {
     type: Number as PropType<number>,
-    default: 0,
-  },
+    default: 0
+  }
 }
 
 const ProjectModal = defineComponent({
@@ -68,10 +68,14 @@ const ProjectModal = defineComponent({
     return { ...toRefs(state), t, onConfirm, onCancel }
   },
   render() {
-    const { t, onConfirm, onCancel, show } = this
+    const { t, onConfirm, onCancel, show, status } = this
     return (
       <Modal
-        title={t('project.list.create_project')}
+        title={
+          status === 0
+            ? t('project.list.create_project')
+            : t('project.list.edit_project')
+        }
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
@@ -105,7 +109,7 @@ const ProjectModal = defineComponent({
         </NForm>
       </Modal>
     )
-  },
+  }
 })
 
 export default ProjectModal

@@ -21,29 +21,29 @@ const login = {
   userName_tips: 'Please enter your username',
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
-  login: 'Login',
+  login: 'Login'
 }
 
 const modal = {
   cancel: 'Cancel',
-  confirm: 'Confirm',
+  confirm: 'Confirm'
 }
 
 const theme = {
   light: 'Light',
-  dark: 'Dark',
+  dark: 'Dark'
 }
 
 const userDropdown = {
   profile: 'Profile',
   password: 'Password',
-  logout: 'Logout',
+  logout: 'Logout'
 }
 
 const menu = {
   home: 'Home',
   project: 'Project',
-  resource: 'Resources',
+  resources: 'Resources',
   datasource: 'Datasource',
   monitor: 'Monitor',
   security: 'Security',
@@ -71,10 +71,7 @@ const menu = {
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environmental_manage: 'Environmental Manage',
-  token_manage: 'Token Manage',
-  task_group_manage: 'Task group manage',
-  task_group_option: 'Task group option',
-  task_group_queue: 'Task group queue',
+  token_manage: 'Token Manage'
 }
 
 const home = {
@@ -82,7 +79,7 @@ const home = {
   process_state_statistics: 'Process State Statistics',
   process_definition_statistics: 'Process Definition Statistics',
   number: 'Number',
-  state: 'State',
+  state: 'State'
 }
 
 const password = {
@@ -92,8 +89,8 @@ const password = {
   password_tips: 'Please enter your password',
   confirm_password_tips: 'Please enter your confirm password',
   two_password_entries_are_inconsistent:
-    'Two password entries are inconsistent',
-  submit: 'Submit',
+      'Two password entries are inconsistent',
+  submit: 'Submit'
 }
 
 const profile = {
@@ -115,7 +112,7 @@ const profile = {
   phone_tips: 'Please enter your phone',
   state_tips: 'Please choose your state',
   enable: 'Enable',
-  disable: 'Disable',
+  disable: 'Disable'
 }
 
 const monitor = {
@@ -127,7 +124,7 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory',
+    directory: 'Directory'
   },
   worker: {
     cpu_usage: 'CPU Usage',
@@ -137,48 +134,59 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory',
+    directory: 'Directory'
   },
   db: {
     health_state: 'Health State',
     max_connections: 'Max Connections',
     threads_connections: 'Threads Connections',
-    threads_running_connections: 'Threads Running Connections',
+    threads_running_connections: 'Threads Running Connections'
   },
   statistics: {
     command_number_of_waiting_for_running:
         'Command Number Of Waiting For Running',
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
-    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
-  },
-}
-
-const project = {
-  list: {
-    create_project: 'Create Project',
-    project_list: 'Project List',
-    project_tips: 'Please enter your project',
-    description_tips: 'Please enter your description',
-    username_tips: 'Please enter your username',
-    project_name: 'Project Name',
-    project_description: 'Project Description',
-    owned_users: 'Owned Users',
-    workflow_define_count: 'Workflow Define Count',
-    process_instance_running_count: 'Process Instance Running Count',
-    description: 'Description',
-    create_time: 'Create Time',
-    update_time: 'Update Time',
-    operation: 'Operation',
-    edit: 'Edit',
-    delete: 'Delete',
-    confirm: 'Confirm',
-    cancel: 'Cancel',
-    delete_confirm: 'Delete?',
-  },
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+  }
 }
 
 const resource = {
+  file: {
+    file_manage: 'File Manage',
+    create_folder: 'Create Folder',
+    create_file: 'Create File',
+    upload_files: 'Upload Files',
+    enter_keyword_tips: 'Please enter keyword',
+    id: '#',
+    name: 'Name',
+    user_name: 'Resource userName',
+    whether_directory: 'Whether directory',
+    file_name: 'File Name',
+    description: 'Description',
+    size: 'Size',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    rename: 'Rename',
+    download: 'Download',
+    delete: 'Delete',
+    yes: 'Yes',
+    no: 'No',
+    folder_name: 'Folder Name',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description',
+    enter_content_tips: 'Please enter the resource content',
+    file_format: 'File Format',
+    file_content: 'File Content',
+    delete_confirm: 'Delete?',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    success: 'Success',
+    file_details: 'File Details',
+    return: 'Return',
+    save: 'Save'
+  },
   task_group_option: {
     id: 'No.',
     manage: 'Task group manage',
@@ -222,6 +230,66 @@ const resource = {
   }
 }
 
+const project = {
+  list: {
+    create_project: 'Create Project',
+    edit_project: 'Edit Project',
+    project_list: 'Project List',
+    project_tips: 'Please enter your project',
+    description_tips: 'Please enter your description',
+    username_tips: 'Please enter your username',
+    project_name: 'Project Name',
+    project_description: 'Project Description',
+    owned_users: 'Owned Users',
+    workflow_define_count: 'Workflow Define Count',
+    process_instance_running_count: 'Process Instance Running Count',
+    description: 'Description',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    delete_confirm: 'Delete?'
+  }
+}
+
+const security = {
+  tenant: {
+    tenant_manage: 'Tenant Manage',
+    create_tenant: 'Create Tenant',
+    search_tips: 'Please enter keywords',
+    num: 'Serial number',
+    tenant_code: 'Operating System Tenant',
+    description: 'Description',
+    queue_name: 'QueueName',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    actions: 'Operation',
+    edit_tenant: 'Edit Tenant',
+    tenant_code_tips: 'Please enter the operating system tenant',
+    queue_name_tips: 'Please select queue',
+    description_tips: 'Please enter a description',
+    delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete'
+  },
+  yarn_queue: {
+    create_queue: 'Create Queue',
+    edit_queue: 'Edit Queue',
+    search_tips: 'Please enter keywords',
+    queue_name: 'Queue Name',
+    queue_value: 'Queue Value',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    queue_name_tips: 'Please enter your queue name',
+    queue_value_tips: 'Please enter your queue value'
+  }
+}
+
 export default {
   login,
   modal,
@@ -232,6 +300,7 @@ export default {
   password,
   profile,
   monitor,
-  project,
   resource,
+  project,
+  security
 }

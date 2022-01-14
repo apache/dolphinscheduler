@@ -27,7 +27,7 @@ export function useProcessDefinition() {
   const getProcessDefinition = () => {
     const { state } = useAsyncState(
       countDefinitionByUser({
-        projectCode: Number(route.params.projectCode),
+        projectCode: Number(route.params.projectCode)
       }).then((res: ProcessDefinitionRes): DefinitionChartData => {
         const xAxisData = res.userList.map((item) => item.userName)
         const seriesData = res.userList.map((item) => item.count)

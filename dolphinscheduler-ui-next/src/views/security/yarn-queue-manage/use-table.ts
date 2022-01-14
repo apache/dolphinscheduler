@@ -16,101 +16,77 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm } from 'naive-ui'
+import { NButton, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import { queryQueueListPaging } from '@/service/modules/queues'
+import { EditOutlined } from '@vicons/antd'
+import type { QueueRes } from '@/service/modules/queues/types'
 
 export function useTable() {
   const { t } = useI18n()
 
-  const handleEdit= (row: any) => {
+  const handleEdit = (row: any) => {
     variables.showModalRef = true
     variables.statusRef = 1
     variables.row = row
   }
 
-  const handleDelete = (row: any) => {
-    deleteTenantById(row.id).then(() => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    })
-  }
-
-  const createColumns = () => {
-    return [
+  const createColumns = (variables: any) => {
+    variables.columns = [
       {
-        title: '编号',
-        key: 'num',
+        title: '#',
+        key: 'index'
       },
       {
-        title: '操作系统租户',
-        key: 'tenantCode',
+        title: t('security.yarn_queue.queue_name'),
+        key: 'queueName'
       },
       {
-        title: '描述',
-        key: 'description',
+        title: t('security.yarn_queue.queue_value'),
+        key: 'queue'
       },
       {
-        title: '队列',
-        key: 'queueName',
+        title: t('security.yarn_queue.create_time'),
+        key: 'createTime'
       },
       {
-        title: '创建时间',
-        key: 'createTime',
+        title: t('security.yarn_queue.update_time'),
+        key: 'updateTime'
       },
       {
-        title: '更新时间',
-        key: 'updateTime',
-      },
-      {
-        title: '操作',
-        key: 'actions',
+        title: t('security.yarn_queue.operation'),
+        key: 'operation',
         render(row: any) {
-          return h('div', null, [
-            h(
-              NButton,
-              {
-                size: 'small',
-                onClick: () => {
-                  handleEdit(row)
-                }
-              },
-              {
-                icon: () => h(EditOutlined)
-              }
-            ),
-            h(
-              NPopconfirm,
-              {
-                onPositiveClick: () => { handleDelete(row) }
-              },
-              {
-                trigger: () => h(
+          return h(
+            NTooltip,
+            {},
+            {
+              trigger: () =>
+                h(
                   NButton,
                   {
+                    circle: true,
+                    type: 'info',
                     size: 'small',
-                    style: {'margin-left': '5px'},
+                    onClick: () => {
+                      handleEdit(row)
+                    }
                   },
                   {
-                    icon: () => h(DeleteOutlined),
+                    icon: () => h(EditOutlined)
                   }
                 ),
-                default: () => {return '确定删除吗?'}
-              }
-            )
-          ])
+              default: () => t('security.yarn_queue.edit')
+            }
+          )
         }
       }
     ]
   }
 
   const variables = reactive({
-    columns: createColumns(),
+    columns: [],
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
@@ -123,13 +99,13 @@ export function useTable() {
 
   const getTableData = (params: any) => {
     const { state } = useAsyncState(
-      queryTenantListPaging({ ...params }).then((res: any) => {
-        variables.tableData = res.totalList.map((item: any, index: number) => {
+      queryQueueListPaging({ ...params }).then((res: QueueRes) => {
+        variables.tableData = res.totalList.map((item, index) => {
           return {
-            num: index + 1,
-            ...item,
+            index: index + 1,
+            ...item
           }
-        })
+        }) as any
         variables.totalPage = res.totalPage
       }),
       {}
@@ -141,5 +117,6 @@ export function useTable() {
   return {
     variables,
     getTableData,
+    createColumns
   }
 }

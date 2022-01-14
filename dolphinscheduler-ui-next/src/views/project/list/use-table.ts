@@ -49,20 +49,20 @@ export function useTable(
           {
             class: styles.links,
             onClick: () =>
-              router.push({ path: `/projects/${row.code}/workflow-monitor` }),
+              router.push({ path: `/projects/${row.code}/workflow-monitor` })
           },
           {
             default: () => {
               return row.name
-            },
+            }
           }
-        ),
+        )
     },
     { title: t('project.list.owned_users'), key: 'userName' },
     { title: t('project.list.workflow_define_count'), key: 'defCount' },
     {
       title: t('project.list.process_instance_running_count'),
-      key: 'instRunningCount',
+      key: 'instRunningCount'
     },
     { title: t('project.list.description'), key: 'description' },
     { title: t('project.list.create_time'), key: 'createTime' },
@@ -73,11 +73,16 @@ export function useTable(
       render: (row: any) =>
         h(TableAction, {
           row,
-          onResetTableData: () => resetTableData(),
+          onResetTableData: () => {
+            if (variables.page > 1 && variables.tableData.length === 1) {
+              variables.page -= 1
+            }
+            resetTableData()
+          },
           onUpdateProjectItem: (code, name, description) =>
-            updateProjectItem(code, name, description),
-        }),
-    },
+            updateProjectItem(code, name, description)
+        })
+    }
   ]
 
   const variables = reactive({
@@ -85,7 +90,7 @@ export function useTable(
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    totalPage: ref(1),
+    totalPage: ref(1)
   })
 
   const getTableData = (params: any) => {
@@ -103,7 +108,7 @@ export function useTable(
           )
           return {
             index: index + 1,
-            ...item,
+            ...item
           }
         }) as any
       }),
