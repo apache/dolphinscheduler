@@ -95,7 +95,7 @@ class EnvironmentE2ETest {
     @Order(30)
     void testEditEnvironment() {
         final EnvironmentPage page = new EnvironmentPage(browser);
-        page.update(editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc, editEnvironmentWorkerGroup);
+        page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc, editEnvironmentWorkerGroup);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();

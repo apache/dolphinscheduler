@@ -65,10 +65,10 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         return this;
     }
 
-    public EnvironmentPage update(String name, String config, String desc, String workerGroup) {
+    public EnvironmentPage update(String oldName, String name, String config, String desc, String workerGroup) {
         environmentList()
                 .stream()
-                .filter(it -> it.findElement(By.className("environmentName")).getAttribute("innerHTML").contains(name))
+                .filter(it -> it.findElement(By.className("environmentName")).getAttribute("innerHTML").contains(oldName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
