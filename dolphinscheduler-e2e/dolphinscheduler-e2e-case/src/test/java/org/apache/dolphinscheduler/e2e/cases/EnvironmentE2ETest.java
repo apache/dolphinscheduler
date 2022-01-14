@@ -41,43 +41,25 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class EnvironmentE2ETest {
 
-    private static final String workerGroup = "test_worker_group";
-
     private static final String environmentName = "test_environment_name";
     private static final String environmentConfig = "test_environment_config";
     private static final String environmentDesc = "test_environment_desc";
-    private static final String environmentWorkerGroup = "[\"" + workerGroup + "\"]";
+    private static final String environmentWorkerGroup = "[\"default\"]";
 
     private static final String editEnvironmentName = "edit_environment_name";
     private static final String editEnvironmentConfig = "edit_environment_config";
     private static final String editEnvironmentDesc = "edit_environment_desc";
-    private static final String editEnvironmentWorkerGroup = "[\"" + workerGroup + "\"]";
+    private static final String editEnvironmentWorkerGroup = "[\"default\"]";
 
     private static RemoteWebDriver browser;
 
     @BeforeAll
     public static void setup() {
-        WorkerGroupPage workerGroupPage = new LoginPage(browser)
+        new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
-                .goToTab(WorkerGroupPage.class)
-                .create(workerGroup);
-
-        await().untilAsserted(() -> assertThat(workerGroupPage.workerGroupList())
-                .as("WorkerGroup list should contain newly-created workerGroup")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(workerGroup)));
-
-        workerGroupPage.goToNav(SecurityPage.class)
-                .goToTab(EnvironmentPage.class);
-    }
-
-    @AfterAll
-    public static void cleanup() {
-        new NavBarPage(browser)
-                .goToNav(SecurityPage.class)
-                .goToTab(WorkerGroupPage.class)
-                .delete(workerGroup);
+                .goToTab(EnvironmentPage.class)
+        ;
     }
 
     @Test
