@@ -27,9 +27,44 @@ concurrency:
   group: e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+
 jobs:
+  build:
+    name: E2E-Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Build Image
+        run: |
+          ./mvnw -B clean install \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dmaven.checkstyle.skip \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl dolphinscheduler-standalone-server -am
+      - name: Export Docker Images
+        run: |
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
+          && du -sh /tmp/standalone-image.tar
+      - uses: actions/upload-artifact@v2
+        name: Upload Docker Images
+        with:
+          name: standalone-image
+          path: /tmp/standalone-image.tar
+          retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -54,22 +89,20 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
-      - name: Build Image
+      - uses: actions/download-artifact@v2
+        name: Download Docker Images
+        with:
+          name: standalone-image
+          path: /tmp
+      - name: Load Docker Images
         run: |
-          ./mvnw -B clean install \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
-          -Dmaven.checkstyle.skip \
-          -Pdocker,release -Ddocker.tag=ci \
-          -pl dolphinscheduler-standalone-server -am
+            docker load -i /tmp/standalone-image.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
