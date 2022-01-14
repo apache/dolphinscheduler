@@ -233,7 +233,7 @@
           <div slot="content">
             <m-select-input
               v-model="delayTime"
-              :list="[0, 1, 5, 10]"
+              :list="[]"
             ></m-select-input>
             <span>({{ $t("Minute") }})</span>
           </div>

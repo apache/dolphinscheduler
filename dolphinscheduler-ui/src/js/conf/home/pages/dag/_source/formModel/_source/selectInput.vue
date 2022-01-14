@@ -73,10 +73,8 @@
       _onChange (o) {
         const r = /^\+?[1-9][0-9]*$/; // 正整数
         if (!r.test(o)) {
-          console.log("非正整数", o)
           this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
         } else {
-          console.log("正整数", o)
           this.$emit('valueEvent', +o)
           this._setIconState(+o)
         }
