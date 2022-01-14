@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="clearfix list" v-if="enable">
+    <div class="clearfix list" v-if="false">
       <div class="text-box">
         <span>{{$t('Waiting Dependent start')}}</span>
       </div>
