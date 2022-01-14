@@ -547,6 +547,13 @@
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
       taskToBackfillItem (task) {
+        let strategy = ''
+        if (this.nodeData.taskType === 'DEPENDENT') {
+          strategy = task.timeoutNotifyStrategy === 'WARNFAILED' ? 'WARN,FAILED' : task.timeoutNotifyStrategy
+        } else {
+          strategy = task.timeoutNotifyStrategy
+        }
+
         return {
           code: task.code,
           conditionResult: task.taskParams.conditionResult,
@@ -568,7 +575,7 @@
           taskInstancePriority: task.taskPriority,
           timeout: {
             interval: task.timeout,
-            strategy: task.timeoutNotifyStrategy,
+            strategy,
             enable: task.timeoutFlag === 'OPEN'
           },
           type: task.taskType,
@@ -754,6 +761,7 @@
         }
         this.successBranch && (this.conditionResult.successNode[0] = this.successBranch)
         this.failedBranch && (this.conditionResult.failedNode[0] = this.failedBranch)
+
         this.$emit('addTaskInfo', {
           item: {
             code: this.nodeData.id,
@@ -773,7 +781,7 @@
             failRetryTimes: this.maxRetryTimes,
             failRetryInterval: this.retryInterval,
             timeoutFlag: this.timeout.enable ? 'OPEN' : 'CLOSE',
-            timeoutNotifyStrategy: this.timeout.strategy,
+            timeoutNotifyStrategy: this.timeout.strategy.indexOf(',') > 0 ? 'WARNFAILED' : this.timeout.strategy,
             timeout: this.timeout.interval || 0,
             delayTime: this.delayTime,
             environmentCode: this.environmentCode || -1,
