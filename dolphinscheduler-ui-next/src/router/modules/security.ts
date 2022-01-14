@@ -34,16 +34,16 @@ export default {
       name: 'tenant-manage',
       component: components['tenant-manage'],
       meta: {
-        title: '租户管理',
-      },
+        title: '租户管理'
+      }
     },
     {
       path: '/security/users',
       name: 'users-manage',
       component: components['home'],
       meta: {
-        title: '用户管理',
-      },
-    },
-  ],
+        title: '用户管理'
+      }
+    }
+  ]
 }

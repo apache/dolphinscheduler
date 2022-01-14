@@ -22,7 +22,7 @@ import {
   NConfigProvider,
   darkTheme,
   GlobalThemeOverrides,
-  NMessageProvider,
+  NMessageProvider
 } from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
 import { useLocalesStore } from '@/store/locales/locales'
@@ -34,7 +34,7 @@ const App = defineComponent({
     const isRouterAlive = ref(true)
     const themeStore = useThemeStore()
     const currentTheme = computed(() =>
-      themeStore.darkTheme ? darkTheme : undefined,
+      themeStore.darkTheme ? darkTheme : undefined
     )
     const localesStore = useLocalesStore()
     /*refresh page when router params change*/
@@ -51,7 +51,7 @@ const App = defineComponent({
       reload,
       isRouterAlive,
       currentTheme,
-      localesStore,
+      localesStore
     }
   },
   render() {
@@ -70,7 +70,7 @@ const App = defineComponent({
         </NMessageProvider>
       </NConfigProvider>
     )
-  },
+  }
 })
 
 export default App

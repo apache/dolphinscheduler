@@ -20,6 +20,6 @@ import { axios } from '@/service/service'
 export function logout(): any {
   return axios({
     url: '/signOut',
-    method: 'post',
+    method: 'post'
   })
 }

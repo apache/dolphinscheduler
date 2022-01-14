@@ -24,7 +24,7 @@ const defaultValue = () => ({
   file: '',
   description: '',
   pid: -1,
-  currentDir: '/',
+  currentDir: '/'
 })
 
 export function useForm() {
@@ -45,7 +45,7 @@ export function useForm() {
           if (state.uploadForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
-        },
+        }
       },
       file: {
         required: true,
@@ -54,13 +54,13 @@ export function useForm() {
           if (state.uploadForm.file === '') {
             return new Error(t('resource.file.enter_content_tips'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return {
     state,
-    resetForm,
+    resetForm
   }
 }

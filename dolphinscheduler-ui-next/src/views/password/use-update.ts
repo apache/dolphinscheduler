@@ -36,7 +36,7 @@ export function useUpdate(state: any) {
           tenantId: userInfo.tenantId,
           email: userInfo.email,
           phone: userInfo.phone,
-          state: userInfo.state,
+          state: userInfo.state
         })
 
         await userStore.setSessionId('')
@@ -47,6 +47,6 @@ export function useUpdate(state: any) {
   }
 
   return {
-    handleUpdate,
+    handleUpdate
   }
 }

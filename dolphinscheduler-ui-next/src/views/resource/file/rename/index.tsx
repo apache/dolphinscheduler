@@ -24,20 +24,20 @@ import { useRename } from './use-rename'
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   id: {
     type: Number as PropType<number>,
-    default: -1,
+    default: -1
   },
   name: {
     type: String as PropType<string>,
-    default: '',
+    default: ''
   },
   description: {
     type: String as PropType<string>,
-    default: '',
-  },
+    default: ''
+  }
 }
 
 export default defineComponent({
@@ -62,7 +62,7 @@ export default defineComponent({
         state.renameForm.id = props.id
         state.renameForm.name = props.name
         state.renameForm.description = props.description
-      },
+      }
     )
 
     return { hideModal, handleFile, ...toRefs(state) }
@@ -98,5 +98,5 @@ export default defineComponent({
         </NForm>
       </Modal>
     )
-  },
+  }
 })

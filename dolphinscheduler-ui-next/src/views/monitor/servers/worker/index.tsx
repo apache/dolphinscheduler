@@ -30,13 +30,13 @@ import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 const master = defineComponent({
   name: 'master',
   setup() {
-    let showModalRef = ref(false)
+    const showModalRef = ref(false)
     const { t } = useI18n()
     const { getWorker } = useWorker()
     const workerRef: Ref<Array<WorkerRes>> = ref(getWorker())
     const columnsRef: TableColumns<any> = [
       { title: '#', key: 'index' },
-      { title: t('monitor.worker.directory'), key: 'directory' },
+      { title: t('monitor.worker.directory'), key: 'directory' }
     ]
 
     return { t, workerRef, showModalRef, columnsRef }
@@ -127,12 +127,12 @@ const master = defineComponent({
                   striped
                   size={'small'}
                 />
-              ),
+              )
           }}
         </Modal>
       </div>
     )
-  },
+  }
 })
 
 export default master

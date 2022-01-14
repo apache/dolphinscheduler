@@ -22,7 +22,7 @@ import {
   PropType,
   nextTick,
   ref,
-  watch,
+  watch
 } from 'vue'
 import * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
@@ -34,20 +34,20 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 const props = {
   modelValue: {
     type: String as PropType<string>,
-    default: '',
+    default: ''
   },
   language: {
     type: String as PropType<string>,
-    default: 'shell',
+    default: 'shell'
   },
   readOnly: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   options: {
     type: Object,
-    default: () => {},
-  },
+    default: () => {}
+  }
 }
 
 // @ts-ignore
@@ -66,7 +66,7 @@ window.MonacoEnvironment = {
       return new tsWorker()
     }
     return new editorWorker()
-  },
+  }
 }
 
 export default defineComponent({
@@ -83,7 +83,7 @@ export default defineComponent({
         if (val !== getValue()) {
           editor?.setValue(val)
         }
-      },
+      }
     )
 
     onMounted(async () => {
@@ -96,7 +96,7 @@ export default defineComponent({
           value: props.modelValue,
           language: props.language,
           readOnly: props.readOnly,
-          automaticLayout: true,
+          automaticLayout: true
         })
       }
     })
@@ -113,9 +113,9 @@ export default defineComponent({
         id='monaco-container'
         style={{
           height: '300px',
-          border: '1px solid #eee',
+          border: '1px solid #eee'
         }}
       ></div>
     )
-  },
+  }
 })

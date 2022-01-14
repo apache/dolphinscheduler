@@ -22,15 +22,15 @@ import type { Ref } from 'vue'
 const props = {
   height: {
     type: [String, Number] as PropType<string | number>,
-    default: 590,
+    default: 590
   },
   width: {
     type: [String, Number] as PropType<string | number>,
-    default: '100%',
+    default: '100%'
   },
   data: {
-    type: Array as PropType<Array<any>>,
-  },
+    type: Array as PropType<Array<any>>
+  }
 }
 
 const PieChart = defineComponent({
@@ -42,11 +42,11 @@ const PieChart = defineComponent({
     const option = {
       tooltip: {
         trigger: 'item',
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
       },
       legend: {
         bottom: '0%',
-        left: 'center',
+        left: 'center'
       },
       series: [
         {
@@ -56,14 +56,14 @@ const PieChart = defineComponent({
           avoidLabelOverlap: false,
           label: {
             show: false,
-            position: 'center',
+            position: 'center'
           },
           labelLine: {
-            show: false,
+            show: false
           },
-          data: props.data,
-        },
-      ],
+          data: props.data
+        }
+      ]
     }
 
     initChart(pieChartRef, option)
@@ -77,11 +77,11 @@ const PieChart = defineComponent({
         ref='pieChartRef'
         style={{
           height: typeof height === 'number' ? height + 'px' : height,
-          width: typeof width === 'number' ? width + 'px' : width,
+          width: typeof width === 'number' ? width + 'px' : width
         }}
       />
     )
-  },
+  }
 })
 
 export default PieChart
