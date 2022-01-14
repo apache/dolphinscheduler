@@ -71,7 +71,8 @@
     },
     methods: {
       _onChange (o) {
-        const r = /^\+?[1-9][0-9]*$/; // 正整数
+        // 正整数判断
+        const r = /^\+?[1-9][0-9]*$/
         if (!r.test(o)) {
           this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
         } else {
