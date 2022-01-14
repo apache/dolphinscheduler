@@ -15,24 +15,28 @@
  * limitations under the License.
  */
 
-.container {
-  width: 100%;
+import { defineComponent } from 'vue'
+import { useProfile } from '../use-profile'
+import styles from '../info.module.scss'
 
-  .header {
-    display: flex;
-    justify-content: space-between;
+const Info = defineComponent({
+  name: 'Info',
+  render() {
+    const { infoOptions } = useProfile()
 
-    .search {
-      display: flex;
-    }
+    return (
+      <dl class={styles.container}>
+        {infoOptions.value.map((item) => {
+          return (
+            <dd class={styles.item}>
+              <span class={styles.label}>{item.key}: </span>
+              <span>{item.value}</span>
+            </dd>
+          )
+        })}
+      </dl>
+    )
   }
+})
 
-  .form, .pagination {
-    margin-top: 16px;
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-  }
-}
+export default Info

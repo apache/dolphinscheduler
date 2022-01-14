@@ -16,14 +16,14 @@
  */
 
 import { defineComponent, PropType } from 'vue'
-import { useProcessDefinition } from './use-process-definition'
+import { useProcessDefinition } from '../use-process-definition'
 import BarChart from '@/components/chart/modules/Bar'
 import Card from '@/components/card'
 
 const props = {
   title: {
-    type: String as PropType<string>,
-  },
+    type: String as PropType<string>
+  }
 }
 
 const DefinitionCard = defineComponent({
@@ -39,20 +39,21 @@ const DefinitionCard = defineComponent({
     const { title, processDefinition } = this
 
     return (
-      <Card title={title}>
-        {{
-          default: () =>
-            processDefinition.xAxisData.length > 0 &&
-            processDefinition.seriesData.length > 0 && (
+      processDefinition.xAxisData.length > 0 &&
+      processDefinition.seriesData.length > 0 && (
+        <Card title={title}>
+          {{
+            default: () => (
               <BarChart
                 xAxisData={processDefinition.xAxisData}
                 seriesData={processDefinition.seriesData}
               />
-            ),
-        }}
-      </Card>
+            )
+          }}
+        </Card>
+      )
     )
-  },
+  }
 })
 
 export default DefinitionCard

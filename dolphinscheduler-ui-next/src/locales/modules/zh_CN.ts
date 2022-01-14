@@ -21,23 +21,23 @@ const login = {
   userName_tips: '请输入用户名',
   userPassword: '密码',
   userPassword_tips: '请输入密码',
-  login: '登录',
+  login: '登录'
 }
 
 const modal = {
   cancel: '取消',
-  confirm: '确定',
+  confirm: '确定'
 }
 
 const theme = {
   light: '浅色',
-  dark: '深色',
+  dark: '深色'
 }
 
 const userDropdown = {
   profile: '用户信息',
   password: '密码管理',
-  logout: '退出登录',
+  logout: '退出登录'
 }
 
 const menu = {
@@ -71,7 +71,7 @@ const menu = {
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
   environmental_manage: '环境管理',
-  token_manage: '令牌管理',
+  token_manage: '令牌管理'
 }
 
 const home = {
@@ -79,7 +79,7 @@ const home = {
   process_state_statistics: '流程状态统计',
   process_definition_statistics: '流程定义统计',
   number: '数量',
-  state: '状态',
+  state: '状态'
 }
 
 const password = {
@@ -89,7 +89,7 @@ const password = {
   password_tips: '请输入密码',
   confirm_password_tips: '请输入确认密码',
   two_password_entries_are_inconsistent: '两次密码输入不一致',
-  submit: '提交',
+  submit: '提交'
 }
 
 const profile = {
@@ -111,7 +111,7 @@ const profile = {
   phone_tips: '请输入手机号',
   state_tips: '请选择状态',
   enable: '启用',
-  disable: '禁用',
+  disable: '禁用'
 }
 
 const monitor = {
@@ -123,7 +123,7 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录',
+    directory: '注册目录'
   },
   worker: {
     cpu_usage: '处理器使用量',
@@ -133,20 +133,59 @@ const monitor = {
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
-    directory: '注册目录',
+    directory: '注册目录'
   },
   db: {
     health_state: '健康状态',
     max_connections: '最大连接数',
     threads_connections: '当前连接数',
-    threads_running_connections: '数据库当前活跃连接数',
+    threads_running_connections: '数据库当前活跃连接数'
   },
   statistics: {
     command_number_of_waiting_for_running: '待执行的命令数',
     failure_command_number: '执行失败的命令数',
     tasks_number_of_waiting_running: '待运行任务数',
-    task_number_of_ready_to_kill: '待杀死任务数',
-  },
+    task_number_of_ready_to_kill: '待杀死任务数'
+  }
+}
+
+const resource = {
+  file: {
+    file_manage: '文件管理',
+    create_folder: '创建文件夹',
+    create_file: '创建文件',
+    upload_files: '上传文件',
+    enter_keyword_tips: '请输入关键词',
+    id: '编号',
+    name: '名称',
+    user_name: '所属用户',
+    whether_directory: '是否文件夹',
+    file_name: '文件名称',
+    description: '描述',
+    size: '大小',
+    update_time: '更新时间',
+    operation: '操作',
+    edit: '编辑',
+    rename: '重命名',
+    download: '下载',
+    delete: '删除',
+    yes: '是',
+    no: '否',
+    folder_name: '文件夹名称',
+    enter_name_tips: '请输入名称',
+    enter_description_tips: '请输入描述',
+    enter_content_tips: '请输入资源内容',
+    enter_suffix_tips: '请输入文件后缀',
+    file_format: '文件格式',
+    file_content: '文件内容',
+    delete_confirm: '确定删除吗?',
+    confirm: '确定',
+    cancel: '取消',
+    success: '成功',
+    file_details: '文件详情',
+    return: '返回',
+    save: '保存'
+  }
 }
 
 const project = {
@@ -169,8 +208,30 @@ const project = {
     delete: '删除',
     confirm: '确定',
     cancel: '取消',
+    delete_confirm: '确定删除吗?'
+  }
+}
+
+const security = {
+  tenant: {
+    tenant_manage: '租户管理',
+    create_tenant: '创建租户',
+    search_tips: '请输入关键词',
+    num: '编号',
+    tenant_code: '操作系统租户',
+    description: '描述',
+    queue_name: '队列',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    actions: '操作',
+    edit_tenant: '编辑租户',
+    tenant_code_tips: '请输入操作系统租户',
+    queue_name_tips: '请选择队列',
+    description_tips: '请输入描述',
     delete_confirm: '确定删除吗?',
-  },
+    edit: '编辑',
+    delete: '删除'
+  }
 }
 
 export default {
@@ -183,5 +244,7 @@ export default {
   password,
   profile,
   monitor,
+  resource,
   project,
+  security
 }

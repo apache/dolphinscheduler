@@ -16,17 +16,22 @@
  */
 
 import { reactive, ref, SetupContext } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryList } from '@/service/modules/queues'
-import { verifyTenantCode, createTenant } from '@/service/modules/tenants'
+import {
+  verifyTenantCode,
+  createTenant,
+  updateTenant
+} from '@/service/modules/tenants'
 
-export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "confirmModal")[]>) {
-  const { t } = useI18n()
-
+export function useModalData(
+  props: any,
+  ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
+) {
   const variables = reactive({
     tenantFormRef: ref(),
     model: {
+      id: ref<number>(-1),
       tenantCode: ref(''),
       description: ref(''),
       queueId: ref<number>(-1),
@@ -59,30 +64,47 @@ export function useModalData(props: any, ctx: SetupContext<("cancelModal" | "con
     return state
   }
 
-  const handleValidate = () => {
+  const handleValidate = (statusRef: number) => {
     variables.tenantFormRef.validate((errors: any) => {
       if (!errors) {
-        console.log('验证成功')
-        submitTenantModal()
+        statusRef === 0 ? submitTenantModal() : updateTenantModal()
       } else {
-        console.log(errors, '验证失败')
         return
       }
     })
   }
 
   const submitTenantModal = () => {
-    verifyTenantCode({tenantCode: variables.model.tenantCode}).then((res: any) => {
-      const data = {
-        tenantCode: variables.model.tenantCode,
-        queueId: variables.model.queueId,
-        description: variables.model.description
+    verifyTenantCode({ tenantCode: variables.model.tenantCode }).then(
+      (res: any) => {
+        const data = {
+          tenantCode: variables.model.tenantCode,
+          queueId: variables.model.queueId,
+          description: variables.model.description
+        }
+        createTenant(data).then(
+          (res: any) => {
+            variables.model.tenantCode = ''
+            variables.model.description = ''
+            ctx.emit('confirmModal', props.showModalRef)
+          },
+          (err: any) => {
+            return
+          }
+        )
       }
-      createTenant(data).then((res: any) => {
-        ctx.emit('confirmModal', props.showModalRef)
-      }, (err: any) => {
-        console.log('err', err)
-      })
+    )
+  }
+
+  const updateTenantModal = () => {
+    const data = {
+      tenantCode: variables.model.tenantCode,
+      queueId: variables.model.queueId,
+      description: variables.model.description,
+      id: variables.model.id
+    }
+    updateTenant(data, { id: variables.model.id }).then((res: any) => {
+      ctx.emit('confirmModal', props.showModalRef)
     })
   }
 

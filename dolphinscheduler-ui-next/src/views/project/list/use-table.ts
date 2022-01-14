@@ -20,8 +20,10 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryProjectListPaging } from '@/service/modules/projects'
 import { format } from 'date-fns'
-import TableAction from './table-action'
+import { useRouter } from 'vue-router'
+import TableAction from './components/table-action'
 import styles from './index.module.scss'
+import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { ProjectRes } from '@/service/modules/projects/types'
 
@@ -34,6 +36,7 @@ export function useTable(
   resetTableData = () => {}
 ) {
   const { t } = useI18n()
+  const router: Router = useRouter()
 
   const columns: TableColumns<any> = [
     { title: '#', key: 'index' },
@@ -45,20 +48,21 @@ export function useTable(
           'a',
           {
             class: styles.links,
-            onClick: () => {},
+            onClick: () =>
+              router.push({ path: `/projects/${row.code}/workflow-monitor` })
           },
           {
             default: () => {
               return row.name
-            },
+            }
           }
-        ),
+        )
     },
     { title: t('project.list.owned_users'), key: 'userName' },
     { title: t('project.list.workflow_define_count'), key: 'defCount' },
     {
       title: t('project.list.process_instance_running_count'),
-      key: 'instRunningCount',
+      key: 'instRunningCount'
     },
     { title: t('project.list.description'), key: 'description' },
     { title: t('project.list.create_time'), key: 'createTime' },
@@ -71,9 +75,9 @@ export function useTable(
           row,
           onResetTableData: () => resetTableData(),
           onUpdateProjectItem: (code, name, description) =>
-            updateProjectItem(code, name, description),
-        }),
-    },
+            updateProjectItem(code, name, description)
+        })
+    }
   ]
 
   const variables = reactive({
@@ -81,7 +85,7 @@ export function useTable(
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(null),
-    totalPage: ref(1),
+    totalPage: ref(1)
   })
 
   const getTableData = (params: any) => {
@@ -99,7 +103,7 @@ export function useTable(
           )
           return {
             index: index + 1,
-            ...item,
+            ...item
           }
         }) as any
       }),

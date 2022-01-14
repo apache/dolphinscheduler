@@ -16,27 +16,27 @@
  */
 
 import { defineComponent, PropType } from 'vue'
-import { useTable } from './use-table'
+import { useTable } from '../use-table'
 import { NDataTable, NDatePicker, NGrid, NGi } from 'naive-ui'
 import PieChart from '@/components/chart/modules/Pie'
 import Card from '@/components/card'
-import type { StateTableData, StateChartData } from './types'
+import type { StateTableData, StateChartData } from '../types'
 
 const props = {
   title: {
-    type: String as PropType<string>,
+    type: String as PropType<string>
   },
   date: {
-    type: Array as PropType<Array<any>>,
+    type: Array as PropType<Array<any>>
   },
   tableData: {
     type: Array as PropType<Array<StateTableData>>,
-    default: () => [],
+    default: () => []
   },
   chartData: {
     type: Array as PropType<Array<StateChartData>>,
-    default: () => [],
-  },
+    default: () => []
+  }
 }
 
 const StateCard = defineComponent({
@@ -80,11 +80,11 @@ const StateCard = defineComponent({
               type='datetimerange'
               clearable
             />
-          ),
+          )
         }}
       </Card>
     )
-  },
+  }
 })
 
 export default StateCard

@@ -142,7 +142,7 @@
       _mVersionGetProcessDefinitionVersionsPage (val) {
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
-          pageSize: this.pageSize,
+          pageSize: this.versionData.pageSize,
           processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })

@@ -15,28 +15,43 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useProfile } from './use-profile'
-import styles from './info.module.scss'
+import { reactive, ref, unref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { FormRules } from 'naive-ui'
 
-const Info = defineComponent({
-  name: 'Info',
-  render() {
-    const { infoOptions } = useProfile()
-
-    return (
-      <dl class={styles.container}>
-        {infoOptions.value.map((item) => {
-          return (
-            <dd class={styles.item}>
-              <span class={styles.label}>{item.key}: </span>
-              <span>{item.value}</span>
-            </dd>
-          )
-        })}
-      </dl>
-    )
-  },
+const defaultValue = () => ({
+  pid: -1,
+  type: 'FILE',
+  name: '',
+  description: '',
+  currentDir: '/'
 })
 
-export default Info
+export function useForm() {
+  const { t } = useI18n()
+
+  const resetForm = () => {
+    state.folderForm = Object.assign(unref(state.folderForm), defaultValue())
+  }
+
+  const state = reactive({
+    folderFormRef: ref(),
+    folderForm: defaultValue(),
+    rules: {
+      name: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.folderForm.name === '') {
+            return new Error(t('resource.file.enter_name_tips'))
+          }
+        }
+      }
+    } as FormRules
+  })
+
+  return {
+    state,
+    resetForm
+  }
+}

@@ -29,8 +29,8 @@ interface ProjectRow extends ProjectList {
 const props = {
   row: {
     type: Object as PropType<ProjectRow>,
-    default: {},
-  },
+    default: {}
+  }
 }
 
 const TableAction = defineComponent({
@@ -82,31 +82,7 @@ const TableAction = defineComponent({
                   <EditOutlined />
                 </NIcon>
               </NButton>
-            ),
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
-            default: () => t('project.list.edit'),
-            trigger: () => (
-              <NButton
-                size='small'
-                type='info'
-                tag='div'
-                onClick={() =>
-                  handleEditProject(
-                    this.row.code,
-                    this.row.name,
-                    this.row.description
-                  )
-                }
-                circle
-              >
-                <NIcon>
-                  <EditOutlined />
-                </NIcon>
-              </NButton>
-            ),
+            )
           }}
         </NTooltip>
         <NTooltip trigger={'hover'}>
@@ -130,16 +106,16 @@ const TableAction = defineComponent({
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
-                    ),
+                    )
                   }}
                 </NPopconfirm>
               </NButton>
-            ),
+            )
           }}
         </NTooltip>
       </NSpace>
     )
-  },
+  }
 })
 
 export default TableAction

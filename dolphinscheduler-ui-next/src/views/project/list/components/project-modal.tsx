@@ -17,22 +17,22 @@
 
 import { defineComponent, PropType, toRefs, onMounted } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
-import { useForm } from './use-form'
+import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createProject, updateProject } from '@/service/modules/projects'
 
 const props = {
   show: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: false
   },
   data: {
-    type: Object as PropType<any>,
+    type: Object as PropType<any>
   },
   status: {
     type: Number as PropType<number>,
-    default: 0,
-  },
+    default: 0
+  }
 }
 
 const ProjectModal = defineComponent({
@@ -105,7 +105,7 @@ const ProjectModal = defineComponent({
         </NForm>
       </Modal>
     )
-  },
+  }
 })
 
 export default ProjectModal

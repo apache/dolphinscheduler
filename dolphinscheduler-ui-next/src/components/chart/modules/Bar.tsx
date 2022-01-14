@@ -22,20 +22,20 @@ import type { Ref } from 'vue'
 const props = {
   height: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: 400
   },
   width: {
     type: [String, Number] as PropType<string | number>,
-    default: '100%',
+    default: '100%'
   },
   xAxisData: {
     type: Array as PropType<Array<string>>,
-    default: () => [],
+    default: () => []
   },
   seriesData: {
     type: Array as PropType<Array<number>>,
-    default: () => [],
-  },
+    default: () => []
+  }
 }
 
 const BarChart = defineComponent({
@@ -48,37 +48,37 @@ const BarChart = defineComponent({
       tooltip: {
         trigger: 'axis',
         axisPointer: {
-          type: 'shadow',
+          type: 'shadow'
         },
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
       },
       grid: {
         left: '3%',
         right: '4%',
         bottom: '3%',
-        containLabel: true,
+        containLabel: true
       },
       xAxis: [
         {
           type: 'category',
           data: props.xAxisData,
           axisTick: {
-            alignWithLabel: true,
-          },
-        },
+            alignWithLabel: true
+          }
+        }
       ],
       yAxis: [
         {
-          type: 'value',
-        },
+          type: 'value'
+        }
       ],
       series: [
         {
           type: 'bar',
           barWidth: '60%',
-          data: props.seriesData,
-        },
-      ],
+          data: props.seriesData
+        }
+      ]
     }
 
     initChart(barChartRef, option)
@@ -92,11 +92,11 @@ const BarChart = defineComponent({
         ref='barChartRef'
         style={{
           height: typeof height === 'number' ? height + 'px' : height,
-          width: typeof width === 'number' ? width + 'px' : width,
+          width: typeof width === 'number' ? width + 'px' : width
         }}
       />
     )
-  },
+  }
 })
 
 export default BarChart

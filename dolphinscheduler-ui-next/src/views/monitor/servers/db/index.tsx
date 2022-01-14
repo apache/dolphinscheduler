@@ -94,7 +94,7 @@ const db = defineComponent({
         </NGi>
       </NGrid>
     )
-  },
+  }
 })
 
 export default db
