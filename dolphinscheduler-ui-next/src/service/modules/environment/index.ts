@@ -21,14 +21,14 @@ import {
   EnvironmentCodeReq,
   EnvironmentNameReq,
   ListReq,
-  CodeReq,
+  CodeReq
 } from './types'
 
 export function createEnvironment(data: EnvironmentReq): any {
   return axios({
     url: '/environment/create',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -36,7 +36,7 @@ export function deleteEnvironmentByCode(data: EnvironmentCodeReq): any {
   return axios({
     url: '/environment/delete',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -44,7 +44,7 @@ export function queryEnvironmentListPaging(params: ListReq): any {
   return axios({
     url: '/environment/list-paging',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -52,14 +52,14 @@ export function queryEnvironmentByCode(params: EnvironmentCodeReq): any {
   return axios({
     url: '/environment/query-by-code',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryAllEnvironmentList(): any {
   return axios({
     url: '/environment/query-environment-list',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -67,7 +67,7 @@ export function updateEnvironment(data: EnvironmentReq & CodeReq): any {
   return axios({
     url: '/environment/update',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -75,6 +75,6 @@ export function verifyEnvironment(data: EnvironmentNameReq): any {
   return axios({
     url: '/environment/verify-environment',
     method: 'post',
-    data,
+    data
   })
 }

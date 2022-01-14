@@ -23,7 +23,7 @@ import {
   reactive,
   Ref,
   watch,
-  inject,
+  inject
 } from 'vue'
 import {
   NIcon,
@@ -32,7 +32,7 @@ import {
   NButtonGroup,
   NButton,
   NPagination,
-  NInput,
+  NInput
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
@@ -63,14 +63,14 @@ export default defineComponent({
     const renameInfo = reactive({
       id: -1,
       name: '',
-      description: '',
+      description: ''
     })
 
     const paginationReactive = reactive({
       page: 1,
       pageSize: 10,
       itemCount: 0,
-      pageSizes: [10, 30, 50],
+      pageSizes: [10, 30, 50]
     })
 
     const handleUpdatePage = (page: number) => {
@@ -79,7 +79,7 @@ export default defineComponent({
         fileId.value,
         serachRef.value,
         paginationReactive.page,
-        paginationReactive.pageSize,
+        paginationReactive.pageSize
       )
     }
 
@@ -90,7 +90,7 @@ export default defineComponent({
         fileId.value,
         serachRef.value,
         paginationReactive.page,
-        paginationReactive.pageSize,
+        paginationReactive.pageSize
       )
     }
 
@@ -107,7 +107,7 @@ export default defineComponent({
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        serachRef.value
       )
     }
 
@@ -121,7 +121,7 @@ export default defineComponent({
         : 'resource-file-create'
       router.push({
         name,
-        params: { id: fileId.value },
+        params: { id: fileId.value }
       })
     }
 
@@ -139,7 +139,7 @@ export default defineComponent({
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fileId.value,
-        serachRef.value,
+        serachRef.value
       )
     }
 
@@ -149,7 +149,7 @@ export default defineComponent({
 
     watch(
       () => router.currentRoute.value.params.id,
-      () => reload(),
+      () => reload()
     )
 
     return {
@@ -169,7 +169,7 @@ export default defineComponent({
       handleUpdatePage,
       handleUpdatePageSize,
       pagination: paginationReactive,
-      renameInfo,
+      renameInfo
     }
   },
   render() {
@@ -179,7 +179,7 @@ export default defineComponent({
       handleConditions,
       handleCreateFolder,
       handleCreateFile,
-      handleUploadFile,
+      handleUploadFile
     } = this
     return (
       <div>
@@ -256,5 +256,5 @@ export default defineComponent({
         </Card>
       </div>
     )
-  },
+  }
 })

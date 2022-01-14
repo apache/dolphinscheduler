@@ -27,6 +27,6 @@ export function useTranslate(locale: WritableComputedRef<string>) {
     localesStore.setLocales(value)
   }
   return {
-    handleChange,
+    handleChange
   }
 }

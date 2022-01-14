@@ -36,7 +36,7 @@ const Info = defineComponent({
         })}
       </dl>
     )
-  },
+  }
 })
 
 export default Info

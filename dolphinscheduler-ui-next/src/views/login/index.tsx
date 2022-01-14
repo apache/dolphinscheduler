@@ -51,7 +51,7 @@ const login = defineComponent({
           >
             {{
               checked: () => 'en_US',
-              unchecked: () => 'zh_CN',
+              unchecked: () => 'zh_CN'
             }}
           </NSwitch>
         </div>
@@ -104,7 +104,7 @@ const login = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default login

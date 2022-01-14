@@ -16,7 +16,10 @@
  */
 
 import { useAsyncState } from '@vueuse/core'
-import { queryTenantListPaging, deleteTenantById } from '@/service/modules/tenants'
+import {
+  queryTenantListPaging,
+  deleteTenantById
+} from '@/service/modules/tenants'
 import { reactive, h, ref } from 'vue'
 import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -25,7 +28,7 @@ import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 export function useTable() {
   const { t } = useI18n()
 
-  const handleEdit= (row: any) => {
+  const handleEdit = (row: any) => {
     variables.showModalRef = true
     variables.statusRef = 1
     variables.row = row
@@ -35,7 +38,10 @@ export function useTable() {
     deleteTenantById(row.id).then(() => {
       getTableData({
         pageSize: variables.pageSize,
-        pageNo: (variables.tableData.length === 1 && variables.page > 1) ? variables.page - 1 : variables.page,
+        pageNo:
+          variables.tableData.length === 1 && variables.page > 1
+            ? variables.page - 1
+            : variables.page,
         searchVal: variables.searchVal
       })
     })
@@ -45,27 +51,27 @@ export function useTable() {
     variables.columns = [
       {
         title: t('security.tenant.num'),
-        key: 'num',
+        key: 'num'
       },
       {
         title: t('security.tenant.tenant_code'),
-        key: 'tenantCode',
+        key: 'tenantCode'
       },
       {
         title: t('security.tenant.description'),
-        key: 'description',
+        key: 'description'
       },
       {
         title: t('security.tenant.queue_name'),
-        key: 'queueName',
+        key: 'queueName'
       },
       {
         title: t('security.tenant.create_time'),
-        key: 'createTime',
+        key: 'createTime'
       },
       {
         title: t('security.tenant.update_time'),
-        key: 'updateTime',
+        key: 'updateTime'
       },
       {
         title: t('security.tenant.actions'),
@@ -74,44 +80,55 @@ export function useTable() {
           return h(NSpace, null, {
             default: () => [
               h(
-                NTooltip, {}, {
-                  trigger: () => h(NButton,
-                    {
-                      circle: true,
-                      type: 'info',
-                      size: 'small',
-                      onClick: () => {
-                        handleEdit(row)
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () => h(EditOutlined)
                       }
-                    },
-                    {
-                      icon: () => h(EditOutlined)
-                    }
-                  ),
+                    ),
                   default: () => t('security.tenant.edit')
                 }
               ),
               h(
                 NPopconfirm,
                 {
-                  onPositiveClick: () => { handleDelete(row) }
+                  onPositiveClick: () => {
+                    handleDelete(row)
+                  }
                 },
                 {
-                  trigger: () => h(
-                    NTooltip, {}, {
-                      trigger: () => h(NButton,
-                        {
-                          circle: true,
-                          type: 'error',
-                          size: 'small',
-                        },
-                        {
-                          icon: () => h(DeleteOutlined)
-                        }
-                      ),
-                      default: () => t('security.tenant.delete')
-                    }
-                  ),
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
+                            NButton,
+                            {
+                              circle: true,
+                              type: 'error',
+                              size: 'small'
+                            },
+                            {
+                              icon: () => h(DeleteOutlined)
+                            }
+                          ),
+                        default: () => t('security.tenant.delete')
+                      }
+                    ),
                   default: () => t('security.tenant.delete_confirm')
                 }
               )
@@ -140,7 +157,7 @@ export function useTable() {
         variables.tableData = res.totalList.map((item: any, index: number) => {
           return {
             num: index + 1,
-            ...item,
+            ...item
           }
         })
         variables.totalPage = res.totalPage

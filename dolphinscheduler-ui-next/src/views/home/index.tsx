@@ -31,8 +31,8 @@ export default defineComponent({
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const { getTaskState } = useTaskState()
     const { getProcessState } = useProcessState()
-    let taskStateRef = ref()
-    let processStateRef = ref()
+    const taskStateRef = ref()
+    const processStateRef = ref()
 
     onMounted(() => {
       taskStateRef.value = getTaskState(dateRef.value)
@@ -53,7 +53,7 @@ export default defineComponent({
       handleTaskDate,
       handleProcessDate,
       taskStateRef,
-      processStateRef,
+      processStateRef
     }
   },
   render() {
@@ -88,5 +88,5 @@ export default defineComponent({
         </NGrid>
       </div>
     )
-  },
+  }
 })

@@ -30,7 +30,7 @@ export function useFolder(state: any) {
   const handleCreateFolder = (
     emit: IEmit,
     hideModal: () => void,
-    resetForm: () => void,
+    resetForm: () => void
   ) => {
     const pid = router.currentRoute.value.params.id || -1
     const currentDir = fileStore.getCurrentDir || '/'
@@ -39,7 +39,7 @@ export function useFolder(state: any) {
         try {
           await createDirectory({
             ...state.folderForm,
-            ...{ pid, currentDir },
+            ...{ pid, currentDir }
           })
 
           window.$message.success(t('resource.file.success'))
@@ -54,6 +54,6 @@ export function useFolder(state: any) {
   }
 
   return {
-    handleCreateFolder,
+    handleCreateFolder
   }
 }

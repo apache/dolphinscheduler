@@ -22,10 +22,6 @@ import utils from '@/utils'
 const modules = import.meta.glob('/src/views/**/**.tsx')
 const components: { [key: string]: Component } = utils.mapping(modules)
 
-console.log('components', components)
-
-console.log(components)
-
 export default {
   path: '/projects',
   name: 'projects',
@@ -38,16 +34,16 @@ export default {
       name: 'projects-list',
       component: components['list'],
       meta: {
-        title: '项目',
-      },
+        title: '项目'
+      }
     },
     {
       path: '/projects/:projectCode/workflow-monitor',
       name: 'workflow-monitor',
       component: components['workflow-monitor'],
       meta: {
-        title: '工作流监控',
-      },
-    },
-  ],
+        title: '工作流监控'
+      }
+    }
+  ]
 }
