@@ -53,7 +53,7 @@ export default defineComponent({
     const router: Router = useRouter()
     const fileId = ref(Number(router.currentRoute.value.params.id) || -1)
 
-    const reload = inject('reload')
+    const reload:any = inject('reload')
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
