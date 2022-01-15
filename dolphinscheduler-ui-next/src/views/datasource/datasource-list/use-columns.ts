@@ -64,7 +64,7 @@ export function useColumns(onCallback: Function) {
                 }
               ),
             default: () =>
-              h(JsonHighlight, { json: rowData.connectionParams }, null)
+              h(JsonHighlight, { rowData })
           }
         )
       }

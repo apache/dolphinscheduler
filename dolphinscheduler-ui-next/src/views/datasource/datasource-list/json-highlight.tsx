@@ -21,18 +21,18 @@ import { isBoolean, isNumber, isPlainObject } from 'lodash'
 import styles from './json-highlight.module.scss'
 
 const props = {
-  json: {
-    type: String as PropType<string>,
-    default: ''
+  rowData: {
+    type: Object as PropType<object>,
+    default: {}
   }
 }
 
 const JsonHighlight = defineComponent({
   name: 'JsonHighlight',
   props,
-  render() {
+  render(props: { rowData: { connectionParams: string } }) {
     return (
-      <pre class={styles['json-highlight']}>{syntaxHighlight(this.json)}</pre>
+      <pre class={styles['json-highlight']}>{syntaxHighlight(props.rowData.connectionParams)}</pre>
     )
   }
 })
