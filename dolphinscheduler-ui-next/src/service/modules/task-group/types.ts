@@ -26,12 +26,43 @@ interface TaskGroupIdReq {
 }
 
 interface TaskGroupReq {
+  name: string
+  projectCode: string
+  groupSize: number
+  description: string
+}
+
+interface TaskGroupUpdateReq extends TaskGroupReq, TaskGroupIdReq{
 
 }
 
+interface TaskGroup {
+  id: number
+  name: string
+  projectCode: number
+  projectName: string
+  groupSize: number
+  useSize: number
+  status: number
+  description: string
+  createTime: string
+  updateTime: string
+}
+
+interface TaskGroupRes {
+  totalList: TaskGroup[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
 
 export {
   ListReq,
   TaskGroupIdReq,
-  TaskGroupReq
+  TaskGroupReq,
+  TaskGroupUpdateReq,
+  TaskGroup,
+  TaskGroupRes,
 }

@@ -15,19 +15,90 @@
  * limitations under the License.
  */
 
+import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAsyncState } from '@vueuse/core'
+import { format } from 'date-fns'
+import { useRouter } from 'vue-router'
+import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import { queryTaskGroupListPaging } from '@/service/modules/task-group'
+import { queryAllProjectList } from '@/service/modules/projects'
+import TableAction from './components/table-action'
+import _ from 'lodash'
 
-export function useTable() {
+export function useTable(
+    updateItem = (
+      id: number,
+      name: string,
+      projectCode: number,
+      groupSize: number,
+      description: string,
+      status: number
+    ): void => {},
+    resetTableData = () => {}
+) {
   const { t } = useI18n()
+  const router: Router = useRouter()
 
-  const columnsRef: TableColumns<any> = [
-    { title: '#', key: 'id' },
-    { title: t('home.number'), key: 'number' },
-    { title: t('home.state'), key: 'state' },
+  const columns: TableColumns<any> = [
+    { title: t('resource.task_group_option.id'), key: 'index' },
+    { title: t('resource.task_group_option.name'), key: 'name' },
+    { title: t('resource.task_group_option.project_name'), key: 'projectName' },
+    { title: t('resource.task_group_option.resource_pool_size'), key: 'groupSize' },
+    { title: t('resource.task_group_option.resource_used_pool_size'), key: 'useSize' },
+    { title: t('resource.task_group_option.desc'), key: 'description' },
+    { title: t('resource.task_group_option.create_time'), key: 'createTime' },
+    { title: t('resource.task_group_option.update_time'), key: 'updateTime' },
+    {
+      title: t('resource.task_group_option.actions'), key: 'actions', width: 150,
+      render: (row: any) =>  h(TableAction, {
+        row,
+        onResetTableData: () => {
+          if (variables.page > 1 && variables.tableData.length === 1) {
+            variables.page -= 1
+          }
+          resetTableData()
+        },
+        onUpdateItem: (id: number, name: string, projectCode: number, groupSize: number, description:string, status:number) => {
+          updateItem(id, name, projectCode, groupSize, description, status)
+        }
+      })
+    }
   ]
 
-  return {
-    columnsRef,
+  const variables = reactive({
+    tableData: [],
+    page: ref(1),
+    pageSize: ref(10),
+    name: ref(null),
+    totalPage: ref(1)
+  })
+
+  const getTableData = (params: any) => {
+    const { state } = useAsyncState(
+        Promise.all([queryTaskGroupListPaging(params), queryAllProjectList()]).then(values => {
+          variables.totalPage = values[0].totalPage
+          variables.tableData = values[0].totalList.map((item, index) => {
+            item.projectName = _.find(values[1], { code: item.projectCode }).name
+            item.createTime = format(
+                new Date(item.createTime),
+                'yyyy-MM-dd HH:mm:ss'
+            )
+            item.updateTime = format(
+                new Date(item.updateTime),
+                'yyyy-MM-dd HH:mm:ss'
+            )
+            return {
+              index: index + 1,
+              ...item
+            }
+          }) as any
+        }),
+        {}
+    )
+    return state
   }
+
+  return { getTableData, variables, columns }
 }

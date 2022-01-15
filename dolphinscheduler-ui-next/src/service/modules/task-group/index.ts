@@ -19,6 +19,8 @@ import { axios } from '@/service/service'
 import {
   ListReq,
   TaskGroupIdReq,
+  TaskGroupReq,
+  TaskGroupUpdateReq
 } from './types'
 
 export function queryTaskGroupListPaging(params: ListReq): any {
@@ -39,7 +41,7 @@ export function queryTaskGroupListPagingByProjectCode(params: ListReq): any {
 
 
 export function createTaskGroup(
-    data: TaskGroupIdReq
+    data: TaskGroupReq
 ): any {
   return axios({
     url: '/task-group/create',
@@ -49,7 +51,7 @@ export function createTaskGroup(
 }
 
 export function updateTaskGroup(
-    data: TaskGroupIdReq
+    data: TaskGroupUpdateReq
 ): any {
   return axios({
     url: '/task-group/update',

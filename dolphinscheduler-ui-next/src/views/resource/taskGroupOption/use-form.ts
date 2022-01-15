@@ -15,37 +15,43 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { reactive, ref } from 'vue'
 import type { FormRules } from 'naive-ui'
 
 export function useForm() {
   const { t } = useI18n()
 
   const state = reactive({
-    passwordFormRef: ref(),
-    passwordForm: {
-      password: '',
-      confirmPassword: '',
+    formRef: ref(),
+    formData: {
+      id: 0,
+      name: '',
+      projectCode: 0,
+      groupSize: 0,
+      status: 1,
+      description: '',
     },
     rules: {
-      password: {
+      name: {
+        required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.passwordForm.password === '') {
-            return new Error(t('password.password_tips'))
+          if (state.formData.name === '') {
+            return new Error(t('resource.task_group_option.please_enter_name'))
           }
-        },
+        }
       },
-      confirmPassword: {
+      description: {
+        required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.passwordForm.confirmPassword === '') {
-            return new Error(t('password.confirm_password_tips'))
+          if (state.formData.description === '') {
+            return new Error(t('resource.task_group_option.please_enter_desc'))
           }
-        },
-      },
-    } as FormRules,
+        }
+      }
+    } as FormRules
   })
 
   return { state, t }
