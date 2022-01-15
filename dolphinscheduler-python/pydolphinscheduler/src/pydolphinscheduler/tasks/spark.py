@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Task Flink."""
+"""Task Spark."""
 
 from typing import Optional
 
@@ -23,32 +23,33 @@ from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.engine import Engine, ProgramType
 
 
-class FlinkVersion(str):
-    """Flink version, for now it just contain `HIGHT` and `LOW`."""
+class SparkVersion(str):
+    """Spark version, for now it just contain `SPARK1` and `SPARK2`."""
 
-    LOW_VERSION = "<1.10"
-    HIGHT_VERSION = ">=1.10"
+    SPARK1 = "SPARK1"
+    SPARK2 = "SPARK2"
 
 
 class DeployMode(str):
-    """Flink deploy mode, for now it just contain `LOCAL` and `CLUSTER`."""
+    """SPARK deploy mode, for now it just contain `LOCAL`, `CLIENT` and `CLUSTER`."""
 
     LOCAL = "local"
+    CLIENT = "client"
     CLUSTER = "cluster"
 
 
-class Flink(Engine):
-    """Task flink object, declare behavior for flink task to dolphinscheduler."""
+class Spark(Engine):
+    """Task spark object, declare behavior for spark task to dolphinscheduler."""
 
     _task_custom_attr = {
         "deploy_mode",
-        "flink_version",
-        "slot",
-        "task_manager",
-        "job_manager_memory",
-        "task_manager_memory",
+        "spark_version",
+        "driver_cores",
+        "driver_memory",
+        "num_executors",
+        "executor_memory",
+        "executor_cores",
         "app_name",
-        "parallelism",
         "main_args",
         "others",
     }
@@ -60,13 +61,13 @@ class Flink(Engine):
         main_package: str,
         program_type: Optional[ProgramType] = ProgramType.SCALA,
         deploy_mode: Optional[DeployMode] = DeployMode.CLUSTER,
-        flink_version: Optional[FlinkVersion] = FlinkVersion.LOW_VERSION,
+        spark_version: Optional[SparkVersion] = SparkVersion.SPARK2,
         app_name: Optional[str] = None,
-        job_manager_memory: Optional[str] = "1G",
-        task_manager_memory: Optional[str] = "2G",
-        slot: Optional[int] = 1,
-        task_manager: Optional[int] = 2,
-        parallelism: Optional[int] = 1,
+        driver_cores: Optional[int] = 1,
+        driver_memory: Optional[str] = "512M",
+        num_executors: Optional[int] = 2,
+        executor_memory: Optional[str] = "2G",
+        executor_cores: Optional[int] = 2,
         main_args: Optional[str] = None,
         others: Optional[str] = None,
         *args,
@@ -74,7 +75,7 @@ class Flink(Engine):
     ):
         super().__init__(
             name,
-            TaskType.FLINK,
+            TaskType.SPARK,
             main_class,
             main_package,
             program_type,
@@ -82,12 +83,12 @@ class Flink(Engine):
             **kwargs
         )
         self.deploy_mode = deploy_mode
-        self.flink_version = flink_version
+        self.spark_version = spark_version
         self.app_name = app_name
-        self.job_manager_memory = job_manager_memory
-        self.task_manager_memory = task_manager_memory
-        self.slot = slot
-        self.task_manager = task_manager
-        self.parallelism = parallelism
+        self.driver_cores = driver_cores
+        self.driver_memory = driver_memory
+        self.num_executors = num_executors
+        self.executor_memory = executor_memory
+        self.executor_cores = executor_cores
         self.main_args = main_args
         self.others = others
