@@ -78,6 +78,7 @@ class TaskType(str):
     CONDITIONS = "CONDITIONS"
     SWITCH = "SWITCH"
     FLINK = "FLINK"
+    SPARK = "SPARK"
 
 
 class DefaultTaskCodeNum(str):

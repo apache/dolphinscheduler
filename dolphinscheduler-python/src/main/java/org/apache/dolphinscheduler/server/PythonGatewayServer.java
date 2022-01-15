@@ -477,7 +477,7 @@ public class PythonGatewayServer extends SpringBootServletInitializer {
 
     /**
      * Get resource by given program type and full name. It return map contain resource id, name.
-     * Useful in Python API create flink task which need processDefinition information.
+     * Useful in Python API create flink or spark task which need processDefinition information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
      * @param fullName    full name of the resource
