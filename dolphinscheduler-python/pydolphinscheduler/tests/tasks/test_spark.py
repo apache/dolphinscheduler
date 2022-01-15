@@ -15,23 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Test Task Flink."""
+"""Test Task Spark."""
 
 from unittest.mock import patch
 
-from pydolphinscheduler.tasks.flink import DeployMode, Flink, FlinkVersion, ProgramType
+from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark, SparkVersion
 
 
 @patch(
     "pydolphinscheduler.core.engine.Engine.get_resource_info",
     return_value=({"id": 1, "name": "test"}),
 )
-def test_flink_get_define(mock_resource):
-    """Test task flink function get_define."""
+def test_spark_get_define(mock_resource):
+    """Test task spark function get_define."""
     code = 123
     version = 1
-    name = "test_flink_get_define"
-    main_class = "org.apache.flink.test_main_class"
+    name = "test_spark_get_define"
+    main_class = "org.apache.spark.test_main_class"
     main_package = "test_main_package"
     program_type = ProgramType.JAVA
     deploy_mode = DeployMode.LOCAL
@@ -42,7 +42,7 @@ def test_flink_get_define(mock_resource):
         "version": 1,
         "description": None,
         "delayTime": 0,
-        "taskType": "FLINK",
+        "taskType": "SPARK",
         "taskParams": {
             "mainClass": main_class,
             "mainJar": {
@@ -50,12 +50,12 @@ def test_flink_get_define(mock_resource):
             },
             "programType": program_type,
             "deployMode": deploy_mode,
-            "flinkVersion": FlinkVersion.LOW_VERSION,
-            "slot": 1,
-            "parallelism": 1,
-            "taskManager": 2,
-            "jobManagerMemory": "1G",
-            "taskManagerMemory": "2G",
+            "sparkVersion": SparkVersion.SPARK2,
+            "driverCores": 1,
+            "driverMemory": "512M",
+            "numExecutors": 2,
+            "executorMemory": "2G",
+            "executorCores": 2,
             "appName": None,
             "mainArgs": None,
             "others": None,
@@ -78,5 +78,5 @@ def test_flink_get_define(mock_resource):
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        task = Flink(name, main_class, main_package, program_type, deploy_mode)
+        task = Spark(name, main_class, main_package, program_type, deploy_mode)
         assert task.get_define() == expect
