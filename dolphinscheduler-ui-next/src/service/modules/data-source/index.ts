@@ -18,7 +18,7 @@
 import { axios } from '@/service/service'
 import {
   ListReq,
-  DataSourceReq,
+  IDataSource,
   UserIdReq,
   TypeReq,
   NameReq,
@@ -33,11 +33,15 @@ export function queryDataSourceListPaging(params: ListReq): any {
   })
 }
 
-export function createDataSource(data: DataSourceReq): any {
+export function createDataSource(data: IDataSource): any {
   return axios({
     url: '/datasources',
     method: 'post',
-    data
+    data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
@@ -49,11 +53,15 @@ export function authedDatasource(params: UserIdReq): any {
   })
 }
 
-export function connectDataSource(data: DataSourceReq): any {
+export function connectDataSource(data: IDataSource): any {
   return axios({
     url: '/datasources/connect',
     method: 'post',
-    data
+    data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
@@ -95,11 +103,15 @@ export function queryDataSource(id: IdReq): any {
   })
 }
 
-export function updateDataSource(data: DataSourceReq, id: IdReq): any {
+export function updateDataSource(data: IDataSource, id: IdReq): any {
   return axios({
     url: `/datasources/${id}`,
     method: 'put',
-    data
+    data,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }
 
