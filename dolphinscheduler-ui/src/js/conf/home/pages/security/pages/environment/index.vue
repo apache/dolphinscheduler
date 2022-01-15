@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create()">{{$t('Create environment')}}</el-button>
+          <el-button size="mini" id="btnCreateEnvironment" @click="_create()">{{$t('Create environment')}}</el-button>
           <el-dialog
             :title="item && item.name ? $t('Edit environment') : $t('Create environment')"
             :v-if="createEnvironmentDialog"

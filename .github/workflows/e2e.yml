@@ -79,6 +79,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
           - name: Queue
             class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
+          - name: Environment
+            class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
           - name: Workflow
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
           - name: FileManage

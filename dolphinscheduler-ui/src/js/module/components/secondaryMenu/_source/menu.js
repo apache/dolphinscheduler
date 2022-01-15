@@ -154,7 +154,8 @@ const menu = {
       isOpen: true,
       enabled: true,
       icon: 'el-icon-setting',
-      children: []
+      children: [],
+      classNames: 'tab-environment-manage'
     },
     {
       name: `${i18n.$t('Token manage')}`,

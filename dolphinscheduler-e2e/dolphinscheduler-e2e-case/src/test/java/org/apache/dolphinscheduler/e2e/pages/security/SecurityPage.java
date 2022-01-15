@@ -45,6 +45,9 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(className = "tab-queue-manage")
     private WebElement menuQueueManage;
 
+    @FindBy(className = "tab-environment-manage")
+    private WebElement menuEnvironmentManage;
+
     public SecurityPage(RemoteWebDriver driver) {
         super(driver);
     }
@@ -71,6 +74,10 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
         if (tab == QueuePage.class) {
             menuQueueManage().click();
             return tab.cast(new QueuePage(driver));
+        }
+        if (tab == EnvironmentPage.class) {
+            menuEnvironmentManage().click();
+            return tab.cast(new EnvironmentPage(driver));
         }
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
