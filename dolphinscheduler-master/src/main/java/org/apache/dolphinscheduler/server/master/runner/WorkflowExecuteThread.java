@@ -81,6 +81,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -608,28 +609,40 @@ public class WorkflowExecuteThread {
                 processInstance.getScheduleTime(),
                 complementListDate.toString());
             scheduleDate = complementListDate.get(index + 1);
-            //the next process complement
-            processInstance.setId(0);
         }
-        processInstance.setScheduleTime(scheduleDate);
+        //the next process complement
+        int create = this.createComplementDataCommand(scheduleDate);
+        if (create > 0) {
+            logger.info("create complement data command successfully.");
+        }
+        return true;
+    }
+
+    private int createComplementDataCommand(Date scheduleDate) {
+        Command command = new Command();
+        command.setScheduleTime(scheduleDate);
+        command.setCommandType(CommandType.COMPLEMENT_DATA);
+        command.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
-            processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
         }
-
-        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-        processInstance.setStartTime(new Date());
-        processInstance.setRestartTime(processInstance.getStartTime());
-        processInstance.setEndTime(null);
-        processService.saveProcessInstance(processInstance);
-        this.taskInstanceMap.clear();
-        startProcess();
-        return true;
+        cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, "yyyy-MM-dd HH:mm:ss"));
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+        command.setTaskDependType(processInstance.getTaskDependType());
+        command.setFailureStrategy(processInstance.getFailureStrategy());
+        command.setWarningType(processInstance.getWarningType());
+        command.setWarningGroupId(processInstance.getWarningGroupId());
+        command.setStartTime(new Date());
+        command.setExecutorId(processInstance.getExecutorId());
+        command.setUpdateTime(new Date());
+        command.setProcessInstancePriority(processInstance.getProcessInstancePriority());
+        command.setWorkerGroup(processInstance.getWorkerGroup());
+        command.setEnvironmentCode(processInstance.getEnvironmentCode());
+        command.setDryRun(processInstance.getDryRun());
+        command.setProcessInstanceId(0);
+        command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
+        return processService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
@@ -1375,13 +1388,22 @@ public class WorkflowExecuteThread {
      * @param taskInstance task instance
      */
     private void addTaskToStandByList(TaskInstance taskInstance) {
-        logger.info("add task to stand by list: {}", taskInstance.getName());
         try {
-            if (!readyToSubmitTaskQueue.contains(taskInstance)) {
-                readyToSubmitTaskQueue.put(taskInstance);
+            if (readyToSubmitTaskQueue.contains(taskInstance)) {
+                logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
+                return;
             }
+            // need to check if the tasks with same task code is active
+            boolean active = hadNotFailTask(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+            if (active) {
+                logger.warn("task was found in active task list, task code:{}", taskInstance.getTaskCode());
+                return;
+            }
+            logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
+                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
+            readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
+            logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
         }
     }
 
@@ -1626,4 +1648,25 @@ public class WorkflowExecuteThread {
             return false;
         }
     }
+
+    /**
+     * check if had not fail task by taskCode and version
+     * @param taskCode
+     * @param version
+     * @return
+     */
+    private boolean hadNotFailTask(long taskCode, int version) {
+        boolean result = false;
+        for (Entry<Integer, TaskInstance> entry : taskInstanceMap.entrySet()) {
+            TaskInstance taskInstance = entry.getValue();
+            if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == version) {
+                if (!taskInstance.getState().typeIsFailure()) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
 }

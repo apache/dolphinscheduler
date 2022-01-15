@@ -24,7 +24,7 @@ import {
   TaskReq,
   LongestReq,
   IdReq,
-  ProcessInstanceReq,
+  ProcessInstanceReq
 } from './types'
 
 export function queryProcessInstanceListPaging(
@@ -34,7 +34,7 @@ export function queryProcessInstanceListPaging(
   return axios({
     url: `/projects/${code}/process-instances`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -45,7 +45,7 @@ export function batchDeleteProcessInstanceByIds(
   return axios({
     url: `/projects/${code}/process-instances/batch-delete`,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -56,7 +56,7 @@ export function queryParentInstanceBySubId(
   return axios({
     url: `/projects/${code}/process-instances/query-parent-by-sub`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -67,7 +67,7 @@ export function querySubProcessInstanceByTaskCode(
   return axios({
     url: `/projects/${code}/process-instances/query-sub-by-parent`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -78,14 +78,14 @@ export function queryTopNLongestRunningProcessInstance(
   return axios({
     url: `/projects/${code}/process-instances/top-n`,
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryProcessInstanceById(id: IdReq, code: CodeReq): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -97,34 +97,34 @@ export function updateProcessInstance(
   return axios({
     url: `/projects/${code}/process-instances/${id}`,
     method: 'put',
-    data,
+    data
   })
 }
 
 export function deleteProcessInstanceById(id: IdReq, code: CodeReq): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}`,
-    method: 'delete',
+    method: 'delete'
   })
 }
 
 export function queryTaskListByProcessId(id: IdReq, code: CodeReq): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/tasks`,
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function vieGanttTree(id: IdReq, code: CodeReq): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-gantt`,
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function viewVariables(id: IdReq, code: CodeReq): any {
   return axios({
     url: `/projects/${code}/process-instances/${id}/view-variables`,
-    method: 'get',
+    method: 'get'
   })
 }

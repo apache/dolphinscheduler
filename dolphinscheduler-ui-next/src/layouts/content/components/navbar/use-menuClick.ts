@@ -30,6 +30,6 @@ export function useMenuClick(ctx: SetupContext<'handleMenuClick'[]>) {
   }
 
   return {
-    handleMenuClick,
+    handleMenuClick
   }
 }

@@ -23,19 +23,45 @@ interface ListReq {
 
 interface ProjectsReq {
   description?: string
-  projectName?: string
+  projectName: string
 }
 
 interface UserIdReq {
   userId?: number
 }
 
-interface CodeReq {
-  code: number
-}
-
 interface UpdateProjectsReq extends ProjectsReq {
   userName?: string
 }
 
-export { ListReq, ProjectsReq, UserIdReq, CodeReq, UpdateProjectsReq }
+interface ProjectList {
+  id: number
+  userId: number
+  userName: string
+  code: any
+  name: string
+  description: string
+  createTime: string
+  updateTime: string
+  perm: number
+  defCount: number
+  instRunningCount: number
+}
+
+interface ProjectRes {
+  totalList: ProjectList[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export {
+  ListReq,
+  ProjectsReq,
+  UserIdReq,
+  UpdateProjectsReq,
+  ProjectRes,
+  ProjectList
+}

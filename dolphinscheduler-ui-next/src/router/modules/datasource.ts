@@ -32,10 +32,10 @@ export default {
     {
       path: '/datasource/list',
       name: 'datasource-list',
-      component: components['home'],
+      component: components['datasource-list'],
       meta: {
-        title: '数据源中心',
-      },
-    },
-  ],
+        title: '数据源中心'
+      }
+    }
+  ]
 }

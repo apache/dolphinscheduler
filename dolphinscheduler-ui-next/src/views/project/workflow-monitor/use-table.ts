@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-module.exports = {
-  "useTabs": false,
-  "semi": false,
-  "vueIndentScriptAndStyle": true,
-  "singleQuote": true,
-  "quoteProps": "as-needed",
-  "jsxBracketSameLine": false,
-  "jsxSingleQuote": true,
-  "arrowParens": "always",
-  "htmlWhitespaceSensitivity": "strict",
-  "endOfLine": "lf"
-};
+import { useI18n } from 'vue-i18n'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+
+export function useTable() {
+  const { t } = useI18n()
+
+  const columnsRef: TableColumns<any> = [
+    { title: '#', key: 'index' },
+    { title: t('home.number'), key: 'number' },
+    { title: t('home.state'), key: 'state' }
+  ]
+
+  return {
+    columnsRef
+  }
+}

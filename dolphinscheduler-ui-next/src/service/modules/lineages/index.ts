@@ -21,7 +21,7 @@ import { ProjectCodeReq, WorkFlowNameReq } from './types'
 export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/lineages/list`,
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -32,7 +32,7 @@ export function queryLineageByWorkFlowName(
   return axios({
     url: `/projects/${projectCode}/lineages/query-by-name`,
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -42,6 +42,6 @@ export function queryLineageByWorkFlowCode(
 ): any {
   return axios({
     url: `/projects/${projectCode}/lineages/${workFlowCode}`,
-    method: 'get',
+    method: 'get'
   })
 }

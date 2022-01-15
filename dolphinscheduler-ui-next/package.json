@@ -7,14 +7,15 @@
     "build:prod": "vue-tsc --noEmit && vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint src --fix --ext .ts,.tsx,.vue",
-    "prettier": "prettier --config .prettier.js --write src/**/*.{vue,ts,tsx}"
+    "prettier": "prettier --write \"src/**/*.{vue,ts,tsx}\""
   },
   "dependencies": {
     "@vueuse/core": "^7.5.3",
     "axios": "^0.24.0",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.27.0",
     "echarts": "^5.2.2",
     "lodash": "^4.17.21",
+    "monaco-editor": "^0.31.1",
     "naive-ui": "2.23.2",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.9",

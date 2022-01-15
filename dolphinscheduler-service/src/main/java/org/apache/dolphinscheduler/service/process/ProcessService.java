@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -26,8 +27,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-
-import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -1079,18 +1078,21 @@ public class ProcessService {
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
 
-        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
-        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
-        subPropertyList = new ArrayList<>(subPropertyList);
-        
-        Map<String, String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        // Since JSONUtils.toList return unmodified list, we need to creat a new List here.
+        List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(parentGlobalParams, Property.class));
+        List<Property> subParams = JSONUtils.toList(subGlobalParams, Property.class);
 
-        for (Property parent : parentPropertyList) {
-            if (!subMap.containsKey(parent.getProp())) {
-                subPropertyList.add(parent);
-            }
-        }
-        return JSONUtils.toJsonString(subPropertyList);
+        Set<String> parentParamKeys = parentParams.stream().map(Property::getProp).collect(toSet());
+
+        // We will combine the params of parent workflow and sub workflow
+        // If the params are defined in both, we will use parent's params to override the sub workflow(ISSUE-7962)
+        // todo: Do we need to consider the other attribute of Property?
+        //      e.g. the subProp's type is not equals with parent, or subProp's direct is not equals with parent
+        //      It's suggested to add node name in property, this kind of problem can be solved.
+        List<Property> extraSubParams = subParams.stream()
+                .filter(subProp -> !parentParamKeys.contains(subProp.getProp())).collect(Collectors.toList());
+        parentParams.addAll(extraSubParams);
+        return JSONUtils.toJsonString(parentParams);
     }
 
     /**
