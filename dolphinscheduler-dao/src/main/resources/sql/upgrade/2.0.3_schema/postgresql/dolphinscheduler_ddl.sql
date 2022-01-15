@@ -36,6 +36,9 @@ EXECUTE 'CREATE INDEX IF NOT EXISTS idx_code_relation ON ' || quote_ident(v_sche
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_process_code_version_relation_log ON ' || quote_ident(v_schema) ||'.t_ds_process_task_relation_log USING Btree("process_definition_code","process_definition_version")';
 EXECUTE 'CREATE INDEX IF NOT EXISTS idx_code_version_task_log ON ' || quote_ident(v_schema) ||'.t_ds_task_definition_log USING Btree("code","version")';
 
+EXECUTE 'ALTER TABLE t_ds_resources alter COLUMN is_directory TYPE bool using (is_directory::bool)';
+EXECUTE 'ALTER TABLE t_ds_resources alter COLUMN is_directory SET DEFAULT FALSE';
+
 return 'Success!';
 exception when others then
 		---Raise EXCEPTION '(%)',SQLERRM;
