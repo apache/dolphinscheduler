@@ -22,13 +22,13 @@ export function queryUiPluginsByType(params: PluginTypeReq): any {
   return axios({
     url: '/ui-plugins/query-by-type',
     method: 'get',
-    params,
+    params
   })
 }
 
 export function queryUiPluginDetailById(id: IdReq): any {
   return axios({
     url: `/ui-plugins/${id}`,
-    method: 'get',
+    method: 'get'
   })
 }

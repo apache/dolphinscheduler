@@ -45,4 +45,22 @@ interface TaskStateRes {
   taskCountDtos: TaskCountDto[]
 }
 
-export { CodeReq, StateReq, ProcessDefinitionRes, TaskStateRes }
+interface TaskQueueRes {
+  taskKill: number
+  taskQueue: number
+}
+
+interface CommandStateRes {
+  errorCount: number
+  normalCount: number
+  commandState: string
+}
+
+export {
+  CodeReq,
+  StateReq,
+  ProcessDefinitionRes,
+  TaskStateRes,
+  TaskQueueRes,
+  CommandStateRes
+}

@@ -32,18 +32,18 @@ export default {
     {
       path: '/projects/list',
       name: 'projects-list',
-      component: components['home'],
+      component: components['list'],
       meta: {
-        title: '项目',
-      },
+        title: '项目'
+      }
     },
     {
-      path: '/projects/:projectCode/index',
-      name: 'projects-index',
-      component: components['home'],
+      path: '/projects/:projectCode/workflow-monitor',
+      name: 'workflow-monitor',
+      component: components['workflow-monitor'],
       meta: {
-        title: '工作流监控',
-      },
-    },
-  ],
+        title: '工作流监控'
+      }
+    }
+  ]
 }

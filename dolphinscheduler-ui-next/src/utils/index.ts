@@ -20,7 +20,7 @@ import regex from './regex'
 
 const utils = {
   mapping,
-  regex,
+  regex
 }
 
 export default utils

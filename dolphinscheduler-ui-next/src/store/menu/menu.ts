@@ -21,16 +21,17 @@ import MenuState from './types'
 export const useMenuStore = defineStore({
   id: 'menu',
   state: (): MenuState => ({
-    menuKey: '',
+    menuKey: 'home'
   }),
+  persist: true,
   getters: {
     getMenuKey(): string {
-      return this.menuKey
-    },
+      return this.menuKey || 'home'
+    }
   },
   actions: {
     setMenuKey(menuKey: string): void {
       this.menuKey = menuKey
-    },
-  },
+    }
+  }
 })

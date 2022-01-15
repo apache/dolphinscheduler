@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, watch, toRefs, ref } from 'vue'
-import { NLayout, NLayoutContent, NLayoutHeader } from 'naive-ui'
+import { defineComponent, onMounted, watch, toRefs } from 'vue'
+import { NLayout, NLayoutContent, NLayoutHeader, useMessage } from 'naive-ui'
 import NavBar from './components/navbar'
 import SideBar from './components/sidebar'
 import { useDataList } from './use-dataList'
@@ -27,15 +27,21 @@ import { useI18n } from 'vue-i18n'
 const Content = defineComponent({
   name: 'Content',
   setup() {
+    window.$message = useMessage()
+
     const menuStore = useMenuStore()
     const { locale } = useI18n()
     const localesStore = useLocalesStore()
-    const { state, changeMenuOption, changeHeaderMenuOptions, changeUserDropdown } = useDataList()
+    const {
+      state,
+      changeMenuOption,
+      changeHeaderMenuOptions,
+      changeUserDropdown
+    } = useDataList()
 
     locale.value = localesStore.getLocales
 
     onMounted(() => {
-      menuStore.setMenuKey('home')
       changeMenuOption(state)
       changeHeaderMenuOptions(state)
       genSideMenu(state)
@@ -54,19 +60,21 @@ const Content = defineComponent({
       state.sideMenuOptions =
         state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
           .children || []
+      state.isShowSide =
+        state.menuOptions.filter((menu: { key: string }) => menu.key === key)[0]
+          .isShowSide || false
     }
 
     const getSideMenuOptions = (item: any) => {
       menuStore.setMenuKey(item.key)
       genSideMenu(state)
-      state.isShowSide = item.isShowSide
     }
 
     return {
       ...toRefs(state),
       menuStore,
       changeMenuOption,
-      getSideMenuOptions,
+      getSideMenuOptions
     }
   },
   render() {
@@ -90,7 +98,7 @@ const Content = defineComponent({
         </NLayout>
       </NLayout>
     )
-  },
+  }
 })
 
 export default Content

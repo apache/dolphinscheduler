@@ -22,18 +22,21 @@ import type { Ref } from 'vue'
 const props = {
   height: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: 400
   },
   width: {
     type: [String, Number] as PropType<string | number>,
-    default: 400,
+    default: 400
   },
+  data: {
+    type: [String, Number] as PropType<string | number>
+  }
 }
 
 const GaugeChart = defineComponent({
   name: 'GaugeChart',
   props,
-  setup() {
+  setup(props) {
     const gaugeChartRef: Ref<HTMLDivElement | null> = ref(null)
 
     const option = {
@@ -42,47 +45,47 @@ const GaugeChart = defineComponent({
           type: 'gauge',
           axisLine: {
             lineStyle: {
-              width: 30,
-            },
+              width: 30
+            }
           },
           pointer: {
             itemStyle: {
-              color: 'auto',
-            },
+              color: 'auto'
+            }
           },
           axisTick: {
             distance: -30,
             length: 8,
             lineStyle: {
               color: '#fff',
-              width: 2,
-            },
+              width: 2
+            }
           },
           splitLine: {
             distance: -30,
             length: 30,
             lineStyle: {
               color: '#fff',
-              width: 4,
-            },
+              width: 4
+            }
           },
           axisLabel: {
             color: 'auto',
             distance: 40,
-            fontSize: 20,
+            fontSize: 20
           },
           detail: {
             valueAnimation: true,
-            formatter: '{value} km/h',
-            color: 'auto',
+            formatter: '{value} %',
+            color: 'auto'
           },
           data: [
             {
-              value: 70,
-            },
-          ],
-        },
-      ],
+              value: props.data
+            }
+          ]
+        }
+      ]
     }
 
     initChart(gaugeChartRef, option)
@@ -96,11 +99,11 @@ const GaugeChart = defineComponent({
         ref='gaugeChartRef'
         style={{
           height: typeof height === 'number' ? height + 'px' : height,
-          width: typeof width === 'number' ? width + 'px' : width,
+          width: typeof width === 'number' ? width + 'px' : width
         }}
       />
     )
-  },
+  }
 })
 
 export default GaugeChart

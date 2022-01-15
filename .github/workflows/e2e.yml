@@ -27,25 +27,11 @@ concurrency:
   group: e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+
 jobs:
-  e2e:
-    name: ${{ matrix.case.name }}
+  build:
+    name: E2E-Build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        case:
-          - name: Tenant
-            class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
-          - name: User
-            class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
-          - name: WorkerGroup
-            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
-          - name: Project
-            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
-          - name: Workflow
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
-    env:
-      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -66,6 +52,59 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
+      - name: Export Docker Images
+        run: |
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
+          && du -sh /tmp/standalone-image.tar
+      - uses: actions/upload-artifact@v2
+        name: Upload Docker Images
+        with:
+          name: standalone-image
+          path: /tmp/standalone-image.tar
+          retention-days: 1
+  e2e:
+    name: ${{ matrix.case.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        case:
+          - name: Tenant
+            class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
+          - name: User
+            class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
+          - name: WorkerGroup
+            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
+          - name: Project
+            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
+          - name: Queue
+            class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
+          - name: Environment
+            class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
+          - name: Workflow
+            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
+          - name: FileManage
+            class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
+    env:
+      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - uses: actions/download-artifact@v2
+        name: Download Docker Images
+        with:
+          name: standalone-image
+          path: /tmp
+      - name: Load Docker Images
+        run: |
+            docker load -i /tmp/standalone-image.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
