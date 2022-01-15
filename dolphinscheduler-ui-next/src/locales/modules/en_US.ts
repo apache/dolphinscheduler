@@ -70,7 +70,7 @@ const menu = {
   alarm_instance_manage: 'Alarm Instance Manage',
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
-  environmental_manage: 'Environmental Manage',
+  environment_manage: 'Environment Manage',
   token_manage: 'Token Manage'
 }
 
@@ -290,7 +290,74 @@ const security = {
     edit: 'Edit',
     queue_name_tips: 'Please enter your queue name',
     queue_value_tips: 'Please enter your queue value'
+  },
+  environment: {
+    create_environment: 'Create Environment',
+    edit_environment: 'Edit Environment',
+    search_tips: 'Please enter keywords',
+    edit: 'Edit',
+    delete: 'Delete',
+    environment_name: 'Environment Name',
+    environment_config: 'Environment Config',
+    environment_desc: 'Environment Desc',
+    worker_groups: 'Worker Groups',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    environment_name_tips: 'Please enter your environment name',
+    environment_config_tips: 'Please enter your environment config',
+    environment_description_tips: 'Please enter your environment description',
+    worker_group_tips: 'Please select worker group'
   }
+}
+const datasource = {
+  datasource: 'DataSource',
+  create_datasource: 'Create DataSource',
+  search_input_tips: 'Please input the keywords',
+  serial_number: '#',
+  datasource_name: 'Datasource Name',
+  datasource_name_tips: 'Please enter datasource name',
+  datasource_user_name: 'Owner',
+  datasource_type: 'Datasource Type',
+  datasource_parameter: 'Datasource Parameter',
+  description: 'Description',
+  description_tips: 'Please enter description',
+  create_time: 'Create Time',
+  update_time: 'Update Time',
+  operation: 'Operation',
+  click_to_view: 'Click to view',
+  delete: 'Delete',
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  create: 'Create',
+  edit: 'Edit',
+  success: 'Success',
+  test_connect: 'Test Connect',
+  ip: 'IP',
+  ip_tips: 'Please enter IP',
+  port: 'Port',
+  port_tips: 'Please enter port',
+  database_name: 'Database Name',
+  database_name_tips: 'Please enter database name',
+  oracle_connect_type: 'ServiceName or SID',
+  oracle_connect_type_tips: 'Please select serviceName or SID',
+  oracle_service_name: 'ServiceName',
+  oracle_sid: 'SID',
+  jdbc_connect_parameters: 'jdbc connect parameters',
+  principal_tips: 'Please enter Principal',
+  krb5_conf_tips:
+    'Please enter the kerberos authentication parameter java.security.krb5.conf',
+  keytab_username_tips:
+    'Please enter the kerberos authentication parameter login.user.keytab.username',
+  keytab_path_tips:
+    'Please enter the kerberos authentication parameter login.user.keytab.path',
+  format_tips: 'Please enter format',
+  connection_parameter: 'connection parameter',
+  user_name: 'User Name',
+  user_name_tips: 'Please enter your username',
+  user_password: 'Password',
+  user_password_tips: 'Please enter your password'
 }
 
 export default {
@@ -305,5 +372,6 @@ export default {
   monitor,
   resource,
   project,
-  security
+  security,
+  datasource
 }

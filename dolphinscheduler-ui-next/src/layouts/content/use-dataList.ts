@@ -55,12 +55,12 @@ export function useDataList() {
   const localesOptions = [
     {
       label: 'English',
-      key: 'en_US',
+      key: 'en_US'
     },
     {
       label: '中文',
-      key: 'zh_CN',
-    },
+      key: 'zh_CN'
+    }
   ]
 
   const state = reactive({
@@ -69,7 +69,7 @@ export function useDataList() {
     userDropdownOptions: [],
     menuOptions: [],
     headerMenuOptions: [],
-    sideMenuOptions: [],
+    sideMenuOptions: []
   })
 
   const changeMenuOption = (state: any) => {
@@ -78,7 +78,7 @@ export function useDataList() {
         label: t('menu.home'),
         key: 'home',
         icon: renderIcon(HomeOutlined),
-        isShowSide: false,
+        isShowSide: false
       },
       {
         label: t('menu.project'),
@@ -89,12 +89,12 @@ export function useDataList() {
           {
             label: t('menu.workflow_monitoring'),
             key: 'workflow-monitoring',
-            icon: renderIcon(FundProjectionScreenOutlined),
+            icon: renderIcon(FundProjectionScreenOutlined)
           },
           {
             label: t('menu.workflow_relationships'),
             key: 'workflow-relationships',
-            icon: renderIcon(PartitionOutlined),
+            icon: renderIcon(PartitionOutlined)
           },
           {
             label: t('menu.workflow'),
@@ -103,23 +103,23 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_definition'),
-                key: 'workflow-definition',
+                key: 'workflow-definition'
               },
               {
                 label: t('menu.workflow_instance'),
-                key: 'workflow-instance',
+                key: 'workflow-instance'
               },
               {
                 label: t('menu.task_instance'),
-                key: 'task-instance',
+                key: 'task-instance'
               },
               {
                 label: t('menu.task_definition'),
-                key: 'task-definition',
-              },
-            ],
-          },
-        ],
+                key: 'task-definition'
+              }
+            ]
+          }
+        ]
       },
       {
         label: t('menu.resources'),
@@ -130,7 +130,7 @@ export function useDataList() {
           {
             label: t('menu.file_manage'),
             key: 'file-manage',
-            icon: renderIcon(FileSearchOutlined),
+            icon: renderIcon(FileSearchOutlined)
           },
           {
             label: t('menu.udf_manage'),
@@ -139,13 +139,13 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.resource_manage'),
-                key: 'resource-manage',
+                key: 'resource-manage'
               },
               {
                 label: t('menu.function_manage'),
-                key: 'function-manage',
-              },
-            ],
+                key: 'function-manage'
+              }
+            ]
           },
           {
             label: t('menu.task_group_manage'),
@@ -158,13 +158,14 @@ export function useDataList() {
               }
             ],
           },
-        ],
+        ]
       },
       {
         label: t('menu.datasource'),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),
         isShowSide: false,
+        children: []
       },
       {
         label: t('menu.monitor'),
@@ -179,17 +180,17 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.master'),
-                key: 'master',
+                key: 'master'
               },
               {
                 label: t('menu.worker'),
-                key: 'worker',
+                key: 'worker'
               },
               {
                 label: t('menu.db'),
-                key: 'db',
-              },
-            ],
+                key: 'db'
+              }
+            ]
           },
           {
             label: t('menu.statistical_manage'),
@@ -198,11 +199,11 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.statistics'),
-                key: 'statistics',
-              },
-            ],
-          },
-        ],
+                key: 'statistics'
+              }
+            ]
+          }
+        ]
       },
       {
         label: t('menu.security'),
@@ -213,63 +214,63 @@ export function useDataList() {
           {
             label: t('menu.tenant_manage'),
             key: 'tenant-manage',
-            icon: renderIcon(UsergroupAddOutlined),
+            icon: renderIcon(UsergroupAddOutlined)
           },
           {
             label: t('menu.user_manage'),
             key: 'user-manage',
-            icon: renderIcon(UserAddOutlined),
+            icon: renderIcon(UserAddOutlined)
           },
           {
             label: t('menu.alarm_group_manage'),
             key: 'alarm-group-manage',
-            icon: renderIcon(WarningOutlined),
+            icon: renderIcon(WarningOutlined)
           },
           {
             label: t('menu.alarm_instance_manage'),
             key: 'alarm-instance-manage',
-            icon: renderIcon(InfoCircleOutlined),
+            icon: renderIcon(InfoCircleOutlined)
           },
           {
             label: t('menu.worker_group_manage'),
             key: 'worker-group-manage',
-            icon: renderIcon(ControlOutlined),
+            icon: renderIcon(ControlOutlined)
           },
           {
             label: t('menu.yarn_queue_manage'),
             key: 'yarn-queue-manage',
-            icon: renderIcon(SlackOutlined),
+            icon: renderIcon(SlackOutlined)
           },
           {
-            label: t('menu.environmental_manage'),
-            key: 'environmental-manage',
-            icon: renderIcon(EnvironmentOutlined),
+            label: t('menu.environment_manage'),
+            key: 'environment-manage',
+            icon: renderIcon(EnvironmentOutlined)
           },
           {
             label: t('menu.token_manage'),
             key: 'token-manage',
-            icon: renderIcon(SafetyOutlined),
-          },
-        ],
-      },
+            icon: renderIcon(SafetyOutlined)
+          }
+        ]
+      }
     ]
   }
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-      (item: {
-        label: string
-        key: string
-        icon: any
-        isShowSide: boolean
-      }) => {
-        return {
-          label: item.label,
-          key: item.key,
-          icon: item.icon,
-          isShowSide: item.isShowSide,
+        (item: {
+          label: string
+          key: string
+          icon: any
+          isShowSide: boolean
+        }) => {
+          return {
+            label: item.label,
+            key: item.key,
+            icon: item.icon,
+            isShowSide: item.isShowSide
+          }
         }
-      }
     )
   }
 
@@ -278,18 +279,18 @@ export function useDataList() {
       {
         label: t('userDropdown.profile'),
         key: 'profile',
-        icon: renderIcon(UserOutlined),
+        icon: renderIcon(UserOutlined)
       },
       {
         label: t('userDropdown.password'),
         key: 'password',
-        icon: renderIcon(KeyOutlined),
+        icon: renderIcon(KeyOutlined)
       },
       {
         label: t('userDropdown.logout'),
         key: 'logout',
-        icon: renderIcon(LogoutOutlined),
-      },
+        icon: renderIcon(LogoutOutlined)
+      }
     ]
   }
 
@@ -297,6 +298,6 @@ export function useDataList() {
     state,
     changeHeaderMenuOptions,
     changeMenuOption,
-    changeUserDropdown,
+    changeUserDropdown
   }
 }

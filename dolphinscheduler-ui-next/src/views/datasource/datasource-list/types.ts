@@ -15,27 +15,33 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+import type {
+  IDataSource,
+  IDataBase
+} from '@/service/modules/data-source/types'
+import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
+import type { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+interface IDataSourceDetail extends Omit<IDataSource, 'other'> {
+  other?: string
+}
 
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['datasource-list'],
-      meta: {
-        title: '数据源中心'
-      }
-    }
-  ]
+interface IDataBaseOption extends SelectBaseOption {
+  label: string
+  value: string
+  defaultPort: number
+  previousPort?: number
+}
+
+type IDataBaseOptionKeys = {
+  [key in IDataBase]: IDataBaseOption
+}
+
+export {
+  IDataSource,
+  IDataSourceDetail,
+  IDataBase,
+  IDataBaseOption,
+  IDataBaseOptionKeys,
+  TableColumns
 }

@@ -15,27 +15,29 @@
  * limitations under the License.
  */
 
-import type { Component } from 'vue'
-import utils from '@/utils'
+.search-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-// All TSX files under the views folder automatically generate mapping relationship
-const modules = import.meta.glob('/src/views/**/**.tsx')
-const components: { [key: string]: Component } = utils.mapping(modules)
+  .box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
 
-export default {
-  path: '/datasource',
-  name: 'datasource',
-  redirect: { name: 'datasource-list' },
-  meta: { title: '数据源中心' },
-  component: () => import('@/layouts/content'),
-  children: [
-    {
-      path: '/datasource/list',
-      name: 'datasource-list',
-      component: components['datasource-list'],
-      meta: {
-        title: '数据源中心'
-      }
+    button {
+      margin-left: 10px;
     }
-  ]
+  }
+}
+
+.table-card {
+  margin-top: 8px;
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }

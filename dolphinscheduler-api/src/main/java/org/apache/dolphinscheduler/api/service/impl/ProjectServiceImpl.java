@@ -344,11 +344,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
-            return result;
+
+        List<Project> projectList;
+        if (isAdmin(loginUser)) {
+            // admin gets all projects except userId
+            projectList = projectMapper.queryProjectExceptUserId(userId);
+        } else {
+            projectList = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         }
-        // query all project list except specified userId
-        List<Project> projectList = projectMapper.queryProjectExceptUserId(userId);
         List<Project> resultList = new ArrayList<>();
         Set<Project> projectSet;
         if (projectList != null && !projectList.isEmpty()) {
@@ -392,10 +395,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
         List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
         result.put(Constants.DATA_LIST, projects);
