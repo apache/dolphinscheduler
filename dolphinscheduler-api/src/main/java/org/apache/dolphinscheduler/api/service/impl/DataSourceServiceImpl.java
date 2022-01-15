@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -389,30 +390,27 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      */
     @Override
     public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
-
         Map<String, Object> result = new HashMap<>();
-        //only admin operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
 
-        /**
-         * query all data sources except userId
-         */
+        List<DataSource> datasourceList;
+        if (isAdmin(loginUser)) {
+            // admin gets all data sources except userId
+            datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
+        } else {
+            // non-admins users get their own data sources
+            datasourceList = dataSourceMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId()));
+        }
         List<DataSource> resultList = new ArrayList<>();
-        List<DataSource> datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
-        Set<DataSource> datasourceSet = null;
+        Set<DataSource> datasourceSet;
         if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
             List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
 
-            Set<DataSource> authedDataSourceSet = null;
+            Set<DataSource> authedDataSourceSet;
             if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
                 authedDataSourceSet = new HashSet<>(authedDataSourceList);
                 datasourceSet.removeAll(authedDataSourceSet);
-
             }
             resultList = new ArrayList<>(datasourceSet);
         }
@@ -431,11 +429,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
 
         List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
         result.put(Constants.DATA_LIST, authedDatasourceList);
