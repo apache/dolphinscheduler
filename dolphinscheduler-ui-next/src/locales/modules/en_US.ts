@@ -70,7 +70,7 @@ const menu = {
   alarm_instance_manage: 'Alarm Instance Manage',
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
-  environmental_manage: 'Environmental Manage',
+  environment_manage: 'Environment Manage',
   token_manage: 'Token Manage'
 }
 
@@ -246,6 +246,25 @@ const security = {
     edit: 'Edit',
     queue_name_tips: 'Please enter your queue name',
     queue_value_tips: 'Please enter your queue value'
+  },
+  environment: {
+    create_environment: 'Create Environment',
+    edit_environment: 'Edit Environment',
+    search_tips: 'Please enter keywords',
+    edit: 'Edit',
+    delete: 'Delete',
+    environment_name: 'Environment Name',
+    environment_config: 'Environment Config',
+    environment_desc: 'Environment Desc',
+    worker_groups: 'Worker Groups',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    environment_name_tips: 'Please enter your environment name',
+    environment_config_tips: 'Please enter your environment config',
+    environment_description_tips: 'Please enter your environment description',
+    worker_group_tips: 'Please select worker group'
   }
 }
 
