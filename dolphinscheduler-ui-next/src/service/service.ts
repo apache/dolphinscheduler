@@ -15,13 +15,9 @@
  * limitations under the License.
  */
 
-import axios, {
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-  AxiosRequestHeaders,
-} from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import qs from 'qs'
+import _ from 'lodash'
 import { useUserStore } from '@/store/user/user'
 
 const userStore = useUserStore()
@@ -30,11 +26,15 @@ const baseRequestConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_APP_WEB_URL + '/dolphinscheduler',
   timeout: 10000,
   transformRequest: (params) => {
-    return qs.stringify(params, { arrayFormat: 'repeat' })
+    if (_.isPlainObject(params)) {
+      return qs.stringify(params, { arrayFormat: 'repeat' })
+    } else {
+      return params
+    }
   },
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' })
-  },
+  }
 }
 
 const service = axios.create(baseRequestConfig)
@@ -66,4 +66,46 @@ service.interceptors.response.use((res: AxiosResponse) => {
   }
 }, err)
 
-export { service as axios }
+const apiPrefix = '/dolphinscheduler'
+const reSlashPrefix = /^\/+/
+
+const resolveURL = (url: string) => {
+  if (url.indexOf('http') === 0) {
+    return url
+  }
+  if (url.charAt(0) !== '/') {
+    return `${apiPrefix}/${url.replace(reSlashPrefix, '')}`
+  }
+
+  return url
+}
+
+/**
+ * download file
+ */
+const downloadFile = (url: string, obj?: any) => {
+  const param: any = {
+    url: resolveURL(url),
+    obj: obj || {}
+  }
+
+  const form = document.createElement('form')
+  form.action = param.url
+  form.method = 'get'
+  form.style.display = 'none'
+  Object.keys(param.obj).forEach((key) => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = key
+    input.value = param.obj[key]
+    form.appendChild(input)
+  })
+  const button = document.createElement('input')
+  button.type = 'submit'
+  form.appendChild(button)
+  document.body.appendChild(form)
+  form.submit()
+  document.body.removeChild(form)
+}
+
+export { service as axios, downloadFile }

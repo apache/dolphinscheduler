@@ -21,23 +21,23 @@ const login = {
   userName_tips: 'Please enter your username',
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
-  login: 'Login',
+  login: 'Login'
 }
 
 const modal = {
   cancel: 'Cancel',
-  confirm: 'Confirm',
+  confirm: 'Confirm'
 }
 
 const theme = {
   light: 'Light',
-  dark: 'Dark',
+  dark: 'Dark'
 }
 
 const userDropdown = {
   profile: 'Profile',
   password: 'Password',
-  logout: 'Logout',
+  logout: 'Logout'
 }
 
 const menu = {
@@ -70,8 +70,8 @@ const menu = {
   alarm_instance_manage: 'Alarm Instance Manage',
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
-  environmental_manage: 'Environmental Manage',
-  token_manage: 'Token Manage',
+  environment_manage: 'Environment Manage',
+  token_manage: 'Token Manage'
 }
 
 const home = {
@@ -79,7 +79,7 @@ const home = {
   process_state_statistics: 'Process State Statistics',
   process_definition_statistics: 'Process Definition Statistics',
   number: 'Number',
-  state: 'State',
+  state: 'State'
 }
 
 const password = {
@@ -90,7 +90,7 @@ const password = {
   confirm_password_tips: 'Please enter your confirm password',
   two_password_entries_are_inconsistent:
     'Two password entries are inconsistent',
-  submit: 'Submit',
+  submit: 'Submit'
 }
 
 const profile = {
@@ -112,7 +112,7 @@ const profile = {
   phone_tips: 'Please enter your phone',
   state_tips: 'Please choose your state',
   enable: 'Enable',
-  disable: 'Disable',
+  disable: 'Disable'
 }
 
 const monitor = {
@@ -124,7 +124,7 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory',
+    directory: 'Directory'
   },
   worker: {
     cpu_usage: 'CPU Usage',
@@ -134,26 +134,65 @@ const monitor = {
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
     host: 'Host',
-    directory: 'Directory',
+    directory: 'Directory'
   },
   db: {
     health_state: 'Health State',
     max_connections: 'Max Connections',
     threads_connections: 'Threads Connections',
-    threads_running_connections: 'Threads Running Connections',
+    threads_running_connections: 'Threads Running Connections'
   },
   statistics: {
     command_number_of_waiting_for_running:
       'Command Number Of Waiting For Running',
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
-    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill',
-  },
+    task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
+  }
+}
+
+const resource = {
+  file: {
+    file_manage: 'File Manage',
+    create_folder: 'Create Folder',
+    create_file: 'Create File',
+    upload_files: 'Upload Files',
+    enter_keyword_tips: 'Please enter keyword',
+    id: '#',
+    name: 'Name',
+    user_name: 'Resource userName',
+    whether_directory: 'Whether directory',
+    file_name: 'File Name',
+    description: 'Description',
+    size: 'Size',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    rename: 'Rename',
+    download: 'Download',
+    delete: 'Delete',
+    yes: 'Yes',
+    no: 'No',
+    folder_name: 'Folder Name',
+    enter_name_tips: 'Please enter name',
+    enter_description_tips: 'Please enter description',
+    enter_content_tips: 'Please enter the resource content',
+    file_format: 'File Format',
+    file_content: 'File Content',
+    delete_confirm: 'Delete?',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    success: 'Success',
+    file_details: 'File Details',
+    return: 'Return',
+    save: 'Save'
+  }
 }
 
 const project = {
   list: {
     create_project: 'Create Project',
+    edit_project: 'Edit Project',
     project_list: 'Project List',
     project_tips: 'Please enter your project',
     description_tips: 'Please enter your description',
@@ -171,8 +210,110 @@ const project = {
     delete: 'Delete',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    delete_confirm: 'Delete?'
+  }
+}
+
+const security = {
+  tenant: {
+    tenant_manage: 'Tenant Manage',
+    create_tenant: 'Create Tenant',
+    search_tips: 'Please enter keywords',
+    num: 'Serial number',
+    tenant_code: 'Operating System Tenant',
+    description: 'Description',
+    queue_name: 'QueueName',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    actions: 'Operation',
+    edit_tenant: 'Edit Tenant',
+    tenant_code_tips: 'Please enter the operating system tenant',
+    queue_name_tips: 'Please select queue',
+    description_tips: 'Please enter a description',
     delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete'
   },
+  yarn_queue: {
+    create_queue: 'Create Queue',
+    edit_queue: 'Edit Queue',
+    search_tips: 'Please enter keywords',
+    queue_name: 'Queue Name',
+    queue_value: 'Queue Value',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    edit: 'Edit',
+    queue_name_tips: 'Please enter your queue name',
+    queue_value_tips: 'Please enter your queue value'
+  },
+  environment: {
+    create_environment: 'Create Environment',
+    edit_environment: 'Edit Environment',
+    search_tips: 'Please enter keywords',
+    edit: 'Edit',
+    delete: 'Delete',
+    environment_name: 'Environment Name',
+    environment_config: 'Environment Config',
+    environment_desc: 'Environment Desc',
+    worker_groups: 'Worker Groups',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    environment_name_tips: 'Please enter your environment name',
+    environment_config_tips: 'Please enter your environment config',
+    environment_description_tips: 'Please enter your environment description',
+    worker_group_tips: 'Please select worker group'
+  }
+}
+const datasource = {
+  datasource: 'DataSource',
+  create_datasource: 'Create DataSource',
+  search_input_tips: 'Please input the keywords',
+  serial_number: '#',
+  datasource_name: 'Datasource Name',
+  datasource_name_tips: 'Please enter datasource name',
+  datasource_user_name: 'Owner',
+  datasource_type: 'Datasource Type',
+  datasource_parameter: 'Datasource Parameter',
+  description: 'Description',
+  description_tips: 'Please enter description',
+  create_time: 'Create Time',
+  update_time: 'Update Time',
+  operation: 'Operation',
+  click_to_view: 'Click to view',
+  delete: 'Delete',
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  create: 'Create',
+  edit: 'Edit',
+  success: 'Success',
+  test_connect: 'Test Connect',
+  ip: 'IP',
+  ip_tips: 'Please enter IP',
+  port: 'Port',
+  port_tips: 'Please enter port',
+  database_name: 'Database Name',
+  database_name_tips: 'Please enter database name',
+  oracle_connect_type: 'ServiceName or SID',
+  oracle_connect_type_tips: 'Please select serviceName or SID',
+  oracle_service_name: 'ServiceName',
+  oracle_sid: 'SID',
+  jdbc_connect_parameters: 'jdbc connect parameters',
+  principal_tips: 'Please enter Principal',
+  krb5_conf_tips:
+    'Please enter the kerberos authentication parameter java.security.krb5.conf',
+  keytab_username_tips:
+    'Please enter the kerberos authentication parameter login.user.keytab.username',
+  keytab_path_tips:
+    'Please enter the kerberos authentication parameter login.user.keytab.path',
+  format_tips: 'Please enter format',
+  connection_parameter: 'connection parameter',
+  user_name: 'User Name',
+  user_name_tips: 'Please enter your username',
+  user_password: 'Password',
+  user_password_tips: 'Please enter your password'
 }
 
 export default {
@@ -185,5 +326,8 @@ export default {
   password,
   profile,
   monitor,
+  resource,
   project,
+  security,
+  datasource
 }

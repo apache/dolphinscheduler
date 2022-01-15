@@ -42,6 +42,6 @@ export function useLogin(state: any) {
   }
 
   return {
-    handleLogin,
+    handleLogin
   }
 }
