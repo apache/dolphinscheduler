@@ -70,7 +70,7 @@ const menu = {
   alarm_instance_manage: '告警实例管理',
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
-  environmental_manage: '环境管理',
+  environment_manage: '环境管理',
   token_manage: '令牌管理'
 }
 
@@ -243,8 +243,27 @@ const security = {
     update_time: '更新时间',
     operation: '操作',
     edit: '编辑',
-    queue_name_tips: '请输入队列名称',
+    queue_name_tips: '请输入队列名',
     queue_value_tips: '请输入队列值'
+  },
+  environment: {
+    create_environment: '创建环境',
+    edit_environment: '编辑环境',
+    search_tips: '请输入关键词',
+    edit: '编辑',
+    delete: '删除',
+    environment_name: '环境名称',
+    environment_config: '环境配置',
+    environment_desc: '环境描述',
+    worker_groups: 'Worker分组',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    environment_name_tips: '请输入环境名',
+    environment_config_tips: '请输入环境配置',
+    environment_description_tips: '请输入环境描述',
+    worker_group_tips: '请选择Worker分组'
   }
 }
 
