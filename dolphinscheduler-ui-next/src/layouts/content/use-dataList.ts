@@ -230,8 +230,8 @@ export function useDataList() {
             icon: renderIcon(SlackOutlined)
           },
           {
-            label: t('menu.environmental_manage'),
-            key: 'environmental-manage',
+            label: t('menu.environment_manage'),
+            key: 'environment-manage',
             icon: renderIcon(EnvironmentOutlined)
           },
           {
