@@ -52,6 +52,14 @@ export default {
       meta: {
         title: 'Yarn队列管理'
       }
+    },
+    {
+      path: '/security/environment-manage',
+      name: 'environment-manage',
+      component: components['environment-manage'],
+      meta: {
+        title: '环境管理'
+      }
     }
   ]
 }
