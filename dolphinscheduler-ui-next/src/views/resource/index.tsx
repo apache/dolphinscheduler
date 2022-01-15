@@ -19,12 +19,10 @@ import { defineComponent } from 'vue'
 
 const resource = defineComponent({
   name: 'resource',
-  setup() {
-  },
+  setup() {},
   render() {
-    return ( {}
-    )
-  },
+    return {}
+  }
 })
 
 export default resource

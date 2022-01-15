@@ -46,8 +46,8 @@ const FormModal = defineComponent({
 
     onMounted(() => {
       queryAllProjectList().then((res: any) => {
-        res.map(item => {
-          projectOptions.value.push({label: item.name, value: item.code})
+        res.map((item) => {
+          projectOptions.value.push({ label: item.name, value: item.code })
         })
       })
       if (props.status === 1) {
@@ -92,7 +92,9 @@ const FormModal = defineComponent({
         onConfirm={onConfirm}
         onCancel={onCancel}
         confirmDisabled={
-          !this.formData.name || !this.formData.groupSize || !this.formData.description
+          !this.formData.name ||
+          !this.formData.groupSize ||
+          !this.formData.description
         }
       >
         <NForm rules={this.rules} ref='formRef'>
@@ -102,17 +104,27 @@ const FormModal = defineComponent({
               placeholder={t('resource.task_group_option.please_enter_name')}
             />
           </NFormItem>
-          <NFormItem label={t('resource.task_group_option.project_name')} path='projectCode'>
+          <NFormItem
+            label={t('resource.task_group_option.project_name')}
+            path='projectCode'
+          >
             <NSelect
-                options={projectOptions}
-                v-model={[this.formData.projectCode, 'value']}
-                placeholder={t('resource.task_group_option.please_select_project')}
+              options={projectOptions}
+              v-model={[this.formData.projectCode, 'value']}
+              placeholder={t(
+                'resource.task_group_option.please_select_project'
+              )}
             />
           </NFormItem>
-          <NFormItem label={t('resource.task_group_option.resource_pool_size')} path='groupSize'>
+          <NFormItem
+            label={t('resource.task_group_option.resource_pool_size')}
+            path='groupSize'
+          >
             <NInput
-                v-model={[this.formData.groupSize, 'value']}
-                placeholder={t('resource.task_group_option.please_enter_resource_pool_size')}
+              v-model={[this.formData.groupSize, 'value']}
+              placeholder={t(
+                'resource.task_group_option.please_enter_resource_pool_size'
+              )}
             />
           </NFormItem>
           <NFormItem

@@ -42,7 +42,7 @@ import {
   EnvironmentOutlined,
   KeyOutlined,
   SafetyOutlined,
-  GroupOutlined,
+  GroupOutlined
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -154,10 +154,10 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_group_option'),
-                key: 'task-group-option',
+                key: 'task-group-option'
               }
-            ],
-          },
+            ]
+          }
         ]
       },
       {
@@ -258,19 +258,19 @@ export function useDataList() {
 
   const changeHeaderMenuOptions = (state: any) => {
     state.headerMenuOptions = state.menuOptions.map(
-        (item: {
-          label: string
-          key: string
-          icon: any
-          isShowSide: boolean
-        }) => {
-          return {
-            label: item.label,
-            key: item.key,
-            icon: item.icon,
-            isShowSide: item.isShowSide
-          }
+      (item: {
+        label: string
+        key: string
+        icon: any
+        isShowSide: boolean
+      }) => {
+        return {
+          label: item.label,
+          key: item.key,
+          icon: item.icon,
+          isShowSide: item.isShowSide
         }
+      }
     )
   }
 

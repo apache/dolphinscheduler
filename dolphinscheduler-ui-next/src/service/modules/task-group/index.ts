@@ -27,7 +27,7 @@ export function queryTaskGroupListPaging(params: ListReq): any {
   return axios({
     url: '/task-group/list-paging',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -35,28 +35,23 @@ export function queryTaskGroupListPagingByProjectCode(params: ListReq): any {
   return axios({
     url: '/task-group/query-list-by-projectCode',
     method: 'get',
-    params,
+    params
   })
 }
 
-
-export function createTaskGroup(
-    data: TaskGroupReq
-): any {
+export function createTaskGroup(data: TaskGroupReq): any {
   return axios({
     url: '/task-group/create',
     method: 'post',
-    data,
+    data
   })
 }
 
-export function updateTaskGroup(
-    data: TaskGroupUpdateReq
-): any {
+export function updateTaskGroup(data: TaskGroupUpdateReq): any {
   return axios({
     url: '/task-group/update',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -64,7 +59,7 @@ export function closeTaskGroup(data: TaskGroupIdReq): any {
   return axios({
     url: '/task-group/close-task-group',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -72,7 +67,7 @@ export function startTaskGroup(data: TaskGroupIdReq): any {
   return axios({
     url: '/task-group/start-task-group',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -80,7 +75,7 @@ export function queryTaskListInTaskGroupQueueById(params: ListReq): any {
   return axios({
     url: '/task-group/query-list-by-group-id',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -88,7 +83,7 @@ export function modifyTaskGroupQueuePriority(data: TaskGroupIdReq): any {
   return axios({
     url: '/task-group/modifyPriority',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -96,6 +91,6 @@ export function forceStartTaskInQueue(data: TaskGroupIdReq): any {
   return axios({
     url: '/task-group/forceStart',
     method: 'post',
-    data,
+    data
   })
 }

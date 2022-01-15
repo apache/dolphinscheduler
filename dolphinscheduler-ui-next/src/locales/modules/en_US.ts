@@ -89,7 +89,7 @@ const password = {
   password_tips: 'Please enter your password',
   confirm_password_tips: 'Please enter your confirm password',
   two_password_entries_are_inconsistent:
-      'Two password entries are inconsistent',
+    'Two password entries are inconsistent',
   submit: 'Submit'
 }
 
@@ -144,7 +144,7 @@ const monitor = {
   },
   statistics: {
     command_number_of_waiting_for_running:
-        'Command Number Of Waiting For Running',
+      'Command Number Of Waiting For Running',
     failure_command_number: 'Failure Command Number',
     tasks_number_of_waiting_running: 'Tasks Number Of Waiting Running',
     task_number_of_ready_to_kill: 'Task Number Of Ready To Kill'
@@ -200,7 +200,8 @@ const resource = {
     name: 'Task group name',
     project_name: 'Project name',
     resource_pool_size: 'Resource pool size',
-    resource_pool_size_be_a_number: 'The size of the task group resource pool should be more than 1',
+    resource_pool_size_be_a_number:
+      'The size of the task group resource pool should be more than 1',
     resource_used_pool_size: 'Used resource',
     desc: 'Task group desc',
     status: 'Task group status',
@@ -208,17 +209,19 @@ const resource = {
     disable_status: 'Disable',
     please_enter_name: 'Please enter task group name',
     please_enter_desc: 'Please enter task group description',
-    please_enter_resource_pool_size: 'Please enter task group resource pool size',
+    please_enter_resource_pool_size:
+      'Please enter task group resource pool size',
     please_select_project: 'Please select a project',
     create_time: 'Create time',
     update_time: 'Update time',
     actions: 'Actions',
-    please_enter_keywords: 'Please enter keywords',
+    please_enter_keywords: 'Please enter keywords'
   },
   task_group_queue: {
     queue: 'Task group queue',
     priority: 'Priority',
-    priority_be_a_number: 'The priority of the task group queue should be a positive number',
+    priority_be_a_number:
+      'The priority of the task group queue should be a positive number',
     force_starting_status: 'Starting status',
     in_queue: 'In queue',
     task_status: 'Task status',

@@ -30,7 +30,7 @@ export function useForm() {
       projectCode: 0,
       groupSize: 0,
       status: 1,
-      description: '',
+      description: ''
     },
     rules: {
       name: {

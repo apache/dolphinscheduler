@@ -74,7 +74,7 @@ const menu = {
   token_manage: '令牌管理',
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
-  task_group_queue: '任务组队列',
+  task_group_queue: '任务组队列'
 }
 
 const home = {
@@ -215,7 +215,7 @@ const resource = {
     create_time: '创建时间',
     update_time: '更新时间',
     actions: '操作',
-    please_enter_keywords: '请输入搜索关键词',
+    please_enter_keywords: '请输入搜索关键词'
   },
   task_group_queue: {
     queue: '任务组队列',

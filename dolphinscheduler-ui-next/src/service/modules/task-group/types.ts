@@ -32,9 +32,7 @@ interface TaskGroupReq {
   description: string
 }
 
-interface TaskGroupUpdateReq extends TaskGroupReq, TaskGroupIdReq{
-
-}
+interface TaskGroupUpdateReq extends TaskGroupReq, TaskGroupIdReq {}
 
 interface TaskGroup {
   id: number
@@ -64,5 +62,5 @@ export {
   TaskGroupReq,
   TaskGroupUpdateReq,
   TaskGroup,
-  TaskGroupRes,
+  TaskGroupRes
 }

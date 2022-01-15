@@ -19,7 +19,10 @@ import { defineComponent, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NSpace, NTooltip, NButton, NIcon, NSwitch } from 'naive-ui'
 import { EditOutlined, UnorderedListOutlined } from '@vicons/antd'
-import type { TaskGroupIdReq, TaskGroup } from "@/service/modules/task-group/types"
+import type {
+  TaskGroupIdReq,
+  TaskGroup
+} from '@/service/modules/task-group/types'
 import { startTaskGroup, closeTaskGroup } from '@/service/modules/task-group'
 
 interface ItemRow extends TaskGroup {
@@ -58,15 +61,14 @@ const TableAction = defineComponent({
         startTaskGroup(params).then(() => {
           emit('resetTableData')
         })
-      } else if (value ===0) {
+      } else if (value === 0) {
         closeTaskGroup(params).then(() => {
           emit('resetTableData')
         })
       }
     }
 
-    const handleViewQueue = (id: number) => {
-    }
+    const handleViewQueue = (id: number) => {}
 
     return { t, handleEdit, handleViewQueue, handleSwitchStatus }
   },
@@ -79,7 +81,14 @@ const TableAction = defineComponent({
           {{
             default: () => t('resource.task_group_option.switch_status'),
             trigger: () => (
-                <NSwitch v-model={[this.row.status, 'value']} checkedValue={1} uncheckedValue={0} onUpdate:value={(value) => handleSwitchStatus(value,this.row.id)}/>
+              <NSwitch
+                v-model={[this.row.status, 'value']}
+                checkedValue={1}
+                uncheckedValue={0}
+                onUpdate:value={(value) =>
+                  handleSwitchStatus(value, this.row.id)
+                }
+              />
             )
           }}
         </NTooltip>
@@ -87,26 +96,26 @@ const TableAction = defineComponent({
           {{
             default: () => t('resource.task_group_option.edit'),
             trigger: () => (
-                <NButton
-                    size='small'
-                    type='info'
-                    tag='div'
-                    onClick={() =>
-                        handleEdit(
-                            this.row.id,
-                            this.row.name,
-                            this.row.projectCode,
-                            this.row.groupSize,
-                            this.row.description,
-                            this.row.status
-                        )
-                    }
-                    circle
-                >
-                  <NIcon>
-                    <EditOutlined />
-                  </NIcon>
-                </NButton>
+              <NButton
+                size='small'
+                type='info'
+                tag='div'
+                onClick={() =>
+                  handleEdit(
+                    this.row.id,
+                    this.row.name,
+                    this.row.projectCode,
+                    this.row.groupSize,
+                    this.row.description,
+                    this.row.status
+                  )
+                }
+                circle
+              >
+                <NIcon>
+                  <EditOutlined />
+                </NIcon>
+              </NButton>
             )
           }}
         </NTooltip>
@@ -114,19 +123,17 @@ const TableAction = defineComponent({
           {{
             default: () => t('resource.task_group_option.view_queue'),
             trigger: () => (
-                <NButton
-                    size='small'
-                    type='primary'
-                    tag='div'
-                    onClick={() =>
-                        handleViewQueue(this.row.id)
-                    }
-                    circle
-                >
-                  <NIcon>
-                    <UnorderedListOutlined />
-                  </NIcon>
-                </NButton>
+              <NButton
+                size='small'
+                type='primary'
+                tag='div'
+                onClick={() => handleViewQueue(this.row.id)}
+                circle
+              >
+                <NIcon>
+                  <UnorderedListOutlined />
+                </NIcon>
+              </NButton>
             )
           }}
         </NTooltip>

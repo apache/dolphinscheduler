@@ -15,11 +15,20 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted} from 'vue'
-import {NButton, NIcon, NInput, NCard, NDataTable, NSwitch, NPagination, NTooltip} from 'naive-ui'
+import { ref, defineComponent, toRefs, reactive, onMounted } from 'vue'
+import {
+  NButton,
+  NIcon,
+  NInput,
+  NCard,
+  NDataTable,
+  NSwitch,
+  NPagination,
+  NTooltip
+} from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
-import {useI18n} from "vue-i18n"
+import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
 import { useTable } from './use-table'
 import FormModal from './components/form-modal'
@@ -82,11 +91,11 @@ const taskGroupOption = defineComponent({
     }
 
     const updateItem = (
-        id: number,
-        name: string,
-        projectCode: number,
-        groupSize: number,
-        description: string
+      id: number,
+      name: string,
+      projectCode: number,
+      groupSize: number,
+      description: string
     ) => {
       modelStatusRef.value = 1
       showModalRef.value = true
@@ -123,7 +132,7 @@ const taskGroupOption = defineComponent({
       modelStatusRef,
       onCancel,
       onConfirm,
-      updateItemData,
+      updateItemData
     }
   },
   render() {
@@ -137,64 +146,77 @@ const taskGroupOption = defineComponent({
       resetTableData,
       onUpdatePageSize,
       updateItem,
-      onSearch,
+      onSearch
     } = this
 
     const { columns } = useTable(updateItem, resetTableData)
 
     return (
-        <div>
-          <NCard>
-            <div class={styles.toolbar}>
-              <div class={styles.left}>
-                <NButton size='small' type={"primary"} onClick={() => this.onCreate()}>
-                  {t('resource.task_group_option.create')}
-                </NButton>
-              </div>
-              <div class={styles.right}>
-                <NInput size='small' v-model={[this.name, 'value']} placeholder={t('resource.task_group_option.please_enter_keywords')}></NInput>
-                <NButton size='small' type='primary' onClick={onSearch}>
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                </NButton>
-              </div>
+      <div>
+        <NCard>
+          <div class={styles.toolbar}>
+            <div class={styles.left}>
+              <NButton
+                size='small'
+                type={'primary'}
+                onClick={() => this.onCreate()}
+              >
+                {t('resource.task_group_option.create')}
+              </NButton>
             </div>
-          </NCard>
-          <Card class={styles['table-card']} title={t('resource.task_group_option.option')}>
-            <div>
-              <NDataTable
-                  columns={columns}
-                  size={'small'}
-                  data={this.tableData}
-                  striped
-              />
-              <div class={styles.pagination}>
-                <NPagination
-                    v-model:page={this.page}
-                    v-model:page-size={this.pageSize}
-                    page-count={this.totalPage}
-                    show-size-picker
-                    page-sizes={[10, 30, 50]}
-                    show-quick-jumper
-                    onUpdatePage={resetTableData}
-                    onUpdatePageSize={onUpdatePageSize}
-                />
-              </div>
+            <div class={styles.right}>
+              <NInput
+                size='small'
+                v-model={[this.name, 'value']}
+                placeholder={t(
+                  'resource.task_group_option.please_enter_keywords'
+                )}
+              ></NInput>
+              <NButton size='small' type='primary' onClick={onSearch}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
             </div>
-          </Card>
-          {showModalRef && (
-              <FormModal
-                  show={showModalRef}
-                  onCancel={onCancel}
-                  onConfirm={onConfirm}
-                  data={updateItemData}
-                  status={modelStatusRef}
+          </div>
+        </NCard>
+        <Card
+          class={styles['table-card']}
+          title={t('resource.task_group_option.option')}
+        >
+          <div>
+            <NDataTable
+              columns={columns}
+              size={'small'}
+              data={this.tableData}
+              striped
+            />
+            <div class={styles.pagination}>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={resetTableData}
+                onUpdatePageSize={onUpdatePageSize}
               />
-          )}
-        </div>
+            </div>
+          </div>
+        </Card>
+        {showModalRef && (
+          <FormModal
+            show={showModalRef}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+            data={updateItemData}
+            status={modelStatusRef}
+          />
+        )}
+      </div>
     )
-  },
+  }
 })
 
 export default taskGroupOption
