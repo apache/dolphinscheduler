@@ -15,47 +15,29 @@
  * limitations under the License.
  */
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
+.search-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 300px;
+
+    button {
+      margin-left: 10px;
+    }
+  }
 }
 
-interface PluginInstanceReq {
-  instanceName: string
-  pluginDefineId: number
-  pluginInstanceParams: string
-}
+.table-card {
+  margin-top: 8px;
 
-interface InstanceNameReq {
-  alertInstanceName: string
-}
-
-interface IdReq {
-  id: number
-}
-
-interface UpdatePluginInstanceReq {
-  alertPluginInstanceId: number
-  instanceName: string
-  pluginInstanceParams: string
-}
-
-interface AlertPluginItem {
-  id: number
-  pluginDefineId: number
-  instanceName: string
-  pluginInstanceParams: string
-  createTime: string
-  updateTime: string
-  alertPluginName: string
-}
-
-export {
-  ListReq,
-  PluginInstanceReq,
-  InstanceNameReq,
-  IdReq,
-  UpdatePluginInstanceReq,
-  AlertPluginItem
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }
