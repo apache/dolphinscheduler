@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType } from 'vue'
-import { NForm, NFormItem, NInput, NUpload, NButton } from 'naive-ui'
+import { defineComponent, toRefs, PropType, onMounted } from 'vue'
+import { NForm, NFormItem, NInput, NUpload, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
+import { CloudUploadOutlined } from '@vicons/antd'
 
 const props = {
   show: {
@@ -34,7 +35,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'updateList'],
   setup(props, ctx) {
-    const { uploadState: state, resetUploadForm: resetForm } = useForm()
+    const { uploadState: state } = useForm()
     const { handleUploadFile } = useModal(state, ctx)
 
     const hideModal = () => {
@@ -42,7 +43,7 @@ export default defineComponent({
     }
 
     const handleFolder = () => {
-      handleUploadFile(resetForm)
+      handleUploadFile()
     }
 
     const customRequest = ({ file }: any) => {
@@ -90,7 +91,12 @@ export default defineComponent({
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
             >
-              <NButton>{t('resource.udf.upload')}</NButton>
+              <NButton>
+                {t('resource.udf.upload')}
+                <NIcon>
+                  <CloudUploadOutlined />
+                </NIcon>
+              </NButton>
             </NUpload>
           </NFormItem>
         </NForm>

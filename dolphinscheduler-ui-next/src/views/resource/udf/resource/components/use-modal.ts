@@ -53,7 +53,7 @@ export function useModal(
           ...state.folderForm,
           ...{ id }
         },
-        state.folderForm.id
+        id
       )
     })
   }
@@ -65,30 +65,18 @@ export function useModal(
           await serviceHandle()
           window.$message.success(t('resource.udf.success'))
           ctx.emit('updateList')
+          ctx.emit('update:show')
         } catch (error: any) {
           window.$message.error(error.message)
         }
-        ctx.emit('update:show')
       }
     })
   }
 
-  const handleCreateOrRenameFolder = (status: number) => {
-    const pid = router.currentRoute.value.params.id || -1
-    const currentDir = fileStore.getCurrentDir || '/'
-    const service = status === 0 ? handleCreateResource : handleRenameResource
-    state.folderFormRef.validate(async (valid: any) => {
-      if (!valid) {
-        try {
-          await service(pid as number, currentDir)
-          window.$message.success(t('resource.udf.success'))
-          ctx.emit('updateList')
-        } catch (error: any) {
-          window.$message.error(error.message)
-        }
-        ctx.emit('update:show')
-      }
-    })
+  const resetUploadForm = () => {
+    state.uploadForm.name = ''
+    state.uploadForm.file = ''
+    state.uploadForm.description = ''
   }
 
   const handleUploadFile = () => {
@@ -108,10 +96,11 @@ export function useModal(
           await createResource(formData as any)
           window.$message.success(t('resource.udf.success'))
           ctx.emit('updateList')
+          ctx.emit('update:show')
+          resetUploadForm()
         } catch (error: any) {
           window.$message.error(error.message)
         }
-        ctx.emit('update:show')
       }
     })
   }
@@ -119,7 +108,6 @@ export function useModal(
   return {
     handleCreateResource,
     handleRenameResource,
-    handleCreateOrRenameFolder,
     handleUploadFile
   }
 }

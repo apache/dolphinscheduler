@@ -86,6 +86,14 @@ export default {
       }
     },
     {
+      path: '/resource/resource-manage/:id',
+      name: 'resource-sub-manage',
+      component: components['resource'],
+      meta: {
+        title: '资源管理'
+      }
+    },
+    {
       path: '/resource/task-group',
       name: 'task-group-manage',
       component: components['taskGroupOption'],

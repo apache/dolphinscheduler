@@ -93,7 +93,7 @@ const Content = defineComponent({
             <SideBar sideMenuOptions={this.sideMenuOptions} />
           )}
           <NLayoutContent native-scrollbar={false} style='padding: 16px 22px'>
-            <router-view />
+            <router-view key={this.$route.fullPath} />
           </NLayoutContent>
         </NLayout>
       </NLayout>

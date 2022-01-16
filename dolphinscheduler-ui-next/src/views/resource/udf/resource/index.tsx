@@ -15,18 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  ref,
-  defineComponent,
-  reactive,
-  Ref,
-  toRefs,
-  ShallowRef,
-  onMounted,
-  unref,
-  watch,
-  toRef
-} from 'vue'
+import { defineComponent, Ref, toRefs, onMounted, toRef } from 'vue'
 import {
   NIcon,
   NSpace,

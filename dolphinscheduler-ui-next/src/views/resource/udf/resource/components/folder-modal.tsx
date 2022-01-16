@@ -72,12 +72,13 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
+
     return (
       <Modal
         show={this.$props.show}
         title={t('resource.udf.create_folder')}
         onCancel={this.hideModal}
-        onConfirm={this.row.id ? this.handleCreate : this.handleCreate}
+        onConfirm={this.row.id ? this.handleRename : this.handleCreate}
       >
         <NForm
           rules={this.rules}

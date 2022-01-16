@@ -30,8 +30,18 @@ import {
   downloadResource,
   deleteResource
 } from '@/service/modules/resources'
-import { IUdfResourceParam, IUdfRes } from './types'
+import { IUdfResourceParam } from './types'
 import styles from './index.module.scss'
+
+const goSubFolder = (router: Router, item: any) => {
+  const fileStore = useFileStore()
+  fileStore.setFileInfo(`${item.alias}|${item.size}`)
+
+  if (item.directory) {
+    fileStore.setCurrentDir(`${item.fullName}`)
+    router.push({ name: 'resource-sub-manage', params: { id: item.id } })
+  }
+}
 
 export function useTable() {
   const { t } = useI18n()
@@ -46,7 +56,26 @@ export function useTable() {
     },
     {
       title: t('resource.udf.udf_source_name'),
-      key: 'alias'
+      key: 'alias',
+      render: (row) => {
+        if (!row.directory) {
+          return row.alias
+        } else {
+          return h(
+            'a',
+            {
+              href: 'javascript:',
+              class: styles.links,
+              onClick: () => goSubFolder(router, row)
+            },
+            {
+              default: () => {
+                return row.alias
+              }
+            }
+          )
+        }
+      }
     },
     {
       title: t('resource.udf.whether_directory'),
@@ -60,7 +89,8 @@ export function useTable() {
     },
     {
       title: t('resource.udf.file_size'),
-      key: 'size'
+      key: 'size',
+      render: (row) => bytesToSize(row.size)
     },
     {
       title: t('resource.udf.description'),
@@ -113,6 +143,7 @@ export function useTable() {
                       circle: true,
                       type: 'info',
                       size: 'tiny',
+                      disabled: row?.directory ? true : false,
                       onClick: () => downloadResource(row.id)
                     },
                     {
@@ -163,7 +194,7 @@ export function useTable() {
     columns,
     row: {},
     tableData: [],
-    id: ref(-1),
+    id: ref(Number(router.currentRoute.value.params.id) || -1),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
