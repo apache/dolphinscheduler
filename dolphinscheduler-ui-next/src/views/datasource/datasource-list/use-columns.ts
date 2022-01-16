@@ -63,8 +63,7 @@ export function useColumns(onCallback: Function) {
                   default: () => t('datasource.click_to_view')
                 }
               ),
-            default: () =>
-              h(JsonHighlight, { rowData })
+            default: () => h(JsonHighlight, { rowData })
           }
         )
       }

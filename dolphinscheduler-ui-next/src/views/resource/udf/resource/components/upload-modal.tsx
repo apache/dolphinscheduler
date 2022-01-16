@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType, onMounted } from 'vue'
+import { defineComponent, toRefs, PropType } from 'vue'
 import { NForm, NFormItem, NInput, NUpload, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'

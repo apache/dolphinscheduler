@@ -32,7 +32,9 @@ const JsonHighlight = defineComponent({
   props,
   render(props: { rowData: { connectionParams: string } }) {
     return (
-      <pre class={styles['json-highlight']}>{syntaxHighlight(props.rowData.connectionParams)}</pre>
+      <pre class={styles['json-highlight']}>
+        {syntaxHighlight(props.rowData.connectionParams)}
+      </pre>
     )
   }
 })
@@ -43,7 +45,7 @@ const syntaxHighlight = (json: string) => {
   const entries = Object.entries(JSON.parse(json))
   for (let i = 0, len = entries.length; i < len; i++) {
     const [key, value] = entries[i]
-    let type: string = ''
+    let type = ''
     if (isBoolean(value) || value === null) {
       type = 'info'
     } else if (isNumber(value)) {

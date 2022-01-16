@@ -28,7 +28,8 @@ import { useAsyncState } from '@vueuse/core'
 import {
   queryResourceListPaging,
   downloadResource,
-  deleteResource
+  deleteResource,
+  queryResourceById
 } from '@/service/modules/resources'
 import { IUdfResourceParam } from './types'
 import styles from './index.module.scss'
@@ -46,6 +47,7 @@ const goSubFolder = (router: Router, item: any) => {
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const fileStore = useFileStore()
 
   const columns: TableColumns<any> = [
     {
@@ -194,6 +196,7 @@ export function useTable() {
     columns,
     row: {},
     tableData: [],
+    breadList: [],
     id: ref(Number(router.currentRoute.value.params.id) || -1),
     page: ref(1),
     pageSize: ref(10),
@@ -206,6 +209,13 @@ export function useTable() {
   const getTableData = (params: IUdfResourceParam) => {
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
+        const breadList =
+          variables.id === -1
+            ? []
+            : (fileStore.getCurrentDir.split('/') as Array<never>)
+        breadList.shift()
+
+        variables.breadList = breadList
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
@@ -232,8 +242,33 @@ export function useTable() {
     )
   }
 
+  const goUdfManage = () => {
+    router.push({ name: 'resource-manage' })
+  }
+
+  const goBread = (fullName: string) => {
+    const { id } = variables
+    queryResourceById(
+      {
+        id,
+        type: 'UDF',
+        fullName
+      },
+      id
+    )
+      .then((res: any) => {
+        fileStore.setCurrentDir(res.fullName)
+        router.push({ name: 'resource-sub-manage', params: { id: res.id } })
+      })
+      .catch((error: any) => {
+        window.$message.error(error.message)
+      })
+  }
+
   return {
     variables,
-    getTableData
+    getTableData,
+    goUdfManage,
+    goBread
   }
 }

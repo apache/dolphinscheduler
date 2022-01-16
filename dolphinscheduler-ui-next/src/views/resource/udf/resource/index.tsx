@@ -23,7 +23,9 @@ import {
   NButtonGroup,
   NButton,
   NPagination,
-  NInput
+  NInput,
+  NBreadcrumb,
+  NBreadcrumbItem
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
@@ -36,7 +38,7 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'resource-manage',
   setup() {
-    const { variables, getTableData } = useTable()
+    const { variables, getTableData, goUdfManage, goBread } = useTable()
 
     const requestData = () => {
       getTableData({
@@ -73,18 +75,30 @@ export default defineComponent({
       handleShowModal(toRef(variables, 'uploadShowRef'))
     }
 
+    const handleBread = (index: number) => {
+      let breadName = ''
+      variables.breadList.forEach((item, i) => {
+        if (i <= index) {
+          breadName = breadName + '/' + item
+        }
+      })
+      goBread(breadName)
+    }
+
     onMounted(() => {
       requestData()
     })
 
     return {
-      ...toRefs(variables),
+      goUdfManage,
+      handleBread,
       requestData,
       handleSearch,
       handleUpdateList,
       handleCreateFolder,
       handleUploadFile,
-      handleChangePageSize
+      handleChangePageSize,
+      ...toRefs(variables)
     }
   },
   render() {
@@ -124,26 +138,52 @@ export default defineComponent({
           </div>
         </Card>
         <Card title={t('resource.udf.udf_resources')}>
-          <NDataTable
-            remote
-            columns={this.columns}
-            data={this.tableData}
-            striped
-            size={'small'}
-            class={styles.table}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
-            />
-          </div>
+          {{
+            default: () => (
+              <div>
+                <NDataTable
+                  remote
+                  columns={this.columns}
+                  data={this.tableData}
+                  striped
+                  size={'small'}
+                  class={styles.table}
+                />
+                <div class={styles.pagination}>
+                  <NPagination
+                    v-model:page={this.page}
+                    v-model:page-size={this.pageSize}
+                    page-count={this.totalPage}
+                    show-size-picker
+                    page-sizes={[10, 30, 50]}
+                    show-quick-jumper
+                    onUpdatePage={this.requestData}
+                    onUpdatePageSize={this.handleChangePageSize}
+                  />
+                </div>
+              </div>
+            ),
+            header: () => (
+              <NBreadcrumb separator='>'>
+                <NBreadcrumbItem>
+                  <NButton text onClick={() => this.goUdfManage()}>
+                    {t('resource.udf.udf_resources')}
+                  </NButton>
+                </NBreadcrumbItem>
+                {this.breadList.map((item, index) => (
+                  <NBreadcrumbItem>
+                    <NButton
+                      text
+                      disabled={index === this.breadList.length - 1}
+                      onClick={() => this.handleBread(index)}
+                    >
+                      {item}
+                    </NButton>
+                  </NBreadcrumbItem>
+                ))}
+              </NBreadcrumb>
+            )
+          }}
         </Card>
         <FolderModal
           v-model:row={this.row}

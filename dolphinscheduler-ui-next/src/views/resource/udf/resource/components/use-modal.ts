@@ -36,7 +36,7 @@ export function useModal(
 
   const handleCreateResource = async () => {
     const pid = router.currentRoute.value.params.id || -1
-    const currentDir = fileStore.getCurrentDir || '/'
+    const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
 
     submitRequest(async () =>
       createDirectory({
@@ -82,7 +82,7 @@ export function useModal(
   const handleUploadFile = () => {
     state.uploadFormRef.validate(async (valid: any) => {
       const pid = router.currentRoute.value.params.id || -1
-      const currentDir = fileStore.getCurrentDir || '/'
+      const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
       if (!valid) {
         const formData = new FormData()
         formData.append('file', state.uploadForm.file)

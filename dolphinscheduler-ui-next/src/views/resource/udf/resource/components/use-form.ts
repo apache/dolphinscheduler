@@ -15,39 +15,22 @@
  * limitations under the License.
  */
 
-import { reactive, ref, unref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
-
-const defaultValue = () => ({
-  pid: -1,
-  type: 'UDF',
-  name: '',
-  description: '',
-  currentDir: '/'
-})
-
-const defaultUploadValue = () => ({
-  name: '',
-  file: '',
-  description: '',
-  pid: -1,
-  currentDir: '/'
-})
 
 export const useForm = () => {
   const { t } = useI18n()
 
-  const resetFolderForm = () => {
-    folderState.folderForm = Object.assign(
-      unref(folderState.folderForm),
-      defaultValue()
-    )
-  }
-
   const folderState = reactive({
     folderFormRef: ref(),
-    folderForm: defaultValue(),
+    folderForm: {
+      pid: -1,
+      type: 'UDF',
+      name: '',
+      description: '',
+      currentDir: '/'
+    },
     rules: {
       name: {
         required: true,
@@ -61,16 +44,15 @@ export const useForm = () => {
     } as FormRules
   })
 
-  const resetUploadForm = () => {
-    uploadState.uploadForm = Object.assign(
-      unref(uploadState.uploadForm),
-      defaultUploadValue()
-    )
-  }
-
   const uploadState = reactive({
     uploadFormRef: ref(),
-    uploadForm: defaultUploadValue(),
+    uploadForm: {
+      name: '',
+      file: '',
+      description: '',
+      pid: -1,
+      currentDir: '/'
+    },
     rules: {
       name: {
         required: true,
@@ -86,8 +68,6 @@ export const useForm = () => {
 
   return {
     folderState,
-    uploadState,
-    resetFolderForm,
-    resetUploadForm
+    uploadState
   }
 }
