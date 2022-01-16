@@ -35,7 +35,7 @@
     "@vicons/antd": "^0.11.0",
     "@vitejs/plugin-vue": "^1.10.2",
     "@vitejs/plugin-vue-jsx": "^1.3.3",
-    "dart-sass": "^1.25.0",
+    "dart-sass": "^1.48.0",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
