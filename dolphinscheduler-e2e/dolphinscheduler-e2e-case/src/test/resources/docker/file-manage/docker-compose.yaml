@@ -81,5 +81,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.1.1.0/24
-          gateway: 10.1.1.1
+        - subnet: 10.1.0.0/24
+          gateway: 10.1.0.1
