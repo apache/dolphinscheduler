@@ -48,7 +48,7 @@ services:
     expose:
       - 9000
     networks:
-      - e2e
+      - e2e1
     environment:
       MINIO_ROOT_USER: accessKey123
       MINIO_ROOT_PASSWORD: secretKey123
