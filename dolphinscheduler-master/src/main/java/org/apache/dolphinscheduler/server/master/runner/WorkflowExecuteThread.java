@@ -1528,27 +1528,25 @@ public class WorkflowExecuteThread {
     }
 
     /**
-     * get recovery task instance
+     * get recovery task instance list
      *
-     * @param taskId task id
-     * @return recovery task instance
+     * @param taskIdArray task id array
+     * @return recovery task instance list
      */
-    private TaskInstance getRecoveryTaskInstance(String taskId) {
-        if (!StringUtils.isNotEmpty(taskId)) {
-            return null;
+    private List<TaskInstance> getRecoverTaskInstanceList(String[] taskIdArray) {
+        if (taskIdArray == null || taskIdArray.length == 0) {
+            return new ArrayList<>();
         }
-        try {
-            Integer intId = Integer.valueOf(taskId);
-            TaskInstance task = processService.findTaskInstanceById(intId);
-            if (task == null) {
-                logger.error("start node id cannot be found: {}", taskId);
-            } else {
-                return task;
+        List<Integer> taskIdList = new ArrayList<>(taskIdArray.length);
+        for (String taskId : taskIdArray) {
+            try {
+                Integer id = Integer.valueOf(taskId);
+                taskIdList.add(id);
+            } catch (Exception e) {
+                logger.error("get recovery task instance failed ", e);
             }
-        } catch (Exception e) {
-            logger.error("get recovery task instance failed ", e);
         }
-        return null;
+        return processService.findTaskInstanceByIdList(taskIdList);
     }
 
     /**
@@ -1564,12 +1562,7 @@ public class WorkflowExecuteThread {
 
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            for (String nodeId : idList) {
-                TaskInstance task = getRecoveryTaskInstance(nodeId);
-                if (task != null) {
-                    instanceList.add(task);
-                }
-            }
+            instanceList = getRecoverTaskInstanceList(idList);
         }
         return instanceList;
     }
