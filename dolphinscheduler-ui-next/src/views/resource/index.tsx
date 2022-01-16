@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-.connections {
-  font-size: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 160px;
-  color: dodgerblue;
-}
+import { defineComponent } from 'vue'
+
+const resource = defineComponent({
+  name: 'resource',
+  setup() {},
+  render() {
+    return {}
+  }
+})
+
+export default resource

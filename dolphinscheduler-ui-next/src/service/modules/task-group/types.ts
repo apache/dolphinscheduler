@@ -15,11 +15,52 @@
  * limitations under the License.
  */
 
-.connections {
-  font-size: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 160px;
-  color: dodgerblue;
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
+
+interface TaskGroupIdReq {
+  id: number
+}
+
+interface TaskGroupReq {
+  name: string
+  projectCode: string
+  groupSize: number
+  description: string
+}
+
+interface TaskGroupUpdateReq extends TaskGroupReq, TaskGroupIdReq {}
+
+interface TaskGroup {
+  id: number
+  name: string
+  projectCode: number
+  projectName: string
+  groupSize: number
+  useSize: number
+  status: number
+  description: string
+  createTime: string
+  updateTime: string
+}
+
+interface TaskGroupRes {
+  totalList: TaskGroup[]
+  total: number
+  totalPage: number
+  pageSize: number
+  currentPage: number
+  start: number
+}
+
+export {
+  ListReq,
+  TaskGroupIdReq,
+  TaskGroupReq,
+  TaskGroupUpdateReq,
+  TaskGroup,
+  TaskGroupRes
 }

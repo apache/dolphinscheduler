@@ -41,7 +41,8 @@ import {
   SlackOutlined,
   EnvironmentOutlined,
   KeyOutlined,
-  SafetyOutlined
+  SafetyOutlined,
+  GroupOutlined
 } from '@vicons/antd'
 
 export function useDataList() {
@@ -143,6 +144,17 @@ export function useDataList() {
               {
                 label: t('menu.function_manage'),
                 key: 'function-manage'
+              }
+            ]
+          },
+          {
+            label: t('menu.task_group_manage'),
+            key: 'task-group-manage',
+            icon: renderIcon(GroupOutlined),
+            children: [
+              {
+                label: t('menu.task_group_option'),
+                key: 'task-group-option'
               }
             ]
           }
