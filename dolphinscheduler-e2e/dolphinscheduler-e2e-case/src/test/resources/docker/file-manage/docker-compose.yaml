@@ -34,14 +34,16 @@ services:
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
+    extra_hosts:
+      - "s3:dolphinscheduler.s3"
     depends_on:
-      awss3:
+      s3:
         condition: service_healthy
       mc:
         condition: service_healthy
-  awss3:
+  s3:
     image: minio/minio:latest
-    hostname: awss3
+    hostname: s3
     tty: true
     stdin_open: true
     command: server /data --console-address ":9001"
@@ -66,7 +68,7 @@ services:
     networks:
       - e2e
     command: bash -c '
-      mc alias set s3 http://awss3:9000 accessKey123 secretKey123
+      mc alias set s3 http://s3:9000 accessKey123 secretKey123
       && mc mb s3/dolphinscheduler && tail -f /dev/null'
     healthcheck:
       test: [ "CMD", "echo", "1" ]
@@ -74,7 +76,7 @@ services:
       timeout: 120s
       retries: 120
     depends_on:
-      awss3:
+      s3:
         condition: service_healthy
 networks:
   e2e:
