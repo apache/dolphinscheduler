@@ -71,7 +71,10 @@ const menu = {
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
   environment_manage: '环境管理',
-  token_manage: '令牌管理'
+  token_manage: '令牌管理',
+  task_group_manage: '任务组管理',
+  task_group_option: '任务组配置',
+  task_group_queue: '任务组队列'
 }
 
 const home = {
@@ -185,6 +188,51 @@ const resource = {
     file_details: '文件详情',
     return: '返回',
     save: '保存'
+  },
+  task_group_option: {
+    id: '编号',
+    manage: '任务组管理',
+    option: '任务组配置',
+    create: '创建任务组',
+    edit: '编辑任务组',
+    delete: '删除任务组',
+    view_queue: '查看任务组队列',
+    switch_status: '切换任务组状态',
+    code: '任务组编号',
+    name: '任务组名称',
+    project_name: '项目名称',
+    resource_pool_size: '资源容量',
+    resource_used_pool_size: '已用资源',
+    desc: '描述信息',
+    status: '任务组状态',
+    enable_status: '启用',
+    disable_status: '不可用',
+    please_enter_name: '请输入任务组名称',
+    please_enter_desc: '请输入任务组描述',
+    please_enter_resource_pool_size: '请输入资源容量大小',
+    resource_pool_size_be_a_number: '资源容量大小必须大于等于1的数值',
+    please_select_project: '请选择项目',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    actions: '操作',
+    please_enter_keywords: '请输入搜索关键词'
+  },
+  task_group_queue: {
+    queue: '任务组队列',
+    priority: '组内优先级',
+    priority_be_a_number: '优先级必须是大于等于0的数值',
+    force_starting_status: '是否强制启动',
+    in_queue: '是否排队中',
+    task_status: '任务状态',
+    view_task_group_queue: '查看任务组队列',
+    the_status_of_waiting: '等待入队',
+    the_status_of_queuing: '排队中',
+    the_status_of_releasing: '已释放',
+    modify_priority: '修改优先级',
+    force_to_start_task: '强制启动',
+    priority_not_empty: '优先级不能为空',
+    priority_must_be_number: '优先级必须是数值',
+    please_select_task_name: '请选择节点名称'
   }
 }
 
@@ -233,6 +281,24 @@ const security = {
     edit: '编辑',
     delete: '删除'
   },
+  alarm_group: {
+    create_alarm_group: '创建告警组',
+    edit_alarm_group: '编辑告警组',
+    search_tips: '请输入关键词',
+    alert_group_name_tips: '请输入告警组名称',
+    alarm_plugin_instance: '告警组实例',
+    alarm_plugin_instance_tips: '请选择告警组实例',
+    alarm_group_description_tips: '请输入告警组描述',
+    alert_group_name: '告警组名称',
+    alarm_group_description: '告警组描述',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    actions: '操作',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除'
+  },
   yarn_queue: {
     create_queue: '创建队列',
     edit_queue: '编辑队列',
@@ -266,6 +332,7 @@ const security = {
     worker_group_tips: '请选择Worker分组'
   }
 }
+
 const datasource = {
   datasource: '数据源',
   create_datasource: '创建数据源',

@@ -602,6 +602,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insertVersion;
         if (processDefinition.equals(processDefinitionDeepCopy)) {
             insertVersion = processDefinitionDeepCopy.getVersion();
+            ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinition.getCode(), insertVersion);
+            processDefinitionLog.setOperator(loginUser.getId());
+            processDefinitionLog.setOperateTime(new Date());
+            int update = processDefinitionLogMapper.updateById(processDefinitionLog);
         } else {
             processDefinition.setUpdateTime(new Date());
             insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);

@@ -15,11 +15,41 @@
  * limitations under the License.
  */
 
-.connections {
-  font-size: 100px;
+.toolbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  min-height: 160px;
-  color: dodgerblue;
+  padding: 0 0 0 0;
+  .left {
+    align-items: center;
+  }
+  .right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.table-card {
+  margin-top: 2px;
+
+  .table-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin: 0 2px 0 0;
+    }
+    div {
+      margin: 0 2px 0 0;
+    }
+  }
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }

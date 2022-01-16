@@ -29,13 +29,14 @@ specifiers:
   '@vueuse/core': ^7.5.3
   axios: ^0.24.0
   dart-sass: ^1.25.0
-  date-fns: ^2.28.0
+  date-fns: ^2.27.0
   echarts: ^5.2.2
   eslint: ^8.6.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-vue: ^8.2.0
   lodash: ^4.17.21
+  monaco-editor: ^0.31.1
   naive-ui: 2.23.2
   nprogress: ^0.2.0
   pinia: ^2.0.9
@@ -60,6 +61,7 @@ dependencies:
   date-fns: 2.28.0
   echarts: 5.2.2
   lodash: 4.17.21
+  monaco-editor: 0.31.1
   naive-ui: 2.23.2_vue@3.2.26
   nprogress: 0.2.0
   pinia: 2.0.9_typescript@4.5.4+vue@3.2.26
@@ -2262,6 +2264,10 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dev: true
+
+  /monaco-editor/0.31.1:
+    resolution: {integrity: sha512-FYPwxGZAeP6mRRyrr5XTGHD9gRXVjy7GUzF4IPChnyt3fS5WrNxIkS8DNujWf6EQy0Zlzpxw8oTVE+mWI2/D1Q==}
+    dev: false
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
