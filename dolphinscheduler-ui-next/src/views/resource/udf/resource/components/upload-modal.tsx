@@ -37,12 +37,8 @@ export default defineComponent({
     const { uploadState: state, resetUploadForm: resetForm } = useForm()
     const { handleUploadFile } = useModal(state, ctx)
 
-    const hideModal = () => {
-      ctx.emit('update:show')
-    }
-
     const handleFolder = () => {
-      handleUploadFile(hideModal, resetForm)
+      handleUploadFile(resetForm)
     }
 
     const customRequest = ({ file }: any) => {
@@ -51,7 +47,6 @@ export default defineComponent({
     }
 
     return {
-      hideModal,
       handleFolder,
       customRequest,
       ...toRefs(state)
@@ -62,7 +57,7 @@ export default defineComponent({
     return (
       <Modal
         show={this.$props.show}
-        title={t('resource.udf.create_folder')}
+        title={t('resource.udf.file_upload')}
         onCancel={this.hideModal}
         onConfirm={this.handleFolder}
       >
@@ -90,7 +85,7 @@ export default defineComponent({
               v-model={[this.uploadForm.file, 'value']}
               customRequest={this.customRequest}
             >
-              <NButton>{t('resource.udf.upload_files')}</NButton>
+              <NButton>{t('resource.udf.upload')}</NButton>
             </NUpload>
           </NFormItem>
         </NForm>

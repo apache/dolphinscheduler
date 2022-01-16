@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
+import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { bytesToSize } from '@/utils/common'
@@ -24,25 +24,20 @@ import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@vicons/antd'
+import { useAsyncState } from '@vueuse/core'
+import {
+  queryResourceListPaging,
+  downloadResource,
+  deleteResource
+} from '@/service/modules/resources'
+import { IUdfResourceParam, IUdfRes } from './types'
 import styles from './index.module.scss'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const handleEdit = (row) => {
-
-  }
-
-  const handleDown = () => {
-
-  }
-
-  const handleDelete = () => {
-
-  }
-
-  const columnsRef: TableColumns<any> = [
+  const columns: TableColumns<any> = [
     {
       title: t('resource.udf.id'),
       key: 'id',
@@ -118,9 +113,7 @@ export function useTable() {
                       circle: true,
                       type: 'info',
                       size: 'tiny',
-                      onClick: () => {
-                        handleDown(row)
-                      }
+                      onClick: () => downloadResource(row.id)
                     },
                     {
                       icon: () => h(DownloadOutlined)
@@ -133,7 +126,7 @@ export function useTable() {
               NPopconfirm,
               {
                 onPositiveClick: () => {
-                  handleDelete(row)
+                  handleDelete(row.id)
                 }
               },
               {
@@ -157,7 +150,7 @@ export function useTable() {
                       default: () => t('resource.udf.delete')
                     }
                   ),
-                default: () => t('security.tenant.delete_confirm')
+                default: () => t('resource.udf.delete_confirm')
               }
             )
           ]
@@ -166,7 +159,46 @@ export function useTable() {
     }
   ]
 
+  const variables = reactive({
+    columns,
+    tableData: [],
+    id: ref(-1),
+    page: ref(1),
+    pageSize: ref(10),
+    searchVal: ref(),
+    totalPage: ref(1)
+  })
+
+  const getTableData = (params: IUdfResourceParam) => {
+    const { state } = useAsyncState(
+      queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
+        variables.totalPage = res.totalPage
+        variables.tableData = res.totalList.map((item: any) => {
+          return { ...item }
+        })
+      }),
+      { total: 0, table: [] }
+    )
+    return state
+  }
+
+  const handleEdit = (row) => {}
+
+  const handleDown = () => {}
+
+  const handleDelete = (id: number) => {
+    deleteResource(id).then(() =>
+      getTableData({
+        id: variables.id,
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    )
+  }
+
   return {
-    columnsRef
+    variables,
+    getTableData
   }
 }

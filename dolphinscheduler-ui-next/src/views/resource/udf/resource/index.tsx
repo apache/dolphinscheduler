@@ -38,41 +38,39 @@ import {
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import Card from '@/components/card'
-import { useResource } from './use-resource'
 import FolderModal from './components/folder-modal'
 import UploadModal from './components/upload-modal'
-import { IUdfResourceParam } from './types'
 import { useTable } from './use-table'
 import styles from './index.module.scss'
 
 export default defineComponent({
   name: 'resource-manage',
   setup() {
-    const idRef = ref(-1)
-    const searchRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
-    const resourceRef = ref()
-    const resourceVariables = reactive<IUdfResourceParam>({
-      id: -1,
-      pageSize: 10,
-      pageNo: 1,
-      searchVal: undefined,
-      type: 'UDF'
-    })
 
-    const { getResource } = useResource()
+    const { variables, getTableData } = useTable()
+
+    const requestData = () => {
+      getTableData({
+        id: variables.id,
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    }
 
     const handleUpdateList = () => {
-      resourceRef.value = getResource(resourceVariables)
+      requestData()
+    }
+
+    const handleChangePageSize = () => {
+      variables.page = 1
+      requestData()
     }
 
     const handleSearch = () => {
-      resourceRef.value = getResource({
-        ...resourceVariables,
-        id: idRef.value,
-        searchVal: searchRef.value
-      })
+      requestData()
     }
 
     const handleShowModal = (showRef: Ref<Boolean>) => {
@@ -88,23 +86,24 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      resourceRef.value = getResource(resourceVariables)
+      requestData()
     })
 
     return {
-      searchRef,
-      resourceRef,
+      ...toRefs(variables),
       folderShowRef,
       uploadShowRef,
-      handleUpdateList,
+      requestData,
       handleSearch,
+      handleUpdateList,
       handleCreateFolder,
-      handleUploadFile
+      handleUploadFile,
+      handleChangePageSize
     }
   },
   render() {
     const { t } = useI18n()
-    const { columnsRef } = useTable()
+    // const { columnsRef } = useTable()
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
@@ -131,7 +130,7 @@ export default defineComponent({
                 <div class={styles.list}>
                   <NInput
                     placeholder={t('resource.udf.enter_keyword_tips')}
-                    v-model={[this.searchRef, 'value']}
+                    v-model={[this.searchVal, 'value']}
                   />
                 </div>
               </div>
@@ -141,12 +140,24 @@ export default defineComponent({
         <Card title={t('resource.udf.udf_resources')}>
           <NDataTable
             remote
-            columns={columnsRef}
-            data={this.resourceRef?.value.table}
+            columns={this.columns}
+            data={this.tableData}
             striped
             size={'small'}
             class={styles.table}
           />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              show-size-picker
+              page-sizes={[10, 30, 50]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
+            />
+          </div>
         </Card>
         <FolderModal
           v-model:show={this.folderShowRef}

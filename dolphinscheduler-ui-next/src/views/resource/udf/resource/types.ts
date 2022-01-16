@@ -20,7 +20,6 @@ export interface IUdfResourceParam {
   pageSize: number
   pageNo: number
   searchVal: string | undefined
-  type: 'UDF'
 }
 
 export interface IUdfRes {

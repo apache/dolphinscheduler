@@ -207,7 +207,10 @@ const resource = {
     delete: 'Delete',
     delete_confirm: 'Delete?',
     success: 'Success',
+    folder_name: 'Folder Name',
+    upload: 'Upload',
     upload_files: 'Upload Files',
+    file_upload: 'File Upload',
     enter_keyword_tips: 'Please enter keyword',
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description'

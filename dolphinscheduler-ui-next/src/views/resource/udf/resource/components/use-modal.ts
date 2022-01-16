@@ -52,7 +52,7 @@ export function useModal(
     })
   }
 
-  const handleUploadFile = (hideModal: () => void, resetForm: () => void) => {
+  const handleUploadFile = (resetForm: () => void) => {
     state.uploadFormRef.validate(async (valid: any) => {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = fileStore.getCurrentDir || '/'
@@ -73,7 +73,7 @@ export function useModal(
           window.$message.error(error.message)
         }
 
-        hideModal()
+        ctx.emit('update:show')
         resetForm()
       }
     })
