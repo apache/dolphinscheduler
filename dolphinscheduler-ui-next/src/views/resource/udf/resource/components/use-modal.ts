@@ -20,7 +20,11 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { useFileStore } from '@/store/file/file'
-import { createDirectory, createResource } from '@/service/modules/resources'
+import {
+  createDirectory,
+  createResource,
+  updateResource
+} from '@/service/modules/resources'
 
 export function useModal(
   state: any,
@@ -30,29 +34,64 @@ export function useModal(
   const router: Router = useRouter()
   const fileStore = useFileStore()
 
-  const handleCreateFolder = (hideModal: () => void, resetForm: () => void) => {
+  const handleCreateResource = async () => {
     const pid = router.currentRoute.value.params.id || -1
     const currentDir = fileStore.getCurrentDir || '/'
+
+    submitRequest(async () =>
+      createDirectory({
+        ...state.folderForm,
+        ...{ pid, currentDir }
+      })
+    )
+  }
+
+  const handleRenameResource = async (id: number) => {
+    submitRequest(async () => {
+      updateResource(
+        {
+          ...state.folderForm,
+          ...{ id }
+        },
+        state.folderForm.id
+      )
+    })
+  }
+
+  const submitRequest = (serviceHandle: any) => {
     state.folderFormRef.validate(async (valid: any) => {
       if (!valid) {
         try {
-          await createDirectory({
-            ...state.folderForm,
-            ...{ pid, currentDir }
-          })
-
+          await serviceHandle()
           window.$message.success(t('resource.udf.success'))
           ctx.emit('updateList')
         } catch (error: any) {
           window.$message.error(error.message)
         }
-        hideModal()
-        resetForm()
+        ctx.emit('update:show')
       }
     })
   }
 
-  const handleUploadFile = (resetForm: () => void) => {
+  const handleCreateOrRenameFolder = (status: number) => {
+    const pid = router.currentRoute.value.params.id || -1
+    const currentDir = fileStore.getCurrentDir || '/'
+    const service = status === 0 ? handleCreateResource : handleRenameResource
+    state.folderFormRef.validate(async (valid: any) => {
+      if (!valid) {
+        try {
+          await service(pid as number, currentDir)
+          window.$message.success(t('resource.udf.success'))
+          ctx.emit('updateList')
+        } catch (error: any) {
+          window.$message.error(error.message)
+        }
+        ctx.emit('update:show')
+      }
+    })
+  }
+
+  const handleUploadFile = () => {
     state.uploadFormRef.validate(async (valid: any) => {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = fileStore.getCurrentDir || '/'
@@ -72,15 +111,15 @@ export function useModal(
         } catch (error: any) {
           window.$message.error(error.message)
         }
-
         ctx.emit('update:show')
-        resetForm()
       }
     })
   }
 
   return {
-    handleCreateFolder,
+    handleCreateResource,
+    handleRenameResource,
+    handleCreateOrRenameFolder,
     handleUploadFile
   }
 }

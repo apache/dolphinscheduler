@@ -15,14 +15,19 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, PropType } from 'vue'
+import { defineComponent, toRefs, PropType, watch } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
+import type { IUdf } from '../types'
 
 const props = {
+  row: {
+    type: Object as PropType<IUdf>,
+    default: {}
+  },
   show: {
     type: Boolean as PropType<boolean>,
     default: false
@@ -34,20 +39,34 @@ export default defineComponent({
   props,
   emits: ['update:show', 'updateList'],
   setup(props, ctx) {
-    const { folderState: state, resetFolderForm: resetForm } = useForm()
-    const { handleCreateFolder } = useModal(state, ctx)
+    const { folderState: state } = useForm()
+
+    const { handleCreateResource, handleRenameResource } = useModal(state, ctx)
 
     const hideModal = () => {
       ctx.emit('update:show')
     }
 
-    const handleFolder = () => {
-      handleCreateFolder(hideModal, resetForm)
+    const handleCreate = () => {
+      handleCreateResource()
     }
+
+    const handleRename = () => {
+      handleRenameResource(props.row.id)
+    }
+
+    watch(
+      () => props.row,
+      () => {
+        state.folderForm.name = props.row.alias
+        state.folderForm.description = props.row.description
+      }
+    )
 
     return {
       hideModal,
-      handleFolder,
+      handleCreate,
+      handleRename,
       ...toRefs(state)
     }
   },
@@ -58,7 +77,7 @@ export default defineComponent({
         show={this.$props.show}
         title={t('resource.udf.create_folder')}
         onCancel={this.hideModal}
-        onConfirm={this.handleFolder}
+        onConfirm={this.row.id ? this.handleCreate : this.handleCreate}
       >
         <NForm
           rules={this.rules}

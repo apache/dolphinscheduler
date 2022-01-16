@@ -37,6 +37,10 @@ export default defineComponent({
     const { uploadState: state, resetUploadForm: resetForm } = useForm()
     const { handleUploadFile } = useModal(state, ctx)
 
+    const hideModal = () => {
+      ctx.emit('update:show')
+    }
+
     const handleFolder = () => {
       handleUploadFile(resetForm)
     }
@@ -47,6 +51,7 @@ export default defineComponent({
     }
 
     return {
+      hideModal,
       handleFolder,
       customRequest,
       ...toRefs(state)

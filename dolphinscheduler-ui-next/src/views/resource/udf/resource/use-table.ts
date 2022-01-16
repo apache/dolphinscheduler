@@ -161,12 +161,15 @@ export function useTable() {
 
   const variables = reactive({
     columns,
+    row: {},
     tableData: [],
     id: ref(-1),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
-    totalPage: ref(1)
+    totalPage: ref(1),
+    folderShowRef: ref(false),
+    uploadShowRef: ref(false)
   })
 
   const getTableData = (params: IUdfResourceParam) => {
@@ -182,9 +185,10 @@ export function useTable() {
     return state
   }
 
-  const handleEdit = (row) => {}
-
-  const handleDown = () => {}
+  const handleEdit = (row: any) => {
+    variables.folderShowRef = true
+    variables.row = row
+  }
 
   const handleDelete = (id: number) => {
     deleteResource(id).then(() =>

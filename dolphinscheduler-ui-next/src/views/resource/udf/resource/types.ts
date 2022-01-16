@@ -22,7 +22,7 @@ export interface IUdfResourceParam {
   searchVal: string | undefined
 }
 
-export interface IUdfRes {
+export interface IUdf {
   id: number
   pid: number
   userId: number

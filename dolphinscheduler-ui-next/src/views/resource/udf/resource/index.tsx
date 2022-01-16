@@ -24,7 +24,8 @@ import {
   ShallowRef,
   onMounted,
   unref,
-  watch
+  watch,
+  toRef
 } from 'vue'
 import {
   NIcon,
@@ -46,9 +47,6 @@ import styles from './index.module.scss'
 export default defineComponent({
   name: 'resource-manage',
   setup() {
-    const folderShowRef = ref(false)
-    const uploadShowRef = ref(false)
-
     const { variables, getTableData } = useTable()
 
     const requestData = () => {
@@ -78,11 +76,12 @@ export default defineComponent({
     }
 
     const handleCreateFolder = () => {
-      handleShowModal(folderShowRef)
+      variables.row = {}
+      handleShowModal(toRef(variables, 'folderShowRef'))
     }
 
     const handleUploadFile = () => {
-      handleShowModal(uploadShowRef)
+      handleShowModal(toRef(variables, 'uploadShowRef'))
     }
 
     onMounted(() => {
@@ -91,8 +90,6 @@ export default defineComponent({
 
     return {
       ...toRefs(variables),
-      folderShowRef,
-      uploadShowRef,
       requestData,
       handleSearch,
       handleUpdateList,
@@ -103,7 +100,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    // const { columnsRef } = useTable()
+
     return (
       <div class={styles.content}>
         <Card class={styles.card}>
@@ -160,6 +157,7 @@ export default defineComponent({
           </div>
         </Card>
         <FolderModal
+          v-model:row={this.row}
           v-model:show={this.folderShowRef}
           onUpdateList={this.handleUpdateList}
         />
