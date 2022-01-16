@@ -32,7 +32,9 @@ const JsonHighlight = defineComponent({
   props,
   render(props: { rowData: { connectionParams: string } }) {
     return (
-      <pre class={styles['json-highlight']}>{syntaxHighlight(props.rowData.connectionParams)}</pre>
+      <pre class={styles['json-highlight']}>
+        {syntaxHighlight(props.rowData.connectionParams)}
+      </pre>
     )
   }
 })

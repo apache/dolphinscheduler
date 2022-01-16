@@ -281,6 +281,24 @@ const security = {
     edit: '编辑',
     delete: '删除'
   },
+  alarm_group: {
+    create_alarm_group: '创建告警组',
+    edit_alarm_group: '编辑告警组',
+    search_tips: '请输入关键词',
+    alert_group_name_tips: '请输入告警组名称',
+    alarm_plugin_instance: '告警组实例',
+    alarm_plugin_instance_tips: '请选择告警组实例',
+    alarm_group_description_tips: '请输入告警组描述',
+    alert_group_name: '告警组名称',
+    alarm_group_description: '告警组描述',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    actions: '操作',
+    operation: '操作',
+    delete_confirm: '确定删除吗?',
+    edit: '编辑',
+    delete: '删除'
+  },
   yarn_queue: {
     create_queue: '创建队列',
     edit_queue: '编辑队列',
@@ -314,6 +332,7 @@ const security = {
     worker_group_tips: '请选择Worker分组'
   }
 }
+
 const datasource = {
   datasource: '数据源',
   create_datasource: '创建数据源',
