@@ -281,6 +281,23 @@ const security = {
     edit: 'Edit',
     delete: 'Delete'
   },
+  alarm_group: {
+    create_alarm_group: 'Create Alarm Group',
+    edit_alarm_group: 'Edit Alarm Group',
+    search_tips: 'Please enter keywords',
+    alert_group_name_tips: 'Please enter your alert group name',
+    alarm_plugin_instance: 'Alarm Plugin Instance',
+    alarm_plugin_instance_tips: 'Please select alert plugin instance',
+    alarm_group_description_tips: 'Please enter your alarm group description',
+    alert_group_name: 'Alert Group Name',
+    alarm_group_description: 'Alarm Group Description',
+    create_time: 'Create Time',
+    update_time: 'Update Time',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete'
+  },
   yarn_queue: {
     create_queue: 'Create Queue',
     edit_queue: 'Edit Queue',
@@ -314,6 +331,7 @@ const security = {
     worker_group_tips: 'Please select worker group'
   }
 }
+
 const datasource = {
   datasource: 'DataSource',
   create_datasource: 'Create DataSource',

@@ -46,6 +46,14 @@ export default {
       }
     },
     {
+      path: '/security/alarm-group-manage',
+      name: 'alarm-group-manage',
+      component: components['alarm-group-manage'],
+      meta: {
+        title: '告警组管理'
+      }
+    },
+    {
       path: '/security/yarn-queue-manage',
       name: 'yarn-queue-manage',
       component: components['yarn-queue-manage'],
