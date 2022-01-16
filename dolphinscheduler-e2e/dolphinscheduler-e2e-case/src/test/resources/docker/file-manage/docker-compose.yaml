@@ -62,6 +62,8 @@ services:
     hostname: mc
     tty: true
     stdin_open: true
+    networks:
+      - e2e
     command: bash -c '
       mc alias set s3 http://s3:9000 accessKey123 secretKey123
       && mc mb s3/dolphinscheduler && tail -f /dev/null'
