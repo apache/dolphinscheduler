@@ -52,7 +52,7 @@ services:
     environment:
       MINIO_ROOT_USER: accessKey123
       MINIO_ROOT_PASSWORD: secretKey123
-      OSTNAME_EXTERNAL: s3
+      HOSTNAME_EXTERNAL: s3
       SERVICES: s3
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
