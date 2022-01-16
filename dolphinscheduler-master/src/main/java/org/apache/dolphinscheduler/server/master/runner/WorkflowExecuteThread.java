@@ -1550,30 +1550,6 @@ public class WorkflowExecuteThread {
     }
 
     /**
-     * get recovery task instance
-     *
-     * @param taskId task id
-     * @return recovery task instance
-     */
-    private TaskInstance getRecoveryTaskInstance(String taskId) {
-        if (!StringUtils.isNotEmpty(taskId)) {
-            return null;
-        }
-        try {
-            Integer intId = Integer.valueOf(taskId);
-            TaskInstance task = processService.findTaskInstanceById(intId);
-            if (task == null) {
-                logger.error("start node id cannot be found: {}", taskId);
-            } else {
-                return task;
-            }
-        } catch (Exception e) {
-            logger.error("get recovery task instance failed ", e);
-        }
-        return null;
-    }
-
-    /**
      * get start task instance list
      *
      * @param cmdParam command param
