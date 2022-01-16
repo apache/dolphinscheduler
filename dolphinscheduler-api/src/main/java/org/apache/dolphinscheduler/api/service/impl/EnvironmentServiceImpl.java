@@ -373,7 +373,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                 if (!StringUtils.isEmpty(key)) {
                     relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                             .lambda()
-                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode,code));
+                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode,code)
+                            .eq(EnvironmentWorkerGroupRelation::getWorkerGroup,key));
                 }
             });
             addWorkerGroupSet.stream().forEach(key -> {
