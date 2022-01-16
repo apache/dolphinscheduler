@@ -37,29 +37,41 @@ services:
     depends_on:
       s3:
         condition: service_healthy
+      mc:
+        condition: service_healthy
   s3:
     image: minio/minio:latest
     hostname: s3
     tty: true
     stdin_open: true
-    ports:
-      - 9000:9000
+    expose:
+      - 9000
     networks:
       - e2e
     environment:
       MINIO_ROOT_USER: accessKey123
       MINIO_ROOT_PASSWORD: secretKey123
-    command: |
-      server /data --console-address ":9001" \
-      && wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /tmp/mc \
-      && chmod +x /tmp/mc \
-      && /tmp/mc alias set s3 http://0.0.0.0:9000 accessKey123 secretKey123 \
-      && /tmp/mc mb s3/dolphinscheduler
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
       timeout: 120s
       retries: 120
-
+  mc:
+    image: minio/mc:latest
+    entrypoint: ""
+    hostname: mc
+    tty: true
+    stdin_open: true
+    command: bash -c '
+      mc alias set s3 http://s3:9000 accessKey123 secretKey123
+      && mc mb s3/dolphinscheduler && tail -f /dev/null'
+    healthcheck:
+      test: [ "CMD", "echo", "1" ]
+      interval: 5s
+      timeout: 120s
+      retries: 120
+    depends_on:
+      s3:
+        condition: service_healthy
 networks:
   e2e:
