@@ -109,7 +109,7 @@ jobs:
         if: "contains(matrix.case.name, 'FileManage')"
         run: |
           wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /tmp/mc \
-          && chmod +x /tmo/mc \
+          && chmod +x /tmp/mc \
           && /tmp/mc alias set s3 http://0.0.0.0:9000 accessKey123 secretKey123 \
           && /tmp/mc mb s3/dolphinscheduler
       - name: Run Test
