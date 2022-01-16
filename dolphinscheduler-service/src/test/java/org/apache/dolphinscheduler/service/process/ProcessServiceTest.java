@@ -70,6 +70,7 @@ import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -788,6 +789,23 @@ public class ProcessServiceTest {
 
         processService.releaseTaskGroup(taskInstance);
 
+    }
+
+    @Test
+    public void testFindTaskInstanceByIdList() {
+        List<Integer> emptyList = new ArrayList<>();
+        Mockito.when(taskInstanceMapper.selectBatchIds(emptyList)).thenReturn(new ArrayList<>());
+        Assert.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
+
+        List<Integer> idList = Collections.singletonList(1);
+        TaskInstance instance = new TaskInstance();
+        instance.setId(1);
+
+        Mockito.when(taskInstanceMapper.selectBatchIds(idList)).thenReturn(Collections.singletonList(instance));
+        List<TaskInstance> taskInstanceByIdList = processService.findTaskInstanceByIdList(idList);
+
+        Assert.assertEquals(1, taskInstanceByIdList.size());
+        Assert.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
     }
 
     private TaskGroupQueue getTaskGroupQueue() {
