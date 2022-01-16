@@ -36,6 +36,7 @@ services:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     links:
       - s3:dolphinscheduler.s3
+      - s3:dolphinscheduler.us-west-1.s3
     depends_on:
       s3:
         condition: service_healthy
