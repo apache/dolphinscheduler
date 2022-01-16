@@ -34,6 +34,8 @@ services:
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
+    links:
+      - dolphinscheduler.s3:s3
     depends_on:
       s3:
         condition: service_healthy
