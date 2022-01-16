@@ -44,6 +44,7 @@ services:
     hostname: s3
     tty: true
     stdin_open: true
+    command: server /data --console-address ":9001"
     expose:
       - 9000
     networks:
