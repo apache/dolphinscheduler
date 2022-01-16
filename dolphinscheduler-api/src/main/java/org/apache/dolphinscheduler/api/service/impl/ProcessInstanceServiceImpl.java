@@ -623,6 +623,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, String.valueOf(processInstanceId));
             return result;
         }
+        //check process instance status
+        if (!processInstance.getState().typeIsFinished()) {
+            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
+                    processInstance.getName(), processInstance.getState().toString(), "delete");
+            return result;
+        }
 
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
@@ -632,7 +638,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         try {
             processService.removeTaskLogFile(processInstanceId);
-        } catch (Exception e) {
+        } catch (Exception ignore) {
+            // ignore
         }
 
         // delete database cascade
