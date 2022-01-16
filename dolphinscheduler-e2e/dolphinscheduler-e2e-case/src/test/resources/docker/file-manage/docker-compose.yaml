@@ -34,9 +34,6 @@ services:
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
-    links:
-      - s3:dolphinscheduler.s3
-      - s3:dolphinscheduler.us-west-1.s3
     depends_on:
       s3:
         condition: service_healthy
@@ -48,8 +45,8 @@ services:
     tty: true
     stdin_open: true
     command: server /data --console-address ":9001"
-    expose:
-      - 9000
+    ports:
+      - 9000:9000
     networks:
       - e2e
     environment:
@@ -81,3 +78,8 @@ services:
         condition: service_healthy
 networks:
   e2e:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.1.1.0/124
+          gateway: 10.1.1.1
