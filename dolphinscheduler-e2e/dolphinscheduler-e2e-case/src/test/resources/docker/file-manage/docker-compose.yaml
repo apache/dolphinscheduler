@@ -34,8 +34,6 @@ services:
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
-    extra_hosts:
-      - "s3:dolphinscheduler.s3"
     depends_on:
       s3:
         condition: service_healthy
@@ -54,6 +52,8 @@ services:
     environment:
       MINIO_ROOT_USER: accessKey123
       MINIO_ROOT_PASSWORD: secretKey123
+      OSTNAME_EXTERNAL: s3
+      SERVICES: s3
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
