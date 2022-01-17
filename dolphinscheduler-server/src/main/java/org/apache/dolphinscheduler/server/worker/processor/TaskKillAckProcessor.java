@@ -33,9 +33,9 @@ public class TaskKillAckProcessor implements NettyRequestProcessor {
         }
 
         if (taskKillAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
-            ResponceCache.get().removeResponseCache(taskKillAckCommand.getTaskInstanceId());
+            ResponceCache.get().removeKillResponseCache(taskKillAckCommand.getTaskInstanceId());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillAckCommand.getTaskInstanceId());
-            logger.debug("removeResponseCache: taskinstance id:{}", taskKillAckCommand.getTaskInstanceId());
+            logger.debug("removeKillResponseCache: taskinstance id:{}", taskKillAckCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskKillAckCommand.getTaskInstanceId());
             logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskKillAckCommand.getTaskInstanceId());
         }
