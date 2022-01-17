@@ -114,7 +114,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "OptionsDataSourceType")
+        @FindBy(className = "el-select-dropdown__item")
         private List<WebElement> selectDataSourceType;
 
         @FindBy(id = "btnDataSourceTypeDropDown")
