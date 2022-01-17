@@ -326,6 +326,21 @@ const security = {
     edit: 'Edit',
     delete: 'Delete'
   },
+  worker_group: {
+    create_worker_group: 'Create Worker Group',
+    edit_worker_group: 'Edit Worker Group',
+    search_tips: 'Please enter keywords',
+    operation: 'Operation',
+    delete_confirm: 'Delete?',
+    edit: 'Edit',
+    delete: 'Delete',
+    group_name: 'Group Name',
+    group_name_tips: 'Please enter your group name',
+    worker_addresses: 'Worker Addresses',
+    worker_addresses_tips: 'Please select worker addresses',
+    create_time: 'Create Time',
+    update_time: 'Update Time'
+  },
   yarn_queue: {
     create_queue: 'Create Queue',
     edit_queue: 'Edit Queue',
