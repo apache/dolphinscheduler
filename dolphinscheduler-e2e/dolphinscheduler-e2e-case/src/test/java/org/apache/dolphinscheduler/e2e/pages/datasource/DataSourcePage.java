@@ -62,7 +62,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
-        createDataSourceForm().selectDataSourceType().selectByVisibleText(dataSourceType.toUpperCase());
+        new Select(createDataSourceForm().selectDataSourceType()).selectByVisibleText(dataSourceType.toUpperCase());
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
         createDataSourceForm().inputIP().sendKeys(ip);
@@ -107,7 +107,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         }
 
         @FindBy(className = "el-select")
-        private Select selectDataSourceType;
+        private WebElement selectDataSourceType;
 
         @FindBy(id = "inputDataSourceName")
         private WebElement inputDataSourceName;
