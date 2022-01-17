@@ -117,7 +117,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         @FindBy(id = "OptionsDataSourceType")
         private List<WebElement> selectDataSourceType;
 
-        @FindBy(xpath = "/html/body/div[9]/div/div[2]/div/div[1]/div/div[1]/div[2]/div/div/span/span/i")
+        @FindBy(id = "btnDataSourceTypeDropDown")
         private WebElement btnDataSourceTypeDropdown;
 
         @FindBy(id = "inputDataSourceName")
