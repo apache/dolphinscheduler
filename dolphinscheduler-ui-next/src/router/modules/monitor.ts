@@ -30,7 +30,7 @@ export default {
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/monitor/servers/master',
+      path: '/monitor/master',
       name: 'servers-master',
       component: components['master'],
       meta: {
@@ -38,7 +38,7 @@ export default {
       }
     },
     {
-      path: '/monitor/servers/worker',
+      path: '/monitor/worker',
       name: 'servers-worker',
       component: components['worker'],
       meta: {
@@ -46,7 +46,7 @@ export default {
       }
     },
     {
-      path: '/monitor/servers/db',
+      path: '/monitor/db',
       name: 'servers-db',
       component: components['db'],
       meta: {
@@ -54,7 +54,7 @@ export default {
       }
     },
     {
-      path: '/monitor/statistics/statistics',
+      path: '/monitor/statistics',
       name: 'statistics-statistics',
       component: components['statistics'],
       meta: {
