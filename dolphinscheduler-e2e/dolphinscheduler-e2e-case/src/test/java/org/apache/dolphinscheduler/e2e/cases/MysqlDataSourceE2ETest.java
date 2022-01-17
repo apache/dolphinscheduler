@@ -60,7 +60,7 @@ public class MysqlDataSourceE2ETest {
 
     private static final String database = "mysql";
 
-    private static final String jdbcParams = "";
+    private static final String jdbcParams = "{\"useSSL\": false}";
 
 
     @BeforeAll
