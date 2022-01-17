@@ -35,22 +35,51 @@ services:
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
     depends_on:
-      hdfs:
+      s3:
         condition: service_healthy
-  hdfs:
-    image: mdouchement/hdfs:latest
-    hostname: hdfs
+      mc:
+        condition: service_healthy
+  s3:
+    image: minio/minio:latest
+    hostname: s3
     tty: true
     stdin_open: true
-    expose:
-      - 8020
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
     networks:
       - e2e
+    environment:
+      MINIO_ROOT_USER: accessKey123
+      MINIO_ROOT_PASSWORD: secretKey123
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:50070" ]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
       timeout: 120s
       retries: 120
-
+  mc:
+    image: minio/mc:latest
+    entrypoint: ""
+    hostname: mc
+    tty: true
+    stdin_open: true
+    networks:
+      - e2e
+    command: bash -c '
+      mc alias set s3 http://s3:9000 accessKey123 secretKey123
+      && mc mb s3/dolphinscheduler && tail -f /dev/null'
+    healthcheck:
+      test: [ "CMD", "echo", "1" ]
+      interval: 5s
+      timeout: 120s
+      retries: 120
+    depends_on:
+      s3:
+        condition: service_healthy
 networks:
   e2e:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.1.0.0/24
+          gateway: 10.1.0.1
