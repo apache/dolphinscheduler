@@ -17,14 +17,17 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NPopconfirm, NSpace, NTag, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
   queryAllWorkerGroupsPaging,
   deleteById
 } from '@/service/modules/worker-groups'
-import type { WorkerGroupRes } from '@/service/modules/worker-groups/types'
+import type {
+  WorkerGroupRes,
+  WorkerGroupItem
+} from '@/service/modules/worker-groups/types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -47,7 +50,20 @@ export function useTable() {
       },
       {
         title: t('security.worker_group.worker_addresses'),
-        key: 'addrList'
+        key: 'addrList',
+        render: (row: WorkerGroupItem) =>
+          h(NSpace, null, {
+            default: () =>
+              row.addrList
+                .split(',')
+                .map((item: string) =>
+                  h(
+                    NTag,
+                    { type: 'success', size: 'small' },
+                    { default: () => item }
+                  )
+                )
+          })
       },
       {
         title: t('security.worker_group.create_time'),
