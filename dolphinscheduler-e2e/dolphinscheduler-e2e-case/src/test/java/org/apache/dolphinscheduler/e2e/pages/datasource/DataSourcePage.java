@@ -66,7 +66,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         createDataSourceForm().selectDataSourceType()
             .stream()
-            .filter(it -> it.getText().contains(dataSourceType.toLowerCase()))
+            .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
             .findFirst()
             .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toLowerCase())))
             .click();
@@ -114,7 +114,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(className = "el-select-dropdown__item")
+        @FindBy(id = "OptionsDataSourceType")
         private List<WebElement> selectDataSourceType;
 
         @FindBy(id = "btnDataSourceTypeDropDown")
