@@ -72,7 +72,7 @@ public class PostgresDataSourceE2ETest {
 
     @Test
     @Order(10)
-    void testCreateMysqlDataSource() {
+    void testCreatePostgresDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
         page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams);
@@ -85,7 +85,7 @@ public class PostgresDataSourceE2ETest {
 
     @Test
     @Order(20)
-    void testDeleteMysqlDataSource() {
+    void testDeletePostgresDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
         page.delete(dataSourceName);
