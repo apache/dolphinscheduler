@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
+import { useAsyncState, useAsyncQueue } from '@vueuse/core'
 import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useAsyncState } from '@vueuse/core'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
@@ -92,31 +92,27 @@ export function useTable(
   })
 
   const getTableData = (params: any) => {
-    const { state } = useAsyncState(
-      Promise.all([
-        queryTaskGroupListPaging(params),
-        queryAllProjectList()
-      ]).then((values) => {
-        variables.totalPage = values[0].totalPage
-        variables.tableData = values[0].totalList.map((item, index) => {
-          item.projectName = _.find(values[1], { code: item.projectCode }).name
-          item.createTime = format(
+    Promise.all([
+      queryTaskGroupListPaging(params),
+      queryAllProjectList()
+    ]).then((values: any[]) => {
+      variables.totalPage = values[0].totalPage
+      variables.tableData = values[0].totalList.map((item: any, index: number) => {
+        item.projectName = _.find(values[1], { code: item.projectCode }).name
+        item.createTime = format(
             new Date(item.createTime),
             'yyyy-MM-dd HH:mm:ss'
-          )
-          item.updateTime = format(
+        )
+        item.updateTime = format(
             new Date(item.updateTime),
             'yyyy-MM-dd HH:mm:ss'
-          )
-          return {
-            index: index + 1,
-            ...item
-          }
-        }) as any
-      }),
-      {}
-    )
-    return state
+        )
+        return {
+          index: index + 1,
+          ...item
+        }
+      })
+    })
   }
 
   return { getTableData, variables, columns }
