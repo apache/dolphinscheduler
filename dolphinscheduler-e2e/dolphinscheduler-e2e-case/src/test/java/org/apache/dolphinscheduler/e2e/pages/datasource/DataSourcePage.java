@@ -64,7 +64,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         createDataSourceForm().btnDataSourceTypeDropdown().click();
 
-        createDataSourceForm().selectDataSourceType()
+        createDataSourceForm.selectDataSourceType()
             .stream()
             .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
             .findFirst()
@@ -114,7 +114,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "OptionsDataSourceType")
+        @FindBy(className = "OptionsDataSourceType")
         private List<WebElement> selectDataSourceType;
 
         @FindBy(id = "btnDataSourceTypeDropDown")
