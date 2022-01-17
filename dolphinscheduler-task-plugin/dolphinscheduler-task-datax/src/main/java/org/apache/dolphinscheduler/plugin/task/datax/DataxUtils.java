@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import com.alibaba.druid.sql.dialect.clickhouse.parser.ClickhouseStatementParser;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
@@ -91,6 +92,8 @@ public class DataxUtils {
                 return new OracleStatementParser(sql);
             case SQLSERVER:
                 return new SQLServerStatementParser(sql);
+            case CLICKHOUSE:
+                return new ClickhouseStatementParser(sql);
             default:
                 return null;
         }
