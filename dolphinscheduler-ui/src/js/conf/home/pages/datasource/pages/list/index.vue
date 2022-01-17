@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <el-button size="mini" @click="_create('')">{{$t('Create Datasource')}}</el-button>
+          <el-button id="btnCreateDataSource" size="mini" @click="_create('')">{{$t('Create Datasource')}}</el-button>
           <el-dialog
             :title="item ?($t('Edit')+$t('Datasource')) : ($t('Create')+$t('Datasource'))"
             v-if="dialogVisible"
