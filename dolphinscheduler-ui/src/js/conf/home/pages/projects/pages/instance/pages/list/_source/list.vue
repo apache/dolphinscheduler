@@ -461,6 +461,7 @@
           this.strDelete = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this._onUpdate()
           this.checkAll = false
           this.strDelete = ''
           this.$message.error(e.msg || '')
