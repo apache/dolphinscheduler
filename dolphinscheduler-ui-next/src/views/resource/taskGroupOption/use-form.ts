@@ -18,6 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import type { FormRules } from 'naive-ui'
+import type { TaskGroupUpdateReq } from '@/service/modules/task-group/types'
 
 export function useForm() {
   const { t } = useI18n()
@@ -31,7 +32,7 @@ export function useForm() {
       groupSize: 0,
       status: 1,
       description: ''
-    },
+    } as TaskGroupUpdateReq,
     rules: {
       name: {
         required: true,
