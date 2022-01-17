@@ -115,6 +115,18 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void queryWorkerAddressList() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
+                        .header("sessionId", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertTrue(result != null && result.isSuccess());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testDeleteById() throws Exception {
         WorkerGroup workerGroup = new WorkerGroup();
         workerGroup.setId(12);
