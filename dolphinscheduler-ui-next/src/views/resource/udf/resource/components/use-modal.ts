@@ -38,17 +38,18 @@ export function useModal(
     const pid = router.currentRoute.value.params.id || -1
     const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
 
-    submitRequest(async () =>
-      createDirectory({
-        ...state.folderForm,
-        ...{ pid, currentDir }
-      })
+    submitRequest(
+      async () =>
+        await createDirectory({
+          ...state.folderForm,
+          ...{ pid, currentDir }
+        })
     )
   }
 
   const handleRenameResource = async (id: number) => {
     submitRequest(async () => {
-      updateResource(
+      await updateResource(
         {
           ...state.folderForm,
           ...{ id }

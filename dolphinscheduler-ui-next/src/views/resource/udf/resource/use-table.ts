@@ -232,6 +232,11 @@ export function useTable() {
   }
 
   const handleDelete = (id: number) => {
+    /* after deleting data from the current page, you need to jump forward when the page is empty. */
+    if (variables.tableData.length === 1 && variables.page > 1) {
+      variables.page -= 1
+    }
+
     deleteResource(id).then(() =>
       getTableData({
         id: variables.id,

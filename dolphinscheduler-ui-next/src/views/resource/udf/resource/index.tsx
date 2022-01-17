@@ -20,7 +20,6 @@ import {
   NIcon,
   NSpace,
   NDataTable,
-  NButtonGroup,
   NButton,
   NPagination,
   NInput,
@@ -59,6 +58,7 @@ export default defineComponent({
     }
 
     const handleSearch = () => {
+      variables.page = 1
       requestData()
     }
 
@@ -109,19 +109,17 @@ export default defineComponent({
         <Card class={styles.card}>
           <div class={styles.header}>
             <NSpace>
-              <NButtonGroup>
-                <NButton onClick={this.handleCreateFolder}>
-                  {t('resource.udf.create_folder')}
-                </NButton>
-                <NButton onClick={this.handleUploadFile}>
-                  {t('resource.udf.upload_udf_resources')}
-                </NButton>
-              </NButtonGroup>
+              <NButton type='primary' onClick={this.handleCreateFolder}>
+                {t('resource.udf.create_folder')}
+              </NButton>
+              <NButton strong secondary onClick={this.handleUploadFile}>
+                {t('resource.udf.upload_udf_resources')}
+              </NButton>
             </NSpace>
             <div class={styles.right}>
               <div class={styles.search}>
                 <div class={styles.list}>
-                  <NButton onClick={this.handleSearch}>
+                  <NButton type='primary' onClick={this.handleSearch}>
                     <NIcon>
                       <SearchOutlined />
                     </NIcon>
@@ -142,7 +140,6 @@ export default defineComponent({
             default: () => (
               <div>
                 <NDataTable
-                  remote
                   columns={this.columns}
                   data={this.tableData}
                   striped
