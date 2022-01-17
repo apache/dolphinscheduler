@@ -367,17 +367,18 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setOperator(loginUser.getId());
         env.setUpdateTime(new Date());
 
-        int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode,code));
+        int update = environmentMapper.update(env, new UpdateWrapper<Environment>().lambda().eq(Environment::getCode, code));
         if (update > 0) {
             deleteWorkerGroupSet.stream().forEach(key -> {
-                if (!StringUtils.isEmpty(key)) {
+                if (StringUtils.isNotEmpty(key)) {
                     relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                             .lambda()
-                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode,code));
+                            .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code)
+                            .eq(EnvironmentWorkerGroupRelation::getWorkerGroup, key));
                 }
             });
             addWorkerGroupSet.stream().forEach(key -> {
-                if (!StringUtils.isEmpty(key)) {
+                if (StringUtils.isNotEmpty(key)) {
                     EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                     relation.setEnvironmentCode(code);
                     relation.setWorkerGroup(key);
